@@ -29,7 +29,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
     updateDigital("accounts", [...accounts, { platform: "", username: "", action: "" }]);
   };
 
-  const updateAccount = (index: number, field: string, value: string) => {
+  const updateAccount = (index: number, field: string, value: string | boolean) => {
     const updated = [...accounts];
     updated[index] = { ...updated[index], [field]: value };
     updateDigital("accounts", updated);
@@ -254,12 +254,40 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
             </div>
             <div className="space-y-2">
               <Label>Preferred Action</Label>
-              <p className="text-xs text-muted-foreground">What should happen to this account (memorialize, delete, transfer)</p>
-              <Input
-                value={account.action || ""}
-                onChange={(e) => updateAccount(index, "action", e.target.value)}
-                placeholder="e.g., Memorialize, Delete, Transfer to..."
-              />
+              <p className="text-xs text-muted-foreground">What should happen to this account</p>
+              <div className="space-y-3">
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`memorialize-${index}`}
+                      checked={account.action_memorialize || false}
+                      onCheckedChange={(checked) => updateAccount(index, "action_memorialize", checked)}
+                    />
+                    <Label htmlFor={`memorialize-${index}`} className="font-normal">Memorialize</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`delete-${index}`}
+                      checked={account.action_delete || false}
+                      onCheckedChange={(checked) => updateAccount(index, "action_delete", checked)}
+                    />
+                    <Label htmlFor={`delete-${index}`} className="font-normal">Delete</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`transfer-${index}`}
+                      checked={account.action_transfer || false}
+                      onCheckedChange={(checked) => updateAccount(index, "action_transfer", checked)}
+                    />
+                    <Label htmlFor={`transfer-${index}`} className="font-normal">Transfer</Label>
+                  </div>
+                </div>
+                <Input
+                  value={account.action_custom || ""}
+                  onChange={(e) => updateAccount(index, "action_custom", e.target.value)}
+                  placeholder="Additional instructions or specify transfer recipient..."
+                />
+              </div>
             </div>
           </Card>
         ))}

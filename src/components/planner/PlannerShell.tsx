@@ -5,6 +5,12 @@ import { Download, Mail, MessageSquare, Facebook, FileText } from "lucide-react"
 import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useTranslation } from "react-i18next";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import everlastingLogo from "@/assets/everlasting-logo.png";
 
 interface PlannerShellProps {
@@ -72,34 +78,43 @@ export const PlannerShell = ({
 
           {/* Actions */}
           <div className="mt-8 space-y-2">
-            <h3 className="text-sm font-semibold text-sidebar-foreground mb-2">Actions</h3>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full justify-start"
-              onClick={onDownloadPDF}
-            >
-              <Download className="mr-2 h-4 w-4" />
-              {t("header.downloadPDF")}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full justify-start"
-              onClick={onEmailPlan}
-            >
-              <Mail className="mr-2 h-4 w-4" />
-              {t("header.emailPlan")}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full justify-start"
-              onClick={() => setShowContactDialog(true)}
-            >
-              <MessageSquare className="mr-2 h-4 w-4" />
-              {t("header.contact")}
-            </Button>
+            <h3 className="text-sm font-semibold text-sidebar-foreground mb-3">Complete & Save Your Plan</h3>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-start"
+                    onClick={onDownloadPDF}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    {t("header.downloadPDF")}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-popover text-popover-foreground border">
+                  <p>In PDF format</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-start"
+                    onClick={onEmailPlan}
+                  >
+                    <Mail className="mr-2 h-4 w-4" />
+                    {t("header.emailPlan")}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-popover text-popover-foreground border">
+                  <p>In PDF format</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <Button
               size="sm"
               className="w-full justify-start bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
@@ -146,6 +161,19 @@ export const PlannerShell = ({
                 <Facebook className="mr-1 h-4 w-4" />
                 Facebook
               </a>
+            </div>
+
+            {/* Contact/Suggest */}
+            <div className="mt-4 pt-4 border-t border-sidebar-border">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start"
+                onClick={() => setShowContactDialog(true)}
+              >
+                <MessageSquare className="mr-2 h-4 w-4" />
+                {t("header.contact")}
+              </Button>
             </div>
           </div>
         </aside>
