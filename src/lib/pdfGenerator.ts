@@ -79,15 +79,14 @@ export const generatePlanPDF = (planData: PlanData) => {
         pdf.text(line, 20, yPosition);
         yPosition += lineHeight;
       });
-    } else if (showBlankLines) {
-      // Add blank lines for printing/hand-writing
-      pdf.setTextColor(150, 150, 150);
-      for (let i = 0; i < 3; i++) {
-        checkPageBreak();
-        pdf.text("_".repeat(80), 20, yPosition);
-        yPosition += lineHeight;
-      }
+    } else {
+      // Show "(none provided)" in italic
+      pdf.setFont("helvetica", "italic");
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("(none provided)", 20, yPosition);
       pdf.setTextColor(0, 0, 0);
+      pdf.setFont("helvetica", "normal");
+      yPosition += lineHeight;
     }
     yPosition += 5;
   };
@@ -98,14 +97,15 @@ export const generatePlanPDF = (planData: PlanData) => {
     pdf.setFont("helvetica", "bold");
     
     if (inline) {
-      // Single line format: Bold Label: normal value
-      const labelText = sanitizeText(label) + ": ";
+      // Single line format: Bold Label:  normal value (with 2 spaces)
+      const labelText = sanitizeText(label) + ":  ";
       pdf.text(labelText, 20, yPosition);
       
       pdf.setFont("helvetica", "normal");
+      const labelWidth = pdf.getTextWidth(labelText);
+      
       if (value && value.trim()) {
         const sanitized = sanitizeText(value);
-        const labelWidth = pdf.getTextWidth(labelText);
         const lines = pdf.splitTextToSize(sanitized, 170 - labelWidth);
         pdf.text(lines[0], 20 + labelWidth, yPosition);
         yPosition += lineHeight;
@@ -117,10 +117,13 @@ export const generatePlanPDF = (planData: PlanData) => {
           yPosition += lineHeight;
         }
       } else {
-        pdf.setTextColor(150, 150, 150);
-        pdf.text("_".repeat(50), 20 + pdf.getTextWidth(labelText), yPosition);
-        yPosition += lineHeight;
+        // Show "(none provided)" in italic
+        pdf.setFont("helvetica", "italic");
+        pdf.setTextColor(100, 100, 100);
+        pdf.text("(none provided)", 20 + labelWidth, yPosition);
         pdf.setTextColor(0, 0, 0);
+        pdf.setFont("helvetica", "normal");
+        yPosition += lineHeight;
       }
     } else {
       // Multi-line format for longer content
@@ -137,10 +140,13 @@ export const generatePlanPDF = (planData: PlanData) => {
           yPosition += lineHeight;
         });
       } else {
-        pdf.setTextColor(150, 150, 150);
-        pdf.text("_".repeat(75), 25, yPosition);
-        yPosition += lineHeight;
+        // Show "(none provided)" in italic
+        pdf.setFont("helvetica", "italic");
+        pdf.setTextColor(100, 100, 100);
+        pdf.text("(none provided)", 25, yPosition);
         pdf.setTextColor(0, 0, 0);
+        pdf.setFont("helvetica", "normal");
+        yPosition += lineHeight;
       }
       yPosition += 3;
     }
@@ -452,6 +458,35 @@ export const generatePlanPDF = (planData: PlanData) => {
   pdf.text("Facebook: https://www.facebook.com/profile.php?id=61580859545223", 105, yPosition, { align: "center" });
 
   // Add logo to last page
+  addPageLogo();
+
+  // Appendix section for uploaded documents/images
+  pdf.addPage();
+  yPosition = 20;
+  addTitle("📎 Appendix");
+  pdf.setFontSize(10);
+  pdf.setFont("helvetica", "normal");
+  pdf.text("Note: Any uploaded images or documents should be attached separately", 20, yPosition);
+  yPosition += lineHeight;
+  pdf.text("to this printed document or stored in a secure location.", 20, yPosition);
+  yPosition += 10;
+  
+  pdf.setFont("helvetica", "italic");
+  pdf.setTextColor(100, 100, 100);
+  pdf.text("Space for additional documentation:", 20, yPosition);
+  yPosition += lineHeight + 5;
+  pdf.setTextColor(0, 0, 0);
+  
+  // Add lines for manual documentation tracking
+  pdf.setFont("helvetica", "normal");
+  for (let i = 0; i < 15; i++) {
+    checkPageBreak();
+    pdf.setTextColor(150, 150, 150);
+    pdf.text("_".repeat(80), 20, yPosition);
+    yPosition += lineHeight;
+  }
+  pdf.setTextColor(0, 0, 0);
+  
   addPageLogo();
 
   return pdf;
