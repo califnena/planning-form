@@ -19,6 +19,13 @@ export const SectionInstructions = ({ value, onChange }: SectionInstructionsProp
         </p>
       </div>
 
+      <div className="p-4 bg-muted/50 rounded-lg">
+        <h3 className="font-semibold mb-2">💡 Important Tip:</h3>
+        <p className="text-sm text-muted-foreground">
+          If you make any handwritten changes on the printed version of this document, it is recommended to initial and date those changes for the record.
+        </p>
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="instructions">General Instructions & Notes</Label>
         <p className="text-xs text-muted-foreground">Document locations, time-sensitive actions, key contacts, and access codes</p>

@@ -300,6 +300,26 @@ export const generatePlanPDF = (planData: PlanData) => {
 
   // Instructions Section
   addTitle("Instructions");
+  
+  // Add important tip about handwritten changes
+  pdf.setFontSize(10);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Important Tip:", 20, yPosition);
+  yPosition += lineHeight;
+  
+  pdf.setFont("helvetica", "italic");
+  pdf.setFontSize(9);
+  const tipText = "If you make any handwritten changes on this printed document, it is recommended to initial and date those changes for the record.";
+  const tipLines = pdf.splitTextToSize(tipText, 170);
+  tipLines.forEach((line: string) => {
+    checkPageBreak();
+    pdf.text(line, 20, yPosition);
+    yPosition += lineHeight - 1;
+  });
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+  yPosition += 8;
+  
   addSection("General Instructions", planData.instructions_notes);
 
   // Personal Information Section
