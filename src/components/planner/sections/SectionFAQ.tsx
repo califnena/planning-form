@@ -17,23 +17,12 @@ export const SectionFAQ = () => {
 
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="item-1">
-          <AccordionTrigger>What's the difference between prepaying and prearranging?</AccordionTrigger>
-          <AccordionContent>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              <strong>Prearranging</strong> means planning your funeral in advance by selecting services
-              and products, but not paying for them. <strong>Prepaying</strong> means paying for your
-              funeral in advance at today's prices, which can protect against inflation.
-            </p>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="item-2">
-          <AccordionTrigger>How do I compare funeral costs?</AccordionTrigger>
+          <AccordionTrigger>What is funeral preplanning and why do people do it?</AccordionTrigger>
           <AccordionContent>
             <div className="text-sm text-muted-foreground space-y-2">
               <p>
-                Under the FTC Funeral Rule, funeral homes must provide a General Price List (GPL) that
-                clearly itemizes costs. Get GPLs from multiple providers to compare prices.
+                Funeral preplanning means arranging your funeral and burial or cremation details ahead of time. 
+                This ensures your wishes are honored, saves your family stress, and can help control costs.
               </p>
               <a
                 href="https://consumer.ftc.gov/articles/planning-your-own-funeral"
@@ -41,60 +30,223 @@ export const SectionFAQ = () => {
                 rel="noopener noreferrer"
                 className="text-primary hover:underline block"
               >
-                FTC: Planning Your Own Funeral →
+                Learn more: FTC Planning Your Own Funeral →
               </a>
             </div>
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="item-3">
-          <AccordionTrigger>How does Medicaid treat prepaid funeral trusts?</AccordionTrigger>
+        <AccordionItem value="item-2">
+          <AccordionTrigger>At what age should I plan my funeral?</AccordionTrigger>
           <AccordionContent>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Medicaid often excludes irrevocable prepaid funeral trusts from asset calculations for
-              eligibility. However, rules vary by state. Consult with an elder law attorney or Medicaid
-              planner in your state for specific guidance.
+              There's no specific age—it's wise to start once you have dependents or assets. Planning early 
+              gives you more control and peace of mind.
             </p>
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="item-4">
-          <AccordionTrigger>Who should I notify first?</AccordionTrigger>
+        <AccordionItem value="item-3">
+          <AccordionTrigger>Should I prepay my funeral or just prearrange?</AccordionTrigger>
           <AccordionContent>
             <div className="text-sm text-muted-foreground space-y-2">
-              <p>Immediate priorities:</p>
-              <ol className="list-decimal list-inside space-y-1 ml-2">
-                <li>Immediate family members</li>
-                <li>Executor of the estate</li>
-                <li>Funeral home or memorial service provider</li>
-                <li>Employer (if currently working)</li>
-                <li>Social Security Administration</li>
-                <li>Life insurance companies</li>
-                <li>Banks and financial institutions</li>
-              </ol>
+              <p>
+                Prepaying can lock in today's prices, but consider the financial health of the provider. 
+                <strong> Prearranging</strong> means planning services without paying. <strong>Prepaying</strong> means 
+                paying in advance at today's prices to protect against inflation.
+              </p>
+              <a
+                href="https://consumer.ftc.gov/articles/planning-your-own-funeral"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline block"
+              >
+                Read FTC guidance →
+              </a>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="item-4">
+          <AccordionTrigger>How do I compare funeral costs?</AccordionTrigger>
+          <AccordionContent>
+            <div className="text-sm text-muted-foreground space-y-2">
+              <p>
+                Request a General Price List (GPL) from each funeral home. By law, funeral homes must provide one 
+                upon request. Compare line items carefully: service fees, casket or urn, embalming, ceremony space, 
+                transport, burial plot or cremation, flowers, and death certificates.
+              </p>
             </div>
           </AccordionContent>
         </AccordionItem>
 
         <AccordionItem value="item-5">
-          <AccordionTrigger>How many death certificates do I need?</AccordionTrigger>
+          <AccordionTrigger>What if I can't afford a funeral?</AccordionTrigger>
           <AccordionContent>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Most people need 10-15 certified copies. You'll need them for insurance claims, banks,
-              investment accounts, property transfers, Social Security, veterans benefits, and more.
-              Order extras initially as they're cheaper in bulk and obtaining more later is time-consuming.
+              Options include direct cremation or burial, government aid, veterans' benefits, or charity programs. 
+              Contact local social services for help.
             </p>
           </AccordionContent>
         </AccordionItem>
 
         <AccordionItem value="item-6">
-          <AccordionTrigger>What are VA burial benefits?</AccordionTrigger>
+          <AccordionTrigger>What is a prepaid funeral plan?</AccordionTrigger>
+          <AccordionContent>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              A contract allowing you to pay now for future funeral services. Funds are often held in trust or 
+              an insurance policy.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="item-7">
+          <AccordionTrigger>Can I cancel a prepaid plan?</AccordionTrigger>
+          <AccordionContent>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Usually yes, though refunds or penalties depend on state laws. Verify terms before signing.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="item-8">
+          <AccordionTrigger>What if the funeral home closes?</AccordionTrigger>
+          <AccordionContent>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              You can usually transfer your prepaid plan. Contact your state's funeral board for assistance.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="item-9">
+          <AccordionTrigger>How does Medicaid treat prepaid funeral trusts?</AccordionTrigger>
+          <AccordionContent>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Some irrevocable prepaid funeral trusts may be excluded from Medicaid asset limits. Check your 
+              state's Medicaid office for guidance.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="item-10">
+          <AccordionTrigger>What is a digital legacy?</AccordionTrigger>
+          <AccordionContent>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Your digital legacy includes your online accounts, data, passwords, and photos. Without a plan, 
+              heirs may lose access.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="item-11">
+          <AccordionTrigger>How can my family access my phone after I die?</AccordionTrigger>
           <AccordionContent>
             <div className="text-sm text-muted-foreground space-y-2">
               <p>
-                Veterans and eligible family members may receive burial benefits including burial in VA
-                national cemeteries, headstones, markers, medallions, burial flags, and Presidential
-                Memorial Certificates at no cost.
+                <strong>Apple:</strong> Add a Legacy Contact under Settings &gt; [Your Name] &gt; Sign-In & Security 
+                &gt; Legacy Contact. Provide them the access key and death certificate.
+              </p>
+              <a
+                href="https://support.apple.com/en-us/102431"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline block"
+              >
+                Apple Legacy Contact Setup →
+              </a>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="item-12">
+          <AccordionTrigger>How can my family access Google or social media accounts?</AccordionTrigger>
+          <AccordionContent>
+            <div className="text-sm text-muted-foreground space-y-2">
+              <p>
+                <strong>Google:</strong> Set up Inactive Account Manager. <strong>Facebook:</strong> Add a Legacy 
+                Contact. Each platform has its own policies—review account settings.
+              </p>
+              <a
+                href="https://myaccount.google.com/inactive"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline block"
+              >
+                Google Inactive Account Manager →
+              </a>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="item-13">
+          <AccordionTrigger>What's a digital executor?</AccordionTrigger>
+          <AccordionContent>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              A digital executor manages your online assets after death. You can name one in your will, but don't 
+              include actual passwords in the will document.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="item-14">
+          <AccordionTrigger>How should I store passwords for my heirs?</AccordionTrigger>
+          <AccordionContent>
+            <div className="text-sm text-muted-foreground space-y-2">
+              <p>
+                Use a password manager (like 1Password or Bitwarden) or write them down and store securely. 
+                Reference its location in your estate documents. Many password managers offer emergency access 
+                features that let trusted contacts request access to your vault after a waiting period.
+              </p>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="item-15">
+          <AccordionTrigger>Who should I notify first after a death?</AccordionTrigger>
+          <AccordionContent>
+            <div className="text-sm text-muted-foreground space-y-2">
+              <p>Funeral home, doctor, or coroner (for pronouncement of death), then family, employer, insurance, 
+              and Social Security.</p>
+              <p className="pt-2">Key steps after a death:</p>
+              <ol className="list-decimal list-inside space-y-1 ml-2">
+                <li>Notify family and authorities</li>
+                <li>Arrange funeral</li>
+                <li>Obtain death certificates</li>
+                <li>Notify insurance and banks</li>
+                <li>Begin estate or probate process</li>
+              </ol>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="item-16">
+          <AccordionTrigger>How many death certificates should I order?</AccordionTrigger>
+          <AccordionContent>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Order 10–15 certified copies; many agencies require originals. They're needed for insurance claims, 
+              banks, investment accounts, property transfers, Social Security, veterans benefits, and more. 
+              Order extras initially as they're cheaper in bulk.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="item-17">
+          <AccordionTrigger>What's the role of an executor?</AccordionTrigger>
+          <AccordionContent>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              They handle debts, assets, and distribution according to the will, and may manage digital assets 
+              if authorized.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="item-18">
+          <AccordionTrigger>What about veterans' benefits?</AccordionTrigger>
+          <AccordionContent>
+            <div className="text-sm text-muted-foreground space-y-2">
+              <p>
+                Veterans may qualify for burial in a national cemetery and partial funeral cost coverage, 
+                headstones, markers, medallions, burial flags, and Presidential Memorial Certificates at no cost.
               </p>
               <a
                 href="https://www.va.gov/burials-memorials/"
@@ -102,14 +254,24 @@ export const SectionFAQ = () => {
                 rel="noopener noreferrer"
                 className="text-primary hover:underline block"
               >
-                VA Burials & Memorials →
+                VA Burials & Memorials Eligibility →
               </a>
             </div>
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="item-7">
-          <AccordionTrigger>How do I plan for pet care?</AccordionTrigger>
+        <AccordionItem value="item-19">
+          <AccordionTrigger>Can I donate my body to science?</AccordionTrigger>
+          <AccordionContent>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Yes. Research medical schools and donation programs in advance. Some cover transportation costs, 
+              but make sure your family knows your wishes.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="item-20">
+          <AccordionTrigger>How do I plan for pet care after my death?</AccordionTrigger>
           <AccordionContent>
             <div className="text-sm text-muted-foreground space-y-2">
               <p>Key steps for pet planning:</p>
@@ -125,63 +287,12 @@ export const SectionFAQ = () => {
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="item-8">
-          <AccordionTrigger>Should I use a password manager?</AccordionTrigger>
+        <AccordionItem value="item-21">
+          <AccordionTrigger>Can I move or change a funeral plan?</AccordionTrigger>
           <AccordionContent>
-            <div className="text-sm text-muted-foreground space-y-2">
-              <p>
-                Yes! Password managers provide secure, encrypted storage for all your login credentials.
-                Popular options include 1Password, LastPass, Dashlane, and Bitwarden. Make sure your
-                executor knows how to access your password manager and keep the master password in a
-                secure location.
-              </p>
-              <p className="pt-2">
-                Also consider setting up emergency access features that let trusted contacts request
-                access to your vault after a waiting period.
-              </p>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="item-9">
-          <AccordionTrigger>What is an Apple Legacy Contact?</AccordionTrigger>
-          <AccordionContent>
-            <div className="text-sm text-muted-foreground space-y-2">
-              <p>
-                Apple Legacy Contact lets you designate someone who can access your Apple ID account and
-                personal data after you pass away. They can access photos, messages, notes, files, and
-                more with an access key you generate.
-              </p>
-              <a
-                href="https://support.apple.com/en-us/102431"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline block"
-              >
-                Learn how to set up Legacy Contact →
-              </a>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="item-10">
-          <AccordionTrigger>What is Google Inactive Account Manager?</AccordionTrigger>
-          <AccordionContent>
-            <div className="text-sm text-muted-foreground space-y-2">
-              <p>
-                Google's Inactive Account Manager lets you decide what happens to your Google account
-                data when you stop using it. You can choose to delete your account or share data with
-                trusted contacts after a specified period of inactivity (3-18 months).
-              </p>
-              <a
-                href="https://myaccount.google.com/inactive"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline block"
-              >
-                Set up Inactive Account Manager →
-              </a>
-            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Yes. Most contracts are transferable, but check the fine print for fees or restrictions.
+            </p>
           </AccordionContent>
         </AccordionItem>
       </Accordion>

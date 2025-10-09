@@ -9,6 +9,7 @@ export interface PlanData {
   title?: string;
   prepared_for?: string;
   preparer_name?: string;
+  prepared_by?: string;
   to_loved_ones_message?: string;
   instructions_notes?: string;
   about_me_notes?: string;
@@ -21,6 +22,11 @@ export interface PlanData {
   digital_notes?: string;
   legal_notes?: string;
   messages_notes?: string;
+  revisions?: Array<{
+    revision_date: string;
+    signature_png: string;
+    prepared_by: string;
+  }>;
 }
 
 export const usePlanData = (userId: string) => {

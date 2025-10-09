@@ -37,6 +37,17 @@ export const SectionInstructions = ({ value, onChange }: SectionInstructionsProp
           <li>Add passwords or access codes for critical accounts</li>
         </ul>
       </div>
+
+      <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+        <p className="text-sm text-foreground leading-relaxed italic">
+          "If you are reading this, it means you have the difficult task of carrying out my final wishes. 
+          I want you to know that everything written here was prepared with love, to make this time a little 
+          easier for you. My hope is that these pages will guide you — not only with the practical details, 
+          but also with the memories and words I've left behind. Please trust that what I've recorded is meant 
+          to lighten your burden and honor the life we shared. I am deeply grateful for your care and your love. 
+          Thank you, with all my heart and soul."
+        </p>
+      </div>
     </div>
   );
 };

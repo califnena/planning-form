@@ -5,6 +5,7 @@ import { User } from "@supabase/supabase-js";
 import { PlannerShell } from "@/components/planner/PlannerShell";
 import { usePlanData } from "@/hooks/usePlanData";
 import { useToast } from "@/hooks/use-toast";
+import { RevisionPromptDialog } from "@/components/planner/RevisionPromptDialog";
 
 // Section components
 import { SectionInstructions } from "@/components/planner/sections/SectionInstructions";
@@ -30,6 +31,8 @@ const PlannerApp = () => {
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [activeSection, setActiveSection] = useState("instructions");
+  const [showRevisionDialog, setShowRevisionDialog] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"download" | "email" | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -104,17 +107,41 @@ const PlannerApp = () => {
   };
 
   const handleDownloadPDF = () => {
-    toast({
-      title: "PDF Export",
-      description: "PDF export feature coming soon!",
-    });
+    setPendingAction("download");
+    setShowRevisionDialog(true);
   };
 
   const handleEmailPlan = () => {
-    toast({
-      title: "Email Plan",
-      description: "Email sharing feature coming soon!",
+    setPendingAction("email");
+    setShowRevisionDialog(true);
+  };
+
+  const handleRevisionConfirm = async (revision: {
+    revision_date: string;
+    signature_png: string;
+    prepared_by: string;
+  }) => {
+    // Add the revision to the plan
+    const currentRevisions = plan.revisions || [];
+    await updatePlan({
+      revisions: [...currentRevisions, revision],
+      prepared_by: revision.prepared_by,
     });
+
+    // Proceed with the pending action
+    if (pendingAction === "download") {
+      toast({
+        title: "Revision Saved",
+        description: "PDF export feature coming soon!",
+      });
+    } else if (pendingAction === "email") {
+      toast({
+        title: "Revision Saved",
+        description: "Email sharing feature coming soon!",
+      });
+    }
+
+    setPendingAction(null);
   };
 
   const sectionItems = [
@@ -258,16 +285,25 @@ const PlannerApp = () => {
   };
 
   return (
-    <PlannerShell
-      sectionItems={sectionItems}
-      activeSection={activeSection}
-      onSectionChange={setActiveSection}
-      onDownloadPDF={handleDownloadPDF}
-      onEmailPlan={handleEmailPlan}
-      onSignOut={handleSignOut}
-    >
-      {renderSection()}
-    </PlannerShell>
+    <>
+      <PlannerShell
+        sectionItems={sectionItems}
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+        onDownloadPDF={handleDownloadPDF}
+        onEmailPlan={handleEmailPlan}
+        onSignOut={handleSignOut}
+      >
+        {renderSection()}
+      </PlannerShell>
+
+      <RevisionPromptDialog
+        open={showRevisionDialog}
+        onOpenChange={setShowRevisionDialog}
+        onConfirm={handleRevisionConfirm}
+        preparedBy={plan.prepared_by || ""}
+      />
+    </>
   );
 };
 
