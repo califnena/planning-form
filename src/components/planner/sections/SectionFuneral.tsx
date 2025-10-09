@@ -44,6 +44,18 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
       </div>
 
       <div className="space-y-6">
+        <div className="space-y-2">
+          <Label htmlFor="funeral_preference">Funeral Preference (If Any)</Label>
+          <p className="text-xs text-muted-foreground">Briefly describe your overall funeral or memorial service preferences</p>
+          <Textarea
+            id="funeral_preference"
+            value={funeral.funeral_preference || ""}
+            onChange={(e) => updateFuneral("funeral_preference", e.target.value)}
+            placeholder="Example: I prefer a simple graveside service with close family only, or I'd like a celebration of life at my favorite park..."
+            rows={3}
+          />
+        </div>
+
         <div>
           <Label className="text-base font-semibold mb-3 block">Final Disposition Preference</Label>
           <div className="space-y-3">
@@ -108,6 +120,18 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
             </div>
           </div>
           
+          <div className="space-y-2 mt-4">
+            <Label htmlFor="cemetery_plot">Cemetery Plot Details</Label>
+            <p className="text-xs text-muted-foreground">Cemetery name, location, plot number, deed information, or pre-purchased plot details</p>
+            <Textarea
+              id="cemetery_plot"
+              value={funeral.cemetery_plot || ""}
+              onChange={(e) => updateFuneral("cemetery_plot", e.target.value)}
+              placeholder="Example: Green Hills Cemetery, Section C, Plot 123, Los Angeles, CA. Deed is in safe deposit box..."
+              rows={3}
+            />
+          </div>
+
           <div className="space-y-2 mt-4">
             <Label htmlFor="disposition_notes">Final Disposition Notes</Label>
             <p className="text-xs text-muted-foreground">Additional details about ashes disposal location, burial specifics, or other disposition preferences</p>
@@ -255,11 +279,11 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
         <div className="p-4 bg-muted/50 rounded-lg">
           <h3 className="font-semibold mb-2">💼 Need Help Planning?</h3>
           <p className="text-sm text-muted-foreground mb-3">
-            Get expert guidance and quotes from Everlasting Funeral Advisors
+            Get expert guidance and quotes from Everlasting Funeral Advisors for urns, caskets, flowers, and complete funeral packages
           </p>
           <Button asChild variant="outline" size="sm">
             <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
-              Request a Quote from EFA
+              Request a Quote from Everlasting Funeral Services
             </a>
           </Button>
         </div>
