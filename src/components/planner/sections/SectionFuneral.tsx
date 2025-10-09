@@ -438,17 +438,42 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
         </div>
 
         <div className="space-y-2">
+          <Label htmlFor="flower_preferences">Flower Preferences</Label>
+          <p className="text-xs text-muted-foreground">Specify preferred flowers, arrangements, or if you prefer donations instead of flowers</p>
+          <Textarea
+            id="flower_preferences"
+            value={funeral.flower_preferences || ""}
+            onChange={(e) => updateFuneral("flower_preferences", e.target.value)}
+            placeholder="Example: White lilies and roses, garden arrangements, no flowers please - donations instead..."
+            rows={3}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="charity_donations">Memorial Donations to Charity</Label>
+          <p className="text-xs text-muted-foreground">Name specific charities or causes where you'd like memorial donations directed</p>
+          <Textarea
+            id="charity_donations"
+            value={funeral.charity_donations || ""}
+            onChange={(e) => updateFuneral("charity_donations", e.target.value)}
+            placeholder="Example: American Cancer Society, Local Animal Shelter, Veterans Foundation, etc. Include contact info or website if known..."
+            rows={3}
+          />
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="funeral_general_notes">Additional Details & Special Requests</Label>
-          <p className="text-xs text-muted-foreground">Preferred funeral home, music, readings, speakers, traditions, dress code, flowers, budget, pre-paid plan details</p>
+          <p className="text-xs text-muted-foreground">Preferred funeral home, music, readings, speakers, traditions, dress code, budget, pre-paid plan details, and any other pertinent information</p>
           <Textarea
             id="funeral_general_notes"
             placeholder="Include:
 - Preferred funeral home or location
 - Music, readings, or speakers
 - Specific traditions or rituals
-- Dress code or flower preferences
+- Dress code preferences
 - Budget guidelines
-- Pre-paid plan details and contract location"
+- Pre-paid plan details and contract location
+- Any other pertinent information"
             value={funeral.general_notes || ""}
             onChange={(e) => updateFuneral("general_notes", e.target.value)}
             rows={8}

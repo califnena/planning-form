@@ -258,6 +258,8 @@ export const generatePlanPDF = (planData: PlanData) => {
   addField("Cemetery Plot Details", funeral.cemetery_plot);
   addField("Religious Service", funeral.religious_service ? "Yes" : "No");
   if (funeral.religious_notes) addField("Religious Service Notes", funeral.religious_notes);
+  if (funeral.flower_preferences) addField("Flower Preferences", funeral.flower_preferences);
+  if (funeral.charity_donations) addField("Memorial Donations to Charity", funeral.charity_donations);
   addField("Additional Details", funeral.general_notes);
 
   // Financial Life Section
