@@ -62,7 +62,7 @@ export const generatePlanPDF = (planData: PlanData) => {
     
     const pageNumText = totalPages ? `Page ${currentPage} of ${totalPages}` : `Page ${currentPage}`;
     const nameText = sanitizeText(legalName);
-    const fullText = `${pageNumText} (${nameText})`;
+    const fullText = `${pageNumText} - ${nameText}`;
     const fullTextWidth = pdf.getTextWidth(fullText);
     
     // If text is too long, split into two lines
@@ -1016,7 +1016,7 @@ export const generatePlanPDF = (planData: PlanData) => {
     
     const pageNumText = `Page ${i} of ${totalPages}`;
     const nameText = sanitizeText(legalName);
-    const fullText = `${pageNumText} (${nameText})`;
+    const fullText = `${pageNumText} - ${nameText}`;
     const fullTextWidth = pdf.getTextWidth(fullText);
     
     // If text is too long, split into two lines
