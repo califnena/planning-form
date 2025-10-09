@@ -276,16 +276,31 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
           />
         </div>
 
-        <div className="p-4 bg-muted/50 rounded-lg">
-          <h3 className="font-semibold mb-2">💼 Need Help Planning?</h3>
-          <p className="text-sm text-muted-foreground mb-3">
-            Get expert guidance and quotes from Everlasting Funeral Advisors for urns, caskets, flowers, and complete funeral packages
-          </p>
-          <Button asChild variant="outline" size="sm">
-            <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
-              Request a Quote from Everlasting Funeral Services
-            </a>
-          </Button>
+        <div className="p-4 bg-muted/50 rounded-lg space-y-4">
+          <div>
+            <h3 className="font-semibold mb-2">💼 Get Quotes for Funeral Services</h3>
+            <p className="text-sm text-muted-foreground mb-3">
+              Request individual quotes from Everlasting Funeral Services
+            </p>
+          </div>
+          
+          <div className="flex flex-wrap gap-3">
+            <Button asChild variant="outline" size="sm">
+              <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
+                Get Quote: Caskets
+              </a>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
+                Get Quote: Urns
+              </a>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
+                Get Quote: Flowers
+              </a>
+            </Button>
+          </div>
         </div>
       </div>
     </div>
