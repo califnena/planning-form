@@ -102,7 +102,7 @@ export const PlannerShell = ({
             </Button>
             <Button
               size="sm"
-              className="w-full justify-start bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse hover:animate-none font-semibold"
+              className="w-full justify-start bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
               asChild
             >
               <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">

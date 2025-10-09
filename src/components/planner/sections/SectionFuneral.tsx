@@ -486,12 +486,12 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
             💼 Need Help Planning?
           </h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Get expert quotes from Everlasting Funeral Services for urns, caskets, flowers, and other funeral packages
+            Get expert quotes from Everlasting Funeral Services for <span className="font-semibold text-foreground">urns, caskets, flowers,</span> and <span className="font-semibold text-foreground">funeral packages</span>
           </p>
           <Button 
             asChild 
             size="lg" 
-            className="w-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black shadow-lg hover:shadow-xl transition-all duration-300 font-semibold text-base group animate-pulse hover:animate-none"
+            className="w-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black shadow-lg hover:shadow-xl transition-all duration-300 font-semibold text-base group"
           >
             <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
               <FileText className="h-5 w-5 group-hover:scale-110 transition-transform" />
