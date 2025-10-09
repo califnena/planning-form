@@ -17,7 +17,7 @@ export const SectionVendors = ({ data, onChange }: SectionVendorsProps) => {
   const addVendor = () => {
     onChange({
       ...data,
-      vendors: [...vendors, { vendor_type: "", contact: "", notes: "" }]
+      vendors: [...vendors, { vendor_type: "", company_name: "", contact: "", notes: "" }]
     });
   };
 
@@ -71,13 +71,22 @@ export const SectionVendors = ({ data, onChange }: SectionVendorsProps) => {
               </Button>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Vendor Type</Label>
                 <Input
                   value={vendor.vendor_type || ""}
                   onChange={(e) => updateVendor(index, "vendor_type", e.target.value)}
                   placeholder="e.g., Funeral Home, Attorney, Florist"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Company Name</Label>
+                <Input
+                  value={vendor.company_name || ""}
+                  onChange={(e) => updateVendor(index, "company_name", e.target.value)}
+                  placeholder="Company or business name"
                 />
               </div>
 

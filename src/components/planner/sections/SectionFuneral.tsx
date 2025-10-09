@@ -43,64 +43,135 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
         </Button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div>
           <Label className="text-base font-semibold mb-3 block">Final Disposition Preference</Label>
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="burial"
-                checked={funeral.burial || false}
-                onCheckedChange={(checked) => updateFuneral("burial", checked)}
-              />
-              <Label htmlFor="burial" className="font-normal">Burial</Label>
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="burial"
+                  checked={funeral.burial || false}
+                  onCheckedChange={(checked) => updateFuneral("burial", checked)}
+                />
+                <Label htmlFor="burial" className="font-normal">Burial</Label>
+              </div>
+              {funeral.burial && (
+                <Textarea
+                  value={funeral.burial_notes || ""}
+                  onChange={(e) => updateFuneral("burial_notes", e.target.value)}
+                  placeholder="Where would you like to be buried? Cemetery name, location, plot details..."
+                  rows={2}
+                  className="ml-6"
+                />
+              )}
             </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="cremation"
-                checked={funeral.cremation || false}
-                onCheckedChange={(checked) => updateFuneral("cremation", checked)}
-              />
-              <Label htmlFor="cremation" className="font-normal">Cremation</Label>
+
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="cremation"
+                  checked={funeral.cremation || false}
+                  onCheckedChange={(checked) => updateFuneral("cremation", checked)}
+                />
+                <Label htmlFor="cremation" className="font-normal">Cremation</Label>
+              </div>
+              {funeral.cremation && (
+                <Textarea
+                  value={funeral.cremation_notes || ""}
+                  onChange={(e) => updateFuneral("cremation_notes", e.target.value)}
+                  placeholder="What should be done with your ashes? (e.g., scattered at favorite location, kept in urn, divided among family, buried in cemetery)..."
+                  rows={2}
+                  className="ml-6"
+                />
+              )}
             </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="donation"
-                checked={funeral.donation || false}
-                onCheckedChange={(checked) => updateFuneral("donation", checked)}
-              />
-              <Label htmlFor="donation" className="font-normal">Body/Organ Donation</Label>
+
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="donation"
+                  checked={funeral.donation || false}
+                  onCheckedChange={(checked) => updateFuneral("donation", checked)}
+                />
+                <Label htmlFor="donation" className="font-normal">Body/Organ Donation</Label>
+              </div>
+              {funeral.donation && (
+                <Textarea
+                  value={funeral.donation_notes || ""}
+                  onChange={(e) => updateFuneral("donation_notes", e.target.value)}
+                  placeholder="Specify which organs, whole body donation to science, organization details..."
+                  rows={2}
+                  className="ml-6"
+                />
+              )}
             </div>
           </div>
         </div>
 
         <div>
           <Label className="text-base font-semibold mb-3 block">Service Preferences</Label>
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="religious"
-                checked={funeral.religious_service || false}
-                onCheckedChange={(checked) => updateFuneral("religious_service", checked)}
-              />
-              <Label htmlFor="religious" className="font-normal">Religious service</Label>
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="religious"
+                  checked={funeral.religious_service || false}
+                  onCheckedChange={(checked) => updateFuneral("religious_service", checked)}
+                />
+                <Label htmlFor="religious" className="font-normal">Religious service</Label>
+              </div>
+              {funeral.religious_service && (
+                <Textarea
+                  value={funeral.religious_notes || ""}
+                  onChange={(e) => updateFuneral("religious_notes", e.target.value)}
+                  placeholder="Which faith tradition? Specific church/temple? Preferred clergy? Special rituals or prayers?"
+                  rows={2}
+                  className="ml-6"
+                />
+              )}
             </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="secular"
-                checked={funeral.secular_service || false}
-                onCheckedChange={(checked) => updateFuneral("secular_service", checked)}
-              />
-              <Label htmlFor="secular" className="font-normal">Secular/Non-religious service</Label>
+
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="secular"
+                  checked={funeral.secular_service || false}
+                  onCheckedChange={(checked) => updateFuneral("secular_service", checked)}
+                />
+                <Label htmlFor="secular" className="font-normal">Secular/Non-religious service</Label>
+              </div>
+              {funeral.secular_service && (
+                <Textarea
+                  value={funeral.secular_notes || ""}
+                  onChange={(e) => updateFuneral("secular_notes", e.target.value)}
+                  placeholder="Preferred tone, speakers, readings, or themes..."
+                  rows={2}
+                  className="ml-6"
+                />
+              )}
             </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="celebration"
-                checked={funeral.celebration_of_life || false}
-                onCheckedChange={(checked) => updateFuneral("celebration_of_life", checked)}
-              />
-              <Label htmlFor="celebration" className="font-normal">Celebration of life</Label>
+
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="celebration"
+                  checked={funeral.celebration_of_life || false}
+                  onCheckedChange={(checked) => updateFuneral("celebration_of_life", checked)}
+                />
+                <Label htmlFor="celebration" className="font-normal">Celebration of life</Label>
+              </div>
+              {funeral.celebration_of_life && (
+                <Textarea
+                  value={funeral.celebration_notes || ""}
+                  onChange={(e) => updateFuneral("celebration_notes", e.target.value)}
+                  placeholder="Preferred venue, style (formal/casual), activities, music, food preferences..."
+                  rows={2}
+                  className="ml-6"
+                />
+              )}
             </div>
+
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="no_service"
@@ -151,20 +222,19 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="funeral_notes">Additional Details & Special Requests</Label>
+          <Label htmlFor="funeral_general_notes">Additional Details & Special Requests</Label>
           <Textarea
-            id="funeral_notes"
+            id="funeral_general_notes"
             placeholder="Include:
 - Preferred funeral home or location
 - Music, readings, or speakers
-- Burial location or what to do with ashes
 - Specific traditions or rituals
 - Dress code or flower preferences
 - Budget guidelines
 - Pre-paid plan details and contract location"
-            value={funeral.notes || ""}
-            onChange={(e) => updateFuneral("notes", e.target.value)}
-            rows={10}
+            value={funeral.general_notes || ""}
+            onChange={(e) => updateFuneral("general_notes", e.target.value)}
+            rows={8}
             className="resize-none"
           />
         </div>

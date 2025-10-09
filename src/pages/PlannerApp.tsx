@@ -234,8 +234,8 @@ const PlannerApp = () => {
       case "messages":
         return (
           <SectionMessages
-            value={plan.messages_notes}
-            onChange={(value) => updatePlan({ messages_notes: value })}
+            data={plan}
+            onChange={(data) => updatePlan(data)}
           />
         );
       case "personal":

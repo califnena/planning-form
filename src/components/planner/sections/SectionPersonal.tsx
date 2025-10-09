@@ -2,7 +2,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Save } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface SectionPersonalProps {
   data: any;
@@ -11,6 +12,7 @@ interface SectionPersonalProps {
 
 export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
   const profile = data.personal_profile || {};
+  const { toast } = useToast();
 
   const updateProfile = (field: string, value: any) => {
     onChange({
@@ -19,11 +21,24 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
     });
   };
 
+  const handleSave = () => {
+    toast({
+      title: "Saved",
+      description: "Personal information has been saved.",
+    });
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Personal Information</h2>
-        <p className="text-muted-foreground">Complete biographical details for official records</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Personal Information</h2>
+          <p className="text-muted-foreground">Complete biographical details for official records</p>
+        </div>
+        <Button onClick={handleSave} size="sm">
+          <Save className="h-4 w-4 mr-2" />
+          Save
+        </Button>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">

@@ -192,6 +192,62 @@ export const SectionFinancial = ({ data, onChange }: SectionFinancialProps) => {
         )}
       </div>
 
+      {/* Safe Deposit Box */}
+      {financial.has_safe_deposit && (
+        <div className="space-y-2">
+          <Label htmlFor="safe_deposit_details" className="text-base font-semibold">Safe Deposit Box Details</Label>
+          <Textarea
+            id="safe_deposit_details"
+            value={financial.safe_deposit_details || ""}
+            onChange={(e) => updateFinancial("safe_deposit_details", e.target.value)}
+            placeholder="Bank name and location, box number, key location, who has access, contents list..."
+            rows={4}
+          />
+        </div>
+      )}
+
+      {/* Cryptocurrency */}
+      {financial.has_crypto && (
+        <div className="space-y-2">
+          <Label htmlFor="crypto_details" className="text-base font-semibold">Cryptocurrency Details</Label>
+          <Textarea
+            id="crypto_details"
+            value={financial.crypto_details || ""}
+            onChange={(e) => updateFinancial("crypto_details", e.target.value)}
+            placeholder="Types of crypto owned, exchanges used, wallet information, seed phrase location (stored securely!), estimated value..."
+            rows={4}
+          />
+        </div>
+      )}
+
+      {/* Business Interests */}
+      {financial.has_business && (
+        <div className="space-y-2">
+          <Label htmlFor="business_details" className="text-base font-semibold">Business Interests Details</Label>
+          <Textarea
+            id="business_details"
+            value={financial.business_details || ""}
+            onChange={(e) => updateFinancial("business_details", e.target.value)}
+            placeholder="Business name, ownership percentage, partner information, succession plans, business documents location, accountant/attorney contacts..."
+            rows={4}
+          />
+        </div>
+      )}
+
+      {/* Debts */}
+      {financial.has_debts && (
+        <div className="space-y-2">
+          <Label htmlFor="debts_details" className="text-base font-semibold">Outstanding Debts Details</Label>
+          <Textarea
+            id="debts_details"
+            value={financial.debts_details || ""}
+            onChange={(e) => updateFinancial("debts_details", e.target.value)}
+            placeholder="List all loans, credit cards, mortgages, car loans, personal loans. Include creditor names, account numbers, and approximate balances..."
+            rows={4}
+          />
+        </div>
+      )}
+
       <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-lg">
         <h3 className="font-semibold mb-2 text-amber-900 dark:text-amber-100">
           🔒 Security Note:

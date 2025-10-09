@@ -15,6 +15,7 @@ interface SectionDigitalProps {
 export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
   const digital = data.digital || {};
   const accounts = digital.accounts || [];
+  const phones = digital.phones || [];
   const { toast } = useToast();
 
   const updateDigital = (field: string, value: any) => {
@@ -36,6 +37,20 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
 
   const removeAccount = (index: number) => {
     updateDigital("accounts", accounts.filter((_: any, i: number) => i !== index));
+  };
+
+  const addPhone = () => {
+    updateDigital("phones", [...phones, { carrier: "", number: "", pin: "" }]);
+  };
+
+  const updatePhone = (index: number, field: string, value: string) => {
+    const updated = [...phones];
+    updated[index] = { ...updated[index], [field]: value };
+    updateDigital("phones", updated);
+  };
+
+  const removePhone = (index: number) => {
+    updateDigital("phones", phones.filter((_: any, i: number) => i !== index));
   };
 
   const handleSave = () => {
@@ -130,6 +145,69 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
         </div>
       </div>
 
+      {/* Phone Section */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Label className="text-base font-semibold">📱 Phone Accounts</Label>
+          <Button onClick={addPhone} size="sm" variant="outline">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Phone
+          </Button>
+        </div>
+
+        {phones.map((phone: any, index: number) => (
+          <Card key={index} className="p-4 space-y-4">
+            <div className="flex justify-between items-start">
+              <h4 className="font-semibold">Phone {index + 1}</h4>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removePhone(index)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Carrier</Label>
+                <Input
+                  value={phone.carrier || ""}
+                  onChange={(e) => updatePhone(index, "carrier", e.target.value)}
+                  placeholder="e.g., Verizon, AT&T"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Phone Number</Label>
+                <Input
+                  value={phone.number || ""}
+                  onChange={(e) => updatePhone(index, "number", e.target.value)}
+                  placeholder="(123) 456-7890"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>PIN/Password Location</Label>
+                <Input
+                  value={phone.pin || ""}
+                  onChange={(e) => updatePhone(index, "pin", e.target.value)}
+                  placeholder="Where PIN is stored"
+                />
+              </div>
+            </div>
+          </Card>
+        ))}
+
+        {phones.length === 0 && (
+          <div className="text-center py-8 border border-dashed rounded-lg">
+            <p className="text-muted-foreground mb-3">No phones added yet</p>
+            <Button onClick={addPhone} variant="outline" size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Your First Phone
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Digital Accounts */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Label className="text-base font-semibold">Account Details</Label>

@@ -19,7 +19,11 @@ export const SectionRevisions = ({ data, onChange }: SectionRevisionsProps) => {
   const addRevision = () => {
     onChange({
       ...data,
-      revisions: [...revisions, { revision_date: new Date().toISOString().split('T')[0], signature_png: "" }]
+      revisions: [...revisions, { 
+        revision_date: new Date().toISOString().split('T')[0], 
+        signature_png: "",
+        prepared_by: data.prepared_by || ""
+      }]
     });
   };
 
