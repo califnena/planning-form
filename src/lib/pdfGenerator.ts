@@ -463,22 +463,66 @@ export const generatePlanPDF = (planData: PlanData) => {
   // Property Section
   addTitle("🏠 My Property");
   const property = planData.property || {};
-  if (property.home_details) addField("Primary Residence", property.home_details, false);
-  if (property.vacation_details) addField("Vacation/Secondary Property", property.vacation_details, false);
-  if (property.vehicles_details) addField("Vehicles", property.vehicles_details, false);
   
+  // Property types owned
+  const propertyTypes = [];
+  if (property.has_primary_home) propertyTypes.push("Primary residence");
+  if (property.has_vacation_home) propertyTypes.push("Vacation home");
+  if (property.has_investment) propertyTypes.push("Investment property");
+  if (property.has_land) propertyTypes.push("Land or lots");
+  if (property.has_vehicles) propertyTypes.push("Vehicles");
+  if (property.has_boats_rvs) propertyTypes.push("Boats or RVs");
+  if (property.has_business) propertyTypes.push("Business ownership");
+  if (property.has_valuables) propertyTypes.push("Jewelry, art, collectibles");
+  
+  if (propertyTypes.length > 0) {
+    checkPageBreak(15);
+    pdf.setFontSize(12);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Property I Own:", 20, yPosition);
+    yPosition += lineHeight + 2;
+    
+    pdf.setFont("times", "normal");
+    pdf.setFontSize(10);
+    propertyTypes.forEach((type: string) => {
+      checkPageBreak();
+      // Add checkbox
+      pdf.setDrawColor(0, 0, 0);
+      pdf.setFillColor(0, 0, 0);
+      pdf.rect(20, yPosition - 3, 3, 3, 'F');
+      pdf.text(sanitizeText(type), 26, yPosition);
+      yPosition += lineHeight + 1;
+    });
+    pdf.setFont("helvetica", "normal");
+    yPosition += 5;
+  }
+  
+  // Property details
   const propertyItems = property.items || [];
   if (propertyItems.length > 0) {
+    checkPageBreak(15);
+    pdf.setFontSize(12);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Property Details:", 20, yPosition);
+    yPosition += lineHeight + 3;
+    
     propertyItems.forEach((item: any, index: number) => {
       checkPageBreak(20);
       pdf.setFontSize(11);
       pdf.setFont("helvetica", "bold");
-      pdf.text(sanitizeText(`Valuable Item ${index + 1}`), 20, yPosition);
+      pdf.text(sanitizeText(`Property ${index + 1}`), 20, yPosition);
       yPosition += lineHeight;
-      addField("Item Name", item.item);
-      addField("Value", item.value);
-      addField("Location", item.location);
-      addField("Intended Recipient", item.recipient);
+      addField("Type", item.type);
+      addField("Description & Details", item.description, false);
+      addField("Document Location", item.location);
+      if (item.document) {
+        pdf.setFont("helvetica", "italic");
+        pdf.setFontSize(9);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text("(Document attached - see online plan)", 20, yPosition);
+        pdf.setTextColor(0, 0, 0);
+        yPosition += lineHeight;
+      }
       yPosition += 3;
     });
   }
@@ -608,21 +652,31 @@ export const generatePlanPDF = (planData: PlanData) => {
       pdf.setFont("helvetica", "bold");
       pdf.text(sanitizeText(`Message ${index + 1}`), 20, yPosition);
       yPosition += lineHeight;
-      addField("Recipient", message.recipient);
-      addField("Message", message.message, false);
+      addField("To (Recipients)", message.recipients);
+      addField("Written Message", message.text_message, false);
+      
+      // Note about audio/video
+      if (message.audio_url || message.video_url) {
+        pdf.setFont("helvetica", "italic");
+        pdf.setFontSize(9);
+        pdf.setTextColor(100, 100, 100);
+        const mediaTypes = [];
+        if (message.audio_url) mediaTypes.push("audio");
+        if (message.video_url) mediaTypes.push("video");
+        pdf.text(`(${mediaTypes.join(" and ")} message available in online plan)`, 20, yPosition);
+        pdf.setTextColor(0, 0, 0);
+        yPosition += lineHeight;
+      }
       yPosition += 5;
     });
   } else {
-    for (let i = 1; i <= 2; i++) {
-      checkPageBreak(25);
-      pdf.setFontSize(11);
-      pdf.setFont("helvetica", "bold");
-      pdf.text(`Message ${i}`, 20, yPosition);
-      yPosition += lineHeight;
-      addField("Recipient", "");
-      addField("Message", "", false);
-      yPosition += 5;
-    }
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "italic");
+    pdf.setTextColor(120, 120, 120);
+    pdf.text("(no messages added yet)", 20, yPosition);
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFont("helvetica", "normal");
+    yPosition += lineHeight + 5;
   }
 
   // Footer on last page
