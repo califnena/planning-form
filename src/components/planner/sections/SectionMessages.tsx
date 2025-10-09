@@ -164,13 +164,19 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
 
             <div className="space-y-2">
               <Label>Written Message</Label>
-              <p className="text-xs text-muted-foreground">Share your love, memories, wisdom, and hopes for their future</p>
+              <p className="text-xs text-muted-foreground">Share your love, memories, wisdom, and hopes for their future (max 5000 characters)</p>
               <Textarea
                 value={message.text_message || ""}
                 onChange={(e) => updateMessage(index, "text_message", e.target.value)}
                 placeholder="Write your message here... Share your love, memories, wisdom, and hopes for their future."
                 rows={6}
+                maxLength={5000}
               />
+              {message.text_message && (
+                <p className="text-xs text-muted-foreground text-right">
+                  {message.text_message.length}/5000 characters
+                </p>
+              )}
             </div>
 
             {/* Audio Recording */}

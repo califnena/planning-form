@@ -328,43 +328,39 @@ export const generatePlanPDF = (planData: PlanData) => {
   const generatedYPosition = profile.nicknames ? 108 : 100;
   pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, generatedYPosition, { align: "center" });
   
-  // Add "Provided by:" above logo with blank lines for separation
+  // Add 10 blank lines for separation (space only, no visible lines)
+  let separationY = generatedYPosition + 10;
+  for (let i = 0; i < 10; i++) {
+    separationY += 5;
+  }
+  
+  // Add "Provided by:" after the blank space
   pdf.setFontSize(11);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(0, 0, 0);
-  pdf.text("Provided by:", 105, 115, { align: "center" });
+  pdf.text("Provided by:", 105, separationY, { align: "center" });
   
-  // Add 10 blank lines for separation
-  let separationY = 120;
-  pdf.setFontSize(10);
-  pdf.setFont("helvetica", "normal");
-  pdf.setTextColor(150, 150, 150);
-  for (let i = 0; i < 10; i++) {
-    pdf.text("_".repeat(60), 105, separationY, { align: "center" });
-    separationY += 5;
-  }
-  pdf.setTextColor(0, 0, 0);
-  
-  // Add logo in center (moved down to accommodate blank lines)
+  // Add logo in center
   try {
-    pdf.addImage(everlastingLogo, 'PNG', pageWidth / 2 - 25, 175, 50, 50);
+    pdf.addImage(everlastingLogo, 'PNG', pageWidth / 2 - 25, separationY + 10, 50, 50);
   } catch (error) {
     console.error('Error adding logo to PDF:', error);
   }
   
   // Add contact info below logo
+  const contactYPosition = separationY + 70;
   pdf.setFontSize(12);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(0, 0, 0);
-  pdf.text("Everlasting Funeral Advisors", 105, 240, { align: "center" });
+  pdf.text("Everlasting Funeral Advisors", 105, contactYPosition, { align: "center" });
   
   pdf.setFontSize(9);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(64, 64, 64);
-  pdf.text("Phone: (323) 863-5804", 105, 252, { align: "center" });
-  pdf.text("Email: info@everlastingfuneraladvisors.com", 105, 259, { align: "center" });
-  pdf.text("Website: https://everlastingfuneraladvisors.com", 105, 266, { align: "center" });
-  pdf.text("Facebook: https://www.facebook.com/profile.php?id=61580859545223", 105, 273, { align: "center" });
+  pdf.text("Phone: (323) 863-5804", 105, contactYPosition + 12, { align: "center" });
+  pdf.text("Email: info@everlastingfuneraladvisors.com", 105, contactYPosition + 19, { align: "center" });
+  pdf.text("Website: https://everlastingfuneraladvisors.com", 105, contactYPosition + 26, { align: "center" });
+  pdf.text("Facebook: https://www.facebook.com/profile.php?id=61580859545223", 105, contactYPosition + 33, { align: "center" });
   pdf.setTextColor(0, 0, 0);
 
   // Add Table of Contents page
@@ -808,6 +804,62 @@ export const generatePlanPDF = (planData: PlanData) => {
     pdf.setFont("helvetica", "italic");
     pdf.setTextColor(120, 120, 120);
     pdf.text("(no messages added yet)", 20, yPosition);
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFont("helvetica", "normal");
+    yPosition += lineHeight + 5;
+  }
+
+  // Revisions & Approvals Section
+  addTitle("Revisions & Approvals");
+  const revisions = planData.revisions || [];
+  const preparedBy = planData.prepared_by || "";
+  
+  if (preparedBy) {
+    addField("Prepared By (Overall)", preparedBy);
+    yPosition += 5;
+  }
+  
+  if (revisions.length > 0) {
+    revisions.forEach((revision: any, index: number) => {
+      checkPageBreak(40);
+      pdf.setFontSize(11);
+      pdf.setFont("helvetica", "bold");
+      pdf.text(sanitizeText(`Revision ${index + 1}`), 20, yPosition);
+      yPosition += lineHeight + 2;
+      
+      addField("Prepared By", revision.prepared_by);
+      addField("Revision Date", revision.revision_date);
+      
+      // Add signature if available
+      if (revision.signature_png) {
+        checkPageBreak(30);
+        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "bold");
+        pdf.text("Signature:", 20, yPosition);
+        yPosition += lineHeight;
+        
+        try {
+          // Add signature image
+          pdf.addImage(revision.signature_png, 'PNG', 20, yPosition, 60, 20);
+          yPosition += 25;
+        } catch (error) {
+          console.error('Error adding signature to PDF:', error);
+          pdf.setFont("helvetica", "italic");
+          pdf.setFontSize(9);
+          pdf.setTextColor(100, 100, 100);
+          pdf.text("(signature could not be displayed)", 20, yPosition);
+          pdf.setTextColor(0, 0, 0);
+          yPosition += lineHeight;
+        }
+      }
+      
+      yPosition += 5;
+    });
+  } else {
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "italic");
+    pdf.setTextColor(120, 120, 120);
+    pdf.text("(no revisions recorded yet)", 20, yPosition);
     pdf.setTextColor(0, 0, 0);
     pdf.setFont("helvetica", "normal");
     yPosition += lineHeight + 5;
