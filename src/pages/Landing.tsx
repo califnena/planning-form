@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 const Landing = () => {
   return (
@@ -11,9 +12,12 @@ const Landing = () => {
             <h1 className="text-xl font-semibold text-primary">My Final Wishes</h1>
             <p className="text-xs text-muted-foreground">Everlasting Funeral Advisors</p>
           </div>
-          <Link to="/login">
-            <Button variant="outline">Sign In</Button>
-          </Link>
+          <div className="flex items-center gap-4">
+            <LanguageSelector />
+            <Link to="/login">
+              <Button variant="outline">Sign In</Button>
+            </Link>
+          </div>
         </div>
       </header>
 
