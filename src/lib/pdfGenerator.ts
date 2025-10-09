@@ -33,7 +33,10 @@ export const generatePlanPDF = (planData: PlanData) => {
       .replace(/[\u2018\u2019]/g, "'") // Replace smart quotes
       .replace(/[\u201C\u201D]/g, '"')
       .replace(/\u2013|\u2014/g, '-') // Replace em/en dashes
-      .replace(/\u2026/g, '...'); // Replace ellipsis
+      .replace(/\u2026/g, '...') // Replace ellipsis
+      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '') // Remove emojis
+      .replace(/[\u{2600}-\u{26FF}]/gu, '') // Remove misc symbols
+      .replace(/[\u{2700}-\u{27BF}]/gu, ''); // Remove dingbats
   };
 
   // Helper to add small logo to bottom right of page
@@ -263,27 +266,32 @@ export const generatePlanPDF = (planData: PlanData) => {
   pdf.setFontSize(10);
   pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 100, { align: "center" });
   
+  // Add "Provided by:" above logo
+  pdf.setFontSize(11);
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(0, 0, 0);
+  pdf.text("Provided by:", 105, 115, { align: "center" });
+  
   // Add logo in center
   try {
-    pdf.addImage(everlastingLogo, 'PNG', pageWidth / 2 - 25, 120, 50, 50);
+    pdf.addImage(everlastingLogo, 'PNG', pageWidth / 2 - 25, 125, 50, 50);
   } catch (error) {
     console.error('Error adding logo to PDF:', error);
   }
   
   // Add contact info below logo
-  pdf.setFontSize(11);
+  pdf.setFontSize(12);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(0, 0, 0);
-  pdf.text("Provided by:", 105, 185, { align: "center" });
-  pdf.text("Everlasting Funeral Advisors", 105, 195, { align: "center" });
+  pdf.text("Everlasting Funeral Advisors", 105, 190, { align: "center" });
   
   pdf.setFontSize(9);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(64, 64, 64);
-  pdf.text("Phone: (323) 863-5804", 105, 207, { align: "center" });
-  pdf.text("Email: info@everlastingfuneraladvisors.com", 105, 214, { align: "center" });
-  pdf.text("Website: https://everlastingfuneraladvisors.com", 105, 221, { align: "center" });
-  pdf.text("Facebook: https://www.facebook.com/profile.php?id=61580859545223", 105, 228, { align: "center" });
+  pdf.text("Phone: (323) 863-5804", 105, 202, { align: "center" });
+  pdf.text("Email: info@everlastingfuneraladvisors.com", 105, 209, { align: "center" });
+  pdf.text("Website: https://everlastingfuneraladvisors.com", 105, 216, { align: "center" });
+  pdf.text("Facebook: https://www.facebook.com/profile.php?id=61580859545223", 105, 223, { align: "center" });
   pdf.setTextColor(0, 0, 0);
 
   // Add sections
@@ -291,11 +299,11 @@ export const generatePlanPDF = (planData: PlanData) => {
   yPosition = 20;
 
   // Instructions Section
-  addTitle("📝 Instructions");
+  addTitle("Instructions");
   addSection("General Instructions", planData.instructions_notes);
 
   // Personal Information Section
-  addTitle("👤 My Personal Information");
+  addTitle("My Personal Information");
   addField("Full Legal Name", profile.full_name || profile.legal_name);
   addField("Nicknames", profile.nicknames);
   addField("Maiden Name", profile.maiden_name);
@@ -359,11 +367,11 @@ export const generatePlanPDF = (planData: PlanData) => {
   }
 
   // About Me Section
-  addTitle("🌟 About Me");
+  addTitle("About Me");
   addSection("My Story & Legacy", planData.about_me_notes);
 
   // Checklist Section
-  addTitle("✅ Checklist");
+  addTitle("Checklist");
   const checklistItems = planData.checklist_items || [];
   if (checklistItems.length > 0 && checklistItems.some((item: string) => item && item.trim())) {
     pdf.setFontSize(10);
@@ -407,7 +415,7 @@ export const generatePlanPDF = (planData: PlanData) => {
   }
 
   // Key Contacts Section
-  addTitle("📞 Key Contacts to Notify");
+  addTitle("Key Contacts to Notify");
   const contacts = planData.contacts || [];
   const contactData = contacts.map((c: any) => [
     c.name || "",
@@ -418,7 +426,7 @@ export const generatePlanPDF = (planData: PlanData) => {
   addTable(["Name", "Relationship", "Contact Info", "Notes"], contactData, contactData.length === 0 ? 3 : 0);
 
   // Vendors Section
-  addTitle("🤝 Preferred Vendors");
+  addTitle("Preferred Vendors");
   const vendors = planData.vendors || [];
   const vendorData = vendors.map((v: any) => [
     v.type || "",
@@ -429,7 +437,7 @@ export const generatePlanPDF = (planData: PlanData) => {
   addTable(["Type", "Business Name", "Contact", "Notes"], vendorData, vendorData.length === 0 ? 2 : 0);
 
   // Funeral Wishes Section
-  addTitle("🕊️ Funeral Wishes");
+  addTitle("Funeral Wishes");
   const funeral = planData.funeral || {};
   addField("Funeral Preference", funeral.funeral_preference, false);
   addField("Burial", funeral.burial ? "Yes" : "No");
@@ -446,7 +454,7 @@ export const generatePlanPDF = (planData: PlanData) => {
   if (funeral.general_notes) addField("Additional Details", funeral.general_notes, false);
 
   // Financial Life Section
-  addTitle("💰 Financial Life");
+  addTitle("Financial Life");
   const financial = planData.financial || {};
   const accounts = financial.accounts || [];
   const accountData = accounts.map((a: any) => [
@@ -461,7 +469,7 @@ export const generatePlanPDF = (planData: PlanData) => {
   if (financial.debts_details) addField("Outstanding Debts", financial.debts_details, false);
 
   // Insurance Section
-  addTitle("🛡️ Insurance");
+  addTitle("Insurance");
   const insurance = planData.insurance || {};
   const policies = insurance.policies || [];
   const policyData = policies.map((p: any) => [
@@ -473,7 +481,7 @@ export const generatePlanPDF = (planData: PlanData) => {
   addTable(["Type", "Company", "Policy #", "Agent"], policyData, policyData.length === 0 ? 2 : 0);
 
   // Property Section
-  addTitle("🏠 My Property");
+  addTitle("My Property");
   const property = planData.property || {};
   
   // Property types owned
@@ -540,11 +548,11 @@ export const generatePlanPDF = (planData: PlanData) => {
   }
 
   // Pets Section
-  addTitle("🐾 My Pets");
+  addTitle("My Pets");
   addSection("Pet Care Instructions", planData.pets_notes);
 
   // Digital World Section
-  addTitle("💻 Digital World");
+  addTitle("Digital World");
   const digital = planData.digital || {};
   
   // Digital Assets
@@ -586,7 +594,7 @@ export const generatePlanPDF = (planData: PlanData) => {
     checkPageBreak(15);
     pdf.setFontSize(12);
     pdf.setFont("helvetica", "bold");
-    pdf.text("📱 Phone Accounts:", 20, yPosition);
+    pdf.text("Phone Accounts:", 20, yPosition);
     yPosition += lineHeight + 3;
     
     phones.forEach((phone: any, index: number) => {
@@ -643,7 +651,7 @@ export const generatePlanPDF = (planData: PlanData) => {
   }
 
   // Legal Section
-  addTitle("⚖️ Legal");
+  addTitle("Legal");
   const legal = planData.legal || {};
   addField("I have a will", legal.has_will ? "Yes" : "No");
   if (legal.will_details) addField("Will Details", legal.will_details, false);
@@ -655,7 +663,7 @@ export const generatePlanPDF = (planData: PlanData) => {
   if (legal.advance_directive_details) addField("Directive Details", legal.advance_directive_details, false);
 
   // Messages Section
-  addTitle("❤️ Messages to Loved Ones");
+  addTitle("Messages to Loved Ones");
   const messages = planData.messages || [];
   if (messages.length > 0) {
     messages.forEach((message: any, index: number) => {
@@ -720,7 +728,7 @@ export const generatePlanPDF = (planData: PlanData) => {
   // Appendix section for uploaded documents/images
   pdf.addPage();
   yPosition = 20;
-  addTitle("📎 Appendix - Digital Media & Documents");
+  addTitle("Appendix - Digital Media & Documents");
   pdf.setFontSize(10);
   pdf.setFont("helvetica", "bold");
   pdf.text("IMPORTANT NOTICE:", 20, yPosition);
