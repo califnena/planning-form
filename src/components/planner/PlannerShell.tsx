@@ -5,6 +5,7 @@ import { Download, Mail, MessageSquare, Facebook, FileText } from "lucide-react"
 import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useTranslation } from "react-i18next";
+import everlastingLogo from "@/assets/everlasting-logo.png";
 
 interface PlannerShellProps {
   children: ReactNode;
@@ -38,9 +39,12 @@ export const PlannerShell = ({
       {/* Header */}
       <header className="border-b border-border sticky top-0 bg-background z-10">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <div>
-            <h1 className="text-lg font-semibold text-primary">{t("header.title")}</h1>
-            <p className="text-xs text-muted-foreground">Interactive Planning Guide</p>
+          <div className="flex items-center gap-3">
+            <img src={everlastingLogo} alt="Everlasting Funeral Advisors" className="h-12 w-12" />
+            <div>
+              <h1 className="text-lg font-semibold text-primary">{t("header.title")}</h1>
+              <p className="text-xs text-muted-foreground">Provided by Everlasting Funeral Advisors</p>
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <LanguageSelector />
