@@ -82,6 +82,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
             type="date"
             value={profile.dob || ""}
             onChange={(e) => updateProfile("dob", e.target.value)}
+            max={new Date().toISOString().split('T')[0]}
           />
         </div>
 
@@ -276,6 +277,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
               type="date"
               value={profile.vet_entry || ""}
               onChange={(e) => updateProfile("vet_entry", e.target.value)}
+              max={new Date().toISOString().split('T')[0]}
             />
           </div>
 
@@ -286,6 +288,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
               type="date"
               value={profile.vet_discharge || ""}
               onChange={(e) => updateProfile("vet_discharge", e.target.value)}
+              max={new Date().toISOString().split('T')[0]}
             />
           </div>
         </div>

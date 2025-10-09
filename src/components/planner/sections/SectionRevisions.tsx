@@ -132,6 +132,7 @@ export const SectionRevisions = ({ data, onChange }: SectionRevisionsProps) => {
                 type="date"
                 value={revision.revision_date || ""}
                 onChange={(e) => updateRevision(index, "revision_date", e.target.value)}
+                max={new Date().toISOString().split('T')[0]}
               />
             </div>
 
