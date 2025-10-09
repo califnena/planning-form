@@ -29,15 +29,16 @@ const AppPage = () => {
     checkAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!session) {
         navigate("/login");
       } else {
         setUser(session.user);
-        
-        // For new OAuth signups, create org
+        // Defer any Supabase calls to avoid deadlocks
         if (event === 'SIGNED_IN') {
-          await ensureUserHasOrg(session.user.id, session.user.email || "User");
+          setTimeout(() => {
+            ensureUserHasOrg(session.user.id, session.user.email || "User");
+          }, 0);
         }
       }
     });
@@ -46,31 +47,36 @@ const AppPage = () => {
   }, [navigate]);
 
   const ensureUserHasOrg = async (userId: string, email: string) => {
-    // Check if user already has an org
-    const { data: existingMembership } = await supabase
-      .from("org_members")
-      .select("id")
-      .eq("user_id", userId)
-      .limit(1)
-      .single();
+    try {
+      // Check if user already has an org
+      const { data: existingMembership } = await supabase
+        .from("org_members")
+        .select("id")
+        .eq("user_id", userId)
+        .limit(1)
+        .maybeSingle();
 
-    if (existingMembership) return;
+      if (existingMembership) return;
 
-    // Create org for new user
-    const { data: orgData, error: orgError } = await supabase
-      .from("orgs")
-      .insert({ name: `${email}'s Organization` })
-      .select()
-      .single();
+      // Create org for new user
+      const { data: orgData, error: orgError } = await supabase
+        .from("orgs")
+        .insert({ name: `${email}'s Organization` })
+        .select()
+        .single();
 
-    if (orgError || !orgData) return;
+      if (orgError || !orgData) return;
 
-    // Add user to org as owner
-    await supabase.from("org_members").insert({
-      org_id: orgData.id,
-      user_id: userId,
-      role: "owner",
-    });
+      // Add user to org as owner
+      await supabase.from("org_members").insert({
+        org_id: orgData.id,
+        user_id: userId,
+        role: "owner",
+      });
+    } catch (e) {
+      // Swallow to avoid blocking auth flow
+      console.warn("ensureUserHasOrg warning", e);
+    }
   };
 
   const handleSignOut = async () => {
