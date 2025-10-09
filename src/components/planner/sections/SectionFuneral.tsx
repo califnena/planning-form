@@ -223,6 +223,7 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
 
         <div className="space-y-2">
           <Label htmlFor="funeral_general_notes">Additional Details & Special Requests</Label>
+          <p className="text-xs text-muted-foreground">Preferred funeral home, music, readings, speakers, traditions, dress code, flowers, budget, pre-paid plan details</p>
           <Textarea
             id="funeral_general_notes"
             placeholder="Include:

@@ -74,6 +74,7 @@ export const SectionVendors = ({ data, onChange }: SectionVendorsProps) => {
             <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Vendor Type</Label>
+                <p className="text-xs text-muted-foreground">Category of service provider</p>
                 <Input
                   value={vendor.vendor_type || ""}
                   onChange={(e) => updateVendor(index, "vendor_type", e.target.value)}
@@ -83,6 +84,7 @@ export const SectionVendors = ({ data, onChange }: SectionVendorsProps) => {
 
               <div className="space-y-2">
                 <Label>Company Name</Label>
+                <p className="text-xs text-muted-foreground">Full business or company name</p>
                 <Input
                   value={vendor.company_name || ""}
                   onChange={(e) => updateVendor(index, "company_name", e.target.value)}
@@ -92,6 +94,7 @@ export const SectionVendors = ({ data, onChange }: SectionVendorsProps) => {
 
               <div className="space-y-2">
                 <Label>Contact Information</Label>
+                <p className="text-xs text-muted-foreground">Phone, email, or physical address</p>
                 <Input
                   value={vendor.contact || ""}
                   onChange={(e) => updateVendor(index, "contact", e.target.value)}
@@ -102,6 +105,7 @@ export const SectionVendors = ({ data, onChange }: SectionVendorsProps) => {
 
             <div className="space-y-2">
               <Label>Notes</Label>
+              <p className="text-xs text-muted-foreground">Special instructions, preferences, or account details</p>
               <Textarea
                 value={vendor.notes || ""}
                 onChange={(e) => updateVendor(index, "notes", e.target.value)}

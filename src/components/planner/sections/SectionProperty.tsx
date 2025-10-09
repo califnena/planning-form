@@ -153,6 +153,7 @@ export const SectionProperty = ({ data, onChange }: SectionPropertyProps) => {
             </div>
             <div className="space-y-2">
               <Label>Type</Label>
+              <p className="text-xs text-muted-foreground">e.g., House, Car, Business, Artwork, Jewelry</p>
               <Input
                 value={item.type || ""}
                 onChange={(e) => updateItem(index, "type", e.target.value)}
@@ -161,6 +162,7 @@ export const SectionProperty = ({ data, onChange }: SectionPropertyProps) => {
             </div>
             <div className="space-y-2">
               <Label>Description & Details</Label>
+              <p className="text-xs text-muted-foreground">Include address, value, mortgage info, or identifying details</p>
               <Textarea
                 value={item.description || ""}
                 onChange={(e) => updateItem(index, "description", e.target.value)}
@@ -170,6 +172,7 @@ export const SectionProperty = ({ data, onChange }: SectionPropertyProps) => {
             </div>
             <div className="space-y-2">
               <Label>Document Location</Label>
+              <p className="text-xs text-muted-foreground">Where deeds, titles, or purchase documents are stored</p>
               <Input
                 value={item.location || ""}
                 onChange={(e) => updateItem(index, "location", e.target.value)}

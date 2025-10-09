@@ -44,6 +44,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="full_name">Full Legal Name</Label>
+          <p className="text-xs text-muted-foreground">Enter your complete legal name as it appears on official documents</p>
           <Input
             id="full_name"
             value={profile.full_name || ""}
@@ -54,6 +55,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
         <div className="space-y-2">
           <Label htmlFor="maiden_name">Maiden Name (if applicable)</Label>
+          <p className="text-xs text-muted-foreground">Birth name if different from current legal name</p>
           <Input
             id="maiden_name"
             value={profile.maiden_name || ""}
@@ -63,6 +65,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
         <div className="space-y-2">
           <Label htmlFor="dob">Date of Birth</Label>
+          <p className="text-xs text-muted-foreground">Needed for official records and certificates</p>
           <Input
             id="dob"
             type="date"
@@ -73,6 +76,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
         <div className="space-y-2">
           <Label htmlFor="birthplace">Place of Birth</Label>
+          <p className="text-xs text-muted-foreground">City, State, and Country where you were born</p>
           <Input
             id="birthplace"
             value={profile.birthplace || ""}
@@ -83,6 +87,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
         <div className="space-y-2">
           <Label htmlFor="ssn">Social Security Number</Label>
+          <p className="text-xs text-muted-foreground">Required for benefits and official notifications</p>
           <Input
             id="ssn"
             value={profile.ssn || ""}
@@ -93,6 +98,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
         <div className="space-y-2">
           <Label htmlFor="citizenship">Citizenship</Label>
+          <p className="text-xs text-muted-foreground">Country of citizenship</p>
           <Input
             id="citizenship"
             value={profile.citizenship || ""}
@@ -103,6 +109,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
       <div className="space-y-2">
         <Label htmlFor="address">Current Address</Label>
+        <p className="text-xs text-muted-foreground">Your complete residential address</p>
         <Textarea
           id="address"
           value={profile.address || ""}

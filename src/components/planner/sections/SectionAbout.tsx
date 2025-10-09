@@ -36,6 +36,7 @@ export const SectionAbout = ({ value, onChange }: SectionAboutProps) => {
 
       <div className="space-y-2">
         <Label htmlFor="about">My Story & Legacy</Label>
+        <p className="text-xs text-muted-foreground">Share career highlights, hobbies, favorite memories, values, and how you'd like to be remembered</p>
         <Textarea
           id="about"
           placeholder="Share your life story, accomplishments, favorite memories, hobbies, and how you'd like to be remembered..."

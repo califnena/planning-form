@@ -18,6 +18,7 @@ export const SectionInstructions = ({ value, onChange }: SectionInstructionsProp
 
       <div className="space-y-2">
         <Label htmlFor="instructions">General Instructions & Notes</Label>
+        <p className="text-xs text-muted-foreground">Document locations, time-sensitive actions, key contacts, and access codes</p>
         <Textarea
           id="instructions"
           placeholder="Add any instructions or important notes here..."

@@ -36,6 +36,7 @@ export const SectionPets = ({ value, onChange }: SectionPetsProps) => {
 
       <div className="space-y-2">
         <Label htmlFor="pets">Pet Care Information</Label>
+        <p className="text-xs text-muted-foreground">For each pet include: name, breed, age, vet contact, medical conditions, feeding schedule, medications, behavioral notes, preferred caregiver, insurance info, microchip numbers, medical records location, care funds, end-of-life preferences</p>
         <Textarea
           id="pets"
           value={value || ""}

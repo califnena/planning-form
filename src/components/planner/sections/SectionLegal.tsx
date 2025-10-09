@@ -109,6 +109,7 @@ export const SectionLegal = ({ data, onChange }: SectionLegalProps) => {
       <div className="grid md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="executor">Executor Name</Label>
+          <p className="text-xs text-muted-foreground">Person responsible for carrying out your will</p>
           <Input
             id="executor"
             value={legal.executor || ""}
@@ -118,6 +119,7 @@ export const SectionLegal = ({ data, onChange }: SectionLegalProps) => {
         </div>
         <div className="space-y-2">
           <Label htmlFor="executor_contact">Executor Contact</Label>
+          <p className="text-xs text-muted-foreground">Best way to reach your executor</p>
           <Input
             id="executor_contact"
             value={legal.executor_contact || ""}
@@ -171,6 +173,7 @@ export const SectionLegal = ({ data, onChange }: SectionLegalProps) => {
 
       <div className="space-y-2">
         <Label htmlFor="document_location">Location of Original Documents</Label>
+        <p className="text-xs text-muted-foreground">Where originals are stored (safe, safe deposit box, attorney's office)</p>
         <Textarea
           id="document_location"
           value={legal.document_location || ""}

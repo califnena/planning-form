@@ -117,6 +117,7 @@ export const SectionChecklist = ({ data, onChange }: SectionChecklistProps) => {
             <div className="flex gap-2 items-start">
               <div className="flex-1">
                 <Label>Checklist Title</Label>
+                <p className="text-xs text-muted-foreground">Name for this custom checklist category</p>
                 <Input
                   value={checklist.title || ""}
                   onChange={(e) => updateChecklistTitle(checklistIndex, e.target.value)}

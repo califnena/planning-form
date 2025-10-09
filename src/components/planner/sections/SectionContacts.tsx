@@ -74,6 +74,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
             <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Name</Label>
+                <p className="text-xs text-muted-foreground">Full name of the person to notify</p>
                 <Input
                   value={contact.name || ""}
                   onChange={(e) => updateContact(index, "name", e.target.value)}
@@ -83,6 +84,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
 
               <div className="space-y-2">
                 <Label>Relationship</Label>
+                <p className="text-xs text-muted-foreground">How they're related to you</p>
                 <Input
                   value={contact.relationship || ""}
                   onChange={(e) => updateContact(index, "relationship", e.target.value)}
@@ -92,6 +94,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
 
               <div className="space-y-2">
                 <Label>Contact Info</Label>
+                <p className="text-xs text-muted-foreground">Best phone number or email</p>
                 <Input
                   value={contact.contact || ""}
                   onChange={(e) => updateContact(index, "contact", e.target.value)}

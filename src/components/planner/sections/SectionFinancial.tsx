@@ -154,6 +154,7 @@ export const SectionFinancial = ({ data, onChange }: SectionFinancialProps) => {
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Account Type</Label>
+                <p className="text-xs text-muted-foreground">Category of financial account</p>
                 <Input
                   value={account.type || ""}
                   onChange={(e) => updateAccount(index, "type", e.target.value)}
@@ -162,6 +163,7 @@ export const SectionFinancial = ({ data, onChange }: SectionFinancialProps) => {
               </div>
               <div className="space-y-2">
                 <Label>Institution</Label>
+                <p className="text-xs text-muted-foreground">Bank or financial company name</p>
                 <Input
                   value={account.institution || ""}
                   onChange={(e) => updateAccount(index, "institution", e.target.value)}
@@ -171,6 +173,7 @@ export const SectionFinancial = ({ data, onChange }: SectionFinancialProps) => {
             </div>
             <div className="space-y-2">
               <Label>Details & Location of Documents</Label>
+              <p className="text-xs text-muted-foreground">Account numbers, beneficiaries, document locations (use password manager for sensitive info)</p>
               <Textarea
                 value={account.details || ""}
                 onChange={(e) => updateAccount(index, "details", e.target.value)}
@@ -196,6 +199,7 @@ export const SectionFinancial = ({ data, onChange }: SectionFinancialProps) => {
       {financial.has_safe_deposit && (
         <div className="space-y-2">
           <Label htmlFor="safe_deposit_details" className="text-base font-semibold">Safe Deposit Box Details</Label>
+          <p className="text-xs text-muted-foreground">Bank location, box number, key location, who has access, contents list</p>
           <Textarea
             id="safe_deposit_details"
             value={financial.safe_deposit_details || ""}
@@ -210,6 +214,7 @@ export const SectionFinancial = ({ data, onChange }: SectionFinancialProps) => {
       {financial.has_crypto && (
         <div className="space-y-2">
           <Label htmlFor="crypto_details" className="text-base font-semibold">Cryptocurrency Details</Label>
+          <p className="text-xs text-muted-foreground">Types of crypto, exchanges, wallet info, seed phrase location (store securely!), value</p>
           <Textarea
             id="crypto_details"
             value={financial.crypto_details || ""}
@@ -224,6 +229,7 @@ export const SectionFinancial = ({ data, onChange }: SectionFinancialProps) => {
       {financial.has_business && (
         <div className="space-y-2">
           <Label htmlFor="business_details" className="text-base font-semibold">Business Interests Details</Label>
+          <p className="text-xs text-muted-foreground">Business name, ownership %, partners, succession plans, document locations, accountant/attorney contacts</p>
           <Textarea
             id="business_details"
             value={financial.business_details || ""}
@@ -238,6 +244,7 @@ export const SectionFinancial = ({ data, onChange }: SectionFinancialProps) => {
       {financial.has_debts && (
         <div className="space-y-2">
           <Label htmlFor="debts_details" className="text-base font-semibold">Outstanding Debts Details</Label>
+          <p className="text-xs text-muted-foreground">List all loans, credit cards, mortgages with creditor names, account numbers, balances</p>
           <Textarea
             id="debts_details"
             value={financial.debts_details || ""}

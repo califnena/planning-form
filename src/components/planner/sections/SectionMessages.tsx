@@ -154,6 +154,7 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
 
             <div className="space-y-2">
               <Label>To (Recipients)</Label>
+              <p className="text-xs text-muted-foreground">Who this message is for (can be one person or multiple people)</p>
               <Input
                 value={message.recipients || ""}
                 onChange={(e) => updateMessage(index, "recipients", e.target.value)}
@@ -163,6 +164,7 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
 
             <div className="space-y-2">
               <Label>Written Message</Label>
+              <p className="text-xs text-muted-foreground">Share your love, memories, wisdom, and hopes for their future</p>
               <Textarea
                 value={message.text_message || ""}
                 onChange={(e) => updateMessage(index, "text_message", e.target.value)}

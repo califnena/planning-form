@@ -162,6 +162,7 @@ export const SectionInsurance = ({ data, onChange }: SectionInsuranceProps) => {
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Insurance Type</Label>
+                <p className="text-xs text-muted-foreground">Category of insurance policy</p>
                 <Input
                   value={policy.type || ""}
                   onChange={(e) => updatePolicy(index, "type", e.target.value)}
@@ -170,6 +171,7 @@ export const SectionInsurance = ({ data, onChange }: SectionInsuranceProps) => {
               </div>
               <div className="space-y-2">
                 <Label>Company</Label>
+                <p className="text-xs text-muted-foreground">Name of insurance provider</p>
                 <Input
                   value={policy.company || ""}
                   onChange={(e) => updatePolicy(index, "company", e.target.value)}
@@ -179,6 +181,7 @@ export const SectionInsurance = ({ data, onChange }: SectionInsuranceProps) => {
             </div>
             <div className="space-y-2">
               <Label>Policy Number</Label>
+              <p className="text-xs text-muted-foreground">Unique identifier for this policy</p>
               <Input
                 value={policy.policy_number || ""}
                 onChange={(e) => updatePolicy(index, "policy_number", e.target.value)}
@@ -187,6 +190,7 @@ export const SectionInsurance = ({ data, onChange }: SectionInsuranceProps) => {
             </div>
             <div className="space-y-2">
               <Label>Details</Label>
+              <p className="text-xs text-muted-foreground">Coverage amount, beneficiaries, agent contact, document location</p>
               <Textarea
                 value={policy.details || ""}
                 onChange={(e) => updatePolicy(index, "details", e.target.value)}

@@ -170,6 +170,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
             <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Carrier</Label>
+                <p className="text-xs text-muted-foreground">Mobile service provider</p>
                 <Input
                   value={phone.carrier || ""}
                   onChange={(e) => updatePhone(index, "carrier", e.target.value)}
@@ -178,6 +179,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
               </div>
               <div className="space-y-2">
                 <Label>Phone Number</Label>
+                <p className="text-xs text-muted-foreground">Your mobile number</p>
                 <Input
                   value={phone.number || ""}
                   onChange={(e) => updatePhone(index, "number", e.target.value)}
@@ -186,6 +188,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
               </div>
               <div className="space-y-2">
                 <Label>PIN/Password Location</Label>
+                <p className="text-xs text-muted-foreground">Where account PIN is stored</p>
                 <Input
                   value={phone.pin || ""}
                   onChange={(e) => updatePhone(index, "pin", e.target.value)}
@@ -232,6 +235,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Platform/Service</Label>
+                <p className="text-xs text-muted-foreground">Name of digital service or platform</p>
                 <Input
                   value={account.platform || ""}
                   onChange={(e) => updateAccount(index, "platform", e.target.value)}
@@ -240,6 +244,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
               </div>
               <div className="space-y-2">
                 <Label>Username/Email</Label>
+                <p className="text-xs text-muted-foreground">How you log into this account</p>
                 <Input
                   value={account.username || ""}
                   onChange={(e) => updateAccount(index, "username", e.target.value)}
@@ -249,6 +254,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
             </div>
             <div className="space-y-2">
               <Label>Preferred Action</Label>
+              <p className="text-xs text-muted-foreground">What should happen to this account (memorialize, delete, transfer)</p>
               <Input
                 value={account.action || ""}
                 onChange={(e) => updateAccount(index, "action", e.target.value)}
@@ -271,6 +277,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
 
       <div className="space-y-2">
         <Label htmlFor="password_manager_info">Password Manager Information</Label>
+        <p className="text-xs text-muted-foreground">Which password manager you use and where the master password is stored</p>
         <Textarea
           id="password_manager_info"
           value={digital.password_manager_info || ""}

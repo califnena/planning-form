@@ -93,6 +93,7 @@ export const SectionRevisions = ({ data, onChange }: SectionRevisionsProps) => {
 
       <div className="space-y-2">
         <Label htmlFor="prepared_by">Prepared By (Name)</Label>
+        <p className="text-xs text-muted-foreground">Full name of person creating or managing this plan</p>
         <Input
           id="prepared_by"
           value={preparedBy}
