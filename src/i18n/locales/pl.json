@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "instructions": "📝 Instrukcje",
+    "personal": "👤 Moje Dane Osobowe",
+    "about": "🌟 O Mnie",
+    "contacts": "📞 Kluczowe Kontakty",
+    "vendors": "🤝 Preferowani Dostawcy",
+    "checklist": "✅ Lista Kontrolna",
+    "funeral": "🕊️ Życzenia Pogrzebowe",
+    "financial": "💰 Życie Finansowe",
+    "insurance": "🛡️ Ubezpieczenia",
+    "property": "🏠 Moja Własność",
+    "pets": "🐾 Moje Zwierzęta",
+    "digital": "💻 Świat Cyfrowy",
+    "legal": "⚖️ Prawne (Testament/Trust)",
+    "messages": "❤️ Wiadomości",
+    "faq": "📖 Przewodnik i FAQ",
+    "revisions": "🖋️ Rewizje i Zatwierdzenia"
+  },
+  "header": {
+    "title": "Moje Ostatnie Życzenia",
+    "downloadPDF": "Pobierz PDF",
+    "emailPlan": "Wyślij Plan Email",
+    "contact": "Kontakt / Sugestia",
+    "signOut": "Wyloguj"
+  },
+  "instructions": {
+    "title": "Instrukcje",
+    "description": "Witaj w Moje Ostatnie Życzenia! Ten kompleksowy planer pomaga organizować ważne informacje dla Twoich bliskich.",
+    "howToUse": "Jak Używać Tego Planera",
+    "tips": "Wskazówki dla Sukcesu",
+    "suggestedText": "Sugerowany Tekst:",
+    "step1": "Nawiguj używając paska bocznego po lewej stronie",
+    "step2": "Wypełnij każdą sekcję we własnym tempie",
+    "step3": "Zapisuj swoje postępy na bieżąco",
+    "step4": "Pobierz lub wyślij emailem swój ukończony plan",
+    "tip1": "Bądź dokładny, ale nie stresuj się o perfekcję",
+    "tip2": "Aktualizuj regularnie, gdy okoliczności się zmienią",
+    "tip3": "Udostępnij kluczowe informacje zaufanym osobom"
+  },
+  "common": {
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "add": "Dodaj",
+    "loading": "Ładowanie...",
+    "notes": "Notatki",
+    "name": "Imię",
+    "email": "Email",
+    "phone": "Telefon",
+    "address": "Adres",
+    "relationship": "Relacja",
+    "yes": "Tak",
+    "no": "Nie"
+  }
+}

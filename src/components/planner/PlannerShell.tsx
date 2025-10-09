@@ -3,6 +3,8 @@ import { SidebarNav } from "./SidebarNav";
 import { Button } from "@/components/ui/button";
 import { Download, Mail, MessageSquare, Facebook } from "lucide-react";
 import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useTranslation } from "react-i18next";
 
 interface PlannerShellProps {
   children: ReactNode;
@@ -24,6 +26,7 @@ export const PlannerShell = ({
   onSignOut,
 }: PlannerShellProps) => {
   const [showContactDialog, setShowContactDialog] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <>
@@ -36,15 +39,18 @@ export const PlannerShell = ({
       <header className="border-b border-border sticky top-0 bg-background z-10">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <div>
-            <h1 className="text-lg font-semibold text-primary">My Final Wishes</h1>
+            <h1 className="text-lg font-semibold text-primary">{t("header.title")}</h1>
             <p className="text-xs text-muted-foreground">Interactive Planning Guide</p>
           </div>
-          <button
-            onClick={onSignOut}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Sign Out
-          </button>
+          <div className="flex items-center gap-4">
+            <LanguageSelector />
+            <button
+              onClick={onSignOut}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              {t("header.signOut")}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -70,7 +76,7 @@ export const PlannerShell = ({
               onClick={onDownloadPDF}
             >
               <Download className="mr-2 h-4 w-4" />
-              Download PDF
+              {t("header.downloadPDF")}
             </Button>
             <Button
               variant="outline"
@@ -79,7 +85,7 @@ export const PlannerShell = ({
               onClick={onEmailPlan}
             >
               <Mail className="mr-2 h-4 w-4" />
-              Email Plan
+              {t("header.emailPlan")}
             </Button>
             <Button
               variant="outline"
@@ -88,7 +94,7 @@ export const PlannerShell = ({
               onClick={() => setShowContactDialog(true)}
             >
               <MessageSquare className="mr-2 h-4 w-4" />
-              Contact & Suggestions
+              {t("header.contact")}
             </Button>
           </div>
 

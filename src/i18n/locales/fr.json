@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "instructions": "📝 Instructions",
+    "personal": "👤 Mes Informations Personnelles",
+    "about": "🌟 À Propos de Moi",
+    "contacts": "📞 Contacts Clés",
+    "vendors": "🤝 Fournisseurs Préférés",
+    "checklist": "✅ Liste de Contrôle",
+    "funeral": "🕊️ Souhaits Funéraires",
+    "financial": "💰 Vie Financière",
+    "insurance": "🛡️ Assurances",
+    "property": "🏠 Ma Propriété",
+    "pets": "🐾 Mes Animaux",
+    "digital": "💻 Monde Numérique",
+    "legal": "⚖️ Légal (Testament/Fiducie)",
+    "messages": "❤️ Messages",
+    "faq": "📖 Guide et FAQ",
+    "revisions": "🖋️ Révisions et Approbations"
+  },
+  "header": {
+    "title": "Mes Dernières Volontés",
+    "downloadPDF": "Télécharger PDF",
+    "emailPlan": "Envoyer le Plan par Email",
+    "contact": "Contact / Suggestion",
+    "signOut": "Se Déconnecter"
+  },
+  "instructions": {
+    "title": "Instructions",
+    "description": "Bienvenue dans Mes Dernières Volontés! Ce planificateur complet vous aide à organiser les informations importantes pour vos proches.",
+    "howToUse": "Comment Utiliser Ce Planificateur",
+    "tips": "Conseils pour Réussir",
+    "suggestedText": "Texte Suggéré:",
+    "step1": "Naviguez en utilisant la barre latérale à gauche",
+    "step2": "Remplissez chaque section à votre rythme",
+    "step3": "Enregistrez votre progression au fur et à mesure",
+    "step4": "Téléchargez ou envoyez par email votre plan complété",
+    "tip1": "Soyez minutieux mais ne stressez pas pour la perfection",
+    "tip2": "Mettez à jour régulièrement lorsque les circonstances changent",
+    "tip3": "Partagez les informations clés avec des personnes de confiance"
+  },
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "loading": "Chargement...",
+    "notes": "Notes",
+    "name": "Nom",
+    "email": "Email",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "relationship": "Relation",
+    "yes": "Oui",
+    "no": "Non"
+  }
+}

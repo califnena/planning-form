@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "instructions": "📝 Istruzioni",
+    "personal": "👤 Le Mie Informazioni Personali",
+    "about": "🌟 Su di Me",
+    "contacts": "📞 Contatti Chiave",
+    "vendors": "🤝 Fornitori Preferiti",
+    "checklist": "✅ Lista di Controllo",
+    "funeral": "🕊️ Desideri Funebri",
+    "financial": "💰 Vita Finanziaria",
+    "insurance": "🛡️ Assicurazioni",
+    "property": "🏠 La Mia Proprietà",
+    "pets": "🐾 I Miei Animali",
+    "digital": "💻 Mondo Digitale",
+    "legal": "⚖️ Legale (Testamento/Trust)",
+    "messages": "❤️ Messaggi",
+    "faq": "📖 Guida e Domande Frequenti",
+    "revisions": "🖋️ Revisioni e Approvazioni"
+  },
+  "header": {
+    "title": "Le Mie Ultime Volontà",
+    "downloadPDF": "Scarica PDF",
+    "emailPlan": "Invia Piano via Email",
+    "contact": "Contatto / Suggerimento",
+    "signOut": "Disconnetti"
+  },
+  "instructions": {
+    "title": "Istruzioni",
+    "description": "Benvenuto in Le Mie Ultime Volontà! Questo pianificatore completo ti aiuta a organizzare informazioni importanti per i tuoi cari.",
+    "howToUse": "Come Usare Questo Pianificatore",
+    "tips": "Consigli per il Successo",
+    "suggestedText": "Testo Suggerito:",
+    "step1": "Naviga usando la barra laterale a sinistra",
+    "step2": "Compila ogni sezione al tuo ritmo",
+    "step3": "Salva i tuoi progressi man mano che procedi",
+    "step4": "Scarica o invia via email il tuo piano completato",
+    "tip1": "Sii accurato ma non stressarti per la perfezione",
+    "tip2": "Aggiorna regolarmente quando le circostanze cambiano",
+    "tip3": "Condividi informazioni chiave con persone fidate"
+  },
+  "common": {
+    "save": "Salva",
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "add": "Aggiungi",
+    "loading": "Caricamento...",
+    "notes": "Note",
+    "name": "Nome",
+    "email": "Email",
+    "phone": "Telefono",
+    "address": "Indirizzo",
+    "relationship": "Relazione",
+    "yes": "Sì",
+    "no": "No"
+  }
+}

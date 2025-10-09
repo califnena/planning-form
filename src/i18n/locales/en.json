@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "instructions": "📝 Instructions",
+    "personal": "👤 My Personal Information",
+    "about": "🌟 About Me",
+    "contacts": "📞 Key Contacts",
+    "vendors": "🤝 Preferred Vendors",
+    "checklist": "✅ Checklist",
+    "funeral": "🕊️ Funeral Wishes",
+    "financial": "💰 Financial Life",
+    "insurance": "🛡️ Insurance",
+    "property": "🏠 My Property",
+    "pets": "🐾 My Pets",
+    "digital": "💻 Digital World",
+    "legal": "⚖️ Legal (Will/Trust)",
+    "messages": "❤️ Messages",
+    "faq": "📖 Guide & FAQ",
+    "revisions": "🖋️ Revisions & Approvals"
+  },
+  "header": {
+    "title": "My Final Wishes",
+    "downloadPDF": "Download PDF",
+    "emailPlan": "Email Plan",
+    "contact": "Contact / Suggest",
+    "signOut": "Sign Out"
+  },
+  "instructions": {
+    "title": "Instructions",
+    "description": "Welcome to My Final Wishes! This comprehensive planner helps you organize important information for your loved ones.",
+    "howToUse": "How to Use This Planner",
+    "tips": "Tips for Success",
+    "suggestedText": "Suggested Text:",
+    "step1": "Navigate using the sidebar on the left",
+    "step2": "Fill out each section at your own pace",
+    "step3": "Save your progress as you go",
+    "step4": "Download or email your completed plan",
+    "tip1": "Be thorough but don't stress about perfection",
+    "tip2": "Update regularly as circumstances change",
+    "tip3": "Share key information with trusted individuals"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "loading": "Loading...",
+    "notes": "Notes",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "relationship": "Relationship",
+    "yes": "Yes",
+    "no": "No"
+  }
+}

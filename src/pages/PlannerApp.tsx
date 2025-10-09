@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { RevisionPromptDialog } from "@/components/planner/RevisionPromptDialog";
 import { EmailPlanDialog } from "@/components/EmailPlanDialog";
 import { generatePlanPDF } from "@/lib/pdfGenerator";
+import { useTranslation } from "react-i18next";
 
 // Section components
 import { SectionInstructions } from "@/components/planner/sections/SectionInstructions";
@@ -30,6 +31,7 @@ import { SectionFAQ } from "@/components/planner/sections/SectionFAQ";
 const PlannerApp = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [activeSection, setActiveSection] = useState("instructions");
@@ -158,32 +160,32 @@ const PlannerApp = () => {
   const sectionItems = [
     {
       id: "instructions",
-      label: "📝 Instructions",
+      label: t("navigation.instructions"),
       completed: !!plan.instructions_notes,
     },
-    { id: "personal", label: "👤 My Personal Information", completed: false },
-    { id: "about", label: "🌟 About Me", completed: !!plan.about_me_notes },
-    { id: "contacts", label: "📞 Key Contacts", completed: false },
-    { id: "vendors", label: "🤝 Preferred Vendors", completed: false },
-    { id: "checklist", label: "✅ Checklist", completed: !!plan.checklist_notes },
+    { id: "personal", label: t("navigation.personal"), completed: false },
+    { id: "about", label: t("navigation.about"), completed: !!plan.about_me_notes },
+    { id: "contacts", label: t("navigation.contacts"), completed: false },
+    { id: "vendors", label: t("navigation.vendors"), completed: false },
+    { id: "checklist", label: t("navigation.checklist"), completed: !!plan.checklist_notes },
     {
       id: "funeral",
-      label: "🕊️ Funeral Wishes",
+      label: t("navigation.funeral"),
       completed: !!plan.funeral_wishes_notes,
     },
     {
       id: "financial",
-      label: "💰 Financial Life",
+      label: t("navigation.financial"),
       completed: !!plan.financial_notes,
     },
-    { id: "insurance", label: "🛡️ Insurance", completed: !!plan.insurance_notes },
-    { id: "property", label: "🏠 My Property", completed: !!plan.property_notes },
-    { id: "pets", label: "🐾 My Pets", completed: !!plan.pets_notes },
-    { id: "digital", label: "💻 Digital World", completed: !!plan.digital_notes },
-    { id: "legal", label: "⚖️ Legal (Will/Trust)", completed: !!plan.legal_notes },
-    { id: "messages", label: "❤️ Messages", completed: !!plan.messages_notes },
-    { id: "faq", label: "📖 Guide & FAQ", completed: false },
-    { id: "revisions", label: "🖋️ Revisions & Approvals", completed: false },
+    { id: "insurance", label: t("navigation.insurance"), completed: !!plan.insurance_notes },
+    { id: "property", label: t("navigation.property"), completed: !!plan.property_notes },
+    { id: "pets", label: t("navigation.pets"), completed: !!plan.pets_notes },
+    { id: "digital", label: t("navigation.digital"), completed: !!plan.digital_notes },
+    { id: "legal", label: t("navigation.legal"), completed: !!plan.legal_notes },
+    { id: "messages", label: t("navigation.messages"), completed: !!plan.messages_notes },
+    { id: "faq", label: t("navigation.faq"), completed: false },
+    { id: "revisions", label: t("navigation.revisions"), completed: false },
   ];
 
   if (authLoading || planLoading) {

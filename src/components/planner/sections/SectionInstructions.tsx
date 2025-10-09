@@ -1,5 +1,6 @@
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "react-i18next";
 
 interface SectionInstructionsProps {
   value?: string;
@@ -7,12 +8,14 @@ interface SectionInstructionsProps {
 }
 
 export const SectionInstructions = ({ value, onChange }: SectionInstructionsProps) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-2xl font-bold mb-2">📝 Instructions</h2>
+        <h2 className="text-2xl font-bold mb-2">{t("navigation.instructions")}</h2>
         <p className="text-muted-foreground mb-6">
-          Use this section to provide any special instructions or guidance for those who will use this plan.
+          {t("instructions.description")}
         </p>
       </div>
 
@@ -30,8 +33,11 @@ export const SectionInstructions = ({ value, onChange }: SectionInstructionsProp
       </div>
 
       <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-        <h3 className="font-semibold mb-2">💡 Tips:</h3>
+        <h3 className="font-semibold mb-2">💡 {t("instructions.tips")}:</h3>
         <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+          <li>{t("instructions.tip1")}</li>
+          <li>{t("instructions.tip2")}</li>
+          <li>{t("instructions.tip3")}</li>
           <li>Include where important documents are stored</li>
           <li>Note any time-sensitive actions that should be taken</li>
           <li>Mention key people who should be contacted first</li>
@@ -40,7 +46,7 @@ export const SectionInstructions = ({ value, onChange }: SectionInstructionsProp
       </div>
 
       <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
-        <h3 className="font-semibold mb-3">Suggested Text:</h3>
+        <h3 className="font-semibold mb-3">{t("instructions.suggestedText")}</h3>
         <p className="text-sm text-foreground leading-relaxed italic">
           "If you are reading this, it means you have the difficult task of carrying out my final wishes. 
           I want you to know that everything written here was prepared with love, to make this time a little 

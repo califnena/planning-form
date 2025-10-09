@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "instructions": "📝 Instruções",
+    "personal": "👤 Minhas Informações Pessoais",
+    "about": "🌟 Sobre Mim",
+    "contacts": "📞 Contatos Principais",
+    "vendors": "🤝 Fornecedores Preferidos",
+    "checklist": "✅ Lista de Verificação",
+    "funeral": "🕊️ Desejos Funerários",
+    "financial": "💰 Vida Financeira",
+    "insurance": "🛡️ Seguros",
+    "property": "🏠 Minha Propriedade",
+    "pets": "🐾 Meus Animais",
+    "digital": "💻 Mundo Digital",
+    "legal": "⚖️ Legal (Testamento/Fideicomisso)",
+    "messages": "❤️ Mensagens",
+    "faq": "📖 Guia e Perguntas Frequentes",
+    "revisions": "🖋️ Revisões e Aprovações"
+  },
+  "header": {
+    "title": "Meus Últimos Desejos",
+    "downloadPDF": "Baixar PDF",
+    "emailPlan": "Enviar Plano por Email",
+    "contact": "Contato / Sugestão",
+    "signOut": "Sair"
+  },
+  "instructions": {
+    "title": "Instruções",
+    "description": "Bem-vindo ao Meus Últimos Desejos! Este planejador abrangente ajuda você a organizar informações importantes para seus entes queridos.",
+    "howToUse": "Como Usar Este Planejador",
+    "tips": "Dicas para o Sucesso",
+    "suggestedText": "Texto Sugerido:",
+    "step1": "Navegue usando a barra lateral à esquerda",
+    "step2": "Preencha cada seção no seu próprio ritmo",
+    "step3": "Salve seu progresso conforme avança",
+    "step4": "Baixe ou envie por email seu plano completo",
+    "tip1": "Seja minucioso, mas não se estresse com a perfeição",
+    "tip2": "Atualize regularmente conforme as circunstâncias mudarem",
+    "tip3": "Compartilhe informações importantes com pessoas de confiança"
+  },
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "add": "Adicionar",
+    "loading": "Carregando...",
+    "notes": "Notas",
+    "name": "Nome",
+    "email": "Email",
+    "phone": "Telefone",
+    "address": "Endereço",
+    "relationship": "Relacionamento",
+    "yes": "Sim",
+    "no": "Não"
+  }
+}
