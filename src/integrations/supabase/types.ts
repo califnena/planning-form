@@ -1038,6 +1038,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_org_owner: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_plan_owner: {
         Args: { _plan_id: string; _user_id: string }
         Returns: boolean

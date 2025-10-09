@@ -19,22 +19,59 @@ const AppPage = () => {
       }
 
       setUser(session.user);
+      
+      // For OAuth users, ensure they have an org
+      await ensureUserHasOrg(session.user.id, session.user.email || "User");
+      
       setLoading(false);
     };
 
     checkAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!session) {
         navigate("/login");
       } else {
         setUser(session.user);
+        
+        // For new OAuth signups, create org
+        if (event === 'SIGNED_IN') {
+          await ensureUserHasOrg(session.user.id, session.user.email || "User");
+        }
       }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const ensureUserHasOrg = async (userId: string, email: string) => {
+    // Check if user already has an org
+    const { data: existingMembership } = await supabase
+      .from("org_members")
+      .select("id")
+      .eq("user_id", userId)
+      .limit(1)
+      .single();
+
+    if (existingMembership) return;
+
+    // Create org for new user
+    const { data: orgData, error: orgError } = await supabase
+      .from("orgs")
+      .insert({ name: `${email}'s Organization` })
+      .select()
+      .single();
+
+    if (orgError || !orgData) return;
+
+    // Add user to org as owner
+    await supabase.from("org_members").insert({
+      org_id: orgData.id,
+      user_id: userId,
+      role: "owner",
+    });
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
