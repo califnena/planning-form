@@ -43,7 +43,7 @@ export const PlannerShell = ({
             <img src={everlastingLogo} alt="Everlasting Funeral Advisors" className="h-12 w-12" />
             <div>
               <h1 className="text-lg font-semibold text-primary">{t("header.title")}</h1>
-              <p className="text-xs text-muted-foreground">Provided by Everlasting Funeral Advisors</p>
+              <p className="text-xs text-muted-foreground">{t("header.providedBy")}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
