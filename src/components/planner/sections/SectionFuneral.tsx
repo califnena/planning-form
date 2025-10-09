@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Save } from "lucide-react";
+import { Save, Upload, X, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
 
 interface SectionFuneralProps {
   data: any;
@@ -13,6 +15,8 @@ interface SectionFuneralProps {
 export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
   const funeral = data.funeral || {};
   const { toast } = useToast();
+  const [uploading, setUploading] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
   const updateFuneral = (field: string, value: any) => {
     onChange({
@@ -26,6 +30,113 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
       title: "Saved",
       description: "Funeral wishes have been saved.",
     });
+  };
+
+  useEffect(() => {
+    // Load existing photo if available
+    if (funeral.photo_path) {
+      const { data: { publicUrl } } = supabase.storage
+        .from('funeral-photos')
+        .getPublicUrl(funeral.photo_path);
+      setPhotoUrl(publicUrl);
+    }
+  }, [funeral.photo_path]);
+
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file",
+        description: "Please upload an image file (JPG, PNG, etc.)",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please upload an image smaller than 5MB",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      // Create a unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/funeral-photo-${Date.now()}.${fileExt}`;
+
+      // Delete old photo if exists
+      if (funeral.photo_path) {
+        await supabase.storage
+          .from('funeral-photos')
+          .remove([funeral.photo_path]);
+      }
+
+      // Upload new photo
+      const { error: uploadError } = await supabase.storage
+        .from('funeral-photos')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('funeral-photos')
+        .getPublicUrl(fileName);
+
+      setPhotoUrl(publicUrl);
+      updateFuneral('photo_path', fileName);
+
+      toast({
+        title: "Photo uploaded",
+        description: "Your funeral photo has been uploaded successfully.",
+      });
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+      toast({
+        title: "Upload failed",
+        description: "There was an error uploading your photo. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    if (!funeral.photo_path) return;
+
+    try {
+      await supabase.storage
+        .from('funeral-photos')
+        .remove([funeral.photo_path]);
+
+      setPhotoUrl(null);
+      updateFuneral('photo_path', null);
+
+      toast({
+        title: "Photo removed",
+        description: "Your funeral photo has been removed.",
+      });
+    } catch (error) {
+      console.error('Error removing photo:', error);
+      toast({
+        title: "Remove failed",
+        description: "There was an error removing your photo. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -44,6 +155,75 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
       </div>
 
       <div className="space-y-6">
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="funeral_photo" className="text-base font-semibold">Preferred Photo</Label>
+            <p className="text-xs text-muted-foreground mt-1 mb-3">
+              Upload a photo you'd like to be used at your funeral or memorial service
+            </p>
+            
+            {photoUrl ? (
+              <div className="space-y-3">
+                <div className="relative inline-block">
+                  <img 
+                    src={photoUrl} 
+                    alt="Funeral photo" 
+                    className="w-48 h-48 object-cover rounded-lg border-2 border-border"
+                  />
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="absolute -top-2 -right-2"
+                    onClick={handleRemovePhoto}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div>
+                  <Label htmlFor="funeral_photo_replace" className="cursor-pointer">
+                    <Button variant="outline" size="sm" asChild>
+                      <span>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Replace Photo
+                      </span>
+                    </Button>
+                  </Label>
+                  <input
+                    id="funeral_photo_replace"
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div>
+                <Label htmlFor="funeral_photo" className="cursor-pointer">
+                  <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors">
+                    <ImageIcon className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
+                    <p className="text-sm font-medium mb-1">
+                      {uploading ? "Uploading..." : "Click to upload photo"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      JPG, PNG or WEBP (max 5MB)
+                    </p>
+                  </div>
+                </Label>
+                <input
+                  id="funeral_photo"
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  disabled={uploading}
+                  className="hidden"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="funeral_preference">Funeral Preference (If Any)</Label>
           <p className="text-xs text-muted-foreground">Briefly describe your overall funeral or memorial service preferences</p>
