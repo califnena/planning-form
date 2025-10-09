@@ -45,7 +45,7 @@ export const generatePlanPDF = (planData: PlanData) => {
   };
 
   // Helper to add page footer with number
-  const addPageFooter = () => {
+  const addPageFooter = (totalPages?: number) => {
     const currentPage = pdf.internal.pages.length - 1;
     
     // Add logo to bottom right
@@ -59,8 +59,20 @@ export const generatePlanPDF = (planData: PlanData) => {
     pdf.setFontSize(9);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(100, 100, 100);
-    const footerText = `Page ${currentPage} (${sanitizeText(legalName)})`;
-    pdf.text(footerText, pageWidth / 2, pageHeight - 15, { align: "center" });
+    
+    const pageNumText = totalPages ? `Page ${currentPage} of ${totalPages}` : `Page ${currentPage}`;
+    const nameText = sanitizeText(legalName);
+    const fullText = `${pageNumText} (${nameText})`;
+    const fullTextWidth = pdf.getTextWidth(fullText);
+    
+    // If text is too long, split into two lines
+    if (fullTextWidth > pageWidth - 60) {
+      pdf.text(pageNumText, pageWidth / 2, pageHeight - 18, { align: "center" });
+      pdf.text(nameText, pageWidth / 2, pageHeight - 12, { align: "center" });
+    } else {
+      pdf.text(fullText, pageWidth / 2, pageHeight - 15, { align: "center" });
+    }
+    
     pdf.setTextColor(0, 0, 0);
   };
   
@@ -878,11 +890,32 @@ export const generatePlanPDF = (planData: PlanData) => {
   // Update all page footers with total page count
   for (let i = 2; i <= totalPages; i++) {
     pdf.setPage(i);
+    
+    // Add logo
+    try {
+      pdf.addImage(everlastingLogo, 'PNG', pageWidth - 25, pageHeight - 20, 12, 12);
+    } catch (error) {
+      console.error('Error adding page logo:', error);
+    }
+    
+    // Add page number with name
     pdf.setFontSize(9);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(100, 100, 100);
-    const footerText = `Page ${i} of ${totalPages} (${sanitizeText(legalName)})`;
-    pdf.text(footerText, pageWidth / 2, pageHeight - 15, { align: "center" });
+    
+    const pageNumText = `Page ${i} of ${totalPages}`;
+    const nameText = sanitizeText(legalName);
+    const fullText = `${pageNumText} (${nameText})`;
+    const fullTextWidth = pdf.getTextWidth(fullText);
+    
+    // If text is too long, split into two lines
+    if (fullTextWidth > pageWidth - 60) {
+      pdf.text(pageNumText, pageWidth / 2, pageHeight - 18, { align: "center" });
+      pdf.text(nameText, pageWidth / 2, pageHeight - 12, { align: "center" });
+    } else {
+      pdf.text(fullText, pageWidth / 2, pageHeight - 15, { align: "center" });
+    }
+    
     pdf.setTextColor(0, 0, 0);
   }
 
