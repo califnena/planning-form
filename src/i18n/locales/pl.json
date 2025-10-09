@@ -22,7 +22,9 @@
     "downloadPDF": "Pobierz PDF",
     "emailPlan": "Wyślij Plan Email",
     "contact": "Kontakt / Sugestia",
-    "signOut": "Wyloguj"
+    "signOut": "Wyloguj",
+    "providedBy": "Dostarczone przez Everlasting Funeral Advisors",
+    "requestQuote": "Poproś o Wycenę"
   },
   "instructions": {
     "title": "Instrukcje",
@@ -52,6 +54,8 @@
     "address": "Adres",
     "relationship": "Relacja",
     "yes": "Tak",
-    "no": "Nie"
+    "no": "Nie",
+    "saved": "Zapisano",
+    "savedDescription": "Twoje zmiany zostały zapisane."
   }
 }
