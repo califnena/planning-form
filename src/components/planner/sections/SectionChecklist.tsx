@@ -62,8 +62,11 @@ export const SectionChecklist = ({ data, onChange }: SectionChecklistProps) => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold mb-2">✅ Checklist</h2>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mb-2">
             Important tasks and reminders for your loved ones to complete.
+          </p>
+          <p className="text-sm text-muted-foreground italic">
+            Check the boxes of the items you want your loved ones/caretaker to do.
           </p>
         </div>
         <Button onClick={handleSave} size="sm">

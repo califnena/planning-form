@@ -83,7 +83,6 @@ export const generatePlanPDF = (planData: PlanData) => {
 
   const checkPageBreak = (additionalSpace: number = 10) => {
     if (yPosition + additionalSpace > pageHeight - marginBottom) {
-      addPageFooter();
       pdf.addPage();
       yPosition = 20;
     }
@@ -329,15 +328,26 @@ export const generatePlanPDF = (planData: PlanData) => {
   const generatedYPosition = profile.nicknames ? 108 : 100;
   pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, generatedYPosition, { align: "center" });
   
-  // Add "Provided by:" above logo
+  // Add "Provided by:" above logo with blank lines for separation
   pdf.setFontSize(11);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(0, 0, 0);
   pdf.text("Provided by:", 105, 115, { align: "center" });
   
-  // Add logo in center
+  // Add 10 blank lines for separation
+  let separationY = 120;
+  pdf.setFontSize(10);
+  pdf.setFont("helvetica", "normal");
+  pdf.setTextColor(150, 150, 150);
+  for (let i = 0; i < 10; i++) {
+    pdf.text("_".repeat(60), 105, separationY, { align: "center" });
+    separationY += 5;
+  }
+  pdf.setTextColor(0, 0, 0);
+  
+  // Add logo in center (moved down to accommodate blank lines)
   try {
-    pdf.addImage(everlastingLogo, 'PNG', pageWidth / 2 - 25, 125, 50, 50);
+    pdf.addImage(everlastingLogo, 'PNG', pageWidth / 2 - 25, 175, 50, 50);
   } catch (error) {
     console.error('Error adding logo to PDF:', error);
   }
@@ -346,15 +356,15 @@ export const generatePlanPDF = (planData: PlanData) => {
   pdf.setFontSize(12);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(0, 0, 0);
-  pdf.text("Everlasting Funeral Advisors", 105, 190, { align: "center" });
+  pdf.text("Everlasting Funeral Advisors", 105, 240, { align: "center" });
   
   pdf.setFontSize(9);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(64, 64, 64);
-  pdf.text("Phone: (323) 863-5804", 105, 202, { align: "center" });
-  pdf.text("Email: info@everlastingfuneraladvisors.com", 105, 209, { align: "center" });
-  pdf.text("Website: https://everlastingfuneraladvisors.com", 105, 216, { align: "center" });
-  pdf.text("Facebook: https://www.facebook.com/profile.php?id=61580859545223", 105, 223, { align: "center" });
+  pdf.text("Phone: (323) 863-5804", 105, 252, { align: "center" });
+  pdf.text("Email: info@everlastingfuneraladvisors.com", 105, 259, { align: "center" });
+  pdf.text("Website: https://everlastingfuneraladvisors.com", 105, 266, { align: "center" });
+  pdf.text("Facebook: https://www.facebook.com/profile.php?id=61580859545223", 105, 273, { align: "center" });
   pdf.setTextColor(0, 0, 0);
 
   // Add Table of Contents page
@@ -467,10 +477,19 @@ export const generatePlanPDF = (planData: PlanData) => {
 
   // Checklist Section
   addTitle("Checklist");
+  
+  // Add instruction for checkboxes
+  pdf.setFontSize(10);
+  pdf.setFont("helvetica", "italic");
+  pdf.setTextColor(80, 80, 80);
+  pdf.text("Check the boxes of the items you want your loved ones/caretaker to do:", 20, yPosition);
+  yPosition += lineHeight + 4;
+  pdf.setTextColor(0, 0, 0);
+  pdf.setFont("helvetica", "normal");
+  
   const checklistItems = planData.checklist_items || [];
   if (checklistItems.length > 0 && checklistItems.some((item: string) => item && item.trim())) {
     pdf.setFontSize(10);
-    pdf.setFont("helvetica", "normal");
     pdf.text("Important tasks and reminders for loved ones to complete:", 20, yPosition);
     yPosition += lineHeight + 3;
     
@@ -824,26 +843,69 @@ export const generatePlanPDF = (planData: PlanData) => {
   pdf.addPage();
   yPosition = 20;
   addTitle("Appendix - Digital Media & Documents");
+  
+  // Check if user has any digital media
+  const hasDigitalMedia = !!(
+    planData.digital_media || 
+    planData.uploaded_files || 
+    planData.attachments ||
+    (planData.digital && (
+      planData.digital.has_social_media ||
+      planData.digital.has_email ||
+      planData.digital.has_cloud_storage ||
+      planData.digital.has_streaming ||
+      planData.digital.has_shopping ||
+      planData.digital.has_photo_sites ||
+      planData.digital.has_domains ||
+      planData.digital.has_password_manager
+    ))
+  );
+  
   pdf.setFontSize(10);
   pdf.setFont("helvetica", "bold");
-  pdf.text("IMPORTANT NOTICE:", 20, yPosition);
-  yPosition += lineHeight + 2;
   
-  pdf.setFont("helvetica", "normal");
-  pdf.text("Any uploaded images, documents, audio recordings, or video files", 20, yPosition);
-  yPosition += lineHeight;
-  pdf.text("can be accessed in the online application at:", 20, yPosition);
-  yPosition += lineHeight + 2;
-  
-  pdf.setFont("helvetica", "bold");
-  pdf.text("https://everlastingfuneraladvisors.com", 20, yPosition);
-  yPosition += lineHeight + 4;
-  
-  pdf.setFont("helvetica", "normal");
-  pdf.text("These digital assets cannot be embedded in this PDF but are securely", 20, yPosition);
-  yPosition += lineHeight;
-  pdf.text("stored in your online plan and can be accessed at any time.", 20, yPosition);
-  yPosition += 12;
+  if (hasDigitalMedia) {
+    pdf.text("IMPORTANT NOTICE:", 20, yPosition);
+    yPosition += lineHeight + 2;
+    
+    pdf.setFont("helvetica", "normal");
+    pdf.text("You have digital media and assets associated with this plan.", 20, yPosition);
+    yPosition += lineHeight + 2;
+    pdf.text("Any uploaded images, documents, audio recordings, or video files", 20, yPosition);
+    yPosition += lineHeight;
+    pdf.text("can be accessed in the online application at:", 20, yPosition);
+    yPosition += lineHeight + 2;
+    
+    pdf.setFont("helvetica", "bold");
+    pdf.text("https://everlastingfuneraladvisors.com", 20, yPosition);
+    yPosition += lineHeight + 4;
+    
+    pdf.setFont("helvetica", "normal");
+    pdf.text("These digital assets cannot be embedded in this PDF but are securely", 20, yPosition);
+    yPosition += lineHeight;
+    pdf.text("stored in your online plan and can be accessed at any time.", 20, yPosition);
+    yPosition += 12;
+  } else {
+    pdf.text("Digital Media Status:", 20, yPosition);
+    yPosition += lineHeight + 2;
+    
+    pdf.setFont("helvetica", "normal");
+    pdf.text("You do not currently have any digital media or uploaded files", 20, yPosition);
+    yPosition += lineHeight;
+    pdf.text("associated with this plan.", 20, yPosition);
+    yPosition += lineHeight + 4;
+    
+    pdf.text("To add digital media, documents, or files, please visit:", 20, yPosition);
+    yPosition += lineHeight + 2;
+    
+    pdf.setFont("helvetica", "bold");
+    pdf.text("https://everlastingfuneraladvisors.com", 20, yPosition);
+    yPosition += lineHeight + 4;
+    
+    pdf.setFont("helvetica", "normal");
+    pdf.text("and access the Digital World section of your online plan.", 20, yPosition);
+    yPosition += 12;
+  }
   
   pdf.setFont("helvetica", "italic");
   pdf.setTextColor(100, 100, 100);
@@ -861,8 +923,6 @@ export const generatePlanPDF = (planData: PlanData) => {
   }
   pdf.setTextColor(0, 0, 0);
   
-  addPageFooter();
-  
   // Calculate total pages (excluding cover)
   const totalPages = pdf.internal.pages.length - 1;
   
@@ -875,7 +935,6 @@ export const generatePlanPDF = (planData: PlanData) => {
   
   tableOfContents.forEach((item) => {
     if (yPosition > pageHeight - 40) {
-      addPageFooter();
       pdf.addPage();
       yPosition = 20;
     }
