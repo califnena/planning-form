@@ -231,8 +231,16 @@ export const generatePlanPDF = (planData: PlanData) => {
   pdf.setFont("helvetica", "normal");
   pdf.text("End-of-Life Planning Guide", 105, 75, { align: "center" });
   
-  if (planData.prepared_by) {
+  // Display full legal name on cover
+  const profile = planData.personal_profile || {};
+  const legalName = profile.full_name || profile.legal_name;
+  if (legalName) {
+    pdf.setFontSize(16);
+    pdf.setFont("helvetica", "bold");
+    pdf.text(sanitizeText(legalName), 105, 95, { align: "center" });
+  } else if (planData.prepared_by) {
     pdf.setFontSize(12);
+    pdf.setFont("helvetica", "normal");
     pdf.text(sanitizeText(`Prepared for: ${planData.prepared_by}`), 105, 95, { align: "center" });
   } else {
     pdf.setFontSize(12);
@@ -276,9 +284,9 @@ export const generatePlanPDF = (planData: PlanData) => {
 
   // Personal Information Section
   addTitle("👤 My Personal Information");
-  const profile = planData.personal_profile || {};
-  addField("Full Legal Name", profile.legal_name);
-  addField("Date of Birth", profile.date_of_birth);
+  addField("Full Legal Name", profile.full_name || profile.legal_name);
+  addField("Nicknames", profile.nicknames);
+  addField("Date of Birth", profile.dob || profile.date_of_birth);
   addField("Social Security Number", profile.ssn);
   addField("Address", profile.address);
   addField("Phone", profile.phone);

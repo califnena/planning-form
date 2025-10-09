@@ -54,6 +54,17 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
 
         <div className="space-y-2">
+          <Label htmlFor="nicknames">Nicknames</Label>
+          <p className="text-xs text-muted-foreground">Any nicknames or names you go by</p>
+          <Input
+            id="nicknames"
+            value={profile.nicknames || ""}
+            onChange={(e) => updateProfile("nicknames", e.target.value)}
+            placeholder="e.g., Bob, Johnny"
+          />
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="maiden_name">Maiden Name (if applicable)</Label>
           <p className="text-xs text-muted-foreground">Birth name if different from current legal name</p>
           <Input
