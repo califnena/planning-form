@@ -111,6 +111,26 @@ const PlannerApp = () => {
     navigate("/");
   };
 
+  const handlePreviewPDF = () => {
+    try {
+      const pdf = generatePlanPDF(plan);
+      const pdfBlob = pdf.output('blob');
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, '_blank');
+      toast({
+        title: "Preview opened",
+        description: "PDF opened in new tab",
+      });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF preview. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleDownloadPDF = () => {
     setPendingAction("download");
     setShowRevisionDialog(true);
@@ -303,6 +323,7 @@ const PlannerApp = () => {
         sectionItems={sectionItems}
         activeSection={activeSection}
         onSectionChange={setActiveSection}
+        onPreviewPDF={handlePreviewPDF}
         onDownloadPDF={handleDownloadPDF}
         onEmailPlan={handleEmailPlan}
         onSignOut={handleSignOut}

@@ -1,7 +1,7 @@
 import { useState, ReactNode } from "react";
 import { SidebarNav } from "./SidebarNav";
 import { Button } from "@/components/ui/button";
-import { Download, Mail, MessageSquare, Facebook, FileText } from "lucide-react";
+import { Download, Mail, MessageSquare, Facebook, FileText, Eye } from "lucide-react";
 import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useTranslation } from "react-i18next";
@@ -18,6 +18,7 @@ interface PlannerShellProps {
   sectionItems: Array<{ id: string; label: string; completed: boolean }>;
   activeSection: string;
   onSectionChange: (section: string) => void;
+  onPreviewPDF: () => void;
   onDownloadPDF: () => void;
   onEmailPlan: () => void;
   onSignOut: () => void;
@@ -28,6 +29,7 @@ export const PlannerShell = ({
   sectionItems,
   activeSection,
   onSectionChange,
+  onPreviewPDF,
   onDownloadPDF,
   onEmailPlan,
   onSignOut,
@@ -79,6 +81,24 @@ export const PlannerShell = ({
           {/* Actions */}
           <div className="mt-8 space-y-2">
             <h3 className="text-sm font-semibold text-sidebar-foreground mb-3">Complete & Save Your Plan</h3>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-start"
+                    onClick={onPreviewPDF}
+                  >
+                    <Eye className="mr-2 h-4 w-4" />
+                    Preview PDF
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-popover text-popover-foreground border">
+                  <p>Preview before downloading</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
