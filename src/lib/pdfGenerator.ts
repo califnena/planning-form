@@ -92,63 +92,82 @@ export const generatePlanPDF = (planData: PlanData) => {
   };
 
   const addField = (label: string, value?: string, inline: boolean = true) => {
-    checkPageBreak(10);
-    pdf.setFontSize(10);
+    checkPageBreak(12);
+    pdf.setFontSize(11);
     pdf.setFont("helvetica", "bold");
     
     if (inline) {
-      // Single line format: Bold Label:  normal value (with 2 spaces)
-      const labelText = sanitizeText(label) + ":  ";
+      // Single line format: Bold Label:     underlined value (with 5 spaces)
+      const labelText = sanitizeText(label) + ":     ";
       pdf.text(labelText, 20, yPosition);
       
-      pdf.setFont("helvetica", "normal");
       const labelWidth = pdf.getTextWidth(labelText);
       
       if (value && value.trim()) {
+        // Use different font for value to stand out
+        pdf.setFont("times", "normal");
+        pdf.setFontSize(10);
         const sanitized = sanitizeText(value);
         const lines = pdf.splitTextToSize(sanitized, 170 - labelWidth);
-        pdf.text(lines[0], 20 + labelWidth, yPosition);
-        yPosition += lineHeight;
+        const valueText = lines[0];
+        pdf.text(valueText, 20 + labelWidth, yPosition);
+        
+        // Underline the answer
+        const valueWidth = pdf.getTextWidth(valueText);
+        pdf.setDrawColor(0, 0, 0);
+        pdf.line(20 + labelWidth, yPosition + 1, 20 + labelWidth + valueWidth, yPosition + 1);
+        
+        yPosition += lineHeight + 2;
         
         // If text wraps, continue on next lines
         for (let i = 1; i < lines.length; i++) {
           checkPageBreak();
-          pdf.text(lines[i], 20, yPosition);
-          yPosition += lineHeight;
+          pdf.text(lines[i], 20 + labelWidth, yPosition);
+          const wrappedWidth = pdf.getTextWidth(lines[i]);
+          pdf.line(20 + labelWidth, yPosition + 1, 20 + labelWidth + wrappedWidth, yPosition + 1);
+          yPosition += lineHeight + 2;
         }
       } else {
         // Show "(none provided)" in italic
         pdf.setFont("helvetica", "italic");
-        pdf.setTextColor(100, 100, 100);
+        pdf.setFontSize(10);
+        pdf.setTextColor(120, 120, 120);
         pdf.text("(none provided)", 20 + labelWidth, yPosition);
         pdf.setTextColor(0, 0, 0);
-        pdf.setFont("helvetica", "normal");
-        yPosition += lineHeight;
+        yPosition += lineHeight + 2;
       }
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(10);
     } else {
       // Multi-line format for longer content
       pdf.text(sanitizeText(label) + ":", 20, yPosition);
-      yPosition += lineHeight;
+      yPosition += lineHeight + 2;
       
-      pdf.setFont("helvetica", "normal");
       if (value && value.trim()) {
+        pdf.setFont("times", "normal");
+        pdf.setFontSize(10);
         const sanitized = sanitizeText(value);
-        const lines = pdf.splitTextToSize(sanitized, 170);
+        const lines = pdf.splitTextToSize(sanitized, 165);
         lines.forEach((line: string) => {
           checkPageBreak();
-          pdf.text(line, 25, yPosition);
-          yPosition += lineHeight;
+          pdf.text(line, 28, yPosition);
+          // Underline each line
+          const lineWidth = pdf.getTextWidth(line);
+          pdf.setDrawColor(0, 0, 0);
+          pdf.line(28, yPosition + 1, 28 + lineWidth, yPosition + 1);
+          yPosition += lineHeight + 2;
         });
       } else {
         // Show "(none provided)" in italic
         pdf.setFont("helvetica", "italic");
-        pdf.setTextColor(100, 100, 100);
-        pdf.text("(none provided)", 25, yPosition);
+        pdf.setFontSize(10);
+        pdf.setTextColor(120, 120, 120);
+        pdf.text("(none provided)", 28, yPosition);
         pdf.setTextColor(0, 0, 0);
-        pdf.setFont("helvetica", "normal");
-        yPosition += lineHeight;
+        yPosition += lineHeight + 2;
       }
-      yPosition += 3;
+      pdf.setFont("helvetica", "normal");
+      yPosition += 4;
     }
   };
 
@@ -463,13 +482,27 @@ export const generatePlanPDF = (planData: PlanData) => {
   // Appendix section for uploaded documents/images
   pdf.addPage();
   yPosition = 20;
-  addTitle("📎 Appendix");
+  addTitle("📎 Appendix - Digital Media & Documents");
   pdf.setFontSize(10);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("IMPORTANT NOTICE:", 20, yPosition);
+  yPosition += lineHeight + 2;
+  
   pdf.setFont("helvetica", "normal");
-  pdf.text("Note: Any uploaded images or documents should be attached separately", 20, yPosition);
+  pdf.text("Any uploaded images, documents, audio recordings, or video files", 20, yPosition);
   yPosition += lineHeight;
-  pdf.text("to this printed document or stored in a secure location.", 20, yPosition);
-  yPosition += 10;
+  pdf.text("can be accessed in the online application at:", 20, yPosition);
+  yPosition += lineHeight + 2;
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text("https://everlastingfuneraladvisors.com", 20, yPosition);
+  yPosition += lineHeight + 4;
+  
+  pdf.setFont("helvetica", "normal");
+  pdf.text("These digital assets cannot be embedded in this PDF but are securely", 20, yPosition);
+  yPosition += lineHeight;
+  pdf.text("stored in your online plan and can be accessed at any time.", 20, yPosition);
+  yPosition += 12;
   
   pdf.setFont("helvetica", "italic");
   pdf.setTextColor(100, 100, 100);
