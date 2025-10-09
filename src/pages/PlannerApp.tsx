@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 
 // Section components
 import { SectionInstructions } from "@/components/planner/sections/SectionInstructions";
+import { SectionPersonal } from "@/components/planner/sections/SectionPersonal";
+import { SectionContacts } from "@/components/planner/sections/SectionContacts";
 import { SectionAbout } from "@/components/planner/sections/SectionAbout";
 import { SectionChecklist } from "@/components/planner/sections/SectionChecklist";
 import { SectionFuneral } from "@/components/planner/sections/SectionFuneral";
@@ -18,6 +20,8 @@ import { SectionPets } from "@/components/planner/sections/SectionPets";
 import { SectionDigital } from "@/components/planner/sections/SectionDigital";
 import { SectionLegal } from "@/components/planner/sections/SectionLegal";
 import { SectionMessages } from "@/components/planner/sections/SectionMessages";
+import { SectionVendors } from "@/components/planner/sections/SectionVendors";
+import { SectionRevisions } from "@/components/planner/sections/SectionRevisions";
 import { SectionFAQ } from "@/components/planner/sections/SectionFAQ";
 
 const PlannerApp = () => {
@@ -234,6 +238,14 @@ const PlannerApp = () => {
             onChange={(value) => updatePlan({ messages_notes: value })}
           />
         );
+      case "personal":
+        return <SectionPersonal data={plan} onChange={updatePlan} />;
+      case "contacts":
+        return <SectionContacts data={plan} onChange={updatePlan} />;
+      case "vendors":
+        return <SectionVendors data={plan} onChange={updatePlan} />;
+      case "revisions":
+        return <SectionRevisions data={plan} onChange={updatePlan} />;
       case "faq":
         return <SectionFAQ />;
       default:
