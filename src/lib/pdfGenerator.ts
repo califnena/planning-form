@@ -22,8 +22,13 @@ export const generatePlanPDF = (planData: PlanData) => {
   let yPosition = 20;
   const pageHeight = pdf.internal.pageSize.height;
   const pageWidth = pdf.internal.pageSize.width;
-  const marginBottom = 20;
+  const marginBottom = 30;
   const lineHeight = 7;
+  const tableOfContents: { title: string; page: number }[] = [];
+  
+  // Get legal name for footer
+  const profile = planData.personal_profile || {};
+  const legalName = profile.full_name || profile.legal_name || "My Final Wishes";
 
   // Helper to sanitize text for PDF (handle special characters)
   const sanitizeText = (text: string): string => {
@@ -39,29 +44,66 @@ export const generatePlanPDF = (planData: PlanData) => {
       .replace(/[\u{2700}-\u{27BF}]/gu, ''); // Remove dingbats
   };
 
-  // Helper to add small logo to bottom right of page
-  const addPageLogo = () => {
+  // Helper to add page footer with number
+  const addPageFooter = () => {
+    const currentPage = pdf.internal.pages.length - 1;
+    
+    // Add logo to bottom right
     try {
-      pdf.addImage(everlastingLogo, 'PNG', pageWidth - 25, pageHeight - 25, 15, 15);
+      pdf.addImage(everlastingLogo, 'PNG', pageWidth - 25, pageHeight - 20, 12, 12);
     } catch (error) {
       console.error('Error adding page logo:', error);
     }
+    
+    // Add page number in center bottom
+    pdf.setFontSize(9);
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(100, 100, 100);
+    const footerText = `Page ${currentPage} (${sanitizeText(legalName)})`;
+    pdf.text(footerText, pageWidth / 2, pageHeight - 15, { align: "center" });
+    pdf.setTextColor(0, 0, 0);
+  };
+  
+  // Helper to add small logo to bottom right of page (legacy)
+  const addPageLogo = () => {
+    addPageFooter();
   };
 
   const checkPageBreak = (additionalSpace: number = 10) => {
     if (yPosition + additionalSpace > pageHeight - marginBottom) {
-      addPageLogo(); // Add logo before new page
+      addPageFooter();
       pdf.addPage();
       yPosition = 20;
     }
   };
 
-  const addTitle = (title: string) => {
-    checkPageBreak(15);
-    pdf.setFontSize(16);
+  const addTitle = (title: string, addToTOC: boolean = true) => {
+    checkPageBreak(20);
+    
+    // Add to table of contents
+    if (addToTOC) {
+      const currentPage = pdf.internal.pages.length - 1;
+      tableOfContents.push({ title, page: currentPage });
+    }
+    
+    // Center the title with decorative lines
+    pdf.setFontSize(18);
     pdf.setFont("helvetica", "bold");
-    pdf.text(sanitizeText(title), 20, yPosition);
-    yPosition += 10;
+    const titleWidth = pdf.getTextWidth(sanitizeText(title));
+    const centerX = pageWidth / 2;
+    
+    // Draw decorative line before title
+    pdf.setDrawColor(0, 0, 0);
+    pdf.setLineWidth(0.5);
+    pdf.line(20, yPosition - 2, centerX - titleWidth / 2 - 5, yPosition - 2);
+    
+    // Draw title
+    pdf.text(sanitizeText(title), centerX, yPosition, { align: "center" });
+    
+    // Draw decorative line after title
+    pdf.line(centerX + titleWidth / 2 + 5, yPosition - 2, pageWidth - 20, yPosition - 2);
+    
+    yPosition += 12;
   };
 
   const addSection = (heading: string, content?: string, showBlankLines: boolean = true) => {
@@ -246,9 +288,7 @@ export const generatePlanPDF = (planData: PlanData) => {
   pdf.text("End-of-Life Planning Guide", 105, 65, { align: "center" });
   
   // Display full legal name on cover
-  const profile = planData.personal_profile || {};
-  const legalName = profile.full_name || profile.legal_name;
-  if (legalName) {
+  if (legalName && legalName !== "My Final Wishes") {
     pdf.setFontSize(16);
     pdf.setFont("helvetica", "bold");
     pdf.text(sanitizeText(legalName), 105, 85, { align: "center" });
@@ -294,6 +334,18 @@ export const generatePlanPDF = (planData: PlanData) => {
   pdf.text("Facebook: https://www.facebook.com/profile.php?id=61580859545223", 105, 223, { align: "center" });
   pdf.setTextColor(0, 0, 0);
 
+  // Add Table of Contents page
+  pdf.addPage();
+  yPosition = 40;
+  
+  pdf.setFontSize(22);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Table of Contents", pageWidth / 2, yPosition, { align: "center" });
+  yPosition += 20;
+  
+  // We'll fill this in at the end, just placeholder for now
+  const tocPageNumber = pdf.internal.pages.length - 1;
+  
   // Add sections
   pdf.addPage();
   yPosition = 20;
@@ -742,8 +794,8 @@ export const generatePlanPDF = (planData: PlanData) => {
   yPosition += 5;
   pdf.text("Facebook: https://www.facebook.com/profile.php?id=61580859545223", 105, yPosition, { align: "center" });
 
-  // Add logo to last page
-  addPageLogo();
+  // Add footer to last page
+  addPageFooter();
 
   // Appendix section for uploaded documents/images
   pdf.addPage();
@@ -786,7 +838,42 @@ export const generatePlanPDF = (planData: PlanData) => {
   }
   pdf.setTextColor(0, 0, 0);
   
-  addPageLogo();
+  addPageFooter();
+  
+  // Calculate total pages (excluding cover)
+  const totalPages = pdf.internal.pages.length - 1;
+  
+  // Go back and fill in the Table of Contents
+  pdf.setPage(tocPageNumber);
+  yPosition = 60;
+  
+  pdf.setFontSize(11);
+  pdf.setFont("helvetica", "normal");
+  
+  tableOfContents.forEach((item) => {
+    if (yPosition > pageHeight - 40) {
+      addPageFooter();
+      pdf.addPage();
+      yPosition = 20;
+    }
+    
+    const dots = ".".repeat(Math.floor((pageWidth - 80 - pdf.getTextWidth(item.title) - pdf.getTextWidth(String(item.page))) / 2));
+    pdf.text(sanitizeText(item.title), 30, yPosition);
+    pdf.text(dots, 30 + pdf.getTextWidth(sanitizeText(item.title)) + 2, yPosition);
+    pdf.text(String(item.page), pageWidth - 30, yPosition, { align: "right" });
+    yPosition += 8;
+  });
+  
+  // Update all page footers with total page count
+  for (let i = 2; i <= totalPages; i++) {
+    pdf.setPage(i);
+    pdf.setFontSize(9);
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(100, 100, 100);
+    const footerText = `Page ${i} of ${totalPages} (${sanitizeText(legalName)})`;
+    pdf.text(footerText, pageWidth / 2, pageHeight - 15, { align: "center" });
+    pdf.setTextColor(0, 0, 0);
+  }
 
   return pdf;
 };
