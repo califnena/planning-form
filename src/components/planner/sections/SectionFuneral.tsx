@@ -456,7 +456,7 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
           />
         </div>
 
-        <div className="p-6 bg-gradient-to-br from-primary/10 via-primary/5 to-background border-2 border-primary/20 rounded-lg shadow-md">
+        <div className="p-6 bg-gradient-to-br from-yellow-50 via-amber-50 to-background dark:from-yellow-950/20 dark:via-amber-950/10 dark:to-background border-2 border-yellow-400/30 rounded-lg shadow-md">
           <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
             💼 Need Help Planning?
           </h3>
@@ -466,7 +466,7 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
           <Button 
             asChild 
             size="lg" 
-            className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold text-base group"
+            className="w-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black shadow-lg hover:shadow-xl transition-all duration-300 font-semibold text-base group animate-pulse hover:animate-none"
           >
             <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
               <FileText className="h-5 w-5 group-hover:scale-110 transition-transform" />
