@@ -178,36 +178,36 @@ const PlannerApp = () => {
       case "checklist":
         return (
           <SectionChecklist
-            value={plan.checklist_notes}
-            onChange={(value) => updatePlan({ checklist_notes: value })}
+            data={plan}
+            onChange={(data) => updatePlan(data)}
           />
         );
       case "funeral":
         return (
           <SectionFuneral
-            value={plan.funeral_wishes_notes}
-            onChange={(value) => updatePlan({ funeral_wishes_notes: value })}
+            data={plan}
+            onChange={(data) => updatePlan(data)}
           />
         );
       case "financial":
         return (
           <SectionFinancial
-            value={plan.financial_notes}
-            onChange={(value) => updatePlan({ financial_notes: value })}
+            data={plan}
+            onChange={(data) => updatePlan(data)}
           />
         );
       case "insurance":
         return (
           <SectionInsurance
-            value={plan.insurance_notes}
-            onChange={(value) => updatePlan({ insurance_notes: value })}
+            data={plan}
+            onChange={(data) => updatePlan(data)}
           />
         );
       case "property":
         return (
           <SectionProperty
-            value={plan.property_notes}
-            onChange={(value) => updatePlan({ property_notes: value })}
+            data={plan}
+            onChange={(data) => updatePlan(data)}
           />
         );
       case "pets":
@@ -220,15 +220,15 @@ const PlannerApp = () => {
       case "digital":
         return (
           <SectionDigital
-            value={plan.digital_notes}
-            onChange={(value) => updatePlan({ digital_notes: value })}
+            data={plan}
+            onChange={(data) => updatePlan(data)}
           />
         );
       case "legal":
         return (
           <SectionLegal
-            value={plan.legal_notes}
-            onChange={(value) => updatePlan({ legal_notes: value })}
+            data={plan}
+            onChange={(data) => updatePlan(data)}
           />
         );
       case "messages":

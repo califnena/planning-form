@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Save } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface SectionVendorsProps {
   data: any;
@@ -11,6 +12,7 @@ interface SectionVendorsProps {
 
 export const SectionVendors = ({ data, onChange }: SectionVendorsProps) => {
   const vendors = data.vendors || [];
+  const { toast } = useToast();
 
   const addVendor = () => {
     onChange({
@@ -29,6 +31,13 @@ export const SectionVendors = ({ data, onChange }: SectionVendorsProps) => {
     onChange({ ...data, vendors: vendors.filter((_: any, i: number) => i !== index) });
   };
 
+  const handleSave = () => {
+    toast({
+      title: "Saved",
+      description: "Vendor information has been saved.",
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -36,10 +45,16 @@ export const SectionVendors = ({ data, onChange }: SectionVendorsProps) => {
           <h2 className="text-2xl font-bold mb-2">Preferred Vendors</h2>
           <p className="text-muted-foreground">Service providers you recommend</p>
         </div>
-        <Button onClick={addVendor} size="sm">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Vendor
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleSave} size="sm" variant="default">
+            <Save className="h-4 w-4 mr-2" />
+            Save
+          </Button>
+          <Button onClick={addVendor} size="sm" variant="outline">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Vendor
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-4">

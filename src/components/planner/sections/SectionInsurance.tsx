@@ -1,49 +1,214 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Card } from "@/components/ui/card";
+import { Plus, Trash2, Save } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface SectionInsuranceProps {
-  value?: string;
-  onChange: (value: string) => void;
+  data: any;
+  onChange: (data: any) => void;
 }
 
-export const SectionInsurance = ({ value, onChange }: SectionInsuranceProps) => {
+export const SectionInsurance = ({ data, onChange }: SectionInsuranceProps) => {
+  const insurance = data.insurance || {};
+  const policies = insurance.policies || [];
+  const { toast } = useToast();
+
+  const updateInsurance = (field: string, value: any) => {
+    onChange({
+      ...data,
+      insurance: { ...insurance, [field]: value }
+    });
+  };
+
+  const addPolicy = () => {
+    updateInsurance("policies", [...policies, { type: "", company: "", policy_number: "", details: "" }]);
+  };
+
+  const updatePolicy = (index: number, field: string, value: string) => {
+    const updated = [...policies];
+    updated[index] = { ...updated[index], [field]: value };
+    updateInsurance("policies", updated);
+  };
+
+  const removePolicy = (index: number) => {
+    updateInsurance("policies", policies.filter((_: any, i: number) => i !== index));
+  };
+
+  const handleSave = () => {
+    toast({
+      title: "Saved",
+      description: "Insurance information has been saved.",
+    });
+  };
+
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">🛡️ Insurance</h2>
-        <p className="text-muted-foreground mb-6">
-          Document all insurance policies including life, health, property, and other coverage.
-        </p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">🛡️ Insurance</h2>
+          <p className="text-muted-foreground">
+            Document all insurance policies and coverage.
+          </p>
+        </div>
+        <Button onClick={handleSave} size="sm">
+          <Save className="h-4 w-4 mr-2" />
+          Save
+        </Button>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="insurance">Insurance Policies & Details</Label>
-        <Textarea
-          id="insurance"
-          placeholder="List all insurance policies:
-- Life insurance (term, whole life, universal)
-- Health insurance (medical, dental, vision)
-- Property insurance (homeowners, renters)
-- Auto insurance
-- Disability insurance
-- Long-term care insurance
-- Umbrella policies
-
-For each policy include:
-- Insurance company name
-- Policy number
-- Coverage amount
-- Beneficiaries
-- Agent contact information
-- Premium payment details"
-          value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
-          rows={14}
-          className="resize-none"
-        />
+      <div className="space-y-4">
+        <Label className="text-base font-semibold">Insurance Types I Have</Label>
+        <div className="grid md:grid-cols-2 gap-3">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="life"
+              checked={insurance.has_life || false}
+              onCheckedChange={(checked) => updateInsurance("has_life", checked)}
+            />
+            <Label htmlFor="life" className="font-normal">Life insurance</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="health"
+              checked={insurance.has_health || false}
+              onCheckedChange={(checked) => updateInsurance("has_health", checked)}
+            />
+            <Label htmlFor="health" className="font-normal">Health insurance</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="dental"
+              checked={insurance.has_dental || false}
+              onCheckedChange={(checked) => updateInsurance("has_dental", checked)}
+            />
+            <Label htmlFor="dental" className="font-normal">Dental insurance</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="vision"
+              checked={insurance.has_vision || false}
+              onCheckedChange={(checked) => updateInsurance("has_vision", checked)}
+            />
+            <Label htmlFor="vision" className="font-normal">Vision insurance</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="homeowners"
+              checked={insurance.has_homeowners || false}
+              onCheckedChange={(checked) => updateInsurance("has_homeowners", checked)}
+            />
+            <Label htmlFor="homeowners" className="font-normal">Homeowners/Renters insurance</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="auto"
+              checked={insurance.has_auto || false}
+              onCheckedChange={(checked) => updateInsurance("has_auto", checked)}
+            />
+            <Label htmlFor="auto" className="font-normal">Auto insurance</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="disability"
+              checked={insurance.has_disability || false}
+              onCheckedChange={(checked) => updateInsurance("has_disability", checked)}
+            />
+            <Label htmlFor="disability" className="font-normal">Disability insurance</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="long_term_care"
+              checked={insurance.has_long_term_care || false}
+              onCheckedChange={(checked) => updateInsurance("has_long_term_care", checked)}
+            />
+            <Label htmlFor="long_term_care" className="font-normal">Long-term care insurance</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="umbrella"
+              checked={insurance.has_umbrella || false}
+              onCheckedChange={(checked) => updateInsurance("has_umbrella", checked)}
+            />
+            <Label htmlFor="umbrella" className="font-normal">Umbrella policy</Label>
+          </div>
+        </div>
       </div>
 
-      <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Label className="text-base font-semibold">Policy Details</Label>
+          <Button onClick={addPolicy} size="sm" variant="outline">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Policy
+          </Button>
+        </div>
+
+        {policies.map((policy: any, index: number) => (
+          <Card key={index} className="p-4 space-y-4">
+            <div className="flex justify-between items-start">
+              <h4 className="font-semibold">Policy {index + 1}</h4>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removePolicy(index)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Insurance Type</Label>
+                <Input
+                  value={policy.type || ""}
+                  onChange={(e) => updatePolicy(index, "type", e.target.value)}
+                  placeholder="e.g., Life, Auto, Homeowners"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Company</Label>
+                <Input
+                  value={policy.company || ""}
+                  onChange={(e) => updatePolicy(index, "company", e.target.value)}
+                  placeholder="Insurance company name"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Policy Number</Label>
+              <Input
+                value={policy.policy_number || ""}
+                onChange={(e) => updatePolicy(index, "policy_number", e.target.value)}
+                placeholder="Policy number"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Details</Label>
+              <Textarea
+                value={policy.details || ""}
+                onChange={(e) => updatePolicy(index, "details", e.target.value)}
+                placeholder="Coverage amount, beneficiaries, agent contact, document location"
+                rows={3}
+              />
+            </div>
+          </Card>
+        ))}
+
+        {policies.length === 0 && (
+          <div className="text-center py-8 border border-dashed rounded-lg">
+            <p className="text-muted-foreground mb-3">No insurance policies added yet</p>
+            <Button onClick={addPolicy} variant="outline" size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Your First Policy
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <div className="p-4 bg-muted/50 rounded-lg">
         <h3 className="font-semibold mb-2">💡 Important:</h3>
         <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
           <li>Keep original policy documents in a secure location</li>

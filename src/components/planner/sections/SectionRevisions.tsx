@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Trash2, Plus, Download } from "lucide-react";
+import { Trash2, Plus } from "lucide-react";
 
 interface SectionRevisionsProps {
   data: any;
@@ -12,6 +12,7 @@ interface SectionRevisionsProps {
 
 export const SectionRevisions = ({ data, onChange }: SectionRevisionsProps) => {
   const revisions = data.revisions || [];
+  const preparedBy = data.prepared_by || "";
   const [isDrawing, setIsDrawing] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -84,6 +85,16 @@ export const SectionRevisions = ({ data, onChange }: SectionRevisionsProps) => {
           <Plus className="h-4 w-4 mr-2" />
           Add Revision
         </Button>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="prepared_by">Prepared By (Name)</Label>
+        <Input
+          id="prepared_by"
+          value={preparedBy}
+          onChange={(e) => onChange({ ...data, prepared_by: e.target.value })}
+          placeholder="Name of person filling out this plan"
+        />
       </div>
 
       <div className="space-y-6">

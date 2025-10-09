@@ -1,6 +1,8 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Plus, Trash2 } from "lucide-react";
 
 interface SectionPersonalProps {
   data: any;
@@ -151,15 +153,48 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="child_names">Children's Names (one per line)</Label>
-        <Textarea
-          id="child_names"
-          value={(profile.child_names || []).join("\n")}
-          onChange={(e) => updateProfile("child_names", e.target.value.split("\n").filter(Boolean))}
-          placeholder="Enter each child's name on a new line"
-          rows={4}
-        />
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Label>Children's Names</Label>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => {
+              const current = profile.child_names || ["", "", "", ""];
+              updateProfile("child_names", [...current, ""]);
+            }}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Child
+          </Button>
+        </div>
+        <div className="space-y-3">
+          {(profile.child_names || ["", "", "", ""]).map((name: string, index: number) => (
+            <div key={index} className="flex gap-2">
+              <Input
+                value={name}
+                onChange={(e) => {
+                  const updated = [...(profile.child_names || ["", "", "", ""])];
+                  updated[index] = e.target.value;
+                  updateProfile("child_names", updated);
+                }}
+                placeholder={`Child ${index + 1} name`}
+              />
+              {(profile.child_names?.length || 0) > 4 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const updated = (profile.child_names || []).filter((_: string, i: number) => i !== index);
+                    updateProfile("child_names", updated);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="border-t pt-6">

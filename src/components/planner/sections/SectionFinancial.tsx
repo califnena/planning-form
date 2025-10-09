@@ -1,49 +1,203 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Card } from "@/components/ui/card";
+import { Plus, Trash2, Save } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface SectionFinancialProps {
-  value?: string;
-  onChange: (value: string) => void;
+  data: any;
+  onChange: (data: any) => void;
 }
 
-export const SectionFinancial = ({ value, onChange }: SectionFinancialProps) => {
+export const SectionFinancial = ({ data, onChange }: SectionFinancialProps) => {
+  const financial = data.financial || {};
+  const accounts = financial.accounts || [];
+  const { toast } = useToast();
+
+  const updateFinancial = (field: string, value: any) => {
+    onChange({
+      ...data,
+      financial: { ...financial, [field]: value }
+    });
+  };
+
+  const addAccount = () => {
+    updateFinancial("accounts", [...accounts, { type: "", institution: "", details: "" }]);
+  };
+
+  const updateAccount = (index: number, field: string, value: string) => {
+    const updated = [...accounts];
+    updated[index] = { ...updated[index], [field]: value };
+    updateFinancial("accounts", updated);
+  };
+
+  const removeAccount = (index: number) => {
+    updateFinancial("accounts", accounts.filter((_: any, i: number) => i !== index));
+  };
+
+  const handleSave = () => {
+    toast({
+      title: "Saved",
+      description: "Financial information has been saved.",
+    });
+  };
+
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">💰 Financial Life</h2>
-        <p className="text-muted-foreground mb-6">
-          Document your financial accounts, assets, and important financial information.
-        </p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">💰 Financial Life</h2>
+          <p className="text-muted-foreground">
+            Document your financial accounts and important financial information.
+          </p>
+        </div>
+        <Button onClick={handleSave} size="sm">
+          <Save className="h-4 w-4 mr-2" />
+          Save
+        </Button>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="financial">Financial Overview & Notes</Label>
-        <Textarea
-          id="financial"
-          placeholder="Include information about:
-- Bank accounts (checking, savings)
-- Investment accounts (brokerage, retirement, 401k, IRA)
-- Loans and debts (mortgages, credit cards, personal loans)
-- Safe deposit boxes and their locations
-- Cryptocurrency or digital assets
-- Business interests or partnerships
-- Expected inheritances or trusts
-- Tax preparation information
-- Financial advisor contact information"
-          value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
-          rows={14}
-          className="resize-none"
-        />
+      <div className="space-y-4">
+        <Label className="text-base font-semibold">Account Types I Have</Label>
+        <div className="grid md:grid-cols-2 gap-3">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="checking"
+              checked={financial.has_checking || false}
+              onCheckedChange={(checked) => updateFinancial("has_checking", checked)}
+            />
+            <Label htmlFor="checking" className="font-normal">Checking accounts</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="savings"
+              checked={financial.has_savings || false}
+              onCheckedChange={(checked) => updateFinancial("has_savings", checked)}
+            />
+            <Label htmlFor="savings" className="font-normal">Savings accounts</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="retirement"
+              checked={financial.has_retirement || false}
+              onCheckedChange={(checked) => updateFinancial("has_retirement", checked)}
+            />
+            <Label htmlFor="retirement" className="font-normal">Retirement accounts (401k, IRA)</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="investment"
+              checked={financial.has_investment || false}
+              onCheckedChange={(checked) => updateFinancial("has_investment", checked)}
+            />
+            <Label htmlFor="investment" className="font-normal">Investment/Brokerage accounts</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="crypto"
+              checked={financial.has_crypto || false}
+              onCheckedChange={(checked) => updateFinancial("has_crypto", checked)}
+            />
+            <Label htmlFor="crypto" className="font-normal">Cryptocurrency</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="safe_deposit"
+              checked={financial.has_safe_deposit || false}
+              onCheckedChange={(checked) => updateFinancial("has_safe_deposit", checked)}
+            />
+            <Label htmlFor="safe_deposit" className="font-normal">Safe deposit box</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="business"
+              checked={financial.has_business || false}
+              onCheckedChange={(checked) => updateFinancial("has_business", checked)}
+            />
+            <Label htmlFor="business" className="font-normal">Business interests</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="debts"
+              checked={financial.has_debts || false}
+              onCheckedChange={(checked) => updateFinancial("has_debts", checked)}
+            />
+            <Label htmlFor="debts" className="font-normal">Outstanding debts/loans</Label>
+          </div>
+        </div>
       </div>
 
-      <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-lg">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Label className="text-base font-semibold">Account Details</Label>
+          <Button onClick={addAccount} size="sm" variant="outline">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Account
+          </Button>
+        </div>
+
+        {accounts.map((account: any, index: number) => (
+          <Card key={index} className="p-4 space-y-4">
+            <div className="flex justify-between items-start">
+              <h4 className="font-semibold">Account {index + 1}</h4>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removeAccount(index)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Account Type</Label>
+                <Input
+                  value={account.type || ""}
+                  onChange={(e) => updateAccount(index, "type", e.target.value)}
+                  placeholder="e.g., Checking, 401k, Brokerage"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Institution</Label>
+                <Input
+                  value={account.institution || ""}
+                  onChange={(e) => updateAccount(index, "institution", e.target.value)}
+                  placeholder="Bank or company name"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Details & Location of Documents</Label>
+              <Textarea
+                value={account.details || ""}
+                onChange={(e) => updateAccount(index, "details", e.target.value)}
+                placeholder="Account numbers, beneficiaries, document locations (avoid sensitive passwords)"
+                rows={3}
+              />
+            </div>
+          </Card>
+        ))}
+
+        {accounts.length === 0 && (
+          <div className="text-center py-8 border border-dashed rounded-lg">
+            <p className="text-muted-foreground mb-3">No accounts added yet</p>
+            <Button onClick={addAccount} variant="outline" size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Your First Account
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-lg">
         <h3 className="font-semibold mb-2 text-amber-900 dark:text-amber-100">
           🔒 Security Note:
         </h3>
         <p className="text-sm text-amber-800 dark:text-amber-200">
-          Sensitive information like account numbers and passwords should be stored securely.
-          Consider using a password manager and only noting "See password manager" here.
+          Avoid storing sensitive passwords or PINs here. Use a password manager and note "See password manager" instead.
         </p>
       </div>
     </div>

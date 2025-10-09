@@ -1,72 +1,213 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Save } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface SectionLegalProps {
-  value?: string;
-  onChange: (value: string) => void;
+  data: any;
+  onChange: (data: any) => void;
 }
 
-export const SectionLegal = ({ value, onChange }: SectionLegalProps) => {
+export const SectionLegal = ({ data, onChange }: SectionLegalProps) => {
+  const legal = data.legal || {};
+  const { toast } = useToast();
+
+  const updateLegal = (field: string, value: any) => {
+    onChange({
+      ...data,
+      legal: { ...legal, [field]: value }
+    });
+  };
+
+  const handleSave = () => {
+    toast({
+      title: "Saved",
+      description: "Legal information has been saved.",
+    });
+  };
+
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">⚖️ Legal (Will/Trust)</h2>
-        <p className="text-muted-foreground mb-6">
-          Document location of legal documents, attorney information, and estate planning details.
-        </p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">⚖️ Legal (Will/Trust)</h2>
+          <p className="text-muted-foreground">
+            Document location of legal documents and estate planning details.
+          </p>
+        </div>
+        <Button onClick={handleSave} size="sm">
+          <Save className="h-4 w-4 mr-2" />
+          Save
+        </Button>
+      </div>
+
+      <div className="space-y-4">
+        <Label className="text-base font-semibold">Documents I Have</Label>
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="will"
+              checked={legal.has_will || false}
+              onCheckedChange={(checked) => updateLegal("has_will", checked)}
+            />
+            <Label htmlFor="will" className="font-normal">Last Will and Testament</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="trust"
+              checked={legal.has_trust || false}
+              onCheckedChange={(checked) => updateLegal("has_trust", checked)}
+            />
+            <Label htmlFor="trust" className="font-normal">Living Trust</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="financial_poa"
+              checked={legal.has_financial_poa || false}
+              onCheckedChange={(checked) => updateLegal("has_financial_poa", checked)}
+            />
+            <Label htmlFor="financial_poa" className="font-normal">Financial Power of Attorney</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="healthcare_poa"
+              checked={legal.has_healthcare_poa || false}
+              onCheckedChange={(checked) => updateLegal("has_healthcare_poa", checked)}
+            />
+            <Label htmlFor="healthcare_poa" className="font-normal">Healthcare Power of Attorney</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="living_will"
+              checked={legal.has_living_will || false}
+              onCheckedChange={(checked) => updateLegal("has_living_will", checked)}
+            />
+            <Label htmlFor="living_will" className="font-normal">Living Will / Advance Directive</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="dnr"
+              checked={legal.has_dnr || false}
+              onCheckedChange={(checked) => updateLegal("has_dnr", checked)}
+            />
+            <Label htmlFor="dnr" className="font-normal">Do Not Resuscitate (DNR)</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="polst"
+              checked={legal.has_polst || false}
+              onCheckedChange={(checked) => updateLegal("has_polst", checked)}
+            />
+            <Label htmlFor="polst" className="font-normal">POLST (Physician Orders)</Label>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="executor">Executor Name</Label>
+          <Input
+            id="executor"
+            value={legal.executor || ""}
+            onChange={(e) => updateLegal("executor", e.target.value)}
+            placeholder="Person named in will"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="executor_contact">Executor Contact</Label>
+          <Input
+            id="executor_contact"
+            value={legal.executor_contact || ""}
+            onChange={(e) => updateLegal("executor_contact", e.target.value)}
+            placeholder="Phone or email"
+          />
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="trustee">Trustee Name (if applicable)</Label>
+          <Input
+            id="trustee"
+            value={legal.trustee || ""}
+            onChange={(e) => updateLegal("trustee", e.target.value)}
+            placeholder="Person managing trust"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="trustee_contact">Trustee Contact</Label>
+          <Input
+            id="trustee_contact"
+            value={legal.trustee_contact || ""}
+            onChange={(e) => updateLegal("trustee_contact", e.target.value)}
+            placeholder="Phone or email"
+          />
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="attorney_name">Attorney Name</Label>
+          <Input
+            id="attorney_name"
+            value={legal.attorney_name || ""}
+            onChange={(e) => updateLegal("attorney_name", e.target.value)}
+            placeholder="Estate planning attorney"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="attorney_contact">Attorney Contact</Label>
+          <Input
+            id="attorney_contact"
+            value={legal.attorney_contact || ""}
+            onChange={(e) => updateLegal("attorney_contact", e.target.value)}
+            placeholder="Phone or email"
+          />
+        </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="legal">Legal Documents & Estate Planning</Label>
+        <Label htmlFor="document_location">Location of Original Documents</Label>
         <Textarea
-          id="legal"
-          placeholder="Document the following:
-
-WILL & TRUST:
-- Location of original will
-- Date will was last updated
-- Executor(s) name and contact
-- Trust information if applicable
-- Trustee contact information
-
-POWERS OF ATTORNEY:
-- Financial power of attorney
-- Healthcare power of attorney / Healthcare proxy
-- Document locations
-
-ADVANCE DIRECTIVES:
-- Living will
-- Do Not Resuscitate (DNR) orders
-- POLST (Physician Orders for Life-Sustaining Treatment)
-
-ATTORNEY INFORMATION:
-- Estate planning attorney name
-- Law firm and contact information
-- Case or client number
-
-GUARDIANSHIP:
-- Guardians for minor children
-- Backup guardians
-
-OTHER LEGAL DOCUMENTS:
-- Prenuptial or postnuptial agreements
-- Divorce decrees
-- Adoption papers
-- Military discharge papers"
-          value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
-          rows={16}
-          className="resize-none"
+          id="document_location"
+          value={legal.document_location || ""}
+          onChange={(e) => updateLegal("document_location", e.target.value)}
+          placeholder="Where are the original legal documents stored? (safe, safe deposit box, attorney's office, etc.)"
+          rows={3}
         />
       </div>
 
-      <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-lg">
+      <div className="space-y-2">
+        <Label htmlFor="guardians">Guardians for Minor Children (if applicable)</Label>
+        <Textarea
+          id="guardians"
+          value={legal.guardians || ""}
+          onChange={(e) => updateLegal("guardians", e.target.value)}
+          placeholder="Primary and backup guardians named in will"
+          rows={3}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="legal_notes">Additional Legal Details</Label>
+        <Textarea
+          id="legal_notes"
+          value={legal.notes || ""}
+          onChange={(e) => updateLegal("notes", e.target.value)}
+          placeholder="Any other important legal information, prenuptial agreements, divorce decrees, military discharge papers, etc."
+          rows={4}
+        />
+      </div>
+
+      <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-lg">
         <h3 className="font-semibold mb-2 text-amber-900 dark:text-amber-100">
           ⚠️ Important:
         </h3>
         <p className="text-sm text-amber-800 dark:text-amber-200">
-          Keep original legal documents in a secure location (safe, safe deposit box, attorney's office).
-          Inform your executor and trusted family members where these documents can be found.
+          Keep original legal documents in a secure location. Inform your executor and trusted family members where these documents can be found.
         </p>
       </div>
     </div>

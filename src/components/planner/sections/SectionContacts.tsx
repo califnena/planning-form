@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Save } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface SectionContactsProps {
   data: any;
@@ -11,6 +12,7 @@ interface SectionContactsProps {
 
 export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
   const contacts = data.contacts || [];
+  const { toast } = useToast();
 
   const addContact = () => {
     onChange({
@@ -29,6 +31,13 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
     onChange({ ...data, contacts: contacts.filter((_: any, i: number) => i !== index) });
   };
 
+  const handleSave = () => {
+    toast({
+      title: "Saved",
+      description: "Contact information has been saved.",
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -36,10 +45,16 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
           <h2 className="text-2xl font-bold mb-2">Key Contacts to Notify</h2>
           <p className="text-muted-foreground">People who should be contacted immediately</p>
         </div>
-        <Button onClick={addContact} size="sm">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Contact
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleSave} size="sm" variant="default">
+            <Save className="h-4 w-4 mr-2" />
+            Save
+          </Button>
+          <Button onClick={addContact} size="sm" variant="outline">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Contact
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-4">
