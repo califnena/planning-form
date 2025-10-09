@@ -288,23 +288,34 @@ export const generatePlanPDF = (planData: PlanData) => {
   pdf.text("End-of-Life Planning Guide", 105, 65, { align: "center" });
   
   // Display full legal name on cover
+  let nameYPosition = 85;
   if (legalName && legalName !== "My Final Wishes") {
     pdf.setFontSize(16);
     pdf.setFont("helvetica", "bold");
-    pdf.text(sanitizeText(legalName), 105, 85, { align: "center" });
+    pdf.text(sanitizeText(legalName), 105, nameYPosition, { align: "center" });
+    
+    // Add nickname (AKA) if available
+    if (profile.nicknames) {
+      nameYPosition += 8;
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "italic");
+      pdf.text(sanitizeText(`(AKA ${profile.nicknames})`), 105, nameYPosition, { align: "center" });
+      pdf.setFont("helvetica", "normal");
+    }
   } else if (planData.prepared_by) {
     pdf.setFontSize(12);
     pdf.setFont("helvetica", "normal");
-    pdf.text(sanitizeText(`Prepared for: ${planData.prepared_by}`), 105, 85, { align: "center" });
+    pdf.text(sanitizeText(`Prepared for: ${planData.prepared_by}`), 105, nameYPosition, { align: "center" });
   } else {
     pdf.setFontSize(12);
     pdf.setTextColor(150, 150, 150);
-    pdf.text("Prepared for: ___________________________", 105, 85, { align: "center" });
+    pdf.text("Prepared for: ___________________________", 105, nameYPosition, { align: "center" });
     pdf.setTextColor(0, 0, 0);
   }
   
   pdf.setFontSize(10);
-  pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 100, { align: "center" });
+  const generatedYPosition = profile.nicknames ? 108 : 100;
+  pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, generatedYPosition, { align: "center" });
   
   // Add "Provided by:" above logo
   pdf.setFontSize(11);
