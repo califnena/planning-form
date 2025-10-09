@@ -161,7 +161,6 @@ const PlannerApp = () => {
       label: "📝 Instructions",
       completed: !!plan.instructions_notes,
     },
-    { id: "revisions", label: "🖋️ Revisions & Approvals", completed: false },
     { id: "personal", label: "👤 My Personal Information", completed: false },
     { id: "about", label: "🌟 About Me", completed: !!plan.about_me_notes },
     { id: "contacts", label: "📞 Key Contacts", completed: false },
@@ -184,6 +183,7 @@ const PlannerApp = () => {
     { id: "legal", label: "⚖️ Legal (Will/Trust)", completed: !!plan.legal_notes },
     { id: "messages", label: "❤️ Messages", completed: !!plan.messages_notes },
     { id: "faq", label: "📖 Guide & FAQ", completed: false },
+    { id: "revisions", label: "🖋️ Revisions & Approvals", completed: false },
   ];
 
   if (authLoading || planLoading) {

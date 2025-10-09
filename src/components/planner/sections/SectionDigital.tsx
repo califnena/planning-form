@@ -297,7 +297,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
               rel="noopener noreferrer"
               className="text-primary hover:underline"
             >
-              Apple Legacy Contact Setup
+              Apple Legacy Contact Setup (iPhone)
             </a>
           </li>
           <li>
@@ -308,6 +308,19 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
               className="text-primary hover:underline"
             >
               Google Inactive Account Manager
+            </a>
+          </li>
+          <li>
+            <a
+              href="#faq"
+              onClick={(e) => {
+                e.preventDefault();
+                const faqSection = document.querySelector('[data-section="faq"]');
+                if (faqSection) faqSection.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-primary hover:underline"
+            >
+              Digital Legacy Section in Guide & FAQ
             </a>
           </li>
         </ul>

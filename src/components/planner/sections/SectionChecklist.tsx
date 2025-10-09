@@ -89,7 +89,28 @@ export const SectionChecklist = ({ data, onChange }: SectionChecklistProps) => {
       </div>
 
       <div className="space-y-3">
-        <h3 className="font-semibold">Standard Tasks:</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold">Standard Tasks:</h3>
+          <Button onClick={() => {
+            const currentChecklist = customChecklists[0] || { title: "Custom Tasks", items: [] };
+            const newItems = [...currentChecklist.items, ...standardItems];
+            const updatedChecklists = customChecklists.length > 0 
+              ? [{ ...currentChecklist, items: newItems }, ...customChecklists.slice(1)]
+              : [{ title: "Custom Tasks", items: newItems }];
+            
+            onChange({
+              ...data,
+              custom_checklists: updatedChecklists
+            });
+            toast({
+              title: "Standard tasks integrated",
+              description: "All standard tasks have been added to your custom checklist.",
+            });
+          }} size="sm" variant="secondary">
+            <Plus className="h-4 w-4 mr-2" />
+            Integrate Standard Tasks
+          </Button>
+        </div>
         {standardItems.map((item, index) => (
           <div key={index} className="flex items-start gap-3">
             <Checkbox id={`check-${index}`} className="mt-1" />
@@ -106,29 +127,10 @@ export const SectionChecklist = ({ data, onChange }: SectionChecklistProps) => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold">Custom Checklists:</h3>
-          <div className="flex gap-2">
-            <Button onClick={() => {
-              const newChecklist = { 
-                title: "Custom Tasks", 
-                items: standardItems.map(item => item) 
-              };
-              onChange({
-                ...data,
-                custom_checklists: [...customChecklists, newChecklist]
-              });
-              toast({
-                title: "Standard tasks integrated",
-                description: "All standard tasks have been added to a new custom checklist.",
-              });
-            }} size="sm" variant="secondary">
-              <Plus className="h-4 w-4 mr-2" />
-              Integrate Standard Tasks
-            </Button>
-            <Button onClick={addChecklist} size="sm" variant="outline">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Checklist
-            </Button>
-          </div>
+          <Button onClick={addChecklist} size="sm" variant="outline">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Checklist
+          </Button>
         </div>
 
         {customChecklists.map((checklist: any, checklistIndex: number) => (

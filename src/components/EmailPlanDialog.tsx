@@ -41,15 +41,33 @@ export const EmailPlanDialog = ({
 
     setLoading(true);
     try {
+      // Import the PDF generator dynamically
+      const { generatePlanPDF } = await import("@/lib/pdfGenerator");
+      
+      // Generate PDF
+      const pdf = generatePlanPDF(planData);
+      const pdfBlob = pdf.output('blob');
+      
+      // Convert blob to base64
+      const reader = new FileReader();
+      reader.readAsDataURL(pdfBlob);
+      
+      await new Promise((resolve, reject) => {
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+      });
+      
+      const base64PDF = (reader.result as string).split(',')[1];
+
       const { error } = await supabase.functions.invoke("send-plan-email", {
-        body: { toEmail: email, planData, preparedBy },
+        body: { toEmail: email, pdfData: base64PDF, preparedBy },
       });
 
       if (error) throw error;
 
       toast({
         title: "Plan Emailed!",
-        description: `Your plan has been sent to ${email}`,
+        description: `Your plan PDF has been sent to ${email}`,
       });
 
       setEmail("");

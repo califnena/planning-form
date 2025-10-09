@@ -107,6 +107,18 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
               )}
             </div>
           </div>
+          
+          <div className="space-y-2 mt-4">
+            <Label htmlFor="disposition_notes">Final Disposition Notes</Label>
+            <p className="text-xs text-muted-foreground">Additional details about ashes disposal location, burial specifics, or other disposition preferences</p>
+            <Textarea
+              id="disposition_notes"
+              value={funeral.disposition_notes || ""}
+              onChange={(e) => updateFuneral("disposition_notes", e.target.value)}
+              placeholder="Example: Ashes to be scattered at favorite beach, buried at specific cemetery plot location, etc."
+              rows={3}
+            />
+          </div>
         </div>
 
         <div>
@@ -238,6 +250,18 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
             rows={8}
             className="resize-none"
           />
+        </div>
+
+        <div className="p-4 bg-muted/50 rounded-lg">
+          <h3 className="font-semibold mb-2">💼 Need Help Planning?</h3>
+          <p className="text-sm text-muted-foreground mb-3">
+            Get expert guidance and quotes from Everlasting Funeral Advisors
+          </p>
+          <Button asChild variant="outline" size="sm">
+            <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
+              Request a Quote from EFA
+            </a>
+          </Button>
         </div>
       </div>
     </div>

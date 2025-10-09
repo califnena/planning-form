@@ -11,7 +11,7 @@ const corsHeaders = {
 
 interface EmailPlanRequest {
   toEmail: string;
-  planData: any;
+  pdfData: string;
   preparedBy: string;
 }
 
@@ -21,7 +21,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { toEmail, planData, preparedBy }: EmailPlanRequest = await req.json();
+    const { toEmail, pdfData, preparedBy }: EmailPlanRequest = await req.json();
 
     const emailResponse = await resend.emails.send({
       from: "My Final Wishes <onboarding@resend.dev>",
@@ -34,18 +34,13 @@ const handler = async (req: Request): Promise<Response> => {
             This plan was prepared by <strong>${preparedBy}</strong> and contains important end-of-life planning information.
           </p>
           <p style="color: #666; font-size: 14px;">
-            Please keep this document in a safe place and ensure it's accessible to those who will need it.
+            Please find your complete plan attached as a PDF document. Keep this in a safe place and ensure it's accessible to those who will need it.
           </p>
           <div style="margin-top: 30px; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
-            <h2 style="color: #333; font-size: 16px;">Plan Summary</h2>
+            <h2 style="color: #333; font-size: 16px;">What's Included</h2>
             <p style="color: #666; font-size: 14px;">
               This comprehensive plan includes instructions, personal information, contacts, funeral wishes, 
               financial details, and important messages for loved ones.
-            </p>
-          </div>
-          <div style="margin-top: 30px; padding: 20px; background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
-            <p style="color: #92400e; font-size: 14px; margin: 0;">
-              <strong>Important:</strong> Please log in to the platform to view the complete plan with all details.
             </p>
           </div>
           <p style="color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
@@ -54,6 +49,12 @@ const handler = async (req: Request): Promise<Response> => {
           </p>
         </div>
       `,
+      attachments: [
+        {
+          filename: `My-Final-Wishes-Plan.pdf`,
+          content: pdfData,
+        },
+      ],
     });
 
     console.log("Plan email sent successfully:", emailResponse);
