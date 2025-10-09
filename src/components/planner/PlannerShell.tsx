@@ -101,9 +101,8 @@ export const PlannerShell = ({
               {t("header.contact")}
             </Button>
             <Button
-              variant="outline"
               size="sm"
-              className="w-full justify-start"
+              className="w-full justify-start bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse hover:animate-none font-semibold"
               asChild
             >
               <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">

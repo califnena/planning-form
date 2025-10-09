@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Save, Upload, X, Image as ImageIcon } from "lucide-react";
+import { Save, Upload, X, Image as ImageIcon, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
@@ -456,13 +456,20 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
           />
         </div>
 
-        <div className="p-4 bg-muted/50 rounded-lg">
-          <h3 className="font-semibold mb-2">💼 Need Help Planning?</h3>
-          <p className="text-sm text-muted-foreground mb-3">
+        <div className="p-6 bg-gradient-to-br from-primary/10 via-primary/5 to-background border-2 border-primary/20 rounded-lg shadow-md">
+          <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
+            💼 Need Help Planning?
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
             Get expert quotes from Everlasting Funeral Services for urns, caskets, flowers, and other funeral packages
           </p>
-          <Button asChild variant="outline" size="sm">
-            <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
+          <Button 
+            asChild 
+            size="lg" 
+            className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold text-base group"
+          >
+            <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
+              <FileText className="h-5 w-5 group-hover:scale-110 transition-transform" />
               Request a Quote from Everlasting Funeral Services
             </a>
           </Button>
