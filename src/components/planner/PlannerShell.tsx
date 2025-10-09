@@ -1,7 +1,8 @@
 import { useState, ReactNode } from "react";
 import { SidebarNav } from "./SidebarNav";
 import { Button } from "@/components/ui/button";
-import { Download, Mail } from "lucide-react";
+import { Download, Mail, MessageSquare, Facebook } from "lucide-react";
+import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
 
 interface PlannerShellProps {
   children: ReactNode;
@@ -22,8 +23,15 @@ export const PlannerShell = ({
   onEmailPlan,
   onSignOut,
 }: PlannerShellProps) => {
+  const [showContactDialog, setShowContactDialog] = useState(false);
+
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <>
+      <ContactSuggestionDialog
+        open={showContactDialog}
+        onOpenChange={setShowContactDialog}
+      />
+      <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
       <header className="border-b border-border sticky top-0 bg-background z-10">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -73,6 +81,15 @@ export const PlannerShell = ({
               <Mail className="mr-2 h-4 w-4" />
               Email Plan
             </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full justify-start"
+              onClick={() => setShowContactDialog(true)}
+            >
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Contact & Suggestions
+            </Button>
           </div>
 
           {/* Contact Info */}
@@ -96,6 +113,20 @@ export const PlannerShell = ({
                 everlastingfuneraladvisors.com
               </a>
             </div>
+
+            {/* Social Media */}
+            <div className="mt-4 pt-4 border-t border-sidebar-border">
+              <h3 className="text-sm font-semibold text-sidebar-foreground mb-2">Follow Us</h3>
+              <a
+                href="https://www.facebook.com/profile.php?id=61580859545223"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center text-primary hover:underline text-xs"
+              >
+                <Facebook className="mr-1 h-4 w-4" />
+                Facebook
+              </a>
+            </div>
           </div>
         </aside>
 
@@ -104,6 +135,7 @@ export const PlannerShell = ({
           <div className="container mx-auto px-4 py-6 max-w-4xl">{children}</div>
         </main>
       </div>
-    </div>
+      </div>
+    </>
   );
 };

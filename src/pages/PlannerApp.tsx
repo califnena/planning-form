@@ -6,6 +6,8 @@ import { PlannerShell } from "@/components/planner/PlannerShell";
 import { usePlanData } from "@/hooks/usePlanData";
 import { useToast } from "@/hooks/use-toast";
 import { RevisionPromptDialog } from "@/components/planner/RevisionPromptDialog";
+import { EmailPlanDialog } from "@/components/EmailPlanDialog";
+import { generatePlanPDF } from "@/lib/pdfGenerator";
 
 // Section components
 import { SectionInstructions } from "@/components/planner/sections/SectionInstructions";
@@ -32,6 +34,7 @@ const PlannerApp = () => {
   const [authLoading, setAuthLoading] = useState(true);
   const [activeSection, setActiveSection] = useState("instructions");
   const [showRevisionDialog, setShowRevisionDialog] = useState(false);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [pendingAction, setPendingAction] = useState<"download" | "email" | null>(null);
 
   useEffect(() => {
@@ -130,15 +133,23 @@ const PlannerApp = () => {
 
     // Proceed with the pending action
     if (pendingAction === "download") {
-      toast({
-        title: "Revision Saved",
-        description: "PDF export feature coming soon!",
-      });
+      try {
+        const pdf = generatePlanPDF(plan);
+        pdf.save(`My-Final-Wishes-${new Date().toISOString().split('T')[0]}.pdf`);
+        toast({
+          title: "Revision Saved",
+          description: "PDF downloaded successfully!",
+        });
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        toast({
+          title: "Error",
+          description: "Failed to generate PDF. Please try again.",
+          variant: "destructive",
+        });
+      }
     } else if (pendingAction === "email") {
-      toast({
-        title: "Revision Saved",
-        description: "Email sharing feature coming soon!",
-      });
+      setShowEmailDialog(true);
     }
 
     setPendingAction(null);
@@ -301,6 +312,13 @@ const PlannerApp = () => {
         open={showRevisionDialog}
         onOpenChange={setShowRevisionDialog}
         onConfirm={handleRevisionConfirm}
+        preparedBy={plan.prepared_by || ""}
+      />
+
+      <EmailPlanDialog
+        open={showEmailDialog}
+        onOpenChange={setShowEmailDialog}
+        planData={plan}
         preparedBy={plan.prepared_by || ""}
       />
     </>
