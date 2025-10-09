@@ -222,14 +222,25 @@ export const generatePlanPDF = (planData: PlanData) => {
     yPosition += 5;
   };
 
-  // Cover page
+  // Cover page - Add elegant frame
+  pdf.setDrawColor(0, 0, 0);
+  pdf.setLineWidth(2);
+  pdf.rect(10, 10, pageWidth - 20, pageHeight - 20);
+  
+  pdf.setLineWidth(0.5);
+  pdf.rect(12, 12, pageWidth - 24, pageHeight - 24);
+  
+  pdf.setLineWidth(0.2);
+  pdf.rect(14, 14, pageWidth - 28, pageHeight - 28);
+  
+  // Title
   pdf.setFontSize(24);
   pdf.setFont("helvetica", "bold");
-  pdf.text("My Final Wishes", 105, 60, { align: "center" });
+  pdf.text("My Final Wishes", 105, 50, { align: "center" });
   
   pdf.setFontSize(14);
   pdf.setFont("helvetica", "normal");
-  pdf.text("End-of-Life Planning Guide", 105, 75, { align: "center" });
+  pdf.text("End-of-Life Planning Guide", 105, 65, { align: "center" });
   
   // Display full legal name on cover
   const profile = planData.personal_profile || {};
@@ -237,42 +248,43 @@ export const generatePlanPDF = (planData: PlanData) => {
   if (legalName) {
     pdf.setFontSize(16);
     pdf.setFont("helvetica", "bold");
-    pdf.text(sanitizeText(legalName), 105, 95, { align: "center" });
+    pdf.text(sanitizeText(legalName), 105, 85, { align: "center" });
   } else if (planData.prepared_by) {
     pdf.setFontSize(12);
     pdf.setFont("helvetica", "normal");
-    pdf.text(sanitizeText(`Prepared for: ${planData.prepared_by}`), 105, 95, { align: "center" });
+    pdf.text(sanitizeText(`Prepared for: ${planData.prepared_by}`), 105, 85, { align: "center" });
   } else {
     pdf.setFontSize(12);
     pdf.setTextColor(150, 150, 150);
-    pdf.text("Prepared for: ___________________________", 105, 95, { align: "center" });
+    pdf.text("Prepared for: ___________________________", 105, 85, { align: "center" });
     pdf.setTextColor(0, 0, 0);
   }
   
   pdf.setFontSize(10);
-  pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 110, { align: "center" });
+  pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 100, { align: "center" });
   
-  // Add contact info on cover page
+  // Add logo in center
+  try {
+    pdf.addImage(everlastingLogo, 'PNG', pageWidth / 2 - 25, 120, 50, 50);
+  } catch (error) {
+    console.error('Error adding logo to PDF:', error);
+  }
+  
+  // Add contact info below logo
   pdf.setFontSize(11);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(0, 0, 0);
-  pdf.text("Provided by:", 105, 140, { align: "center" });
-  pdf.text("Everlasting Funeral Advisors", 105, 150, { align: "center" });
+  pdf.text("Provided by:", 105, 185, { align: "center" });
+  pdf.text("Everlasting Funeral Advisors", 105, 195, { align: "center" });
   
   pdf.setFontSize(9);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(64, 64, 64);
-  pdf.text("Phone: (323) 863-5804", 105, 162, { align: "center" });
-  pdf.text("Email: info@everlastingfuneraladvisors.com", 105, 169, { align: "center" });
-  pdf.text("Website: https://everlastingfuneraladvisors.com", 105, 176, { align: "center" });
-  pdf.text("Facebook: https://www.facebook.com/profile.php?id=61580859545223", 105, 183, { align: "center" });
-  
-  // Add logo at the bottom of cover page
-  try {
-    pdf.addImage(everlastingLogo, 'PNG', pageWidth / 2 - 25, pageHeight - 65, 50, 50);
-  } catch (error) {
-    console.error('Error adding logo to PDF:', error);
-  }
+  pdf.text("Phone: (323) 863-5804", 105, 207, { align: "center" });
+  pdf.text("Email: info@everlastingfuneraladvisors.com", 105, 214, { align: "center" });
+  pdf.text("Website: https://everlastingfuneraladvisors.com", 105, 221, { align: "center" });
+  pdf.text("Facebook: https://www.facebook.com/profile.php?id=61580859545223", 105, 228, { align: "center" });
+  pdf.setTextColor(0, 0, 0);
 
   // Add sections
   pdf.addPage();
