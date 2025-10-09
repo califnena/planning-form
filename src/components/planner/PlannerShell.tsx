@@ -1,7 +1,7 @@
 import { useState, ReactNode } from "react";
 import { SidebarNav } from "./SidebarNav";
 import { Button } from "@/components/ui/button";
-import { Download, Mail, MessageSquare, Facebook } from "lucide-react";
+import { Download, Mail, MessageSquare, Facebook, FileText } from "lucide-react";
 import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useTranslation } from "react-i18next";
@@ -95,6 +95,17 @@ export const PlannerShell = ({
             >
               <MessageSquare className="mr-2 h-4 w-4" />
               {t("header.contact")}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full justify-start"
+              asChild
+            >
+              <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
+                <FileText className="mr-2 h-4 w-4" />
+                Request a Quote
+              </a>
             </Button>
           </div>
 
