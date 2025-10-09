@@ -21,11 +21,33 @@ export const generatePlanPDF = (planData: PlanData) => {
   const pdf = new jsPDF();
   let yPosition = 20;
   const pageHeight = pdf.internal.pageSize.height;
+  const pageWidth = pdf.internal.pageSize.width;
   const marginBottom = 20;
   const lineHeight = 7;
 
+  // Helper to sanitize text for PDF (handle special characters)
+  const sanitizeText = (text: string): string => {
+    if (!text) return '';
+    return text
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+      .replace(/[\u2018\u2019]/g, "'") // Replace smart quotes
+      .replace(/[\u201C\u201D]/g, '"')
+      .replace(/\u2013|\u2014/g, '-') // Replace em/en dashes
+      .replace(/\u2026/g, '...'); // Replace ellipsis
+  };
+
+  // Helper to add small logo to bottom right of page
+  const addPageLogo = () => {
+    try {
+      pdf.addImage(everlastingLogo, 'PNG', pageWidth - 25, pageHeight - 25, 15, 15);
+    } catch (error) {
+      console.error('Error adding page logo:', error);
+    }
+  };
+
   const checkPageBreak = (additionalSpace: number = 10) => {
     if (yPosition + additionalSpace > pageHeight - marginBottom) {
+      addPageLogo(); // Add logo before new page
       pdf.addPage();
       yPosition = 20;
     }
@@ -35,7 +57,7 @@ export const generatePlanPDF = (planData: PlanData) => {
     checkPageBreak(15);
     pdf.setFontSize(16);
     pdf.setFont("helvetica", "bold");
-    pdf.text(title, 20, yPosition);
+    pdf.text(sanitizeText(title), 20, yPosition);
     yPosition += 10;
   };
 
@@ -43,14 +65,15 @@ export const generatePlanPDF = (planData: PlanData) => {
     checkPageBreak(20);
     pdf.setFontSize(12);
     pdf.setFont("helvetica", "bold");
-    pdf.text(heading, 20, yPosition);
+    pdf.text(sanitizeText(heading), 20, yPosition);
     yPosition += lineHeight;
 
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
     
     if (content && content.trim()) {
-      const lines = pdf.splitTextToSize(content, 170);
+      const sanitized = sanitizeText(content);
+      const lines = pdf.splitTextToSize(sanitized, 170);
       lines.forEach((line: string) => {
         checkPageBreak();
         pdf.text(line, 20, yPosition);
@@ -73,12 +96,13 @@ export const generatePlanPDF = (planData: PlanData) => {
     checkPageBreak(15);
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "bold");
-    pdf.text(label + ":", 20, yPosition);
+    pdf.text(sanitizeText(label) + ":", 20, yPosition);
     yPosition += lineHeight;
     
     pdf.setFont("helvetica", "normal");
     if (value && value.trim()) {
-      const lines = pdf.splitTextToSize(value, 170);
+      const sanitized = sanitizeText(value);
+      const lines = pdf.splitTextToSize(sanitized, 170);
       lines.forEach((line: string) => {
         checkPageBreak();
         pdf.text(line, 25, yPosition);
@@ -94,37 +118,48 @@ export const generatePlanPDF = (planData: PlanData) => {
   };
 
   // Cover page
-  // Add logo at the top
-  try {
-    pdf.addImage(everlastingLogo, 'PNG', 80, 30, 50, 50);
-  } catch (error) {
-    console.error('Error adding logo to PDF:', error);
-  }
-  
   pdf.setFontSize(24);
   pdf.setFont("helvetica", "bold");
-  pdf.text("My Final Wishes", 105, 95, { align: "center" });
+  pdf.text("My Final Wishes", 105, 60, { align: "center" });
   
   pdf.setFontSize(14);
   pdf.setFont("helvetica", "normal");
-  pdf.text("End-of-Life Planning Guide", 105, 110, { align: "center" });
-  
-  pdf.setFontSize(11);
-  pdf.setFont("helvetica", "italic");
-  pdf.text("Provided by Everlasting Funeral Advisors", 105, 125, { align: "center" });
+  pdf.text("End-of-Life Planning Guide", 105, 75, { align: "center" });
   
   if (planData.prepared_by) {
     pdf.setFontSize(12);
-    pdf.text(`Prepared for: ${planData.prepared_by}`, 105, 145, { align: "center" });
+    pdf.text(sanitizeText(`Prepared for: ${planData.prepared_by}`), 105, 95, { align: "center" });
   } else {
     pdf.setFontSize(12);
     pdf.setTextColor(150, 150, 150);
-    pdf.text("Prepared for: ___________________________", 105, 145, { align: "center" });
+    pdf.text("Prepared for: ___________________________", 105, 95, { align: "center" });
     pdf.setTextColor(0, 0, 0);
   }
   
   pdf.setFontSize(10);
-  pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 160, { align: "center" });
+  pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 110, { align: "center" });
+  
+  // Add contact info on cover page
+  pdf.setFontSize(11);
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(0, 0, 0);
+  pdf.text("Provided by:", 105, 140, { align: "center" });
+  pdf.text("Everlasting Funeral Advisors", 105, 150, { align: "center" });
+  
+  pdf.setFontSize(9);
+  pdf.setFont("helvetica", "normal");
+  pdf.setTextColor(64, 64, 64);
+  pdf.text("Phone: (323) 863-5804", 105, 162, { align: "center" });
+  pdf.text("Email: info@everlastingfuneraladvisors.com", 105, 169, { align: "center" });
+  pdf.text("Website: https://everlastingfuneraladvisors.com", 105, 176, { align: "center" });
+  pdf.text("Facebook: https://www.facebook.com/profile.php?id=61580859545223", 105, 183, { align: "center" });
+  
+  // Add logo at the bottom of cover page
+  try {
+    pdf.addImage(everlastingLogo, 'PNG', pageWidth / 2 - 25, pageHeight - 65, 50, 50);
+  } catch (error) {
+    console.error('Error adding logo to PDF:', error);
+  }
 
   // Add sections
   pdf.addPage();
@@ -156,7 +191,7 @@ export const generatePlanPDF = (planData: PlanData) => {
       checkPageBreak(25);
       pdf.setFontSize(11);
       pdf.setFont("helvetica", "bold");
-      pdf.text(`Contact ${index + 1}`, 20, yPosition);
+      pdf.text(sanitizeText(`Contact ${index + 1}`), 20, yPosition);
       yPosition += lineHeight;
       addField("Name", contact.name);
       addField("Relationship", contact.relationship);
@@ -187,7 +222,7 @@ export const generatePlanPDF = (planData: PlanData) => {
       checkPageBreak(25);
       pdf.setFontSize(11);
       pdf.setFont("helvetica", "bold");
-      pdf.text(`Vendor ${index + 1}`, 20, yPosition);
+      pdf.text(sanitizeText(`Vendor ${index + 1}`), 20, yPosition);
       yPosition += lineHeight;
       addField("Type", vendor.type);
       addField("Business Name", vendor.business);
@@ -234,7 +269,7 @@ export const generatePlanPDF = (planData: PlanData) => {
       checkPageBreak(20);
       pdf.setFontSize(11);
       pdf.setFont("helvetica", "bold");
-      pdf.text(`Account ${index + 1}`, 20, yPosition);
+      pdf.text(sanitizeText(`Account ${index + 1}`), 20, yPosition);
       yPosition += lineHeight;
       addField("Type", account.type);
       addField("Institution", account.institution);
@@ -268,7 +303,7 @@ export const generatePlanPDF = (planData: PlanData) => {
       checkPageBreak(25);
       pdf.setFontSize(11);
       pdf.setFont("helvetica", "bold");
-      pdf.text(`Policy ${index + 1}`, 20, yPosition);
+      pdf.text(sanitizeText(`Policy ${index + 1}`), 20, yPosition);
       yPosition += lineHeight;
       addField("Type", policy.type);
       addField("Company", policy.company);
@@ -308,7 +343,7 @@ export const generatePlanPDF = (planData: PlanData) => {
       checkPageBreak(20);
       pdf.setFontSize(11);
       pdf.setFont("helvetica", "bold");
-      pdf.text(`Valuable Item ${index + 1}`, 20, yPosition);
+      pdf.text(sanitizeText(`Valuable Item ${index + 1}`), 20, yPosition);
       yPosition += lineHeight;
       addField("Item Name", item.item);
       addField("Value", item.value);
@@ -331,7 +366,7 @@ export const generatePlanPDF = (planData: PlanData) => {
       checkPageBreak(20);
       pdf.setFontSize(11);
       pdf.setFont("helvetica", "bold");
-      pdf.text(`Digital Account ${index + 1}`, 20, yPosition);
+      pdf.text(sanitizeText(`Digital Account ${index + 1}`), 20, yPosition);
       yPosition += lineHeight;
       addField("Platform", account.platform);
       addField("Username", account.username);
@@ -375,7 +410,7 @@ export const generatePlanPDF = (planData: PlanData) => {
       checkPageBreak(25);
       pdf.setFontSize(11);
       pdf.setFont("helvetica", "bold");
-      pdf.text(`Message ${index + 1}`, 20, yPosition);
+      pdf.text(sanitizeText(`Message ${index + 1}`), 20, yPosition);
       yPosition += lineHeight;
       addField("Recipient", message.recipient);
       addField("Message", message.message);
@@ -395,19 +430,30 @@ export const generatePlanPDF = (planData: PlanData) => {
   }
 
   // Footer on last page
-  checkPageBreak(35);
-  pdf.setFontSize(9);
+  checkPageBreak(40);
+  pdf.setFontSize(10);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(0, 0, 0);
-  pdf.text("Everlasting Funeral Advisors", 105, pageHeight - 25, { align: "center" });
+  pdf.text("Contact Information:", 105, yPosition, { align: "center" });
+  yPosition += 8;
+  
+  pdf.setFontSize(9);
+  pdf.text("Everlasting Funeral Advisors", 105, yPosition, { align: "center" });
+  yPosition += 7;
   
   pdf.setFontSize(8);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(64, 64, 64);
-  pdf.text("Phone: (323) 863-5804", 105, pageHeight - 18, { align: "center" });
-  pdf.text("Email: info@everlastingfuneraladvisors.com", 105, pageHeight - 13, { align: "center" });
-  pdf.text("Website: https://everlastingfuneraladvisors.com", 105, pageHeight - 8, { align: "center" });
-  pdf.text("Facebook: https://www.facebook.com/profile.php?id=61580859545223", 105, pageHeight - 3, { align: "center" });
+  pdf.text("Phone: (323) 863-5804", 105, yPosition, { align: "center" });
+  yPosition += 5;
+  pdf.text("Email: info@everlastingfuneraladvisors.com", 105, yPosition, { align: "center" });
+  yPosition += 5;
+  pdf.text("Website: https://everlastingfuneraladvisors.com", 105, yPosition, { align: "center" });
+  yPosition += 5;
+  pdf.text("Facebook: https://www.facebook.com/profile.php?id=61580859545223", 105, yPosition, { align: "center" });
+
+  // Add logo to last page
+  addPageLogo();
 
   return pdf;
 };
