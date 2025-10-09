@@ -93,9 +93,9 @@ export const ContactSuggestionDialog = ({
 
           <TabsContent value="contact" className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="contact-name">Your Name</Label>
+              <Label htmlFor="name">Your Name</Label>
               <Input
-                id="contact-name"
+                id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="John Doe"
@@ -103,9 +103,9 @@ export const ContactSuggestionDialog = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="contact-email">Your Email</Label>
+              <Label htmlFor="email">Your Email</Label>
               <Input
-                id="contact-email"
+                id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -114,9 +114,9 @@ export const ContactSuggestionDialog = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="contact-message">Message</Label>
+              <Label htmlFor="message">Message</Label>
               <Textarea
-                id="contact-message"
+                id="message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="How can we help you?"
@@ -135,9 +135,9 @@ export const ContactSuggestionDialog = ({
 
           <TabsContent value="suggestion" className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="suggestion-name">Your Name</Label>
+              <Label htmlFor="name-sug">Your Name</Label>
               <Input
-                id="suggestion-name"
+                id="name-sug"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="John Doe"
@@ -145,9 +145,9 @@ export const ContactSuggestionDialog = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="suggestion-email">Your Email</Label>
+              <Label htmlFor="email-sug">Your Email</Label>
               <Input
-                id="suggestion-email"
+                id="email-sug"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -156,9 +156,9 @@ export const ContactSuggestionDialog = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="suggestion-message">Your Suggestion</Label>
+              <Label htmlFor="message-sug">Your Suggestion</Label>
               <Textarea
-                id="suggestion-message"
+                id="message-sug"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Share your ideas to improve our platform..."
