@@ -106,10 +106,29 @@ export const SectionChecklist = ({ data, onChange }: SectionChecklistProps) => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold">Custom Checklists:</h3>
-          <Button onClick={addChecklist} size="sm" variant="outline">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Checklist
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => {
+              const newChecklist = { 
+                title: "Custom Tasks", 
+                items: standardItems.map(item => item) 
+              };
+              onChange({
+                ...data,
+                custom_checklists: [...customChecklists, newChecklist]
+              });
+              toast({
+                title: "Standard tasks integrated",
+                description: "All standard tasks have been added to a new custom checklist.",
+              });
+            }} size="sm" variant="secondary">
+              <Plus className="h-4 w-4 mr-2" />
+              Integrate Standard Tasks
+            </Button>
+            <Button onClick={addChecklist} size="sm" variant="outline">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Checklist
+            </Button>
+          </div>
         </div>
 
         {customChecklists.map((checklist: any, checklistIndex: number) => (

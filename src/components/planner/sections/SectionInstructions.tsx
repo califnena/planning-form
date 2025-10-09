@@ -40,6 +40,7 @@ export const SectionInstructions = ({ value, onChange }: SectionInstructionsProp
       </div>
 
       <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+        <h3 className="font-semibold mb-3">Suggested Text:</h3>
         <p className="text-sm text-foreground leading-relaxed italic">
           "If you are reading this, it means you have the difficult task of carrying out my final wishes. 
           I want you to know that everything written here was prepared with love, to make this time a little 

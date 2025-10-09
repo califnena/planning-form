@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Plus, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,7 +18,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
   const addContact = () => {
     onChange({
       ...data,
-      contacts: [...contacts, { name: "", relationship: "", contact: "", auto_notify: false }]
+      contacts: [...contacts, { name: "", relationship: "", contact: "", auto_notify: false, note: "" }]
     });
   };
 
@@ -101,6 +102,17 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
                   placeholder="Phone or email"
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Notes</Label>
+              <p className="text-xs text-muted-foreground">Any additional information about this contact</p>
+              <Textarea
+                value={contact.note || ""}
+                onChange={(e) => updateContact(index, "note", e.target.value)}
+                placeholder="Add special instructions or context..."
+                rows={2}
+              />
             </div>
 
             <div className="flex items-center space-x-2">

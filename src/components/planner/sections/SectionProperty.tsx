@@ -25,7 +25,22 @@ export const SectionProperty = ({ data, onChange }: SectionPropertyProps) => {
   };
 
   const addItem = () => {
-    updateProperty("items", [...items, { type: "", description: "", location: "" }]);
+    updateProperty("items", [...items, { type: "", description: "", location: "", document: "" }]);
+  };
+
+  const handleFileUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updateItem(index, "document", reader.result as string);
+        toast({
+          title: "Document attached",
+          description: `${file.name} has been attached to this property.`,
+        });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const updateItem = (index: number, field: string, value: string) => {
@@ -178,6 +193,30 @@ export const SectionProperty = ({ data, onChange }: SectionPropertyProps) => {
                 onChange={(e) => updateItem(index, "location", e.target.value)}
                 placeholder="Where are the deeds, titles, or important documents?"
               />
+            </div>
+            <div className="space-y-2">
+              <Label>Attach Document</Label>
+              <p className="text-xs text-muted-foreground">Upload deed, title, or related document (will be included in PDF)</p>
+              <div className="space-y-2">
+                <Input
+                  type="file"
+                  accept="image/*,.pdf"
+                  onChange={(e) => handleFileUpload(index, e)}
+                  className="cursor-pointer"
+                />
+                {item.document && (
+                  <div className="flex items-center gap-2 p-2 border rounded">
+                    <span className="text-sm text-muted-foreground">Document attached</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => updateItem(index, "document", "")}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           </Card>
         ))}

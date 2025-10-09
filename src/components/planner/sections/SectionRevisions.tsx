@@ -117,6 +117,16 @@ export const SectionRevisions = ({ data, onChange }: SectionRevisionsProps) => {
             </div>
 
             <div className="space-y-2">
+              <Label>Prepared By (Name)</Label>
+              <p className="text-xs text-muted-foreground">Full name of person signing this revision</p>
+              <Input
+                value={revision.prepared_by || ""}
+                onChange={(e) => updateRevision(index, "prepared_by", e.target.value)}
+                placeholder="Name of person creating this revision"
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label>Revision Date</Label>
               <Input
                 type="date"

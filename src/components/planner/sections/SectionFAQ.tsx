@@ -4,18 +4,25 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { FAQDownloadButton } from "./FAQDownloadButton";
 
 export const SectionFAQ = () => {
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">📖 Guide & FAQ</h2>
-        <p className="text-muted-foreground mb-6">
-          Helpful information and frequently asked questions about end-of-life planning.
-        </p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">📖 Guide & FAQ</h2>
+          <p className="text-muted-foreground">
+            Helpful information and frequently asked questions about end-of-life planning.
+          </p>
+        </div>
+        <FAQDownloadButton />
       </div>
 
-      <Accordion type="single" collapsible className="w-full">
+      {/* Funeral Planning Section */}
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold">🕊️ Funeral Planning</h3>
+        <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="item-1">
           <AccordionTrigger>What is funeral preplanning and why do people do it?</AccordionTrigger>
           <AccordionContent>
@@ -127,7 +134,13 @@ export const SectionFAQ = () => {
             </p>
           </AccordionContent>
         </AccordionItem>
+      </Accordion>
+      </div>
 
+      {/* Digital Legacy Section */}
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold">💻 Digital Legacy</h3>
+        <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="item-10">
           <AccordionTrigger>What is a digital legacy?</AccordionTrigger>
           <AccordionContent>
@@ -201,6 +214,13 @@ export const SectionFAQ = () => {
           </AccordionContent>
         </AccordionItem>
 
+      </Accordion>
+      </div>
+
+      {/* Estate & Administrative Section */}
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold">📋 Estate & Administrative</h3>
+        <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="item-15">
           <AccordionTrigger>Who should I notify first after a death?</AccordionTrigger>
           <AccordionContent>
@@ -240,6 +260,13 @@ export const SectionFAQ = () => {
           </AccordionContent>
         </AccordionItem>
 
+      </Accordion>
+      </div>
+
+      {/* Special Considerations Section */}
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold">🎖️ Special Considerations</h3>
+        <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="item-18">
           <AccordionTrigger>What about veterans' benefits?</AccordionTrigger>
           <AccordionContent>
@@ -296,6 +323,7 @@ export const SectionFAQ = () => {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
+      </div>
 
       <div className="mt-8 pt-6 border-t border-border">
         <h3 className="font-semibold mb-3">Additional Resources:</h3>

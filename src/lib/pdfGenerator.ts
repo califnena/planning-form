@@ -100,6 +100,30 @@ export const generatePlanPDF = (planData: PlanData) => {
 
   addTitle("🏠 My Property");
   addSection("Property Information", planData.property_notes);
+  
+  // Add property documents if available
+  if (planData.property?.items && Array.isArray(planData.property.items)) {
+    planData.property.items.forEach((item: any, index: number) => {
+      if (item.document) {
+        checkPageBreak(60);
+        pdf.setFontSize(11);
+        pdf.setFont("helvetica", "bold");
+        pdf.text(`Property ${index + 1} Document: ${item.type || 'Untitled'}`, 20, yPosition);
+        yPosition += 10;
+        
+        try {
+          // Add the image to the PDF
+          pdf.addImage(item.document, 'JPEG', 20, yPosition, 170, 100);
+          yPosition += 110;
+        } catch (error) {
+          pdf.setFontSize(10);
+          pdf.setFont("helvetica", "italic");
+          pdf.text("(Document attached but could not be displayed in PDF)", 20, yPosition);
+          yPosition += lineHeight;
+        }
+      }
+    });
+  }
 
   addTitle("🐾 My Pets");
   addSection("Pet Care Instructions", planData.pets_notes);
