@@ -155,75 +155,6 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
       </div>
 
       <div className="space-y-6">
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="funeral_photo" className="text-base font-semibold">Preferred Photo</Label>
-            <p className="text-xs text-muted-foreground mt-1 mb-3">
-              Upload a photo you'd like to be used at your funeral or memorial service
-            </p>
-            
-            {photoUrl ? (
-              <div className="space-y-3">
-                <div className="relative inline-block">
-                  <img 
-                    src={photoUrl} 
-                    alt="Funeral photo" 
-                    className="w-48 h-48 object-cover rounded-lg border-2 border-border"
-                  />
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    className="absolute -top-2 -right-2"
-                    onClick={handleRemovePhoto}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div>
-                  <Label htmlFor="funeral_photo_replace" className="cursor-pointer">
-                    <Button variant="outline" size="sm" asChild>
-                      <span>
-                        <Upload className="h-4 w-4 mr-2" />
-                        Replace Photo
-                      </span>
-                    </Button>
-                  </Label>
-                  <input
-                    id="funeral_photo_replace"
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    disabled={uploading}
-                    className="hidden"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div>
-                <Label htmlFor="funeral_photo" className="cursor-pointer">
-                  <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors">
-                    <ImageIcon className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
-                    <p className="text-sm font-medium mb-1">
-                      {uploading ? "Uploading..." : "Click to upload photo"}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      JPG, PNG or WEBP (max 5MB)
-                    </p>
-                  </div>
-                </Label>
-                <input
-                  id="funeral_photo"
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  disabled={uploading}
-                  className="hidden"
-                />
-              </div>
-            )}
-          </div>
-        </div>
-
         <div className="space-y-2">
           <Label htmlFor="funeral_preference">Funeral Preference (If Any)</Label>
           <p className="text-xs text-muted-foreground">Briefly describe your overall funeral or memorial service preferences</p>
@@ -234,6 +165,131 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
             placeholder="Example: I prefer a simple graveside service with close family only, or I'd like a celebration of life at my favorite park..."
             rows={3}
           />
+        </div>
+
+        <div className="space-y-4">
+          <Label className="text-base font-semibold">Have You Already Purchased Items?</Label>
+          <p className="text-xs text-muted-foreground">
+            Let us know if you've already purchased a casket, urn, flowers, funeral packets, or other funeral-related items
+          </p>
+          
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="purchased_casket"
+                  checked={funeral.purchased_casket || false}
+                  onCheckedChange={(checked) => updateFuneral("purchased_casket", checked)}
+                />
+                <Label htmlFor="purchased_casket" className="font-normal">Casket</Label>
+              </div>
+              {funeral.purchased_casket && (
+                <Textarea
+                  value={funeral.purchased_casket_notes || ""}
+                  onChange={(e) => updateFuneral("purchased_casket_notes", e.target.value)}
+                  placeholder="Provide details: where purchased, model/style, location where stored, receipt location..."
+                  rows={2}
+                  className="ml-6"
+                />
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="purchased_urn"
+                  checked={funeral.purchased_urn || false}
+                  onCheckedChange={(checked) => updateFuneral("purchased_urn", checked)}
+                />
+                <Label htmlFor="purchased_urn" className="font-normal">Urn</Label>
+              </div>
+              {funeral.purchased_urn && (
+                <Textarea
+                  value={funeral.purchased_urn_notes || ""}
+                  onChange={(e) => updateFuneral("purchased_urn_notes", e.target.value)}
+                  placeholder="Provide details: where purchased, material/style, location where stored..."
+                  rows={2}
+                  className="ml-6"
+                />
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="purchased_flowers"
+                  checked={funeral.purchased_flowers || false}
+                  onCheckedChange={(checked) => updateFuneral("purchased_flowers", checked)}
+                />
+                <Label htmlFor="purchased_flowers" className="font-normal">Flowers (pre-arranged)</Label>
+              </div>
+              {funeral.purchased_flowers && (
+                <Textarea
+                  value={funeral.purchased_flowers_notes || ""}
+                  onChange={(e) => updateFuneral("purchased_flowers_notes", e.target.value)}
+                  placeholder="Provide details: florist contact, arrangements purchased, payment confirmation..."
+                  rows={2}
+                  className="ml-6"
+                />
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="purchased_packets"
+                  checked={funeral.purchased_packets || false}
+                  onCheckedChange={(checked) => updateFuneral("purchased_packets", checked)}
+                />
+                <Label htmlFor="purchased_packets" className="font-normal">Funeral Packets/Programs</Label>
+              </div>
+              {funeral.purchased_packets && (
+                <Textarea
+                  value={funeral.purchased_packets_notes || ""}
+                  onChange={(e) => updateFuneral("purchased_packets_notes", e.target.value)}
+                  placeholder="Provide details: where ordered, quantity, design preferences, location of files..."
+                  rows={2}
+                  className="ml-6"
+                />
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="purchased_other"
+                  checked={funeral.purchased_other || false}
+                  onCheckedChange={(checked) => updateFuneral("purchased_other", checked)}
+                />
+                <Label htmlFor="purchased_other" className="font-normal">Other Items</Label>
+              </div>
+              {funeral.purchased_other && (
+                <Textarea
+                  value={funeral.purchased_other_notes || ""}
+                  onChange={(e) => updateFuneral("purchased_other_notes", e.target.value)}
+                  placeholder="Describe any other funeral-related items you've purchased..."
+                  rows={2}
+                  className="ml-6"
+                />
+              )}
+            </div>
+          </div>
+
+          <div className="p-4 bg-muted/50 rounded-lg border border-border">
+            <p className="text-sm text-muted-foreground mb-3">
+              If you haven't purchased these items yet, <span className="font-semibold text-foreground">Everlasting Funeral Services</span> can help you with everything you need.
+            </p>
+            <Button 
+              asChild 
+              variant="outline"
+              size="sm"
+              className="w-full"
+            >
+              <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
+                Get a Quote from Everlasting Funeral Services
+              </a>
+            </Button>
+          </div>
         </div>
 
         <div>
@@ -479,6 +535,75 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
             rows={8}
             className="resize-none"
           />
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="funeral_photo" className="text-base font-semibold">Preferred Photo</Label>
+            <p className="text-xs text-muted-foreground mt-1 mb-3">
+              Upload a photo you'd like to be used at your funeral or memorial service
+            </p>
+            
+            {photoUrl ? (
+              <div className="space-y-3">
+                <div className="relative inline-block">
+                  <img 
+                    src={photoUrl} 
+                    alt="Funeral photo" 
+                    className="w-48 h-48 object-cover rounded-lg border-2 border-border"
+                  />
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="absolute -top-2 -right-2"
+                    onClick={handleRemovePhoto}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div>
+                  <Label htmlFor="funeral_photo_replace" className="cursor-pointer">
+                    <Button variant="outline" size="sm" asChild>
+                      <span>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Replace Photo
+                      </span>
+                    </Button>
+                  </Label>
+                  <input
+                    id="funeral_photo_replace"
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div>
+                <Label htmlFor="funeral_photo" className="cursor-pointer">
+                  <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors">
+                    <ImageIcon className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
+                    <p className="text-sm font-medium mb-1">
+                      {uploading ? "Uploading..." : "Click to upload photo"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      JPG, PNG or WEBP (max 5MB)
+                    </p>
+                  </div>
+                </Label>
+                <input
+                  id="funeral_photo"
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  disabled={uploading}
+                  className="hidden"
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="p-6 bg-gradient-to-br from-yellow-50 via-amber-50 to-background dark:from-yellow-950/20 dark:via-amber-950/10 dark:to-background border-2 border-yellow-400/30 rounded-lg shadow-md">
