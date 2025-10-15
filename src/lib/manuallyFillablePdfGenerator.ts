@@ -223,24 +223,53 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   addLabeledField("Full Legal Name:");
   addLabeledField("Nicknames (if any):");
+  addLabeledField("Maiden Name (if applicable):");
   addLabeledField("Date of Birth:");
   addLabeledField("Place of Birth:");
   addLabeledField("Social Security Number:");
-  addLabeledField("Current Address:");
-  yPosition += 5;
-  addLabeledField("Phone:");
-  addLabeledField("Email:");
-  addLabeledField("Marital Status:");
-  addLabeledField("Spouse/Partner Name:");
-  addLabeledField("Religion/Faith:");
+  addLabeledField("Citizenship:");
   
   yPosition += 8;
-  addSubheader("Children's Names");
-  addRuledLines(6);
+  addSubheader("Address & Contact");
+  addRuledLines(3, "Current Address:");
+  addLabeledField("Phone:");
+  addLabeledField("Email:");
   
   addPageFooter(2);
 
-  // PAGE 3 - About Me
+  // PAGE 3 - Personal Information (continued)
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "My Personal Information (continued)",
+    "",
+    false
+  );
+  
+  addSubheader("Family Information");
+  addLabeledField("Marital Status:");
+  addLabeledField("Spouse/Partner Name:");
+  addLabeledField("Former Spouse Name (if applicable):");
+  addLabeledField("Religion/Faith:");
+  addLabeledField("Father's Name:");
+  addLabeledField("Mother's Name:");
+  
+  yPosition += 8;
+  addSubheader("Children's Names");
+  addRuledLines(8);
+  
+  yPosition += 8;
+  addSubheader("Military Service (if applicable)");
+  addLabeledField("Branch:");
+  addLabeledField("Rank:");
+  addLabeledField("Serial Number:");
+  addLabeledField("War/Conflict:");
+  addLabeledField("Date of Entry:");
+  addLabeledField("Date of Discharge:");
+  
+  addPageFooter(3);
+
+  // PAGE 4 - About Me
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -250,9 +279,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   addRuledLines(28, "My Story & Legacy:");
   
-  addPageFooter(3);
+  addPageFooter(4);
 
-  // PAGE 4 - Key Contacts
+  // PAGE 5 - Key Contacts
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -278,11 +307,60 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addLabeledField("Phone/Email:");
   
   yPosition += 8;
-  addRuledLines(8, "Additional Contacts:");
+  addSubheader("Contact 4");
+  addLabeledField("Name:");
+  addLabeledField("Relationship:");
+  addLabeledField("Phone/Email:");
   
-  addPageFooter(4);
+  yPosition += 8;
+  addSubheader("Contact 5");
+  addLabeledField("Name:");
+  addLabeledField("Relationship:");
+  addLabeledField("Phone/Email:");
+  
+  addPageFooter(5);
 
-  // PAGE 6 - Preferred Vendors
+  // PAGE 6 - Key Contacts (continued)
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "Key Contacts to Notify (continued)",
+    "",
+    false
+  );
+  
+  addSubheader("Contact 6");
+  addLabeledField("Name:");
+  addLabeledField("Relationship:");
+  addLabeledField("Phone/Email:");
+  
+  yPosition += 8;
+  addSubheader("Contact 7");
+  addLabeledField("Name:");
+  addLabeledField("Relationship:");
+  addLabeledField("Phone/Email:");
+  
+  yPosition += 8;
+  addSubheader("Contact 8");
+  addLabeledField("Name:");
+  addLabeledField("Relationship:");
+  addLabeledField("Phone/Email:");
+  
+  yPosition += 8;
+  addSubheader("Contact 9");
+  addLabeledField("Name:");
+  addLabeledField("Relationship:");
+  addLabeledField("Phone/Email:");
+  
+  yPosition += 8;
+  addSubheader("Contact 10");
+  addLabeledField("Name:");
+  addLabeledField("Relationship:");
+  addLabeledField("Phone/Email:");
+  
+  addPageFooter(6);
+
+  // PAGE 7 - Preferred Vendors
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -306,9 +384,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   yPosition += 8;
   addRuledLines(6, "Additional Vendors:");
   
-  addPageFooter(6);
+  addPageFooter(7);
 
-  // PAGE 7 - Checklist
+  // PAGE 8 - Checklist
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -316,19 +394,39 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
     "Important tasks you want your loved ones to complete."
   );
   
+  const checklistItems = [
+    "Contact funeral home and arrange services",
+    "Notify close family members and friends",
+    "Locate will, trust documents, and insurance policies",
+    "Contact attorney or executor of estate",
+    "Notify employer (if applicable) and request benefits information",
+    "Contact life insurance companies",
+    "Notify banks and financial institutions",
+    "Cancel subscriptions and recurring services",
+    "Handle social media and digital accounts",
+    "File for death certificate copies",
+    "Contact Social Security Administration",
+    "Notify mortgage company and property insurance",
+    "Review and settle outstanding debts",
+    "Transfer vehicle titles and registrations"
+  ];
+  
   pdf.setFontSize(11);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(...colors.bodyGray);
   
-  for (let i = 1; i <= 20; i++) {
-    if (yPosition > pageHeight - marginBottom) break;
-    addCheckbox("", marginLeft);
+  checklistItems.forEach((item) => {
+    if (yPosition > pageHeight - marginBottom) return;
+    addCheckbox(item, marginLeft);
     yPosition += 9;
-  }
+  });
   
-  addPageFooter(7);
+  yPosition += 8;
+  addRuledLines(4, "Custom Tasks:");
+  
+  addPageFooter(8);
 
-  // PAGE 8 - My Funeral & Memorial Wishes
+  // PAGE 9 - My Funeral & Memorial Wishes
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -361,9 +459,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addSubheader("Additional Funeral Wishes");
   addRuledLines(6, "Special requests, items to display, dress preferences, etc.:");
   
-  addPageFooter(8);
+  addPageFooter(9);
 
-  // PAGE 9 - Financial Life
+  // PAGE 10 - Financial Life
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -383,9 +481,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   yPosition += 8;
   addRuledLines(10, "Additional Financial Information:");
   
-  addPageFooter(9);
+  addPageFooter(10);
 
-  // PAGE 10 - Insurance
+  // PAGE 11 - Insurance
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -407,9 +505,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   yPosition += 8;
   addRuledLines(8, "Other Insurance (Health, Auto, etc.):");
   
-  addPageFooter(10);
+  addPageFooter(11);
 
-  // PAGE 11 - Property
+  // PAGE 12 - Property
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -448,9 +546,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addLabeledField("Address/Description:");
   addLabeledField("Location of Deed/Title:");
   
-  addPageFooter(11);
+  addPageFooter(12);
 
-  // PAGE 12 - Property (continued)
+  // PAGE 13 - Property (continued)
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -500,9 +598,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addLabeledField("Address/Description:");
   addLabeledField("Location of Deed/Title:");
   
-  addPageFooter(12);
+  addPageFooter(13);
 
-  // PAGE 13 - Pets
+  // PAGE 14 - Pets
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -512,9 +610,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   addRuledLines(28, "Pet Care Instructions:");
   
-  addPageFooter(13);
+  addPageFooter(14);
 
-  // PAGE 14 - Digital World
+  // PAGE 15 - Digital World
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -538,9 +636,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   addRuledLines(10, "Account Details & Access Instructions:");
   
-  addPageFooter(14);
+  addPageFooter(15);
 
-  // PAGE 15 - Legal Documents
+  // PAGE 16 - Legal Documents
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -561,9 +659,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addRuledLines(4, "Attorney Name & Contact:");
   addRuledLines(10, "Special Legal Instructions:");
   
-  addPageFooter(15);
+  addPageFooter(16);
 
-  // PAGE 16 - Messages to Loved Ones
+  // PAGE 17 - Messages to Loved Ones
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -582,9 +680,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   fillRemainingWithLines();
   
-  addPageFooter(16);
+  addPageFooter(17);
 
-  // PAGE 17 - Revisions & Approvals
+  // PAGE 18 - Revisions & Approvals
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -606,7 +704,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   yPosition += 8;
   addRuledLines(6, "Additional Notes:");
   
-  addPageFooter(17);
+  addPageFooter(18);
 
   // Go back and fill in the Table of Contents
   pdf.setPage(tocPageNumber);
