@@ -1,4 +1,5 @@
 import jsPDF from "jspdf";
+import everlastingLogo from "@/assets/everlasting-logo.png";
 
 interface PlanData {
   prepared_by?: string;
@@ -40,6 +41,14 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
 
   // Helper to add page footer
   const addPageFooter = (pageNum?: number) => {
+    // Add small logo to top right
+    try {
+      const logoSize = 8;
+      pdf.addImage(everlastingLogo, 'PNG', pageWidth - marginRight - logoSize, 5, logoSize, logoSize);
+    } catch (error) {
+      console.error('Error adding logo to page:', error);
+    }
+    
     pdf.setFontSize(8);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(...colors.bodyGray);
@@ -177,6 +186,16 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   pdf.text("Please use a pen and write clearly", pageWidth / 2, yPosition, { align: "center" });
   
   yPosition = 110;
+  
+  // Add logo in center above the prepared for field
+  try {
+    const logoSize = 40;
+    pdf.addImage(everlastingLogo, 'PNG', pageWidth / 2 - logoSize / 2, yPosition - 10, logoSize, logoSize);
+    yPosition += 35;
+  } catch (error) {
+    console.error('Error adding logo to cover page:', error);
+  }
+  
   addLabeledField("Prepared for (Full Name):");
   addLabeledField("Date Prepared:");
   
@@ -201,19 +220,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   addPageFooter();
 
-  // PAGE 1 - My Instructions
-  pdf.addPage();
-  yPosition = 20;
-  addPageHeader(
-    "My Instructions",
-    "Important information about where to find documents, access codes, and special instructions."
-  );
-  
-  addRuledLines(20, "My General Instructions:");
-  
-  addPageFooter(1);
-
-  // PAGE 2 - Checklist
+  // PAGE 1 - Checklist
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -250,6 +257,18 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   yPosition += 8;
   addRuledLines(4, "Custom Tasks:");
+  
+  addPageFooter(1);
+
+  // PAGE 2 - My Instructions
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "My Instructions",
+    "Important information about where to find documents, access codes, and special instructions."
+  );
+  
+  addRuledLines(20, "My General Instructions:");
   
   addPageFooter(2);
 

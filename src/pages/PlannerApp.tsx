@@ -198,12 +198,12 @@ const PlannerApp = () => {
   };
 
   const sectionItems = [
+    { id: "checklist", label: t("navigation.checklist"), completed: !!plan.checklist_notes },
     {
       id: "instructions",
       label: t("navigation.instructions"),
       completed: !!plan.instructions_notes,
     },
-    { id: "checklist", label: t("navigation.checklist"), completed: !!plan.checklist_notes },
     { id: "personal", label: t("navigation.personal"), completed: false },
     { id: "about", label: t("navigation.about"), completed: !!plan.about_me_notes },
     { id: "contacts", label: t("navigation.contacts"), completed: false },
