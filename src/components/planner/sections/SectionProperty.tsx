@@ -24,7 +24,7 @@ export const SectionProperty = ({ data, onChange }: SectionPropertyProps) => {
     });
     
     // Auto-create item when checkbox is checked
-    if (field.startsWith('has_') && value === true) {
+    if (field.startsWith('has_') && value === true && field !== 'has_other') {
       const propertyType = field.replace('has_', '').replace(/_/g, ' ');
       const typeCapitalized = propertyType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
       
@@ -35,6 +35,17 @@ export const SectionProperty = ({ data, onChange }: SectionPropertyProps) => {
       
       if (!existingItem) {
         addItemWithType(typeCapitalized);
+      }
+    }
+    
+    // Handle "other" type - create item with custom type
+    if (field === 'has_other' && value === true && property.other_type) {
+      const existingItem = items.find((item: any) => 
+        item.type?.toLowerCase() === property.other_type.toLowerCase()
+      );
+      
+      if (!existingItem) {
+        addItemWithType(property.other_type);
       }
     }
   };
@@ -95,55 +106,23 @@ export const SectionProperty = ({ data, onChange }: SectionPropertyProps) => {
       </div>
 
       <div className="space-y-4">
-        <Label className="text-base font-semibold">Property I Own</Label>
+        <Label className="text-base font-semibold">Property Type</Label>
         <div className="grid md:grid-cols-2 gap-3">
           <div className="flex items-center space-x-2">
             <Checkbox
-              id="primary_home"
-              checked={property.has_primary_home || false}
-              onCheckedChange={(checked) => updateProperty("has_primary_home", checked)}
+              id="house"
+              checked={property.has_house || false}
+              onCheckedChange={(checked) => updateProperty("has_house", checked)}
             />
-            <Label htmlFor="primary_home" className="font-normal">Primary residence</Label>
+            <Label htmlFor="house" className="font-normal">House</Label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
-              id="vacation_home"
-              checked={property.has_vacation_home || false}
-              onCheckedChange={(checked) => updateProperty("has_vacation_home", checked)}
+              id="car"
+              checked={property.has_car || false}
+              onCheckedChange={(checked) => updateProperty("has_car", checked)}
             />
-            <Label htmlFor="vacation_home" className="font-normal">Vacation home</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="investment"
-              checked={property.has_investment || false}
-              onCheckedChange={(checked) => updateProperty("has_investment", checked)}
-            />
-            <Label htmlFor="investment" className="font-normal">Investment property</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="land"
-              checked={property.has_land || false}
-              onCheckedChange={(checked) => updateProperty("has_land", checked)}
-            />
-            <Label htmlFor="land" className="font-normal">Land or lots</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="vehicles"
-              checked={property.has_vehicles || false}
-              onCheckedChange={(checked) => updateProperty("has_vehicles", checked)}
-            />
-            <Label htmlFor="vehicles" className="font-normal">Vehicles</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="boats_rvs"
-              checked={property.has_boats_rvs || false}
-              onCheckedChange={(checked) => updateProperty("has_boats_rvs", checked)}
-            />
-            <Label htmlFor="boats_rvs" className="font-normal">Boats or RVs</Label>
+            <Label htmlFor="car" className="font-normal">Car</Label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -151,15 +130,46 @@ export const SectionProperty = ({ data, onChange }: SectionPropertyProps) => {
               checked={property.has_business || false}
               onCheckedChange={(checked) => updateProperty("has_business", checked)}
             />
-            <Label htmlFor="business" className="font-normal">Business ownership</Label>
+            <Label htmlFor="business" className="font-normal">Business</Label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
-              id="valuables"
-              checked={property.has_valuables || false}
-              onCheckedChange={(checked) => updateProperty("has_valuables", checked)}
+              id="artwork"
+              checked={property.has_artwork || false}
+              onCheckedChange={(checked) => updateProperty("has_artwork", checked)}
             />
-            <Label htmlFor="valuables" className="font-normal">Jewelry, art, collectibles</Label>
+            <Label htmlFor="artwork" className="font-normal">Artwork</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="jewelry"
+              checked={property.has_jewelry || false}
+              onCheckedChange={(checked) => updateProperty("has_jewelry", checked)}
+            />
+            <Label htmlFor="jewelry" className="font-normal">Jewelry</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="money_cash"
+              checked={property.has_money_cash || false}
+              onCheckedChange={(checked) => updateProperty("has_money_cash", checked)}
+            />
+            <Label htmlFor="money_cash" className="font-normal">Money/Cash</Label>
+          </div>
+          <div className="flex items-center space-x-2 md:col-span-2">
+            <Checkbox
+              id="other"
+              checked={property.has_other || false}
+              onCheckedChange={(checked) => updateProperty("has_other", checked)}
+            />
+            <Label htmlFor="other" className="font-normal">Other:</Label>
+            <Input
+              value={property.other_type || ""}
+              onChange={(e) => updateProperty("other_type", e.target.value)}
+              placeholder="Specify type"
+              className="ml-2 flex-1"
+              disabled={!property.has_other}
+            />
           </div>
         </div>
       </div>
