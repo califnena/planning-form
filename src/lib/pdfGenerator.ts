@@ -63,20 +63,20 @@ export const generatePlanPDF = (planData: PlanData) => {
     // Add teal line at bottom
     pdf.setDrawColor(...colors.subheaderTeal);
     pdf.setLineWidth(0.5);
-    pdf.line(marginLeft, pageHeight - 25, pageWidth - marginRight, pageHeight - 25);
+    pdf.line(marginLeft, pageHeight - 23, pageWidth - marginRight, pageHeight - 23);
     
-    // Add footer text - more readable
+    // Add footer text
     pdf.setFontSize(9);
     pdf.setFont("helvetica", "normal");
-    pdf.setTextColor(40, 40, 40);  // Darker for better readability
-    pdf.text("Generated with Everlasting Funeral Advisors – My Final Wishes Planner", pageWidth / 2, pageHeight - 17, { align: "center" });
+    pdf.setTextColor(60, 60, 60);
+    pdf.text("Generated with Everlasting Funeral Advisors – My Final Wishes Planner", pageWidth / 2, pageHeight - 15, { align: "center" });
     
-    // Add page number - larger and darker
-    pdf.setFontSize(10);
+    // Add page number - bold and black
+    pdf.setFontSize(11);
     pdf.setFont("helvetica", "bold");
-    pdf.setTextColor(0, 0, 0);  // Black for maximum contrast
+    pdf.setTextColor(0, 0, 0);
     const pageNumText = totalPages ? `Page ${currentPage} of ${totalPages}` : `Page ${currentPage}`;
-    pdf.text(pageNumText, pageWidth / 2, pageHeight - 10, { align: "center" });
+    pdf.text(pageNumText, pageWidth / 2, pageHeight - 8, { align: "center" });
     
     pdf.setTextColor(...colors.bodyGray);
   };
@@ -1087,20 +1087,20 @@ export const generatePlanPDF = (planData: PlanData) => {
     // Add teal line at bottom
     pdf.setDrawColor(...colors.subheaderTeal);
     pdf.setLineWidth(0.5);
-    pdf.line(marginLeft, pageHeight - 25, pageWidth - marginRight, pageHeight - 25);
+    pdf.line(marginLeft, pageHeight - 23, pageWidth - marginRight, pageHeight - 23);
     
-    // Add footer text - more readable
+    // Add footer text
     pdf.setFontSize(9);
     pdf.setFont("helvetica", "normal");
-    pdf.setTextColor(40, 40, 40);  // Darker for better readability
-    pdf.text("Generated with Everlasting Funeral Advisors – My Final Wishes Planner", pageWidth / 2, pageHeight - 17, { align: "center" });
+    pdf.setTextColor(60, 60, 60);
+    pdf.text("Generated with Everlasting Funeral Advisors – My Final Wishes Planner", pageWidth / 2, pageHeight - 15, { align: "center" });
     
-    // Add page number - larger and darker
-    pdf.setFontSize(10);
+    // Add page number - bold and black
+    pdf.setFontSize(11);
     pdf.setFont("helvetica", "bold");
-    pdf.setTextColor(0, 0, 0);  // Black for maximum contrast
+    pdf.setTextColor(0, 0, 0);
     const pageNumText = `Page ${i} of ${totalPages}`;
-    pdf.text(pageNumText, pageWidth / 2, pageHeight - 10, { align: "center" });
+    pdf.text(pageNumText, pageWidth / 2, pageHeight - 8, { align: "center" });
     
     pdf.setTextColor(...colors.bodyGray);
   }
