@@ -435,6 +435,55 @@ export const generatePlanPDF = (planData: PlanData) => {
   
   addSection("General Instructions", planData.instructions_notes);
 
+  // Checklist Section
+  addTitle("Checklist");
+  
+  // Add instruction for checkboxes
+  pdf.setFontSize(10);
+  pdf.setFont("helvetica", "italic");
+  pdf.setTextColor(...colors.bodyGray);
+  pdf.text("This section details tasks you want your loved ones to complete:", marginLeft, yPosition);
+  yPosition += lineHeight + 6;
+  pdf.setFont("helvetica", "normal");
+  
+  const checklistItems = planData.checklist_items || [];
+  if (checklistItems.length > 0 && checklistItems.some((item: string) => item && item.trim())) {
+    checklistItems.forEach((item: string, index: number) => {
+      if (item && item.trim()) {
+        checkPageBreak(12);
+        
+        // Add modern checkbox
+        addCheckbox(marginLeft, yPosition, false);
+        
+        // Add item text
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(11);
+        pdf.setTextColor(...colors.bodyGray);
+        const sanitized = sanitizeText(item);
+        const boxWidth = pageWidth - marginLeft - marginRight - 8;
+        const lines = pdf.splitTextToSize(sanitized, boxWidth);
+        pdf.text(lines[0], marginLeft + 7, yPosition);
+        yPosition += lineHeight + 2;
+        
+        // Wrap additional lines if needed
+        for (let i = 1; i < lines.length; i++) {
+          checkPageBreak();
+          pdf.text(lines[i], marginLeft + 7, yPosition);
+          yPosition += lineHeight + 2;
+        }
+      }
+    });
+    yPosition += 3;
+  } else {
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "italic");
+    pdf.setTextColor(...colors.lightGray);
+    pdf.text("(none provided)", marginLeft, yPosition);
+    pdf.setTextColor(...colors.bodyGray);
+    pdf.setFont("helvetica", "normal");
+    yPosition += lineHeight + 5;
+  }
+
   // Personal Information Section
   addTitle("My Personal Information");
   addField("Full Legal Name", profile.full_name || profile.legal_name);
@@ -502,55 +551,6 @@ export const generatePlanPDF = (planData: PlanData) => {
   // About Me Section
   addTitle("About Me");
   addSection("My Story & Legacy", planData.about_me_notes);
-
-  // Checklist Section
-  addTitle("Checklist");
-  
-  // Add instruction for checkboxes
-  pdf.setFontSize(10);
-  pdf.setFont("helvetica", "italic");
-  pdf.setTextColor(...colors.bodyGray);
-  pdf.text("This section details tasks you want your loved ones to complete:", marginLeft, yPosition);
-  yPosition += lineHeight + 6;
-  pdf.setFont("helvetica", "normal");
-  
-  const checklistItems = planData.checklist_items || [];
-  if (checklistItems.length > 0 && checklistItems.some((item: string) => item && item.trim())) {
-    checklistItems.forEach((item: string, index: number) => {
-      if (item && item.trim()) {
-        checkPageBreak(12);
-        
-        // Add modern checkbox
-        addCheckbox(marginLeft, yPosition, false);
-        
-        // Add item text
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(11);
-        pdf.setTextColor(...colors.bodyGray);
-        const sanitized = sanitizeText(item);
-        const boxWidth = pageWidth - marginLeft - marginRight - 8;
-        const lines = pdf.splitTextToSize(sanitized, boxWidth);
-        pdf.text(lines[0], marginLeft + 7, yPosition);
-        yPosition += lineHeight + 2;
-        
-        // Wrap additional lines if needed
-        for (let i = 1; i < lines.length; i++) {
-          checkPageBreak();
-          pdf.text(lines[i], marginLeft + 7, yPosition);
-          yPosition += lineHeight + 2;
-        }
-      }
-    });
-    yPosition += 3;
-  } else {
-    pdf.setFontSize(10);
-    pdf.setFont("helvetica", "italic");
-    pdf.setTextColor(...colors.lightGray);
-    pdf.text("(none provided)", marginLeft, yPosition);
-    pdf.setTextColor(...colors.bodyGray);
-    pdf.setFont("helvetica", "normal");
-    yPosition += lineHeight + 5;
-  }
 
   // Key Contacts Section
   addTitle("Key Contacts to Notify");
