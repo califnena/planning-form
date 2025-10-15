@@ -3,9 +3,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Plus, Trash2, Save, Mic, Video, Play, Pause, RotateCcw, Download } from "lucide-react";
+import { Plus, Trash2, Save, Mic, Video, Play, Pause, RotateCcw, Download, ChevronDown, ChevronUp, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useRef } from "react";
+import { EmailPlanDialog } from "@/components/EmailPlanDialog";
 
 interface Message {
   recipients: string;
@@ -24,6 +25,8 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
   const { toast } = useToast();
   const [recordingIndex, setRecordingIndex] = useState<number | null>(null);
   const [recordingType, setRecordingType] = useState<'audio' | 'video' | null>(null);
+  const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set([0])); // First message open by default
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
@@ -124,6 +127,18 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
     });
   };
 
+  const toggleMessageExpanded = (index: number) => {
+    setExpandedMessages(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
+  };
+
   const handleSave = () => {
     toast({
       title: "Saved",
@@ -141,6 +156,10 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button onClick={() => setEmailDialogOpen(true)} size="sm" variant="outline">
+            <Mail className="h-4 w-4 mr-2" />
+            Email Plan
+          </Button>
           <Button onClick={handleSave} size="sm">
             <Save className="h-4 w-4 mr-2" />
             Save
@@ -153,27 +172,44 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
       </div>
 
       <div className="space-y-4">
-        {messages.map((message: Message, index: number) => (
-          <Card key={index} className="p-6 space-y-4">
-            <div className="flex justify-between items-start">
-              <h3 className="font-semibold text-lg">Message {index + 1}</h3>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={addMessage}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeMessage(index)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+        {messages.map((message: Message, index: number) => {
+          const isExpanded = expandedMessages.has(index);
+          
+          return (
+            <Card key={index} className="overflow-hidden">
+              <div className="p-4 bg-muted/30 flex justify-between items-center cursor-pointer hover:bg-muted/50 transition-colors"
+                   onClick={() => toggleMessageExpanded(index)}>
+                <h3 className="font-semibold text-lg flex items-center gap-2">
+                  Message {index + 1}
+                  {message.recipients && <span className="text-sm text-muted-foreground font-normal">- {message.recipients}</span>}
+                </h3>
+                <div className="flex gap-2 items-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addMessage();
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeMessage(index);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                  {isExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                </div>
               </div>
-            </div>
+              
+              {isExpanded && (
+                <div className="p-6 space-y-4">
 
             <div className="space-y-2">
               <Label>To (Recipients)</Label>
@@ -313,8 +349,11 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
                 )}
               </div>
             </div>
-          </Card>
-        ))}
+                </div>
+              )}
+            </Card>
+          );
+        })}
 
         {messages.length === 0 && (
           <div className="text-center py-12 border border-dashed rounded-lg">
@@ -338,6 +377,13 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
           <li>Remind them to take care of themselves and each other</li>
         </ul>
       </div>
+
+      <EmailPlanDialog
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+        planData={data}
+        preparedBy={data.about?.full_name || ""}
+      />
     </div>
   );
 };
