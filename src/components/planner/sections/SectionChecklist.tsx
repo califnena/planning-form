@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Trash2, Save } from "lucide-react";
+import { Plus, Trash2, Save, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import jsPDF from "jspdf";
+import everlastingLogo from "@/assets/everlasting-logo.png";
 
 interface SectionChecklistProps {
   data: any;
@@ -57,6 +59,91 @@ export const SectionChecklist = ({ data, onChange }: SectionChecklistProps) => {
     });
   };
 
+  const handleDownloadChecklist = () => {
+    const pdf = new jsPDF();
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    // Title
+    pdf.setFontSize(20);
+    pdf.setFont("helvetica", "bold");
+    const title = "Important Tasks Checklist";
+    const titleWidth = pdf.getTextWidth(title);
+    pdf.text(title, (pageWidth - titleWidth) / 2, 20);
+
+    // Subtitle
+    pdf.setFontSize(11);
+    pdf.setFont("helvetica", "normal");
+    const subtitle = "Tasks and reminders for loved ones to complete";
+    const subtitleWidth = pdf.getTextWidth(subtitle);
+    pdf.text(subtitle, (pageWidth - subtitleWidth) / 2, 30);
+
+    let yPos = 45;
+    
+    // Standard checklist items
+    pdf.setFontSize(12);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Standard Checklist Items:", 15, yPos);
+    yPos += 8;
+    
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "normal");
+    DEFAULT_CHECKLIST_ITEMS.forEach((item) => {
+      if (yPos > pageHeight - 40) {
+        pdf.addPage();
+        yPos = 20;
+      }
+      
+      // Checkbox
+      pdf.rect(15, yPos - 3, 4, 4);
+      pdf.text(item, 22, yPos);
+      yPos += 7;
+    });
+
+    // Custom items
+    if (customItems.length > 0) {
+      yPos += 5;
+      if (yPos > pageHeight - 40) {
+        pdf.addPage();
+        yPos = 20;
+      }
+      
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Custom Checklist Items:", 15, yPos);
+      yPos += 8;
+      
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "normal");
+      customItems.forEach((item: string) => {
+        if (yPos > pageHeight - 40) {
+          pdf.addPage();
+          yPos = 20;
+        }
+        
+        // Checkbox
+        pdf.rect(15, yPos - 3, 4, 4);
+        pdf.text(item || "(Empty item)", 22, yPos);
+        yPos += 7;
+      });
+    }
+
+    // Add logo at bottom
+    const logoWidth = 40;
+    const logoHeight = 10;
+    const logoX = (pageWidth - logoWidth) / 2;
+    const logoY = pageHeight - 20;
+    
+    pdf.addImage(everlastingLogo, "PNG", logoX, logoY, logoWidth, logoHeight);
+
+    pdf.save("checklist.pdf");
+    
+    toast({
+      title: "Downloaded",
+      description: "Checklist PDF has been generated.",
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -69,10 +156,16 @@ export const SectionChecklist = ({ data, onChange }: SectionChecklistProps) => {
             Check the boxes of the items you want your loved ones/caretaker to do.
           </p>
         </div>
-        <Button onClick={handleSave} size="sm">
-          <Save className="h-4 w-4 mr-2" />
-          Save
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleSave} size="sm">
+            <Save className="h-4 w-4 mr-2" />
+            Save
+          </Button>
+          <Button onClick={handleDownloadChecklist} size="sm" variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Download PDF
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-6">
