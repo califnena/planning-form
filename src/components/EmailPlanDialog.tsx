@@ -9,7 +9,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -28,7 +27,6 @@ export const EmailPlanDialog = ({
 }: EmailPlanDialogProps) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [pdfMode, setPdfMode] = useState<"fillable" | "manual">("fillable");
   const { toast } = useToast();
 
   const handleSend = async () => {
@@ -43,16 +41,9 @@ export const EmailPlanDialog = ({
 
     setLoading(true);
     try {
-      // Import the appropriate PDF generator based on mode
-      let pdf;
-      if (pdfMode === "manual") {
-        const { generateManuallyFillablePDF } = await import("@/lib/manuallyFillablePdfGenerator");
-        pdf = generateManuallyFillablePDF(planData);
-      } else {
-        const { generatePlanPDF } = await import("@/lib/pdfGenerator");
-        pdf = generatePlanPDF(planData);
-      }
-      
+      // Always use fillable PDF for email
+      const { generatePlanPDF } = await import("@/lib/pdfGenerator");
+      const pdf = generatePlanPDF(planData);
       const pdfBlob = pdf.output('blob');
       
       // Convert blob to base64
@@ -102,30 +93,6 @@ export const EmailPlanDialog = ({
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="space-y-3">
-            <Label>PDF Format</Label>
-            <RadioGroup value={pdfMode} onValueChange={(value) => setPdfMode(value as "fillable" | "manual")}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="fillable" id="fillable" />
-                <Label htmlFor="fillable" className="font-normal cursor-pointer">
-                  Fillable PDF (current)
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="manual" id="manual" />
-                <Label htmlFor="manual" className="font-normal cursor-pointer">
-                  Print Manually Fillable Form (for handwriting)
-                </Label>
-              </div>
-            </RadioGroup>
-            <p className="text-xs text-muted-foreground">
-              {pdfMode === "fillable" 
-                ? "Complete PDF with all your entered information"
-                : "Blank form optimized for printing and filling out by hand"
-              }
-            </p>
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="email">Recipient Email</Label>
             <Input
