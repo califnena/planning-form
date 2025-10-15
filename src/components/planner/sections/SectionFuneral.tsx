@@ -450,33 +450,31 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="contact_everlasting"
-                  checked={funeral.contact_everlasting || false}
-                  onCheckedChange={(checked) => updateFuneral("contact_everlasting", checked)}
-                />
-                <Label htmlFor="contact_everlasting" className="font-normal">Get a quote from Everlasting Funeral Advisors</Label>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="contact_everlasting"
+                    checked={funeral.contact_everlasting || false}
+                    onCheckedChange={(checked) => updateFuneral("contact_everlasting", checked)}
+                  />
+                  <Label htmlFor="contact_everlasting" className="font-normal">Get a quote from Everlasting Funeral Advisors</Label>
+                </div>
+                <Button 
+                  asChild 
+                  variant="outline"
+                  size="sm"
+                >
+                  <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Request a Quote
+                  </a>
+                </Button>
               </div>
               {funeral.contact_everlasting && (
                 <div className="ml-6 p-3 bg-muted/50 rounded-lg border border-border">
-                  <p className="text-xs text-muted-foreground mb-2">
-                    ✓ Email notification sent to Everlasting Funeral Advisors
+                  <p className="text-xs text-muted-foreground">
+                    ✓ Email notification sent to Everlasting Funeral Advisors - they will contact you soon to discuss your needs.
                   </p>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Get expert help with all your funeral planning needs
-                  </p>
-                  <Button 
-                    asChild 
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                  >
-                    <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      Request a Quote
-                    </a>
-                  </Button>
                 </div>
               )}
             </div>
