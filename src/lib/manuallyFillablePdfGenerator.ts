@@ -282,7 +282,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   addPageFooter(4);
 
-  // PAGE 5 - Preferred Vendors
+  // PAGE 6 - Preferred Vendors
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -306,9 +306,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   yPosition += 8;
   addRuledLines(6, "Additional Vendors:");
   
-  addPageFooter(5);
+  addPageFooter(6);
 
-  // PAGE 6 - Checklist
+  // PAGE 7 - Checklist
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -326,9 +326,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
     yPosition += 9;
   }
   
-  addPageFooter(6);
+  addPageFooter(7);
 
-  // PAGE 7 - My Funeral & Memorial Wishes
+  // PAGE 8 - My Funeral & Memorial Wishes
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -353,11 +353,17 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   yPosition += 10;
   
   addRuledLines(3, "Preferred Location:");
-  addRuledLines(4, "Music / Readings / Speakers:");
+  addRuledLines(3, "Music Selections:");
+  addRuledLines(3, "Readings or Poems:");
+  addRuledLines(3, "Speakers / Officiants:");
   
-  addPageFooter(7);
+  yPosition += 6;
+  addSubheader("Additional Funeral Wishes");
+  addRuledLines(6, "Special requests, items to display, dress preferences, etc.:");
+  
+  addPageFooter(8);
 
-  // PAGE 8 - Financial Life
+  // PAGE 9 - Financial Life
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -377,9 +383,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   yPosition += 8;
   addRuledLines(10, "Additional Financial Information:");
   
-  addPageFooter(8);
+  addPageFooter(9);
 
-  // PAGE 9 - Insurance
+  // PAGE 10 - Insurance
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -401,9 +407,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   yPosition += 8;
   addRuledLines(8, "Other Insurance (Health, Auto, etc.):");
   
-  addPageFooter(9);
+  addPageFooter(10);
 
-  // PAGE 10 - Property
+  // PAGE 11 - Property
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -423,13 +429,80 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   yPosition += 8;
   addCheckbox("Business ownership", marginLeft);
   addCheckbox("Jewelry, art, collectibles", marginLeft + 80);
-  yPosition += 10;
+  yPosition += 12;
   
-  addRuledLines(12, "Property Details & Location of Deeds/Titles:");
+  addSubheader("Property 1");
+  addLabeledField("Type:");
+  addLabeledField("Address/Description:");
+  addLabeledField("Location of Deed/Title:");
   
-  addPageFooter(10);
+  yPosition += 8;
+  addSubheader("Property 2");
+  addLabeledField("Type:");
+  addLabeledField("Address/Description:");
+  addLabeledField("Location of Deed/Title:");
+  
+  yPosition += 8;
+  addSubheader("Property 3");
+  addLabeledField("Type:");
+  addLabeledField("Address/Description:");
+  addLabeledField("Location of Deed/Title:");
+  
+  addPageFooter(11);
 
-  // PAGE 11 - Pets
+  // PAGE 12 - Property (continued)
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "My Property (continued)",
+    "",
+    false
+  );
+  
+  addSubheader("Property 4");
+  addLabeledField("Type:");
+  addLabeledField("Address/Description:");
+  addLabeledField("Location of Deed/Title:");
+  
+  yPosition += 8;
+  addSubheader("Property 5");
+  addLabeledField("Type:");
+  addLabeledField("Address/Description:");
+  addLabeledField("Location of Deed/Title:");
+  
+  yPosition += 8;
+  addSubheader("Property 6");
+  addLabeledField("Type:");
+  addLabeledField("Address/Description:");
+  addLabeledField("Location of Deed/Title:");
+  
+  yPosition += 8;
+  addSubheader("Property 7");
+  addLabeledField("Type:");
+  addLabeledField("Address/Description:");
+  addLabeledField("Location of Deed/Title:");
+  
+  yPosition += 8;
+  addSubheader("Property 8");
+  addLabeledField("Type:");
+  addLabeledField("Address/Description:");
+  addLabeledField("Location of Deed/Title:");
+  
+  yPosition += 8;
+  addSubheader("Property 9");
+  addLabeledField("Type:");
+  addLabeledField("Address/Description:");
+  addLabeledField("Location of Deed/Title:");
+  
+  yPosition += 8;
+  addSubheader("Property 10");
+  addLabeledField("Type:");
+  addLabeledField("Address/Description:");
+  addLabeledField("Location of Deed/Title:");
+  
+  addPageFooter(12);
+
+  // PAGE 13 - Pets
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -439,9 +512,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   addRuledLines(28, "Pet Care Instructions:");
   
-  addPageFooter(11);
+  addPageFooter(13);
 
-  // PAGE 12 - Digital World
+  // PAGE 14 - Digital World
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -465,9 +538,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   addRuledLines(10, "Account Details & Access Instructions:");
   
-  addPageFooter(12);
+  addPageFooter(14);
 
-  // PAGE 13 - Legal Documents
+  // PAGE 15 - Legal Documents
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -488,9 +561,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addRuledLines(4, "Attorney Name & Contact:");
   addRuledLines(10, "Special Legal Instructions:");
   
-  addPageFooter(13);
+  addPageFooter(15);
 
-  // PAGE 14 - Messages to Loved Ones
+  // PAGE 16 - Messages to Loved Ones
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -509,9 +582,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   fillRemainingWithLines();
   
-  addPageFooter(14);
+  addPageFooter(16);
 
-  // PAGE 15 - Revisions & Approvals
+  // PAGE 17 - Revisions & Approvals
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -533,7 +606,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   yPosition += 8;
   addRuledLines(6, "Additional Notes:");
   
-  addPageFooter(15);
+  addPageFooter(17);
 
   // Go back and fill in the Table of Contents
   pdf.setPage(tocPageNumber);
