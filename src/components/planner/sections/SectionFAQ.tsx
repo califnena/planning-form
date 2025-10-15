@@ -481,6 +481,200 @@ export const SectionFAQ = () => {
           </a>
         </div>
       </div>
+
+      {/* Body Care & Special Circumstances Section */}
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold">🏥 Body Care & Special Circumstances</h3>
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="organ-donation">
+            <AccordionTrigger>Can I still have a home funeral with organ or tissue donation?</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>
+                  Yes, you can still have a home funeral if the deceased was an organ and/or tissue donor.
+                </p>
+                <p>
+                  <strong>Organ donation</strong> typically requires the person to have died in a hospital setting while on life-support, 
+                  as organs need an ongoing supply of blood and oxygen. Organ donation may include the heart, lungs, liver, kidneys, 
+                  pancreas, and intestines.
+                </p>
+                <p>
+                  <strong>Tissue donation</strong> may include corneas, bone, tendons, skin, heart valves, veins, and arteries. 
+                  Tissue donors may be eligible even if they didn&apos;t die in a hospital. Some organ procurement organizations (OPOs) 
+                  allow up to twelve hours after death before transport to their facility, which means you may spend time with the 
+                  body before and/or after tissue donation.
+                </p>
+                <p>
+                  <strong>Important:</strong> Let the OPO know you&apos;re preparing the body without a funeral director. Request that 
+                  they pack recovery areas, neatly suture incisions, wrap the body well, and/or dress it in a Unionall. Check their 
+                  policies for self-transport.
+                </p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="organ-donation-care">
+            <AccordionTrigger>How do I care for a body after organ & tissue donation?</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>
+                  Because organ and tissue donation is a surgical procedure, special considerations are needed:
+                </p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>If the OPO sutures and wraps recovery sites well, you may work around the wraps or use a Unionall</li>
+                  <li>You can shroud, veil, and symbolically care for parts of the body (like hands or face) if preparing the entire body feels overwhelming</li>
+                  <li>Take extra care when turning, bathing, and dressing - have multiple people help</li>
+                  <li>Long bones may have been removed and replaced with dowel rods or similar materials</li>
+                  <li>Large sections of skin and soft tissues may have been removed from the abdomen, back, and/or limbs</li>
+                </ul>
+                <p>
+                  <strong>Caring for recovery sites:</strong> Clean, dry, and cover incisions with absorbent materials (cotton, gauze, 
+                  panty liners). Tape them down with medical or duct tape. You can seal incisions with Gorilla Glue and prevent leakage 
+                  by wrapping with plastic wrap or butcher paper. Place ice directly on incision/recovery sites when cooling the body.
+                </p>
+                <p className="text-xs italic">
+                  Note: Some materials may not be compatible with certain disposition types like natural burial - check with your provider.
+                </p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="autopsy">
+            <AccordionTrigger>Can I still have a home funeral if an autopsy was performed?</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>
+                  Yes, you can still have a home funeral after an autopsy. An autopsy is a postmortem examination to determine cause 
+                  of death and may include surgical procedures with incisions in the chest, abdomen, and head.
+                </p>
+                <p>
+                  <strong>Important steps:</strong>
+                </p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Inform the medical examiner/coroner that the body won&apos;t be going to a funeral home</li>
+                  <li>Ask them to tightly and neatly suture incisions and to rinse the body</li>
+                  <li>Learn the autopsy provider&apos;s policy for non-funeral director transport</li>
+                  <li>If cause of death is obvious (like in an accident), you may ask them not to do a surgical autopsy</li>
+                </ul>
+                <p>
+                  There is no cost for an autopsy when ordered by a medical examiner/coroner.
+                </p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="autopsy-care">
+            <AccordionTrigger>How do I care for a body after an autopsy?</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>
+                  Take extra care when turning, bathing, and dressing. Have multiple people help with moving and transporting.
+                </p>
+                <p>
+                  <strong>Incision care:</strong> Treat incisions like any wound - clean and dry them without getting water inside. 
+                  Bandage or cover as needed. Use a Unionall suit if concerned about leakage. Place ice directly on incision sites 
+                  when cooling the body.
+                </p>
+                <p>
+                  <strong>Cranial incisions:</strong> The head may have been shaved with prominent stitches across the scalp. 
+                  Use hats or scarves to cover incisions. If eyes were removed, eye sockets can be filled with cotton balls.
+                </p>
+                <p>
+                  <strong>Internal organs:</strong> Organs examined during autopsy are often placed in a plastic viscera bag in the 
+                  abdomen. These bags aren&apos;t compatible with natural burial, natural organic reduction (NOR), or water cremation and 
+                  may need removal. Check with your disposition facility - they may remove it as part of the process.
+                </p>
+                <p>
+                  You can ask the autopsy provider not to use a plastic bag or to dispose of organs. If organs are disposed of, 
+                  pad the sunken abdomen with cotton batting or cloth under clothing.
+                </p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="decomposition">
+            <AccordionTrigger>Can I have a home funeral if the body has started to decompose?</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>
+                  Yes, you can still have a home funeral in the early stages of decomposition.
+                </p>
+                <p>
+                  Decomposition is the natural process after death involving the breakdown of cells and bacterial growth. As it progresses, 
+                  skin changes color and texture, gases build and are released, and fluids leak from the body.
+                </p>
+                <p>
+                  <strong>Factors affecting decomposition speed:</strong> time since death, body condition, air temperature, and humidity.
+                </p>
+                <p>
+                  <strong>Care considerations:</strong> The body will usually be examined by a medical examiner/coroner, and an autopsy 
+                  may be performed. Extra care should be given to prevent further decomposition by keeping the body cool. You may wish 
+                  to hire a professional if a viewing is desired.
+                </p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="skin-slippage">
+            <AccordionTrigger>What is skin slippage and how do I handle it?</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>
+                  Skin slippage (skin slip) is the separation of the outermost layer of skin from the underlying layer. There may be 
+                  fluid in the spaces, and the skin can split and leak. This is a natural decomposition process.
+                </p>
+                <p>
+                  <strong>Treatment options:</strong>
+                </p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Apply isopropyl alcohol on affected areas to dry out the skin</li>
+                  <li>Wrap the area with saran wrap or butcher paper taped/tied into place (butcher paper is preferred for natural burial)</li>
+                  <li>For significant fluid or large skin openings, use cotton balls, cotton batting, gauze, or chux pad strips to cover before wrapping</li>
+                  <li>Use cornstarch to help absorb fluid</li>
+                </ul>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="body-trauma">
+            <AccordionTrigger>How does body trauma affect home funeral care?</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>
+                  Body trauma related to the cause of death may affect how a body looks, the position it can be placed in for viewing, 
+                  odors present, and more.
+                </p>
+                <p>
+                  These may be cases where you enlist professional help. In cases where there will be no viewing, you have more flexibility 
+                  in how you approach body care.
+                </p>
+                <p>
+                  Consider symbolic care - you don&apos;t have to prepare the entire body. You can focus on caring for specific parts like 
+                  the hands or face, or use veiling and shrouding techniques.
+                </p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="unionall">
+            <AccordionTrigger>What is a Unionall and when is it used?</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>
+                  Unionalls are plastic one-piece bodysuits used to contain fluids, often after autopsy or organ/tissue donation.
+                </p>
+                <p>
+                  You can dress a person in clothing once the Unionall is in place. However, if opting for natural burial, natural 
+                  organic reduction (composting), or water cremation, the Unionall will likely need to be removed before disposition.
+                </p>
+                <p>
+                  Talk to your disposition provider about their requirements and policies regarding Unionalls.
+                </p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
     </div>
   );
 };
