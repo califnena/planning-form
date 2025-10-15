@@ -1,6 +1,6 @@
 {
   "navigation": {
-    "instructions": "📝 Instructions",
+    "instructions": "📝 My Instructions",
     "personal": "👤 My Personal Information",
     "about": "🌟 About Me",
     "contacts": "📞 Key Contacts",
@@ -28,7 +28,7 @@
     "requestQuote": "Request a Quote"
   },
   "instructions": {
-    "title": "Instructions",
+    "title": "My Instructions",
     "description": "Welcome to My Final Wishes! This comprehensive planner helps you organize important information for your loved ones.",
     "howToUse": "How to Use This Planner",
     "tips": "Tips for Success",
@@ -44,7 +44,7 @@
     "tip5": "Note any time-sensitive actions that should be taken",
     "tip6": "Mention key people who should be contacted first",
     "tip7": "Add passwords or access codes for critical accounts",
-    "generalInstructions": "General Instructions & Notes",
+    "generalInstructions": "My General Instructions",
     "generalInstructionsHelp": "Document locations, time-sensitive actions, key contacts, and access codes",
     "placeholder": "Add any instructions or important notes here...",
     "suggestedMessage": "If you are reading this, it means you have the difficult task of carrying out my final wishes. I want you to know that everything written here was prepared with love, to make this time a little easier for you. My hope is that these pages will guide you — not only with the practical details, but also with the memories and words I've left behind. Please trust that what I've recorded is meant to lighten your burden and honor the life we shared. I am deeply grateful for your care and your love. Thank you, with all my heart and soul."

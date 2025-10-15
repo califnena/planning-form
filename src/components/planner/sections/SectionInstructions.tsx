@@ -13,7 +13,7 @@ export const SectionInstructions = ({ value, onChange }: SectionInstructionsProp
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-2xl font-bold mb-2">{t("navigation.instructions")}</h2>
+        <h2 className="text-2xl font-bold mb-2">📝 My Instructions</h2>
         <p className="text-muted-foreground mb-6">
           {t("instructions.description")}
         </p>
@@ -27,7 +27,7 @@ export const SectionInstructions = ({ value, onChange }: SectionInstructionsProp
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="instructions">General Instructions & Notes</Label>
+        <Label htmlFor="instructions">My General Instructions</Label>
         <p className="text-xs text-muted-foreground">Document locations, time-sensitive actions, key contacts, and access codes</p>
         <Textarea
           id="instructions"
