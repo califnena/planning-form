@@ -141,10 +141,10 @@ const PlannerApp = () => {
   const handleDownloadManualForm = () => {
     try {
       const pdf = generateManuallyFillablePDF(plan);
-      pdf.save(`My-Final-Wishes-Manual-Form-${new Date().toISOString().split('T')[0]}.pdf`);
+      pdf.save(`My-Final-Wishes-Blank-Form-${new Date().toISOString().split('T')[0]}.pdf`);
       toast({
-        title: "Manual Form Downloaded",
-        description: "Blank form ready for printing and handwriting.",
+        title: "Blank Form Downloaded",
+        description: "Printable blank form ready for handwriting.",
       });
     } catch (error) {
       console.error("Error generating manual form:", error);

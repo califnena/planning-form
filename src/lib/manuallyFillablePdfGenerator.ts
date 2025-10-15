@@ -25,6 +25,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   const marginRight = 15; // 0.75" for hole punch
   const marginBottom = 25;
   const lineHeight = 6;
+  const tableOfContents: { title: string; page: number }[] = [];
   
   // Color palette
   const colors = {
@@ -53,7 +54,13 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   };
 
   // Helper to add page header
-  const addPageHeader = (title: string, helperText?: string) => {
+  const addPageHeader = (title: string, helperText?: string, addToTOC: boolean = true) => {
+    // Add to table of contents
+    if (addToTOC) {
+      const currentPage = pdf.internal.pages.length - 1;
+      tableOfContents.push({ title, page: currentPage });
+    }
+    
     pdf.setFontSize(18);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(...colors.headerNavy);
@@ -175,58 +182,38 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   addPageFooter();
 
-  // PAGE 1 - My Funeral & Memorial Wishes
+  // TABLE OF CONTENTS
+  pdf.addPage();
+  yPosition = 20;
+  
+  pdf.setFontSize(22);
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(...colors.headerNavy);
+  pdf.text("Table of Contents", pageWidth / 2, yPosition, { align: "center" });
+  yPosition += 20;
+  
+  pdf.setFontSize(11);
+  pdf.setFont("helvetica", "normal");
+  pdf.setTextColor(...colors.bodyGray);
+  
+  // We'll fill this in at the end, placeholder for now
+  const tocPageNumber = pdf.internal.pages.length - 1;
+  
+  addPageFooter();
+
+  // PAGE 1 - My Instructions
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
-    "My Funeral & Memorial Wishes",
-    "This section details your specific wishes for your funeral or memorial arrangements."
+    "My Instructions",
+    "Important information about where to find documents, access codes, and special instructions."
   );
   
-  addSubheader("Disposition of My Remains");
-  addCheckbox("Burial", marginLeft);
-  addCheckbox("Cremation", marginLeft + 60);
-  addCheckbox("Donation to Science", marginLeft + 120);
-  yPosition += 10;
-  
-  addRuledLines(4, "Notes (e.g., specific wishes for ashes, burial location):");
-  
-  addSubheader("My Memorial Service Preferences");
-  addCheckbox("Home Vigil", marginLeft);
-  addCheckbox("Celebration of Life", marginLeft + 70);
-  yPosition += 8;
-  addCheckbox("Religious Ceremony", marginLeft);
-  addCheckbox("Other", marginLeft + 70);
-  yPosition += 10;
-  
-  addRuledLines(3, "Preferred Location:");
-  addRuledLines(4, "Music / Readings / Speakers:");
+  addRuledLines(20, "My General Instructions:");
   
   addPageFooter(1);
 
-  // PAGE 2 - Service Details
-  pdf.addPage();
-  yPosition = 20;
-  addPageHeader(
-    "Service Details & Preferences",
-    "Additional details about how you'd like your service to be conducted."
-  );
-  
-  addSubheader("Additional Service Preferences");
-  addCheckbox("Open Casket", marginLeft);
-  addCheckbox("Visitation/Viewing", marginLeft + 75);
-  yPosition += 8;
-  addCheckbox("Military Honors", marginLeft);
-  addCheckbox("Graveside Service", marginLeft + 75);
-  yPosition += 10;
-  
-  addRuledLines(4, "Flower Preferences:");
-  addRuledLines(4, "Memorial Donations (Charity/Organization):");
-  addRuledLines(6, "Special Instructions or Personal Touches:");
-  
-  addPageFooter(2);
-
-  // PAGE 3 - Personal Information
+  // PAGE 2 - Personal Information
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -250,6 +237,18 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   yPosition += 8;
   addSubheader("Children's Names");
   addRuledLines(6);
+  
+  addPageFooter(2);
+
+  // PAGE 3 - About Me
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "About Me",
+    "Share your story, values, and what made your life meaningful."
+  );
+  
+  addRuledLines(28, "My Story & Legacy:");
   
   addPageFooter(3);
 
@@ -283,12 +282,87 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   addPageFooter(4);
 
-  // PAGE 5 - Financial & Insurance
+  // PAGE 5 - Preferred Vendors
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
-    "Financial & Insurance Information",
-    "Important details about your financial accounts and insurance policies."
+    "Preferred Vendors",
+    "Funeral homes, florists, or other service providers you'd like your family to use."
+  );
+  
+  addSubheader("Vendor 1");
+  addLabeledField("Type (e.g., Funeral Home, Florist):");
+  addLabeledField("Business Name:");
+  addLabeledField("Contact Info:");
+  addLabeledField("Notes:");
+  
+  yPosition += 8;
+  addSubheader("Vendor 2");
+  addLabeledField("Type:");
+  addLabeledField("Business Name:");
+  addLabeledField("Contact Info:");
+  addLabeledField("Notes:");
+  
+  yPosition += 8;
+  addRuledLines(6, "Additional Vendors:");
+  
+  addPageFooter(5);
+
+  // PAGE 6 - Checklist
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "Checklist",
+    "Important tasks you want your loved ones to complete."
+  );
+  
+  pdf.setFontSize(11);
+  pdf.setFont("helvetica", "normal");
+  pdf.setTextColor(...colors.bodyGray);
+  
+  for (let i = 1; i <= 20; i++) {
+    if (yPosition > pageHeight - marginBottom) break;
+    addCheckbox("", marginLeft);
+    yPosition += 9;
+  }
+  
+  addPageFooter(6);
+
+  // PAGE 7 - My Funeral & Memorial Wishes
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "My Funeral & Memorial Wishes",
+    "This section details your specific wishes for your funeral or memorial arrangements."
+  );
+  
+  addSubheader("Disposition of My Remains");
+  addCheckbox("Burial", marginLeft);
+  addCheckbox("Cremation", marginLeft + 60);
+  addCheckbox("Donation to Science", marginLeft + 120);
+  yPosition += 10;
+  
+  addRuledLines(4, "Notes (e.g., specific wishes for ashes, burial location):");
+  
+  addSubheader("My Memorial Service Preferences");
+  addCheckbox("Home Vigil", marginLeft);
+  addCheckbox("Celebration of Life", marginLeft + 70);
+  yPosition += 8;
+  addCheckbox("Religious Ceremony", marginLeft);
+  addCheckbox("Other", marginLeft + 70);
+  yPosition += 10;
+  
+  addRuledLines(3, "Preferred Location:");
+  addRuledLines(4, "Music / Readings / Speakers:");
+  
+  addPageFooter(7);
+
+  // PAGE 8 - Financial Life
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "Financial Life",
+    "Important details about your financial accounts."
   );
   
   addSubheader("Bank Accounts");
@@ -296,21 +370,108 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addLabeledField("Account Type & Number:");
   
   yPosition += 8;
-  addSubheader("Insurance Policies");
-  addLabeledField("Life Insurance Company:");
-  addLabeledField("Policy Number:");
-  addLabeledField("Agent Name & Phone:");
+  addSubheader("Investment Accounts");
+  addLabeledField("Institution:");
+  addLabeledField("Account Details:");
   
   yPosition += 8;
   addRuledLines(10, "Additional Financial Information:");
   
-  addPageFooter(5);
+  addPageFooter(8);
 
-  // PAGE 6 - Legal Documents
+  // PAGE 9 - Insurance
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
-    "Legal Documents & Wishes",
+    "Insurance",
+    "Information about your insurance policies."
+  );
+  
+  addSubheader("Life Insurance Policy 1");
+  addLabeledField("Insurance Company:");
+  addLabeledField("Policy Number:");
+  addLabeledField("Agent Name & Phone:");
+  
+  yPosition += 8;
+  addSubheader("Life Insurance Policy 2");
+  addLabeledField("Insurance Company:");
+  addLabeledField("Policy Number:");
+  addLabeledField("Agent Name & Phone:");
+  
+  yPosition += 8;
+  addRuledLines(8, "Other Insurance (Health, Auto, etc.):");
+  
+  addPageFooter(9);
+
+  // PAGE 10 - Property
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "My Property",
+    "Real estate, vehicles, and valuable possessions."
+  );
+  
+  addSubheader("Property I Own");
+  addCheckbox("Primary residence", marginLeft);
+  addCheckbox("Vacation home", marginLeft + 80);
+  yPosition += 8;
+  addCheckbox("Investment property", marginLeft);
+  addCheckbox("Land or lots", marginLeft + 80);
+  yPosition += 8;
+  addCheckbox("Vehicles", marginLeft);
+  addCheckbox("Boats or RVs", marginLeft + 80);
+  yPosition += 8;
+  addCheckbox("Business ownership", marginLeft);
+  addCheckbox("Jewelry, art, collectibles", marginLeft + 80);
+  yPosition += 10;
+  
+  addRuledLines(12, "Property Details & Location of Deeds/Titles:");
+  
+  addPageFooter(10);
+
+  // PAGE 11 - Pets
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "My Pets",
+    "Care instructions and arrangements for your beloved pets."
+  );
+  
+  addRuledLines(28, "Pet Care Instructions:");
+  
+  addPageFooter(11);
+
+  // PAGE 12 - Digital World
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "Digital World",
+    "Online accounts, digital assets, and access information."
+  );
+  
+  addSubheader("Digital Assets I Have");
+  addCheckbox("Social media accounts", marginLeft);
+  addCheckbox("Email accounts", marginLeft + 90);
+  yPosition += 8;
+  addCheckbox("Cloud storage", marginLeft);
+  addCheckbox("Streaming services", marginLeft + 90);
+  yPosition += 8;
+  addCheckbox("Shopping accounts", marginLeft);
+  addCheckbox("Photo sharing sites", marginLeft + 90);
+  yPosition += 8;
+  addCheckbox("Domain names/websites", marginLeft);
+  addCheckbox("Password manager", marginLeft + 90);
+  yPosition += 10;
+  
+  addRuledLines(10, "Account Details & Access Instructions:");
+  
+  addPageFooter(12);
+
+  // PAGE 13 - Legal Documents
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "Legal",
     "Location and details of important legal documents."
   );
   
@@ -327,9 +488,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addRuledLines(4, "Attorney Name & Contact:");
   addRuledLines(10, "Special Legal Instructions:");
   
-  addPageFooter(6);
+  addPageFooter(13);
 
-  // PAGE 7 - Messages to Loved Ones
+  // PAGE 14 - Messages to Loved Ones
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -348,32 +509,52 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   fillRemainingWithLines();
   
-  addPageFooter(7);
+  addPageFooter(14);
 
-  // PAGE 8 - Executor/Planner Contact
+  // PAGE 15 - Revisions & Approvals
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
-    "Executor / Planner Contact",
-    "Person responsible for carrying out this plan and making arrangements."
+    "Revisions & Approvals",
+    "Document updates and approvals to this plan."
   );
   
-  addSubheader("Primary Executor");
-  addLabeledField("Name:");
-  addLabeledField("Phone:");
-  addLabeledField("Email:");
-  addLabeledField("Address:");
+  addSubheader("Revision 1");
+  addLabeledField("Prepared By:");
+  addLabeledField("Date:");
+  addRuledLines(3, "Signature:");
   
-  yPosition += 10;
-  addSubheader("Backup Contact");
-  addLabeledField("Name:");
-  addLabeledField("Phone:");
-  addLabeledField("Email:");
+  yPosition += 8;
+  addSubheader("Revision 2");
+  addLabeledField("Prepared By:");
+  addLabeledField("Date:");
+  addRuledLines(3, "Signature:");
   
-  yPosition += 10;
-  addRuledLines(8, "Additional Notes or Instructions:");
+  yPosition += 8;
+  addRuledLines(6, "Additional Notes:");
   
-  addPageFooter(8);
+  addPageFooter(15);
+
+  // Go back and fill in the Table of Contents
+  pdf.setPage(tocPageNumber);
+  yPosition = 40;
+  
+  tableOfContents.forEach((item) => {
+    if (yPosition > pageHeight - 40) {
+      pdf.addPage();
+      yPosition = 20;
+    }
+    
+    pdf.setFontSize(11);
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(...colors.bodyGray);
+    
+    const dots = ".".repeat(Math.floor((pageWidth - 80 - pdf.getTextWidth(item.title) - pdf.getTextWidth(String(item.page))) / 2));
+    pdf.text(item.title, 30, yPosition);
+    pdf.text(dots, 30 + pdf.getTextWidth(item.title) + 2, yPosition);
+    pdf.text(String(item.page), pageWidth - 30, yPosition, { align: "right" });
+    yPosition += 8;
+  });
 
   return pdf;
 };

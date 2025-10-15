@@ -129,11 +129,11 @@ export const PlannerShell = ({
                     onClick={onDownloadManualForm}
                   >
                     <Printer className="mr-2 h-4 w-4" />
-                    Print Manual Form
+                    Blank Form
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="bg-popover text-popover-foreground border">
-                  <p>Blank form for handwriting</p>
+                  <p>Printable blank form for handwriting</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
