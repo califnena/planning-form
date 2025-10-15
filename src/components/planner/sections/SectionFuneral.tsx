@@ -290,7 +290,7 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
         <div className="space-y-4">
           <Label className="text-base font-semibold">Pre-Arranged or Prepaid Items/Services</Label>
           <p className="text-xs text-muted-foreground">
-            Check off what you've already arranged or where you need assistance
+            Check off what you&apos;ve already arranged or paid for. When you check an item, provide details about what&apos;s been arranged and where documents can be found.
           </p>
           
           <div className="space-y-3">
@@ -301,13 +301,13 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                   checked={funeral.purchased_funeral_home || false}
                   onCheckedChange={(checked) => updateFuneral("purchased_funeral_home", checked)}
                 />
-                <Label htmlFor="purchased_funeral_home" className="font-normal">Funeral Home</Label>
+                <Label htmlFor="purchased_funeral_home" className="font-normal">Funeral Home (Already Arranged/Prepaid)</Label>
               </div>
               {funeral.purchased_funeral_home && (
                 <Input
                   value={funeral.funeral_home_name || ""}
                   onChange={(e) => updateFuneral("funeral_home_name", e.target.value)}
-                  placeholder="Enter funeral home name"
+                  placeholder="Funeral home name, contract details, payment status, document location"
                   className="ml-6"
                 />
               )}
@@ -320,13 +320,13 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                   checked={funeral.purchased_cemetery || false}
                   onCheckedChange={(checked) => updateFuneral("purchased_cemetery", checked)}
                 />
-                <Label htmlFor="purchased_cemetery" className="font-normal">Cemetery</Label>
+                <Label htmlFor="purchased_cemetery" className="font-normal">Cemetery Plot (Already Arranged/Prepaid)</Label>
               </div>
               {funeral.purchased_cemetery && (
                 <Input
                   value={funeral.cemetery_name || ""}
                   onChange={(e) => updateFuneral("cemetery_name", e.target.value)}
-                  placeholder="Enter cemetery name"
+                  placeholder="Cemetery name, plot location, deed location, payment status"
                   className="ml-6"
                 />
               )}
@@ -339,13 +339,13 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                   checked={funeral.purchased_funeral_packet || false}
                   onCheckedChange={(checked) => updateFuneral("purchased_funeral_packet", checked)}
                 />
-                <Label htmlFor="purchased_funeral_packet" className="font-normal">Funeral Packet</Label>
+                <Label htmlFor="purchased_funeral_packet" className="font-normal">Funeral Package (Already Arranged/Prepaid)</Label>
               </div>
               {funeral.purchased_funeral_packet && (
                 <Input
                   value={funeral.funeral_packet_name || ""}
                   onChange={(e) => updateFuneral("funeral_packet_name", e.target.value)}
-                  placeholder="Enter where purchased or package name"
+                  placeholder="Package name, provider, what's included, contract location"
                   className="ml-6"
                 />
               )}
@@ -358,13 +358,13 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                   checked={funeral.purchased_headstone || false}
                   onCheckedChange={(checked) => updateFuneral("purchased_headstone", checked)}
                 />
-                <Label htmlFor="purchased_headstone" className="font-normal">Headstone</Label>
+                <Label htmlFor="purchased_headstone" className="font-normal">Headstone/Marker (Already Arranged/Prepaid)</Label>
               </div>
               {funeral.purchased_headstone && (
                 <Input
                   value={funeral.headstone_name || ""}
                   onChange={(e) => updateFuneral("headstone_name", e.target.value)}
-                  placeholder="Enter details or where purchased"
+                  placeholder="Vendor, design details, inscription, payment status, receipt location"
                   className="ml-6"
                 />
               )}
@@ -377,13 +377,13 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                   checked={funeral.purchased_flowers || false}
                   onCheckedChange={(checked) => updateFuneral("purchased_flowers", checked)}
                 />
-                <Label htmlFor="purchased_flowers" className="font-normal">Flowers</Label>
+                <Label htmlFor="purchased_flowers" className="font-normal">Flowers/Arrangements (Already Arranged/Prepaid)</Label>
               </div>
               {funeral.purchased_flowers && (
                 <Input
                   value={funeral.flowers_name || ""}
                   onChange={(e) => updateFuneral("flowers_name", e.target.value)}
-                  placeholder="Enter florist or arrangements details"
+                  placeholder="Florist name, arrangement details, payment status, contact info"
                   className="ml-6"
                 />
               )}
