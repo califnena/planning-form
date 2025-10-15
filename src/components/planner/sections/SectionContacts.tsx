@@ -20,7 +20,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
   const addContact = () => {
     onChange({
       ...data,
-      contacts: [...contacts, { name: "", relationship: "", contact: "", auto_notify: false, note: "" }]
+      contacts: [...contacts, { name: "", relationship: "", email: "", phone: "", note: "" }]
     });
   };
 
@@ -65,8 +65,9 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "bold");
     pdf.text("Name", 15, yPos);
-    pdf.text("Relationship", 70, yPos);
-    pdf.text("Contact Info", 120, yPos);
+    pdf.text("Relationship", 60, yPos);
+    pdf.text("Email", 100, yPos);
+    pdf.text("Phone", 140, yPos);
 
     // Draw header line
     pdf.setLineWidth(0.5);
@@ -83,8 +84,15 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
       }
 
       pdf.text(contact.name || "", 15, yPos);
-      pdf.text(contact.relationship || "", 70, yPos);
-      pdf.text(contact.contact || "", 120, yPos);
+      pdf.text(contact.relationship || "", 60, yPos);
+      
+      // Split email and phone to fit in smaller columns
+      const email = contact.email || "";
+      const phone = contact.phone || "";
+      pdf.setFontSize(9);
+      pdf.text(email.length > 20 ? email.substring(0, 18) + "..." : email, 100, yPos);
+      pdf.text(phone, 140, yPos);
+      pdf.setFontSize(10);
 
       if (contact.note) {
         yPos += 5;
@@ -153,7 +161,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
               </Button>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Name</Label>
                 <p className="text-xs text-muted-foreground">Full name of the person to notify</p>
@@ -175,12 +183,24 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
               </div>
 
               <div className="space-y-2">
-                <Label>Contact Info</Label>
-                <p className="text-xs text-muted-foreground">Best phone number or email</p>
+                <Label>Email</Label>
+                <p className="text-xs text-muted-foreground">Email address</p>
                 <Input
-                  value={contact.contact || ""}
-                  onChange={(e) => updateContact(index, "contact", e.target.value)}
-                  placeholder="Phone or email"
+                  type="email"
+                  value={contact.email || ""}
+                  onChange={(e) => updateContact(index, "email", e.target.value)}
+                  placeholder="email@example.com"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Phone Number</Label>
+                <p className="text-xs text-muted-foreground">Best phone number to reach them</p>
+                <Input
+                  type="tel"
+                  value={contact.phone || ""}
+                  onChange={(e) => updateContact(index, "phone", e.target.value)}
+                  placeholder="(555) 123-4567"
                 />
               </div>
             </div>
