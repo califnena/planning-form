@@ -7,7 +7,6 @@ import { usePlanData } from "@/hooks/usePlanData";
 import { useToast } from "@/hooks/use-toast";
 import { RevisionPromptDialog } from "@/components/planner/RevisionPromptDialog";
 import { EmailPlanDialog } from "@/components/EmailPlanDialog";
-import { DownloadOptionsDialog } from "@/components/DownloadOptionsDialog";
 import { generatePlanPDF } from "@/lib/pdfGenerator";
 import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator";
 import { useTranslation } from "react-i18next";
@@ -40,9 +39,7 @@ const PlannerApp = () => {
   const [activeSection, setActiveSection] = useState("instructions");
   const [showRevisionDialog, setShowRevisionDialog] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
-  const [showDownloadOptionsDialog, setShowDownloadOptionsDialog] = useState(false);
-  const [pendingAction, setPendingAction] = useState<"download" | "email" | null>(null);
-  const [pendingRevision, setPendingRevision] = useState<any>(null);
+  const [pendingAction, setPendingAction] = useState<"download" | "email" | "manual" | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -141,6 +138,11 @@ const PlannerApp = () => {
     setShowRevisionDialog(true);
   };
 
+  const handleDownloadManualForm = () => {
+    setPendingAction("manual");
+    setShowRevisionDialog(true);
+  };
+
   const handleEmailPlan = () => {
     setPendingAction("email");
     setShowRevisionDialog(true);
@@ -158,45 +160,44 @@ const PlannerApp = () => {
       prepared_by: revision.prepared_by,
     });
 
-    // Store the revision and show appropriate dialog
-    setPendingRevision(revision);
-    
+    // Proceed with the pending action
     if (pendingAction === "download") {
-      setShowDownloadOptionsDialog(true);
+      try {
+        const pdf = generatePlanPDF(plan);
+        pdf.save(`My-Final-Wishes-${new Date().toISOString().split('T')[0]}.pdf`);
+        toast({
+          title: "Revision Saved",
+          description: "Your plan has been updated and downloaded successfully.",
+        });
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        toast({
+          title: "Error",
+          description: "Failed to generate PDF. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } else if (pendingAction === "manual") {
+      try {
+        const pdf = generateManuallyFillablePDF(plan);
+        pdf.save(`My-Final-Wishes-Manual-Form-${new Date().toISOString().split('T')[0]}.pdf`);
+        toast({
+          title: "Revision Saved",
+          description: "Manual form downloaded successfully.",
+        });
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        toast({
+          title: "Error",
+          description: "Failed to generate manual form. Please try again.",
+          variant: "destructive",
+        });
+      }
     } else if (pendingAction === "email") {
       setShowEmailDialog(true);
     }
 
     setPendingAction(null);
-  };
-
-  const handleDownloadWithMode = (mode: "fillable" | "manual") => {
-    try {
-      let pdf;
-      if (mode === "manual") {
-        pdf = generateManuallyFillablePDF(plan);
-      } else {
-        pdf = generatePlanPDF(plan);
-      }
-      
-      const fileName = mode === "manual" 
-        ? `My-Final-Wishes-Manual-Form-${new Date().toISOString().split('T')[0]}.pdf`
-        : `My-Final-Wishes-${new Date().toISOString().split('T')[0]}.pdf`;
-      
-      pdf.save(fileName);
-      
-      toast({
-        title: "Revision Saved",
-        description: "Your plan has been updated and downloaded successfully.",
-      });
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      toast({
-        title: "Error",
-        description: "Failed to generate PDF. Please try again.",
-        variant: "destructive",
-      });
-    }
   };
 
   const sectionItems = [
@@ -350,6 +351,7 @@ const PlannerApp = () => {
         onSectionChange={setActiveSection}
         onPreviewPDF={handlePreviewPDF}
         onDownloadPDF={handleDownloadPDF}
+        onDownloadManualForm={handleDownloadManualForm}
         onEmailPlan={handleEmailPlan}
         onSignOut={handleSignOut}
       >
@@ -368,12 +370,6 @@ const PlannerApp = () => {
         onOpenChange={setShowEmailDialog}
         planData={plan}
         preparedBy={plan.prepared_by || ""}
-      />
-
-      <DownloadOptionsDialog
-        open={showDownloadOptionsDialog}
-        onOpenChange={setShowDownloadOptionsDialog}
-        onConfirm={handleDownloadWithMode}
       />
     </>
   );

@@ -1,7 +1,7 @@
 import { useState, ReactNode } from "react";
 import { SidebarNav } from "./SidebarNav";
 import { Button } from "@/components/ui/button";
-import { Download, Mail, MessageSquare, Facebook, FileText, Eye } from "lucide-react";
+import { Download, Mail, MessageSquare, Facebook, FileText, Eye, Printer } from "lucide-react";
 import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useTranslation } from "react-i18next";
@@ -20,6 +20,7 @@ interface PlannerShellProps {
   onSectionChange: (section: string) => void;
   onPreviewPDF: () => void;
   onDownloadPDF: () => void;
+  onDownloadManualForm: () => void;
   onEmailPlan: () => void;
   onSignOut: () => void;
 }
@@ -31,6 +32,7 @@ export const PlannerShell = ({
   onSectionChange,
   onPreviewPDF,
   onDownloadPDF,
+  onDownloadManualForm,
   onEmailPlan,
   onSignOut,
 }: PlannerShellProps) => {
@@ -114,6 +116,24 @@ export const PlannerShell = ({
                 </TooltipTrigger>
                 <TooltipContent side="right" className="bg-popover text-popover-foreground border">
                   <p>In PDF format</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-start"
+                    onClick={onDownloadManualForm}
+                  >
+                    <Printer className="mr-2 h-4 w-4" />
+                    Print Manual Form
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-popover text-popover-foreground border">
+                  <p>Blank form for handwriting</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
