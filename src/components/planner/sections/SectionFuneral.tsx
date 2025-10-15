@@ -3,7 +3,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Save, Upload, X, Image as ImageIcon, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -172,115 +171,133 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
         <div className="space-y-4">
           <Label className="text-base font-semibold">Have You Already Purchased Items?</Label>
           <p className="text-xs text-muted-foreground">
-            Let us know if you've already purchased funeral-related items
+            Check off the items you've already arranged or need help with
           </p>
           
-          <RadioGroup
-            value={funeral.items_purchased_status || "no"}
-            onValueChange={(value) => updateFuneral("items_purchased_status", value)}
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="yes" id="items-yes" />
-              <Label htmlFor="items-yes" className="font-normal cursor-pointer">Yes</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="no" id="items-no" />
-              <Label htmlFor="items-no" className="font-normal cursor-pointer">No</Label>
-            </div>
-          </RadioGroup>
-
-          {funeral.items_purchased_status === "yes" ? (
-            <div className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="funeral_home_name">Funeral Home</Label>
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="purchased_funeral_home"
+                  checked={funeral.purchased_funeral_home || false}
+                  onCheckedChange={(checked) => updateFuneral("purchased_funeral_home", checked)}
+                />
+                <Label htmlFor="purchased_funeral_home" className="font-normal">Funeral Home</Label>
+              </div>
+              {funeral.purchased_funeral_home && (
                 <Input
-                  id="funeral_home_name"
                   value={funeral.funeral_home_name || ""}
                   onChange={(e) => updateFuneral("funeral_home_name", e.target.value)}
                   placeholder="Enter funeral home name"
+                  className="ml-6"
                 />
-              </div>
+              )}
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="cemetery_name">Cemetery</Label>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="purchased_cemetery"
+                  checked={funeral.purchased_cemetery || false}
+                  onCheckedChange={(checked) => updateFuneral("purchased_cemetery", checked)}
+                />
+                <Label htmlFor="purchased_cemetery" className="font-normal">Cemetery</Label>
+              </div>
+              {funeral.purchased_cemetery && (
                 <Input
-                  id="cemetery_name"
                   value={funeral.cemetery_name || ""}
                   onChange={(e) => updateFuneral("cemetery_name", e.target.value)}
                   placeholder="Enter cemetery name"
+                  className="ml-6"
                 />
-              </div>
+              )}
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="funeral_packet_name">Funeral Packet</Label>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="purchased_funeral_packet"
+                  checked={funeral.purchased_funeral_packet || false}
+                  onCheckedChange={(checked) => updateFuneral("purchased_funeral_packet", checked)}
+                />
+                <Label htmlFor="purchased_funeral_packet" className="font-normal">Funeral Packet</Label>
+              </div>
+              {funeral.purchased_funeral_packet && (
                 <Input
-                  id="funeral_packet_name"
                   value={funeral.funeral_packet_name || ""}
                   onChange={(e) => updateFuneral("funeral_packet_name", e.target.value)}
                   placeholder="Enter where purchased or package name"
+                  className="ml-6"
                 />
-              </div>
+              )}
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="headstone_name">Headstone</Label>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="purchased_headstone"
+                  checked={funeral.purchased_headstone || false}
+                  onCheckedChange={(checked) => updateFuneral("purchased_headstone", checked)}
+                />
+                <Label htmlFor="purchased_headstone" className="font-normal">Headstone</Label>
+              </div>
+              {funeral.purchased_headstone && (
                 <Input
-                  id="headstone_name"
                   value={funeral.headstone_name || ""}
                   onChange={(e) => updateFuneral("headstone_name", e.target.value)}
                   placeholder="Enter details or where purchased"
+                  className="ml-6"
                 />
-              </div>
+              )}
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="flowers_name">Flowers</Label>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="purchased_flowers"
+                  checked={funeral.purchased_flowers || false}
+                  onCheckedChange={(checked) => updateFuneral("purchased_flowers", checked)}
+                />
+                <Label htmlFor="purchased_flowers" className="font-normal">Flowers</Label>
+              </div>
+              {funeral.purchased_flowers && (
                 <Input
-                  id="flowers_name"
                   value={funeral.flowers_name || ""}
                   onChange={(e) => updateFuneral("flowers_name", e.target.value)}
                   placeholder="Enter florist or arrangements details"
+                  className="ml-6"
                 />
-              </div>
+              )}
             </div>
-          ) : (
-            <div className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="preferred_funeral_home">Preferred Funeral Home</Label>
-                <Input
-                  id="preferred_funeral_home"
-                  value={funeral.preferred_funeral_home || ""}
-                  onChange={(e) => updateFuneral("preferred_funeral_home", e.target.value)}
-                  placeholder="Enter preferred funeral home name"
-                />
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="preferred_cemetery">Cemetery</Label>
-                <Input
-                  id="preferred_cemetery"
-                  value={funeral.preferred_cemetery || ""}
-                  onChange={(e) => updateFuneral("preferred_cemetery", e.target.value)}
-                  placeholder="Enter preferred cemetery name"
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="contact_everlasting"
+                  checked={funeral.contact_everlasting || false}
+                  onCheckedChange={(checked) => updateFuneral("contact_everlasting", checked)}
                 />
+                <Label htmlFor="contact_everlasting" className="font-normal">Reach out to Everlasting Funeral Advisors</Label>
               </div>
-
-              <div className="p-4 bg-muted/50 rounded-lg border border-border">
-                <p className="text-sm font-semibold mb-2">Everlasting Funeral Advisors</p>
-                <p className="text-xs text-muted-foreground mb-3">
-                  Get expert help with all your funeral planning needs
-                </p>
-                <Button 
-                  asChild 
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                >
-                  <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
-                    Get a Quote
-                  </a>
-                </Button>
-              </div>
+              {funeral.contact_everlasting && (
+                <div className="ml-6 p-3 bg-muted/50 rounded-lg border border-border">
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Get expert help with all your funeral planning needs
+                  </p>
+                  <Button 
+                    asChild 
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                  >
+                    <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
+                      Get a Quote
+                    </a>
+                  </Button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
 
         <div>
