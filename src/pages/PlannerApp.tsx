@@ -39,7 +39,7 @@ const PlannerApp = () => {
   const [activeSection, setActiveSection] = useState("instructions");
   const [showRevisionDialog, setShowRevisionDialog] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
-  const [pendingAction, setPendingAction] = useState<"download" | "email" | "manual" | null>(null);
+  const [pendingAction, setPendingAction] = useState<"download" | "email" | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -139,8 +139,21 @@ const PlannerApp = () => {
   };
 
   const handleDownloadManualForm = () => {
-    setPendingAction("manual");
-    setShowRevisionDialog(true);
+    try {
+      const pdf = generateManuallyFillablePDF(plan);
+      pdf.save(`My-Final-Wishes-Manual-Form-${new Date().toISOString().split('T')[0]}.pdf`);
+      toast({
+        title: "Manual Form Downloaded",
+        description: "Blank form ready for printing and handwriting.",
+      });
+    } catch (error) {
+      console.error("Error generating manual form:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate manual form. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleEmailPlan = () => {
@@ -174,22 +187,6 @@ const PlannerApp = () => {
         toast({
           title: "Error",
           description: "Failed to generate PDF. Please try again.",
-          variant: "destructive",
-        });
-      }
-    } else if (pendingAction === "manual") {
-      try {
-        const pdf = generateManuallyFillablePDF(plan);
-        pdf.save(`My-Final-Wishes-Manual-Form-${new Date().toISOString().split('T')[0]}.pdf`);
-        toast({
-          title: "Revision Saved",
-          description: "Manual form downloaded successfully.",
-        });
-      } catch (error) {
-        console.error("Error generating PDF:", error);
-        toast({
-          title: "Error",
-          description: "Failed to generate manual form. Please try again.",
           variant: "destructive",
         });
       }
