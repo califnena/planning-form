@@ -11,15 +11,142 @@ export const SectionFAQ = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-2">📖 Guide & FAQ</h2>
+          <h2 className="text-2xl font-bold mb-2">❓ FAQ</h2>
           <p className="text-muted-foreground">
-            Helpful information and frequently asked questions about end-of-life planning.
+            Frequently asked questions about end-of-life planning.
           </p>
         </div>
         <FAQDownloadButton />
       </div>
 
-      {/* Funeral Planning Section */}
+      <div className="bg-muted/50 border border-border rounded-lg p-6 mb-6">
+        <p className="text-sm leading-relaxed">
+          While we receive many questions related to funeral planning, there are several that we encounter on a regular basis. 
+          With that in mind, we've compiled the top questions we hear. We've listed them below, along with a summary of our answers. 
+          To help you explore these questions about funeral planning further, we've included links to sections of our website with more detail.
+        </p>
+        <p className="text-sm leading-relaxed mt-4">
+          Planning a funeral can be difficult. Whether you're making arrangements after the loss of a loved one or preparing in advance for yourself, 
+          the process can be overwhelming. That's because it involves emotional decisions, financial considerations, and logistical details that most 
+          people don't think about until the need arises.
+        </p>
+      </div>
+
+      {/* Top Questions */}
+      <div className="space-y-3 mb-8">
+        <h3 className="text-lg font-semibold">💰 Top Questions</h3>
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="cost">
+            <AccordionTrigger>How much does a funeral cost?</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>
+                  Questions about the cost of a funeral are by far the most common that we receive. The answer may be a bit complicated. 
+                  The actual cost of a funeral depends on several factors. Among these are location, the type of service you choose, and your personal preferences.
+                </p>
+                <p>
+                  According to the National Funeral Directors Association, the average cost of a traditional funeral with a burial in the U.S. 
+                  ranges from $7,000 to $12,000, including the casket, service fees, and burial plot. Cremation tends to be less expensive, 
+                  averaging $4,000 to $7,000. Additional costs may include flowers, catering, or memorial keepsakes.
+                </p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="importance">
+            <AccordionTrigger>Why is funeral planning important?</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>
+                  We often say that the best time to plan a funeral is before you need it. We really believe that. Funeral planning can ensure 
+                  that your wishes or the wishes of your loved one are honored. Best of all, spelling out how you want to be memorialized can ease 
+                  the emotional and financial burdens on your family members during a difficult time.
+                </p>
+                <p>
+                  Planning allows you to make thoughtful decisions about the type of service, burial or cremation options, and other essential details. 
+                  When you prepare, you ensure that everything aligns with personal values and preferences. You'll also have time to make financial 
+                  arrangements so that the expenses associated with your funeral are taken care of.
+                </p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="steps">
+            <AccordionTrigger>What are the steps in planning a funeral?</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>Planning a funeral is similar to planning any other significant event designed to celebrate a life milestone. The key steps include:</p>
+                <ol className="list-decimal list-inside space-y-2 ml-2">
+                  <li><strong>Set a Budget:</strong> Knowing how much you can comfortably spend will give you a framework for the many decisions you'll need to make.</li>
+                  <li><strong>Decide on Disposition:</strong> Choose between burial, cremation, or other options.</li>
+                  <li><strong>Choose Service Options:</strong> Select the type of service you want. Do you want a traditional funeral, or would you prefer a memorial service and a celebration of life?</li>
+                  <li><strong>Estimate Costs:</strong> Assess the expected expenses and adjust your choices to align with your budget.</li>
+                  <li><strong>Communicate Your Plan:</strong> Share your decisions with family or a trusted individual.</li>
+                  <li><strong>Flesh out the ceremony details:</strong> You can specify elements like readings, music, and who will participate in the ceremony.</li>
+                  <li><strong>Arrange Financing:</strong> Explore options such as funeral insurance, trusts, or pre-purchase services.</li>
+                  <li><strong>Organize Your Personal Information:</strong> Gather and organize key documents such as wills, insurance policies, and other key information.</li>
+                </ol>
+                <p className="mt-3">
+                  Our After Me Planner and Organizer is the perfect tool to help you manage all steps of the funeral planning process.
+                </p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="financial-help">
+            <AccordionTrigger>What financial help is available for funeral expenses?</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>
+                  Thinking about your own mortality or having someone close to you pass can be overwhelming. When you add the stress of figuring out 
+                  how to pay for it, the burden feels even heavier. Unfortunately, funerals are expensive. There are several ways to get help, but it's 
+                  always best to ensure you have set aside funds to cover it.
+                </p>
+                <p>It's always a good idea to ask the funeral home if they are familiar with any available resources. Some other options include:</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Life insurance policies that cover funeral costs</li>
+                  <li>Veterans' benefits for eligible service members</li>
+                  <li>Social Security (a one-time death benefit of $255 for qualifying survivors)</li>
+                  <li>State or county assistance programs for low-income families</li>
+                  <li>Charitable organizations such as churches and social groups</li>
+                  <li>Crowdfunding and Social Networks</li>
+                </ul>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="immediate-steps">
+            <AccordionTrigger>What should I do right away when someone dies?</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>
+                  When someone dies, the initial steps depend on the circumstances of the death, including the location and manner in which it occurred.
+                </p>
+                <p>
+                  If the death happens at home and the person was under medical care, contact their doctor or hospice nurse so they can officially 
+                  pronounce the death. If it was unexpected or there was no medical professional involved, call 911 so emergency personnel can assess the situation.
+                </p>
+                <p>
+                  Once the death is legally confirmed, you'll need to choose a funeral home or mortuary to take the person into their care. If your 
+                  loved one had made arrangements in advance or has documented their wishes, locate those papers. They can save you from having to 
+                  guess what your loved one would have wanted.
+                </p>
+                <p>
+                  The next step is to notify close family and friends. You will also need to handle practical matters such as securing the home, 
+                  caring for pets, and gathering important documents.
+                </p>
+                <p>
+                  It's okay to ask for help. There's a lot to manage, and you don't have to do it all alone. Take things one step at a time, 
+                  lean on others for support. Remember, while there are legal and logistical tasks to handle, taking time to process your emotions 
+                  is just as important.
+                </p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
+
+      {/* Additional Questions */}
       <div className="space-y-3">
         <h3 className="text-lg font-semibold">🕊️ Funeral Planning</h3>
         <Accordion type="single" collapsible className="w-full">

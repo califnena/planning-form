@@ -26,6 +26,7 @@ import { SectionLegal } from "@/components/planner/sections/SectionLegal";
 import { SectionMessages } from "@/components/planner/sections/SectionMessages";
 import { SectionVendors } from "@/components/planner/sections/SectionVendors";
 import { SectionRevisions } from "@/components/planner/sections/SectionRevisions";
+import { SectionGuide } from "@/components/planner/sections/SectionGuide";
 import { SectionFAQ } from "@/components/planner/sections/SectionFAQ";
 
 const PlannerApp = () => {
@@ -204,6 +205,7 @@ const PlannerApp = () => {
     { id: "digital", label: t("navigation.digital"), completed: !!plan.digital_notes },
     { id: "legal", label: t("navigation.legal"), completed: !!plan.legal_notes },
     { id: "messages", label: t("navigation.messages"), completed: !!plan.messages_notes },
+    { id: "guide", label: t("navigation.guide"), completed: false },
     { id: "faq", label: t("navigation.faq"), completed: false },
     { id: "revisions", label: t("navigation.revisions"), completed: false },
   ];
@@ -306,6 +308,8 @@ const PlannerApp = () => {
         return <SectionVendors data={plan} onChange={updatePlan} />;
       case "revisions":
         return <SectionRevisions data={plan} onChange={updatePlan} />;
+      case "guide":
+        return <SectionGuide />;
       case "faq":
         return <SectionFAQ />;
       default:
