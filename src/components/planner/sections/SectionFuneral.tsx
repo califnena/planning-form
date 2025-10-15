@@ -339,7 +339,7 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                   checked={funeral.purchased_funeral_packet || false}
                   onCheckedChange={(checked) => updateFuneral("purchased_funeral_packet", checked)}
                 />
-                <Label htmlFor="purchased_funeral_packet" className="font-normal">Funeral Package (Already Arranged/Prepaid)</Label>
+                <Label htmlFor="purchased_funeral_packet" className="font-normal">Funeral Plan (prepaid)</Label>
               </div>
               {funeral.purchased_funeral_packet && (
                 <Input
