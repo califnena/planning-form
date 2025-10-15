@@ -22,10 +22,29 @@ export const SectionProperty = ({ data, onChange }: SectionPropertyProps) => {
       ...data,
       property: { ...property, [field]: value }
     });
+    
+    // Auto-create item when checkbox is checked
+    if (field.startsWith('has_') && value === true) {
+      const propertyType = field.replace('has_', '').replace(/_/g, ' ');
+      const typeCapitalized = propertyType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      
+      // Check if item already exists for this type
+      const existingItem = items.find((item: any) => 
+        item.type?.toLowerCase() === propertyType.toLowerCase()
+      );
+      
+      if (!existingItem) {
+        addItemWithType(typeCapitalized);
+      }
+    }
   };
 
   const addItem = () => {
     updateProperty("items", [...items, { type: "", description: "", location: "", document: "" }]);
+  };
+
+  const addItemWithType = (type: string) => {
+    updateProperty("items", [...items, { type, description: "", location: "", document: "" }]);
   };
 
   const handleFileUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {

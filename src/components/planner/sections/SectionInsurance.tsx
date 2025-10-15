@@ -22,10 +22,29 @@ export const SectionInsurance = ({ data, onChange }: SectionInsuranceProps) => {
       ...data,
       insurance: { ...insurance, [field]: value }
     });
+    
+    // Auto-create policy when checkbox is checked
+    if (field.startsWith('has_') && value === true) {
+      const insuranceType = field.replace('has_', '').replace(/_/g, ' ');
+      const typeCapitalized = insuranceType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      
+      // Check if policy already exists for this type
+      const existingPolicy = policies.find((p: any) => 
+        p.type?.toLowerCase() === insuranceType.toLowerCase()
+      );
+      
+      if (!existingPolicy) {
+        addPolicyWithType(typeCapitalized);
+      }
+    }
   };
 
   const addPolicy = () => {
     updateInsurance("policies", [...policies, { type: "", company: "", policy_number: "", details: "" }]);
+  };
+
+  const addPolicyWithType = (type: string) => {
+    updateInsurance("policies", [...policies, { type, company: "", policy_number: "", details: "" }]);
   };
 
   const updatePolicy = (index: number, field: string, value: string) => {
