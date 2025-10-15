@@ -396,7 +396,7 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                   checked={funeral.contact_everlasting || false}
                   onCheckedChange={(checked) => updateFuneral("contact_everlasting", checked)}
                 />
-                <Label htmlFor="contact_everlasting" className="font-normal">Reach out to Everlasting Funeral Advisors</Label>
+                <Label htmlFor="contact_everlasting" className="font-normal">Get a quote from Everlasting Funeral Advisors</Label>
               </div>
               {funeral.contact_everlasting && (
                 <div className="ml-6 p-3 bg-muted/50 rounded-lg border border-border">
@@ -412,14 +412,26 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                     size="sm"
                     className="w-full"
                   >
-                    <a href="mailto:califnena@gmail.com" className="flex items-center justify-center gap-2">
-                      <Mail className="h-4 w-4" />
-                      Email Directly
+                    <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Request a Quote
                     </a>
                   </Button>
                 </div>
               )}
             </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="prearranged_notes">Notes on Pre-Arranged Items</Label>
+            <p className="text-xs text-muted-foreground">Additional details about pre-arranged or prepaid services</p>
+            <Textarea
+              id="prearranged_notes"
+              value={funeral.prearranged_notes || ""}
+              onChange={(e) => updateFuneral("prearranged_notes", e.target.value)}
+              placeholder="Example: Contract details, payment information, location of paperwork..."
+              rows={3}
+            />
           </div>
         </div>
 
@@ -494,6 +506,18 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
               />
               <Label htmlFor="no_service" className="font-normal">No formal service</Label>
             </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="service_preferences_notes">Notes on Service Preferences</Label>
+            <p className="text-xs text-muted-foreground">Additional details about your service preferences</p>
+            <Textarea
+              id="service_preferences_notes"
+              value={funeral.service_preferences_notes || ""}
+              onChange={(e) => updateFuneral("service_preferences_notes", e.target.value)}
+              placeholder="Example: Specific venue preferences, attendee list considerations, special requests..."
+              rows={3}
+            />
           </div>
         </div>
 
