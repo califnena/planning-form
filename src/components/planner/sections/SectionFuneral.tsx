@@ -289,102 +289,162 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
 
         <div className="space-y-4">
           <Label className="text-base font-semibold">Pre-Arranged or Prepaid Items/Services</Label>
-          <p className="text-xs text-muted-foreground">
-            Check off what you&apos;ve already arranged or paid for. When you check an item, provide details about what&apos;s been arranged and where documents can be found.
+          <p className="text-xs text-muted-foreground mb-4">
+            Check off what you&apos;ve already arranged or where you need assistance
           </p>
           
-          <div className="space-y-3">
+          <div className="space-y-4">
+            {/* Funeral Home */}
             <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="purchased_funeral_home"
-                  checked={funeral.purchased_funeral_home || false}
-                  onCheckedChange={(checked) => updateFuneral("purchased_funeral_home", checked)}
-                />
-                <Label htmlFor="purchased_funeral_home" className="font-normal">Funeral Home (Already Arranged/Prepaid)</Label>
+              <div className="grid grid-cols-[1fr_auto_auto] gap-4 items-center">
+                <Label className="font-normal">Funeral Home</Label>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="purchased_funeral_home"
+                    checked={funeral.purchased_funeral_home || false}
+                    onCheckedChange={(checked) => updateFuneral("purchased_funeral_home", checked)}
+                  />
+                  <Label htmlFor="purchased_funeral_home" className="text-xs font-normal whitespace-nowrap">Arranged/Prepaid</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="needs_funeral_home"
+                    checked={funeral.needs_funeral_home || false}
+                    onCheckedChange={(checked) => updateFuneral("needs_funeral_home", checked)}
+                  />
+                  <Label htmlFor="needs_funeral_home" className="text-xs font-normal whitespace-nowrap">Needs to be Done</Label>
+                </div>
               </div>
               {funeral.purchased_funeral_home && (
                 <Input
                   value={funeral.funeral_home_name || ""}
                   onChange={(e) => updateFuneral("funeral_home_name", e.target.value)}
                   placeholder="Funeral home name, contract details, payment status, document location"
-                  className="ml-6"
+                  className="ml-0"
                 />
               )}
             </div>
 
+            {/* Cemetery Plot */}
             <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="purchased_cemetery"
-                  checked={funeral.purchased_cemetery || false}
-                  onCheckedChange={(checked) => updateFuneral("purchased_cemetery", checked)}
-                />
-                <Label htmlFor="purchased_cemetery" className="font-normal">Cemetery Plot (Already Arranged/Prepaid)</Label>
+              <div className="grid grid-cols-[1fr_auto_auto] gap-4 items-center">
+                <Label className="font-normal">Cemetery Plot</Label>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="purchased_cemetery"
+                    checked={funeral.purchased_cemetery || false}
+                    onCheckedChange={(checked) => updateFuneral("purchased_cemetery", checked)}
+                  />
+                  <Label htmlFor="purchased_cemetery" className="text-xs font-normal whitespace-nowrap">Arranged/Prepaid</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="needs_cemetery"
+                    checked={funeral.needs_cemetery || false}
+                    onCheckedChange={(checked) => updateFuneral("needs_cemetery", checked)}
+                  />
+                  <Label htmlFor="needs_cemetery" className="text-xs font-normal whitespace-nowrap">Needs to be Done</Label>
+                </div>
               </div>
               {funeral.purchased_cemetery && (
                 <Input
                   value={funeral.cemetery_name || ""}
                   onChange={(e) => updateFuneral("cemetery_name", e.target.value)}
                   placeholder="Cemetery name, plot location, deed location, payment status"
-                  className="ml-6"
+                  className="ml-0"
                 />
               )}
             </div>
 
+            {/* Funeral Plan */}
             <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="purchased_funeral_packet"
-                  checked={funeral.purchased_funeral_packet || false}
-                  onCheckedChange={(checked) => updateFuneral("purchased_funeral_packet", checked)}
-                />
-                <Label htmlFor="purchased_funeral_packet" className="font-normal">Funeral Plan (prepaid)</Label>
+              <div className="grid grid-cols-[1fr_auto_auto] gap-4 items-center">
+                <Label className="font-normal">Funeral Plan (prepaid)</Label>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="purchased_funeral_packet"
+                    checked={funeral.purchased_funeral_packet || false}
+                    onCheckedChange={(checked) => updateFuneral("purchased_funeral_packet", checked)}
+                  />
+                  <Label htmlFor="purchased_funeral_packet" className="text-xs font-normal whitespace-nowrap">Arranged/Prepaid</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="needs_funeral_packet"
+                    checked={funeral.needs_funeral_packet || false}
+                    onCheckedChange={(checked) => updateFuneral("needs_funeral_packet", checked)}
+                  />
+                  <Label htmlFor="needs_funeral_packet" className="text-xs font-normal whitespace-nowrap">Needs to be Done</Label>
+                </div>
               </div>
               {funeral.purchased_funeral_packet && (
                 <Input
                   value={funeral.funeral_packet_name || ""}
                   onChange={(e) => updateFuneral("funeral_packet_name", e.target.value)}
                   placeholder="Package name, provider, what's included, contract location"
-                  className="ml-6"
+                  className="ml-0"
                 />
               )}
             </div>
 
+            {/* Headstone/Marker */}
             <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="purchased_headstone"
-                  checked={funeral.purchased_headstone || false}
-                  onCheckedChange={(checked) => updateFuneral("purchased_headstone", checked)}
-                />
-                <Label htmlFor="purchased_headstone" className="font-normal">Headstone/Marker (Already Arranged/Prepaid)</Label>
+              <div className="grid grid-cols-[1fr_auto_auto] gap-4 items-center">
+                <Label className="font-normal">Headstone/Marker</Label>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="purchased_headstone"
+                    checked={funeral.purchased_headstone || false}
+                    onCheckedChange={(checked) => updateFuneral("purchased_headstone", checked)}
+                  />
+                  <Label htmlFor="purchased_headstone" className="text-xs font-normal whitespace-nowrap">Arranged/Prepaid</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="needs_headstone"
+                    checked={funeral.needs_headstone || false}
+                    onCheckedChange={(checked) => updateFuneral("needs_headstone", checked)}
+                  />
+                  <Label htmlFor="needs_headstone" className="text-xs font-normal whitespace-nowrap">Needs to be Done</Label>
+                </div>
               </div>
               {funeral.purchased_headstone && (
                 <Input
                   value={funeral.headstone_name || ""}
                   onChange={(e) => updateFuneral("headstone_name", e.target.value)}
                   placeholder="Vendor, design details, inscription, payment status, receipt location"
-                  className="ml-6"
+                  className="ml-0"
                 />
               )}
             </div>
 
+            {/* Flowers/Arrangements */}
             <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="purchased_flowers"
-                  checked={funeral.purchased_flowers || false}
-                  onCheckedChange={(checked) => updateFuneral("purchased_flowers", checked)}
-                />
-                <Label htmlFor="purchased_flowers" className="font-normal">Flowers/Arrangements (Already Arranged/Prepaid)</Label>
+              <div className="grid grid-cols-[1fr_auto_auto] gap-4 items-center">
+                <Label className="font-normal">Flowers/Arrangements</Label>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="purchased_flowers"
+                    checked={funeral.purchased_flowers || false}
+                    onCheckedChange={(checked) => updateFuneral("purchased_flowers", checked)}
+                  />
+                  <Label htmlFor="purchased_flowers" className="text-xs font-normal whitespace-nowrap">Arranged/Prepaid</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="needs_flowers"
+                    checked={funeral.needs_flowers || false}
+                    onCheckedChange={(checked) => updateFuneral("needs_flowers", checked)}
+                  />
+                  <Label htmlFor="needs_flowers" className="text-xs font-normal whitespace-nowrap">Needs to be Done</Label>
+                </div>
               </div>
               {funeral.purchased_flowers && (
                 <Input
                   value={funeral.flowers_name || ""}
                   onChange={(e) => updateFuneral("flowers_name", e.target.value)}
                   placeholder="Florist name, arrangement details, payment status, contact info"
-                  className="ml-6"
+                  className="ml-0"
                 />
               )}
             </div>
