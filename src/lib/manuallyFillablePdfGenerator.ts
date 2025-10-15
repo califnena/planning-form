@@ -453,7 +453,8 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addCheckbox("Headstone", marginLeft + 70);
   yPosition += 8;
   addCheckbox("Flowers", marginLeft);
-  addCheckbox("Reach out to Everlasting Funeral Advisors", marginLeft + 70);
+  yPosition += 8;
+  addCheckbox("Get a quote from Everlasting Funeral Advisors", marginLeft);
   yPosition += 10;
   
   addPageFooter(9);
@@ -483,13 +484,12 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addCheckbox("Pre-paid funeral plan", marginLeft + 70);
   yPosition += 10;
   
-  addRuledLines(3, "Flower Preferences:");
-  addRuledLines(3, "Memorial Donations to Charity:");
-  addRuledLines(3, "Preferred Location:");
-  addRuledLines(3, "Music Selections:");
-  addRuledLines(3, "Readings or Poems:");
-  addRuledLines(3, "Speakers / Officiants:");
-  addRuledLines(3, "Additional Details & Special Requests:");
+  addRuledLines(2, "Flower Preferences:");
+  addRuledLines(2, "Memorial Donations to Charity:");
+  addRuledLines(2, "Preferred Location:");
+  addRuledLines(2, "Music Selections:");
+  addRuledLines(2, "Readings or Poems:");
+  addRuledLines(2, "Speakers / Officiants:");
   
   addPageFooter(10);
 
@@ -513,9 +513,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   yPosition += 8;
   addRuledLines(10, "Additional Financial Information:");
   
-  addPageFooter(10);
+  addPageFooter(11);
 
-  // PAGE 11 - Insurance
+  // PAGE 12 - Insurance
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -537,7 +537,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   yPosition += 8;
   addRuledLines(8, "Other Insurance (Health, Auto, etc.):");
   
-  addPageFooter(11);
+  addPageFooter(12);
 
   // PAGE 12 - My Property
   pdf.addPage();
