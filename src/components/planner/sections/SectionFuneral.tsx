@@ -461,8 +461,8 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                 </div>
                 <Button 
                   asChild 
-                  variant="outline"
                   size="sm"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-black"
                 >
                   <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                     <FileText className="h-4 w-4" />
