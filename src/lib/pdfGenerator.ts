@@ -268,23 +268,20 @@ export const generatePlanPDF = (planData: PlanData) => {
 
   const addTable = (headers: string[], data: any[][], emptyRows: number = 0) => {
     const colWidths = [50, 50, 60, 30]; // Adjust based on columns
-    const startX = 20;
+    const startX = marginLeft;
     
     checkPageBreak(15 + (data.length || emptyRows) * 7);
     
     // Draw header
-    pdf.setFontSize(9);
+    pdf.setFontSize(10);
     pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(...colors.bodyGray);
     let xPos = startX;
     headers.forEach((header, i) => {
       pdf.text(sanitizeText(header), xPos, yPosition);
       xPos += colWidths[i];
     });
-    yPosition += lineHeight;
-    
-    // Draw line under header
-    pdf.setDrawColor(200, 200, 200);
-    pdf.line(startX, yPosition - 2, startX + colWidths.reduce((a, b) => a + b, 0), yPosition - 2);
+    yPosition += lineHeight + 2;
     
     // Draw data rows
     pdf.setFont("helvetica", "normal");
