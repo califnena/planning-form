@@ -20,6 +20,23 @@ export const SectionLegal = ({ data, onChange }: SectionLegalProps) => {
       ...data,
       legal: { ...legal, [field]: value }
     });
+    
+    // Auto-populate executor/trustee fields when will/trust is checked
+    if (field === 'has_will' && value === true && !legal.executor) {
+      // Show executor fields by ensuring user fills them in
+      setTimeout(() => {
+        const executorInput = document.getElementById('executor');
+        if (executorInput) executorInput.focus();
+      }, 100);
+    }
+    
+    if (field === 'has_trust' && value === true && !legal.trustee) {
+      // Show trustee fields by ensuring user fills them in
+      setTimeout(() => {
+        const trusteeInput = document.getElementById('trustee');
+        if (trusteeInput) trusteeInput.focus();
+      }, 100);
+    }
   };
 
   const handleSave = () => {

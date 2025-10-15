@@ -23,10 +23,29 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
       ...data,
       digital: { ...digital, [field]: value }
     });
+    
+    // Auto-create account when checkbox is checked
+    if (field.startsWith('has_') && value === true && field !== 'has_password_manager') {
+      const accountType = field.replace('has_', '').replace(/_/g, ' ');
+      const typeCapitalized = accountType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      
+      // Check if account already exists for this type
+      const existingAccount = accounts.find((acc: any) => 
+        acc.platform?.toLowerCase().includes(accountType.toLowerCase())
+      );
+      
+      if (!existingAccount) {
+        addAccountWithPlatform(typeCapitalized);
+      }
+    }
   };
 
   const addAccount = () => {
     updateDigital("accounts", [...accounts, { platform: "", username: "", action: "" }]);
+  };
+
+  const addAccountWithPlatform = (platform: string) => {
+    updateDigital("accounts", [...accounts, { platform, username: "", action: "" }]);
   };
 
   const updateAccount = (index: number, field: string, value: string | boolean) => {
