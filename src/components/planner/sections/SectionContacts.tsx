@@ -195,17 +195,6 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
                 rows={2}
               />
             </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id={`auto-${index}`}
-                checked={contact.auto_notify || false}
-                onCheckedChange={(checked) => updateContact(index, "auto_notify", checked)}
-              />
-              <Label htmlFor={`auto-${index}`} className="text-sm font-normal">
-                Auto-notify this contact when plan is activated
-              </Label>
-            </div>
           </div>
         ))}
 
