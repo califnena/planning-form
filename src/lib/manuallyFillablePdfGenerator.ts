@@ -40,13 +40,15 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   const funeral = planData.funeral || {};
 
   // Helper to add page footer
-  const addPageFooter = (pageNum?: number) => {
-    // Add small logo to top right
-    try {
-      const logoSize = 8;
-      pdf.addImage(everlastingLogo, 'PNG', pageWidth - marginRight - logoSize, 5, logoSize, logoSize);
-    } catch (error) {
-      console.error('Error adding logo to page:', error);
+  const addPageFooter = (pageNum?: number, skipLogo: boolean = false) => {
+    // Add small logo to top right (skip on cover page)
+    if (!skipLogo) {
+      try {
+        const logoSize = 8;
+        pdf.addImage(everlastingLogo, 'PNG', pageWidth - marginRight - logoSize, 5, logoSize, logoSize);
+      } catch (error) {
+        console.error('Error adding logo to page:', error);
+      }
     }
     
     pdf.setFontSize(8);
@@ -199,7 +201,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addLabeledField("Prepared for (Full Name):");
   addLabeledField("Date Prepared:");
   
-  addPageFooter();
+  addPageFooter(undefined, true); // Skip logo on cover page
 
   // TABLE OF CONTENTS
   pdf.addPage();
@@ -610,7 +612,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addLabeledField("Location of Deed/Title:");
   
   yPosition += 8;
-  addRuledLines(10, "Additional Property:");
+  addRuledLines(15, "Additional Property:");
   
   addPageFooter(13);
 
@@ -622,7 +624,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
     "Care instructions and arrangements for your beloved pets."
   );
   
-  addRuledLines(28, "Pet Care Instructions:");
+  addRuledLines(26, "Pet Care Instructions:");
   
   addPageFooter(14);
 
