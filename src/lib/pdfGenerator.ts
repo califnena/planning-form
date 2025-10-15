@@ -22,9 +22,21 @@ export const generatePlanPDF = (planData: PlanData) => {
   let yPosition = 20;
   const pageHeight = pdf.internal.pageSize.height;
   const pageWidth = pdf.internal.pageSize.width;
+  const marginLeft = 20;
+  const marginRight = 15; // 0.75" for hole punch space
   const marginBottom = 30;
-  const lineHeight = 7;
+  const lineHeight = 6;
   const tableOfContents: { title: string; page: number }[] = [];
+  
+  // Color palette
+  const colors = {
+    headerNavy: [26, 46, 68] as [number, number, number],      // #1A2E44
+    subheaderTeal: [14, 118, 118] as [number, number, number], // #0E7676
+    bodyGray: [68, 68, 68] as [number, number, number],        // #444444
+    lightGray: [180, 180, 180] as [number, number, number],
+    boxBg: [249, 250, 251] as [number, number, number],        // Light background for form boxes
+    boxBorder: [220, 220, 220] as [number, number, number]     // Subtle gray border
+  };
   
   // Get legal name for footer
   const profile = planData.personal_profile || {};
@@ -48,32 +60,24 @@ export const generatePlanPDF = (planData: PlanData) => {
   const addPageFooter = (totalPages?: number) => {
     const currentPage = pdf.internal.pages.length - 1;
     
-    // Add logo to bottom right
-    try {
-      pdf.addImage(everlastingLogo, 'PNG', pageWidth - 25, pageHeight - 20, 12, 12);
-    } catch (error) {
-      console.error('Error adding page logo:', error);
-    }
+    // Add teal line at bottom
+    pdf.setDrawColor(...colors.subheaderTeal);
+    pdf.setLineWidth(0.5);
+    pdf.line(marginLeft, pageHeight - 25, pageWidth - marginRight, pageHeight - 25);
     
-    // Add page number in center bottom
+    // Add footer text
+    pdf.setFontSize(8);
+    pdf.setFont("helvetica", "italic");
+    pdf.setTextColor(...colors.bodyGray);
+    pdf.text("Generated with Everlasting Funeral Advisors – My Final Wishes Planner", pageWidth / 2, pageHeight - 18, { align: "center" });
+    
+    // Add page number
     pdf.setFontSize(9);
     pdf.setFont("helvetica", "normal");
-    pdf.setTextColor(100, 100, 100);
-    
     const pageNumText = totalPages ? `Page ${currentPage} of ${totalPages}` : `Page ${currentPage}`;
-    const nameText = sanitizeText(legalName);
-    const fullText = `${pageNumText} - ${nameText}`;
-    const fullTextWidth = pdf.getTextWidth(fullText);
+    pdf.text(pageNumText, pageWidth / 2, pageHeight - 12, { align: "center" });
     
-    // If text is too long, split into two lines
-    if (fullTextWidth > pageWidth - 60) {
-      pdf.text(pageNumText, pageWidth / 2, pageHeight - 18, { align: "center" });
-      pdf.text(nameText, pageWidth / 2, pageHeight - 12, { align: "center" });
-    } else {
-      pdf.text(fullText, pageWidth / 2, pageHeight - 15, { align: "center" });
-    }
-    
-    pdf.setTextColor(0, 0, 0);
+    pdf.setTextColor(...colors.bodyGray);
   };
   
   // Helper to add small logo to bottom right of page (legacy)
@@ -88,6 +92,20 @@ export const generatePlanPDF = (planData: PlanData) => {
     }
   };
 
+  // Helper to add checkbox (modern square with optional check)
+  const addCheckbox = (x: number, y: number, checked: boolean = false) => {
+    const size = 4;
+    pdf.setDrawColor(...colors.bodyGray);
+    pdf.setLineWidth(0.5);
+    pdf.roundedRect(x, y - size + 1, size, size, 0.5, 0.5, 'S');
+    
+    if (checked) {
+      pdf.setFillColor(...colors.subheaderTeal);
+      pdf.setDrawColor(...colors.subheaderTeal);
+      pdf.roundedRect(x + 0.5, y - size + 1.5, size - 1, size - 1, 0.3, 0.3, 'F');
+    }
+  };
+
   const addTitle = (title: string, addToTOC: boolean = true) => {
     checkPageBreak(20);
     
@@ -97,133 +115,153 @@ export const generatePlanPDF = (planData: PlanData) => {
       tableOfContents.push({ title, page: currentPage });
     }
     
-    // Center the title with decorative lines
-    pdf.setFontSize(18);
+    // Modern section header with teal underline
+    pdf.setFontSize(16);
     pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(...colors.headerNavy);
+    pdf.text(sanitizeText(title), marginLeft, yPosition);
+    
+    // Teal underline
     const titleWidth = pdf.getTextWidth(sanitizeText(title));
-    const centerX = pageWidth / 2;
+    pdf.setDrawColor(...colors.subheaderTeal);
+    pdf.setLineWidth(1.5);
+    pdf.line(marginLeft, yPosition + 2, marginLeft + titleWidth, yPosition + 2);
     
-    // Draw decorative line before title
-    pdf.setDrawColor(0, 0, 0);
-    pdf.setLineWidth(0.5);
-    pdf.line(20, yPosition - 2, centerX - titleWidth / 2 - 5, yPosition - 2);
-    
-    // Draw title
-    pdf.text(sanitizeText(title), centerX, yPosition, { align: "center" });
-    
-    // Draw decorative line after title
-    pdf.line(centerX + titleWidth / 2 + 5, yPosition - 2, pageWidth - 20, yPosition - 2);
-    
-    yPosition += 12;
+    pdf.setTextColor(...colors.bodyGray);
+    yPosition += 14;
   };
 
   const addSection = (heading: string, content?: string, showBlankLines: boolean = true) => {
-    checkPageBreak(20);
-    pdf.setFontSize(12);
+    checkPageBreak(30);
+    
+    // Subheader
+    pdf.setFontSize(13);
     pdf.setFont("helvetica", "bold");
-    pdf.text(sanitizeText(heading), 20, yPosition);
-    yPosition += lineHeight;
+    pdf.setTextColor(...colors.subheaderTeal);
+    pdf.text(sanitizeText(heading), marginLeft, yPosition);
+    yPosition += 10;
 
-    pdf.setFontSize(10);
+    // Form box with rounded corners and light background
+    const boxWidth = pageWidth - marginLeft - marginRight;
+    const boxStartY = yPosition;
+    
+    pdf.setFontSize(11);
     pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(...colors.bodyGray);
     
     if (content && content.trim()) {
       const sanitized = sanitizeText(content);
-      const lines = pdf.splitTextToSize(sanitized, 170);
+      const lines = pdf.splitTextToSize(sanitized, boxWidth - 8);
+      const boxHeight = Math.max(lines.length * lineHeight + 8, 20);
+      
+      // Draw rounded box
+      pdf.setFillColor(...colors.boxBg);
+      pdf.setDrawColor(...colors.boxBorder);
+      pdf.setLineWidth(0.3);
+      pdf.roundedRect(marginLeft, boxStartY, boxWidth, boxHeight, 2, 2, 'FD');
+      
+      // Add text inside box
+      let textY = boxStartY + 6;
       lines.forEach((line: string) => {
-        checkPageBreak();
-        pdf.text(line, 20, yPosition);
-        yPosition += lineHeight;
+        pdf.text(line, marginLeft + 4, textY);
+        textY += lineHeight;
       });
+      yPosition = boxStartY + boxHeight + 4;
     } else {
-      // Show "(none provided)" in italic
+      const boxHeight = 15;
+      pdf.setFillColor(...colors.boxBg);
+      pdf.setDrawColor(...colors.boxBorder);
+      pdf.setLineWidth(0.3);
+      pdf.roundedRect(marginLeft, boxStartY, boxWidth, boxHeight, 2, 2, 'FD');
+      
       pdf.setFont("helvetica", "italic");
-      pdf.setTextColor(100, 100, 100);
-      pdf.text("(none provided)", 20, yPosition);
-      pdf.setTextColor(0, 0, 0);
+      pdf.setTextColor(...colors.lightGray);
+      pdf.text("(none provided)", marginLeft + 4, boxStartY + 10);
+      pdf.setTextColor(...colors.bodyGray);
       pdf.setFont("helvetica", "normal");
-      yPosition += lineHeight;
+      yPosition = boxStartY + boxHeight + 4;
     }
-    yPosition += 5;
   };
 
   const addField = (label: string, value?: string, inline: boolean = true) => {
-    checkPageBreak(12);
+    checkPageBreak(20);
+    
     pdf.setFontSize(11);
     pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(...colors.bodyGray);
+    
+    const boxWidth = pageWidth - marginLeft - marginRight;
     
     if (inline) {
-      // Single line format: Bold Label:     underlined value (with 5 spaces)
-      const labelText = sanitizeText(label) + ":     ";
-      pdf.text(labelText, 20, yPosition);
+      // Label above value in a clean box format
+      pdf.text(sanitizeText(label), marginLeft, yPosition);
+      yPosition += 7;
       
-      const labelWidth = pdf.getTextWidth(labelText);
+      const boxStartY = yPosition;
+      const boxHeight = 12;
+      
+      // Draw form field box
+      pdf.setFillColor(...colors.boxBg);
+      pdf.setDrawColor(...colors.boxBorder);
+      pdf.setLineWidth(0.3);
+      pdf.roundedRect(marginLeft, boxStartY, boxWidth, boxHeight, 1.5, 1.5, 'FD');
       
       if (value && value.trim()) {
-        // Use different font for value to stand out
-        pdf.setFont("times", "normal");
-        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(11);
         const sanitized = sanitizeText(value);
-        const lines = pdf.splitTextToSize(sanitized, 170 - labelWidth);
-        const valueText = lines[0];
-        pdf.text(valueText, 20 + labelWidth, yPosition);
-        
-        // Underline the answer
-        const valueWidth = pdf.getTextWidth(valueText);
-        pdf.setDrawColor(0, 0, 0);
-        pdf.line(20 + labelWidth, yPosition + 1, 20 + labelWidth + valueWidth, yPosition + 1);
-        
-        yPosition += lineHeight + 2;
-        
-        // If text wraps, continue on next lines
-        for (let i = 1; i < lines.length; i++) {
-          checkPageBreak();
-          pdf.text(lines[i], 20 + labelWidth, yPosition);
-          const wrappedWidth = pdf.getTextWidth(lines[i]);
-          pdf.line(20 + labelWidth, yPosition + 1, 20 + labelWidth + wrappedWidth, yPosition + 1);
-          yPosition += lineHeight + 2;
-        }
+        const lines = pdf.splitTextToSize(sanitized, boxWidth - 6);
+        pdf.text(lines[0], marginLeft + 3, boxStartY + 8);
       } else {
-        // Show "(none provided)" in italic
         pdf.setFont("helvetica", "italic");
         pdf.setFontSize(10);
-        pdf.setTextColor(120, 120, 120);
-        pdf.text("(none provided)", 20 + labelWidth, yPosition);
-        pdf.setTextColor(0, 0, 0);
-        yPosition += lineHeight + 2;
+        pdf.setTextColor(...colors.lightGray);
+        pdf.text("(not provided)", marginLeft + 3, boxStartY + 8);
+        pdf.setTextColor(...colors.bodyGray);
       }
+      
+      yPosition = boxStartY + boxHeight + 5;
       pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(10);
     } else {
-      // Multi-line format for longer content
-      pdf.text(sanitizeText(label) + ":", 20, yPosition);
-      yPosition += lineHeight + 2;
+      // Multi-line format with larger box
+      pdf.text(sanitizeText(label), marginLeft, yPosition);
+      yPosition += 7;
+      
+      const boxStartY = yPosition;
       
       if (value && value.trim()) {
-        pdf.setFont("times", "normal");
-        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(11);
         const sanitized = sanitizeText(value);
-        const lines = pdf.splitTextToSize(sanitized, 165);
+        const lines = pdf.splitTextToSize(sanitized, boxWidth - 6);
+        const boxHeight = Math.max(lines.length * lineHeight + 6, 15);
+        
+        pdf.setFillColor(...colors.boxBg);
+        pdf.setDrawColor(...colors.boxBorder);
+        pdf.setLineWidth(0.3);
+        pdf.roundedRect(marginLeft, boxStartY, boxWidth, boxHeight, 1.5, 1.5, 'FD');
+        
+        let textY = boxStartY + 6;
         lines.forEach((line: string) => {
-          checkPageBreak();
-          pdf.text(line, 28, yPosition);
-          // Underline each line
-          const lineWidth = pdf.getTextWidth(line);
-          pdf.setDrawColor(0, 0, 0);
-          pdf.line(28, yPosition + 1, 28 + lineWidth, yPosition + 1);
-          yPosition += lineHeight + 2;
+          pdf.text(line, marginLeft + 3, textY);
+          textY += lineHeight;
         });
+        yPosition = boxStartY + boxHeight + 5;
       } else {
-        // Show "(none provided)" in italic
+        const boxHeight = 15;
+        pdf.setFillColor(...colors.boxBg);
+        pdf.setDrawColor(...colors.boxBorder);
+        pdf.setLineWidth(0.3);
+        pdf.roundedRect(marginLeft, boxStartY, boxWidth, boxHeight, 1.5, 1.5, 'FD');
+        
         pdf.setFont("helvetica", "italic");
         pdf.setFontSize(10);
-        pdf.setTextColor(120, 120, 120);
-        pdf.text("(none provided)", 28, yPosition);
-        pdf.setTextColor(0, 0, 0);
-        yPosition += lineHeight + 2;
+        pdf.setTextColor(...colors.lightGray);
+        pdf.text("(not provided)", marginLeft + 3, boxStartY + 10);
+        pdf.setTextColor(...colors.bodyGray);
+        yPosition = boxStartY + boxHeight + 5;
       }
       pdf.setFont("helvetica", "normal");
-      yPosition += 4;
     }
   };
 
@@ -278,25 +316,21 @@ export const generatePlanPDF = (planData: PlanData) => {
     yPosition += 5;
   };
 
-  // Cover page - Add elegant frame
-  pdf.setDrawColor(0, 0, 0);
-  pdf.setLineWidth(2);
-  pdf.rect(10, 10, pageWidth - 20, pageHeight - 20);
-  
-  pdf.setLineWidth(0.5);
-  pdf.rect(12, 12, pageWidth - 24, pageHeight - 24);
-  
-  pdf.setLineWidth(0.2);
-  pdf.rect(14, 14, pageWidth - 28, pageHeight - 28);
+  // Cover page - Modern clean design
+  // Teal accent bar at top
+  pdf.setFillColor(...colors.subheaderTeal);
+  pdf.rect(0, 0, pageWidth, 8, 'F');
   
   // Title
-  pdf.setFontSize(24);
+  pdf.setFontSize(28);
   pdf.setFont("helvetica", "bold");
-  pdf.text("My Final Wishes", 105, 50, { align: "center" });
+  pdf.setTextColor(...colors.headerNavy);
+  pdf.text("My Final Wishes", pageWidth / 2, 45, { align: "center" });
   
   pdf.setFontSize(14);
   pdf.setFont("helvetica", "normal");
-  pdf.text("End-of-Life Planning Guide", 105, 65, { align: "center" });
+  pdf.setTextColor(...colors.bodyGray);
+  pdf.text("End-of-Life Planning Guide", pageWidth / 2, 58, { align: "center" });
   
   // Display full legal name on cover
   let nameYPosition = 85;
@@ -477,49 +511,45 @@ export const generatePlanPDF = (planData: PlanData) => {
   // Add instruction for checkboxes
   pdf.setFontSize(10);
   pdf.setFont("helvetica", "italic");
-  pdf.setTextColor(80, 80, 80);
-  pdf.text("Check the boxes of the items you want your loved ones/caretaker to do:", 20, yPosition);
-  yPosition += lineHeight + 4;
-  pdf.setTextColor(0, 0, 0);
+  pdf.setTextColor(...colors.bodyGray);
+  pdf.text("This section details tasks you want your loved ones to complete:", marginLeft, yPosition);
+  yPosition += lineHeight + 6;
   pdf.setFont("helvetica", "normal");
   
   const checklistItems = planData.checklist_items || [];
   if (checklistItems.length > 0 && checklistItems.some((item: string) => item && item.trim())) {
-    pdf.setFontSize(10);
-    pdf.text("Important tasks and reminders for loved ones to complete:", 20, yPosition);
-    yPosition += lineHeight + 3;
-    
     checklistItems.forEach((item: string, index: number) => {
       if (item && item.trim()) {
-        checkPageBreak(10);
-        // Add checkbox
-        pdf.setDrawColor(0, 0, 0);
-        pdf.rect(20, yPosition - 3, 3, 3);
+        checkPageBreak(12);
         
-        // Add item text with underline
-        pdf.setFont("times", "normal");
+        // Add modern checkbox
+        addCheckbox(marginLeft, yPosition, false);
+        
+        // Add item text
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(11);
+        pdf.setTextColor(...colors.bodyGray);
         const sanitized = sanitizeText(item);
-        const lines = pdf.splitTextToSize(sanitized, 165);
-        lines.forEach((line: string, lineIndex: number) => {
-          if (lineIndex > 0) {
-            checkPageBreak();
-          }
-          pdf.text(line, 26, yPosition);
-          const lineWidth = pdf.getTextWidth(line);
-          pdf.line(26, yPosition + 1, 26 + lineWidth, yPosition + 1);
+        const boxWidth = pageWidth - marginLeft - marginRight - 8;
+        const lines = pdf.splitTextToSize(sanitized, boxWidth);
+        pdf.text(lines[0], marginLeft + 7, yPosition);
+        yPosition += lineHeight + 2;
+        
+        // Wrap additional lines if needed
+        for (let i = 1; i < lines.length; i++) {
+          checkPageBreak();
+          pdf.text(lines[i], marginLeft + 7, yPosition);
           yPosition += lineHeight + 2;
-        });
-        yPosition += 2;
+        }
       }
     });
-    pdf.setFont("helvetica", "normal");
-    yPosition += 5;
+    yPosition += 3;
   } else {
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "italic");
-    pdf.setTextColor(120, 120, 120);
-    pdf.text("(none provided)", 20, yPosition);
-    pdf.setTextColor(0, 0, 0);
+    pdf.setTextColor(...colors.lightGray);
+    pdf.text("(none provided)", marginLeft, yPosition);
+    pdf.setTextColor(...colors.bodyGray);
     pdf.setFont("helvetica", "normal");
     yPosition += lineHeight + 5;
   }
@@ -547,21 +577,72 @@ export const generatePlanPDF = (planData: PlanData) => {
   addTable(["Type", "Business Name", "Contact", "Notes"], vendorData, vendorData.length === 0 ? 2 : 0);
 
   // Funeral Wishes Section
-  addTitle("Funeral Wishes");
+  addTitle("My Funeral & Memorial Wishes");
+  
+  pdf.setFontSize(10);
+  pdf.setFont("helvetica", "italic");
+  pdf.setTextColor(...colors.bodyGray);
+  pdf.text("This section details your specific wishes for your funeral or memorial arrangements.", marginLeft, yPosition);
+  yPosition += lineHeight + 6;
+  pdf.setFont("helvetica", "normal");
+  
   const funeral = planData.funeral || {};
-  addField("Funeral Preference", funeral.funeral_preference, false);
-  addField("Burial", funeral.burial ? "Yes" : "No");
-  if (funeral.burial_notes) addField("Burial Notes", funeral.burial_notes, false);
-  addField("Cremation", funeral.cremation ? "Yes" : "No");
-  if (funeral.cremation_notes) addField("Cremation Notes", funeral.cremation_notes, false);
-  addField("Body/Organ Donation", funeral.donation ? "Yes" : "No");
-  if (funeral.donation_notes) addField("Donation Notes", funeral.donation_notes, false);
-  if (funeral.cemetery_plot) addField("Cemetery Plot Details", funeral.cemetery_plot, false);
-  addField("Religious Service", funeral.religious_service ? "Yes" : "No");
-  if (funeral.religious_notes) addField("Religious Service Notes", funeral.religious_notes, false);
+  
+  // Disposition of Remains subsection
+  pdf.setFontSize(13);
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(...colors.subheaderTeal);
+  pdf.text("Disposition of My Remains", marginLeft, yPosition);
+  yPosition += 10;
+  
+  // Checkboxes for disposition options
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(11);
+  pdf.setTextColor(...colors.bodyGray);
+  
+  checkPageBreak(30);
+  addCheckbox(marginLeft, yPosition, funeral.burial);
+  pdf.text("Burial", marginLeft + 7, yPosition);
+  yPosition += 8;
+  
+  addCheckbox(marginLeft, yPosition, funeral.cremation);
+  pdf.text("Cremation", marginLeft + 7, yPosition);
+  yPosition += 8;
+  
+  addCheckbox(marginLeft, yPosition, funeral.donation);
+  pdf.text("Donation to Science", marginLeft + 7, yPosition);
+  yPosition += 10;
+  
+  if (funeral.burial_notes || funeral.cremation_notes || funeral.donation_notes) {
+    addField("Notes", funeral.burial_notes || funeral.cremation_notes || funeral.donation_notes, false);
+  }
+  
+  // Memorial Service Preferences
+  pdf.setFontSize(13);
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(...colors.subheaderTeal);
+  pdf.text("My Memorial Service Preferences", marginLeft, yPosition);
+  yPosition += 10;
+  
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(11);
+  pdf.setTextColor(...colors.bodyGray);
+  
+  if (funeral.religious_service) {
+    addCheckbox(marginLeft, yPosition, true);
+    pdf.text("Religious Ceremony", marginLeft + 7, yPosition);
+    yPosition += 8;
+  }
+  
+  if (funeral.funeral_preference) {
+    addField("Service Type", funeral.funeral_preference, false);
+  }
+  
+  if (funeral.cemetery_plot) addField("Location", funeral.cemetery_plot, false);
+  if (funeral.religious_notes) addField("Music or Readings", funeral.religious_notes, false);
   if (funeral.flower_preferences) addField("Flower Preferences", funeral.flower_preferences, false);
   if (funeral.charity_donations) addField("Memorial Donations to Charity", funeral.charity_donations, false);
-  if (funeral.general_notes) addField("Additional Details", funeral.general_notes, false);
+  if (funeral.general_notes) addField("Additional Wishes", funeral.general_notes, false);
 
   // Financial Life Section
   addTitle("Financial Life");
@@ -865,28 +946,31 @@ export const generatePlanPDF = (planData: PlanData) => {
     yPosition += lineHeight + 5;
   }
 
-  // Footer on last page
-  checkPageBreak(40);
+  // Footer on last page with teal accent
+  checkPageBreak(50);
+  
+  // Teal divider line
+  pdf.setDrawColor(...colors.subheaderTeal);
+  pdf.setLineWidth(1);
+  pdf.line(marginLeft, yPosition, pageWidth - marginRight, yPosition);
+  yPosition += 10;
+  
   pdf.setFontSize(10);
   pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(0, 0, 0);
-  pdf.text("Contact Information:", 105, yPosition, { align: "center" });
-  yPosition += 8;
+  pdf.setTextColor(...colors.headerNavy);
+  pdf.text("Generated with Everlasting Funeral Advisors – My Final Wishes Planner", pageWidth / 2, yPosition, { align: "center" });
+  yPosition += 10;
   
   pdf.setFontSize(9);
-  pdf.text("Everlasting Funeral Advisors", 105, yPosition, { align: "center" });
-  yPosition += 7;
+  pdf.setFont("helvetica", "normal");
+  pdf.setTextColor(...colors.bodyGray);
+  pdf.text("Everlasting Funeral Advisors", pageWidth / 2, yPosition, { align: "center" });
+  yPosition += 6;
   
   pdf.setFontSize(8);
-  pdf.setFont("helvetica", "normal");
-  pdf.setTextColor(64, 64, 64);
-  pdf.text("Phone: (323) 863-5804", 105, yPosition, { align: "center" });
+  pdf.text("Phone: (323) 863-5804 | Email: info@everlastingfuneraladvisors.com", pageWidth / 2, yPosition, { align: "center" });
   yPosition += 5;
-  pdf.text("Email: info@everlastingfuneraladvisors.com", 105, yPosition, { align: "center" });
-  yPosition += 5;
-  pdf.text("Website: https://everlastingfuneraladvisors.com", 105, yPosition, { align: "center" });
-  yPosition += 5;
-  pdf.text("Facebook: https://www.facebook.com/profile.php?id=61580859545223", 105, yPosition, { align: "center" });
+  pdf.text("Website: https://everlastingfuneraladvisors.com", pageWidth / 2, yPosition, { align: "center" });
 
   // Add footer to last page
   addPageFooter();
@@ -1002,32 +1086,24 @@ export const generatePlanPDF = (planData: PlanData) => {
   for (let i = 2; i <= totalPages; i++) {
     pdf.setPage(i);
     
-    // Add logo
-    try {
-      pdf.addImage(everlastingLogo, 'PNG', pageWidth - 25, pageHeight - 20, 12, 12);
-    } catch (error) {
-      console.error('Error adding page logo:', error);
-    }
+    // Add teal line at bottom
+    pdf.setDrawColor(...colors.subheaderTeal);
+    pdf.setLineWidth(0.5);
+    pdf.line(marginLeft, pageHeight - 25, pageWidth - marginRight, pageHeight - 25);
     
-    // Add page number with name
+    // Add footer text
+    pdf.setFontSize(8);
+    pdf.setFont("helvetica", "italic");
+    pdf.setTextColor(...colors.bodyGray);
+    pdf.text("Generated with Everlasting Funeral Advisors – My Final Wishes Planner", pageWidth / 2, pageHeight - 18, { align: "center" });
+    
+    // Add page number
     pdf.setFontSize(9);
     pdf.setFont("helvetica", "normal");
-    pdf.setTextColor(100, 100, 100);
-    
     const pageNumText = `Page ${i} of ${totalPages}`;
-    const nameText = sanitizeText(legalName);
-    const fullText = `${pageNumText} - ${nameText}`;
-    const fullTextWidth = pdf.getTextWidth(fullText);
+    pdf.text(pageNumText, pageWidth / 2, pageHeight - 12, { align: "center" });
     
-    // If text is too long, split into two lines
-    if (fullTextWidth > pageWidth - 60) {
-      pdf.text(pageNumText, pageWidth / 2, pageHeight - 18, { align: "center" });
-      pdf.text(nameText, pageWidth / 2, pageHeight - 12, { align: "center" });
-    } else {
-      pdf.text(fullText, pageWidth / 2, pageHeight - 15, { align: "center" });
-    }
-    
-    pdf.setTextColor(0, 0, 0);
+    pdf.setTextColor(...colors.bodyGray);
   }
 
   return pdf;
