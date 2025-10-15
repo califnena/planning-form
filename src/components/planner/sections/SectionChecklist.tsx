@@ -207,6 +207,13 @@ export const SectionChecklist = ({ data, onChange }: SectionChecklistProps) => {
                       className="flex-1"
                     />
                     <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={addCustomItem}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                    <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => removeCustomItem(index)}

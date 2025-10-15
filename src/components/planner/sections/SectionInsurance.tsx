@@ -151,13 +151,22 @@ export const SectionInsurance = ({ data, onChange }: SectionInsuranceProps) => {
           <Card key={index} className="p-4 space-y-4">
             <div className="flex justify-between items-start">
               <h4 className="font-semibold">Policy {index + 1}</h4>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removePolicy(index)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={addPolicy}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removePolicy(index)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">

@@ -214,6 +214,16 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
                 }}
                 placeholder={`Child ${index + 1} name`}
               />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const current = profile.child_names || ["", "", "", ""];
+                  updateProfile("child_names", [...current, ""]);
+                }}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
               {(profile.child_names?.length || 0) > 4 && (
                 <Button
                   variant="ghost"

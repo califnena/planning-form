@@ -143,13 +143,22 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
           <Card key={index} className="p-6 space-y-4">
             <div className="flex justify-between items-start">
               <h3 className="font-semibold text-lg">Message {index + 1}</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeMessage(index)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={addMessage}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeMessage(index)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-2">

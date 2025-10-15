@@ -158,13 +158,22 @@ export const SectionProperty = ({ data, onChange }: SectionPropertyProps) => {
           <Card key={index} className="p-4 space-y-4">
             <div className="flex justify-between items-start">
               <h4 className="font-semibold">Property {index + 1}</h4>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeItem(index)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={addItem}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeItem(index)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             <div className="space-y-2">
               <Label>Type</Label>
@@ -207,6 +216,13 @@ export const SectionProperty = ({ data, onChange }: SectionPropertyProps) => {
                 {item.document && (
                   <div className="flex items-center gap-2 p-2 border rounded">
                     <span className="text-sm text-muted-foreground">Document attached</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={addItem}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"

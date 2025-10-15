@@ -62,13 +62,22 @@ export const SectionVendors = ({ data, onChange }: SectionVendorsProps) => {
           <div key={index} className="p-4 border border-border rounded-lg space-y-4">
             <div className="flex justify-between items-start">
               <h3 className="font-semibold">Vendor {index + 1}</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeVendor(index)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={addVendor}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeVendor(index)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
             <div className="grid md:grid-cols-3 gap-4">
