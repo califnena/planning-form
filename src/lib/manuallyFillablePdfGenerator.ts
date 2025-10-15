@@ -457,7 +457,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   yPosition += 6;
   addSubheader("Additional Funeral Wishes");
-  addRuledLines(6, "Special requests, items to display, dress preferences, etc.:");
+  addRuledLines(3, "Special requests, items to display, dress preferences, etc.:");
   
   addPageFooter(9);
 
@@ -507,7 +507,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   addPageFooter(11);
 
-  // PAGE 12 - Property
+  // PAGE 12 - My Property
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -546,17 +546,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addLabeledField("Address/Description:");
   addLabeledField("Location of Deed/Title:");
   
-  addPageFooter(12);
-
-  // PAGE 13 - Property (continued)
-  pdf.addPage();
-  yPosition = 20;
-  addPageHeader(
-    "My Property (continued)",
-    "",
-    false
-  );
-  
+  yPosition += 8;
   addSubheader("Property 4");
   addLabeledField("Type:");
   addLabeledField("Address/Description:");
@@ -569,38 +559,11 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addLabeledField("Location of Deed/Title:");
   
   yPosition += 8;
-  addSubheader("Property 6");
-  addLabeledField("Type:");
-  addLabeledField("Address/Description:");
-  addLabeledField("Location of Deed/Title:");
+  addRuledLines(10, "Additional Property:");
   
-  yPosition += 8;
-  addSubheader("Property 7");
-  addLabeledField("Type:");
-  addLabeledField("Address/Description:");
-  addLabeledField("Location of Deed/Title:");
-  
-  yPosition += 8;
-  addSubheader("Property 8");
-  addLabeledField("Type:");
-  addLabeledField("Address/Description:");
-  addLabeledField("Location of Deed/Title:");
-  
-  yPosition += 8;
-  addSubheader("Property 9");
-  addLabeledField("Type:");
-  addLabeledField("Address/Description:");
-  addLabeledField("Location of Deed/Title:");
-  
-  yPosition += 8;
-  addSubheader("Property 10");
-  addLabeledField("Type:");
-  addLabeledField("Address/Description:");
-  addLabeledField("Location of Deed/Title:");
-  
-  addPageFooter(13);
+  addPageFooter(12);
 
-  // PAGE 14 - Pets
+  // PAGE 13 - Pets
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -634,11 +597,12 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addCheckbox("Password manager", marginLeft + 90);
   yPosition += 10;
   
+  addRuledLines(3, "Phone/Device Access (passcodes, PIN):");
   addRuledLines(10, "Account Details & Access Instructions:");
   
-  addPageFooter(15);
+  addPageFooter(13);
 
-  // PAGE 16 - Legal Documents
+  // PAGE 14 - Legal Documents
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -659,9 +623,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addRuledLines(4, "Attorney Name & Contact:");
   addRuledLines(10, "Special Legal Instructions:");
   
-  addPageFooter(16);
+  addPageFooter(14);
 
-  // PAGE 17 - Messages to Loved Ones
+  // PAGE 15 - Messages to Loved Ones (Message 1)
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -680,9 +644,75 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   fillRemainingWithLines();
   
+  addPageFooter(15);
+
+  // PAGE 16 - Messages to Loved Ones (Message 2)
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "Messages to Loved Ones (continued)",
+    "",
+    false
+  );
+  
+  addRuledLines(3, "To (Name/Relationship):");
+  
+  yPosition += 4;
+  pdf.setFontSize(11);
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(...colors.bodyGray);
+  pdf.text("Message:", marginLeft, yPosition);
+  yPosition += 7;
+  
+  fillRemainingWithLines();
+  
+  addPageFooter(16);
+
+  // PAGE 17 - Messages to Loved Ones (Message 3)
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "Messages to Loved Ones (continued)",
+    "",
+    false
+  );
+  
+  addRuledLines(3, "To (Name/Relationship):");
+  
+  yPosition += 4;
+  pdf.setFontSize(11);
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(...colors.bodyGray);
+  pdf.text("Message:", marginLeft, yPosition);
+  yPosition += 7;
+  
+  fillRemainingWithLines();
+  
   addPageFooter(17);
 
-  // PAGE 18 - Revisions & Approvals
+  // PAGE 18 - Messages to Loved Ones (Message 4)
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "Messages to Loved Ones (continued)",
+    "",
+    false
+  );
+  
+  addRuledLines(3, "To (Name/Relationship):");
+  
+  yPosition += 4;
+  pdf.setFontSize(11);
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(...colors.bodyGray);
+  pdf.text("Message:", marginLeft, yPosition);
+  yPosition += 7;
+  
+  fillRemainingWithLines();
+  
+  addPageFooter(18);
+
+  // PAGE 19 - Revisions & Approvals
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -704,7 +734,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   yPosition += 8;
   addRuledLines(6, "Additional Notes:");
   
-  addPageFooter(18);
+  addPageFooter(19);
 
   // Go back and fill in the Table of Contents
   pdf.setPage(tocPageNumber);
