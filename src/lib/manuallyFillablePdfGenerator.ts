@@ -434,34 +434,66 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
     "This section details your specific wishes for your funeral or memorial arrangements."
   );
   
-  addSubheader("Disposition of My Remains");
+  addRuledLines(3, "Funeral Preference (If Any):");
+  
+  addSubheader("Final Disposition Preference");
   addCheckbox("Burial", marginLeft);
   addCheckbox("Cremation", marginLeft + 60);
-  addCheckbox("Donation to Science", marginLeft + 120);
+  addCheckbox("Body/Organ Donation", marginLeft + 120);
   yPosition += 10;
   
-  addRuledLines(4, "Notes (e.g., specific wishes for ashes, burial location):");
+  addRuledLines(3, "Cemetery Plot Details:");
+  addRuledLines(3, "Final Disposition Notes:");
   
-  addSubheader("My Memorial Service Preferences");
-  addCheckbox("Home Vigil", marginLeft);
-  addCheckbox("Celebration of Life", marginLeft + 70);
+  addSubheader("Pre-Arranged or Prepaid Items/Services");
+  addCheckbox("Funeral Home", marginLeft);
+  addCheckbox("Cemetery", marginLeft + 70);
   yPosition += 8;
-  addCheckbox("Religious Ceremony", marginLeft);
-  addCheckbox("Other", marginLeft + 70);
+  addCheckbox("Funeral Packet", marginLeft);
+  addCheckbox("Headstone", marginLeft + 70);
+  yPosition += 8;
+  addCheckbox("Flowers", marginLeft);
+  addCheckbox("Reach out to Everlasting Funeral Advisors", marginLeft + 70);
   yPosition += 10;
   
+  addPageFooter(9);
+
+  // PAGE 10 - My Funeral & Memorial Wishes (continued)
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "My Funeral & Memorial Wishes (continued)",
+    "",
+    false
+  );
+  
+  addSubheader("Service Preferences");
+  addCheckbox("Religious service", marginLeft);
+  addCheckbox("Secular/Non-religious service", marginLeft + 85);
+  yPosition += 8;
+  addCheckbox("Celebration of life", marginLeft);
+  addCheckbox("No formal service", marginLeft + 85);
+  yPosition += 10;
+  
+  addSubheader("Additional Preferences");
+  addCheckbox("Open casket", marginLeft);
+  addCheckbox("Visitation/viewing", marginLeft + 70);
+  yPosition += 8;
+  addCheckbox("Military honors", marginLeft);
+  addCheckbox("Pre-paid funeral plan", marginLeft + 70);
+  yPosition += 10;
+  
+  addRuledLines(3, "Flower Preferences:");
+  addRuledLines(3, "Memorial Donations to Charity:");
   addRuledLines(3, "Preferred Location:");
   addRuledLines(3, "Music Selections:");
   addRuledLines(3, "Readings or Poems:");
   addRuledLines(3, "Speakers / Officiants:");
+  addRuledLines(3, "Additional Details & Special Requests:");
   
-  yPosition += 6;
-  addSubheader("Additional Funeral Wishes");
-  addRuledLines(3, "Special requests, items to display, dress preferences, etc.:");
-  
-  addPageFooter(9);
+  addPageFooter(10);
 
-  // PAGE 10 - Financial Life
+  // PAGE 11 - Financial Life
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -600,9 +632,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addRuledLines(3, "Phone/Device Access (passcodes, PIN):");
   addRuledLines(10, "Account Details & Access Instructions:");
   
-  addPageFooter(13);
+  addPageFooter(14);
 
-  // PAGE 14 - Legal Documents
+  // PAGE 15 - Legal Documents
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -623,9 +655,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addRuledLines(4, "Attorney Name & Contact:");
   addRuledLines(10, "Special Legal Instructions:");
   
-  addPageFooter(14);
+  addPageFooter(15);
 
-  // PAGE 15 - Messages to Loved Ones (Message 1)
+  // PAGE 16 - Messages to Loved Ones
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -644,31 +676,9 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   fillRemainingWithLines();
   
-  addPageFooter(15);
-
-  // PAGE 16 - Messages to Loved Ones (Message 2)
-  pdf.addPage();
-  yPosition = 20;
-  addPageHeader(
-    "Messages to Loved Ones (continued)",
-    "",
-    false
-  );
-  
-  addRuledLines(3, "To (Name/Relationship):");
-  
-  yPosition += 4;
-  pdf.setFontSize(11);
-  pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(...colors.bodyGray);
-  pdf.text("Message:", marginLeft, yPosition);
-  yPosition += 7;
-  
-  fillRemainingWithLines();
-  
   addPageFooter(16);
 
-  // PAGE 17 - Messages to Loved Ones (Message 3)
+  // PAGE 17 - Messages to Loved Ones (Message 2)
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -690,7 +700,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   addPageFooter(17);
 
-  // PAGE 18 - Messages to Loved Ones (Message 4)
+  // PAGE 18 - Messages to Loved Ones (Message 3)
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -712,7 +722,29 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   
   addPageFooter(18);
 
-  // PAGE 19 - Revisions & Approvals
+  // PAGE 19 - Messages to Loved Ones (Message 4)
+  pdf.addPage();
+  yPosition = 20;
+  addPageHeader(
+    "Messages to Loved Ones (continued)",
+    "",
+    false
+  );
+  
+  addRuledLines(3, "To (Name/Relationship):");
+  
+  yPosition += 4;
+  pdf.setFontSize(11);
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(...colors.bodyGray);
+  pdf.text("Message:", marginLeft, yPosition);
+  yPosition += 7;
+  
+  fillRemainingWithLines();
+  
+  addPageFooter(19);
+
+  // PAGE 20 - Revisions & Approvals
   pdf.addPage();
   yPosition = 20;
   addPageHeader(
@@ -734,7 +766,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   yPosition += 8;
   addRuledLines(6, "Additional Notes:");
   
-  addPageFooter(19);
+  addPageFooter(20);
 
   // Go back and fill in the Table of Contents
   pdf.setPage(tocPageNumber);
