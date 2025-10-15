@@ -169,9 +169,9 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
         </div>
 
         <div className="space-y-4">
-          <Label className="text-base font-semibold">Have You Already Purchased Items?</Label>
+          <Label className="text-base font-semibold">Pre-Arranged Items & Services</Label>
           <p className="text-xs text-muted-foreground">
-            Check off the items you've already arranged or need help with
+            Check off what you've already arranged or where you need assistance
           </p>
           
           <div className="space-y-3">
