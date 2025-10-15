@@ -3,7 +3,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Save, Upload, X, Image as ImageIcon, FileText } from "lucide-react";
+import { Save, Upload, X, Image as ImageIcon, FileText, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
@@ -19,11 +19,41 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
   const [uploading, setUploading] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
-  const updateFuneral = (field: string, value: any) => {
+  const updateFuneral = async (field: string, value: any) => {
     onChange({
       ...data,
       funeral: { ...funeral, [field]: value }
     });
+    
+    // Send email when contact_everlasting is checked
+    if (field === "contact_everlasting" && value === true) {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        const { error } = await supabase.functions.invoke('send-contact-email', {
+          body: {
+            name: user?.email || "User",
+            email: user?.email || "no-email@provided.com",
+            message: "A user has requested to be contacted by Everlasting Funeral Advisors through the My Final Wishes platform.",
+            type: "contact"
+          }
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Request sent",
+          description: "Everlasting Funeral Advisors will contact you soon.",
+        });
+      } catch (error) {
+        console.error('Error sending email:', error);
+        toast({
+          title: "Notice",
+          description: "Your preference has been saved. You can also contact Everlasting Funeral Advisors directly.",
+          variant: "default",
+        });
+      }
+    }
   };
 
   const handleSave = () => {
@@ -168,8 +198,97 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
           />
         </div>
 
+        <div>
+          <Label className="text-base font-semibold mb-3 block">Final Disposition Preference</Label>
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="burial"
+                  checked={funeral.burial || false}
+                  onCheckedChange={(checked) => updateFuneral("burial", checked)}
+                />
+                <Label htmlFor="burial" className="font-normal">Burial</Label>
+              </div>
+              {funeral.burial && (
+                <Textarea
+                  value={funeral.burial_notes || ""}
+                  onChange={(e) => updateFuneral("burial_notes", e.target.value)}
+                  placeholder="Where would you like to be buried? Cemetery name, location, plot details..."
+                  rows={2}
+                  className="ml-6"
+                />
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="cremation"
+                  checked={funeral.cremation || false}
+                  onCheckedChange={(checked) => updateFuneral("cremation", checked)}
+                />
+                <Label htmlFor="cremation" className="font-normal">Cremation</Label>
+              </div>
+              {funeral.cremation && (
+                <Textarea
+                  value={funeral.cremation_notes || ""}
+                  onChange={(e) => updateFuneral("cremation_notes", e.target.value)}
+                  placeholder="What should be done with your ashes? (e.g., scattered at favorite location, kept in urn, divided among family, buried in cemetery)..."
+                  rows={2}
+                  className="ml-6"
+                />
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="donation"
+                  checked={funeral.donation || false}
+                  onCheckedChange={(checked) => updateFuneral("donation", checked)}
+                />
+                <Label htmlFor="donation" className="font-normal">Body/Organ Donation</Label>
+              </div>
+              {funeral.donation && (
+                <Textarea
+                  value={funeral.donation_notes || ""}
+                  onChange={(e) => updateFuneral("donation_notes", e.target.value)}
+                  placeholder="Specify which organs, whole body donation to science, organization details..."
+                  rows={2}
+                  className="ml-6"
+                />
+              )}
+            </div>
+          </div>
+          
+          <div className="space-y-2 mt-4">
+            <Label htmlFor="cemetery_plot">Cemetery Plot Details</Label>
+            <p className="text-xs text-muted-foreground">Cemetery name, location, plot number, deed information, or pre-purchased plot details</p>
+            <Textarea
+              id="cemetery_plot"
+              value={funeral.cemetery_plot || ""}
+              onChange={(e) => updateFuneral("cemetery_plot", e.target.value)}
+              placeholder="Example: Green Hills Cemetery, Section C, Plot 123, Los Angeles, CA. Deed is in safe deposit box..."
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2 mt-4">
+            <Label htmlFor="disposition_notes">Final Disposition Notes</Label>
+            <p className="text-xs text-muted-foreground">Additional details about ashes disposal location, burial specifics, or other disposition preferences</p>
+            <Textarea
+              id="disposition_notes"
+              value={funeral.disposition_notes || ""}
+              onChange={(e) => updateFuneral("disposition_notes", e.target.value)}
+              placeholder="Example: Ashes to be scattered at favorite beach, buried at specific cemetery plot location, etc."
+              rows={3}
+            />
+          </div>
+        </div>
+
         <div className="space-y-4">
-          <Label className="text-base font-semibold">Pre-Arranged Items & Services</Label>
+          <Label className="text-base font-semibold">Pre-Arranged or Prepaid Items/Services</Label>
           <p className="text-xs text-muted-foreground">
             Check off what you've already arranged or where you need assistance
           </p>
@@ -282,6 +401,9 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
               {funeral.contact_everlasting && (
                 <div className="ml-6 p-3 bg-muted/50 rounded-lg border border-border">
                   <p className="text-xs text-muted-foreground mb-2">
+                    ✓ Email notification sent to Everlasting Funeral Advisors
+                  </p>
+                  <p className="text-xs text-muted-foreground mb-3">
                     Get expert help with all your funeral planning needs
                   </p>
                   <Button 
@@ -290,102 +412,14 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                     size="sm"
                     className="w-full"
                   >
-                    <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
-                      Get a Quote
+                    <a href="mailto:califnena@gmail.com" className="flex items-center justify-center gap-2">
+                      <Mail className="h-4 w-4" />
+                      Email Directly
                     </a>
                   </Button>
                 </div>
               )}
             </div>
-          </div>
-        </div>
-
-        <div>
-          <Label className="text-base font-semibold mb-3 block">Final Disposition Preference</Label>
-          <div className="space-y-3">
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="burial"
-                  checked={funeral.burial || false}
-                  onCheckedChange={(checked) => updateFuneral("burial", checked)}
-                />
-                <Label htmlFor="burial" className="font-normal">Burial</Label>
-              </div>
-              {funeral.burial && (
-                <Textarea
-                  value={funeral.burial_notes || ""}
-                  onChange={(e) => updateFuneral("burial_notes", e.target.value)}
-                  placeholder="Where would you like to be buried? Cemetery name, location, plot details..."
-                  rows={2}
-                  className="ml-6"
-                />
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="cremation"
-                  checked={funeral.cremation || false}
-                  onCheckedChange={(checked) => updateFuneral("cremation", checked)}
-                />
-                <Label htmlFor="cremation" className="font-normal">Cremation</Label>
-              </div>
-              {funeral.cremation && (
-                <Textarea
-                  value={funeral.cremation_notes || ""}
-                  onChange={(e) => updateFuneral("cremation_notes", e.target.value)}
-                  placeholder="What should be done with your ashes? (e.g., scattered at favorite location, kept in urn, divided among family, buried in cemetery)..."
-                  rows={2}
-                  className="ml-6"
-                />
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="donation"
-                  checked={funeral.donation || false}
-                  onCheckedChange={(checked) => updateFuneral("donation", checked)}
-                />
-                <Label htmlFor="donation" className="font-normal">Body/Organ Donation</Label>
-              </div>
-              {funeral.donation && (
-                <Textarea
-                  value={funeral.donation_notes || ""}
-                  onChange={(e) => updateFuneral("donation_notes", e.target.value)}
-                  placeholder="Specify which organs, whole body donation to science, organization details..."
-                  rows={2}
-                  className="ml-6"
-                />
-              )}
-            </div>
-          </div>
-          
-          <div className="space-y-2 mt-4">
-            <Label htmlFor="cemetery_plot">Cemetery Plot Details</Label>
-            <p className="text-xs text-muted-foreground">Cemetery name, location, plot number, deed information, or pre-purchased plot details</p>
-            <Textarea
-              id="cemetery_plot"
-              value={funeral.cemetery_plot || ""}
-              onChange={(e) => updateFuneral("cemetery_plot", e.target.value)}
-              placeholder="Example: Green Hills Cemetery, Section C, Plot 123, Los Angeles, CA. Deed is in safe deposit box..."
-              rows={3}
-            />
-          </div>
-
-          <div className="space-y-2 mt-4">
-            <Label htmlFor="disposition_notes">Final Disposition Notes</Label>
-            <p className="text-xs text-muted-foreground">Additional details about ashes disposal location, burial specifics, or other disposition preferences</p>
-            <Textarea
-              id="disposition_notes"
-              value={funeral.disposition_notes || ""}
-              onChange={(e) => updateFuneral("disposition_notes", e.target.value)}
-              placeholder="Example: Ashes to be scattered at favorite beach, buried at specific cemetery plot location, etc."
-              rows={3}
-            />
           </div>
         </div>
 

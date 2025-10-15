@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Plus, Trash2, Save, Mic, Video, Play, Pause, RotateCcw } from "lucide-react";
+import { Plus, Trash2, Save, Mic, Video, Play, Pause, RotateCcw, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useRef } from "react";
 
@@ -110,6 +110,20 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
     updateMessage(index, type === 'audio' ? 'audio_url' : 'video_url', undefined);
   };
 
+  const downloadRecording = (url: string, type: 'audio' | 'video', index: number) => {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `message-${index + 1}-${type}-recording.webm`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    toast({
+      title: "Download started",
+      description: `Your ${type} recording is downloading`,
+    });
+  };
+
   const handleSave = () => {
     toast({
       title: "Saved",
@@ -212,8 +226,16 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
                     )}
                   </Button>
                 ) : (
-                  <div className="flex gap-2 items-center">
+                  <div className="flex gap-2 items-center flex-wrap">
                     <audio controls src={message.audio_url} className="max-w-xs" />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => downloadRecording(message.audio_url!, 'audio', index)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -262,6 +284,14 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
                 ) : (
                   <div className="flex gap-2 items-center flex-wrap">
                     <video controls src={message.video_url} className="max-w-md rounded" />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => downloadRecording(message.video_url!, 'video', index)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
