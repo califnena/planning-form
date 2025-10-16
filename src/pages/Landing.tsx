@@ -89,6 +89,91 @@ const Landing = () => {
           </div>
         </div>
 
+        {/* About Us Section */}
+        <div className="max-w-6xl mx-auto mt-32 mb-20">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              About Everlasting Funeral Advisors
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Your trusted partner in compassionate, affordable funeral planning
+            </p>
+          </div>
+
+          {/* Testimonial */}
+          <div className="bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-lg p-8 md:p-12 mb-16">
+            <div className="flex flex-col items-center text-center">
+              <div className="text-5xl mb-4">💙</div>
+              <blockquote className="text-lg md:text-xl italic text-foreground mb-4">
+                "Everlasting Caskets made a difficult time much easier with their compassionate guidance and affordable options. We are forever grateful."
+              </blockquote>
+              <p className="text-sm text-muted-foreground">— A grateful family</p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12">
+            {/* Products */}
+            <div className="bg-card border border-border rounded-lg p-8">
+              <h3 className="text-2xl font-semibold text-foreground mb-6 flex items-center gap-3">
+                <span className="text-3xl">🏺</span>
+                Affordable Products
+              </h3>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1">✓</span>
+                  <span className="text-muted-foreground">Premium and budget-friendly caskets</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1">✓</span>
+                  <span className="text-muted-foreground">Beautiful cremation urns in various styles</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1">✓</span>
+                  <span className="text-muted-foreground">Fresh flower arrangements and memorial tributes</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1">✓</span>
+                  <span className="text-muted-foreground">Complete funeral packages tailored to your budget</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Services */}
+            <div className="bg-card border border-border rounded-lg p-8">
+              <h3 className="text-2xl font-semibold text-foreground mb-6 flex items-center gap-3">
+                <span className="text-3xl">🤝</span>
+                Professional Services
+              </h3>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1">✓</span>
+                  <span className="text-muted-foreground">Expert funeral planning advisors</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1">✓</span>
+                  <span className="text-muted-foreground">Legacy Planner (physical binder & digital platform)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1">✓</span>
+                  <span className="text-muted-foreground">Customized eulogy writing and song selection</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1">✓</span>
+                  <span className="text-muted-foreground">Guidance and coaching to document your funeral plans and last wishes</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <Button asChild size="lg" className="text-lg px-8 py-6">
+              <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
+                Learn More About Our Services
+              </a>
+            </Button>
+          </div>
+        </div>
+
         {/* Video Section */}
         <div className="max-w-4xl mx-auto mt-20">
           <video 
