@@ -84,7 +84,7 @@ export const PlannerShell = ({
 
           {/* Actions */}
           <div className="mt-8 space-y-2">
-            <h3 className="text-sm font-semibold text-sidebar-foreground mb-3">Complete & Save Your Plan</h3>
+            <h3 className="text-sm font-semibold text-sidebar-foreground mb-3">My Document</h3>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -95,7 +95,7 @@ export const PlannerShell = ({
                     onClick={onPreviewPDF}
                   >
                     <Eye className="mr-2 h-4 w-4" />
-                    Preview PDF
+                    Preview My Document (PDF Format)
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="bg-popover text-popover-foreground border">
@@ -113,7 +113,7 @@ export const PlannerShell = ({
                     onClick={onDownloadPDF}
                   >
                     <Download className="mr-2 h-4 w-4" />
-                    {t("header.downloadPDF")}
+                    Generate My Document (PDF Format)
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="bg-popover text-popover-foreground border">

@@ -24,7 +24,7 @@ export const generatePlanPDF = (planData: PlanData) => {
   const pageWidth = pdf.internal.pageSize.width;
   const marginLeft = 20;
   const marginRight = 15; // 0.75" for hole punch space
-  const marginBottom = 30;
+  const marginBottom = 35;
   const lineHeight = 6;
   const tableOfContents: { title: string; page: number }[] = [];
   
