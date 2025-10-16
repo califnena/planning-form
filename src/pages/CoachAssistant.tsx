@@ -1,0 +1,274 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2, Heart, Sparkles } from "lucide-react";
+
+type Message = { role: "user" | "assistant"; content: string };
+type Mode = "planning" | "emotional";
+
+const TOPICS = [
+  { label: "🌺 My Funeral Wishes", prompt: "Help me document my funeral wishes." },
+  { label: "🕊 Writing My Legacy Letter", prompt: "Help me write a legacy letter to my family." },
+  { label: "🪷 Coping with Grief", prompt: "I'm feeling overwhelmed and need gentle support." },
+  { label: "💼 Organizing My Documents", prompt: "Help me organize important documents and passwords." },
+];
+
+export default function CoachAssistant() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [mode, setMode] = useState<Mode>("planning");
+  const [hasAccess, setHasAccess] = useState(false);
+  const [checkingAccess, setCheckingAccess] = useState(true);
+
+  useEffect(() => {
+    checkVIPAccess();
+  }, []);
+
+  const checkVIPAccess = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate("/login");
+        return;
+      }
+
+      const { data: subscription } = await supabase
+        .from("subscriptions")
+        .select("plan_type")
+        .eq("user_id", user.id)
+        .eq("status", "active")
+        .single();
+
+      if (subscription?.plan_type === "vip_annual" || subscription?.plan_type === "vip_monthly") {
+        setHasAccess(true);
+      } else {
+        toast({
+          title: "VIP Access Required",
+          description: "This feature is only available to VIP members. Please upgrade your plan.",
+          variant: "destructive",
+        });
+        navigate("/app/profile/subscription");
+      }
+    } catch (error) {
+      console.error("Error checking access:", error);
+      navigate("/app/profile/subscription");
+    } finally {
+      setCheckingAccess(false);
+    }
+  };
+
+  const streamChat = async (userMessage: string) => {
+    const newMessages: Message[] = [...messages, { role: "user", content: userMessage }];
+    setMessages(newMessages);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach-chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ messages: newMessages, mode }),
+      });
+
+      if (!response.ok || !response.body) throw new Error("Failed to start stream");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = "";
+      let assistantContent = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              assistantContent += content;
+              setMessages((prev) => {
+                const last = prev[prev.length - 1];
+                if (last?.role === "assistant") {
+                  return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: assistantContent } : m));
+                }
+                return [...prev, { role: "assistant", content: assistantContent }];
+              });
+            }
+          } catch {
+            textBuffer = line + "\n" + textBuffer;
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Chat error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to get response. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSend = () => {
+    if (!input.trim()) return;
+    streamChat(input);
+    setInput("");
+  };
+
+  const handleTopicClick = (prompt: string) => {
+    streamChat(prompt);
+  };
+
+  if (checkingAccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!hasAccess) return null;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#f7f5f2] to-[#e8e2dd] p-4 md:p-8">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <Card className="border-none shadow-lg">
+          <CardHeader className="text-center space-y-4">
+            <div className="flex items-center justify-center gap-2">
+              <Heart className="h-6 w-6 text-primary" />
+              <CardTitle className="text-3xl font-serif">Your Everlasting Coach</CardTitle>
+            </div>
+            <CardDescription className="text-base">
+              Available 24/7 for planning guidance and emotional support.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="text-sm leading-relaxed text-muted-foreground space-y-2">
+              <p>
+                I'm your Everlasting Coach — here to walk with you through every step of planning, reflection, and peace of mind.
+              </p>
+              <p className="font-medium">You can ask me about:</p>
+              <ul className="list-disc list-inside space-y-1 ml-2">
+                <li>Organizing your end-of-life plans</li>
+                <li>Creating messages for loved ones</li>
+                <li>Managing stress, grief, or anxiety</li>
+                <li>Understanding funeral, trust, and insurance choices</li>
+              </ul>
+              <p className="italic mt-4">Type your question below, or select a topic to begin.</p>
+            </div>
+
+            <div className="flex gap-3 flex-wrap justify-center">
+              <Button
+                variant={mode === "planning" ? "default" : "outline"}
+                onClick={() => setMode("planning")}
+                className="gap-2"
+              >
+                <Sparkles className="h-4 w-4" />
+                🗂 Planning Mode
+              </Button>
+              <Button
+                variant={mode === "emotional" ? "default" : "outline"}
+                onClick={() => setMode("emotional")}
+                className="gap-2"
+              >
+                <Heart className="h-4 w-4" />
+                💛 Emotional Support Mode
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-none shadow-lg">
+          <CardContent className="p-6 space-y-4">
+            <ScrollArea className="h-[400px] pr-4">
+              <div className="space-y-4">
+                {messages.map((msg, i) => (
+                  <div
+                    key={i}
+                    className={`p-4 rounded-lg ${
+                      msg.role === "user"
+                        ? "bg-primary/10 ml-8"
+                        : "bg-muted mr-8"
+                    }`}
+                  >
+                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                  </div>
+                ))}
+                {isLoading && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm">Coach is thinking...</span>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+
+            <div className="grid grid-cols-2 gap-2">
+              {TOPICS.map((topic) => (
+                <Button
+                  key={topic.label}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleTopicClick(topic.prompt)}
+                  disabled={isLoading}
+                  className="text-xs"
+                >
+                  {topic.label}
+                </Button>
+              ))}
+            </div>
+
+            <div className="flex gap-2">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type your message here..."
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                className="resize-none"
+                rows={3}
+              />
+              <Button onClick={handleSend} disabled={isLoading || !input.trim()}>
+                Send
+              </Button>
+            </div>
+
+            <p className="text-xs text-muted-foreground text-center">
+              Your conversation is private and secure. This coach does not provide legal, medical, or financial advice.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

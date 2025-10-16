@@ -1151,7 +1151,12 @@ export type Database = {
       app_role: "owner" | "member" | "executor" | "admin"
       insurance_type: "health" | "life" | "other"
       property_kind: "primary" | "investment"
-      subscription_plan: "free" | "basic" | "premium"
+      subscription_plan:
+        | "free"
+        | "basic"
+        | "premium"
+        | "vip_annual"
+        | "vip_monthly"
       subscription_status: "active" | "canceled" | "past_due" | "trialing"
     }
     CompositeTypes: {
@@ -1283,7 +1288,13 @@ export const Constants = {
       app_role: ["owner", "member", "executor", "admin"],
       insurance_type: ["health", "life", "other"],
       property_kind: ["primary", "investment"],
-      subscription_plan: ["free", "basic", "premium"],
+      subscription_plan: [
+        "free",
+        "basic",
+        "premium",
+        "vip_annual",
+        "vip_monthly",
+      ],
       subscription_status: ["active", "canceled", "past_due", "trialing"],
     },
   },
