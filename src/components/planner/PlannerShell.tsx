@@ -1,7 +1,7 @@
 import { useState, ReactNode } from "react";
 import { SidebarNav } from "./SidebarNav";
 import { Button } from "@/components/ui/button";
-import { Download, Mail, MessageSquare, Facebook, FileText, Eye, Printer } from "lucide-react";
+import { Download, Mail, MessageSquare, Facebook, FileText, Eye, Printer, Save } from "lucide-react";
 import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
@@ -24,6 +24,7 @@ interface PlannerShellProps {
   onDownloadManualForm: () => void;
   onEmailPlan: () => void;
   onSignOut: () => void;
+  onSave?: () => void;
 }
 
 export const PlannerShell = ({
@@ -36,6 +37,7 @@ export const PlannerShell = ({
   onDownloadManualForm,
   onEmailPlan,
   onSignOut,
+  onSave,
 }: PlannerShellProps) => {
   const [showContactDialog, setShowContactDialog] = useState(false);
   const { t } = useTranslation();
@@ -84,7 +86,30 @@ export const PlannerShell = ({
 
           {/* Actions */}
           <div className="mt-8 space-y-2">
-            <h3 className="text-sm font-semibold text-sidebar-foreground mb-3">My Document</h3>
+            <h3 className="text-sm font-semibold text-sidebar-foreground mb-3">Actions</h3>
+            <div className="text-xs text-muted-foreground mb-3 p-2 bg-muted/30 rounded">
+              ✓ All fields auto-save
+            </div>
+            {onSave && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="w-full justify-start"
+                      onClick={onSave}
+                    >
+                      <Save className="mr-2 h-4 w-4" />
+                      Save Now
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="bg-popover text-popover-foreground border">
+                    <p>Manual save (auto-save is already enabled)</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -95,11 +120,11 @@ export const PlannerShell = ({
                     onClick={onPreviewPDF}
                   >
                     <Eye className="mr-2 h-4 w-4" />
-                    Preview My Document (PDF Format)
+                    Preview My Document
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="bg-popover text-popover-foreground border">
-                  <p>Preview before downloading</p>
+                  <p>Preview before downloading (PDF Format)</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -113,11 +138,29 @@ export const PlannerShell = ({
                     onClick={onDownloadPDF}
                   >
                     <Download className="mr-2 h-4 w-4" />
-                    Generate My Document (PDF Format)
+                    Generate My Document
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="bg-popover text-popover-foreground border">
-                  <p>In PDF format</p>
+                  <p>Download your plan (PDF Format)</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-start"
+                    onClick={onEmailPlan}
+                  >
+                    <Mail className="mr-2 h-4 w-4" />
+                    Email My Document
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-popover text-popover-foreground border">
+                  <p>Send your plan via email (PDF Format)</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -136,24 +179,6 @@ export const PlannerShell = ({
                 </TooltipTrigger>
                 <TooltipContent side="right" className="bg-popover text-popover-foreground border">
                   <p>Printable blank form for handwriting</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start"
-                    onClick={onEmailPlan}
-                  >
-                    <Mail className="mr-2 h-4 w-4" />
-                    {t("header.emailPlan")}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="bg-popover text-popover-foreground border">
-                  <p>In PDF format</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

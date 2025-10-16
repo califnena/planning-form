@@ -7,6 +7,12 @@ import { Card } from "@/components/ui/card";
 import { Plus, Trash2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface SectionFinancialProps {
   data: any;
@@ -55,11 +61,21 @@ export const SectionFinancial = ({ data, onChange }: SectionFinancialProps) => {
           <p className="text-muted-foreground">
             {t("financial.description")}
           </p>
+          <p className="text-xs text-primary mt-1">✓ Auto-saves as you type</p>
         </div>
-        <Button onClick={handleSave} size="sm">
-          <Save className="h-4 w-4 mr-2" />
-          {t("common.save")}
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button onClick={handleSave} size="sm">
+                <Save className="h-4 w-4 mr-2" />
+                {t("common.save")}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Fields auto-save automatically</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       <div className="space-y-4">

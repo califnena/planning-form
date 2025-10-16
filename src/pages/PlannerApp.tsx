@@ -138,6 +138,14 @@ const PlannerApp = () => {
     navigate("/");
   };
 
+  const handleManualSave = () => {
+    // Data is already auto-saved, this just provides user feedback
+    toast({
+      title: "Saved",
+      description: "Your plan has been saved successfully.",
+    });
+  };
+
   const handlePreviewPDF = () => {
     try {
       const pdf = generatePlanPDF(plan);
@@ -376,6 +384,7 @@ const PlannerApp = () => {
         onDownloadManualForm={handleDownloadManualForm}
         onEmailPlan={handleEmailPlan}
         onSignOut={handleSignOut}
+        onSave={handleManualSave}
       >
         {renderSection()}
       </PlannerShell>

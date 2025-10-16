@@ -8,6 +8,12 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface SectionFuneralProps {
   data: any;
@@ -180,11 +186,21 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
           <p className="text-muted-foreground">
             {t("funeral.description")}
           </p>
+          <p className="text-xs text-primary mt-1">✓ Auto-saves as you type</p>
         </div>
-        <Button onClick={handleSave} size="sm">
-          <Save className="h-4 w-4 mr-2" />
-          {t("common.save")}
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button onClick={handleSave} size="sm">
+                <Save className="h-4 w-4 mr-2" />
+                {t("common.save")}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Fields auto-save automatically</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       <div className="space-y-6">
