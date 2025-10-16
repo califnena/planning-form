@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Check } from "lucide-react";
+import binderImage from "@/assets/fireproof-binder.png";
 
 type SubscriptionPlan = "free" | "basic" | "premium";
 
@@ -156,10 +157,17 @@ export default function Subscription() {
         <CardHeader>
           <CardTitle>Physical Fireproof Binder</CardTitle>
           <CardDescription>
-            Get a premium fireproof binder for your printed plan
+            Fireproof 3 Ring Binder with Zipper, 1 Inch D Rings Hold up 245 Sheets of 8.5" x 11" (A4)
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="aspect-video w-full overflow-hidden rounded-lg mb-4">
+            <img 
+              src={binderImage} 
+              alt="Fireproof and water-resistant 3 ring binder"
+              className="w-full h-full object-cover"
+            />
+          </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-2xl font-bold">$89</span>
@@ -168,15 +176,19 @@ export default function Subscription() {
             <ul className="space-y-2 mt-4">
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <span className="text-sm">Fire-resistant protection for your documents</span>
+                <span className="text-sm">Fireproof protection up to 2000°F</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <span className="text-sm">Durable construction for long-term storage</span>
+                <span className="text-sm">Water-resistant construction</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <span className="text-sm">Professional presentation</span>
+                <span className="text-sm">Secure zipper closure</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                <span className="text-sm">Holds up to 245 sheets</span>
               </li>
             </ul>
           </div>
