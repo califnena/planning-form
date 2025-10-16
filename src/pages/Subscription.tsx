@@ -82,10 +82,14 @@ export default function Subscription() {
   ];
 
   const handleUpgrade = (plan: SubscriptionPlan) => {
-    toast({
-      title: t("subscription.comingSoon"),
-      description: t("subscription.comingSoonDescription"),
-    });
+    if (plan === "basic") {
+      window.location.href = "https://buy.stripe.com/6oU28r2x75OrbLxg6q7bW00";
+    } else {
+      toast({
+        title: t("subscription.comingSoon"),
+        description: t("subscription.comingSoonDescription"),
+      });
+    }
   };
 
   const handleCancel = () => {
