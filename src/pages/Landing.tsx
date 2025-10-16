@@ -24,18 +24,6 @@ const Landing = () => {
 
       {/* Hero Section */}
       <main className="container mx-auto px-4 py-16 md:py-24">
-        {/* Video Section */}
-        <div className="max-w-4xl mx-auto mb-16">
-          <video 
-            className="w-full rounded-lg shadow-lg"
-            controls
-            poster="/placeholder.svg"
-          >
-            <source src="/videos/funeral-planner-ad.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-
         <div className="max-w-3xl mx-auto text-center space-y-6">
           {/* Mascot Image */}
           <div className="flex justify-center mb-8">
@@ -87,6 +75,18 @@ const Landing = () => {
               Give your family clarity and guidance during difficult times with organized, accessible information.
             </p>
           </div>
+        </div>
+
+        {/* Video Section */}
+        <div className="max-w-4xl mx-auto mt-20">
+          <video 
+            className="w-full rounded-lg shadow-lg"
+            controls
+            poster="/placeholder.svg"
+          >
+            <source src="/videos/funeral-planner-ad.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
         </div>
       </main>
 
