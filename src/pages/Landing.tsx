@@ -12,6 +12,12 @@ const Landing = () => {
           <div>
             <h1 className="text-xl font-semibold text-primary">My Final Wishes</h1>
             <p className="text-xs text-muted-foreground">Everlasting Funeral Advisors</p>
+            <a 
+              href="#about" 
+              className="text-xs text-primary hover:underline"
+            >
+              About Us
+            </a>
           </div>
           <div className="flex items-center gap-4">
             <LanguageSelector />
@@ -90,7 +96,7 @@ const Landing = () => {
         </div>
 
         {/* About Us Section */}
-        <div className="max-w-6xl mx-auto mt-32 mb-20">
+        <div id="about" className="max-w-6xl mx-auto mt-32 mb-20">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               About Everlasting Funeral Advisors
@@ -191,7 +197,7 @@ const Landing = () => {
       <footer className="border-t border-border mt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-5xl mx-auto">
-            <h3 className="font-semibold text-lg mb-3 text-foreground">Contact Us</h3>
+            <h3 className="font-semibold text-lg mb-3 text-foreground">Provided by</h3>
             <div className="space-y-2 text-muted-foreground">
               <p className="font-medium text-foreground">Everlasting Funeral Advisors</p>
               <p>(323) 863-5804</p>
