@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Heart, Sparkles, ArrowRight } from "lucide-react";
+import { Loader2, Heart, Sparkles, ArrowRight, Mic, Volume2, VolumeX } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 type Message = { role: "user" | "assistant"; content: string };
@@ -28,6 +28,8 @@ export default function CoachAssistant() {
   const [mode, setMode] = useState<Mode>("planning");
   const [hasAccess, setHasAccess] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTTSEnabled, setIsTTSEnabled] = useState(true);
 
   useEffect(() => {
     checkVIPAccess();
@@ -333,23 +335,57 @@ export default function CoachAssistant() {
               ))}
             </div>
 
-            <div className="flex gap-2">
-              <Textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Type your message here..."
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                  }
-                }}
-                className="resize-none"
-                rows={3}
-              />
-              <Button onClick={handleSend} disabled={isLoading || !input.trim()}>
-                Send
-              </Button>
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Button
+                  variant={isRecording ? "destructive" : "outline"}
+                  size="icon"
+                  onClick={() => {
+                    setIsRecording(!isRecording);
+                    toast({
+                      title: isRecording ? "Recording stopped" : "Recording started",
+                      description: isRecording ? "Processing your voice..." : "Speak now",
+                    });
+                  }}
+                  disabled={isLoading}
+                  title="Record voice message"
+                >
+                  <Mic className={`h-4 w-4 ${isRecording ? 'animate-pulse' : ''}`} />
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    setIsTTSEnabled(!isTTSEnabled);
+                    toast({
+                      title: isTTSEnabled ? "Audio disabled" : "Audio enabled",
+                      description: isTTSEnabled ? "Responses will not be read aloud" : "Responses will be read aloud",
+                    });
+                  }}
+                  disabled={isLoading}
+                  title={isTTSEnabled ? "Disable audio" : "Enable audio"}
+                >
+                  {isTTSEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                </Button>
+
+                <Textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Type your message here..."
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSend();
+                    }
+                  }}
+                  className="resize-none flex-1"
+                  rows={3}
+                />
+                <Button onClick={handleSend} disabled={isLoading || !input.trim()}>
+                  Send
+                </Button>
+              </div>
             </div>
 
             <p className="text-xs text-muted-foreground text-center">
