@@ -69,13 +69,13 @@ export const generatePlanPDF = (planData: PlanData) => {
     pdf.setFontSize(9);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(60, 60, 60);
-    pdf.text("Generated with Everlasting Funeral Advisors – My Final Wishes Planner", pageWidth / 2, pageHeight - 15, { align: "center" });
+    pdf.text("provided by Everlasting Funeral Advisors – My Final Wishes Planner", pageWidth / 2, pageHeight - 15, { align: "center" });
     
-    // Add page number - bold and black
+    // Add page number with legal name - bold and black
     pdf.setFontSize(11);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(0, 0, 0);
-    const pageNumText = totalPages ? `Page ${currentPage} of ${totalPages}` : `Page ${currentPage}`;
+    const pageNumText = totalPages ? `Page ${currentPage} of ${totalPages} (${legalName})` : `Page ${currentPage} (${legalName})`;
     pdf.text(pageNumText, pageWidth / 2, pageHeight - 8, { align: "center" });
     
     pdf.setTextColor(...colors.bodyGray);
@@ -323,7 +323,7 @@ export const generatePlanPDF = (planData: PlanData) => {
   pdf.setFontSize(28);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(...colors.headerNavy);
-  pdf.text("My Final Wishes", pageWidth / 2, 45, { align: "center" });
+  pdf.text("My Life & Legacy Planner", pageWidth / 2, 45, { align: "center" });
   
   pdf.setFontSize(14);
   pdf.setFont("helvetica", "normal");
