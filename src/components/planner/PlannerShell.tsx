@@ -56,9 +56,7 @@ export const PlannerShell = ({
               <h1 className="text-lg font-semibold text-primary">{t("header.title")}</h1>
               <p className="text-xs text-muted-foreground">{t("header.providedBy")}</p>
               <a 
-                href="https://everlastingfuneraladvisors.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
+                href="/about-us"
                 className="text-xs text-primary hover:underline"
               >
                 About Us
@@ -192,9 +190,7 @@ export const PlannerShell = ({
                 everlastingfuneraladvisors.com
               </a>
               <a
-                href="https://everlastingfuneraladvisors.com"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/about-us"
                 className="text-primary hover:underline block mt-1"
               >
                 About Us

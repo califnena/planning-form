@@ -12,12 +12,12 @@ const Landing = () => {
           <div>
             <h1 className="text-xl font-semibold text-primary">My Final Wishes</h1>
             <p className="text-xs text-muted-foreground">Everlasting Funeral Advisors</p>
-            <a 
-              href="#about" 
+            <Link 
+              to="/about-us"
               className="text-xs text-primary hover:underline"
             >
               About Us
-            </a>
+            </Link>
           </div>
           <div className="flex items-center gap-4">
             <LanguageSelector />
