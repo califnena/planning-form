@@ -55,7 +55,7 @@ export default function Subscription() {
     {
       name: "Basic",
       value: "basic" as SubscriptionPlan,
-      price: "$49",
+      price: "$29",
       period: "per year",
       features: [
         "Preview all sections",
@@ -66,7 +66,7 @@ export default function Subscription() {
     {
       name: "Premium",
       value: "premium" as SubscriptionPlan,
-      price: "$99",
+      price: "$59",
       period: "per year",
       features: [
         "Full access to all features",
@@ -151,6 +151,43 @@ export default function Subscription() {
           </Card>
         ))}
       </div>
+
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>Physical Fireproof Binder</CardTitle>
+          <CardDescription>
+            Get a premium fireproof binder for your printed plan
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">$89</span>
+              <span className="text-sm text-muted-foreground">plus shipping</span>
+            </div>
+            <ul className="space-y-2 mt-4">
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                <span className="text-sm">Fire-resistant protection for your documents</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                <span className="text-sm">Durable construction for long-term storage</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                <span className="text-sm">Professional presentation</span>
+              </li>
+            </ul>
+          </div>
+          <Button className="w-full" onClick={() => toast({
+            title: "Coming soon",
+            description: "Physical binder ordering will be available once Stripe is integrated.",
+          })}>
+            Order Now
+          </Button>
+        </CardContent>
+      </Card>
 
       {subscriptionData && subscriptionData.current_period_end && (
         <Card className="mt-8">
