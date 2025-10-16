@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Check, ArrowLeft } from "lucide-react";
 import binderImage from "@/assets/fireproof-binder.png";
+import { PLANS } from "@/lib/plans";
 
 type SubscriptionPlan = "free" | "basic" | "monthly" | "premium" | "elite";
 
@@ -45,75 +46,51 @@ export default function Subscription() {
 
   const plans = [
     {
-      name: t("subscription.free"),
-      value: "free" as SubscriptionPlan,
-      price: "$0",
-      period: t("subscription.freePeriod"),
-      features: [
-        t("subscription.freeFeature1"),
-        t("subscription.freeFeature2"),
-        t("subscription.freeFeature3"),
-      ],
-    },
-    {
-      name: t("subscription.basic"),
+      name: PLANS.BASIC_ANNUAL.name,
       value: "basic" as SubscriptionPlan,
-      price: t("subscription.basicPrice"),
-      period: t("subscription.perYear"),
-      features: [
-        t("subscription.basicFeature1"),
-        t("subscription.basicFeature2"),
-        t("subscription.basicFeature3"),
-      ],
+      price: PLANS.BASIC_ANNUAL.price,
+      period: "",
+      features: PLANS.BASIC_ANNUAL.features,
+      payLink: PLANS.BASIC_ANNUAL.payLink,
     },
     {
-      name: t("subscription.monthly"),
-      value: "monthly" as SubscriptionPlan,
-      price: t("subscription.monthlyPrice"),
-      period: t("subscription.perMonth"),
-      features: [
-        t("subscription.monthlyFeature1"),
-        t("subscription.monthlyFeature2"),
-        t("subscription.monthlyFeature3"),
-        t("subscription.monthlyFeature4"),
-        t("subscription.monthlyFeature5"),
-      ],
-    },
-    {
-      name: t("subscription.premium"),
+      name: PLANS.PREMIUM_ANNUAL.name,
       value: "premium" as SubscriptionPlan,
-      price: t("subscription.premiumPrice"),
-      period: t("subscription.perYear"),
-      features: [
-        t("subscription.premiumFeature1"),
-        t("subscription.premiumFeature2"),
-        t("subscription.premiumFeature3"),
-        t("subscription.premiumFeature4"),
-        t("subscription.premiumFeature5"),
-        t("subscription.premiumFeature6"),
-      ],
+      price: PLANS.PREMIUM_ANNUAL.price,
+      period: "",
+      features: PLANS.PREMIUM_ANNUAL.features,
+      payLink: PLANS.PREMIUM_ANNUAL.payLink,
     },
     {
-      name: t("subscription.elite"),
+      name: PLANS.VIP_ANNUAL.name,
       value: "elite" as SubscriptionPlan,
-      price: t("subscription.elitePrice"),
-      period: t("subscription.perYear"),
-      features: [
-        t("subscription.eliteFeature1"),
-        t("subscription.eliteFeature2"),
-        t("subscription.eliteFeature3"),
-        t("subscription.eliteFeature4"),
-        t("subscription.eliteFeature5"),
-        t("subscription.eliteFeature6"),
-      ],
+      price: PLANS.VIP_ANNUAL.price,
+      period: "",
+      features: PLANS.VIP_ANNUAL.features,
+      payLink: PLANS.VIP_ANNUAL.payLink,
+    },
+    {
+      name: PLANS.VIP_MONTHLY.name,
+      value: "monthly" as SubscriptionPlan,
+      price: PLANS.VIP_MONTHLY.price,
+      period: "",
+      features: PLANS.VIP_MONTHLY.features,
+      payLink: PLANS.VIP_MONTHLY.payLink,
+    },
+    {
+      name: PLANS.DO_IT_FOR_YOU.name,
+      value: "free" as SubscriptionPlan,
+      price: PLANS.DO_IT_FOR_YOU.price,
+      period: "",
+      features: PLANS.DO_IT_FOR_YOU.features,
+      payLink: PLANS.DO_IT_FOR_YOU.payLink,
     },
   ];
 
-  const handleUpgrade = (plan: SubscriptionPlan) => {
-    if (plan === "basic") {
-      window.location.href = "https://buy.stripe.com/6oU28r2x75OrbLxg6q7bW00";
-    } else if (plan === "premium") {
-      window.location.href = "https://buy.stripe.com/14A5kD6Nn3Gjg1NdYi7bW02";
+  const handleUpgrade = (planValue: SubscriptionPlan) => {
+    const plan = plans.find(p => p.value === planValue);
+    if (plan?.payLink) {
+      window.location.href = plan.payLink;
     } else {
       toast({
         title: t("subscription.comingSoon"),
@@ -153,9 +130,9 @@ export default function Subscription() {
         <p className="text-muted-foreground">{t("subscription.description")}</p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {plans.map((plan) => (
-          <Card key={plan.value} className={currentPlan === plan.value ? "border-primary" : ""}>
+          <Card key={plan.name} className={currentPlan === plan.value ? "border-primary" : ""}>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>{plan.name}</CardTitle>
@@ -164,8 +141,7 @@ export default function Subscription() {
                 )}
               </div>
               <CardDescription>
-                <span className="text-3xl font-bold text-foreground">{plan.price}</span>
-                <span className="text-muted-foreground"> / {plan.period}</span>
+                <span className="text-2xl font-bold text-foreground">{plan.price}</span>
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -188,9 +164,8 @@ export default function Subscription() {
                 <Button 
                   onClick={() => handleUpgrade(plan.value)} 
                   className="w-full"
-                  disabled={plan.value === "free"}
                 >
-                  {plan.value === "free" ? t("subscription.currentBadge") : t("subscription.upgrade")}
+                  {t("subscription.upgrade")}
                 </Button>
               )}
             </CardContent>
@@ -200,7 +175,7 @@ export default function Subscription() {
 
       <Card className="mt-8">
         <CardHeader>
-          <CardTitle>{t("subscription.binderTitle")}</CardTitle>
+          <CardTitle>{PLANS.BINDER.name}</CardTitle>
           <CardDescription>
             {t("subscription.binderDescription")}
           </CardDescription>
@@ -209,37 +184,26 @@ export default function Subscription() {
           <div className="aspect-video w-full overflow-hidden rounded-lg mb-4">
             <img 
               src={binderImage} 
-              alt={t("subscription.binderTitle")}
+              alt={PLANS.BINDER.name}
               className="w-full h-full object-cover"
             />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold">{t("subscription.binderPrice")}</span>
-              <span className="text-sm text-muted-foreground">{t("subscription.plusShipping")}</span>
+              <span className="text-2xl font-bold">{PLANS.BINDER.price}</span>
             </div>
             <ul className="space-y-2 mt-4">
-              <li className="flex items-start gap-2">
-                <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <span className="text-sm">{t("subscription.binderFeature1")}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <span className="text-sm">{t("subscription.binderFeature2")}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <span className="text-sm">{t("subscription.binderFeature3")}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <span className="text-sm">{t("subscription.binderFeature4")}</span>
-              </li>
+              {PLANS.BINDER.features.map((feature, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <span className="text-sm">{feature}</span>
+                </li>
+              ))}
             </ul>
           </div>
           <Button 
             className="w-full" 
-            onClick={() => window.location.href = "https://buy.stripe.com/eVqcN5dbLfp1aHt8DY7bW01"}
+            onClick={() => window.location.href = PLANS.BINDER.payLink}
           >
             {t("subscription.orderNow")}
           </Button>
