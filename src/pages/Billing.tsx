@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import {
 export default function Billing() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [invoices, setInvoices] = useState<any[]>([]);
   const [subscription, setSubscription] = useState<any>(null);
@@ -58,8 +60,8 @@ export default function Billing() {
 
   const handleUpdatePaymentMethod = () => {
     toast({
-      title: "Coming soon",
-      description: "Payment method management will be available once Stripe is integrated.",
+      title: t("billing.comingSoon"),
+      description: t("billing.paymentMethodComingSoon"),
     });
   };
 
@@ -86,18 +88,18 @@ export default function Billing() {
         className="mb-6"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Return to Home
+        {t("billing.returnHome")}
       </Button>
       
       <div>
-        <h1 className="text-3xl font-bold">Billing</h1>
-        <p className="text-muted-foreground">Manage your payment methods and invoices</p>
+        <h1 className="text-3xl font-bold">{t("billing.title")}</h1>
+        <p className="text-muted-foreground">{t("billing.description")}</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Payment Method</CardTitle>
-          <CardDescription>Update your payment information</CardDescription>
+          <CardTitle>{t("billing.paymentMethod")}</CardTitle>
+          <CardDescription>{t("billing.paymentMethodDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
           {subscription?.stripe_customer_id ? (
@@ -105,20 +107,20 @@ export default function Billing() {
               <div className="flex items-center gap-3">
                 <CreditCard className="h-5 w-5 text-muted-foreground" />
                 <div>
-                  <p className="font-medium">Card on file</p>
-                  <p className="text-sm text-muted-foreground">Payment method connected</p>
+                  <p className="font-medium">{t("billing.cardOnFile")}</p>
+                  <p className="text-sm text-muted-foreground">{t("billing.paymentConnected")}</p>
                 </div>
               </div>
               <Button variant="outline" onClick={handleUpdatePaymentMethod}>
-                Update
+                {t("billing.update")}
               </Button>
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-muted-foreground mb-4">No payment method on file</p>
+              <p className="text-muted-foreground mb-4">{t("billing.noPaymentMethod")}</p>
               <Button onClick={handleUpdatePaymentMethod}>
                 <CreditCard className="mr-2 h-4 w-4" />
-                Add Payment Method
+                {t("billing.addPaymentMethod")}
               </Button>
             </div>
           )}
@@ -127,18 +129,18 @@ export default function Billing() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Billing History</CardTitle>
-          <CardDescription>View and download your invoices</CardDescription>
+          <CardTitle>{t("billing.billingHistory")}</CardTitle>
+          <CardDescription>{t("billing.billingHistoryDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
           {invoices.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Invoice</TableHead>
+                  <TableHead>{t("billing.dateColumn")}</TableHead>
+                  <TableHead>{t("billing.amountColumn")}</TableHead>
+                  <TableHead>{t("billing.statusColumn")}</TableHead>
+                  <TableHead className="text-right">{t("billing.invoiceColumn")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -174,7 +176,7 @@ export default function Billing() {
             </Table>
           ) : (
             <div className="text-center py-8 text-muted-foreground">
-              No invoices yet
+              {t("billing.noInvoices")}
             </div>
           )}
         </CardContent>

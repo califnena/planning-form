@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ import { Loader2, Upload, ArrowLeft } from "lucide-react";
 export default function Profile() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [userId, setUserId] = useState<string>("");
@@ -59,8 +61,8 @@ export default function Profile() {
       if (error) throw error;
 
       toast({
-        title: "Profile updated",
-        description: "Your profile has been saved successfully.",
+        title: t("profile.profileUpdated"),
+        description: t("profile.profileUpdatedDescription"),
       });
     } catch (error: any) {
       toast({
@@ -94,8 +96,8 @@ export default function Profile() {
       setAvatarUrl(publicUrl);
       
       toast({
-        title: "Avatar uploaded",
-        description: "Your avatar has been updated.",
+        title: t("profile.avatarUploaded"),
+        description: t("profile.avatarUploadedDescription"),
       });
     } catch (error: any) {
       toast({
@@ -124,13 +126,13 @@ export default function Profile() {
         className="mb-6"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Return to Home
+        {t("profile.returnHome")}
       </Button>
       
       <Card>
         <CardHeader>
-          <CardTitle>Account Settings</CardTitle>
-          <CardDescription>Manage your profile information</CardDescription>
+          <CardTitle>{t("profile.title")}</CardTitle>
+          <CardDescription>{t("profile.description")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center gap-4">
@@ -144,7 +146,7 @@ export default function Profile() {
               <Label htmlFor="avatar-upload" className="cursor-pointer">
                 <div className="flex items-center gap-2 text-sm text-primary hover:underline">
                   <Upload className="h-4 w-4" />
-                  Upload new photo
+                  {t("profile.uploadPhoto")}
                 </div>
               </Label>
               <input
@@ -159,7 +161,7 @@ export default function Profile() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("profile.emailLabel")}</Label>
             <Input
               id="email"
               type="email"
@@ -168,23 +170,23 @@ export default function Profile() {
               className="bg-muted"
             />
             <p className="text-xs text-muted-foreground">
-              Email cannot be changed
+              {t("profile.emailDisabled")}
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name</Label>
+            <Label htmlFor="fullName">{t("profile.fullNameLabel")}</Label>
             <Input
               id="fullName"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="Enter your full name"
+              placeholder={t("profile.fullNamePlaceholder")}
             />
           </div>
 
           <Button onClick={handleSave} disabled={saving}>
             {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Save Changes
+            {t("profile.saveChanges")}
           </Button>
         </CardContent>
       </Card>

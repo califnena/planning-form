@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ type SubscriptionPlan = "free" | "basic" | "premium";
 export default function Subscription() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [currentPlan, setCurrentPlan] = useState<SubscriptionPlan>("free");
   const [subscriptionData, setSubscriptionData] = useState<any>(null);
@@ -43,53 +45,53 @@ export default function Subscription() {
 
   const plans = [
     {
-      name: "Free",
+      name: t("subscription.free"),
       value: "free" as SubscriptionPlan,
       price: "$0",
-      period: "forever",
+      period: t("subscription.freePeriod"),
       features: [
-        "Preview all sections",
-        "No PDF generation",
-        "No data input",
+        t("subscription.freeFeature1"),
+        t("subscription.freeFeature2"),
+        t("subscription.freeFeature3"),
       ],
     },
     {
-      name: "Basic",
+      name: t("subscription.basic"),
       value: "basic" as SubscriptionPlan,
-      price: "$29",
-      period: "per year",
+      price: t("subscription.basicPrice"),
+      period: t("subscription.perYear"),
       features: [
-        "Preview all sections",
-        "Generate blank forms",
-        "View only access",
+        t("subscription.basicFeature1"),
+        t("subscription.basicFeature2"),
+        t("subscription.basicFeature3"),
       ],
     },
     {
-      name: "Premium",
+      name: t("subscription.premium"),
       value: "premium" as SubscriptionPlan,
-      price: "$59",
-      period: "per year",
+      price: t("subscription.premiumPrice"),
+      period: t("subscription.perYear"),
       features: [
-        "Full access to all features",
-        "Input and save data",
-        "Generate filled PDFs",
-        "Email plans",
-        "Priority support",
+        t("subscription.premiumFeature1"),
+        t("subscription.premiumFeature2"),
+        t("subscription.premiumFeature3"),
+        t("subscription.premiumFeature4"),
+        t("subscription.premiumFeature5"),
       ],
     },
   ];
 
   const handleUpgrade = (plan: SubscriptionPlan) => {
     toast({
-      title: "Coming soon",
-      description: "Stripe integration will be added to handle subscription upgrades.",
+      title: t("subscription.comingSoon"),
+      description: t("subscription.comingSoonDescription"),
     });
   };
 
   const handleCancel = () => {
     toast({
-      title: "Coming soon",
-      description: "Subscription cancellation will be available once Stripe is integrated.",
+      title: t("subscription.comingSoon"),
+      description: t("subscription.cancelComingSoon"),
     });
   };
 
@@ -109,12 +111,12 @@ export default function Subscription() {
         className="mb-6"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Return to Home
+        {t("subscription.returnHome")}
       </Button>
       
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Subscription Plans</h1>
-        <p className="text-muted-foreground">Choose the plan that works best for you</p>
+        <h1 className="text-3xl font-bold">{t("subscription.title")}</h1>
+        <p className="text-muted-foreground">{t("subscription.description")}</p>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
@@ -124,7 +126,7 @@ export default function Subscription() {
               <div className="flex items-center justify-between">
                 <CardTitle>{plan.name}</CardTitle>
                 {currentPlan === plan.value && (
-                  <Badge>Current</Badge>
+                  <Badge>{t("subscription.currentBadge")}</Badge>
                 )}
               </div>
               <CardDescription>
@@ -145,7 +147,7 @@ export default function Subscription() {
               {currentPlan === plan.value ? (
                 currentPlan !== "free" && (
                   <Button variant="outline" onClick={handleCancel} className="w-full">
-                    Cancel Subscription
+                    {t("subscription.cancelSubscription")}
                   </Button>
                 )
               ) : (
@@ -154,7 +156,7 @@ export default function Subscription() {
                   className="w-full"
                   disabled={plan.value === "free"}
                 >
-                  {plan.value === "free" ? "Current Plan" : "Upgrade"}
+                  {plan.value === "free" ? t("subscription.currentBadge") : t("subscription.upgrade")}
                 </Button>
               )}
             </CardContent>
@@ -164,48 +166,48 @@ export default function Subscription() {
 
       <Card className="mt-8">
         <CardHeader>
-          <CardTitle>Physical Fireproof Binder</CardTitle>
+          <CardTitle>{t("subscription.binderTitle")}</CardTitle>
           <CardDescription>
-            Fireproof 3 Ring Binder with Zipper, 1 Inch D Rings Hold up 245 Sheets of 8.5" x 11" (A4)
+            {t("subscription.binderDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="aspect-video w-full overflow-hidden rounded-lg mb-4">
             <img 
               src={binderImage} 
-              alt="Fireproof and water-resistant 3 ring binder"
+              alt={t("subscription.binderTitle")}
               className="w-full h-full object-cover"
             />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold">$89</span>
-              <span className="text-sm text-muted-foreground">plus shipping</span>
+              <span className="text-2xl font-bold">{t("subscription.binderPrice")}</span>
+              <span className="text-sm text-muted-foreground">{t("subscription.plusShipping")}</span>
             </div>
             <ul className="space-y-2 mt-4">
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <span className="text-sm">Fireproof protection up to 2000°F</span>
+                <span className="text-sm">{t("subscription.binderFeature1")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <span className="text-sm">Water-resistant construction</span>
+                <span className="text-sm">{t("subscription.binderFeature2")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <span className="text-sm">Secure zipper closure</span>
+                <span className="text-sm">{t("subscription.binderFeature3")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <span className="text-sm">Holds up to 245 sheets</span>
+                <span className="text-sm">{t("subscription.binderFeature4")}</span>
               </li>
             </ul>
           </div>
           <Button className="w-full" onClick={() => toast({
-            title: "Coming soon",
-            description: "Physical binder ordering will be available once Stripe is integrated.",
+            title: t("subscription.comingSoon"),
+            description: t("subscription.binderComingSoon"),
           })}>
-            Order Now
+            {t("subscription.orderNow")}
           </Button>
         </CardContent>
       </Card>
@@ -213,18 +215,18 @@ export default function Subscription() {
       {subscriptionData && subscriptionData.current_period_end && (
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>Subscription Details</CardTitle>
+            <CardTitle>{t("subscription.subscriptionDetails")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Status:</span>
+                <span className="text-muted-foreground">{t("subscription.statusLabel")}</span>
                 <Badge variant={subscriptionData.status === "active" ? "default" : "secondary"}>
                   {subscriptionData.status}
                 </Badge>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Current period ends:</span>
+                <span className="text-muted-foreground">{t("subscription.periodEndsLabel")}</span>
                 <span>{new Date(subscriptionData.current_period_end).toLocaleDateString()}</span>
               </div>
             </div>
