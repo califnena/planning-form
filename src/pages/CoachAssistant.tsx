@@ -41,6 +41,13 @@ export default function CoachAssistant() {
         return;
       }
 
+      // Master account has full access
+      if (user.email === "califnena@gmail.com") {
+        setHasAccess(true);
+        setCheckingAccess(false);
+        return;
+      }
+
       const { data: subscription } = await supabase
         .from("subscriptions")
         .select("plan_type")

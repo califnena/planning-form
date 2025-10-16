@@ -27,11 +27,19 @@ export default function Subscription() {
   const [loading, setLoading] = useState(true);
   const [currentSubscription, setCurrentSubscription] = useState<any>(null);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [isMasterAccount, setIsMasterAccount] = useState(false);
 
   const loadSubscription = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       navigate("/login");
+      return;
+    }
+
+    // Check if master account
+    if (user.email === "califnena@gmail.com") {
+      setIsMasterAccount(true);
+      setLoading(false);
       return;
     }
 
@@ -105,6 +113,20 @@ export default function Subscription() {
         <h1 className="text-3xl font-bold">{t("subscription.title")}</h1>
         <p className="text-muted-foreground">{t("subscription.description")}</p>
       </div>
+
+      {isMasterAccount && (
+        <Card className="mb-6 border-primary bg-gradient-to-r from-primary/5 to-primary/10">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Check className="h-5 w-5 text-primary" />
+              Master Account - Full Access
+            </CardTitle>
+            <CardDescription>
+              Your account has unlimited access to all features without requiring a subscription.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
 
       <div className="grid md:grid-cols-3 gap-6">
         {[PLANS.BASIC_ANNUAL, PLANS.PREMIUM_ANNUAL, PLANS.VIP_ANNUAL].map((p) => {

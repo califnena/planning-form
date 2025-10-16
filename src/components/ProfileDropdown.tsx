@@ -36,15 +36,19 @@ export const ProfileDropdown = () => {
           setProfile(data);
         }
 
-        // Check VIP subscription status
-        const { data: subscriptionData } = await supabase
-          .from("subscriptions")
-          .select("plan_type")
-          .eq("user_id", user.id)
-          .eq("status", "active")
-          .maybeSingle();
-        
-        setIsVIP(subscriptionData?.plan_type === "vip_annual" || subscriptionData?.plan_type === "vip_monthly");
+        // Check VIP subscription status or master account
+        if (user.email === "califnena@gmail.com") {
+          setIsVIP(true);
+        } else {
+          const { data: subscriptionData } = await supabase
+            .from("subscriptions")
+            .select("plan_type")
+            .eq("user_id", user.id)
+            .eq("status", "active")
+            .maybeSingle();
+          
+          setIsVIP(subscriptionData?.plan_type === "vip_annual" || subscriptionData?.plan_type === "vip_monthly");
+        }
       }
     };
 
