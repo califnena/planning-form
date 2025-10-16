@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Check, ArrowLeft } from "lucide-react";
 import binderImage from "@/assets/fireproof-binder.png";
 
-type SubscriptionPlan = "free" | "basic" | "monthly" | "premium";
+type SubscriptionPlan = "free" | "basic" | "monthly" | "premium" | "elite";
 
 export default function Subscription() {
   const navigate = useNavigate();
@@ -93,6 +93,20 @@ export default function Subscription() {
         t("subscription.premiumFeature6"),
       ],
     },
+    {
+      name: t("subscription.elite"),
+      value: "elite" as SubscriptionPlan,
+      price: t("subscription.elitePrice"),
+      period: t("subscription.perYear"),
+      features: [
+        t("subscription.eliteFeature1"),
+        t("subscription.eliteFeature2"),
+        t("subscription.eliteFeature3"),
+        t("subscription.eliteFeature4"),
+        t("subscription.eliteFeature5"),
+        t("subscription.eliteFeature6"),
+      ],
+    },
   ];
 
   const handleUpgrade = (plan: SubscriptionPlan) => {
@@ -137,7 +151,7 @@ export default function Subscription() {
         <p className="text-muted-foreground">{t("subscription.description")}</p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
         {plans.map((plan) => (
           <Card key={plan.value} className={currentPlan === plan.value ? "border-primary" : ""}>
             <CardHeader>
