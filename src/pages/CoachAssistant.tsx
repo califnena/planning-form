@@ -240,33 +240,55 @@ export default function CoachAssistant() {
               <p>
                 I'm your Everlasting Coach — here to walk with you through every step of planning, reflection, and peace of mind.
               </p>
-              <p className="font-medium">You can ask me about:</p>
-              <ul className="list-disc list-inside space-y-1 ml-2">
-                <li>Organizing your end-of-life plans</li>
-                <li>Creating messages for loved ones</li>
-                <li>Managing stress, grief, or anxiety</li>
-                <li>Understanding funeral, trust, and insurance choices</li>
-              </ul>
-              <p className="italic mt-4">Type your question below, or select a topic to begin.</p>
+              <p className="italic mt-2">Choose your mode below to get started.</p>
             </div>
 
-            <div className="flex gap-3 flex-wrap justify-center">
-              <Button
-                variant={mode === "planning" ? "default" : "outline"}
-                onClick={() => setMode("planning")}
-                className="gap-2"
-              >
-                <Sparkles className="h-4 w-4" />
-                🗂 Planning Mode
-              </Button>
-              <Button
-                variant={mode === "emotional" ? "default" : "outline"}
-                onClick={() => setMode("emotional")}
-                className="gap-2"
-              >
-                <Heart className="h-4 w-4" />
-                💛 Emotional Support Mode
-              </Button>
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 p-4 rounded-lg">
+              <h3 className="font-semibold mb-3 text-center">Select Your Mode:</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                <button
+                  onClick={() => setMode("planning")}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    mode === "planning"
+                      ? "border-primary bg-primary/10 shadow-lg"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    <span className="font-semibold text-lg">🗂 Planning Mode</span>
+                  </div>
+                  <p className="text-xs text-left text-muted-foreground">
+                    Get help organizing your funeral wishes, legal documents, financial accounts, and final instructions
+                  </p>
+                </button>
+
+                <button
+                  onClick={() => setMode("emotional")}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    mode === "emotional"
+                      ? "border-primary bg-primary/10 shadow-lg"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Heart className="h-5 w-5 text-primary" />
+                    <span className="font-semibold text-lg">💛 Emotional Support</span>
+                  </div>
+                  <p className="text-xs text-left text-muted-foreground">
+                    Receive compassionate guidance for managing grief, anxiety, and difficult emotions
+                  </p>
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-muted/50 p-3 rounded-lg">
+              <p className="text-sm text-center">
+                <span className="font-medium">Current mode:</span>{" "}
+                <span className="text-primary font-semibold">
+                  {mode === "planning" ? "🗂 Planning Mode" : "💛 Emotional Support Mode"}
+                </span>
+              </p>
             </div>
           </CardContent>
         </Card>
