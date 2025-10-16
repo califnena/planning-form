@@ -191,6 +191,14 @@ export const PlannerShell = ({
               >
                 everlastingfuneraladvisors.com
               </a>
+              <a
+                href="https://everlastingfuneraladvisors.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline block mt-1"
+              >
+                About Us
+              </a>
             </div>
 
             {/* Social Media */}
