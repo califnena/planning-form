@@ -50,6 +50,18 @@ const Landing = () => {
           </div>
         </div>
 
+        {/* Overview Section */}
+        <div className="max-w-4xl mx-auto mt-20 mb-20">
+          <div className="bg-card border border-border rounded-lg p-8 md:p-12 shadow-sm">
+            <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-6 text-center">
+              Our Mission
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed text-center">
+              Are you prepared for one of life's most difficult moments? Our mission is to guide families through the process of planning an affordable funeral with care, compassion, and expertise. From understanding your options to making thoughtful decisions, we're here to support you every step of the way. With our resources and guidance, you can create a meaningful farewell that honors your loved one's life while easing the burden on your family during a challenging time. Let us help you navigate this journey with sensitivity and understanding.
+            </p>
+          </div>
+        </div>
+
         {/* Benefits Section */}
         <div className="mt-20 grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           <div className="p-6 rounded-lg border border-border bg-card">
