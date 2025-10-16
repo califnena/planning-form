@@ -66,9 +66,37 @@ export const SectionLegal = ({ data, onChange }: SectionLegalProps) => {
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
             <Checkbox
+              id="none"
+              checked={legal.has_none || false}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  // When NONE is checked, uncheck will and trust
+                  onChange({
+                    ...data,
+                    legal: { ...legal, has_none: true, has_will: false, has_trust: false }
+                  });
+                } else {
+                  updateLegal("has_none", false);
+                }
+              }}
+            />
+            <Label htmlFor="none" className="font-normal">None</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
               id="will"
               checked={legal.has_will || false}
-              onCheckedChange={(checked) => updateLegal("has_will", checked)}
+              onCheckedChange={(checked) => {
+                if (checked && legal.has_none) {
+                  // If NONE was checked, uncheck it when checking will
+                  onChange({
+                    ...data,
+                    legal: { ...legal, has_will: true, has_none: false }
+                  });
+                } else {
+                  updateLegal("has_will", checked);
+                }
+              }}
             />
             <Label htmlFor="will" className="font-normal">Last Will and Testament</Label>
           </div>
@@ -76,7 +104,17 @@ export const SectionLegal = ({ data, onChange }: SectionLegalProps) => {
             <Checkbox
               id="trust"
               checked={legal.has_trust || false}
-              onCheckedChange={(checked) => updateLegal("has_trust", checked)}
+              onCheckedChange={(checked) => {
+                if (checked && legal.has_none) {
+                  // If NONE was checked, uncheck it when checking trust
+                  onChange({
+                    ...data,
+                    legal: { ...legal, has_trust: true, has_none: false }
+                  });
+                } else {
+                  updateLegal("has_trust", checked);
+                }
+              }}
             />
             <Label htmlFor="trust" className="font-normal">Living Trust</Label>
           </div>

@@ -25,6 +25,13 @@ const guides: Guide[] = [
     description: "Essential information about making informed end-of-life decisions, including healthcare directives, living wills, and advance care planning. This guide helps you document your medical preferences and ensure your wishes are honored.",
     filename: "My-End-of-Life-Decisions-Guide.pdf",
     path: "/guides/My-End-of-Life-Decisions-Guide.pdf"
+  },
+  {
+    id: "discussing-death",
+    title: "Discussing Death",
+    description: "How to chronicle and celebrate the lives of your loved ones. Learn strategies for starting meaningful conversations about death, funeral planning, and end-of-life wishes with family members.",
+    filename: "Discussing-Death-Guide.pdf",
+    path: "/guides/Discussing-Death-Guide.pdf"
   }
 ];
 
