@@ -7,6 +7,7 @@ import { Save, Upload, X, Image as ImageIcon, FileText, Mail } from "lucide-reac
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 interface SectionFuneralProps {
   data: any;
@@ -16,6 +17,7 @@ interface SectionFuneralProps {
 export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
   const funeral = data.funeral || {};
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
@@ -42,14 +44,14 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
         if (error) throw error;
 
         toast({
-          title: "Request sent",
-          description: "Everlasting Funeral Advisors will contact you soon.",
+          title: t("funeral.requestSent"),
+          description: t("funeral.requestDescription"),
         });
       } catch (error) {
         console.error('Error sending email:', error);
         toast({
-          title: "Notice",
-          description: "Your preference has been saved. You can also contact Everlasting Funeral Advisors directly.",
+          title: t("funeral.notice"),
+          description: t("funeral.noticeDescription"),
           variant: "default",
         });
       }
@@ -58,8 +60,8 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
 
   const handleSave = () => {
     toast({
-      title: "Saved",
-      description: "Funeral wishes have been saved.",
+      title: t("common.saved"),
+      description: t("funeral.saved"),
     });
   };
 
@@ -80,8 +82,8 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
     // Validate file type
     if (!file.type.startsWith('image/')) {
       toast({
-        title: "Invalid file",
-        description: "Please upload an image file (JPG, PNG, etc.)",
+        title: t("funeral.invalidFile"),
+        description: t("funeral.invalidFileDescription"),
         variant: "destructive"
       });
       return;
@@ -90,8 +92,8 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast({
-        title: "File too large",
-        description: "Please upload an image smaller than 5MB",
+        title: t("funeral.fileTooLarge"),
+        description: t("funeral.fileTooLargeDescription"),
         variant: "destructive"
       });
       return;
@@ -130,14 +132,14 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
       updateFuneral('photo_path', fileName);
 
       toast({
-        title: "Photo uploaded",
-        description: "Your funeral photo has been uploaded successfully.",
+        title: t("funeral.photoUploaded"),
+        description: t("funeral.photoUploadedDescription"),
       });
     } catch (error) {
       console.error('Error uploading photo:', error);
       toast({
-        title: "Upload failed",
-        description: "There was an error uploading your photo. Please try again.",
+        title: t("funeral.uploadFailed"),
+        description: t("funeral.uploadFailedDescription"),
         variant: "destructive"
       });
     } finally {
@@ -157,14 +159,14 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
       updateFuneral('photo_path', null);
 
       toast({
-        title: "Photo removed",
-        description: "Your funeral photo has been removed.",
+        title: t("funeral.photoRemoved"),
+        description: t("funeral.photoRemovedDescription"),
       });
     } catch (error) {
       console.error('Error removing photo:', error);
       toast({
-        title: "Remove failed",
-        description: "There was an error removing your photo. Please try again.",
+        title: t("funeral.removeFailed"),
+        description: t("funeral.removeFailedDescription"),
         variant: "destructive"
       });
     }
@@ -174,32 +176,32 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-2">🕊️ Funeral Wishes</h2>
+          <h2 className="text-2xl font-bold mb-2">{t("navigation.funeral")}</h2>
           <p className="text-muted-foreground">
-            Document your preferences for funeral or memorial services.
+            {t("funeral.description")}
           </p>
         </div>
         <Button onClick={handleSave} size="sm">
           <Save className="h-4 w-4 mr-2" />
-          Save
+          {t("common.save")}
         </Button>
       </div>
 
       <div className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="funeral_preference">Funeral Preference (If Any)</Label>
-          <p className="text-xs text-muted-foreground">Briefly describe your overall funeral or memorial service preferences</p>
+          <Label htmlFor="funeral_preference">{t("funeral.funeralPreference")}</Label>
+          <p className="text-xs text-muted-foreground">{t("funeral.funeralPreferenceHelp")}</p>
           <Textarea
             id="funeral_preference"
             value={funeral.funeral_preference || ""}
             onChange={(e) => updateFuneral("funeral_preference", e.target.value)}
-            placeholder="Example: I prefer a simple graveside service with close family only, or I'd like a celebration of life at my favorite park..."
+            placeholder={t("funeral.funeralPreferencePlaceholder")}
             rows={3}
           />
         </div>
 
         <div>
-          <Label className="text-base font-semibold mb-3 block">Final Disposition Preference</Label>
+          <Label className="text-base font-semibold mb-3 block">{t("funeral.finalDisposition")}</Label>
           <div className="space-y-3">
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
@@ -208,13 +210,13 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                   checked={funeral.burial || false}
                   onCheckedChange={(checked) => updateFuneral("burial", checked)}
                 />
-                <Label htmlFor="burial" className="font-normal">Burial</Label>
+                <Label htmlFor="burial" className="font-normal">{t("funeral.burial")}</Label>
               </div>
               {funeral.burial && (
                 <Textarea
                   value={funeral.burial_notes || ""}
                   onChange={(e) => updateFuneral("burial_notes", e.target.value)}
-                  placeholder="Where would you like to be buried? Cemetery name, location, plot details..."
+                  placeholder={t("funeral.burialNotesPlaceholder")}
                   rows={2}
                   className="ml-6"
                 />
@@ -228,13 +230,13 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                   checked={funeral.cremation || false}
                   onCheckedChange={(checked) => updateFuneral("cremation", checked)}
                 />
-                <Label htmlFor="cremation" className="font-normal">Cremation</Label>
+                <Label htmlFor="cremation" className="font-normal">{t("funeral.cremation")}</Label>
               </div>
               {funeral.cremation && (
                 <Textarea
                   value={funeral.cremation_notes || ""}
                   onChange={(e) => updateFuneral("cremation_notes", e.target.value)}
-                  placeholder="What should be done with your ashes? (e.g., scattered at favorite location, kept in urn, divided among family, buried in cemetery)..."
+                  placeholder={t("funeral.cremationNotesPlaceholder")}
                   rows={2}
                   className="ml-6"
                 />
@@ -248,13 +250,13 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                   checked={funeral.donation || false}
                   onCheckedChange={(checked) => updateFuneral("donation", checked)}
                 />
-                <Label htmlFor="donation" className="font-normal">Body/Organ Donation</Label>
+                <Label htmlFor="donation" className="font-normal">{t("funeral.donation")}</Label>
               </div>
               {funeral.donation && (
                 <Textarea
                   value={funeral.donation_notes || ""}
                   onChange={(e) => updateFuneral("donation_notes", e.target.value)}
-                  placeholder="Specify which organs, whole body donation to science, organization details..."
+                  placeholder={t("funeral.donationNotesPlaceholder")}
                   rows={2}
                   className="ml-6"
                 />
@@ -263,48 +265,48 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
           </div>
           
           <div className="space-y-2 mt-4">
-            <Label htmlFor="cemetery_plot">Cemetery Plot Details</Label>
-            <p className="text-xs text-muted-foreground">Cemetery name, location, plot number, deed information, or pre-purchased plot details</p>
+            <Label htmlFor="cemetery_plot">{t("funeral.cemeteryPlot")}</Label>
+            <p className="text-xs text-muted-foreground">{t("funeral.cemeteryPlotHelp")}</p>
             <Textarea
               id="cemetery_plot"
               value={funeral.cemetery_plot || ""}
               onChange={(e) => updateFuneral("cemetery_plot", e.target.value)}
-              placeholder="Example: Green Hills Cemetery, Section C, Plot 123, Los Angeles, CA. Deed is in safe deposit box..."
+              placeholder={t("funeral.cemeteryPlotPlaceholder")}
               rows={3}
             />
           </div>
 
           <div className="space-y-2 mt-4">
-            <Label htmlFor="disposition_notes">Final Disposition Notes</Label>
-            <p className="text-xs text-muted-foreground">Additional details about ashes disposal location, burial specifics, or other disposition preferences</p>
+            <Label htmlFor="disposition_notes">{t("funeral.dispositionNotes")}</Label>
+            <p className="text-xs text-muted-foreground">{t("funeral.dispositionNotesHelp")}</p>
             <Textarea
               id="disposition_notes"
               value={funeral.disposition_notes || ""}
               onChange={(e) => updateFuneral("disposition_notes", e.target.value)}
-              placeholder="Example: Ashes to be scattered at favorite beach, buried at specific cemetery plot location, etc."
+              placeholder={t("funeral.dispositionNotesPlaceholder")}
               rows={3}
             />
           </div>
         </div>
 
         <div className="space-y-4">
-          <Label className="text-base font-semibold">Pre-Arranged or Prepaid Items/Services</Label>
+          <Label className="text-base font-semibold">{t("funeral.prearranged")}</Label>
           <p className="text-xs text-muted-foreground mb-4">
-            Check off what you&apos;ve already arranged or where you need assistance
+            {t("funeral.prearrangedHelp")}
           </p>
           
           <div className="space-y-4">
             {/* Funeral Home */}
             <div className="space-y-2">
               <div className="grid grid-cols-[1fr_auto_auto] gap-4 items-center">
-                <Label className="font-normal">Funeral Home</Label>
+                <Label className="font-normal">{t("funeral.funeralHome")}</Label>
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="purchased_funeral_home"
                     checked={funeral.purchased_funeral_home || false}
                     onCheckedChange={(checked) => updateFuneral("purchased_funeral_home", checked)}
                   />
-                  <Label htmlFor="purchased_funeral_home" className="text-xs font-normal whitespace-nowrap">Arranged/Prepaid</Label>
+                  <Label htmlFor="purchased_funeral_home" className="text-xs font-normal whitespace-nowrap">{t("funeral.arrangedPrepaid")}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
@@ -312,14 +314,14 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                     checked={funeral.needs_funeral_home || false}
                     onCheckedChange={(checked) => updateFuneral("needs_funeral_home", checked)}
                   />
-                  <Label htmlFor="needs_funeral_home" className="text-xs font-normal whitespace-nowrap">Needs to be Done</Label>
+                  <Label htmlFor="needs_funeral_home" className="text-xs font-normal whitespace-nowrap">{t("funeral.needsToBeDone")}</Label>
                 </div>
               </div>
               {funeral.purchased_funeral_home && (
                 <Input
                   value={funeral.funeral_home_name || ""}
                   onChange={(e) => updateFuneral("funeral_home_name", e.target.value)}
-                  placeholder="Funeral home name, contract details, payment status, document location"
+                  placeholder={t("funeral.funeralHomePlaceholder")}
                   className="ml-0"
                 />
               )}
@@ -328,14 +330,14 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
             {/* Cemetery Plot */}
             <div className="space-y-2">
               <div className="grid grid-cols-[1fr_auto_auto] gap-4 items-center">
-                <Label className="font-normal">Cemetery Plot</Label>
+                <Label className="font-normal">{t("funeral.cemeteryPlotItem")}</Label>
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="purchased_cemetery"
                     checked={funeral.purchased_cemetery || false}
                     onCheckedChange={(checked) => updateFuneral("purchased_cemetery", checked)}
                   />
-                  <Label htmlFor="purchased_cemetery" className="text-xs font-normal whitespace-nowrap">Arranged/Prepaid</Label>
+                  <Label htmlFor="purchased_cemetery" className="text-xs font-normal whitespace-nowrap">{t("funeral.arrangedPrepaid")}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
@@ -343,14 +345,14 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                     checked={funeral.needs_cemetery || false}
                     onCheckedChange={(checked) => updateFuneral("needs_cemetery", checked)}
                   />
-                  <Label htmlFor="needs_cemetery" className="text-xs font-normal whitespace-nowrap">Needs to be Done</Label>
+                  <Label htmlFor="needs_cemetery" className="text-xs font-normal whitespace-nowrap">{t("funeral.needsToBeDone")}</Label>
                 </div>
               </div>
               {funeral.purchased_cemetery && (
                 <Input
                   value={funeral.cemetery_name || ""}
                   onChange={(e) => updateFuneral("cemetery_name", e.target.value)}
-                  placeholder="Cemetery name, plot location, deed location, payment status"
+                  placeholder={t("funeral.cemeteryPlotItemPlaceholder")}
                   className="ml-0"
                 />
               )}
@@ -359,14 +361,14 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
             {/* Funeral Plan */}
             <div className="space-y-2">
               <div className="grid grid-cols-[1fr_auto_auto] gap-4 items-center">
-                <Label className="font-normal">Funeral Plan (prepaid)</Label>
+                <Label className="font-normal">{t("funeral.funeralPlan")}</Label>
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="purchased_funeral_packet"
                     checked={funeral.purchased_funeral_packet || false}
                     onCheckedChange={(checked) => updateFuneral("purchased_funeral_packet", checked)}
                   />
-                  <Label htmlFor="purchased_funeral_packet" className="text-xs font-normal whitespace-nowrap">Arranged/Prepaid</Label>
+                  <Label htmlFor="purchased_funeral_packet" className="text-xs font-normal whitespace-nowrap">{t("funeral.arrangedPrepaid")}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
@@ -374,14 +376,14 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                     checked={funeral.needs_funeral_packet || false}
                     onCheckedChange={(checked) => updateFuneral("needs_funeral_packet", checked)}
                   />
-                  <Label htmlFor="needs_funeral_packet" className="text-xs font-normal whitespace-nowrap">Needs to be Done</Label>
+                  <Label htmlFor="needs_funeral_packet" className="text-xs font-normal whitespace-nowrap">{t("funeral.needsToBeDone")}</Label>
                 </div>
               </div>
               {funeral.purchased_funeral_packet && (
                 <Input
                   value={funeral.funeral_packet_name || ""}
                   onChange={(e) => updateFuneral("funeral_packet_name", e.target.value)}
-                  placeholder="Package name, provider, what's included, contract location"
+                  placeholder={t("funeral.funeralPlanPlaceholder")}
                   className="ml-0"
                 />
               )}
@@ -390,14 +392,14 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
             {/* Headstone/Marker */}
             <div className="space-y-2">
               <div className="grid grid-cols-[1fr_auto_auto] gap-4 items-center">
-                <Label className="font-normal">Headstone/Marker</Label>
+                <Label className="font-normal">{t("funeral.headstone")}</Label>
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="purchased_headstone"
                     checked={funeral.purchased_headstone || false}
                     onCheckedChange={(checked) => updateFuneral("purchased_headstone", checked)}
                   />
-                  <Label htmlFor="purchased_headstone" className="text-xs font-normal whitespace-nowrap">Arranged/Prepaid</Label>
+                  <Label htmlFor="purchased_headstone" className="text-xs font-normal whitespace-nowrap">{t("funeral.arrangedPrepaid")}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
@@ -405,14 +407,14 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                     checked={funeral.needs_headstone || false}
                     onCheckedChange={(checked) => updateFuneral("needs_headstone", checked)}
                   />
-                  <Label htmlFor="needs_headstone" className="text-xs font-normal whitespace-nowrap">Needs to be Done</Label>
+                  <Label htmlFor="needs_headstone" className="text-xs font-normal whitespace-nowrap">{t("funeral.needsToBeDone")}</Label>
                 </div>
               </div>
               {funeral.purchased_headstone && (
                 <Input
                   value={funeral.headstone_name || ""}
                   onChange={(e) => updateFuneral("headstone_name", e.target.value)}
-                  placeholder="Vendor, design details, inscription, payment status, receipt location"
+                  placeholder={t("funeral.headstonePlaceholder")}
                   className="ml-0"
                 />
               )}
@@ -421,14 +423,14 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
             {/* Flowers/Arrangements */}
             <div className="space-y-2">
               <div className="grid grid-cols-[1fr_auto_auto] gap-4 items-center">
-                <Label className="font-normal">Flowers/Arrangements</Label>
+                <Label className="font-normal">{t("funeral.flowers")}</Label>
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="purchased_flowers"
                     checked={funeral.purchased_flowers || false}
                     onCheckedChange={(checked) => updateFuneral("purchased_flowers", checked)}
                   />
-                  <Label htmlFor="purchased_flowers" className="text-xs font-normal whitespace-nowrap">Arranged/Prepaid</Label>
+                  <Label htmlFor="purchased_flowers" className="text-xs font-normal whitespace-nowrap">{t("funeral.arrangedPrepaid")}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
@@ -436,14 +438,14 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
                     checked={funeral.needs_flowers || false}
                     onCheckedChange={(checked) => updateFuneral("needs_flowers", checked)}
                   />
-                  <Label htmlFor="needs_flowers" className="text-xs font-normal whitespace-nowrap">Needs to be Done</Label>
+                  <Label htmlFor="needs_flowers" className="text-xs font-normal whitespace-nowrap">{t("funeral.needsToBeDone")}</Label>
                 </div>
               </div>
               {funeral.purchased_flowers && (
                 <Input
                   value={funeral.flowers_name || ""}
                   onChange={(e) => updateFuneral("flowers_name", e.target.value)}
-                  placeholder="Florist name, arrangement details, payment status, contact info"
+                  placeholder={t("funeral.flowersPlaceholder")}
                   className="ml-0"
                 />
               )}
