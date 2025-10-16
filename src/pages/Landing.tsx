@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import mascotCouple from "@/assets/mascot-couple.png";
+import mascotCouple from "@/assets/mascot-couple-scene.png";
 
 const Landing = () => {
   return (

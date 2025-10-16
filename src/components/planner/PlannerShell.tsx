@@ -55,6 +55,14 @@ export const PlannerShell = ({
             <div>
               <h1 className="text-lg font-semibold text-primary">{t("header.title")}</h1>
               <p className="text-xs text-muted-foreground">{t("header.providedBy")}</p>
+              <a 
+                href="https://everlastingfuneraladvisors.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs text-primary hover:underline"
+              >
+                About Us
+              </a>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -165,7 +173,7 @@ export const PlannerShell = ({
 
           {/* Contact Info */}
           <div className="mt-8 pt-4 border-t border-sidebar-border">
-            <h3 className="text-sm font-semibold text-sidebar-foreground mb-2">Contact Us</h3>
+            <h3 className="text-sm font-semibold text-sidebar-foreground mb-2">Provided by</h3>
             <div className="text-xs text-sidebar-foreground/80 space-y-1">
               <p className="font-medium">Everlasting Funeral Advisors</p>
               <p>(323) 863-5804</p>
