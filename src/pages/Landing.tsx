@@ -31,15 +31,6 @@ const Landing = () => {
       {/* Hero Section */}
       <main className="container mx-auto px-4 py-16 md:py-24">
         <div className="max-w-3xl mx-auto text-center space-y-6">
-          {/* Mascot Image */}
-          <div className="flex justify-center mb-8">
-            <img 
-              src={mascotCouple} 
-              alt="Funeral Planning Mascots" 
-              className="w-64 h-auto"
-            />
-          </div>
-
           <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">
             Plan Your Final Wishes with Peace of Mind
           </h1>
@@ -56,8 +47,17 @@ const Landing = () => {
           </div>
         </div>
 
+        {/* Mascot Image */}
+        <div className="flex justify-center mt-20 mb-12">
+          <img 
+            src={mascotCouple} 
+            alt="Funeral Planning Mascots" 
+            className="w-64 h-auto"
+          />
+        </div>
+
         {/* Overview Section */}
-        <div className="max-w-4xl mx-auto mt-20 mb-20">
+        <div className="max-w-4xl mx-auto mb-20">
           <div className="bg-card border border-border rounded-lg p-8 md:p-12 shadow-sm">
             <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-6 text-center">
               Our Mission
