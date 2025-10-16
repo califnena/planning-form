@@ -79,30 +79,55 @@ const PlannerApp = () => {
 
   const ensureUserHasOrg = async (userId: string, email: string) => {
     try {
-      const { data: existingMembership } = await supabase
+      // Check if user already has an org membership
+      const { data: existingMembership, error: memberError } = await supabase
         .from("org_members")
-        .select("id")
+        .select("id, org_id")
         .eq("user_id", userId)
         .limit(1)
         .maybeSingle();
 
-      if (existingMembership) return;
+      if (memberError) {
+        console.error("Error checking org membership:", memberError);
+      }
 
+      // If user already has membership, we're done
+      if (existingMembership) {
+        console.log("User already has org membership");
+        return;
+      }
+
+      // Try to create new org and membership
       const { data: orgData, error: orgError } = await supabase
         .from("orgs")
         .insert({ name: `${email}'s Organization` })
         .select()
         .single();
 
-      if (orgError || !orgData) return;
+      if (orgError) {
+        console.error("Error creating org:", orgError);
+        // Org creation failed, but app can still work with localStorage
+        return;
+      }
 
-      await supabase.from("org_members").insert({
-        org_id: orgData.id,
-        user_id: userId,
-        role: "owner",
-      });
+      if (orgData) {
+        const { error: memberInsertError } = await supabase
+          .from("org_members")
+          .insert({
+            org_id: orgData.id,
+            user_id: userId,
+            role: "owner",
+          });
+
+        if (memberInsertError) {
+          console.error("Error creating org membership:", memberInsertError);
+        } else {
+          console.log("Org and membership created successfully");
+        }
+      }
     } catch (e) {
-      console.warn("ensureUserHasOrg warning", e);
+      console.error("ensureUserHasOrg error:", e);
+      // Don't throw - app can still work with localStorage
     }
   };
 

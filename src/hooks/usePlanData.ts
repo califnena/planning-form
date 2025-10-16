@@ -34,73 +34,6 @@ export const usePlanData = (userId: string) => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Load plan from Supabase
-  useEffect(() => {
-    const loadPlan = async () => {
-      try {
-        // Get user's org
-        const { data: orgMember } = await supabase
-          .from("org_members")
-          .select("org_id")
-          .eq("user_id", userId)
-          .eq("role", "owner")
-          .single();
-
-        if (!orgMember) {
-          setLoading(false);
-          return;
-        }
-
-        // Get or create plan
-        const { data: existingPlan } = await supabase
-          .from("plans")
-          .select("*")
-          .eq("org_id", orgMember.org_id)
-          .eq("owner_user_id", userId)
-          .maybeSingle();
-
-        if (existingPlan) {
-          setPlan(existingPlan);
-          // Merge with localStorage if newer
-          const localData = localStorage.getItem(`plan_${userId}`);
-          if (localData) {
-            const parsed = JSON.parse(localData);
-            const localTime = new Date(parsed.updated_at || 0);
-            const serverTime = new Date(existingPlan.updated_at || 0);
-            if (localTime > serverTime) {
-              setPlan(parsed);
-            }
-          }
-        } else {
-          // Create new plan
-          const { data: newPlan, error } = await supabase
-            .from("plans")
-            .insert({
-              org_id: orgMember.org_id,
-              owner_user_id: userId,
-              title: "My Final Wishes Plan",
-            })
-            .select()
-            .single();
-
-          if (error) throw error;
-          setPlan(newPlan);
-        }
-      } catch (error: any) {
-        console.error("Error loading plan:", error);
-        toast({
-          title: "Error loading plan",
-          description: error.message,
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPlan();
-  }, [userId, toast]);
-
   // Debounced save to Supabase
   const saveToDB = useCallback(
     debounce(async (data: PlanData) => {
@@ -122,6 +55,123 @@ export const usePlanData = (userId: string) => {
     }, 800),
     []
   );
+
+  // Load plan from Supabase
+  useEffect(() => {
+    const loadPlan = async () => {
+      try {
+        // First, try to load from localStorage
+        const localData = localStorage.getItem(`plan_${userId}`);
+        if (localData) {
+          try {
+            const parsed = JSON.parse(localData);
+            setPlan(parsed);
+          } catch (e) {
+            console.error("Error parsing localStorage:", e);
+          }
+        }
+
+        // Get user's org - use maybeSingle to avoid errors
+        const { data: orgMember, error: orgError } = await supabase
+          .from("org_members")
+          .select("org_id")
+          .eq("user_id", userId)
+          .eq("role", "owner")
+          .maybeSingle();
+
+        if (orgError) {
+          console.error("Error fetching org member:", orgError);
+          setLoading(false);
+          return;
+        }
+
+        if (!orgMember) {
+          console.log("No org found for user, data will be stored locally only");
+          setLoading(false);
+          return;
+        }
+
+        // Get or create plan
+        const { data: existingPlan, error: planError } = await supabase
+          .from("plans")
+          .select("*")
+          .eq("org_id", orgMember.org_id)
+          .eq("owner_user_id", userId)
+          .maybeSingle();
+
+        if (planError) {
+          console.error("Error fetching plan:", planError);
+          setLoading(false);
+          return;
+        }
+
+        if (existingPlan) {
+          // Merge server data with local data, preferring newer data
+          if (localData) {
+            const parsed = JSON.parse(localData);
+            const localTime = new Date(parsed.updated_at || 0);
+            const serverTime = new Date(existingPlan.updated_at || 0);
+            if (localTime > serverTime) {
+              // Local is newer, sync to server
+              setPlan(parsed);
+              saveToDB(parsed);
+            } else {
+              // Server is newer, use server data
+              setPlan(existingPlan);
+              localStorage.setItem(`plan_${userId}`, JSON.stringify(existingPlan));
+            }
+          } else {
+            setPlan(existingPlan);
+            localStorage.setItem(`plan_${userId}`, JSON.stringify(existingPlan));
+          }
+        } else {
+          // Create new plan in database
+          const planData = localData ? JSON.parse(localData) : {
+            title: "My Final Wishes Plan",
+          };
+
+          const { data: newPlan, error: createError } = await supabase
+            .from("plans")
+            .insert({
+              org_id: orgMember.org_id,
+              owner_user_id: userId,
+              ...planData,
+            })
+            .select()
+            .single();
+
+          if (createError) {
+            console.error("Error creating plan:", createError);
+            // Plan creation failed, but we have local data
+            setLoading(false);
+            return;
+          }
+
+          if (newPlan) {
+            setPlan(newPlan);
+            localStorage.setItem(`plan_${userId}`, JSON.stringify(newPlan));
+          }
+        }
+      } catch (error: any) {
+        console.error("Error loading plan:", error);
+        // Don't show error toast if we have local data
+        const localData = localStorage.getItem(`plan_${userId}`);
+        if (!localData) {
+          toast({
+            title: "Note",
+            description: "Working in offline mode. Your data is saved locally.",
+            variant: "default",
+          });
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (userId) {
+      loadPlan();
+    }
+  }, [userId, toast, saveToDB]);
 
   // Update plan (saves to localStorage immediately, DB after debounce)
   const updatePlan = useCallback(
