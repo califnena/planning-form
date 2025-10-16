@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Plus, Save, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import jsPDF from "jspdf";
 import everlastingLogo from "@/assets/everlasting-logo.png";
 
@@ -16,6 +17,7 @@ interface SectionContactsProps {
 export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
   const contacts = data.contacts || [];
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const addContact = () => {
     onChange({
@@ -36,8 +38,8 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
 
   const handleSave = () => {
     toast({
-      title: "Saved",
-      description: "Contact information has been saved.",
+      title: t("common.saved"),
+      description: t("contacts.saved"),
     });
   };
 

@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Trash2, Save, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import jsPDF from "jspdf";
 import everlastingLogo from "@/assets/everlasting-logo.png";
 
@@ -31,6 +32,7 @@ const DEFAULT_CHECKLIST_ITEMS = [
 export const SectionChecklist = ({ data, onChange }: SectionChecklistProps) => {
   const customItems = data.checklist_items || [];
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const addCustomItem = () => {
     onChange({
@@ -54,8 +56,8 @@ export const SectionChecklist = ({ data, onChange }: SectionChecklistProps) => {
 
   const handleSave = () => {
     toast({
-      title: "Saved",
-      description: "Checklist has been saved.",
+      title: t("common.saved"),
+      description: t("checklist.saved"),
     });
   };
 

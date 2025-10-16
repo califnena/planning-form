@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 interface SectionPersonalProps {
   data: any;
@@ -13,6 +14,7 @@ interface SectionPersonalProps {
 export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
   const profile = data.personal_profile || {};
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const updateProfile = (field: string, value: any) => {
     onChange({
@@ -23,8 +25,8 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
   const handleSave = () => {
     toast({
-      title: "Saved",
-      description: "Personal information has been saved.",
+      title: t("common.saved"),
+      description: t("personal.saved"),
     });
   };
 
@@ -32,41 +34,41 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-2">Personal Information</h2>
-          <p className="text-muted-foreground">Complete biographical details for official records</p>
+          <h2 className="text-2xl font-bold mb-2">{t("personal.title")}</h2>
+          <p className="text-muted-foreground">{t("personal.description")}</p>
         </div>
         <Button onClick={handleSave} size="sm">
           <Save className="h-4 w-4 mr-2" />
-          Save
+          {t("common.save")}
         </Button>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="full_name">Full Legal Name</Label>
-          <p className="text-xs text-muted-foreground">Enter your complete legal name as it appears on official documents</p>
+          <Label htmlFor="full_name">{t("personal.fullName")}</Label>
+          <p className="text-xs text-muted-foreground">{t("personal.fullNameHelp")}</p>
           <Input
             id="full_name"
             value={profile.full_name || ""}
             onChange={(e) => updateProfile("full_name", e.target.value)}
-            placeholder="First Middle Last"
+            placeholder={t("personal.fullNamePlaceholder")}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="nicknames">Nicknames</Label>
-          <p className="text-xs text-muted-foreground">Any nicknames or names you go by</p>
+          <Label htmlFor="nicknames">{t("personal.nicknames")}</Label>
+          <p className="text-xs text-muted-foreground">{t("personal.nicknamesHelp")}</p>
           <Input
             id="nicknames"
             value={profile.nicknames || ""}
             onChange={(e) => updateProfile("nicknames", e.target.value)}
-            placeholder="e.g., Bob, Johnny"
+            placeholder={t("personal.nicknamesPlaceholder")}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="maiden_name">Maiden Name (if applicable)</Label>
-          <p className="text-xs text-muted-foreground">Birth name if different from current legal name</p>
+          <Label htmlFor="maiden_name">{t("personal.maidenName")}</Label>
+          <p className="text-xs text-muted-foreground">{t("personal.maidenNameHelp")}</p>
           <Input
             id="maiden_name"
             value={profile.maiden_name || ""}
@@ -75,8 +77,8 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="dob">Date of Birth</Label>
-          <p className="text-xs text-muted-foreground">Needed for official records and certificates</p>
+          <Label htmlFor="dob">{t("personal.dob")}</Label>
+          <p className="text-xs text-muted-foreground">{t("personal.dobHelp")}</p>
           <Input
             id="dob"
             type="date"
@@ -87,30 +89,30 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="birthplace">Place of Birth</Label>
-          <p className="text-xs text-muted-foreground">City, State, and Country where you were born</p>
+          <Label htmlFor="birthplace">{t("personal.birthplace")}</Label>
+          <p className="text-xs text-muted-foreground">{t("personal.birthplaceHelp")}</p>
           <Input
             id="birthplace"
             value={profile.birthplace || ""}
             onChange={(e) => updateProfile("birthplace", e.target.value)}
-            placeholder="City, State, Country"
+            placeholder={t("personal.birthplacePlaceholder")}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="ssn">Social Security Number</Label>
-          <p className="text-xs text-muted-foreground">Required for benefits and official notifications</p>
+          <Label htmlFor="ssn">{t("personal.ssn")}</Label>
+          <p className="text-xs text-muted-foreground">{t("personal.ssnHelp")}</p>
           <Input
             id="ssn"
             value={profile.ssn || ""}
             onChange={(e) => updateProfile("ssn", e.target.value)}
-            placeholder="XXX-XX-XXXX"
+            placeholder={t("personal.ssnPlaceholder")}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="citizenship">Citizenship</Label>
-          <p className="text-xs text-muted-foreground">Country of citizenship</p>
+          <Label htmlFor="citizenship">{t("personal.citizenship")}</Label>
+          <p className="text-xs text-muted-foreground">{t("personal.citizenshipHelp")}</p>
           <Input
             id="citizenship"
             value={profile.citizenship || ""}
@@ -120,20 +122,20 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="address">Current Address</Label>
-        <p className="text-xs text-muted-foreground">Your complete residential address</p>
+        <Label htmlFor="address">{t("personal.address")}</Label>
+        <p className="text-xs text-muted-foreground">{t("personal.addressHelp")}</p>
         <Textarea
           id="address"
           value={profile.address || ""}
           onChange={(e) => updateProfile("address", e.target.value)}
-          placeholder="Street, City, State, ZIP"
+          placeholder={t("personal.addressPlaceholder")}
           rows={3}
         />
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="marital_status">Marital Status</Label>
+          <Label htmlFor="marital_status">{t("personal.maritalStatus")}</Label>
           <Input
             id="marital_status"
             value={profile.marital_status || ""}
@@ -142,7 +144,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="partner_name">Spouse/Partner Name</Label>
+          <Label htmlFor="partner_name">{t("personal.partnerName")}</Label>
           <Input
             id="partner_name"
             value={profile.partner_name || ""}
@@ -151,7 +153,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="ex_spouse_name">Former Spouse Name (if applicable)</Label>
+          <Label htmlFor="ex_spouse_name">{t("personal.exSpouseName")}</Label>
           <Input
             id="ex_spouse_name"
             value={profile.ex_spouse_name || ""}
@@ -160,7 +162,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="religion">Religion/Faith</Label>
+          <Label htmlFor="religion">{t("personal.religion")}</Label>
           <Input
             id="religion"
             value={profile.religion || ""}
@@ -169,7 +171,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="father_name">Father's Name</Label>
+          <Label htmlFor="father_name">{t("personal.fatherName")}</Label>
           <Input
             id="father_name"
             value={profile.father_name || ""}
@@ -178,7 +180,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="mother_name">Mother's Name</Label>
+          <Label htmlFor="mother_name">{t("personal.motherName")}</Label>
           <Input
             id="mother_name"
             value={profile.mother_name || ""}
@@ -189,7 +191,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <Label>Children's Names</Label>
+          <Label>{t("personal.childrenNames")}</Label>
           <Button 
             variant="outline" 
             size="sm"
@@ -199,7 +201,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
             }}
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Child
+            {t("personal.addChild")}
           </Button>
         </div>
         <div className="space-y-3">
@@ -212,7 +214,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
                   updated[index] = e.target.value;
                   updateProfile("child_names", updated);
                 }}
-                placeholder={`Child ${index + 1} name`}
+                placeholder={t("personal.childPlaceholder", { index: index + 1 })}
               />
               <Button
                 variant="outline"
@@ -242,10 +244,10 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
       </div>
 
       <div className="border-t pt-6">
-        <h3 className="text-lg font-semibold mb-4">Military Service (if applicable)</h3>
+        <h3 className="text-lg font-semibold mb-4">{t("personal.militaryService")}</h3>
         <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="vet_branch">Branch</Label>
+            <Label htmlFor="vet_branch">{t("personal.vetBranch")}</Label>
             <Input
               id="vet_branch"
               value={profile.vet_branch || ""}
@@ -254,7 +256,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="vet_rank">Rank</Label>
+            <Label htmlFor="vet_rank">{t("personal.vetRank")}</Label>
             <Input
               id="vet_rank"
               value={profile.vet_rank || ""}
@@ -263,7 +265,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="vet_serial">Serial Number</Label>
+            <Label htmlFor="vet_serial">{t("personal.vetSerial")}</Label>
             <Input
               id="vet_serial"
               value={profile.vet_serial || ""}
@@ -272,7 +274,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="vet_war">War/Conflict</Label>
+            <Label htmlFor="vet_war">{t("personal.vetWar")}</Label>
             <Input
               id="vet_war"
               value={profile.vet_war || ""}
@@ -281,7 +283,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="vet_entry">Date of Entry</Label>
+            <Label htmlFor="vet_entry">{t("personal.vetEntry")}</Label>
             <Input
               id="vet_entry"
               type="date"
@@ -292,7 +294,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="vet_discharge">Date of Discharge</Label>
+            <Label htmlFor="vet_discharge">{t("personal.vetDischarge")}</Label>
             <Input
               id="vet_discharge"
               type="date"

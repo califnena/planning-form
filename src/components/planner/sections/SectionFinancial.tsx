@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 interface SectionFinancialProps {
   data: any;
@@ -16,6 +17,7 @@ export const SectionFinancial = ({ data, onChange }: SectionFinancialProps) => {
   const financial = data.financial || {};
   const accounts = financial.accounts || [];
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const updateFinancial = (field: string, value: any) => {
     onChange({
@@ -40,8 +42,8 @@ export const SectionFinancial = ({ data, onChange }: SectionFinancialProps) => {
 
   const handleSave = () => {
     toast({
-      title: "Saved",
-      description: "Financial information has been saved.",
+      title: t("common.saved"),
+      description: t("financial.saved"),
     });
   };
 
@@ -49,14 +51,14 @@ export const SectionFinancial = ({ data, onChange }: SectionFinancialProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-2">💰 Financial Life</h2>
+          <h2 className="text-2xl font-bold mb-2">{t("navigation.financial")}</h2>
           <p className="text-muted-foreground">
-            Document your financial accounts and important financial information.
+            {t("financial.description")}
           </p>
         </div>
         <Button onClick={handleSave} size="sm">
           <Save className="h-4 w-4 mr-2" />
-          Save
+          {t("common.save")}
         </Button>
       </div>
 
