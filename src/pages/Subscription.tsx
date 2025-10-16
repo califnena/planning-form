@@ -112,6 +112,8 @@ export default function Subscription() {
   const handleUpgrade = (plan: SubscriptionPlan) => {
     if (plan === "basic") {
       window.location.href = "https://buy.stripe.com/6oU28r2x75OrbLxg6q7bW00";
+    } else if (plan === "premium") {
+      window.location.href = "https://buy.stripe.com/14A5kD6Nn3Gjg1NdYi7bW02";
     } else {
       toast({
         title: t("subscription.comingSoon"),
