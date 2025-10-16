@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Check } from "lucide-react";
+import { Loader2, Check, ArrowLeft } from "lucide-react";
 import binderImage from "@/assets/fireproof-binder.png";
 
 type SubscriptionPlan = "free" | "basic" | "premium";
@@ -103,6 +103,15 @@ export default function Subscription() {
 
   return (
     <div className="container max-w-6xl py-8">
+      <Button 
+        variant="ghost" 
+        onClick={() => navigate("/app")}
+        className="mb-6"
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Return to Home
+      </Button>
+      
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Subscription Plans</h1>
         <p className="text-muted-foreground">Choose the plan that works best for you</p>

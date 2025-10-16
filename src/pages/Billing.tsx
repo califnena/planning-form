@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, CreditCard, Download } from "lucide-react";
+import { Loader2, CreditCard, Download, ArrowLeft } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -80,6 +80,15 @@ export default function Billing() {
 
   return (
     <div className="container max-w-4xl py-8 space-y-8">
+      <Button 
+        variant="ghost" 
+        onClick={() => navigate("/app")}
+        className="mb-6"
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Return to Home
+      </Button>
+      
       <div>
         <h1 className="text-3xl font-bold">Billing</h1>
         <p className="text-muted-foreground">Manage your payment methods and invoices</p>

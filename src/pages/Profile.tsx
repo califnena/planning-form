@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Upload, ArrowLeft } from "lucide-react";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -118,6 +118,15 @@ export default function Profile() {
 
   return (
     <div className="container max-w-2xl py-8">
+      <Button 
+        variant="ghost" 
+        onClick={() => navigate("/app")}
+        className="mb-6"
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Return to Home
+      </Button>
+      
       <Card>
         <CardHeader>
           <CardTitle>Account Settings</CardTitle>
