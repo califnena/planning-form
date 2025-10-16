@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Check, ArrowLeft } from "lucide-react";
 import binderImage from "@/assets/fireproof-binder.png";
 
-type SubscriptionPlan = "free" | "basic" | "premium";
+type SubscriptionPlan = "free" | "basic" | "monthly" | "premium";
 
 export default function Subscription() {
   const navigate = useNavigate();
@@ -67,6 +67,19 @@ export default function Subscription() {
       ],
     },
     {
+      name: t("subscription.monthly"),
+      value: "monthly" as SubscriptionPlan,
+      price: t("subscription.monthlyPrice"),
+      period: t("subscription.perMonth"),
+      features: [
+        t("subscription.monthlyFeature1"),
+        t("subscription.monthlyFeature2"),
+        t("subscription.monthlyFeature3"),
+        t("subscription.monthlyFeature4"),
+        t("subscription.monthlyFeature5"),
+      ],
+    },
+    {
       name: t("subscription.premium"),
       value: "premium" as SubscriptionPlan,
       price: t("subscription.premiumPrice"),
@@ -77,6 +90,7 @@ export default function Subscription() {
         t("subscription.premiumFeature3"),
         t("subscription.premiumFeature4"),
         t("subscription.premiumFeature5"),
+        t("subscription.premiumFeature6"),
       ],
     },
   ];
@@ -123,7 +137,7 @@ export default function Subscription() {
         <p className="text-muted-foreground">{t("subscription.description")}</p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         {plans.map((plan) => (
           <Card key={plan.value} className={currentPlan === plan.value ? "border-primary" : ""}>
             <CardHeader>
