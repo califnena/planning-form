@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Mail, MessageSquare, Facebook, FileText, Eye, Printer } from "lucide-react";
 import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { ProfileDropdown } from "@/components/ProfileDropdown";
 import { useTranslation } from "react-i18next";
 import {
   Tooltip,
@@ -58,12 +59,7 @@ export const PlannerShell = ({
           </div>
           <div className="flex items-center gap-4">
             <LanguageSelector />
-            <button
-              onClick={onSignOut}
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              {t("header.signOut")}
-            </button>
+            <ProfileDropdown />
           </div>
         </div>
       </header>
