@@ -71,8 +71,3 @@ export const PLANS = {
     ],
   },
 } as const;
-
-export const withPromo = (url: string, promoCode: string = "EFA10") => {
-  const separator = url.includes("?") ? "&" : "?";
-  return `${url}${separator}prefilled_promo_code=${promoCode}`;
-};
