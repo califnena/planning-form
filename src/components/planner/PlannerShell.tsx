@@ -1,11 +1,12 @@
 import { useState, ReactNode } from "react";
 import { SidebarNav } from "./SidebarNav";
 import { Button } from "@/components/ui/button";
-import { Download, Mail, MessageSquare, Facebook, FileText, Eye, Printer, Save } from "lucide-react";
+import { Download, Mail, MessageSquare, Facebook, FileText, Eye, Printer, Save, Sparkles } from "lucide-react";
 import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import {
   Tooltip,
   TooltipContent,
@@ -191,6 +192,17 @@ export const PlannerShell = ({
                 <FileText className="mr-2 h-4 w-4" />
                 Request a Quote
               </a>
+            </Button>
+            
+            <Button
+              size="sm"
+              className="w-full justify-start bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
+              asChild
+            >
+              <Link to="/vip-coach">
+                <Sparkles className="mr-2 h-4 w-4" />
+                VIP Coach Assistant
+              </Link>
             </Button>
           </div>
 
