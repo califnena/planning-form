@@ -207,10 +207,10 @@ export default function Subscription() {
               </li>
             </ul>
           </div>
-          <Button className="w-full" onClick={() => toast({
-            title: t("subscription.comingSoon"),
-            description: t("subscription.binderComingSoon"),
-          })}>
+          <Button 
+            className="w-full" 
+            onClick={() => window.location.href = "https://buy.stripe.com/eVqcN5dbLfp1aHt8DY7bW01"}
+          >
             {t("subscription.orderNow")}
           </Button>
         </CardContent>
