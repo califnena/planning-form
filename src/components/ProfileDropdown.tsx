@@ -1,4 +1,4 @@
-import { User, LogOut, Settings, CreditCard } from "lucide-react";
+import { User, LogOut, Settings, CreditCard, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -19,6 +19,7 @@ export const ProfileDropdown = () => {
   const { toast } = useToast();
   const [profile, setProfile] = useState<{ full_name?: string; avatar_url?: string } | null>(null);
   const [userEmail, setUserEmail] = useState<string>("");
+  const [isVIP, setIsVIP] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -34,6 +35,16 @@ export const ProfileDropdown = () => {
         if (data) {
           setProfile(data);
         }
+
+        // Check VIP subscription status
+        const { data: subscriptionData } = await supabase
+          .from("subscriptions")
+          .select("plan_type")
+          .eq("user_id", user.id)
+          .eq("status", "active")
+          .maybeSingle();
+        
+        setIsVIP(subscriptionData?.plan_type === "vip_annual" || subscriptionData?.plan_type === "vip_monthly");
       }
     };
 
@@ -89,6 +100,15 @@ export const ProfileDropdown = () => {
           <Settings className="mr-2 h-4 w-4" />
           <span>Subscription</span>
         </DropdownMenuItem>
+        {isVIP && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => navigate("/vip-coach")} className="text-primary">
+              <Sparkles className="mr-2 h-4 w-4" />
+              <span>VIP Coach Assistant</span>
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
