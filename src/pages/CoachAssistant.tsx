@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Heart, Sparkles, ArrowRight, Mic, Volume2, VolumeX } from "lucide-react";
+import { Loader2, Heart, Sparkles, ArrowRight, Mic, Volume2, VolumeX, Home, LogOut } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 type Message = { role: "user" | "assistant"; content: string };
@@ -147,6 +147,11 @@ export default function CoachAssistant() {
     streamChat(prompt);
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/login");
+  };
+
   if (checkingAccess) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -229,6 +234,26 @@ export default function CoachAssistant() {
       <div className="max-w-4xl mx-auto space-y-6">
         <Card className="border-none shadow-lg">
           <CardHeader className="text-center space-y-4">
+            <div className="flex items-center justify-between mb-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/app")}
+                className="gap-2"
+              >
+                <Home className="h-4 w-4" />
+                Home
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
+            </div>
             <div className="flex items-center justify-center gap-2">
               <Heart className="h-6 w-6 text-primary" />
               <CardTitle className="text-3xl font-serif">Your Everlasting Coach</CardTitle>
@@ -390,6 +415,8 @@ export default function CoachAssistant() {
 
             <p className="text-xs text-muted-foreground text-center">
               Your conversation is private and secure. This coach does not provide legal, medical, or financial advice.
+              <br />
+              <strong>Note:</strong> Conversations are not saved — they will be lost if you refresh or leave this page.
             </p>
           </CardContent>
         </Card>
