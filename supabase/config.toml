@@ -1,1 +1,19 @@
 project_id = "bhhmizhxxpckibxudbrq"
+
+[functions.coach-chat]
+verify_jwt = false
+
+[functions.send-contact-email]
+verify_jwt = false
+
+[functions.send-plan-email]
+verify_jwt = false
+
+[functions.kb-search]
+verify_jwt = false
+
+[functions.create-appointment]
+verify_jwt = true
+
+[functions.assistant-chat]
+verify_jwt = true

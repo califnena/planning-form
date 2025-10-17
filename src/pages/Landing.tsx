@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { AssistantWidget } from "@/components/assistant/AssistantWidget";
 import mascotCouple from "@/assets/mascot-couple-scene.png";
 
 const Landing = () => {
@@ -220,6 +221,8 @@ const Landing = () => {
           </div>
         </div>
       </footer>
+      
+      <AssistantWidget />
     </div>
   );
 };

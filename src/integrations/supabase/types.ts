@@ -14,6 +14,131 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_tour_steps: {
+        Row: {
+          body: string | null
+          created_at: string | null
+          id: string
+          screen: string
+          selector: string | null
+          step_order: number
+          title: string | null
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string | null
+          id?: string
+          screen: string
+          selector?: string | null
+          step_order: number
+          title?: string | null
+        }
+        Update: {
+          body?: string | null
+          created_at?: string | null
+          id?: string
+          screen?: string
+          selector?: string | null
+          step_order?: number
+          title?: string | null
+        }
+        Relationships: []
+      }
+      appointments: {
+        Row: {
+          channel: string | null
+          created_at: string | null
+          ends_at: string
+          id: string
+          notes: string | null
+          starts_at: string
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          channel?: string | null
+          created_at?: string | null
+          ends_at: string
+          id?: string
+          notes?: string | null
+          starts_at: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          channel?: string | null
+          created_at?: string | null
+          ends_at?: string
+          id?: string
+          notes?: string | null
+          starts_at?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      assistant_conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      assistant_messages: {
+        Row: {
+          content: string
+          conversation_id: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assistant_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "assistant_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bank_accounts: {
         Row: {
           account_number: string | null
@@ -251,6 +376,33 @@ export type Database = {
           },
         ]
       }
+      faqs: {
+        Row: {
+          answer: string
+          category: string | null
+          id: string
+          keywords: string[] | null
+          question: string
+          updated_at: string | null
+        }
+        Insert: {
+          answer: string
+          category?: string | null
+          id?: string
+          keywords?: string[] | null
+          question: string
+          updated_at?: string | null
+        }
+        Update: {
+          answer?: string
+          category?: string | null
+          id?: string
+          keywords?: string[] | null
+          question?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       funeral_funding: {
         Row: {
           account: string | null
@@ -422,6 +574,33 @@ export type Database = {
           status?: string
           stripe_invoice_id?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      kb_articles: {
+        Row: {
+          body: string
+          embedding: string | null
+          id: string
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          body: string
+          embedding?: string | null
+          id?: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          body?: string
+          embedding?: string | null
+          id?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -1122,9 +1301,29 @@ export type Database = {
       }
     }
     Functions: {
+      binary_quantize: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
+      }
       get_user_subscription: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["subscription_plan"]
+      }
+      halfvec_avg: {
+        Args: { "": number[] }
+        Returns: unknown
+      }
+      halfvec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      halfvec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      halfvec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
       }
       has_executor_access: {
         Args: { _plan_id: string; _user_id: string }
@@ -1138,6 +1337,22 @@ export type Database = {
         }
         Returns: boolean
       }
+      hnsw_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_sparsevec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnswhandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
       is_org_owner: {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
@@ -1145,6 +1360,71 @@ export type Database = {
       is_plan_owner: {
         Args: { _plan_id: string; _user_id: string }
         Returns: boolean
+      }
+      ivfflat_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflathandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      kb_semantic_search: {
+        Args: { match_count: number; query_text: string }
+        Returns: {
+          id: string
+          similarity: number
+          snippet: string
+          title: string
+        }[]
+      }
+      l2_norm: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: number
+      }
+      l2_normalize: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      sparsevec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      vector_avg: {
+        Args: { "": number[] }
+        Returns: string
+      }
+      vector_dims: {
+        Args: { "": string } | { "": unknown }
+        Returns: number
+      }
+      vector_norm: {
+        Args: { "": string }
+        Returns: number
+      }
+      vector_out: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      vector_send: {
+        Args: { "": string }
+        Returns: string
+      }
+      vector_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
       }
     }
     Enums: {

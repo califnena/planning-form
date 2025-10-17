@@ -10,6 +10,7 @@ import { EmailPlanDialog } from "@/components/EmailPlanDialog";
 import { generatePlanPDF } from "@/lib/pdfGenerator";
 import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator";
 import { useTranslation } from "react-i18next";
+import { AssistantWidget } from "@/components/assistant/AssistantWidget";
 
 // Section components
 import { SectionInstructions } from "@/components/planner/sections/SectionInstructions";
@@ -402,6 +403,8 @@ const PlannerApp = () => {
         planData={plan}
         preparedBy={plan.prepared_by || ""}
       />
+      
+      <AssistantWidget />
     </>
   );
 };
