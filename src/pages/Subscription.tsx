@@ -233,8 +233,10 @@ export default function Subscription() {
             <ul className="space-y-1 mb-4 list-disc pl-5">
               {PLANS.DO_IT_FOR_YOU.features.map((f) => <li key={f} className="text-sm">{f}</li>)}
             </ul>
-            <Button className="w-full" onClick={() => open(PLANS.DO_IT_FOR_YOU.payLink)}>
-              Book Session
+            <Button className="w-full" asChild>
+              <a href="https://calendar.app.google/2PVUy1ZuajWR1VaZ7" target="_blank" rel="noopener noreferrer">
+                Book Appointment
+              </a>
             </Button>
           </CardContent>
         </Card>

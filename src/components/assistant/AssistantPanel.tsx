@@ -15,7 +15,6 @@ import {
   Loader2,
   ThumbsUp,
   ThumbsDown,
-  Phone,
   MessageCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -41,6 +40,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [showBooking, setShowBooking] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -53,6 +53,18 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Close panel when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isOpen && panelRef.current && !panelRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen, onClose]);
 
   const loadOrCreateConversation = async () => {
     try {
@@ -294,7 +306,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
 
   return (
     <>
-      <Card className="fixed bottom-24 right-6 w-[380px] h-[600px] shadow-2xl z-40 flex flex-col md:bottom-8 md:right-24">
+      <Card ref={panelRef} className="fixed bottom-24 right-6 w-[380px] h-[600px] shadow-2xl z-40 flex flex-col md:bottom-8 md:right-24">
         <CardHeader className="pb-3 space-y-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <MessageCircle className="h-5 w-5 text-primary" />
@@ -385,7 +397,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
               </Button>
             </div>
 
-            <div className="flex justify-between items-center">
+            <div className="flex justify-start items-center">
               <Button
                 variant="ghost"
                 size="sm"
@@ -394,11 +406,6 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
               >
                 <Trash2 className="h-3 w-3 mr-1" />
                 Clear history
-              </Button>
-              
-              <Button variant="ghost" size="sm" className="text-xs">
-                <Phone className="h-3 w-3 mr-1" />
-                Talk to human
               </Button>
             </div>
           </div>
