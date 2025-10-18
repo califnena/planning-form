@@ -63,11 +63,12 @@ export const PLANS = {
     name: "Do It For You (One-Time)",
     price: "$249 one-time",
     payLink: "https://buy.stripe.com/4gM6oHgnXfp18zl2fA7bW03",
-    description: "Get personalized assistance with a live one-on-one virtual session. We guide you through every question in your planner, complete the forms for you, and prepare a finalized digital copy ready to print or share. Includes expert support, gentle guidance, and peace of mind knowing everything is handled for you. Binder sold separately. One-time $249.",
+    description: "Get personalized assistance with a live one-on-one virtual session. We guide you through every question in your planner, complete the forms for you, and prepare a finalized digital copy ready to print or share. Includes expert support, gentle guidance, fireproof binder, and peace of mind knowing everything is handled for you.",
     features: [
       "1:1 virtual interview & walkthrough",
       "We complete your forms for you",
-      "Finalized digital copy (binder sold separately)"
+      "Fireproof binder included",
+      "Finalized digital copy ready to print"
     ],
   },
 } as const;

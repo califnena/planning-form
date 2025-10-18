@@ -128,34 +128,54 @@ export default function Subscription() {
         </Card>
       )}
 
-      <div className="grid md:grid-cols-3 gap-6">
-        {[PLANS.BASIC_ANNUAL, PLANS.PREMIUM_ANNUAL, PLANS.VIP_ANNUAL].map((p) => {
-          const isCurrentPlan = currentPlanKey === p.key;
-          return (
-            <Card key={p.key} className={`rounded-2xl shadow-sm ${isCurrentPlan ? "border-primary border-2" : ""}`}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>{p.name}</CardTitle>
-                  {isCurrentPlan && <Badge>Current Plan</Badge>}
-                </div>
-                <div className="text-xl font-semibold text-muted-foreground">{p.price}</div>
-                {p.description && (
-                  <CardDescription className="mt-2 text-sm">{p.description}</CardDescription>
-                )}
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-1 mb-4 list-disc pl-5">
-                  {p.features.map((f) => <li key={f} className="text-sm">{f}</li>)}
-                </ul>
-                {isCurrentPlan ? (
-                  <Button 
-                    variant="destructive" 
-                    className="w-full" 
-                    onClick={() => setShowCancelDialog(true)}
-                  >
-                    Cancel Plan
-                  </Button>
-                ) : (
+      {/* Current Subscription Status */}
+      {hasActiveSubscription && (
+        <Card className="mb-8 border-primary">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-primary" />
+                  Active Subscription
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  You're currently subscribed to {PLANS[currentPlanKey.toUpperCase() as keyof typeof PLANS]?.name || currentPlanKey}
+                </CardDescription>
+              </div>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowCancelDialog(true)}
+                className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+              >
+                Cancel Subscription
+              </Button>
+            </div>
+          </CardHeader>
+        </Card>
+      )}
+
+      {/* Subscription Plans */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-4">Subscription Plans</h2>
+        <div className="grid md:grid-cols-3 gap-6 mb-6">
+          {[PLANS.BASIC_ANNUAL, PLANS.PREMIUM_ANNUAL, PLANS.VIP_ANNUAL].map((p) => {
+            const isCurrentPlan = currentPlanKey === p.key;
+            return (
+              <Card key={p.key} className={`rounded-2xl shadow-sm ${isCurrentPlan ? "border-primary border-2" : ""}`}>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>{p.name}</CardTitle>
+                    {isCurrentPlan && <Badge>Current Plan</Badge>}
+                  </div>
+                  <div className="text-xl font-semibold text-muted-foreground">{p.price}</div>
+                  {p.description && (
+                    <CardDescription className="mt-2 text-sm">{p.description}</CardDescription>
+                  )}
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-1 mb-4 list-disc pl-5">
+                    {p.features.map((f) => <li key={f} className="text-sm">{f}</li>)}
+                  </ul>
                   <Button 
                     className="w-full" 
                     onClick={() => open(p.payLink)}
@@ -163,83 +183,87 @@ export default function Subscription() {
                   >
                     {hasActiveSubscription ? "Already Subscribed" : "Subscribe"}
                   </Button>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6 mt-8">
-        {[PLANS.VIP_MONTHLY, PLANS.BINDER].map((p) => {
-          const isCurrentPlan = currentPlanKey === p.key;
-          const isSubscription = p.key !== "fireproof_binder";
-          return (
-            <Card key={p.key} className={`rounded-2xl shadow-sm ${isCurrentPlan ? "border-primary border-2" : ""}`}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>{p.name}</CardTitle>
-                  {isCurrentPlan && <Badge>Current Plan</Badge>}
-                </div>
-                <div className="text-xl font-semibold text-muted-foreground">{p.price}</div>
-                {p.description && (
-                  <CardDescription className="mt-2 text-sm">{p.description}</CardDescription>
-                )}
-              </CardHeader>
-              <CardContent>
-                {p.key === "fireproof_binder" && (
-                  <div className="aspect-video w-full overflow-hidden rounded-lg mb-4">
-                    <img 
-                      src={binderImage} 
-                      alt={p.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-                <ul className="space-y-1 mb-4 list-disc pl-5">
-                  {p.features.map((f) => <li key={f} className="text-sm">{f}</li>)}
-                </ul>
-                {isCurrentPlan ? (
-                  <Button 
-                    variant="destructive" 
-                    className="w-full" 
-                    onClick={() => setShowCancelDialog(true)}
-                  >
-                    Cancel Plan
-                  </Button>
-                ) : (
-                  <Button 
-                    className="w-full" 
-                    onClick={() => open(p.payLink)}
-                    disabled={isSubscription && hasActiveSubscription}
-                  >
-                    {isSubscription && hasActiveSubscription ? "Already Subscribed" : "Buy"}
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
 
         <Card className="rounded-2xl shadow-sm">
           <CardHeader>
-            <CardTitle>{PLANS.DO_IT_FOR_YOU.name}</CardTitle>
-            <div className="text-xl font-semibold text-muted-foreground">{PLANS.DO_IT_FOR_YOU.price}</div>
-            {PLANS.DO_IT_FOR_YOU.description && (
-              <CardDescription className="mt-2 text-sm">{PLANS.DO_IT_FOR_YOU.description}</CardDescription>
+            <div className="flex items-center justify-between">
+              <CardTitle>{PLANS.VIP_MONTHLY.name}</CardTitle>
+              {currentPlanKey === PLANS.VIP_MONTHLY.key && <Badge>Current Plan</Badge>}
+            </div>
+            <div className="text-xl font-semibold text-muted-foreground">{PLANS.VIP_MONTHLY.price}</div>
+            {PLANS.VIP_MONTHLY.description && (
+              <CardDescription className="mt-2 text-sm">{PLANS.VIP_MONTHLY.description}</CardDescription>
             )}
           </CardHeader>
           <CardContent>
             <ul className="space-y-1 mb-4 list-disc pl-5">
-              {PLANS.DO_IT_FOR_YOU.features.map((f) => <li key={f} className="text-sm">{f}</li>)}
+              {PLANS.VIP_MONTHLY.features.map((f) => <li key={f} className="text-sm">{f}</li>)}
             </ul>
-            <Button className="w-full" asChild>
-              <a href="https://calendar.app.google/2PVUy1ZuajWR1VaZ7" target="_blank" rel="noopener noreferrer">
-                Book Appointment
-              </a>
+            <Button 
+              className="w-full" 
+              onClick={() => open(PLANS.VIP_MONTHLY.payLink)}
+              disabled={hasActiveSubscription}
+            >
+              {hasActiveSubscription ? "Already Subscribed" : "Subscribe"}
             </Button>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Premium Services */}
+      <div>
+        <h2 className="text-2xl font-bold mb-4">Premium Services</h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          <Card className="rounded-2xl shadow-sm">
+            <CardHeader>
+              <CardTitle>{PLANS.BINDER.name}</CardTitle>
+              <div className="text-xl font-semibold text-muted-foreground">{PLANS.BINDER.price}</div>
+            </CardHeader>
+            <CardContent>
+              <div className="aspect-video w-full overflow-hidden rounded-lg mb-4">
+                <img 
+                  src={binderImage} 
+                  alt={PLANS.BINDER.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <ul className="space-y-1 mb-4 list-disc pl-5">
+                {PLANS.BINDER.features.map((f) => <li key={f} className="text-sm">{f}</li>)}
+              </ul>
+              <Button className="w-full" onClick={() => open(PLANS.BINDER.payLink)}>
+                Order Binder
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl shadow-sm border-primary border-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                {PLANS.DO_IT_FOR_YOU.name}
+                <Badge variant="secondary">Popular</Badge>
+              </CardTitle>
+              <div className="text-xl font-semibold text-muted-foreground">{PLANS.DO_IT_FOR_YOU.price}</div>
+              {PLANS.DO_IT_FOR_YOU.description && (
+                <CardDescription className="mt-2 text-sm">{PLANS.DO_IT_FOR_YOU.description}</CardDescription>
+              )}
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-1 mb-4 list-disc pl-5">
+                {PLANS.DO_IT_FOR_YOU.features.map((f) => <li key={f} className="text-sm">{f}</li>)}
+              </ul>
+              <Button className="w-full" asChild>
+                <a href="https://calendar.app.google/2PVUy1ZuajWR1VaZ7" target="_blank" rel="noopener noreferrer">
+                  Book Appointment
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
