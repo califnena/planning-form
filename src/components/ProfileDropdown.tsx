@@ -96,12 +96,8 @@ export const ProfileDropdown = () => {
           <User className="mr-2 h-4 w-4" />
           <span>Account</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/app/profile/billing")}>
-          <CreditCard className="mr-2 h-4 w-4" />
-          <span>Billing</span>
-        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/app/profile/subscription")}>
-          <Settings className="mr-2 h-4 w-4" />
+          <CreditCard className="mr-2 h-4 w-4" />
           <span>Subscription</span>
         </DropdownMenuItem>
         {isVIP && (

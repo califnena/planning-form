@@ -15,7 +15,8 @@ import {
   Loader2,
   ThumbsUp,
   ThumbsDown,
-  MessageCircle
+  MessageCircle,
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BookingModal } from "./BookingModal";
@@ -308,10 +309,20 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
     <>
       <Card ref={panelRef} className="fixed bottom-24 right-6 w-[380px] h-[600px] shadow-2xl z-40 flex flex-col md:bottom-8 md:right-24">
         <CardHeader className="pb-3 space-y-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <MessageCircle className="h-5 w-5 text-primary" />
-            Ask Everlasting
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <MessageCircle className="h-5 w-5 text-primary" />
+              Ask Everlasting
+            </CardTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-8 w-8"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
           
           <div className="flex gap-2 flex-wrap">
             <Button 

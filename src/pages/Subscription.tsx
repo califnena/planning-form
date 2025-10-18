@@ -157,8 +157,8 @@ export default function Subscription() {
       {/* Subscription Plans */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-4">Subscription Plans</h2>
-        <div className="grid md:grid-cols-3 gap-6 mb-6">
-          {[PLANS.BASIC_ANNUAL, PLANS.PREMIUM_ANNUAL, PLANS.VIP_ANNUAL].map((p) => {
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          {[PLANS.BASIC_ANNUAL, PLANS.PREMIUM_ANNUAL].map((p) => {
             const isCurrentPlan = currentPlanKey === p.key;
             return (
               <Card key={p.key} className={`rounded-2xl shadow-sm ${isCurrentPlan ? "border-primary border-2" : ""}`}>
@@ -189,28 +189,54 @@ export default function Subscription() {
           })}
         </div>
 
-        <Card className="rounded-2xl shadow-sm">
+        {/* VIP Plans */}
+        <Card className="rounded-2xl shadow-sm border-primary border-2">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>{PLANS.VIP_MONTHLY.name}</CardTitle>
-              {currentPlanKey === PLANS.VIP_MONTHLY.key && <Badge>Current Plan</Badge>}
-            </div>
-            <div className="text-xl font-semibold text-muted-foreground">{PLANS.VIP_MONTHLY.price}</div>
-            {PLANS.VIP_MONTHLY.description && (
-              <CardDescription className="mt-2 text-sm">{PLANS.VIP_MONTHLY.description}</CardDescription>
-            )}
+            <CardTitle className="flex items-center gap-2">
+              VIP Plans
+              <Badge variant="secondary">Most Popular</Badge>
+            </CardTitle>
+            <CardDescription className="mt-2">
+              Experience complete peace of mind with 24/7 guided planning and emotional support. Includes everything in Premium plus access to a compassionate, AI-powered coach for personalized guidance through end-of-life planning, organization, and coping.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-1 mb-4 list-disc pl-5">
-              {PLANS.VIP_MONTHLY.features.map((f) => <li key={f} className="text-sm">{f}</li>)}
+            <ul className="space-y-1 mb-6 list-disc pl-5">
+              <li className="text-sm">Everything in Premium</li>
+              <li className="text-sm">24/7 guided planning & coping coach (AI-powered)</li>
             </ul>
-            <Button 
-              className="w-full" 
-              onClick={() => open(PLANS.VIP_MONTHLY.payLink)}
-              disabled={hasActiveSubscription}
-            >
-              {hasActiveSubscription ? "Already Subscribed" : "Subscribe"}
-            </Button>
+            
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold">Annual Plan</h4>
+                  {currentPlanKey === PLANS.VIP_ANNUAL.key && <Badge>Current</Badge>}
+                </div>
+                <div className="text-2xl font-bold text-primary mb-4">{PLANS.VIP_ANNUAL.price}</div>
+                <Button 
+                  className="w-full" 
+                  onClick={() => open(PLANS.VIP_ANNUAL.payLink)}
+                  disabled={hasActiveSubscription}
+                >
+                  {hasActiveSubscription ? "Already Subscribed" : "Subscribe Annual"}
+                </Button>
+              </div>
+              
+              <div className="border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold">Monthly Plan</h4>
+                  {currentPlanKey === PLANS.VIP_MONTHLY.key && <Badge>Current</Badge>}
+                </div>
+                <div className="text-2xl font-bold text-primary mb-4">{PLANS.VIP_MONTHLY.price}</div>
+                <Button 
+                  className="w-full" 
+                  onClick={() => open(PLANS.VIP_MONTHLY.payLink)}
+                  disabled={hasActiveSubscription}
+                >
+                  {hasActiveSubscription ? "Already Subscribed" : "Subscribe Monthly"}
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
