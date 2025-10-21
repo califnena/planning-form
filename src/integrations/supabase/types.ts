@@ -235,6 +235,95 @@ export type Database = {
           },
         ]
       }
+      cases: {
+        Row: {
+          case_status: string
+          created_at: string
+          decedent_id: string | null
+          executor_contact_id: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          case_status?: string
+          created_at?: string
+          decedent_id?: string | null
+          executor_contact_id?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          case_status?: string
+          created_at?: string
+          decedent_id?: string | null
+          executor_contact_id?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cases_decedent_id_fkey"
+            columns: ["decedent_id"]
+            isOneToOne: false
+            referencedRelation: "decedents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cases_executor_contact_id_fkey"
+            columns: ["executor_contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contacts: {
+        Row: {
+          address: string | null
+          case_id: string
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          case_id: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          case_id?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contacts_notify: {
         Row: {
           auto_injected: boolean | null
@@ -331,6 +420,50 @@ export type Database = {
           },
         ]
       }
+      death_cert_requests: {
+        Row: {
+          case_id: string
+          created_at: string
+          id: string
+          ordered_on: string | null
+          quantity_requested: number
+          received_on: string | null
+          recipients_json: Json | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          id?: string
+          ordered_on?: string | null
+          quantity_requested?: number
+          received_on?: string | null
+          recipients_json?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          id?: string
+          ordered_on?: string | null
+          quantity_requested?: number
+          received_on?: string | null
+          recipients_json?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "death_cert_requests_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       debts: {
         Row: {
           account_number: string | null
@@ -372,6 +505,121 @@ export type Database = {
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      decedents: {
+        Row: {
+          case_id: string
+          citizenship: string | null
+          cod_text: string | null
+          created_at: string
+          dob: string | null
+          dod: string | null
+          id: string
+          legal_name: string
+          marital_status: string | null
+          military_branch: string | null
+          notes: string | null
+          physician_name: string | null
+          place_of_death: string | null
+          pob_city: string | null
+          pob_state: string | null
+          religion: string | null
+          residence_address: string | null
+          ssn_encrypted: string | null
+          tod: string | null
+          updated_at: string
+        }
+        Insert: {
+          case_id: string
+          citizenship?: string | null
+          cod_text?: string | null
+          created_at?: string
+          dob?: string | null
+          dod?: string | null
+          id?: string
+          legal_name: string
+          marital_status?: string | null
+          military_branch?: string | null
+          notes?: string | null
+          physician_name?: string | null
+          place_of_death?: string | null
+          pob_city?: string | null
+          pob_state?: string | null
+          religion?: string | null
+          residence_address?: string | null
+          ssn_encrypted?: string | null
+          tod?: string | null
+          updated_at?: string
+        }
+        Update: {
+          case_id?: string
+          citizenship?: string | null
+          cod_text?: string | null
+          created_at?: string
+          dob?: string | null
+          dod?: string | null
+          id?: string
+          legal_name?: string
+          marital_status?: string | null
+          military_branch?: string | null
+          notes?: string | null
+          physician_name?: string | null
+          place_of_death?: string | null
+          pob_city?: string | null
+          pob_state?: string | null
+          religion?: string | null
+          residence_address?: string | null
+          ssn_encrypted?: string | null
+          tod?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "decedents_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          case_id: string
+          created_at: string
+          doc_type: string
+          file_url: string | null
+          id: string
+          storage_location_text: string | null
+          updated_at: string
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          doc_type: string
+          file_url?: string | null
+          id?: string
+          storage_location_text?: string | null
+          updated_at?: string
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          doc_type?: string
+          file_url?: string | null
+          id?: string
+          storage_location_text?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
             referencedColumns: ["id"]
           },
         ]
@@ -645,6 +893,94 @@ export type Database = {
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notices: {
+        Row: {
+          case_id: string
+          confirmation_ref: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          notice_type: string
+          status: string
+          submitted_on: string | null
+          updated_at: string
+        }
+        Insert: {
+          case_id: string
+          confirmation_ref?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          notice_type: string
+          status?: string
+          submitted_on?: string | null
+          updated_at?: string
+        }
+        Update: {
+          case_id?: string
+          confirmation_ref?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          notice_type?: string
+          status?: string
+          submitted_on?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notices_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      obituary: {
+        Row: {
+          case_id: string
+          created_at: string
+          draft_text: string | null
+          id: string
+          newspapers_json: Json | null
+          other_outlets: string | null
+          published_links_json: Json | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          draft_text?: string | null
+          id?: string
+          newspapers_json?: Json | null
+          other_outlets?: string | null
+          published_links_json?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          draft_text?: string | null
+          id?: string
+          newspapers_json?: Json | null
+          other_outlets?: string | null
+          published_links_json?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "obituary_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
             referencedColumns: ["id"]
           },
         ]
@@ -1103,6 +1439,101 @@ export type Database = {
           },
         ]
       }
+      service_plan: {
+        Row: {
+          case_id: string
+          casket_open_viewing_bool: boolean | null
+          created_at: string
+          date_time: string | null
+          disposition: string | null
+          flowers_json: Json | null
+          honors_json: Json | null
+          id: string
+          music_json: Json | null
+          officiants_json: Json | null
+          pallbearers_json: Json | null
+          readings_json: Json | null
+          service_type: string | null
+          updated_at: string
+          venue_address: string | null
+          venue_name: string | null
+        }
+        Insert: {
+          case_id: string
+          casket_open_viewing_bool?: boolean | null
+          created_at?: string
+          date_time?: string | null
+          disposition?: string | null
+          flowers_json?: Json | null
+          honors_json?: Json | null
+          id?: string
+          music_json?: Json | null
+          officiants_json?: Json | null
+          pallbearers_json?: Json | null
+          readings_json?: Json | null
+          service_type?: string | null
+          updated_at?: string
+          venue_address?: string | null
+          venue_name?: string | null
+        }
+        Update: {
+          case_id?: string
+          casket_open_viewing_bool?: boolean | null
+          created_at?: string
+          date_time?: string | null
+          disposition?: string | null
+          flowers_json?: Json | null
+          honors_json?: Json | null
+          id?: string
+          music_json?: Json | null
+          officiants_json?: Json | null
+          pallbearers_json?: Json | null
+          readings_json?: Json | null
+          service_type?: string | null
+          updated_at?: string
+          venue_address?: string | null
+          venue_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_plan_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      settings: {
+        Row: {
+          created_at: string
+          default_task_templates_json: Json | null
+          id: string
+          logo_url: string | null
+          org_name: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          default_task_templates_json?: Json | null
+          id?: string
+          logo_url?: string | null
+          org_name?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          default_task_templates_json?: Json | null
+          id?: string
+          logo_url?: string | null
+          org_name?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       social_accounts: {
         Row: {
           action: string | null
@@ -1186,6 +1617,101 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      tasks: {
+        Row: {
+          assigned_contact_id: string | null
+          case_id: string
+          category: string
+          created_at: string
+          due_date: string | null
+          id: string
+          notes: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_contact_id?: string | null
+          case_id: string
+          category: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_contact_id?: string | null
+          case_id?: string
+          category?: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_assigned_contact_id_fkey"
+            columns: ["assigned_contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transport: {
+        Row: {
+          case_id: string
+          created_at: string
+          escort_required_bool: boolean | null
+          from_funeral_home: string | null
+          id: string
+          to_funeral_home: string | null
+          updated_at: string
+          vehicles_json: Json | null
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          escort_required_bool?: boolean | null
+          from_funeral_home?: string | null
+          id?: string
+          to_funeral_home?: string | null
+          updated_at?: string
+          vehicles_json?: Json | null
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          escort_required_bool?: boolean | null
+          from_funeral_home?: string | null
+          id?: string
+          to_funeral_home?: string | null
+          updated_at?: string
+          vehicles_json?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transport_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vehicles: {
         Row: {
@@ -1352,6 +1878,10 @@ export type Database = {
       hnswhandler: {
         Args: { "": unknown }
         Returns: unknown
+      }
+      is_case_owner: {
+        Args: { _case_id: string; _user_id: string }
+        Returns: boolean
       }
       is_org_owner: {
         Args: { _org_id: string; _user_id: string }
