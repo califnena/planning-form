@@ -465,6 +465,12 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
       addField("Platform:", account.platform);
       addField("Username:", account.username);
       addField("Status:", account.status ? account.status.charAt(0).toUpperCase() + account.status.slice(1) : "");
+      
+      pdf.setFont("helvetica", "bold");
+      addCheckbox(marginLeft, yPosition, account.completed);
+      pdf.text("Completed", marginLeft + 8, yPosition);
+      yPosition += 7;
+      
       addField("Notes:", account.notes);
       yPosition += 3;
     });
@@ -507,17 +513,37 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
       yPosition += 6;
       
       const utilities = property.utilities || {};
-      if (utilities.water) addField("Water:", typeof utilities.water === 'string' ? utilities.water : utilities.water.provider);
-      if (utilities.electric) addField("Electric:", typeof utilities.electric === 'string' ? utilities.electric : utilities.electric.provider);
-      if (utilities.gas) addField("Gas:", typeof utilities.gas === 'string' ? utilities.gas : utilities.gas.provider);
-      if (utilities.phone) addField("Phone:", typeof utilities.phone === 'string' ? utilities.phone : utilities.phone.provider);
-      if (utilities.internet) addField("Internet:", typeof utilities.internet === 'string' ? utilities.internet : utilities.internet.provider);
-      if (utilities.cable) addField("Cable:", typeof utilities.cable === 'string' ? utilities.cable : utilities.cable.provider);
-      if (utilities.lawn) addField("Lawn:", typeof utilities.lawn === 'string' ? utilities.lawn : utilities.lawn.provider);
-      if (utilities.pool) addField("Pool:", typeof utilities.pool === 'string' ? utilities.pool : utilities.pool.provider);
-      if (utilities.pest) addField("Pest:", typeof utilities.pest === 'string' ? utilities.pest : utilities.pest.provider);
-      if (utilities.propane) addField("Propane:", typeof utilities.propane === 'string' ? utilities.propane : utilities.propane.provider);
-      if (utilities.other) addField("Other:", typeof utilities.other === 'string' ? utilities.other : utilities.other.provider);
+      const utilityTypes = [
+        { key: 'water', label: 'Water' },
+        { key: 'electric', label: 'Electric' },
+        { key: 'gas', label: 'Gas' },
+        { key: 'phone', label: 'Phone' },
+        { key: 'internet', label: 'Internet' },
+        { key: 'cable', label: 'Cable' },
+        { key: 'lawn', label: 'Lawn' },
+        { key: 'pool', label: 'Pool' },
+        { key: 'pest', label: 'Pest' },
+        { key: 'propane', label: 'Propane' },
+        { key: 'other', label: 'Other' }
+      ];
+      
+      utilityTypes.forEach(({ key, label }) => {
+        const utility = utilities[key];
+        if (utility) {
+          const provider = typeof utility === 'string' ? utility : utility.provider;
+          const completed = typeof utility === 'object' ? utility.completed : false;
+          
+          checkPageBreak(15);
+          addField(`${label}:`, provider);
+          
+          if (typeof utility === 'object') {
+            pdf.setFont("helvetica", "bold");
+            addCheckbox(marginLeft, yPosition, completed);
+            pdf.text("Completed", marginLeft + 8, yPosition);
+            yPosition += 7;
+          }
+        }
+      });
       
       // Disposition section
       checkPageBreak(20);
@@ -529,6 +555,15 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
       addField("Realtor Estimate:", property.realtorEstimate);
       addField("Future Use:", property.futureUse);
       addField("Transfer Notes:", property.transferNotes, true);
+      
+      // Property completion status
+      checkPageBreak(15);
+      pdf.setFont("helvetica", "bold");
+      addCheckbox(marginLeft, yPosition, property.completed);
+      pdf.text("Property Completed", marginLeft + 8, yPosition);
+      yPosition += 7;
+      
+      addField("Additional Notes:", property.notes, true);
       yPosition += 5;
     });
   } else {
@@ -556,12 +591,14 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
       addField("Type:", subscription.type);
       addField("Provider:", subscription.provider);
       addField("Account Info:", subscription.accountInfo);
-      addField("Notes:", subscription.notes, true);
       
       pdf.setFont("helvetica", "bold");
-      addCheckbox(marginLeft, yPosition, subscription.cancelled);
-      pdf.text("Cancelled or Transferred", marginLeft + 8, yPosition);
-      yPosition += 10;
+      addCheckbox(marginLeft, yPosition, subscription.completed);
+      pdf.text("Completed", marginLeft + 8, yPosition);
+      yPosition += 7;
+      
+      addField("Notes:", subscription.notes, true);
+      yPosition += 5;
     });
   } else {
     addField("No subscriptions documented", "");
