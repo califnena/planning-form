@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
 
 interface StepProps {
   formData: any;
@@ -17,6 +19,7 @@ interface DigitalAccount {
   platform: string;
   username: string;
   status: "open" | "closed" | "memorialized" | "transferred";
+  completed: boolean;
   notes: string;
 }
 
@@ -28,6 +31,7 @@ export function Step8DigitalAccounts({ formData, onSave }: StepProps) {
         platform: "",
         username: "",
         status: "open" as const,
+        completed: false,
         notes: "",
       },
     ]
@@ -49,6 +53,7 @@ export function Step8DigitalAccounts({ formData, onSave }: StepProps) {
         platform: "",
         username: "",
         status: "open" as const,
+        completed: false,
         notes: "",
       },
     ]);
@@ -79,72 +84,84 @@ export function Step8DigitalAccounts({ formData, onSave }: StepProps) {
         </p>
       </div>
 
-      {accounts.map((account, index) => (
-        <div key={account.id} className="border rounded-lg p-4 space-y-4 relative">
-          {accounts.length > 1 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => removeAccount(account.id)}
-              className="absolute top-2 right-2"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
-
-          <h3 className="font-semibold">Account {index + 1}</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor={`platform-${account.id}`}>Platform / Service</Label>
-              <Input
-                id={`platform-${account.id}`}
-                placeholder="e.g., Facebook, Gmail, Netflix"
-                value={account.platform}
-                onChange={(e) => updateAccount(account.id, "platform", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor={`username-${account.id}`}>Username / Email</Label>
-              <Input
-                id={`username-${account.id}`}
-                placeholder="Account username or email"
-                value={account.username}
-                onChange={(e) => updateAccount(account.id, "username", e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor={`status-${account.id}`}>Status</Label>
-            <Select
-              value={account.status}
-              onValueChange={(value) => updateAccount(account.id, "status", value)}
-            >
-              <SelectTrigger id={`status-${account.id}`}>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="open">Open</SelectItem>
-                <SelectItem value="closed">Closed</SelectItem>
-                <SelectItem value="memorialized">Memorialized</SelectItem>
-                <SelectItem value="transferred">Transferred</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor={`notes-${account.id}`}>Notes</Label>
-            <Input
-              id={`notes-${account.id}`}
-              placeholder="Date closed, confirmation number, or other notes"
-              value={account.notes}
-              onChange={(e) => updateAccount(account.id, "notes", e.target.value)}
-            />
-          </div>
-        </div>
-      ))}
+      <div className="border rounded-lg overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Platform / Service</TableHead>
+              <TableHead>Username / Email</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="w-[100px]">Completed</TableHead>
+              <TableHead>Notes</TableHead>
+              <TableHead className="w-[60px]"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {accounts.map((account) => (
+              <TableRow key={account.id}>
+                <TableCell>
+                  <Input
+                    placeholder="e.g., Facebook, Gmail"
+                    value={account.platform}
+                    onChange={(e) => updateAccount(account.id, "platform", e.target.value)}
+                    className="min-w-[150px]"
+                  />
+                </TableCell>
+                <TableCell>
+                  <Input
+                    placeholder="Username or email"
+                    value={account.username}
+                    onChange={(e) => updateAccount(account.id, "username", e.target.value)}
+                    className="min-w-[150px]"
+                  />
+                </TableCell>
+                <TableCell>
+                  <Select
+                    value={account.status}
+                    onValueChange={(value) => updateAccount(account.id, "status", value)}
+                  >
+                    <SelectTrigger className="min-w-[130px]">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="open">Open</SelectItem>
+                      <SelectItem value="closed">Closed</SelectItem>
+                      <SelectItem value="memorialized">Memorialized</SelectItem>
+                      <SelectItem value="transferred">Transferred</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell>
+                  <Checkbox
+                    checked={account.completed}
+                    onCheckedChange={(checked) => updateAccount(account.id, "completed", !!checked)}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Textarea
+                    placeholder="Notes, confirmation number, etc."
+                    value={account.notes}
+                    onChange={(e) => updateAccount(account.id, "notes", e.target.value)}
+                    className="min-w-[200px]"
+                    rows={1}
+                  />
+                </TableCell>
+                <TableCell>
+                  {accounts.length > 1 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeAccount(account.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       <Button onClick={addAccount} variant="outline" className="w-full">
         <Plus className="mr-2 h-4 w-4" />

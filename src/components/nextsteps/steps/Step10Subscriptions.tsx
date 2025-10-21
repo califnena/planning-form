@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface StepProps {
   formData: any;
@@ -17,7 +17,7 @@ interface Subscription {
   type: string;
   provider: string;
   accountInfo: string;
-  cancelled: boolean;
+  completed: boolean;
   notes: string;
 }
 
@@ -29,7 +29,7 @@ export function Step10Subscriptions({ formData, onSave }: StepProps) {
         type: "",
         provider: "",
         accountInfo: "",
-        cancelled: false,
+        completed: false,
         notes: "",
       },
     ]
@@ -50,7 +50,7 @@ export function Step10Subscriptions({ formData, onSave }: StepProps) {
         type: "",
         provider: "",
         accountInfo: "",
-        cancelled: false,
+        completed: false,
         notes: "",
       },
     ]);
@@ -81,78 +81,76 @@ export function Step10Subscriptions({ formData, onSave }: StepProps) {
         </p>
       </div>
 
-      {subscriptions.map((subscription, index) => (
-        <div key={subscription.id} className="border rounded-lg p-4 space-y-4 relative">
-          {subscriptions.length > 1 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => removeSubscription(subscription.id)}
-              className="absolute top-2 right-2"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
-
-          <h3 className="font-semibold">Subscription {index + 1}</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor={`type-${subscription.id}`}>Type / Category</Label>
-              <Input
-                id={`type-${subscription.id}`}
-                placeholder="e.g., Magazine, Newspaper, Membership"
-                value={subscription.type}
-                onChange={(e) => updateSubscription(subscription.id, "type", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor={`provider-${subscription.id}`}>Provider / Publisher</Label>
-              <Input
-                id={`provider-${subscription.id}`}
-                placeholder="e.g., New York Times, National Geographic, AAA"
-                value={subscription.provider}
-                onChange={(e) => updateSubscription(subscription.id, "provider", e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor={`account-${subscription.id}`}>Account / Member Number</Label>
-            <Input
-              id={`account-${subscription.id}`}
-              placeholder="Account or membership number, if applicable"
-              value={subscription.accountInfo}
-              onChange={(e) => updateSubscription(subscription.id, "accountInfo", e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor={`notes-${subscription.id}`}>Cancellation / Transfer Notes</Label>
-            <Textarea
-              id={`notes-${subscription.id}`}
-              placeholder="How to cancel, who to contact, transfer instructions, etc."
-              value={subscription.notes}
-              onChange={(e) => updateSubscription(subscription.id, "notes", e.target.value)}
-              rows={2}
-            />
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id={`cancelled-${subscription.id}`}
-              checked={subscription.cancelled}
-              onCheckedChange={(checked) =>
-                updateSubscription(subscription.id, "cancelled", checked)
-              }
-            />
-            <Label htmlFor={`cancelled-${subscription.id}`} className="cursor-pointer font-medium">
-              Cancelled or Transferred
-            </Label>
-          </div>
-        </div>
-      ))}
+      <div className="border rounded-lg overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Type / Category</TableHead>
+              <TableHead>Provider / Publisher</TableHead>
+              <TableHead>Account / Member #</TableHead>
+              <TableHead className="w-[100px]">Completed</TableHead>
+              <TableHead>Notes</TableHead>
+              <TableHead className="w-[60px]"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {subscriptions.map((subscription) => (
+              <TableRow key={subscription.id}>
+                <TableCell>
+                  <Input
+                    placeholder="e.g., Magazine, Membership"
+                    value={subscription.type}
+                    onChange={(e) => updateSubscription(subscription.id, "type", e.target.value)}
+                    className="min-w-[150px]"
+                  />
+                </TableCell>
+                <TableCell>
+                  <Input
+                    placeholder="e.g., New York Times, AAA"
+                    value={subscription.provider}
+                    onChange={(e) => updateSubscription(subscription.id, "provider", e.target.value)}
+                    className="min-w-[150px]"
+                  />
+                </TableCell>
+                <TableCell>
+                  <Input
+                    placeholder="Account number"
+                    value={subscription.accountInfo}
+                    onChange={(e) => updateSubscription(subscription.id, "accountInfo", e.target.value)}
+                    className="min-w-[120px]"
+                  />
+                </TableCell>
+                <TableCell>
+                  <Checkbox
+                    checked={subscription.completed}
+                    onCheckedChange={(checked) => updateSubscription(subscription.id, "completed", !!checked)}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Textarea
+                    placeholder="Cancellation notes, contact info, etc."
+                    value={subscription.notes}
+                    onChange={(e) => updateSubscription(subscription.id, "notes", e.target.value)}
+                    className="min-w-[200px]"
+                    rows={1}
+                  />
+                </TableCell>
+                <TableCell>
+                  {subscriptions.length > 1 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeSubscription(subscription.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       <Button onClick={addSubscription} variant="outline" className="w-full">
         <Plus className="mr-2 h-4 w-4" />

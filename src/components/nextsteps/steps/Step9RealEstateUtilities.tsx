@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface StepProps {
   formData: any;
@@ -34,6 +36,8 @@ interface Property {
   realtorEstimate: string;
   futureUse: string;
   transferNotes: string;
+  completed: boolean;
+  notes: string;
 }
 
 export function Step9RealEstateUtilities({ formData, onSave }: StepProps) {
@@ -62,6 +66,8 @@ export function Step9RealEstateUtilities({ formData, onSave }: StepProps) {
         realtorEstimate: "",
         futureUse: "",
         transferNotes: "",
+        completed: false,
+        notes: "",
       },
     ]
   );
@@ -99,6 +105,8 @@ export function Step9RealEstateUtilities({ formData, onSave }: StepProps) {
         realtorEstimate: "",
         futureUse: "",
         transferNotes: "",
+        completed: false,
+        notes: "",
       },
     ]);
   };
@@ -190,44 +198,41 @@ export function Step9RealEstateUtilities({ formData, onSave }: StepProps) {
 
           <div className="space-y-3">
             <Label className="text-base font-semibold">Utilities & Service Providers</Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {[
-                { key: "water", label: "Water" },
-                { key: "electric", label: "Electric" },
-                { key: "gas", label: "Gas" },
-                { key: "phone", label: "Phone" },
-                { key: "internet", label: "Internet" },
-                { key: "cable", label: "Cable/TV" },
-                { key: "lawn", label: "Lawn Service" },
-                { key: "pool", label: "Pool Service" },
-                { key: "pest", label: "Pest Control" },
-                { key: "propane", label: "Propane" },
-              ].map((util) => (
-                <div key={util.key} className="space-y-1">
-                  <Label htmlFor={`${util.key}-${property.id}`} className="text-sm">
-                    {util.label}
-                  </Label>
-                  <Input
-                    id={`${util.key}-${property.id}`}
-                    placeholder={`Provider & account info`}
-                    value={property.utilities[util.key as keyof typeof property.utilities]}
-                    onChange={(e) => updateUtility(property.id, util.key, e.target.value)}
-                    className="text-sm"
-                  />
-                </div>
-              ))}
-              <div className="space-y-1">
-                <Label htmlFor={`other-${property.id}`} className="text-sm">
-                  Other Services
-                </Label>
-                <Input
-                  id={`other-${property.id}`}
-                  placeholder="Other utility/service providers"
-                  value={property.utilities.other}
-                  onChange={(e) => updateUtility(property.id, "other", e.target.value)}
-                  className="text-sm"
-                />
-              </div>
+            <div className="border rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Utility / Service</TableHead>
+                    <TableHead>Provider & Account Info</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[
+                    { key: "water", label: "Water" },
+                    { key: "electric", label: "Electric" },
+                    { key: "gas", label: "Gas" },
+                    { key: "phone", label: "Phone" },
+                    { key: "internet", label: "Internet" },
+                    { key: "cable", label: "Cable/TV" },
+                    { key: "lawn", label: "Lawn Service" },
+                    { key: "pool", label: "Pool Service" },
+                    { key: "pest", label: "Pest Control" },
+                    { key: "propane", label: "Propane" },
+                    { key: "other", label: "Other Services" },
+                  ].map((util) => (
+                    <TableRow key={util.key}>
+                      <TableCell className="font-medium">{util.label}</TableCell>
+                      <TableCell>
+                        <Input
+                          placeholder="Provider & account info"
+                          value={property.utilities[util.key as keyof typeof property.utilities]}
+                          onChange={(e) => updateUtility(property.id, util.key, e.target.value)}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           </div>
 
@@ -262,6 +267,30 @@ export function Step9RealEstateUtilities({ formData, onSave }: StepProps) {
                 value={property.transferNotes}
                 onChange={(e) => updateProperty(property.id, "transferNotes", e.target.value)}
                 rows={3}
+              />
+            </div>
+          </div>
+
+          <div className="pt-4 border-t space-y-3">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id={`completed-${property.id}`}
+                checked={property.completed}
+                onCheckedChange={(checked) => updateProperty(property.id, "completed", !!checked)}
+              />
+              <Label htmlFor={`completed-${property.id}`} className="cursor-pointer font-medium">
+                Property handling completed
+              </Label>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor={`notes-${property.id}`}>Additional Notes</Label>
+              <Textarea
+                id={`notes-${property.id}`}
+                placeholder="Any additional notes about this property"
+                value={property.notes}
+                onChange={(e) => updateProperty(property.id, "notes", e.target.value)}
+                rows={2}
               />
             </div>
           </div>
