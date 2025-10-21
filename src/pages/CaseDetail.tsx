@@ -281,7 +281,7 @@ export default function CaseDetail() {
               onClick={handleGeneratePDF}
             >
               <Download className="mr-2 h-4 w-4" />
-              Generate PDF
+              Generate After Life Action Plan
             </Button>
           </div>
         </aside>
@@ -321,7 +321,7 @@ export default function CaseDetail() {
             ) : (
               <Button onClick={handleGeneratePDF} className="bg-green-600 hover:bg-green-700">
                 <CheckCircle2 className="mr-2 h-4 w-4" />
-                Generate PDF Report
+                Generate After Life Action Plan
               </Button>
             )}
             </div>
