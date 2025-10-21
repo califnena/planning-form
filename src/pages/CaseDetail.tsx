@@ -126,6 +126,10 @@ export default function CaseDetail() {
     }
   };
 
+  const handleGeneratePDF = () => {
+    setPdfDialogOpen(true);
+  };
+
 
   const renderStep = () => {
     const stepProps = {
@@ -324,6 +328,13 @@ export default function CaseDetail() {
           </div>
         </main>
       </div>
+
+      <PdfGenerationDialog
+        open={pdfDialogOpen}
+        onOpenChange={setPdfDialogOpen}
+        formData={formData}
+        decedentName={caseData?.decedent?.legal_name || ""}
+      />
     </div>
   );
 }
