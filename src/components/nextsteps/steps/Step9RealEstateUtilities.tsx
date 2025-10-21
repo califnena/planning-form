@@ -13,6 +13,11 @@ interface StepProps {
   caseId: string;
 }
 
+interface Utility {
+  provider: string;
+  completed: boolean;
+}
+
 interface Property {
   id: string;
   address: string;
@@ -20,17 +25,17 @@ interface Property {
   taxInfo: string;
   insurance: string;
   utilities: {
-    water: string;
-    electric: string;
-    gas: string;
-    phone: string;
-    internet: string;
-    cable: string;
-    lawn: string;
-    pool: string;
-    pest: string;
-    propane: string;
-    other: string;
+    water: Utility;
+    electric: Utility;
+    gas: Utility;
+    phone: Utility;
+    internet: Utility;
+    cable: Utility;
+    lawn: Utility;
+    pool: Utility;
+    pest: Utility;
+    propane: Utility;
+    other: Utility;
   };
   disposition: string;
   realtorEstimate: string;
@@ -50,17 +55,17 @@ export function Step9RealEstateUtilities({ formData, onSave }: StepProps) {
         taxInfo: "",
         insurance: "",
         utilities: {
-          water: "",
-          electric: "",
-          gas: "",
-          phone: "",
-          internet: "",
-          cable: "",
-          lawn: "",
-          pool: "",
-          pest: "",
-          propane: "",
-          other: "",
+          water: { provider: "", completed: false },
+          electric: { provider: "", completed: false },
+          gas: { provider: "", completed: false },
+          phone: { provider: "", completed: false },
+          internet: { provider: "", completed: false },
+          cable: { provider: "", completed: false },
+          lawn: { provider: "", completed: false },
+          pool: { provider: "", completed: false },
+          pest: { provider: "", completed: false },
+          propane: { provider: "", completed: false },
+          other: { provider: "", completed: false },
         },
         disposition: "",
         realtorEstimate: "",
@@ -89,17 +94,17 @@ export function Step9RealEstateUtilities({ formData, onSave }: StepProps) {
         taxInfo: "",
         insurance: "",
         utilities: {
-          water: "",
-          electric: "",
-          gas: "",
-          phone: "",
-          internet: "",
-          cable: "",
-          lawn: "",
-          pool: "",
-          pest: "",
-          propane: "",
-          other: "",
+          water: { provider: "", completed: false },
+          electric: { provider: "", completed: false },
+          gas: { provider: "", completed: false },
+          phone: { provider: "", completed: false },
+          internet: { provider: "", completed: false },
+          cable: { provider: "", completed: false },
+          lawn: { provider: "", completed: false },
+          pool: { provider: "", completed: false },
+          pest: { provider: "", completed: false },
+          propane: { provider: "", completed: false },
+          other: { provider: "", completed: false },
         },
         disposition: "",
         realtorEstimate: "",
@@ -123,11 +128,20 @@ export function Step9RealEstateUtilities({ formData, onSave }: StepProps) {
     );
   };
 
-  const updateUtility = (propertyId: string, utility: string, value: string) => {
+  const updateUtility = (propertyId: string, utility: string, field: 'provider' | 'completed', value: string | boolean) => {
     setProperties(
       properties.map((p) =>
         p.id === propertyId
-          ? { ...p, utilities: { ...p.utilities, [utility]: value } }
+          ? { 
+              ...p, 
+              utilities: { 
+                ...p.utilities, 
+                [utility]: { 
+                  ...p.utilities[utility as keyof typeof p.utilities],
+                  [field]: value 
+                } 
+              } 
+            }
           : p
       )
     );
@@ -204,6 +218,7 @@ export function Step9RealEstateUtilities({ formData, onSave }: StepProps) {
                   <TableRow>
                     <TableHead>Utility / Service</TableHead>
                     <TableHead>Provider & Account Info</TableHead>
+                    <TableHead className="w-24">Completed</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -225,8 +240,14 @@ export function Step9RealEstateUtilities({ formData, onSave }: StepProps) {
                       <TableCell>
                         <Input
                           placeholder="Provider & account info"
-                          value={property.utilities[util.key as keyof typeof property.utilities]}
-                          onChange={(e) => updateUtility(property.id, util.key, e.target.value)}
+                          value={property.utilities[util.key as keyof typeof property.utilities].provider}
+                          onChange={(e) => updateUtility(property.id, util.key, 'provider', e.target.value)}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Checkbox
+                          checked={property.utilities[util.key as keyof typeof property.utilities].completed}
+                          onCheckedChange={(checked) => updateUtility(property.id, util.key, 'completed', !!checked)}
                         />
                       </TableCell>
                     </TableRow>
