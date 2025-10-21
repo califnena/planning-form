@@ -17,6 +17,8 @@ import { Step5Obituary } from "@/components/nextsteps/steps/Step5Obituary";
 import { Step6ServiceDetails } from "@/components/nextsteps/steps/Step6ServiceDetails";
 import { Step7FinancesEstate } from "@/components/nextsteps/steps/Step7FinancesEstate";
 import { Step8DigitalAccounts } from "@/components/nextsteps/steps/Step8DigitalAccounts";
+import { Step9RealEstateUtilities } from "@/components/nextsteps/steps/Step9RealEstateUtilities";
+import { Step10Subscriptions } from "@/components/nextsteps/steps/Step10Subscriptions";
 import { generateAfterLifePlanPDF } from "@/lib/afterLifePlanPdfGenerator";
 
 const STEPS = [
@@ -29,6 +31,8 @@ const STEPS = [
   { id: 6, title: "Service & Memorial Details", subtitle: "Planning Ceremony" },
   { id: 7, title: "Finances & Estate", subtitle: "Money & Property" },
   { id: 8, title: "Digital Accounts", subtitle: "Online Presence" },
+  { id: 9, title: "Real Estate & Utilities", subtitle: "Property Management" },
+  { id: 10, title: "Subscriptions", subtitle: "Non-Digital Services" },
 ];
 
 export default function CaseDetail() {
@@ -161,6 +165,10 @@ export default function CaseDetail() {
         return <Step7FinancesEstate {...stepProps} />;
       case 8:
         return <Step8DigitalAccounts {...stepProps} />;
+      case 9:
+        return <Step9RealEstateUtilities {...stepProps} />;
+      case 10:
+        return <Step10Subscriptions {...stepProps} />;
       default:
         return null;
     }

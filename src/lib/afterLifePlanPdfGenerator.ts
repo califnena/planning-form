@@ -12,6 +12,8 @@ interface PlanData {
   step6?: any;
   step7?: any;
   step8?: any;
+  step9?: any;
+  step10?: any;
 }
 
 export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName: string) => {
@@ -93,8 +95,8 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(0, 0, 0);
     const pageNumText = preparedForDisplay 
-      ? `Page ${currentPage} of 9 (${preparedForDisplay})`
-      : `Page ${currentPage} of 9`;
+      ? `Page ${currentPage} of 11 (${preparedForDisplay})`
+      : `Page ${currentPage} of 11`;
     pdf.text(pageNumText, pageWidth / 2, pageHeight - 8, { align: "center" });
     
     pdf.setTextColor(...colors.bodyGray);
@@ -449,14 +451,119 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   
   const step8 = formData.step8 || {};
   
-  addField("Primary Email:", step8.primaryEmail);
-  addField("Social Media:", step8.socialMediaAccounts, true);
-  addField("Streaming or Subscriptions:", step8.streamingServices, true);
-  yPosition += 3;
+  if (step8.accounts && Array.isArray(step8.accounts)) {
+    step8.accounts.forEach((account: any, index: number) => {
+      checkPageBreak(25);
+      
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(11);
+      pdf.text(`Account ${index + 1}`, marginLeft, yPosition);
+      yPosition += 7;
+      
+      addField("Platform:", account.platform);
+      addField("Username:", account.username);
+      addField("Status:", account.status ? account.status.charAt(0).toUpperCase() + account.status.slice(1) : "");
+      addField("Notes:", account.notes);
+      yPosition += 3;
+    });
+  }
   
   pdf.setFont("helvetica", "bold");
   addCheckbox(marginLeft, yPosition, step8.allClosed);
-  pdf.text("All digital accounts closed", marginLeft + 8, yPosition);
+  pdf.text("All digital accounts have been handled", marginLeft + 8, yPosition);
+  
+  addPageFooter();
+
+  // Step 9: Real Estate & Utilities
+  pdf.addPage();
+  yPosition = 20;
+  addTitle("REAL ESTATE & UTILITIES");
+  
+  const step9 = formData.step9 || {};
+  
+  if (step9.properties && Array.isArray(step9.properties)) {
+    step9.properties.forEach((property: any, index: number) => {
+      checkPageBreak(30);
+      
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(12);
+      pdf.setTextColor(...colors.subheaderTeal);
+      pdf.text(`Property ${index + 1}`, marginLeft, yPosition);
+      pdf.setTextColor(...colors.bodyGray);
+      yPosition += 7;
+      
+      addField("Address:", property.address);
+      addField("Mortgage:", property.mortgage);
+      addField("Tax Info:", property.taxInfo);
+      addField("Insurance:", property.insurance);
+      
+      // Utilities section
+      checkPageBreak(20);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(10);
+      pdf.text("Utilities & Services:", marginLeft, yPosition);
+      yPosition += 6;
+      
+      const utilities = property.utilities || {};
+      if (utilities.water) addField("Water:", utilities.water);
+      if (utilities.electric) addField("Electric:", utilities.electric);
+      if (utilities.gas) addField("Gas:", utilities.gas);
+      if (utilities.phone) addField("Phone:", utilities.phone);
+      if (utilities.internet) addField("Internet:", utilities.internet);
+      if (utilities.cable) addField("Cable:", utilities.cable);
+      if (utilities.lawn) addField("Lawn:", utilities.lawn);
+      if (utilities.pool) addField("Pool:", utilities.pool);
+      if (utilities.pest) addField("Pest:", utilities.pest);
+      if (utilities.propane) addField("Propane:", utilities.propane);
+      if (utilities.other) addField("Other:", utilities.other);
+      
+      // Disposition section
+      checkPageBreak(20);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(10);
+      pdf.text("Disposition & Transfer:", marginLeft, yPosition);
+      yPosition += 6;
+      
+      addField("Realtor Estimate:", property.realtorEstimate);
+      addField("Future Use:", property.futureUse);
+      addField("Transfer Notes:", property.transferNotes, true);
+      yPosition += 5;
+    });
+  } else {
+    addField("No properties documented", "");
+  }
+  
+  addPageFooter();
+
+  // Step 10: Subscriptions
+  pdf.addPage();
+  yPosition = 20;
+  addTitle("NON-DIGITAL SUBSCRIPTIONS");
+  
+  const step10 = formData.step10 || {};
+  
+  if (step10.subscriptions && Array.isArray(step10.subscriptions)) {
+    step10.subscriptions.forEach((subscription: any, index: number) => {
+      checkPageBreak(20);
+      
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(11);
+      pdf.text(`Subscription ${index + 1}`, marginLeft, yPosition);
+      yPosition += 7;
+      
+      addField("Type:", subscription.type);
+      addField("Provider:", subscription.provider);
+      addField("Account Info:", subscription.accountInfo);
+      addField("Notes:", subscription.notes, true);
+      
+      pdf.setFont("helvetica", "bold");
+      addCheckbox(marginLeft, yPosition, subscription.cancelled);
+      pdf.text("Cancelled or Transferred", marginLeft + 8, yPosition);
+      yPosition += 10;
+    });
+  } else {
+    addField("No subscriptions documented", "");
+  }
   
   addPageFooter();
 
