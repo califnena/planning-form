@@ -507,17 +507,17 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
       yPosition += 6;
       
       const utilities = property.utilities || {};
-      if (utilities.water) addField("Water:", utilities.water);
-      if (utilities.electric) addField("Electric:", utilities.electric);
-      if (utilities.gas) addField("Gas:", utilities.gas);
-      if (utilities.phone) addField("Phone:", utilities.phone);
-      if (utilities.internet) addField("Internet:", utilities.internet);
-      if (utilities.cable) addField("Cable:", utilities.cable);
-      if (utilities.lawn) addField("Lawn:", utilities.lawn);
-      if (utilities.pool) addField("Pool:", utilities.pool);
-      if (utilities.pest) addField("Pest:", utilities.pest);
-      if (utilities.propane) addField("Propane:", utilities.propane);
-      if (utilities.other) addField("Other:", utilities.other);
+      if (utilities.water) addField("Water:", typeof utilities.water === 'string' ? utilities.water : utilities.water.provider);
+      if (utilities.electric) addField("Electric:", typeof utilities.electric === 'string' ? utilities.electric : utilities.electric.provider);
+      if (utilities.gas) addField("Gas:", typeof utilities.gas === 'string' ? utilities.gas : utilities.gas.provider);
+      if (utilities.phone) addField("Phone:", typeof utilities.phone === 'string' ? utilities.phone : utilities.phone.provider);
+      if (utilities.internet) addField("Internet:", typeof utilities.internet === 'string' ? utilities.internet : utilities.internet.provider);
+      if (utilities.cable) addField("Cable:", typeof utilities.cable === 'string' ? utilities.cable : utilities.cable.provider);
+      if (utilities.lawn) addField("Lawn:", typeof utilities.lawn === 'string' ? utilities.lawn : utilities.lawn.provider);
+      if (utilities.pool) addField("Pool:", typeof utilities.pool === 'string' ? utilities.pool : utilities.pool.provider);
+      if (utilities.pest) addField("Pest:", typeof utilities.pest === 'string' ? utilities.pest : utilities.pest.provider);
+      if (utilities.propane) addField("Propane:", typeof utilities.propane === 'string' ? utilities.propane : utilities.propane.provider);
+      if (utilities.other) addField("Other:", typeof utilities.other === 'string' ? utilities.other : utilities.other.provider);
       
       // Disposition section
       checkPageBreak(20);

@@ -277,11 +277,11 @@ export default function CaseDetail() {
             <Button 
               variant="outline" 
               size="sm" 
-              className="w-full justify-start"
+              className="w-full justify-start text-xs"
               onClick={handleGeneratePDF}
             >
-              <Download className="mr-2 h-4 w-4" />
-              Generate After Life Action Plan
+              <Download className="mr-2 h-4 w-4 flex-shrink-0" />
+              <span className="text-left">Generate After Life Action Plan</span>
             </Button>
           </div>
         </aside>
