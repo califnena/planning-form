@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 
 // Step Components
+import { Step0Overview } from "@/components/nextsteps/steps/Step0Overview";
 import { Step1ImmediateNeeds } from "@/components/nextsteps/steps/Step1ImmediateNeeds";
 import { Step2OfficialNotifications } from "@/components/nextsteps/steps/Step2OfficialNotifications";
 import { Step3KeyDocuments } from "@/components/nextsteps/steps/Step3KeyDocuments";
@@ -16,8 +17,10 @@ import { Step5Obituary } from "@/components/nextsteps/steps/Step5Obituary";
 import { Step6ServiceDetails } from "@/components/nextsteps/steps/Step6ServiceDetails";
 import { Step7FinancesEstate } from "@/components/nextsteps/steps/Step7FinancesEstate";
 import { Step8DigitalAccounts } from "@/components/nextsteps/steps/Step8DigitalAccounts";
+import { generateAfterLifePlanPDF } from "@/lib/afterLifePlanPdfGenerator";
 
 const STEPS = [
+  { id: 0, title: "Overview", subtitle: "What This Plan Does" },
   { id: 1, title: "Immediate Needs", subtitle: "First 48 Hours" },
   { id: 2, title: "Official Notifications", subtitle: "Government & Services" },
   { id: 3, title: "Find Key Documents", subtitle: "Legal Papers" },
@@ -32,7 +35,7 @@ export default function CaseDetail() {
   const { caseId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(true);
   const [caseData, setCaseData] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
@@ -115,11 +118,21 @@ export default function CaseDetail() {
   };
 
   const handleGeneratePDF = () => {
-    toast({
-      title: "Generating PDF",
-      description: "Your After-Life Plan report is being prepared...",
-    });
-    // PDF generation will be implemented
+    try {
+      const decedentName = caseData?.decedent?.legal_name || "Unnamed";
+      generateAfterLifePlanPDF(formData, decedentName);
+      toast({
+        title: "PDF Generated",
+        description: "Your After-Life Plan report has been downloaded successfully",
+      });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF report",
+        variant: "destructive",
+      });
+    }
   };
 
   const renderStep = () => {
@@ -130,6 +143,8 @@ export default function CaseDetail() {
     };
 
     switch (currentStep) {
+      case 0:
+        return <Step0Overview />;
       case 1:
         return <Step1ImmediateNeeds {...stepProps} />;
       case 2:
@@ -173,7 +188,7 @@ export default function CaseDetail() {
     );
   }
 
-  const progress = (currentStep / STEPS.length) * 100;
+  const progress = (currentStep / (STEPS.length - 1)) * 100;
   const currentStepInfo = STEPS[currentStep - 1];
 
   return (
@@ -191,7 +206,7 @@ export default function CaseDetail() {
                   {caseData.decedent?.legal_name || "After-Life Action Plan"}
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Step {currentStep} of {STEPS.length}
+                  {currentStep === 0 ? "Overview" : `Step ${currentStep} of ${STEPS.length - 1}`}
                 </p>
               </div>
             </div>
@@ -285,26 +300,26 @@ export default function CaseDetail() {
 
             {/* Navigation */}
             <div className="flex justify-between items-center">
-              <Button
-                variant="outline"
-                onClick={handlePrevious}
-                disabled={currentStep === 1}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Previous
-              </Button>
+            <Button
+              variant="outline"
+              onClick={handlePrevious}
+              disabled={currentStep === 0}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Previous
+            </Button>
 
-              {currentStep < STEPS.length ? (
-                <Button onClick={handleNext}>
-                  Next
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              ) : (
-                <Button onClick={handleGeneratePDF} className="bg-green-600 hover:bg-green-700">
-                  <CheckCircle2 className="mr-2 h-4 w-4" />
-                  Generate PDF Report
-                </Button>
-              )}
+            {currentStep < STEPS.length - 1 ? (
+              <Button onClick={handleNext}>
+                Next
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              <Button onClick={handleGeneratePDF} className="bg-green-600 hover:bg-green-700">
+                <CheckCircle2 className="mr-2 h-4 w-4" />
+                Generate PDF Report
+              </Button>
+            )}
             </div>
           </div>
         </main>
