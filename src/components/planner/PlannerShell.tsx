@@ -205,10 +205,12 @@ export const PlannerShell = ({
                   variant="outline"
                   size="sm"
                   className="w-full justify-start"
-                  disabled
+                  asChild
                 >
-                  <FileText className="mr-2 h-4 w-4" />
-                  Coming Soon
+                  <Link to="/next-steps">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Open Case Manager
+                  </Link>
                 </Button>
               </div>
             </div>
