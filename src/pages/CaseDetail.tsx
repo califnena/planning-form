@@ -19,7 +19,9 @@ import { Step7FinancesEstate } from "@/components/nextsteps/steps/Step7FinancesE
 import { Step8DigitalAccounts } from "@/components/nextsteps/steps/Step8DigitalAccounts";
 import { Step9RealEstateUtilities } from "@/components/nextsteps/steps/Step9RealEstateUtilities";
 import { Step10Subscriptions } from "@/components/nextsteps/steps/Step10Subscriptions";
-import { generateAfterLifePlanPDF } from "@/lib/afterLifePlanPdfGenerator";
+import { Step11OtherProperty } from "@/components/nextsteps/steps/Step11OtherProperty";
+import { Step12Business } from "@/components/nextsteps/steps/Step12Business";
+import { PdfGenerationDialog } from "@/components/nextsteps/PdfGenerationDialog";
 
 const STEPS = [
   { id: 0, title: "Overview", subtitle: "What This Plan Does" },
@@ -33,6 +35,8 @@ const STEPS = [
   { id: 8, title: "Digital Accounts", subtitle: "Online Presence" },
   { id: 9, title: "Real Estate & Utilities", subtitle: "Property Management" },
   { id: 10, title: "Subscriptions", subtitle: "Non-Digital Services" },
+  { id: 11, title: "Other Property", subtitle: "Vehicles, Jewelry & More" },
+  { id: 12, title: "Business", subtitle: "Business Ownership" },
 ];
 
 export default function CaseDetail() {
@@ -44,6 +48,7 @@ export default function CaseDetail() {
   const [caseData, setCaseData] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
   const [isSaving, setIsSaving] = useState(false);
+  const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
 
   useEffect(() => {
     if (caseId) {
@@ -121,23 +126,6 @@ export default function CaseDetail() {
     }
   };
 
-  const handleGeneratePDF = async () => {
-    try {
-      const decedentName = caseData?.decedent?.legal_name || "";
-      await generateAfterLifePlanPDF(formData, decedentName);
-      toast({
-        title: "PDF Generated",
-        description: "Your After-Life Plan report has been downloaded successfully",
-      });
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      toast({
-        title: "Error",
-        description: "Failed to generate PDF report",
-        variant: "destructive",
-      });
-    }
-  };
 
   const renderStep = () => {
     const stepProps = {
@@ -169,6 +157,10 @@ export default function CaseDetail() {
         return <Step9RealEstateUtilities {...stepProps} />;
       case 10:
         return <Step10Subscriptions {...stepProps} />;
+      case 11:
+        return <Step11OtherProperty {...stepProps} />;
+      case 12:
+        return <Step12Business {...stepProps} />;
       default:
         return null;
     }

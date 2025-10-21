@@ -14,6 +14,8 @@ interface PlanData {
   step8?: any;
   step9?: any;
   step10?: any;
+  step11?: any;
+  step12?: any;
 }
 
 export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName: string) => {
@@ -95,8 +97,8 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(0, 0, 0);
     const pageNumText = preparedForDisplay 
-      ? `Page ${currentPage} of 11 (${preparedForDisplay})`
-      : `Page ${currentPage} of 11`;
+      ? `Page ${currentPage} of 13 (${preparedForDisplay})`
+      : `Page ${currentPage} of 13`;
     pdf.text(pageNumText, pageWidth / 2, pageHeight - 8, { align: "center" });
     
     pdf.setTextColor(...colors.bodyGray);
@@ -564,6 +566,93 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   } else {
     addField("No subscriptions documented", "");
   }
+  
+  addPageFooter();
+
+  // Step 11: Other Property
+  pdf.addPage();
+  yPosition = 20;
+  addTitle("OTHER PROPERTY & POSSESSIONS");
+  
+  const step11 = formData.step11 || {};
+  
+  if (step11.properties && Array.isArray(step11.properties)) {
+    step11.properties.forEach((property: any, index: number) => {
+      checkPageBreak(35);
+      
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(12);
+      pdf.setTextColor(...colors.subheaderTeal);
+      pdf.text(`Property Item ${index + 1}`, marginLeft, yPosition);
+      pdf.setTextColor(...colors.bodyGray);
+      yPosition += 7;
+      
+      addField("Category:", property.category);
+      addField("Description:", property.description, true);
+      addField("Location/Storage:", property.location);
+      addField("Estimated Value:", property.estimatedValue);
+      addField("Intended Disposition:", property.disposition);
+      addField("Notes:", property.notes, true);
+      
+      pdf.setFont("helvetica", "bold");
+      addCheckbox(marginLeft, yPosition, property.completed);
+      pdf.text("Completed", marginLeft + 8, yPosition);
+      yPosition += 10;
+    });
+  } else {
+    addField("No property items documented", "");
+  }
+  
+  addField("General Notes:", step11.generalNotes, true);
+  
+  addPageFooter();
+
+  // Step 12: Business
+  pdf.addPage();
+  yPosition = 20;
+  addTitle("BUSINESS OWNERSHIP & MANAGEMENT");
+  
+  const step12 = formData.step12 || {};
+  
+  addField("Business Name:", step12.businessName);
+  addField("Business Type:", step12.businessType);
+  addField("EIN:", step12.ein);
+  addField("Ownership Structure:", step12.ownership);
+  addField("Key Business Contacts:", step12.keyContacts, true);
+  addField("Business Accountant:", step12.accountant);
+  addField("Business Attorney:", step12.attorney);
+  addField("Succession Plan:", step12.successionPlan, true);
+  addField("Business Bank Accounts:", step12.bankAccounts, true);
+  addField("Business Assets:", step12.assets, true);
+  addField("Business Liabilities:", step12.liabilities, true);
+  addField("Disposition Instructions:", step12.disposition, true);
+  
+  checkPageBreak(30);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(11);
+  pdf.text("Business Tasks Checklist:", marginLeft, yPosition);
+  yPosition += 8;
+  
+  addCheckbox(marginLeft, yPosition, step12.partnersNotified);
+  pdf.text("Partners/Co-owners notified", marginLeft + 8, yPosition);
+  yPosition += 7;
+  
+  addCheckbox(marginLeft, yPosition, step12.employeesNotified);
+  pdf.text("Employees notified", marginLeft + 8, yPosition);
+  yPosition += 7;
+  
+  addCheckbox(marginLeft, yPosition, step12.accountsTransferred);
+  pdf.text("Accounts transferred or closed", marginLeft + 8, yPosition);
+  yPosition += 7;
+  
+  addCheckbox(marginLeft, yPosition, step12.licensesHandled);
+  pdf.text("Licenses handled", marginLeft + 8, yPosition);
+  yPosition += 7;
+  
+  addCheckbox(marginLeft, yPosition, step12.dispositionComplete);
+  pdf.text("Disposition completed", marginLeft + 8, yPosition);
+  
+  addField("Additional Notes:", step12.notes, true);
   
   addPageFooter();
 
