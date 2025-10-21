@@ -60,7 +60,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
     
     if (pageNum) {
       pdf.setFontSize(9);
-      pdf.text(`Page ${pageNum} (Full Legal Name)`, pageWidth / 2, pageHeight - 7, { align: "center" });
+      pdf.text(`Page ${pageNum}`, pageWidth / 2, pageHeight - 7, { align: "center" });
     }
   };
 
@@ -594,19 +594,7 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addLabeledField("Location of Deed/Title:");
   
   yPosition += 8;
-  addSubheader("Property 3");
-  addLabeledField("Type:");
-  addLabeledField("Address/Description:");
-  addLabeledField("Location of Deed/Title:");
-  
-  yPosition += 8;
-  addSubheader("Property 4");
-  addLabeledField("Type:");
-  addLabeledField("Address/Description:");
-  addLabeledField("Location of Deed/Title:");
-  
-  yPosition += 8;
-  addRuledLines(15, "Additional Property:");
+  addRuledLines(20, "Additional Properties:");
   
   addPageFooter(13);
 
@@ -618,7 +606,19 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
     "Care instructions and arrangements for your beloved pets."
   );
   
-  addRuledLines(26, "Pet Care Instructions:");
+  addSubheader("Type of Pets I Have");
+  addCheckbox("Dog", marginLeft);
+  addCheckbox("Cat", marginLeft + 50);
+  addCheckbox("Bird", marginLeft + 100);
+  yPosition += 8;
+  addCheckbox("Snake", marginLeft);
+  addCheckbox("Fish", marginLeft + 50);
+  addCheckbox("Rabbit", marginLeft + 100);
+  yPosition += 8;
+  addCheckbox("Other", marginLeft);
+  yPosition += 12;
+  
+  addRuledLines(18, "Care Instructions (who to leave pets with, how to care for them, etc.):");
   
   addPageFooter(14);
 

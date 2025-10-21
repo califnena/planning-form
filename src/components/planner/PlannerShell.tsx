@@ -111,99 +111,131 @@ export const PlannerShell = ({
                 </Tooltip>
               </TooltipProvider>
             )}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start"
-                    onClick={onPreviewPDF}
-                  >
-                    <Eye className="mr-2 h-4 w-4" />
-                    Preview My Document
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="bg-popover text-popover-foreground border">
-                  <p>Preview before downloading (PDF Format)</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start"
-                    onClick={onDownloadPDF}
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Generate My Document
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="bg-popover text-popover-foreground border">
-                  <p>Download your plan (PDF Format)</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start"
-                    onClick={onEmailPlan}
-                  >
-                    <Mail className="mr-2 h-4 w-4" />
-                    Email My Document
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="bg-popover text-popover-foreground border">
-                  <p>Send your plan via email (PDF Format)</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start"
-                    onClick={onDownloadManualForm}
-                  >
-                    <Printer className="mr-2 h-4 w-4" />
-                    Blank Form
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="bg-popover text-popover-foreground border">
-                  <p>Printable blank form for handwriting</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <Button
-              size="sm"
-              className="w-full justify-start bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
-              asChild
-            >
-              <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
-                <FileText className="mr-2 h-4 w-4" />
-                Request a Quote
-              </a>
-            </Button>
             
-            <Button
-              size="sm"
-              className="w-full justify-start bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
-              asChild
-            >
-              <Link to="/vip-coach">
-                <Sparkles className="mr-2 h-4 w-4" />
-                VIP Coach Assistant
-              </Link>
-            </Button>
+            {/* Everlasting Wishes - Pre-Planning Mode */}
+            <div className="mt-4 pt-4 border-t border-sidebar-border">
+              <h3 className="text-xs font-semibold text-sidebar-foreground mb-2 text-muted-foreground uppercase tracking-wider">
+                Everlasting Wishes
+              </h3>
+              <p className="text-xs text-muted-foreground mb-3 italic">(Pre-Planning Mode)</p>
+              <div className="space-y-2">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-start"
+                        onClick={onPreviewPDF}
+                      >
+                        <Eye className="mr-2 h-4 w-4" />
+                        Preview My Document
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="bg-popover text-popover-foreground border">
+                      <p>Preview before downloading (PDF Format)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-start"
+                        onClick={onDownloadPDF}
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Generate My Document
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="bg-popover text-popover-foreground border">
+                      <p>Download your plan (PDF Format)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-start"
+                        onClick={onEmailPlan}
+                      >
+                        <Mail className="mr-2 h-4 w-4" />
+                        Email My Document
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="bg-popover text-popover-foreground border">
+                      <p>Send your plan via email (PDF Format)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-start"
+                        onClick={onDownloadManualForm}
+                      >
+                        <Printer className="mr-2 h-4 w-4" />
+                        Blank Form
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="bg-popover text-popover-foreground border">
+                      <p>Printable blank form for handwriting</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            </div>
+
+            {/* Everlasting Next Steps - After-Life Action Plan */}
+            <div className="mt-4 pt-4 border-t border-sidebar-border">
+              <h3 className="text-xs font-semibold text-sidebar-foreground mb-2 text-muted-foreground uppercase tracking-wider">
+                Everlasting Next Steps
+              </h3>
+              <p className="text-xs text-muted-foreground mb-3 italic">(After-Life Action Plan)</p>
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start"
+                  disabled
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  Coming Soon
+                </Button>
+              </div>
+            </div>
+            
+            <div className="mt-4 pt-4 border-t border-sidebar-border">
+              <Button
+                size="sm"
+                className="w-full justify-start bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
+                asChild
+              >
+                <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Request a Quote
+                </a>
+              </Button>
+              
+              <Button
+                size="sm"
+                className="w-full justify-start mt-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
+                asChild
+              >
+                <Link to="/vip-coach">
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  VIP Coach Assistant
+                </Link>
+              </Button>
+            </div>
           </div>
 
           {/* Contact Info */}
