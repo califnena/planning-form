@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus, FileText, Eye, Download, Mail, Users } from "lucide-react";
+import { Plus, FileText, Eye, Download, Mail, Users, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
@@ -36,7 +36,7 @@ export default function NextSteps() {
         .from("cases")
         .select(`
           *,
-          decedent:decedents(legal_name, dod)
+          decedent:decedents!cases_decedent_id_fkey(legal_name, dod)
         `)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
@@ -110,10 +110,16 @@ export default function NextSteps() {
               <h1 className="text-3xl font-bold text-foreground">Everlasting Next Steps</h1>
               <p className="text-muted-foreground mt-1">After-Life Action Plan</p>
             </div>
-            <Button onClick={createNewCase} size="lg">
-              <Plus className="mr-2 h-5 w-5" />
-              Start New Plan
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => navigate("/")} size="lg">
+                <Home className="mr-2 h-5 w-5" />
+                Return to Home
+              </Button>
+              <Button onClick={createNewCase} size="lg">
+                <Plus className="mr-2 h-5 w-5" />
+                Start New Plan
+              </Button>
+            </div>
           </div>
         </div>
       </header>

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Download, Mail, Share2, FileText } from "lucide-react";
+import { ArrowLeft, Download, Mail, Share2, FileText, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CaseVitalStats } from "@/components/nextsteps/CaseVitalStats";
 import { CaseChecklist } from "@/components/nextsteps/CaseChecklist";
@@ -30,7 +30,7 @@ export default function CaseDetail() {
         .from("cases")
         .select(`
           *,
-          decedent:decedents(*),
+          decedent:decedents!cases_decedent_id_fkey(*),
           contacts(*),
           tasks(*),
           notices(*),
@@ -105,6 +105,10 @@ export default function CaseDetail() {
               </div>
             </div>
             <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => navigate("/")}>
+                <Home className="mr-2 h-4 w-4" />
+                Home
+              </Button>
               <Button variant="outline" size="sm">
                 <Share2 className="mr-2 h-4 w-4" />
                 Share
