@@ -111,7 +111,7 @@ export default function NextSteps() {
               <p className="text-muted-foreground mt-1">After-Life Action Plan</p>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => navigate("/")} size="lg">
+              <Button variant="outline" onClick={() => navigate("/app")} size="lg">
                 <Home className="mr-2 h-5 w-5" />
                 Return to Home
               </Button>

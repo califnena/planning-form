@@ -162,14 +162,14 @@ export const PlannerShell = ({
                         variant="outline"
                         size="sm"
                         className="w-full justify-start"
-                        onClick={onEmailPlan}
+                        onClick={onDownloadPDF}
                       >
-                        <Mail className="mr-2 h-4 w-4" />
-                        Email My Document
+                        <Download className="mr-2 h-4 w-4" />
+                        Generate My Document
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="right" className="bg-popover text-popover-foreground border">
-                      <p>Send your plan via email (PDF Format)</p>
+                      <p>Download your plan (PDF Format)</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
