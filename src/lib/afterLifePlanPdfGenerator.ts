@@ -223,54 +223,37 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   yPos += 10;
   addSectionDivider();
   
-  if (formData.step1) {
-    const step1 = formData.step1;
-    
-    pdf.setFontSize(11.5);
-    pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-    pdf.setFont("helvetica", "bold");
-    pdf.text(`${step1.funeralHomeContacted ? "☑" : "☐"} Contact funeral home`, margin, yPos);
-    yPos += 7;
-    if (step1.funeralHomeName) {
-      pdf.setFontSize(11.5);
-      pdf.setFont("helvetica", "normal");
-      pdf.text(`   Name: ${step1.funeralHomeName}`, margin + 5, yPos);
-      yPos += 6;
-    }
-    if (step1.funeralHomePhone) {
-      pdf.text(`   Phone: ${step1.funeralHomePhone}`, margin + 5, yPos);
-      yPos += 6;
-    }
-    yPos += 5;
-    
-    pdf.setFont("helvetica", "bold");
-    pdf.text(`${step1.residenceSecured ? "☑" : "☐"} Secure residence`, margin, yPos);
-    yPos += 7;
-    if (step1.residenceNotes) {
-      pdf.setFont("helvetica", "normal");
-      pdf.text(`   Notes: ${step1.residenceNotes}`, margin + 5, yPos);
-      yPos += 6;
-    }
-    yPos += 5;
-    
-    pdf.setFont("helvetica", "bold");
-    pdf.text(`${step1.familyNotified ? "☑" : "☐"} Notify immediate family`, margin, yPos);
-    yPos += 7;
-    if (step1.familyContacts) {
-      pdf.setFont("helvetica", "normal");
-      pdf.text(`   Contacts: ${step1.familyContacts}`, margin + 5, yPos);
-      yPos += 6;
-    }
-    yPos += 5;
-    
-    if (step1.otherUrgent) {
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Other urgent items:", margin, yPos);
-      yPos += 7;
-      pdf.setFont("helvetica", "normal");
-      addWrappedText(step1.otherUrgent);
-    }
-  }
+  const step1 = formData.step1 || {};
+  
+  pdf.setFontSize(11.5);
+  pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
+  pdf.setFont("helvetica", "bold");
+  pdf.text(`${step1.funeralHomeContacted ? "☑" : "☐"} Contact funeral home`, margin, yPos);
+  yPos += 7;
+  
+  addField("   Name:", step1.funeralHomeName);
+  addField("   Phone:", step1.funeralHomePhone);
+  yPos += 5;
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text(`${step1.residenceSecured ? "☑" : "☐"} Secure residence`, margin, yPos);
+  yPos += 7;
+  
+  addField("   Notes:", step1.residenceNotes);
+  yPos += 5;
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text(`${step1.familyNotified ? "☑" : "☐"} Notify immediate family`, margin, yPos);
+  yPos += 7;
+  
+  addField("   Contacts:", step1.familyContacts);
+  yPos += 5;
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Other urgent items:", margin, yPos);
+  yPos += 7;
+  
+  addField("", step1.otherUrgent, true);
   
   addFooter();
 
@@ -286,71 +269,45 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   yPos += 10;
   addSectionDivider();
   
-  if (formData.step2) {
-    const step2 = formData.step2;
-    pdf.setFontSize(11.5);
-    pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-    pdf.setFont("helvetica", "bold");
-    
-    pdf.text(`${step2.ssaDone ? "☑" : "☐"} Social Security Administration`, margin, yPos);
-    yPos += 7;
-    if (step2.ssaContact || step2.ssaConfirmation) {
-      pdf.setFont("helvetica", "normal");
-      if (step2.ssaContact) {
-        pdf.text(`   Contact: ${step2.ssaContact}`, margin + 5, yPos);
-        yPos += 6;
-      }
-      if (step2.ssaConfirmation) {
-        pdf.text(`   Confirmation: ${step2.ssaConfirmation}`, margin + 5, yPos);
-        yPos += 6;
-      }
-    }
-    yPos += 5;
-    
-    pdf.setFont("helvetica", "bold");
-    pdf.text(`${step2.employerDone ? "☑" : "☐"} Employer / HR Contact`, margin, yPos);
-    yPos += 7;
-    if (step2.employerContact) {
-      pdf.setFont("helvetica", "normal");
-      pdf.text(`   ${step2.employerContact}`, margin + 5, yPos);
-      yPos += 6;
-    }
-    yPos += 5;
-    
-    pdf.setFont("helvetica", "bold");
-    pdf.text(`${step2.insuranceDone ? "☑" : "☐"} Insurance Company`, margin, yPos);
-    yPos += 7;
-    if (step2.insuranceCompany || step2.insurancePolicy) {
-      pdf.setFont("helvetica", "normal");
-      if (step2.insuranceCompany) {
-        pdf.text(`   Company: ${step2.insuranceCompany}`, margin + 5, yPos);
-        yPos += 6;
-      }
-      if (step2.insurancePolicy) {
-        pdf.text(`   Policy: ${step2.insurancePolicy}`, margin + 5, yPos);
-        yPos += 6;
-      }
-    }
-    yPos += 5;
-    
-    pdf.setFont("helvetica", "bold");
-    pdf.text(`${step2.bankDone ? "☑" : "☐"} Bank / Account Closing`, margin, yPos);
-    yPos += 7;
-    if (step2.bankStatus) {
-      pdf.setFont("helvetica", "normal");
-      pdf.text(`   ${step2.bankStatus}`, margin + 5, yPos);
-      yPos += 6;
-    }
-    yPos += 5;
-    
-    pdf.setFont("helvetica", "bold");
-    pdf.text(`${step2.utilitiesDone ? "☑" : "☐"} Utilities / Subscriptions`, margin, yPos);
-    yPos += 7;
-    if (step2.utilitiesList) {
-      pdf.setFont("helvetica", "normal");
-      pdf.text(`   ${step2.utilitiesList}`, margin + 5, yPos);
-    }
-  }
+  const step2 = formData.step2 || {};
+  pdf.setFontSize(11.5);
+  pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
+  pdf.setFont("helvetica", "bold");
+  
+  pdf.text(`${step2.ssaDone ? "☑" : "☐"} Social Security Administration`, margin, yPos);
+  yPos += 7;
+  
+  addField("   Contact:", step2.ssaContact);
+  addField("   Confirmation:", step2.ssaConfirmation);
+  yPos += 5;
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text(`${step2.employerDone ? "☑" : "☐"} Employer or HR Contact`, margin, yPos);
+  yPos += 7;
+  
+  addField("   Contact:", step2.employerContact);
+  yPos += 5;
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text(`${step2.insuranceDone ? "☑" : "☐"} Insurance Company`, margin, yPos);
+  yPos += 7;
+  
+  addField("   Company:", step2.insuranceCompany);
+  addField("   Policy:", step2.insurancePolicy);
+  yPos += 5;
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text(`${step2.bankDone ? "☑" : "☐"} Bank or Account Closing`, margin, yPos);
+  yPos += 7;
+  
+  addField("   Status:", step2.bankStatus);
+  yPos += 5;
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text(`${step2.utilitiesDone ? "☑" : "☐"} Utilities or Subscriptions`, margin, yPos);
+  yPos += 7;
+  
+  addField("   List:", step2.utilitiesList);
   
   addFooter();
 
@@ -366,19 +323,17 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   yPos += 10;
   addSectionDivider();
   
-  if (formData.step3) {
-    const step3 = formData.step3;
-    pdf.setFontSize(11.5);
-    pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-    pdf.setFont("helvetica", "normal");
-    
-    addField("Will / Trust Location:", step3.willLocation);
-    addField("Living Trust:", step3.trustLocation);
-    addField("Deeds / Titles:", step3.deedsLocation);
-    addField("Insurance Policy Folder:", step3.insuranceLocation);
-    addField("Tax Returns Found In:", step3.taxDocLocation);
-    addField("Safe Deposit Box:", step3.safeDepositBox);
-  }
+  const step3 = formData.step3 || {};
+  pdf.setFontSize(11.5);
+  pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
+  pdf.setFont("helvetica", "normal");
+  
+  addField("Will or Trust Location:", step3.willLocation);
+  addField("Living Trust:", step3.trustLocation);
+  addField("Deeds or Titles:", step3.deedsLocation);
+  addField("Insurance Policy Folder:", step3.insuranceLocation);
+  addField("Tax Returns Found In:", step3.taxDocLocation);
+  addField("Safe Deposit Box:", step3.safeDepositBox);
   
   addFooter();
 
@@ -394,26 +349,22 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   yPos += 10;
   addSectionDivider();
   
-  if (formData.step4) {
-    const step4 = formData.step4;
-    pdf.setFontSize(11.5);
-    pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-    pdf.setFont("helvetica", "normal");
-    
-    addField("Number Ordered:", step4.numberOrdered?.toString());
-    
-    if (step4.recipients) {
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Recipients:", margin, yPos);
-      yPos += 7;
-      pdf.setFont("helvetica", "normal");
-      addWrappedText(step4.recipients);
-      yPos += 5;
-    }
-    
-    pdf.setFont("helvetica", "bold");
-    pdf.text(`${step4.allReceived ? "☑" : "☐"} All certificates received`, margin, yPos);
-  }
+  const step4 = formData.step4 || {};
+  pdf.setFontSize(11.5);
+  pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
+  pdf.setFont("helvetica", "normal");
+  
+  addField("Number Ordered:", step4.numberOrdered?.toString());
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Recipients:", margin, yPos);
+  yPos += 7;
+  
+  addField("", step4.recipients, true);
+  yPos += 5;
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text(`${step4.allReceived ? "☑" : "☐"} All certificates received`, margin, yPos);
   
   addFooter();
 
@@ -429,23 +380,19 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   yPos += 10;
   addSectionDivider();
   
-  if (formData.step5) {
-    const step5 = formData.step5;
-    pdf.setFontSize(11.5);
-    pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-    
-    if (step5.obituaryText) {
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Obituary Text:", margin, yPos);
-      yPos += 7;
-      pdf.setFont("helvetica", "normal");
-      addWrappedText(step5.obituaryText);
-      yPos += 8;
-    }
-    
-    addField("Publication(s):", step5.publications, true);
-    addField("Online Link:", step5.onlineLink);
-  }
+  const step5 = formData.step5 || {};
+  pdf.setFontSize(11.5);
+  pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Obituary Text:", margin, yPos);
+  yPos += 7;
+  
+  addField("", step5.obituaryText, true);
+  yPos += 8;
+  
+  addField("Publication(s):", step5.publications, true);
+  addField("Online Link:", step5.onlineLink);
   
   addFooter();
 
@@ -461,40 +408,31 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   yPos += 10;
   addSectionDivider();
   
-  if (formData.step6) {
-    const step6 = formData.step6;
-    pdf.setFontSize(11.5);
-    pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-    
-    addField("Service Type:", step6.serviceType);
-    addField("Venue:", step6.venueName);
-    addField("Address:", step6.venueAddress);
-    
-    if (step6.dateTime) {
-      addField("Date/Time:", new Date(step6.dateTime).toLocaleString());
-    }
-    
-    if (step6.officiants) {
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Officiants:", margin, yPos);
-      yPos += 7;
-      pdf.setFont("helvetica", "normal");
-      addWrappedText(step6.officiants);
-      yPos += 5;
-    }
-    
-    if (step6.musicReadings) {
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Music / Readings:", margin, yPos);
-      yPos += 7;
-      pdf.setFont("helvetica", "normal");
-      addWrappedText(step6.musicReadings);
-      yPos += 5;
-    }
-    
-    pdf.setFont("helvetica", "bold");
-    pdf.text(`${step6.confirmed ? "☑" : "☐"} Confirmed with funeral home`, margin, yPos);
-  }
+  const step6 = formData.step6 || {};
+  pdf.setFontSize(11.5);
+  pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
+  
+  addField("Service Type:", step6.serviceType);
+  addField("Venue:", step6.venueName);
+  addField("Address:", step6.venueAddress);
+  addField("Date/Time:", step6.dateTime ? new Date(step6.dateTime).toLocaleString() : undefined);
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Officiants:", margin, yPos);
+  yPos += 7;
+  
+  addField("", step6.officiants, true);
+  yPos += 5;
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Music or Readings:", margin, yPos);
+  yPos += 7;
+  
+  addField("", step6.musicReadings, true);
+  yPos += 5;
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text(`${step6.confirmed ? "☑" : "☐"} Confirmed with funeral home`, margin, yPos);
   
   addFooter();
 
@@ -510,36 +448,30 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   yPos += 10;
   addSectionDivider();
   
-  if (formData.step7) {
-    const step7 = formData.step7;
-    pdf.setFontSize(11.5);
-    pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-    
-    addField("Executor:", step7.executorName);
-    addField("Contact:", step7.executorContact);
-    addField("Attorney:", step7.attorney);
-    
-    if (step7.bankAccounts) {
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Bank Accounts / Debts:", margin, yPos);
-      yPos += 7;
-      pdf.setFont("helvetica", "normal");
-      addWrappedText(step7.bankAccounts);
-      yPos += 5;
-    }
-    
-    if (step7.propertyTransfers) {
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Property Transfers:", margin, yPos);
-      yPos += 7;
-      pdf.setFont("helvetica", "normal");
-      addWrappedText(step7.propertyTransfers);
-      yPos += 5;
-    }
-    
-    pdf.setFont("helvetica", "bold");
-    pdf.text(`${step7.estateSettled ? "☑" : "☐"} Estate accounts settled`, margin, yPos);
-  }
+  const step7 = formData.step7 || {};
+  pdf.setFontSize(11.5);
+  pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
+  
+  addField("Executor:", step7.executorName);
+  addField("Contact:", step7.executorContact);
+  addField("Attorney:", step7.attorney);
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Bank Accounts or Debts:", margin, yPos);
+  yPos += 7;
+  
+  addField("", step7.bankAccounts, true);
+  yPos += 5;
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Property Transfers:", margin, yPos);
+  yPos += 7;
+  
+  addField("", step7.propertyTransfers, true);
+  yPos += 5;
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text(`${step7.estateSettled ? "☑" : "☐"} Estate accounts settled`, margin, yPos);
   
   addFooter();
 
@@ -555,34 +487,28 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   yPos += 10;
   addSectionDivider();
   
-  if (formData.step8) {
-    const step8 = formData.step8;
-    pdf.setFontSize(11.5);
-    pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-    
-    addField("Primary Email:", step8.primaryEmail);
-    
-    if (step8.socialMediaAccounts) {
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Social Media:", margin, yPos);
-      yPos += 7;
-      pdf.setFont("helvetica", "normal");
-      addWrappedText(step8.socialMediaAccounts);
-      yPos += 5;
-    }
-    
-    if (step8.streamingServices) {
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Streaming / Subscriptions:", margin, yPos);
-      yPos += 7;
-      pdf.setFont("helvetica", "normal");
-      addWrappedText(step8.streamingServices);
-      yPos += 5;
-    }
-    
-    pdf.setFont("helvetica", "bold");
-    pdf.text(`${step8.allClosed ? "☑" : "☐"} All digital accounts closed`, margin, yPos);
-  }
+  const step8 = formData.step8 || {};
+  pdf.setFontSize(11.5);
+  pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
+  
+  addField("Primary Email:", step8.primaryEmail);
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Social Media:", margin, yPos);
+  yPos += 7;
+  
+  addField("", step8.socialMediaAccounts, true);
+  yPos += 5;
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Streaming or Subscriptions:", margin, yPos);
+  yPos += 7;
+  
+  addField("", step8.streamingServices, true);
+  yPos += 5;
+  
+  pdf.setFont("helvetica", "bold");
+  pdf.text(`${step8.allClosed ? "☑" : "☐"} All digital accounts closed`, margin, yPos);
   
   addFooter();
 
