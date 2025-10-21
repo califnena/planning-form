@@ -1,6 +1,24 @@
+import { useState, useEffect } from "react";
 import { FileText, CheckCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-export function Step0Overview() {
+interface Step0OverviewProps {
+  formData: any;
+  onSave: (data: any) => void;
+  caseId: string;
+}
+
+export function Step0Overview({ formData, onSave }: Step0OverviewProps) {
+  const [preparedFor, setPreparedFor] = useState(formData?.preparedFor || "");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onSave({ preparedFor });
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [preparedFor]);
+
   return (
     <div className="space-y-6">
       <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
@@ -13,6 +31,22 @@ export function Step0Overview() {
           in the hours and days after a loss. It provides organized checklists, document tracking, 
           and guidance so nothing important is missed.
         </p>
+        
+        <div className="mt-4">
+          <Label htmlFor="preparedFor" className="text-sm font-medium">
+            This plan is prepared for:
+          </Label>
+          <Input
+            id="preparedFor"
+            placeholder="Enter name (e.g., Smith Family, John Doe, etc.)"
+            value={preparedFor}
+            onChange={(e) => setPreparedFor(e.target.value)}
+            className="mt-2"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            This name will appear on the PDF cover page and throughout the document
+          </p>
+        </div>
       </div>
 
       <div className="space-y-4">

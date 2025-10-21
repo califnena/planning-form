@@ -35,12 +35,15 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   };
   
   // Prepared for name (sanitized for filename)
-  const preparedForName = (formData.preparedFor || decedentName || "Family")
-    .trim()
-    .replace(/[^a-zA-Z0-9\s-]/g, "")
-    .replace(/\s+/g, "-");
+  const preparedForRaw = formData.preparedFor || decedentName || "";
+  const preparedForName = preparedForRaw
+    ? preparedForRaw
+        .trim()
+        .replace(/[^a-zA-Z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+    : "Plan";
 
-  const preparedForDisplay = formData.preparedFor || decedentName || "Family";
+  const preparedForDisplay = preparedForRaw.trim() || "";
 
   // Load logo
   let logoBase64 = "";
@@ -89,7 +92,9 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
     pdf.setFontSize(11);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(0, 0, 0);
-    const pageNumText = `Page ${currentPage} of 9 (${preparedForDisplay})`;
+    const pageNumText = preparedForDisplay 
+      ? `Page ${currentPage} of 9 (${preparedForDisplay})`
+      : `Page ${currentPage} of 9`;
     pdf.text(pageNumText, pageWidth / 2, pageHeight - 8, { align: "center" });
     
     pdf.setTextColor(...colors.bodyGray);
@@ -206,10 +211,23 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   
   // Prepared for
   let nameYPosition = 85;
+  pdf.setFontSize(12);
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(...colors.bodyGray);
+  pdf.text("Prepared for:", pageWidth / 2, nameYPosition, { align: "center" });
+  
+  nameYPosition += 10;
   if (preparedForDisplay) {
     pdf.setFontSize(16);
     pdf.setFont("helvetica", "bold");
-    pdf.text(sanitizeText(`Prepared for: ${preparedForDisplay}`), pageWidth / 2, nameYPosition, { align: "center" });
+    pdf.setTextColor(...colors.headerNavy);
+    pdf.text(sanitizeText(preparedForDisplay), pageWidth / 2, nameYPosition, { align: "center" });
+  } else {
+    // Draw blank line for manual entry
+    pdf.setDrawColor(...colors.boxBorder);
+    pdf.setLineWidth(0.3);
+    const lineWidth = 100;
+    pdf.line(pageWidth / 2 - lineWidth / 2, nameYPosition + 2, pageWidth / 2 + lineWidth / 2, nameYPosition + 2);
   }
   
   pdf.setFontSize(10);

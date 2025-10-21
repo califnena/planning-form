@@ -119,7 +119,7 @@ export default function CaseDetail() {
 
   const handleGeneratePDF = async () => {
     try {
-      const decedentName = caseData?.decedent?.legal_name || "Unnamed";
+      const decedentName = caseData?.decedent?.legal_name || "";
       await generateAfterLifePlanPDF(formData, decedentName);
       toast({
         title: "PDF Generated",
@@ -144,7 +144,7 @@ export default function CaseDetail() {
 
     switch (currentStep) {
       case 0:
-        return <Step0Overview />;
+        return <Step0Overview {...stepProps} />;
       case 1:
         return <Step1ImmediateNeeds {...stepProps} />;
       case 2:
