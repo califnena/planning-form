@@ -209,7 +209,7 @@ export const PlannerShell = ({
                 >
                   <Link to="/next-steps">
                     <FileText className="mr-2 h-4 w-4" />
-                    Open Case Manager
+                    After Life Plan
                   </Link>
                 </Button>
               </div>

@@ -241,6 +241,7 @@ export type Database = {
           created_at: string
           decedent_id: string | null
           executor_contact_id: string | null
+          form_data: Json | null
           id: string
           updated_at: string
           user_id: string
@@ -250,6 +251,7 @@ export type Database = {
           created_at?: string
           decedent_id?: string | null
           executor_contact_id?: string | null
+          form_data?: Json | null
           id?: string
           updated_at?: string
           user_id: string
@@ -259,6 +261,7 @@ export type Database = {
           created_at?: string
           decedent_id?: string | null
           executor_contact_id?: string | null
+          form_data?: Json | null
           id?: string
           updated_at?: string
           user_id?: string
