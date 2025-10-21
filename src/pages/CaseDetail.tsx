@@ -177,7 +177,7 @@ export default function CaseDetail() {
   const currentStepInfo = STEPS[currentStep - 1];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b border-border bg-card sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
@@ -213,62 +213,102 @@ export default function CaseDetail() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Step Header */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-foreground mb-1">
-            {currentStepInfo.title}
-          </h2>
-          <p className="text-muted-foreground">{currentStepInfo.subtitle}</p>
-        </div>
+      <div className="flex flex-1">
+        {/* Sidebar Navigation */}
+        <aside className="w-64 border-r border-border bg-sidebar p-4 overflow-y-auto hidden md:block">
+          <div className="mb-6">
+            <h2 className="font-semibold text-sidebar-foreground mb-4">Steps</h2>
+            <nav className="space-y-1">
+              {STEPS.map((step) => (
+                <button
+                  key={step.id}
+                  onClick={() => {
+                    setCurrentStep(step.id);
+                    window.scrollTo(0, 0);
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                    currentStep === step.id
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-semibold"
+                      style={{
+                        borderColor: currentStep === step.id ? "currentColor" : "rgba(128, 128, 128, 0.3)",
+                        backgroundColor: currentStep === step.id ? "currentColor" : "transparent",
+                        color: currentStep === step.id ? "var(--sidebar-accent)" : "inherit"
+                      }}
+                    >
+                      {step.id}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">{step.title}</div>
+                      <div className="text-xs text-muted-foreground truncate">{step.subtitle}</div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </nav>
+          </div>
 
-        {/* Step Content */}
-        <Card className="p-6 mb-6">
-          {renderStep()}
-        </Card>
-
-        {/* Navigation */}
-        <div className="flex justify-between items-center">
-          <Button
-            variant="outline"
-            onClick={handlePrevious}
-            disabled={currentStep === 1}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Previous
-          </Button>
-
-          {currentStep < STEPS.length ? (
-            <Button onClick={handleNext}>
-              Next
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          ) : (
-            <Button onClick={handleGeneratePDF} className="bg-green-600 hover:bg-green-700">
-              <CheckCircle2 className="mr-2 h-4 w-4" />
-              Generate PDF Report
-            </Button>
-          )}
-        </div>
-
-        {/* Step Navigation Pills */}
-        <div className="mt-8 flex flex-wrap gap-2 justify-center">
-          {STEPS.map((step) => (
-            <button
-              key={step.id}
-              onClick={() => setCurrentStep(step.id)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                currentStep === step.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
-              }`}
+          {/* Actions */}
+          <div className="mt-8 pt-4 border-t border-sidebar-border">
+            <h3 className="text-sm font-semibold text-sidebar-foreground mb-3">Actions</h3>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full justify-start"
+              onClick={handleGeneratePDF}
             >
-              {step.id}. {step.title}
-            </button>
-          ))}
-        </div>
-      </main>
+              <Download className="mr-2 h-4 w-4" />
+              Generate PDF
+            </Button>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="container mx-auto px-4 py-8 max-w-4xl">
+            {/* Step Header */}
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-foreground mb-1">
+                {currentStepInfo.title}
+              </h2>
+              <p className="text-muted-foreground">{currentStepInfo.subtitle}</p>
+            </div>
+
+            {/* Step Content */}
+            <Card className="p-6 mb-6">
+              {renderStep()}
+            </Card>
+
+            {/* Navigation */}
+            <div className="flex justify-between items-center">
+              <Button
+                variant="outline"
+                onClick={handlePrevious}
+                disabled={currentStep === 1}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Previous
+              </Button>
+
+              {currentStep < STEPS.length ? (
+                <Button onClick={handleNext}>
+                  Next
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              ) : (
+                <Button onClick={handleGeneratePDF} className="bg-green-600 hover:bg-green-700">
+                  <CheckCircle2 className="mr-2 h-4 w-4" />
+                  Generate PDF Report
+                </Button>
+              )}
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
