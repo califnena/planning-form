@@ -56,7 +56,16 @@ export const PlannerShell = ({
           <div className="flex items-center gap-3">
             <img src={everlastingLogo} alt="Everlasting Funeral Advisors" className="h-12 w-12" />
             <div>
-              <h1 className="text-lg font-semibold text-primary">{t("header.title")}</h1>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <h1 className="text-lg font-semibold text-primary cursor-help">{t("header.title")}</h1>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-popover text-popover-foreground border max-w-xs">
+                    <p>{t("header.subtitle")}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <p className="text-xs text-muted-foreground">{t("header.providedBy")}</p>
               <a 
                 href="/about-us"
@@ -77,7 +86,7 @@ export const PlannerShell = ({
         {/* Sidebar */}
         <aside className="w-64 border-r border-border bg-sidebar p-4 overflow-y-auto hidden md:block">
           <div className="mb-6">
-            <h2 className="font-semibold text-sidebar-foreground mb-4">Sections</h2>
+            <h2 className="font-semibold text-sidebar-foreground mb-4">Pre-Planning Sections</h2>
             <SidebarNav
               items={sectionItems}
               activeSection={activeSection}
@@ -102,7 +111,7 @@ export const PlannerShell = ({
                       onClick={onSave}
                     >
                       <Save className="mr-2 h-4 w-4" />
-                      Save Now
+                      Save My Progress
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="right" className="bg-popover text-popover-foreground border">
@@ -129,7 +138,7 @@ export const PlannerShell = ({
                         onClick={onPreviewPDF}
                       >
                         <Eye className="mr-2 h-4 w-4" />
-                        Preview My Document
+                        Preview Planner
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="right" className="bg-popover text-popover-foreground border">
