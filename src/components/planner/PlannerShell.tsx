@@ -26,6 +26,7 @@ interface PlannerShellProps {
   onEmailPlan: () => void;
   onSignOut: () => void;
   onSave?: () => void;
+  onAfterLifePlan?: () => void;
 }
 
 export const PlannerShell = ({
@@ -39,6 +40,7 @@ export const PlannerShell = ({
   onEmailPlan,
   onSignOut,
   onSave,
+  onAfterLifePlan,
 }: PlannerShellProps) => {
   const [showContactDialog, setShowContactDialog] = useState(false);
   const { t } = useTranslation();
@@ -115,7 +117,7 @@ export const PlannerShell = ({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="right" className="bg-popover text-popover-foreground border">
-                    <p>Manual save (auto-save is already enabled)</p>
+                    <p>✓ All fields auto-save</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -171,24 +173,6 @@ export const PlannerShell = ({
                         variant="outline"
                         size="sm"
                         className="w-full justify-start"
-                        onClick={onDownloadPDF}
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        Generate My Document
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="bg-popover text-popover-foreground border">
-                      <p>Download your plan (PDF Format)</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full justify-start"
                         onClick={onDownloadManualForm}
                       >
                         <Printer className="mr-2 h-4 w-4" />
@@ -214,12 +198,10 @@ export const PlannerShell = ({
                   variant="outline"
                   size="sm"
                   className="w-full justify-start"
-                  asChild
+                  onClick={onAfterLifePlan}
                 >
-                  <Link to="/next-steps">
-                    <FileText className="mr-2 h-4 w-4" />
-                    After Life Plan
-                  </Link>
+                  <FileText className="mr-2 h-4 w-4" />
+                  After Life Plan
                 </Button>
               </div>
             </div>

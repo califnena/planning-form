@@ -147,6 +147,34 @@ const PlannerApp = () => {
     });
   };
 
+  const handleAfterLifePlan = async () => {
+    try {
+      // Create a new case
+      const { data: newCase, error } = await supabase
+        .from("cases")
+        .insert({ user_id: user!.id })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Navigate directly to the case detail page
+      navigate(`/next-steps/case/${newCase.id}`);
+      
+      toast({
+        title: "After-Life Plan Started",
+        description: "Begin the guided checklist for next steps.",
+      });
+    } catch (error) {
+      console.error("Error creating after-life plan:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create after-life plan. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handlePreviewPDF = () => {
     try {
       const pdf = generatePlanPDF(plan);
@@ -386,6 +414,7 @@ const PlannerApp = () => {
         onEmailPlan={handleEmailPlan}
         onSignOut={handleSignOut}
         onSave={handleManualSave}
+        onAfterLifePlan={handleAfterLifePlan}
       >
         {renderSection()}
       </PlannerShell>
