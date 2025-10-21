@@ -104,14 +104,14 @@ export default function CaseDetail() {
   };
 
   const handleNext = () => {
-    if (currentStep < STEPS.length) {
+    if (currentStep < STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
       window.scrollTo(0, 0);
     }
   };
 
   const handlePrevious = () => {
-    if (currentStep > 1) {
+    if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
       window.scrollTo(0, 0);
     }
@@ -189,7 +189,7 @@ export default function CaseDetail() {
   }
 
   const progress = (currentStep / (STEPS.length - 1)) * 100;
-  const currentStepInfo = STEPS[currentStep - 1];
+  const currentStepInfo = STEPS[currentStep];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
