@@ -35,6 +35,7 @@ export const generateBlankAfterLifePlanPDF = async () => {
   }
 
   const addPageFooter = () => {
+    // Page number will be updated at the end
     const currentPage = pdf.internal.pages.length - 1;
     
     pdf.setDrawColor(...colors.subheaderTeal);
@@ -49,9 +50,25 @@ export const generateBlankAfterLifePlanPDF = async () => {
     pdf.setFontSize(11);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(0, 0, 0);
-    pdf.text(`Page ${currentPage} of 13`, pageWidth / 2, pageHeight - 8, { align: "center" });
+    // Placeholder - will be updated at the end
+    pdf.text(`Page ${currentPage}`, pageWidth / 2, pageHeight - 8, { align: "center" });
     
     pdf.setTextColor(...colors.bodyGray);
+  };
+
+  const updateAllPageNumbers = () => {
+    const totalPages = pdf.internal.pages.length - 1;
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(11);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(0, 0, 0);
+      // Clear previous text area
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(pageWidth / 2 - 30, pageHeight - 12, 60, 10, 'F');
+      // Add correct page number
+      pdf.text(`Page ${i} of ${totalPages}`, pageWidth / 2, pageHeight - 8, { align: "center" });
+    }
   };
 
   const checkPageBreak = (additionalSpace: number = 10) => {
@@ -324,7 +341,7 @@ export const generateBlankAfterLifePlanPDF = async () => {
   addTitle("DIGITAL ACCOUNTS AND ACCESS");
   
   for (let i = 1; i <= 3; i++) {
-    checkPageBreak(30);
+    checkPageBreak(35);
     pdf.setFont("helvetica", "bold");
     pdf.text(`Account ${i}`, marginLeft, yPosition);
     yPosition += 7;
@@ -332,6 +349,12 @@ export const generateBlankAfterLifePlanPDF = async () => {
     addBlankField("Platform:");
     addBlankField("Username:");
     addBlankField("Status:");
+    
+    pdf.setFont("helvetica", "bold");
+    addCheckbox(marginLeft, yPosition);
+    pdf.text("Completed", marginLeft + 8, yPosition);
+    yPosition += 7;
+    
     addBlankField("Notes:");
     yPosition += 3;
   }
@@ -365,11 +388,15 @@ export const generateBlankAfterLifePlanPDF = async () => {
   pdf.text("Utilities & Services:", marginLeft, yPosition);
   yPosition += 6;
   
-  addBlankField("Water:");
-  addBlankField("Electric:");
-  addBlankField("Gas:");
-  addBlankField("Phone:");
-  addBlankField("Internet:");
+  const utilityTypes = ["Water", "Electric", "Gas", "Phone", "Internet", "Cable", "Lawn", "Pool", "Pest", "Propane", "Other"];
+  utilityTypes.forEach(utility => {
+    checkPageBreak(20);
+    addBlankField(`${utility}:`);
+    pdf.setFont("helvetica", "bold");
+    addCheckbox(marginLeft, yPosition);
+    pdf.text("Completed", marginLeft + 8, yPosition);
+    yPosition += 7;
+  });
   
   checkPageBreak(20);
   pdf.setFont("helvetica", "bold");
@@ -380,6 +407,14 @@ export const generateBlankAfterLifePlanPDF = async () => {
   addBlankField("Future Use:");
   addBlankField("Transfer Notes:", true);
   
+  checkPageBreak(15);
+  pdf.setFont("helvetica", "bold");
+  addCheckbox(marginLeft, yPosition);
+  pdf.text("Property Completed", marginLeft + 8, yPosition);
+  yPosition += 7;
+  
+  addBlankField("Additional Notes:", true);
+  
   addPageFooter();
 
   // Step 10: Subscriptions
@@ -388,7 +423,7 @@ export const generateBlankAfterLifePlanPDF = async () => {
   addTitle("NON-DIGITAL SUBSCRIPTIONS");
   
   for (let i = 1; i <= 3; i++) {
-    checkPageBreak(25);
+    checkPageBreak(30);
     pdf.setFont("helvetica", "bold");
     pdf.text(`Subscription ${i}`, marginLeft, yPosition);
     yPosition += 7;
@@ -396,12 +431,14 @@ export const generateBlankAfterLifePlanPDF = async () => {
     addBlankField("Type:");
     addBlankField("Provider:");
     addBlankField("Account Info:");
-    addBlankField("Notes:", true);
     
     pdf.setFont("helvetica", "bold");
     addCheckbox(marginLeft, yPosition);
-    pdf.text("Cancelled or Transferred", marginLeft + 8, yPosition);
-    yPosition += 10;
+    pdf.text("Completed", marginLeft + 8, yPosition);
+    yPosition += 7;
+    
+    addBlankField("Notes:", true);
+    yPosition += 5;
   }
   
   addPageFooter();
@@ -479,6 +516,9 @@ export const generateBlankAfterLifePlanPDF = async () => {
   pdf.text("Disposition completed", marginLeft + 8, yPosition);
   
   addPageFooter();
+
+  // Update all page numbers with correct total
+  updateAllPageNumbers();
 
   // Save the PDF
   const fileName = `After-Life-Action-Plan-BLANK-${new Date().toISOString().split("T")[0]}.pdf`;

@@ -92,16 +92,34 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
     pdf.setTextColor(60, 60, 60);
     pdf.text("provided by Everlasting Funeral Advisors – After-Life Action Plan", pageWidth / 2, pageHeight - 15, { align: "center" });
     
-    // Add page number with name - bold and black
+    // Add page number with name - bold and black (will be updated at end)
     pdf.setFontSize(11);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(0, 0, 0);
     const pageNumText = preparedForDisplay 
-      ? `Page ${currentPage} of 13 (${preparedForDisplay})`
-      : `Page ${currentPage} of 13`;
+      ? `Page ${currentPage} (${preparedForDisplay})`
+      : `Page ${currentPage}`;
     pdf.text(pageNumText, pageWidth / 2, pageHeight - 8, { align: "center" });
     
     pdf.setTextColor(...colors.bodyGray);
+  };
+
+  const updateAllPageNumbers = () => {
+    const totalPages = pdf.internal.pages.length - 1;
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(11);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(0, 0, 0);
+      // Clear previous text area
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(pageWidth / 2 - 50, pageHeight - 12, 100, 10, 'F');
+      // Add correct page number
+      const pageNumText = preparedForDisplay 
+        ? `Page ${i} of ${totalPages} (${preparedForDisplay})`
+        : `Page ${i} of ${totalPages}`;
+      pdf.text(pageNumText, pageWidth / 2, pageHeight - 8, { align: "center" });
+    }
   };
 
   const checkPageBreak = (additionalSpace: number = 10) => {
@@ -692,6 +710,9 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   addField("Additional Notes:", step12.notes, true);
   
   addPageFooter();
+
+  // Update all page numbers with correct total
+  updateAllPageNumbers();
 
   // Save the PDF
   const fileName = `After-Life-Action-Plan-${preparedForName}-${
