@@ -47,7 +47,7 @@ export default function NextSteps() {
       console.error("Error fetching cases:", error);
       toast({
         title: "Error",
-        description: "Failed to load cases",
+        description: "Failed to load plans",
         variant: "destructive",
       });
     } finally {
@@ -69,8 +69,8 @@ export default function NextSteps() {
       if (error) throw error;
 
       toast({
-        title: "Case Created",
-        description: "New case has been created successfully",
+        title: "Plan Created",
+        description: "New plan has been created successfully",
       });
 
       navigate(`/next-steps/case/${newCase.id}`);
@@ -78,7 +78,7 @@ export default function NextSteps() {
       console.error("Error creating case:", error);
       toast({
         title: "Error",
-        description: "Failed to create case",
+        description: "Failed to create plan",
         variant: "destructive",
       });
     }
@@ -96,7 +96,7 @@ export default function NextSteps() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Loading cases...</p>
+        <p className="text-muted-foreground">Loading plans...</p>
       </div>
     );
   }
@@ -112,7 +112,7 @@ export default function NextSteps() {
             </div>
             <Button onClick={createNewCase} size="lg">
               <Plus className="mr-2 h-5 w-5" />
-              Start New Case
+              Start New Plan
             </Button>
           </div>
         </div>
@@ -122,13 +122,13 @@ export default function NextSteps() {
         {cases.length === 0 ? (
           <div className="text-center py-16">
             <Users className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-            <h2 className="text-2xl font-semibold mb-2">No Cases Yet</h2>
+            <h2 className="text-2xl font-semibold mb-2">No Plans Yet</h2>
             <p className="text-muted-foreground mb-6">
-              Create your first case to start organizing and tracking post-death action items
+              Create your first After-Life Action Plan to guide your loved ones through next steps
             </p>
             <Button onClick={createNewCase} size="lg">
               <Plus className="mr-2 h-5 w-5" />
-              Start New Case
+              Start New Plan
             </Button>
           </div>
         ) : (
@@ -139,11 +139,11 @@ export default function NextSteps() {
                 className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
                 onClick={() => navigate(`/next-steps/case/${caseItem.id}`)}
               >
-                <div className="space-y-3">
+                  <div className="space-y-3">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg">
-                        {caseItem.decedent?.legal_name || "Unnamed Case"}
+                        {caseItem.decedent?.legal_name || "Unnamed Plan"}
                       </h3>
                       {caseItem.decedent?.dod && (
                         <p className="text-sm text-muted-foreground">
@@ -174,21 +174,44 @@ export default function NextSteps() {
 
         <div className="mt-12 border-t border-border pt-8">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-xl font-semibold mb-4">About After-Life Action Plans</h2>
-            <p className="text-muted-foreground mb-4">
-              The After-Life Action Plan guides executors and family members from the moment of death 
-              through the first 30-90 days. It provides a structured checklist covering:
+            <h2 className="text-xl font-semibold mb-4">What This Plan Helps You Do</h2>
+            <p className="text-muted-foreground mb-6">
+              The Everlasting Next Steps Plan guides family members and executors through what to do in the hours and days after a loss. It provides organized checklists, document tracking, and guidance so nothing important is missed.
             </p>
-            <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
-              <li>Immediate actions (0-48 hours): funeral home selection, securing residence, notifying family</li>
-              <li>Filings and notices: Social Security, employer, insurance, banks, utilities</li>
-              <li>Document location index: will, trust, deeds, titles, insurance policies</li>
-              <li>Death certificate orders and distribution tracking</li>
-              <li>Obituary drafting and publication management</li>
-              <li>Service planning: venue, officiant, pallbearers, music, readings</li>
-              <li>Financial and property management tasks</li>
-              <li>Digital account handling</li>
-            </ul>
+            <div className="space-y-4 text-muted-foreground">
+              <div>
+                <h3 className="font-medium text-foreground mb-2">Step 1 – Immediate Needs (First 48 Hours)</h3>
+                <p className="text-sm">• Contact funeral home • Secure residence • Notify close family</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground mb-2">Step 2 – Official Notifications</h3>
+                <p className="text-sm">• Social Security • Employer • Insurance • Banks • Utilities</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground mb-2">Step 3 – Find Key Documents</h3>
+                <p className="text-sm">• Will • Trust • Property • Insurance • Taxes</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground mb-2">Step 4 – Death Certificates</h3>
+                <p className="text-sm">Track orders, quantities, and recipients</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground mb-2">Step 5 – Obituary & Announcements</h3>
+                <p className="text-sm">Draft obituary, select outlets, share memorial details</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground mb-2">Step 6 – Service & Memorial Details</h3>
+                <p className="text-sm">Venue, officiant, pallbearers, music, readings</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground mb-2">Step 7 – Finances & Estate</h3>
+                <p className="text-sm">Financial and property management tasks</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground mb-2">Step 8 – Digital Accounts & Subscriptions</h3>
+                <p className="text-sm">Digital account handling and online presence</p>
+              </div>
+            </div>
           </div>
         </div>
       </main>

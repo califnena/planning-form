@@ -49,7 +49,7 @@ export default function CaseDetail() {
       console.error("Error fetching case:", error);
       toast({
         title: "Error",
-        description: "Failed to load case details",
+        description: "Failed to load plan details",
         variant: "destructive",
       });
     } finally {
@@ -67,7 +67,7 @@ export default function CaseDetail() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Loading case...</p>
+        <p className="text-muted-foreground">Loading plan...</p>
       </div>
     );
   }
@@ -76,10 +76,10 @@ export default function CaseDetail() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-muted-foreground mb-4">Case not found</p>
+          <p className="text-muted-foreground mb-4">Plan not found</p>
           <Button onClick={() => navigate("/next-steps")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Cases
+            Back to Plans
           </Button>
         </div>
       </div>
@@ -97,7 +97,7 @@ export default function CaseDetail() {
               </Button>
               <div>
                 <h1 className="text-xl font-semibold">
-                  {caseData.decedent?.legal_name || "Case Details"}
+                  {caseData.decedent?.legal_name || "Plan Details"}
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   Status: {caseData.case_status}
