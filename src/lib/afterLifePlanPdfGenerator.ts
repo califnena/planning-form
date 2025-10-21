@@ -73,10 +73,10 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
     
-    // Left: Brand name and plan title
+    // Left: Plan title only (removed brand name)
     const headerText = sectionName 
-      ? `Everlasting Funeral Advisors — After-Life Action Plan | ${sectionName}`
-      : "Everlasting Funeral Advisors — After-Life Action Plan";
+      ? `After-Life Action Plan | ${sectionName}`
+      : "After-Life Action Plan";
     pdf.text(headerText, margin, headerY);
     
     // Right: Add logo
@@ -144,8 +144,10 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
     pdf.setFontSize(11.5);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-    pdf.text(label, margin, yPos);
-    yPos += 7;
+    if (label) {
+      pdf.text(label, margin, yPos);
+      yPos += 7;
+    }
     
     if (value) {
       pdf.setFont("helvetica", "normal");
@@ -156,12 +158,16 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
         yPos += 7;
       }
     } else {
-      // Add underline for blank field
+      // Add multiple underlines for blank fields
       pdf.setDrawColor(efaGray400[0], efaGray400[1], efaGray400[2]);
       pdf.setLineWidth(0.3);
       const fieldWidth = maxWidth * 0.9;
-      pdf.line(margin + 5, yPos, margin + 5 + fieldWidth, yPos);
-      yPos += 10;
+      const numLines = multiline ? 3 : 1;
+      
+      for (let i = 0; i < numLines; i++) {
+        pdf.line(margin + 5, yPos, margin + 5 + fieldWidth, yPos);
+        yPos += 10;
+      }
     }
   };
 
@@ -219,7 +225,7 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   pdf.setFontSize(15);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-  pdf.text("IMMEDIATE NEEDS (First 48 Hours)", margin, yPos);
+  pdf.text("• IMMEDIATE NEEDS (First 48 Hours)", margin, yPos);
   yPos += 10;
   addSectionDivider();
   
@@ -265,7 +271,7 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   pdf.setFontSize(15);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-  pdf.text("OFFICIAL NOTIFICATIONS", margin, yPos);
+  pdf.text("• OFFICIAL NOTIFICATIONS", margin, yPos);
   yPos += 10;
   addSectionDivider();
   
@@ -319,7 +325,7 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   pdf.setFontSize(15);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-  pdf.text("KEY DOCUMENTS AND LOCATIONS", margin, yPos);
+  pdf.text("• KEY DOCUMENTS AND LOCATIONS", margin, yPos);
   yPos += 10;
   addSectionDivider();
   
@@ -345,7 +351,7 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   pdf.setFontSize(15);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-  pdf.text("DEATH CERTIFICATES", margin, yPos);
+  pdf.text("• DEATH CERTIFICATES", margin, yPos);
   yPos += 10;
   addSectionDivider();
   
@@ -376,7 +382,7 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   pdf.setFontSize(15);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-  pdf.text("OBITUARY AND ANNOUNCEMENTS", margin, yPos);
+  pdf.text("• OBITUARY AND ANNOUNCEMENTS", margin, yPos);
   yPos += 10;
   addSectionDivider();
   
@@ -404,7 +410,7 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   pdf.setFontSize(15);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-  pdf.text("SERVICE AND MEMORIAL DETAILS", margin, yPos);
+  pdf.text("• SERVICE AND MEMORIAL DETAILS", margin, yPos);
   yPos += 10;
   addSectionDivider();
   
@@ -444,7 +450,7 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   pdf.setFontSize(15);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-  pdf.text("FINANCES AND ESTATE TASKS", margin, yPos);
+  pdf.text("• FINANCES AND ESTATE TASKS", margin, yPos);
   yPos += 10;
   addSectionDivider();
   
@@ -483,7 +489,7 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   pdf.setFontSize(15);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
-  pdf.text("DIGITAL ACCOUNTS AND ACCESS", margin, yPos);
+  pdf.text("• DIGITAL ACCOUNTS AND ACCESS", margin, yPos);
   yPos += 10;
   addSectionDivider();
   
