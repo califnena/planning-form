@@ -1,4 +1,5 @@
 import jsPDF from "jspdf";
+import logoImage from "@/assets/efa-logo.png";
 
 interface PlanData {
   decedentName?: string;
@@ -13,7 +14,7 @@ interface PlanData {
   step8?: any;
 }
 
-export const generateAfterLifePlanPDF = (formData: PlanData, decedentName: string) => {
+export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName: string) => {
   const pdf = new jsPDF();
   let yPos = 20;
   const pageWidth = pdf.internal.pageSize.width;
@@ -35,6 +36,36 @@ export const generateAfterLifePlanPDF = (formData: PlanData, decedentName: strin
     .replace(/[^a-zA-Z0-9\s-]/g, "")
     .replace(/\s+/g, "-");
 
+  // Load and convert logo to base64
+  let logoBase64 = "";
+  try {
+    const response = await fetch(logoImage);
+    const blob = await response.blob();
+    logoBase64 = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.error("Failed to load logo:", error);
+  }
+
+  // Helper function to add logo
+  const addLogo = (size: "small" | "large" = "small") => {
+    if (!logoBase64) return;
+    
+    try {
+      const logoWidth = size === "large" ? 40 : 30;
+      const logoHeight = logoWidth; // Square logo
+      const logoX = pageWidth - margin - logoWidth;
+      const logoY = size === "large" ? 20 : 5;
+      
+      pdf.addImage(logoBase64, "PNG", logoX, logoY, logoWidth, logoHeight);
+    } catch (error) {
+      console.error("Failed to add logo to PDF:", error);
+    }
+  };
+
   // Helper function to add header
   const addHeader = (sectionName?: string) => {
     const headerY = 10;
@@ -48,8 +79,8 @@ export const generateAfterLifePlanPDF = (formData: PlanData, decedentName: strin
       : "Everlasting Funeral Advisors — After-Life Action Plan";
     pdf.text(headerText, margin, headerY);
     
-    // Right: Logo placeholder (would need actual logo implementation)
-    // Note: jsPDF requires addImage() with base64 data for logos
+    // Right: Add logo
+    addLogo("small");
   };
 
   // Helper function to add footer
@@ -135,6 +166,9 @@ export const generateAfterLifePlanPDF = (formData: PlanData, decedentName: strin
   };
 
   // Cover Page
+  // Add logo to cover page
+  addLogo("large");
+  
   pdf.setTextColor(efaGray900[0], efaGray900[1], efaGray900[2]);
   yPos = pageHeight / 2 - 40;
   

@@ -117,10 +117,10 @@ export default function CaseDetail() {
     }
   };
 
-  const handleGeneratePDF = () => {
+  const handleGeneratePDF = async () => {
     try {
       const decedentName = caseData?.decedent?.legal_name || "Unnamed";
-      generateAfterLifePlanPDF(formData, decedentName);
+      await generateAfterLifePlanPDF(formData, decedentName);
       toast({
         title: "PDF Generated",
         description: "Your After-Life Plan report has been downloaded successfully",
