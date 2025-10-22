@@ -3,7 +3,6 @@ import { SidebarNav } from "./SidebarNav";
 import { Button } from "@/components/ui/button";
 import { Download, Mail, MessageSquare, Facebook, FileText, Eye, Printer, Save, Sparkles, Menu } from "lucide-react";
 import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
-import { LanguageSelector } from "@/components/LanguageSelector";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -303,7 +302,6 @@ export const PlannerShell = ({
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
-            <LanguageSelector />
             <ProfileDropdown />
           </div>
         </div>

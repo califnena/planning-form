@@ -3,7 +3,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Heart, Package, Users } from "lucide-react";
 import everlastingLogo from "@/assets/everlasting-logo.png";
-import { LanguageSelector } from "@/components/LanguageSelector";
 
 const AboutUs = () => {
   return (
@@ -19,7 +18,6 @@ const AboutUs = () => {
                 <p className="text-xs text-muted-foreground">Interactive Planning Guide</p>
               </div>
             </div>
-            <LanguageSelector />
           </div>
         </div>
       </header>

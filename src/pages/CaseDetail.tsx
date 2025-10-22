@@ -275,7 +275,7 @@ export default function CaseDetail() {
                 </SheetContent>
               </Sheet>
               
-              <Button variant="ghost" size="sm" onClick={() => navigate("/next-steps")} className="hidden sm:flex">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/app")} className="hidden sm:flex">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <div>
