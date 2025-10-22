@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { BackToHomeButton } from "@/components/BackToHomeButton";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -124,6 +125,9 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+      <div className="absolute top-4 left-4">
+        <BackToHomeButton />
+      </div>
       <div className="absolute top-4 right-4">
         <LanguageSelector />
       </div>
@@ -216,13 +220,6 @@ const Signup = () => {
             Already have an account?{" "}
             <Link to="/login" className="text-primary hover:underline font-medium">
               Sign in
-            </Link>
-          </div>
-          <div className="mt-4 text-center">
-            <Link to="/">
-              <Button variant="ghost" size="sm">
-                ← Back to Home
-              </Button>
             </Link>
           </div>
         </CardContent>
