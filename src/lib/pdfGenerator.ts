@@ -60,6 +60,16 @@ export const generatePlanPDF = (planData: PlanData) => {
   const addPageFooter = (totalPages?: number) => {
     const currentPage = pdf.internal.pages.length - 1;
     
+    // Add small logo to top right (except on cover and TOC pages)
+    if (currentPage > 2) {
+      try {
+        const logoSize = 12;
+        pdf.addImage(everlastingLogo, 'PNG', pageWidth - marginRight - logoSize, 8, logoSize, logoSize);
+      } catch (error) {
+        console.error('Error adding logo to page:', error);
+      }
+    }
+    
     // Add teal line at bottom
     pdf.setDrawColor(...colors.subheaderTeal);
     pdf.setLineWidth(0.5);
@@ -498,14 +508,20 @@ export const generatePlanPDF = (planData: PlanData) => {
   addField("Email", profile.email);
   addField("Marital Status", profile.marital_status);
   addField("Spouse/Partner Name", profile.partner_name);
+  if (profile.partner_phone) addField("Spouse/Partner Phone", profile.partner_phone);
+  if (profile.partner_email) addField("Spouse/Partner Email", profile.partner_email);
   addField("Former Spouse Name", profile.ex_spouse_name);
   addField("Religion/Faith", profile.religion);
   addField("Father's Name", profile.father_name);
+  if (profile.father_phone) addField("Father's Phone", profile.father_phone);
+  if (profile.father_email) addField("Father's Email", profile.father_email);
   addField("Mother's Name", profile.mother_name);
+  if (profile.mother_phone) addField("Mother's Phone", profile.mother_phone);
+  if (profile.mother_email) addField("Mother's Email", profile.mother_email);
   
   // Children's Names
-  const childNames = profile.child_names || [];
-  if (childNames.length > 0 && childNames.some((name: string) => name && name.trim())) {
+  const children = profile.children || [];
+  if (children.length > 0 && children.some((child: any) => child.name && child.name.trim())) {
     checkPageBreak(15);
     pdf.setFontSize(12);
     pdf.setFont("helvetica", "bold");
@@ -514,15 +530,30 @@ export const generatePlanPDF = (planData: PlanData) => {
     
     pdf.setFont("times", "normal");
     pdf.setFontSize(10);
-    childNames.forEach((name: string, index: number) => {
-      if (name && name.trim()) {
+    children.forEach((child: any, index: number) => {
+      if (child.name && child.name.trim()) {
         checkPageBreak();
-        const childText = `${index + 1}. ${sanitizeText(name)}`;
+        const childText = `${index + 1}. ${sanitizeText(child.name)}`;
         pdf.text(childText, 28, yPosition);
         const textWidth = pdf.getTextWidth(childText);
         pdf.setDrawColor(0, 0, 0);
         pdf.line(28, yPosition + 1, 28 + textWidth, yPosition + 1);
         yPosition += lineHeight + 2;
+        
+        if (child.phone) {
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(9);
+          pdf.text(`   Phone: ${sanitizeText(child.phone)}`, 28, yPosition);
+          yPosition += lineHeight;
+        }
+        if (child.email) {
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(9);
+          pdf.text(`   Email: ${sanitizeText(child.email)}`, 28, yPosition);
+          yPosition += lineHeight + 2;
+        }
+        pdf.setFont("times", "normal");
+        pdf.setFontSize(10);
       }
     });
     pdf.setFont("helvetica", "normal");
@@ -548,7 +579,9 @@ export const generatePlanPDF = (planData: PlanData) => {
     yPosition += 5;
   }
 
-  // About Me Section
+  // About Me Section - START ON NEW PAGE
+  pdf.addPage();
+  yPosition = 20;
   addTitle("About Me");
   addSection("My Story & Legacy", planData.about_me_notes);
 
@@ -738,7 +771,26 @@ export const generatePlanPDF = (planData: PlanData) => {
 
   // Pets Section
   addTitle("My Pets");
-  addSection("Pet Care Instructions", planData.pets_notes);
+  
+  const pets = planData.pets || [];
+  if (pets.length > 0 && pets.some((pet: any) => pet.name || pet.type || pet.instructions)) {
+    pets.forEach((pet: any, index: number) => {
+      if (pet.name || pet.type || pet.instructions) {
+        checkPageBreak(30);
+        pdf.setFontSize(11);
+        pdf.setFont("helvetica", "bold");
+        pdf.text(sanitizeText(`Pet ${index + 1}`), 20, yPosition);
+        yPosition += lineHeight;
+        
+        if (pet.type) addField("Type", pet.type);
+        if (pet.name) addField("Name", pet.name);
+        if (pet.instructions) addField("Care Instructions", pet.instructions, false);
+        yPosition += 5;
+      }
+    });
+  } else {
+    addSection("Pet Care Instructions", planData.pets_notes);
+  }
 
   // Digital World Section
   addTitle("Digital World");
@@ -851,7 +903,9 @@ export const generatePlanPDF = (planData: PlanData) => {
   addField("Advance Healthcare Directive", legal.has_advance_directive ? "Yes" : "No");
   if (legal.advance_directive_details) addField("Directive Details", legal.advance_directive_details, false);
 
-  // Messages Section
+  // Messages Section - START ON NEW PAGE
+  pdf.addPage();
+  yPosition = 20;
   addTitle("Messages to Loved Ones");
   const messages = planData.messages || [];
   if (messages.length > 0) {
@@ -1083,6 +1137,16 @@ export const generatePlanPDF = (planData: PlanData) => {
   // Update all page footers with total page count
   for (let i = 2; i <= totalPages; i++) {
     pdf.setPage(i);
+    
+    // Add small logo to top right (except on cover and TOC pages)
+    if (i > 2) {
+      try {
+        const logoSize = 12;
+        pdf.addImage(everlastingLogo, 'PNG', pageWidth - marginRight - logoSize, 8, logoSize, logoSize);
+      } catch (error) {
+        console.error('Error adding logo to page:', error);
+      }
+    }
     
     // Add teal line at bottom
     pdf.setDrawColor(...colors.subheaderTeal);

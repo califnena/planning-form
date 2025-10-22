@@ -169,6 +169,27 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
 
         <div className="space-y-2">
+          <Label htmlFor="partner_phone">Spouse/Partner Phone</Label>
+          <Input
+            id="partner_phone"
+            value={profile.partner_phone || ""}
+            onChange={(e) => updateProfile("partner_phone", e.target.value)}
+            placeholder="(555) 123-4567"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="partner_email">Spouse/Partner Email</Label>
+          <Input
+            id="partner_email"
+            type="email"
+            value={profile.partner_email || ""}
+            onChange={(e) => updateProfile("partner_email", e.target.value)}
+            placeholder="spouse@example.com"
+          />
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="ex_spouse_name">{t("personal.exSpouseName")}</Label>
           <Input
             id="ex_spouse_name"
@@ -196,11 +217,53 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
 
         <div className="space-y-2">
+          <Label htmlFor="father_phone">Father's Phone</Label>
+          <Input
+            id="father_phone"
+            value={profile.father_phone || ""}
+            onChange={(e) => updateProfile("father_phone", e.target.value)}
+            placeholder="(555) 123-4567"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="father_email">Father's Email</Label>
+          <Input
+            id="father_email"
+            type="email"
+            value={profile.father_email || ""}
+            onChange={(e) => updateProfile("father_email", e.target.value)}
+            placeholder="father@example.com"
+          />
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="mother_name">{t("personal.motherName")}</Label>
           <Input
             id="mother_name"
             value={profile.mother_name || ""}
             onChange={(e) => updateProfile("mother_name", e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="mother_phone">Mother's Phone</Label>
+          <Input
+            id="mother_phone"
+            value={profile.mother_phone || ""}
+            onChange={(e) => updateProfile("mother_phone", e.target.value)}
+            placeholder="(555) 123-4567"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="mother_email">Mother's Email</Label>
+          <Input
+            id="mother_email"
+            type="email"
+            value={profile.mother_email || ""}
+            onChange={(e) => updateProfile("mother_email", e.target.value)}
+            placeholder="mother@example.com"
           />
         </div>
       </div>
@@ -212,48 +275,62 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
             variant="outline" 
             size="sm"
             onClick={() => {
-              const current = profile.child_names || ["", "", "", ""];
-              updateProfile("child_names", [...current, ""]);
+              const current = profile.children || [{ name: "", phone: "", email: "" }];
+              updateProfile("children", [...current, { name: "", phone: "", email: "" }]);
             }}
           >
             <Plus className="h-4 w-4 mr-2" />
             {t("personal.addChild")}
           </Button>
         </div>
-        <div className="space-y-3">
-          {(profile.child_names || ["", "", "", ""]).map((name: string, index: number) => (
-            <div key={index} className="flex gap-2">
+        <div className="space-y-4">
+          {(profile.children || [{ name: "", phone: "", email: "" }]).map((child: any, index: number) => (
+            <div key={index} className="border rounded-lg p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="font-semibold">Child {index + 1}</Label>
+                {(profile.children?.length || 0) > 1 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      const updated = (profile.children || []).filter((_: any, i: number) => i !== index);
+                      updateProfile("children", updated);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
               <Input
-                value={name}
+                value={child.name || ""}
                 onChange={(e) => {
-                  const updated = [...(profile.child_names || ["", "", "", ""])];
-                  updated[index] = e.target.value;
-                  updateProfile("child_names", updated);
+                  const updated = [...(profile.children || [])];
+                  updated[index] = { ...updated[index], name: e.target.value };
+                  updateProfile("children", updated);
                 }}
-                placeholder={t("personal.childPlaceholder", { index: index + 1 })}
+                placeholder="Child's name"
               />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const current = profile.child_names || ["", "", "", ""];
-                  updateProfile("child_names", [...current, ""]);
-                }}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-              {(profile.child_names?.length || 0) > 4 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    const updated = (profile.child_names || []).filter((_: string, i: number) => i !== index);
-                    updateProfile("child_names", updated);
+              <div className="grid md:grid-cols-2 gap-3">
+                <Input
+                  value={child.phone || ""}
+                  onChange={(e) => {
+                    const updated = [...(profile.children || [])];
+                    updated[index] = { ...updated[index], phone: e.target.value };
+                    updateProfile("children", updated);
                   }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
+                  placeholder="Phone number"
+                />
+                <Input
+                  type="email"
+                  value={child.email || ""}
+                  onChange={(e) => {
+                    const updated = [...(profile.children || [])];
+                    updated[index] = { ...updated[index], email: e.target.value };
+                    updateProfile("children", updated);
+                  }}
+                  placeholder="Email address"
+                />
+              </div>
             </div>
           ))}
         </div>

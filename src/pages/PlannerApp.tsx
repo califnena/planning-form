@@ -7,6 +7,7 @@ import { usePlanData } from "@/hooks/usePlanData";
 import { useToast } from "@/hooks/use-toast";
 import { RevisionPromptDialog } from "@/components/planner/RevisionPromptDialog";
 import { EmailPlanDialog } from "@/components/EmailPlanDialog";
+import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { generatePlanPDF } from "@/lib/pdfGenerator";
 import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator";
 import { useTranslation } from "react-i18next";
@@ -291,6 +292,14 @@ const PlannerApp = () => {
     { id: "revisions", label: t("navigation.revisions"), completed: false },
   ];
 
+  const handleNextSection = () => {
+    const currentIndex = sectionItems.findIndex(item => item.id === activeSection);
+    if (currentIndex < sectionItems.length - 1) {
+      setActiveSection(sectionItems[currentIndex + 1].id);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   if (authLoading || planLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -303,103 +312,142 @@ const PlannerApp = () => {
   }
 
   const renderSection = () => {
+    const currentIndex = sectionItems.findIndex(item => item.id === activeSection);
+    const isLastSection = activeSection === "messages";
+    
+    let sectionContent;
+    
     switch (activeSection) {
       case "instructions":
-        return (
+        sectionContent = (
           <SectionInstructions
             value={plan.instructions_notes}
             onChange={(value) => updatePlan({ instructions_notes: value })}
           />
         );
+        break;
       case "about":
-        return (
+        sectionContent = (
           <SectionAbout
             value={plan.about_me_notes}
             onChange={(value) => updatePlan({ about_me_notes: value })}
           />
         );
+        break;
       case "checklist":
-        return (
+        sectionContent = (
           <SectionChecklist
             data={plan}
             onChange={(data) => updatePlan(data)}
           />
         );
+        break;
       case "funeral":
-        return (
+        sectionContent = (
           <SectionFuneral
             data={plan}
             onChange={(data) => updatePlan(data)}
           />
         );
+        break;
       case "financial":
-        return (
+        sectionContent = (
           <SectionFinancial
             data={plan}
             onChange={(data) => updatePlan(data)}
           />
         );
+        break;
       case "insurance":
-        return (
+        sectionContent = (
           <SectionInsurance
             data={plan}
             onChange={(data) => updatePlan(data)}
           />
         );
+        break;
       case "property":
-        return (
+        sectionContent = (
           <SectionProperty
             data={plan}
             onChange={(data) => updatePlan(data)}
           />
         );
+        break;
       case "pets":
-        return (
+        sectionContent = (
           <SectionPets
-            value={plan.pets_notes}
-            onChange={(value) => updatePlan({ pets_notes: value })}
+            data={plan}
+            onChange={updatePlan}
           />
         );
+        break;
       case "digital":
-        return (
+        sectionContent = (
           <SectionDigital
             data={plan}
             onChange={(data) => updatePlan(data)}
           />
         );
+        break;
       case "legal":
-        return (
+        sectionContent = (
           <SectionLegal
             data={plan}
             onChange={(data) => updatePlan(data)}
           />
         );
+        break;
       case "messages":
-        return (
+        sectionContent = (
           <SectionMessages
             data={plan}
             onChange={(data) => updatePlan(data)}
           />
         );
+        break;
       case "personal":
-        return <SectionPersonal data={plan} onChange={updatePlan} />;
+        sectionContent = <SectionPersonal data={plan} onChange={updatePlan} />;
+        break;
       case "contacts":
-        return <SectionContacts data={plan} onChange={updatePlan} />;
+        sectionContent = <SectionContacts data={plan} onChange={updatePlan} />;
+        break;
       case "vendors":
-        return <SectionVendors data={plan} onChange={updatePlan} />;
+        sectionContent = <SectionVendors data={plan} onChange={updatePlan} />;
+        break;
       case "revisions":
-        return <SectionRevisions data={plan} onChange={updatePlan} />;
+        sectionContent = <SectionRevisions data={plan} onChange={updatePlan} />;
+        break;
       case "guide":
-        return <SectionGuide />;
+        sectionContent = <SectionGuide />;
+        break;
       case "faq":
-        return <SectionFAQ />;
+        sectionContent = <SectionFAQ />;
+        break;
       default:
-        return (
+        sectionContent = (
           <div className="text-center text-muted-foreground py-12">
             This section is coming soon...
           </div>
         );
     }
+
+    // Don't show navigation on guide, faq, and revisions sections
+    const showNavigation = !["guide", "faq", "revisions"].includes(activeSection);
+
+    return (
+      <div>
+        {sectionContent}
+        {showNavigation && (
+          <SectionNavigation
+            currentSection={activeSection}
+            onNext={handleNextSection}
+            onGenerateDocument={handleDownloadPDF}
+            isLastSection={isLastSection}
+          />
+        )}
+      </div>
+    );
   };
 
   return (
