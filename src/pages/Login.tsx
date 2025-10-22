@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { LanguageSelector } from "@/components/LanguageSelector";
 import { BackToHomeButton } from "@/components/BackToHomeButton";
 
 const Login = () => {
@@ -85,9 +84,6 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
       <div className="absolute top-4 left-4">
         <BackToHomeButton />
-      </div>
-      <div className="absolute top-4 right-4">
-        <LanguageSelector />
       </div>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, ArrowLeft } from "lucide-react";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -182,6 +183,11 @@ export default function Profile() {
               onChange={(e) => setFullName(e.target.value)}
               placeholder={t("profile.fullNamePlaceholder")}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Language / Idioma</Label>
+            <LanguageSelector />
           </div>
 
           <Button onClick={handleSave} disabled={saving}>
