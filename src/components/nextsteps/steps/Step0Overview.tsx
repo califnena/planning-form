@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
 interface Step0OverviewProps {
   formData: any;
@@ -14,6 +15,23 @@ interface Step0OverviewProps {
 export function Step0Overview({ formData, onSave }: Step0OverviewProps) {
   const [preparedFor, setPreparedFor] = useState(formData?.preparedFor || "");
   const [overviewNotes, setOverviewNotes] = useState(formData?.overviewNotes || "");
+  
+  const handleClearAll = () => {
+    setPreparedFor("");
+    setOverviewNotes("");
+    setStep1Complete(false);
+    setStep2Complete(false);
+    setStep3Complete(false);
+    setStep4Complete(false);
+    setStep5Complete(false);
+    setStep6Complete(false);
+    setStep7Complete(false);
+    setStep8Complete(false);
+    setStep9Complete(false);
+    setStep10Complete(false);
+    setStep11Complete(false);
+    setStep12Complete(false);
+  };
   
   // Step completion tracking
   const [step1Complete, setStep1Complete] = useState(formData?.step1Complete || false);
@@ -53,6 +71,16 @@ export function Step0Overview({ formData, onSave }: Step0OverviewProps) {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <Button 
+          variant="outline" 
+          onClick={handleClearAll}
+          size="sm"
+        >
+          Clear All Fields
+        </Button>
+      </div>
+
       {/* Description Block */}
       <div className="bg-muted/30 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-foreground mb-3">What This Plan Helps You Do</h3>
