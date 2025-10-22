@@ -1,5 +1,7 @@
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface SectionInstructionsProps {
@@ -12,11 +14,24 @@ export const SectionInstructions = ({ value, onChange }: SectionInstructionsProp
   
   return (
     <div className="space-y-4">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">📝 My Instructions</h2>
-        <p className="text-muted-foreground mb-6">
-          {t("instructions.description")}
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">📝 My Instructions</h2>
+          <p className="text-muted-foreground mb-6">
+            {t("instructions.description")}
+          </p>
+        </div>
+        {value && (
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => onChange("")}
+            className="flex-shrink-0"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Clear All
+          </Button>
+        )}
       </div>
 
       <div className="p-4 bg-muted/50 rounded-lg">

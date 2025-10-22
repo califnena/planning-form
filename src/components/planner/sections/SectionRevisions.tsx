@@ -37,7 +37,7 @@ export const SectionRevisions = ({ data, onChange }: SectionRevisionsProps) => {
     onChange({ ...data, revisions: revisions.filter((_: any, i: number) => i !== index) });
   };
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     setIsDrawing(true);
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -45,17 +45,35 @@ export const SectionRevisions = ({ data, onChange }: SectionRevisionsProps) => {
     if (!ctx) return;
     const rect = canvas.getBoundingClientRect();
     ctx.beginPath();
-    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    
+    let x, y;
+    if ('touches' in e) {
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
+    } else {
+      x = e.clientX - rect.left;
+      y = e.clientY - rect.top;
+    }
+    ctx.moveTo(x, y);
   };
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const rect = canvas.getBoundingClientRect();
-    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    
+    let x, y;
+    if ('touches' in e) {
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
+    } else {
+      x = e.clientX - rect.left;
+      y = e.clientY - rect.top;
+    }
+    ctx.lineTo(x, y);
     ctx.stroke();
   };
 
@@ -161,11 +179,14 @@ export const SectionRevisions = ({ data, onChange }: SectionRevisionsProps) => {
                       ref={canvasRef}
                       width={400}
                       height={150}
-                      className="border border-dashed rounded cursor-crosshair w-full"
+                      className="border border-dashed rounded cursor-crosshair w-full touch-none"
                       onMouseDown={startDrawing}
                       onMouseMove={draw}
                       onMouseUp={stopDrawing}
                       onMouseLeave={stopDrawing}
+                      onTouchStart={startDrawing}
+                      onTouchMove={draw}
+                      onTouchEnd={stopDrawing}
                     />
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm" onClick={clearSignature}>

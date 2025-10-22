@@ -289,7 +289,6 @@ const PlannerApp = () => {
     { id: "messages", label: t("navigation.messages"), completed: !!plan.messages_notes },
     { id: "guide", label: t("navigation.guide"), completed: false },
     { id: "faq", label: t("navigation.faq"), completed: false },
-    { id: "revisions", label: t("navigation.revisions"), completed: false },
   ];
 
   const handleNextSection = () => {
