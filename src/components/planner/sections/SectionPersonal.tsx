@@ -160,36 +160,6 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="partner_name">{t("personal.partnerName")}</Label>
-          <Input
-            id="partner_name"
-            value={profile.partner_name || ""}
-            onChange={(e) => updateProfile("partner_name", e.target.value)}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="partner_phone">Spouse/Partner Phone</Label>
-          <Input
-            id="partner_phone"
-            value={profile.partner_phone || ""}
-            onChange={(e) => updateProfile("partner_phone", e.target.value)}
-            placeholder="(555) 123-4567"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="partner_email">Spouse/Partner Email</Label>
-          <Input
-            id="partner_email"
-            type="email"
-            value={profile.partner_email || ""}
-            onChange={(e) => updateProfile("partner_email", e.target.value)}
-            placeholder="spouse@example.com"
-          />
-        </div>
-
-        <div className="space-y-2">
           <Label htmlFor="ex_spouse_name">{t("personal.exSpouseName")}</Label>
           <Input
             id="ex_spouse_name"
@@ -206,65 +176,110 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
             onChange={(e) => updateProfile("religion", e.target.value)}
           />
         </div>
+      </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="father_name">{t("personal.fatherName")}</Label>
-          <Input
-            id="father_name"
-            value={profile.father_name || ""}
-            onChange={(e) => updateProfile("father_name", e.target.value)}
-          />
+      <div className="border-t pt-6">
+        <h3 className="text-lg font-semibold mb-4">Spouse/Partner Information</h3>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="partner_name">{t("personal.partnerName")}</Label>
+            <Input
+              id="partner_name"
+              value={profile.partner_name || ""}
+              onChange={(e) => updateProfile("partner_name", e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="partner_phone">Phone</Label>
+            <Input
+              id="partner_phone"
+              value={profile.partner_phone || ""}
+              onChange={(e) => updateProfile("partner_phone", e.target.value)}
+              placeholder="(555) 123-4567"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="partner_email">Email</Label>
+            <Input
+              id="partner_email"
+              type="email"
+              value={profile.partner_email || ""}
+              onChange={(e) => updateProfile("partner_email", e.target.value)}
+              placeholder="spouse@example.com"
+            />
+          </div>
         </div>
+      </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="father_phone">Father's Phone</Label>
-          <Input
-            id="father_phone"
-            value={profile.father_phone || ""}
-            onChange={(e) => updateProfile("father_phone", e.target.value)}
-            placeholder="(555) 123-4567"
-          />
+      <div className="border-t pt-6">
+        <h3 className="text-lg font-semibold mb-4">Father's Information</h3>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="father_name">{t("personal.fatherName")}</Label>
+            <Input
+              id="father_name"
+              value={profile.father_name || ""}
+              onChange={(e) => updateProfile("father_name", e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="father_phone">Phone</Label>
+            <Input
+              id="father_phone"
+              value={profile.father_phone || ""}
+              onChange={(e) => updateProfile("father_phone", e.target.value)}
+              placeholder="(555) 123-4567"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="father_email">Email</Label>
+            <Input
+              id="father_email"
+              type="email"
+              value={profile.father_email || ""}
+              onChange={(e) => updateProfile("father_email", e.target.value)}
+              placeholder="father@example.com"
+            />
+          </div>
         </div>
+      </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="father_email">Father's Email</Label>
-          <Input
-            id="father_email"
-            type="email"
-            value={profile.father_email || ""}
-            onChange={(e) => updateProfile("father_email", e.target.value)}
-            placeholder="father@example.com"
-          />
-        </div>
+      <div className="border-t pt-6">
+        <h3 className="text-lg font-semibold mb-4">Mother's Information</h3>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="mother_name">{t("personal.motherName")}</Label>
+            <Input
+              id="mother_name"
+              value={profile.mother_name || ""}
+              onChange={(e) => updateProfile("mother_name", e.target.value)}
+            />
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="mother_name">{t("personal.motherName")}</Label>
-          <Input
-            id="mother_name"
-            value={profile.mother_name || ""}
-            onChange={(e) => updateProfile("mother_name", e.target.value)}
-          />
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="mother_phone">Phone</Label>
+            <Input
+              id="mother_phone"
+              value={profile.mother_phone || ""}
+              onChange={(e) => updateProfile("mother_phone", e.target.value)}
+              placeholder="(555) 123-4567"
+            />
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="mother_phone">Mother's Phone</Label>
-          <Input
-            id="mother_phone"
-            value={profile.mother_phone || ""}
-            onChange={(e) => updateProfile("mother_phone", e.target.value)}
-            placeholder="(555) 123-4567"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="mother_email">Mother's Email</Label>
-          <Input
-            id="mother_email"
-            type="email"
-            value={profile.mother_email || ""}
-            onChange={(e) => updateProfile("mother_email", e.target.value)}
-            placeholder="mother@example.com"
-          />
+          <div className="space-y-2">
+            <Label htmlFor="mother_email">Email</Label>
+            <Input
+              id="mother_email"
+              type="email"
+              value={profile.mother_email || ""}
+              onChange={(e) => updateProfile("mother_email", e.target.value)}
+              placeholder="mother@example.com"
+            />
+          </div>
         </div>
       </div>
 

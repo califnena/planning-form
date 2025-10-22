@@ -310,14 +310,26 @@ export const generateManuallyFillablePDF = (planData: PlanData) => {
   addSubheader("Family Information");
   addLabeledField("Marital Status:");
   addLabeledField("Spouse/Partner Name:");
+  addLabeledField("Spouse/Partner Phone:");
+  addLabeledField("Spouse/Partner Email:");
   addLabeledField("Former Spouse Name (if applicable):");
   addLabeledField("Religion/Faith:");
-  addLabeledField("Father's Name:");
-  addLabeledField("Mother's Name:");
   
   yPosition += 8;
-  addSubheader("Children's Names");
-  addRuledLines(8);
+  addSubheader("Father's Information");
+  addLabeledField("Father's Name:");
+  addLabeledField("Father's Phone:");
+  addLabeledField("Father's Email:");
+  
+  yPosition += 8;
+  addSubheader("Mother's Information");
+  addLabeledField("Mother's Name:");
+  addLabeledField("Mother's Phone:");
+  addLabeledField("Mother's Email:");
+  
+  yPosition += 8;
+  addSubheader("Children's Information");
+  addRuledLines(8, "Children's names, phone numbers, and email addresses:");
   
   yPosition += 8;
   addSubheader("Military Service (if applicable)");

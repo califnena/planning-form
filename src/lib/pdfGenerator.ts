@@ -607,7 +607,9 @@ export const generatePlanPDF = (planData: PlanData) => {
   ]);
   addTable(["Type", "Business Name", "Contact", "Notes"], vendorData, vendorData.length === 0 ? 2 : 0);
 
-  // Funeral Wishes Section
+  // Funeral Wishes Section - START ON NEW PAGE
+  pdf.addPage();
+  yPosition = 20;
   addTitle("My Funeral & Memorial Wishes");
   
   pdf.setFontSize(10);
@@ -702,9 +704,12 @@ export const generatePlanPDF = (planData: PlanData) => {
   ]);
   addTable(["Type", "Company", "Policy #", "Agent"], policyData, policyData.length === 0 ? 2 : 0);
 
-  // Property Section
+  // Property Section - START ON NEW PAGE
+  pdf.addPage();
+  yPosition = 20;
   addTitle("My Property");
   const property = planData.property || {};
+  const properties = property.properties || [];
   
   // Property types owned
   const propertyTypes = [];
@@ -792,7 +797,9 @@ export const generatePlanPDF = (planData: PlanData) => {
     addSection("Pet Care Instructions", planData.pets_notes);
   }
 
-  // Digital World Section
+  // Digital World Section - START ON NEW PAGE
+  pdf.addPage();
+  yPosition = 20;
   addTitle("Digital World");
   const digital = planData.digital || {};
   
@@ -1023,9 +1030,6 @@ export const generatePlanPDF = (planData: PlanData) => {
   pdf.text("Phone: (323) 863-5804 | Email: info@everlastingfuneraladvisors.com", pageWidth / 2, yPosition, { align: "center" });
   yPosition += 5;
   pdf.text("Website: https://everlastingfuneraladvisors.com", pageWidth / 2, yPosition, { align: "center" });
-
-  // Add footer to last page
-  addPageFooter();
 
   // Appendix section for uploaded documents/images
   pdf.addPage();

@@ -140,14 +140,25 @@ export const generateBlankAfterLifePlanPDF = async () => {
   pdf.setTextColor(...colors.bodyGray);
   pdf.text("Essential Steps for Loved Ones", pageWidth / 2, 58, { align: "center" });
   
+  // Prepared for - PROMINENT DISPLAY with blank line
   let nameYPosition = 85;
-  pdf.setFontSize(12);
-  pdf.setFont("helvetica", "bold");
-  pdf.text("Prepared for:", pageWidth / 2, nameYPosition, { align: "center" });
   
-  nameYPosition += 10;
-  pdf.setDrawColor(...colors.boxBorder);
-  pdf.setLineWidth(0.3);
+  // Draw a subtle box for emphasis
+  const boxWidth = 140;
+  const boxHeight = 35;
+  pdf.setFillColor(...colors.boxBg);
+  pdf.setDrawColor(...colors.subheaderTeal);
+  pdf.setLineWidth(1);
+  pdf.roundedRect(pageWidth / 2 - boxWidth / 2, nameYPosition - 8, boxWidth, boxHeight, 3, 3, 'FD');
+  
+  pdf.setFontSize(11);
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(...colors.subheaderTeal);
+  pdf.text("THIS PLAN IS PREPARED FOR:", pageWidth / 2, nameYPosition, { align: "center" });
+  
+  nameYPosition += 12;
+  pdf.setDrawColor(...colors.bodyGray);
+  pdf.setLineWidth(0.5);
   const lineWidth = 100;
   pdf.line(pageWidth / 2 - lineWidth / 2, nameYPosition + 2, pageWidth / 2 + lineWidth / 2, nameYPosition + 2);
   
