@@ -29,7 +29,7 @@ import { Step12Business } from "@/components/nextsteps/steps/Step12Business";
 import { PdfGenerationDialog } from "@/components/nextsteps/PdfGenerationDialog";
 
 const STEPS = [
-  { id: 0, title: "Overview", subtitle: "What This Plan Does" },
+  { id: 0, title: "Overview", subtitle: "Essential Steps Guide" },
   { id: 1, title: "Immediate Needs", subtitle: "First 48 Hours" },
   { id: 2, title: "Official Notifications", subtitle: "Government & Services" },
   { id: 3, title: "Find Key Documents", subtitle: "Legal Papers" },

@@ -54,17 +54,14 @@ export function Step0Overview({ formData, onSave }: Step0OverviewProps) {
   return (
     <div className="space-y-6">
       <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-          <FileText className="h-5 w-5 text-primary" />
-          What This Plan Helps You Do
-        </h3>
-        <p className="text-muted-foreground mb-4">
+        <h3 className="text-lg font-semibold text-foreground mb-3">What This Plan Helps You Do</h3>
+        <p className="text-muted-foreground mb-6">
           The Everlasting Next Steps Plan guides family members and executors through what to do 
           in the hours and days after a loss. It provides organized checklists, document tracking, 
           and guidance so nothing important is missed.
         </p>
         
-        <div className="mt-4">
+        <div>
           <Label htmlFor="preparedFor" className="text-sm font-medium">
             This plan is prepared for:
           </Label>
