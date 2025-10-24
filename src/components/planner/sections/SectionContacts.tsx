@@ -6,6 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Plus, Save, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { usePreviewMode } from "@/pages/PlannerApp";
+import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import jsPDF from "jspdf";
 import everlastingLogo from "@/assets/everlasting-logo.png";
 
@@ -18,8 +20,17 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
   const contacts = data.contacts || [];
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { isPreviewMode } = usePreviewMode();
 
   const addContact = () => {
+    if (isPreviewMode) {
+      toast({
+        title: "Preview Mode",
+        description: "Editing is locked. Start a trial to unlock.",
+        variant: "destructive",
+      });
+      return;
+    }
     onChange({
       ...data,
       contacts: [...contacts, { name: "", relationship: "", email: "", phone: "", note: "" }]
@@ -37,6 +48,14 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
   };
 
   const handleSave = () => {
+    if (isPreviewMode) {
+      toast({
+        title: "Preview Mode",
+        description: "Editing is locked. Start a trial to unlock.",
+        variant: "destructive",
+      });
+      return;
+    }
     toast({
       title: t("common.saved"),
       description: t("contacts.saved"),
@@ -44,6 +63,14 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
   };
 
   const handleDownloadContacts = async () => {
+    if (isPreviewMode) {
+      toast({
+        title: "Preview Mode",
+        description: "PDF export is locked. Start a trial to unlock.",
+        variant: "destructive",
+      });
+      return;
+    }
     const pdf = new jsPDF();
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
@@ -134,22 +161,23 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
           <p className="text-muted-foreground">People who should be contacted immediately</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={handleSave} size="sm" variant="default">
+          <Button onClick={handleSave} size="sm" variant="default" disabled={isPreviewMode}>
             <Save className="h-4 w-4 mr-2" />
             Save
           </Button>
-          <Button onClick={handleDownloadContacts} size="sm" variant="outline">
+          <Button onClick={handleDownloadContacts} size="sm" variant="outline" disabled={isPreviewMode}>
             <Download className="h-4 w-4 mr-2" />
             Download PDF
           </Button>
-          <Button onClick={addContact} size="sm" variant="outline">
+          <Button onClick={addContact} size="sm" variant="outline" disabled={isPreviewMode}>
             <Plus className="h-4 w-4 mr-2" />
             Add Contact
           </Button>
         </div>
       </div>
 
-      <div className="space-y-4">
+      <PreviewModeWrapper>
+        <div className="space-y-4">
         {contacts.map((contact: any, index: number) => (
           <div key={index} className="p-4 border border-border rounded-lg space-y-4">
             <div className="flex justify-between items-start">
@@ -239,6 +267,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
           </div>
         )}
       </div>
+    </PreviewModeWrapper>
     </div>
   );
 };

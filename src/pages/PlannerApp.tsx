@@ -1,17 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { PlannerShell } from "@/components/planner/PlannerShell";
 import { usePlanData } from "@/hooks/usePlanData";
+import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { useToast } from "@/hooks/use-toast";
 import { RevisionPromptDialog } from "@/components/planner/RevisionPromptDialog";
 import { EmailPlanDialog } from "@/components/EmailPlanDialog";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
+import { PreviewModeBanner } from "@/components/PreviewModeBanner";
 import { generatePlanPDF } from "@/lib/pdfGenerator";
 import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator";
 import { useTranslation } from "react-i18next";
 import { AssistantWidget } from "@/components/assistant/AssistantWidget";
+
+// Preview Mode Context
+const PreviewModeContext = createContext<{ isPreviewMode: boolean }>({ isPreviewMode: false });
+export const usePreviewMode = () => useContext(PreviewModeContext);
 
 // Section components
 import { SectionInstructions } from "@/components/planner/sections/SectionInstructions";
@@ -134,6 +140,8 @@ const PlannerApp = () => {
   };
 
   const { plan, loading: planLoading, updatePlan } = usePlanData(user?.id || "");
+  const { hasActiveSubscription, isLoading: subscriptionLoading } = useSubscriptionStatus(user?.id);
+  const isPreviewMode = !hasActiveSubscription;
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -177,6 +185,14 @@ const PlannerApp = () => {
   };
 
   const handlePreviewPDF = () => {
+    if (isPreviewMode) {
+      toast({
+        title: "Preview Mode",
+        description: "PDF export is locked. Start a trial to unlock.",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       const pdf = generatePlanPDF(plan);
       const pdfBlob = pdf.output('blob');
@@ -197,11 +213,27 @@ const PlannerApp = () => {
   };
 
   const handleDownloadPDF = () => {
+    if (isPreviewMode) {
+      toast({
+        title: "Preview Mode",
+        description: "PDF export is locked. Start a trial to unlock.",
+        variant: "destructive",
+      });
+      return;
+    }
     setPendingAction("download");
     setShowRevisionDialog(true);
   };
 
   const handleDownloadManualForm = () => {
+    if (isPreviewMode) {
+      toast({
+        title: "Preview Mode",
+        description: "PDF export is locked. Start a trial to unlock.",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       const pdf = generateManuallyFillablePDF(plan);
       pdf.save(`My-Final-Wishes-Blank-Form-${new Date().toISOString().split('T')[0]}.pdf`);
@@ -220,6 +252,14 @@ const PlannerApp = () => {
   };
 
   const handleEmailPlan = () => {
+    if (isPreviewMode) {
+      toast({
+        title: "Preview Mode",
+        description: "Email export is locked. Start a trial to unlock.",
+        variant: "destructive",
+      });
+      return;
+    }
     setPendingAction("email");
     setShowRevisionDialog(true);
   };
@@ -299,7 +339,7 @@ const PlannerApp = () => {
     }
   };
 
-  if (authLoading || planLoading) {
+  if (authLoading || planLoading || subscriptionLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -450,7 +490,7 @@ const PlannerApp = () => {
   };
 
   return (
-    <>
+    <PreviewModeContext.Provider value={{ isPreviewMode }}>
       <PlannerShell
         sectionItems={sectionItems}
         activeSection={activeSection}
@@ -463,6 +503,7 @@ const PlannerApp = () => {
         onSave={handleManualSave}
         onAfterLifePlan={handleAfterLifePlan}
       >
+        {isPreviewMode && <PreviewModeBanner />}
         {renderSection()}
       </PlannerShell>
 
@@ -481,7 +522,7 @@ const PlannerApp = () => {
       />
       
       <AssistantWidget />
-    </>
+    </PreviewModeContext.Provider>
   );
 };
 

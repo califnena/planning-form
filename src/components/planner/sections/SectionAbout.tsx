@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { usePreviewMode } from "@/pages/PlannerApp";
+import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 
 interface SectionAboutProps {
   value?: string;
@@ -13,8 +15,17 @@ interface SectionAboutProps {
 export const SectionAbout = ({ value, onChange }: SectionAboutProps) => {
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { isPreviewMode } = usePreviewMode();
 
   const handleSave = () => {
+    if (isPreviewMode) {
+      toast({
+        title: "Preview Mode",
+        description: "Editing is locked. Start a trial to unlock.",
+        variant: "destructive",
+      });
+      return;
+    }
     toast({
       title: t("common.saved"),
       description: t("about.saved"),
@@ -30,24 +41,26 @@ export const SectionAbout = ({ value, onChange }: SectionAboutProps) => {
             {t("about.description")}
           </p>
         </div>
-        <Button onClick={handleSave} size="sm">
+        <Button onClick={handleSave} size="sm" disabled={isPreviewMode}>
           <Save className="h-4 w-4 mr-2" />
           {t("common.save")}
         </Button>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="about">{t("about.storyLegacy")}</Label>
-        <p className="text-xs text-muted-foreground">{t("about.storyHelp")}</p>
-        <Textarea
-          id="about"
-          placeholder={t("about.placeholder")}
-          value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
-          rows={12}
-          className="resize-none"
-        />
-      </div>
+      <PreviewModeWrapper>
+        <div className="space-y-2">
+          <Label htmlFor="about">{t("about.storyLegacy")}</Label>
+          <p className="text-xs text-muted-foreground">{t("about.storyHelp")}</p>
+          <Textarea
+            id="about"
+            placeholder={t("about.placeholder")}
+            value={value || ""}
+            onChange={(e) => onChange(e.target.value)}
+            rows={12}
+            className="resize-none"
+          />
+        </div>
+      </PreviewModeWrapper>
 
       <div className="mt-6 p-4 bg-muted/50 rounded-lg">
         <h3 className="font-semibold mb-2">💡 {t("about.whatToInclude")}</h3>

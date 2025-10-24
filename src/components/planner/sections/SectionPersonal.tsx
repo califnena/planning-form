@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { usePreviewMode } from "@/pages/PlannerApp";
+import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import {
   Tooltip,
   TooltipContent,
@@ -21,6 +23,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
   const profile = data.personal_profile || {};
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { isPreviewMode } = usePreviewMode();
 
   const updateProfile = (field: string, value: any) => {
     onChange({
@@ -30,6 +33,14 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
   };
 
   const handleSave = () => {
+    if (isPreviewMode) {
+      toast({
+        title: "Preview Mode",
+        description: "Editing is locked. Start a trial to unlock.",
+        variant: "destructive",
+      });
+      return;
+    }
     toast({
       title: t("common.saved"),
       description: t("personal.saved"),
@@ -47,7 +58,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button onClick={handleSave} size="sm">
+              <Button onClick={handleSave} size="sm" disabled={isPreviewMode}>
                 <Save className="h-4 w-4 mr-2" />
                 {t("common.save")}
               </Button>
@@ -59,7 +70,8 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </TooltipProvider>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <PreviewModeWrapper>
+        <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="full_name">{t("personal.fullName")}</Label>
           <p className="text-xs text-muted-foreground">{t("personal.fullNameHelp")}</p>
@@ -412,7 +424,8 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
             />
           </div>
         </div>
-      </div>
+        </div>
+      </PreviewModeWrapper>
     </div>
   );
 };

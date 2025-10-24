@@ -3,6 +3,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { usePreviewMode } from "@/pages/PlannerApp";
+import { PreviewModeTooltip } from "@/components/planner/PreviewModeTooltip";
 
 interface SectionInstructionsProps {
   value?: string;
@@ -11,6 +13,7 @@ interface SectionInstructionsProps {
 
 export const SectionInstructions = ({ value, onChange }: SectionInstructionsProps) => {
   const { t } = useTranslation();
+  const { isPreviewMode } = usePreviewMode();
   
   return (
     <div className="space-y-4">
@@ -21,7 +24,7 @@ export const SectionInstructions = ({ value, onChange }: SectionInstructionsProp
             {t("instructions.description")}
           </p>
         </div>
-        {value && (
+        {value && !isPreviewMode && (
           <Button 
             variant="outline" 
             size="sm"
@@ -44,14 +47,17 @@ export const SectionInstructions = ({ value, onChange }: SectionInstructionsProp
       <div className="space-y-2">
         <Label htmlFor="instructions">My General Instructions</Label>
         <p className="text-xs text-muted-foreground">Document locations, time-sensitive actions, key contacts, and access codes</p>
-        <Textarea
-          id="instructions"
-          placeholder="Add any instructions or important notes here..."
-          value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
-          rows={8}
-          className="resize-none"
-        />
+        <PreviewModeTooltip enabled={isPreviewMode}>
+          <Textarea
+            id="instructions"
+            placeholder="Add any instructions or important notes here..."
+            value={value || ""}
+            onChange={(e) => onChange(e.target.value)}
+            rows={8}
+            className="resize-none w-full"
+            disabled={isPreviewMode}
+          />
+        </PreviewModeTooltip>
       </div>
 
       <div className="mt-6 p-4 bg-muted/50 rounded-lg">
