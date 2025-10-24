@@ -2,7 +2,7 @@ export const PLANS = {
   BASIC_ANNUAL: {
     key: "basic_annual",
     name: "Basic (Annual)",
-    price: "$29 / year",
+    price: "$9.99 / year",
     payLink: "https://buy.stripe.com/6oU28r2x75OrbLxg6q7bW00",
     description: "",
     features: [
@@ -14,7 +14,7 @@ export const PLANS = {
   PREMIUM_ANNUAL: {
     key: "premium_annual",
     name: "Premium (Annual)",
-    price: "$59 / year",
+    price: "$29.99 / year",
     payLink: "https://buy.stripe.com/14A5kD6Nn3Gjg1NdYi7bW02",
     description: "Gain full access to your planning toolkit. Generate blank and prefilled forms, save data in all fields, and create downloadable PDF reports. Email your completed plan, record personal audio or video messages, update anytime, and use multilingual fields. Organize your wishes securely and share easily with loved ones or advisors. Unlimited updates and priority support included.",
     features: [
@@ -53,7 +53,7 @@ export const PLANS = {
   BINDER: {
     key: "fireproof_binder",
     name: "Fireproof Binder (Add-On)",
-    price: "$89 one-time (+ shipping)",
+    price: "$69.99 one-time (+ shipping)",
     payLink: "https://buy.stripe.com/eVqcN5dbLfp1aHt8DY7bW01",
     description: "",
     features: ["Physical fireproof binder for printed plan (ships separately)"],
