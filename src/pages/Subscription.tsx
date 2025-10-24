@@ -98,6 +98,13 @@ export default function Subscription() {
     );
   }
 
+  const handleStartTrial = () => {
+    toast({
+      title: "Trial Starting Soon",
+      description: "The 1-day trial feature will be available shortly. Stay tuned!",
+    });
+  };
+
   return (
     <div className="container mx-auto py-10">
       <Button 
@@ -112,7 +119,29 @@ export default function Subscription() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold">{t("subscription.title")}</h1>
         <p className="text-muted-foreground">{t("subscription.description")}</p>
+        <p className="text-sm text-muted-foreground mt-2">
+          Subscriptions are paid in advance, per user. 1-day trial available.
+        </p>
       </div>
+
+      {/* Trial Call-to-Action */}
+      {!hasActiveSubscription && !isMasterAccount && (
+        <Card className="mb-8 border-primary bg-gradient-to-r from-primary/10 to-primary/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              Try It Free for 1 Day
+            </CardTitle>
+            <CardDescription>
+              Experience all features with no commitment. Start your free 1-day trial now and unlock full access to the planner.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={handleStartTrial} size="lg" className="w-full sm:w-auto">
+              Start 1-Day Trial
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {isMasterAccount && (
         <Card className="mb-6 border-primary bg-gradient-to-r from-primary/5 to-primary/10">
