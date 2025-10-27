@@ -59,6 +59,46 @@ export default function Subscription() {
 
   const open = (url: string) => window.open(url, "_blank", "noopener,noreferrer");
 
+  const PLAN_LOOKUP: Record<string, { envKey: string; mode: "subscription" | "payment" }> = {
+    [PLANS.BASIC_ANNUAL.key]: { envKey: "STRIPE_LOOKUP_BASIC", mode: "subscription" },
+    [PLANS.PREMIUM_ANNUAL.key]: { envKey: "STRIPE_LOOKUP_PREMIUM_YEAR", mode: "subscription" },
+    [PLANS.VIP_ANNUAL.key]: { envKey: "STRIPE_LOOKUP_VIP_YEAR", mode: "subscription" },
+    [PLANS.VIP_MONTHLY.key]: { envKey: "STRIPE_LOOKUP_VIP_MONTHLY", mode: "subscription" },
+    [PLANS.BINDER.key]: { envKey: "STRIPE_LOOKUP_BINDER", mode: "payment" },
+    [PLANS.DO_IT_FOR_YOU.key]: { envKey: "STRIPE_LOOKUP_DIFY", mode: "payment" },
+  };
+
+  const handleCheckout = async (planKey: string) => {
+    try {
+      const successUrl = `${window.location.origin}/subscription?status=success`;
+      const cancelUrl = `${window.location.origin}/subscription?status=cancel`;
+      const mapping = PLAN_LOOKUP[planKey];
+      if (!mapping) {
+        toast({ title: "Checkout error", description: "Unknown plan.", variant: "destructive" });
+        return;
+      }
+      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
+        body: {
+          planKey: mapping.envKey,
+          mode: mapping.mode,
+          successUrl,
+          cancelUrl,
+          allowPromotionCodes: true,
+          trialDays: 1,
+        },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url as string;
+      } else {
+        throw new Error("Invalid checkout response");
+      }
+    } catch (err) {
+      console.error(err);
+      toast({ title: "Checkout error", description: "Failed to start checkout. Try again.", variant: "destructive" });
+    }
+  };
+
   const handleCancelSubscription = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -207,7 +247,7 @@ export default function Subscription() {
                   </ul>
                   <Button 
                     className="w-full" 
-                    onClick={() => open(p.payLink)}
+                    onClick={() => handleCheckout(p.key)}
                     disabled={hasActiveSubscription}
                   >
                     {hasActiveSubscription ? "Already Subscribed" : "Subscribe"}
@@ -244,7 +284,7 @@ export default function Subscription() {
                 <div className="text-2xl font-bold text-primary mb-4">{PLANS.VIP_ANNUAL.price}</div>
                 <Button 
                   className="w-full" 
-                  onClick={() => open(PLANS.VIP_ANNUAL.payLink)}
+                  onClick={() => handleCheckout(PLANS.VIP_ANNUAL.key)}
                   disabled={hasActiveSubscription}
                 >
                   {hasActiveSubscription ? "Already Subscribed" : "Subscribe Annual"}
@@ -259,7 +299,7 @@ export default function Subscription() {
                 <div className="text-2xl font-bold text-primary mb-4">{PLANS.VIP_MONTHLY.price}</div>
                 <Button 
                   className="w-full" 
-                  onClick={() => open(PLANS.VIP_MONTHLY.payLink)}
+                  onClick={() => handleCheckout(PLANS.VIP_MONTHLY.key)}
                   disabled={hasActiveSubscription}
                 >
                   {hasActiveSubscription ? "Already Subscribed" : "Subscribe Monthly"}
@@ -290,7 +330,7 @@ export default function Subscription() {
               <ul className="space-y-1 mb-4 list-disc pl-5">
                 {PLANS.BINDER.features.map((f) => <li key={f} className="text-sm">{f}</li>)}
               </ul>
-              <Button className="w-full" onClick={() => open(PLANS.BINDER.payLink)}>
+              <Button className="w-full" onClick={() => handleCheckout(PLANS.BINDER.key)}>
                 Order Binder
               </Button>
             </CardContent>
