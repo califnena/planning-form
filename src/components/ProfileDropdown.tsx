@@ -36,8 +36,11 @@ export const ProfileDropdown = () => {
           setProfile(data);
         }
 
-        // Check VIP subscription status or master account
-        if (user.email === "califnena@gmail.com") {
+        // Check VIP access via role-based system
+        const { data: hasVIPAccess } = await supabase
+          .rpc('has_vip_access', { _user_id: user.id });
+        
+        if (hasVIPAccess) {
           setIsVIP(true);
         } else {
           const { data: subscriptionData } = await supabase

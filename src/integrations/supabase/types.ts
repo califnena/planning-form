@@ -1716,6 +1716,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       vehicles: {
         Row: {
           created_at: string
@@ -1834,6 +1855,13 @@ export type Database = {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["subscription_plan"]
       }
+      has_app_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       has_executor_access: {
         Args: { _plan_id: string; _user_id: string }
         Returns: boolean
@@ -1846,6 +1874,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_vip_access: { Args: { _user_id: string }; Returns: boolean }
       is_case_owner: {
         Args: { _case_id: string; _user_id: string }
         Returns: boolean
@@ -1869,7 +1898,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "owner" | "member" | "executor" | "admin"
+      app_role: "owner" | "member" | "executor" | "admin" | "vip"
       insurance_type: "health" | "life" | "other"
       property_kind: "primary" | "investment"
       subscription_plan:
@@ -2006,7 +2035,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["owner", "member", "executor", "admin"],
+      app_role: ["owner", "member", "executor", "admin", "vip"],
       insurance_type: ["health", "life", "other"],
       property_kind: ["primary", "investment"],
       subscription_plan: [

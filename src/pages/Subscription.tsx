@@ -36,8 +36,11 @@ export default function Subscription() {
       return;
     }
 
-    // Check if master account
-    if (user.email === "califnena@gmail.com") {
+    // Check for admin role
+    const { data: adminRole } = await supabase
+      .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
+    
+    if (adminRole) {
       setIsMasterAccount(true);
       setLoading(false);
       return;

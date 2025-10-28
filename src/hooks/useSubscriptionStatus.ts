@@ -16,12 +16,17 @@ export function useSubscriptionStatus(userId: string | undefined) {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         
-        // Check for master account
-        if (user?.email === "califnena@gmail.com") {
-          setIsMasterAccount(true);
-          setHasActiveSubscription(true);
-          setIsLoading(false);
-          return;
+        // Check for admin role
+        if (user) {
+          const { data: adminRole } = await supabase
+            .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
+          
+          if (adminRole) {
+            setIsMasterAccount(true);
+            setHasActiveSubscription(true);
+            setIsLoading(false);
+            return;
+          }
         }
 
         // Check subscription status

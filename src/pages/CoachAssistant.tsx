@@ -43,8 +43,11 @@ export default function CoachAssistant() {
         return;
       }
 
-      // Master account has full access
-      if (user.email === "califnena@gmail.com") {
+      // Check for VIP access via role-based system
+      const { data: hasVIPAccess } = await supabase
+        .rpc('has_vip_access', { _user_id: user.id });
+      
+      if (hasVIPAccess) {
         setHasAccess(true);
         setCheckingAccess(false);
         return;
