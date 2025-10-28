@@ -10,6 +10,8 @@ import { RevisionPromptDialog } from "@/components/planner/RevisionPromptDialog"
 import { EmailPlanDialog } from "@/components/EmailPlanDialog";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { PreviewModeBanner } from "@/components/PreviewModeBanner";
+import { PIINotice } from "@/components/planner/PIINotice";
+import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
 import { generatePlanPDF } from "@/lib/pdfGenerator";
 import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator";
 import { useTranslation } from "react-i18next";
@@ -47,7 +49,9 @@ const PlannerApp = () => {
   const [activeSection, setActiveSection] = useState("instructions");
   const [showRevisionDialog, setShowRevisionDialog] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
-  const [pendingAction, setPendingAction] = useState<"download" | "email" | null>(null);
+  const [showPIIDialog, setShowPIIDialog] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"download" | "email" | "preview" | null>(null);
+  const [pendingPIIData, setPendingPIIData] = useState<any>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -193,23 +197,9 @@ const PlannerApp = () => {
       });
       return;
     }
-    try {
-      const pdf = generatePlanPDF(plan);
-      const pdfBlob = pdf.output('blob');
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      window.open(pdfUrl, '_blank');
-      toast({
-        title: "Preview opened",
-        description: "PDF opened in new tab",
-      });
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      toast({
-        title: "Error",
-        description: "Failed to generate PDF preview. Please try again.",
-        variant: "destructive",
-      });
-    }
+    // Show PII dialog first
+    setPendingAction("preview");
+    setShowPIIDialog(true);
   };
 
   const handleDownloadPDF = () => {
@@ -222,7 +212,7 @@ const PlannerApp = () => {
       return;
     }
     setPendingAction("download");
-    setShowRevisionDialog(true);
+    setShowPIIDialog(true);  // Show PII dialog first
   };
 
   const handleDownloadManualForm = () => {
@@ -261,7 +251,39 @@ const PlannerApp = () => {
       return;
     }
     setPendingAction("email");
-    setShowRevisionDialog(true);
+    setShowPIIDialog(true);  // Show PII dialog first
+  };
+
+  // Handle PII data submission
+  const handlePIISubmit = (piiData: any) => {
+    setPendingPIIData(piiData);
+    
+    // For preview, generate PDF immediately
+    if (pendingAction === "preview") {
+      try {
+        const planWithPII = { ...plan, _pii: piiData };
+        const pdf = generatePlanPDF(planWithPII);
+        const pdfBlob = pdf.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        window.open(pdfUrl, '_blank');
+        toast({
+          title: "Preview opened",
+          description: "PDF opened in new tab (PII data not saved)",
+        });
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        toast({
+          title: "Error",
+          description: "Failed to generate PDF preview. Please try again.",
+          variant: "destructive",
+        });
+      }
+      setPendingAction(null);
+      setPendingPIIData(null);
+    } else {
+      // For download/email, proceed to revision dialog
+      setShowRevisionDialog(true);
+    }
   };
 
   const handleRevisionConfirm = async (revision: {
@@ -279,11 +301,12 @@ const PlannerApp = () => {
     // Proceed with the pending action
     if (pendingAction === "download") {
       try {
-        const pdf = generatePlanPDF(plan);
+        const planWithPII = { ...plan, _pii: pendingPIIData };
+        const pdf = generatePlanPDF(planWithPII);
         pdf.save(`My-Final-Wishes-${new Date().toISOString().split('T')[0]}.pdf`);
         toast({
           title: "Revision Saved",
-          description: "Your plan has been updated and downloaded successfully.",
+          description: "Your plan has been updated and downloaded successfully. (PII data not saved)",
         });
       } catch (error) {
         console.error("Error generating PDF:", error);
@@ -298,6 +321,7 @@ const PlannerApp = () => {
     }
 
     setPendingAction(null);
+    setPendingPIIData(null);  // Clear PII data after use
   };
 
   const sectionItems = [
@@ -504,6 +528,7 @@ const PlannerApp = () => {
         onAfterLifePlan={handleAfterLifePlan}
       >
         {isPreviewMode && <PreviewModeBanner />}
+        <PIINotice />
         {renderSection()}
       </PlannerShell>
 
@@ -514,10 +539,16 @@ const PlannerApp = () => {
         preparedBy={plan.prepared_by || ""}
       />
 
+      <PIICollectionDialog
+        open={showPIIDialog}
+        onOpenChange={setShowPIIDialog}
+        onSubmit={handlePIISubmit}
+      />
+
       <EmailPlanDialog
         open={showEmailDialog}
         onOpenChange={setShowEmailDialog}
-        planData={plan}
+        planData={{ ...plan, _pii: pendingPIIData }}
         preparedBy={plan.prepared_by || ""}
       />
       

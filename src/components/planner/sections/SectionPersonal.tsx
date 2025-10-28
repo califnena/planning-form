@@ -2,11 +2,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, Save } from "lucide-react";
+import { Plus, Trash2, Save, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { usePreviewMode } from "@/pages/PlannerApp";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Tooltip,
   TooltipContent,
@@ -69,6 +70,17 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
           </Tooltip>
         </TooltipProvider>
       </div>
+
+      <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-950/20 mb-4">
+        <Shield className="h-5 w-5 text-blue-600" />
+        <AlertTitle className="text-blue-900 dark:text-blue-100 font-semibold text-sm">
+          Privacy Protected: Sensitive Information Not Saved
+        </AlertTitle>
+        <AlertDescription className="text-blue-800 dark:text-blue-200 text-xs mt-1">
+          For your security, <strong>we do NOT save</strong> sensitive details like SSN, DOB, addresses, or phone numbers. 
+          You'll re-enter this information only when generating your PDF. It's only used for printing and never stored.
+        </AlertDescription>
+      </Alert>
 
       <PreviewModeWrapper>
         <div className="grid md:grid-cols-2 gap-6">

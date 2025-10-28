@@ -4,9 +4,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
-import { Plus, Trash2, Save } from "lucide-react";
+import { Plus, Trash2, Save, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Tooltip,
   TooltipContent,
@@ -77,6 +78,17 @@ export const SectionFinancial = ({ data, onChange }: SectionFinancialProps) => {
           </Tooltip>
         </TooltipProvider>
       </div>
+
+      <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-950/20 mb-4">
+        <Shield className="h-5 w-5 text-blue-600" />
+        <AlertTitle className="text-blue-900 dark:text-blue-100 font-semibold text-sm">
+          Privacy Protected: Financial Information Not Saved
+        </AlertTitle>
+        <AlertDescription className="text-blue-800 dark:text-blue-200 text-xs mt-1">
+          For your security, <strong>we do NOT save</strong> sensitive financial details like account numbers, balances, or policy numbers. 
+          You'll re-enter this information only when generating your PDF. It's only used for printing and never stored.
+        </AlertDescription>
+      </Alert>
 
       <div className="space-y-4">
         <Label className="text-base font-semibold">Account Types I Have</Label>
