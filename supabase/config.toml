@@ -1,13 +1,13 @@
 project_id = "bhhmizhxxpckibxudbrq"
 
 [functions.coach-chat]
-verify_jwt = false
+verify_jwt = true
 
 [functions.send-contact-email]
 verify_jwt = false
 
 [functions.send-plan-email]
-verify_jwt = false
+verify_jwt = true
 
 [functions.kb-search]
 verify_jwt = false

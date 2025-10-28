@@ -24,23 +24,50 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { name, email, message, type }: ContactRequest = await req.json();
 
+    // Input validation
+    if (!name || typeof name !== 'string' || name.trim().length === 0 || name.length > 100) {
+      return new Response(JSON.stringify({ error: 'Invalid name' }), {
+        status: 400,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    if (!email || typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) {
+      return new Response(JSON.stringify({ error: 'Invalid email' }), {
+        status: 400,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    if (!message || typeof message !== 'string' || message.trim().length === 0 || message.length > 5000) {
+      return new Response(JSON.stringify({ error: 'Invalid message' }), {
+        status: 400,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    // Sanitize inputs
+    const sanitizedName = name.trim().substring(0, 100);
+    const sanitizedEmail = email.trim().toLowerCase().substring(0, 255);
+    const sanitizedMessage = message.trim().substring(0, 5000);
+
     const subject = type === "contact" ? "Contact Request" : "Suggestion Submitted";
     
     const emailResponse = await resend.emails.send({
       from: "My Final Wishes <onboarding@resend.dev>",
       to: ["califnena@gmail.com"],
-      reply_to: email,
-      subject: `${subject} from ${name}`,
+      reply_to: sanitizedEmail,
+      subject: `${subject} from ${sanitizedName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h1 style="color: #333; border-bottom: 2px solid #4F46E5; padding-bottom: 10px;">${subject}</h1>
           <div style="margin-top: 20px;">
-            <p style="color: #666; font-size: 14px;"><strong>From:</strong> ${name}</p>
-            <p style="color: #666; font-size: 14px;"><strong>Email:</strong> ${email}</p>
+            <p style="color: #666; font-size: 14px;"><strong>From:</strong> ${sanitizedName}</p>
+            <p style="color: #666; font-size: 14px;"><strong>Email:</strong> ${sanitizedEmail}</p>
           </div>
           <div style="margin-top: 20px; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
             <h2 style="color: #333; font-size: 16px;">Message:</h2>
-            <p style="color: #666; font-size: 14px; white-space: pre-wrap;">${message}</p>
+            <p style="color: #666; font-size: 14px; white-space: pre-wrap;">${sanitizedMessage}</p>
           </div>
           <p style="color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
             Sent from My Final Wishes Platform
@@ -52,20 +79,20 @@ const handler = async (req: Request): Promise<Response> => {
     // Send confirmation to user
     await resend.emails.send({
       from: "My Final Wishes <onboarding@resend.dev>",
-      to: [email],
+      to: [sanitizedEmail],
       subject: `We received your ${type === "contact" ? "message" : "suggestion"}!`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h1 style="color: #333;">Thank you for reaching out!</h1>
           <p style="color: #666; font-size: 14px; margin-top: 20px;">
-            Hi ${name},
+            Hi ${sanitizedName},
           </p>
           <p style="color: #666; font-size: 14px;">
             We have received your ${type === "contact" ? "message" : "suggestion"} and will get back to you as soon as possible.
           </p>
           <div style="margin-top: 20px; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
             <h2 style="color: #333; font-size: 16px;">Your message:</h2>
-            <p style="color: #666; font-size: 14px; white-space: pre-wrap;">${message}</p>
+            <p style="color: #666; font-size: 14px; white-space: pre-wrap;">${sanitizedMessage}</p>
           </div>
           <p style="color: #666; font-size: 14px; margin-top: 30px;">
             Best regards,<br/>

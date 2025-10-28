@@ -14,8 +14,22 @@ serve(async (req) => {
   try {
     const { query } = await req.json();
     
+    // Validate and sanitize input
     if (!query || typeof query !== 'string') {
       return new Response(JSON.stringify({ error: 'Query is required' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Sanitize query: limit length and remove special SQL characters
+    const sanitizedQuery = query
+      .trim()
+      .substring(0, 100)
+      .replace(/[%_\\]/g, '\\$&'); // Escape SQL wildcards
+    
+    if (sanitizedQuery.length === 0) {
+      return new Response(JSON.stringify({ error: 'Query cannot be empty' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -28,15 +42,15 @@ serve(async (req) => {
 
     // 1) Semantic search on KB articles (using helper function)
     const { data: kbResults, error: kbError } = await supabase
-      .rpc('kb_semantic_search', { query_text: query, match_count: 5 });
+      .rpc('kb_semantic_search', { query_text: sanitizedQuery, match_count: 5 });
 
     console.log('KB search results:', kbResults, kbError);
 
-    // 2) Keyword search on FAQs
+    // 2) Keyword search on FAQs (using sanitized query)
     const { data: faqResults, error: faqError } = await supabase
       .from('faqs')
       .select('id, category, question, answer')
-      .or(`question.ilike.%${query}%,answer.ilike.%${query}%,keywords.cs.{${query}}`)
+      .or(`question.ilike.%${sanitizedQuery}%,answer.ilike.%${sanitizedQuery}%`)
       .limit(3);
 
     console.log('FAQ search results:', faqResults, faqError);
