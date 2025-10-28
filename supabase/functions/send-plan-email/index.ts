@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -9,11 +10,12 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-interface EmailPlanRequest {
-  toEmail: string;
-  pdfData: string;
-  preparedBy: string;
-}
+// Input validation schema
+const emailPlanSchema = z.object({
+  toEmail: z.string().email("Invalid email format").max(255, "Email too long"),
+  pdfData: z.string().max(10 * 1024 * 1024, "PDF data exceeds 10MB limit"), // 10MB limit
+  preparedBy: z.string().trim().max(200, "Prepared by field too long"),
+});
 
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
@@ -21,7 +23,25 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { toEmail, pdfData, preparedBy }: EmailPlanRequest = await req.json();
+    const rawBody = await req.json();
+    
+    // Validate input
+    const validationResult = emailPlanSchema.safeParse(rawBody);
+    if (!validationResult.success) {
+      console.error("Validation error:", validationResult.error);
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid input", 
+          details: validationResult.error.errors 
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { toEmail, pdfData, preparedBy } = validationResult.data;
+    
+    // Sanitize preparedBy to prevent any potential XSS in email
+    const sanitizedPreparedBy = preparedBy.replace(/[<>]/g, ''); // Remove angle brackets
 
     const emailResponse = await resend.emails.send({
       from: "My Final Wishes <onboarding@resend.dev>",
@@ -31,7 +51,7 @@ const handler = async (req: Request): Promise<Response> => {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h1 style="color: #333; border-bottom: 2px solid #4F46E5; padding-bottom: 10px;">My Final Wishes Plan</h1>
           <p style="color: #666; font-size: 14px; margin-top: 20px;">
-            This plan was prepared by <strong>${preparedBy}</strong> and contains important end-of-life planning information.
+            This plan was prepared by <strong>${sanitizedPreparedBy}</strong> and contains important end-of-life planning information.
           </p>
           <p style="color: #666; font-size: 14px;">
             Please find your complete plan attached as a PDF document. Keep this in a safe place and ensure it's accessible to those who will need it.

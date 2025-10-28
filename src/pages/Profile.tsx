@@ -84,17 +84,19 @@ export default function Profile() {
     try {
       const fileExt = file.name.split(".").pop();
       const fileName = `${userId}.${fileExt}`;
-      const { error: uploadError, data } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from("funeral-photos")
         .upload(fileName, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      const { data: signedUrlData, error: urlError } = await supabase.storage
         .from("funeral-photos")
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 3600); // 1 hour expiration
 
-      setAvatarUrl(publicUrl);
+      if (urlError) throw urlError;
+      
+      setAvatarUrl(signedUrlData.signedUrl);
       
       toast({
         title: t("profile.avatarUploaded"),

@@ -73,12 +73,18 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
 
   useEffect(() => {
     // Load existing photo if available
-    if (funeral.photo_path) {
-      const { data: { publicUrl } } = supabase.storage
-        .from('funeral-photos')
-        .getPublicUrl(funeral.photo_path);
-      setPhotoUrl(publicUrl);
-    }
+    const loadPhoto = async () => {
+      if (funeral.photo_path) {
+        const { data, error } = await supabase.storage
+          .from('funeral-photos')
+          .createSignedUrl(funeral.photo_path, 3600); // 1 hour expiration
+        
+        if (!error && data?.signedUrl) {
+          setPhotoUrl(data.signedUrl);
+        }
+      }
+    };
+    loadPhoto();
   }, [funeral.photo_path]);
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,12 +135,14 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
+      // Get signed URL (valid for 1 hour)
+      const { data, error: urlError } = await supabase.storage
         .from('funeral-photos')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 3600);
 
-      setPhotoUrl(publicUrl);
+      if (urlError) throw urlError;
+      
+      setPhotoUrl(data.signedUrl);
       updateFuneral('photo_path', fileName);
 
       toast({
