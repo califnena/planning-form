@@ -13,6 +13,7 @@ import PlannerApp from "./pages/PlannerApp";
 import Profile from "./pages/Profile";
 import Subscription from "./pages/Subscription";
 import AboutUs from "./pages/AboutUs";
+import LegalForms from "./pages/LegalForms";
 import CoachAssistant from "./pages/CoachAssistant";
 import NextSteps from "./pages/NextSteps";
 import CaseDetail from "./pages/CaseDetail";
@@ -30,6 +31,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/legal-forms" element={<LegalForms />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/reset-password" element={<ResetPassword />} />
