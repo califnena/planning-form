@@ -16,7 +16,42 @@ export const SectionInstructions = ({ value, onChange }: SectionInstructionsProp
   const { isPreviewMode } = usePreviewMode();
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Instructions & Settings Header */}
+      <div>
+        <h2 className="text-2xl font-bold mb-2">📋 Instructions & Settings</h2>
+        <p className="text-muted-foreground">
+          Welcome to your life planning guide. Here's what you need to know before you begin.
+        </p>
+      </div>
+
+      {/* Important Notice About Filling Out Fields */}
+      <div className="p-6 bg-primary/10 border-2 border-primary/30 rounded-lg space-y-4">
+        <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
+          <span className="text-2xl">ℹ️</span>
+          You Don't Have to Fill Out Everything
+        </h3>
+        <div className="space-y-3 text-sm text-foreground leading-relaxed">
+          <p>
+            <strong>This planner is designed to be flexible.</strong> You are not required to complete every section 
+            or fill in every field. Only provide the information you believe is necessary or helpful for those who 
+            will be handling your affairs after you're gone.
+          </p>
+          <p>
+            Think about what matters most to you:
+          </p>
+          <ul className="list-disc pl-6 space-y-1">
+            <li>What do your loved ones need to know to carry out your wishes?</li>
+            <li>What information will make their responsibilities easier?</li>
+            <li>What details about your belongings, accounts, or preferences should be documented?</li>
+          </ul>
+          <p>
+            <strong>Your goal:</strong> Share what you want to relay to those taking care of you, your belongings, 
+            and your legacy after you're gone. Nothing more, nothing less.
+          </p>
+        </div>
+      </div>
+
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold mb-2">📝 My Instructions</h2>
