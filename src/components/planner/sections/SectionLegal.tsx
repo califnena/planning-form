@@ -3,9 +3,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Save, Shield } from "lucide-react";
+import { Save, Shield, FileText, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Link } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface SectionLegalProps {
   data: any;
@@ -72,6 +74,29 @@ export const SectionLegal = ({ data, onChange }: SectionLegalProps) => {
           You'll re-enter this information only when generating your PDF. It's only used for printing and never stored.
         </AlertDescription>
       </Alert>
+
+      <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 mb-6">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-primary/10 rounded-lg">
+              <FileText className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg mb-2">Need Legal Forms & Resources?</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Access state-specific legal forms, learn about advance directives, wills, powers of attorney, and more. 
+                Get free forms from trusted sources like AARP and CaringInfo.
+              </p>
+              <Button asChild className="w-full sm:w-auto">
+                <Link to="/legal-forms">
+                  View Legal Forms & Resources
+                  <ExternalLink className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="space-y-4">
         <Label className="text-base font-semibold">Documents I Have</Label>
