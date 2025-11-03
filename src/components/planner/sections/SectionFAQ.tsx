@@ -675,6 +675,101 @@ export const SectionFAQ = () => {
           </AccordionItem>
         </Accordion>
       </div>
+
+      {/* Legal Documents Section */}
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold">⚖️ Legal Documents</h3>
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="legal-forms-one-state">
+            <AccordionTrigger>Why can't I use one form for all states?</AccordionTrigger>
+            <AccordionContent>
+              <p className="text-sm text-muted-foreground">
+                Each state has its own legal requirements for advance directives, powers of attorney, and other legal documents. Some states require specific mandatory language, unique notices, or their own statutory forms. A form from one state may not be legally valid in another state. To ensure your documents are enforceable, always use forms designed specifically for your state.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="legal-attorney-needed">
+            <AccordionTrigger>Do I need an attorney to complete these forms?</AccordionTrigger>
+            <AccordionContent>
+              <p className="text-sm text-muted-foreground mb-2">
+                Many basic legal forms can be completed without an attorney, including advance directives, living wills, and powers of attorney. However, you should consider consulting an attorney if:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
+                <li>You have a complex estate or family situation</li>
+                <li>You have questions about what powers to grant</li>
+                <li>You want to ensure everything is properly executed</li>
+                <li>You need forms that go beyond basic templates</li>
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="legal-advance-directive-vs-living-will">
+            <AccordionTrigger>What's the difference between an advance directive and a living will?</AccordionTrigger>
+            <AccordionContent>
+              <p className="text-sm text-muted-foreground mb-2">
+                The terminology varies by state, but generally:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
+                <li>A <strong>living will</strong> specifies your wishes about life-sustaining medical treatment if you become unable to communicate</li>
+                <li>An <strong>advance directive</strong> is a broader term that may include both a living will and a healthcare power of attorney</li>
+                <li>Some states combine these into a single document, while others have separate forms</li>
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="legal-forms-validity">
+            <AccordionTrigger>How do I make sure my forms are legally valid?</AccordionTrigger>
+            <AccordionContent>
+              <p className="text-sm text-muted-foreground mb-2">To ensure validity:</p>
+              <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground ml-2">
+                <li>Use forms specifically designed for your state</li>
+                <li>Follow all execution requirements (witnesses, notarization) exactly as specified</li>
+                <li>Ensure witnesses meet your state's qualifications (not family members, not beneficiaries, etc.)</li>
+                <li>Store originals in a safe place and provide copies to relevant parties (healthcare proxy, family, doctors)</li>
+                <li>Review and update documents regularly, especially after major life changes</li>
+              </ol>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="legal-multiple-states">
+            <AccordionTrigger>What happens if I spend time in multiple states?</AccordionTrigger>
+            <AccordionContent>
+              <p className="text-sm text-muted-foreground">
+                Some states honor advance directives from other states, while others require compliance with their own laws. If you regularly spend significant time in multiple states (such as snowbirds), it's recommended to complete advance directives for each state where you reside.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="legal-change-revoke">
+            <AccordionTrigger>Can I change or revoke these documents later?</AccordionTrigger>
+            <AccordionContent>
+              <p className="text-sm text-muted-foreground">
+                Yes. You can typically revoke or modify these documents at any time while you have mental capacity. Follow your state's specific procedures for revocation, which may include destroying the original, creating a new document, or filing a written revocation. Always notify everyone who has copies of the old document.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="legal-document-storage">
+            <AccordionTrigger>Where should I keep these documents?</AccordionTrigger>
+            <AccordionContent>
+              <p className="text-sm text-muted-foreground mb-2">
+                Keep original documents in a safe but accessible location. Provide copies to:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
+                <li>Your healthcare agent/proxy</li>
+                <li>Your primary care physician</li>
+                <li>Close family members</li>
+                <li>Your attorney (if you have one)</li>
+                <li>Hospital or nursing facility (if applicable)</li>
+              </ul>
+              <p className="text-sm text-muted-foreground mt-2 font-semibold">
+                Do NOT keep them in a safe deposit box, as they may not be accessible in an emergency.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
     </div>
   );
 };
