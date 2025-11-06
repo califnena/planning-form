@@ -1,5 +1,14 @@
 import jsPDF from "jspdf";
 import everlastingLogo from "@/assets/everlasting-logo.png";
+import {
+  hasFinancialData,
+  hasInsuranceData,
+  hasPropertyData,
+  hasPetsData,
+  hasDigitalData,
+  hasLegalData,
+  hasMessagesData
+} from "./pdf_helpers";
 
 interface PlanData {
   prepared_by?: string;
@@ -421,43 +430,47 @@ export const generatePlanPDF = (planData: PlanData) => {
   pdf.addPage();
   yPosition = 20;
 
-  // Instructions Section
-  addTitle("Instructions");
-  
-  // Add important tip about handwritten changes
-  pdf.setFontSize(10);
-  pdf.setFont("helvetica", "bold");
-  pdf.text("Important Tip:", 20, yPosition);
-  yPosition += lineHeight;
-  
-  pdf.setFont("helvetica", "italic");
-  pdf.setFontSize(9);
-  const tipText = "If you make any handwritten changes on this printed document, it is recommended to initial and date those changes for the record.";
-  const tipLines = pdf.splitTextToSize(tipText, 170);
-  tipLines.forEach((line: string) => {
-    checkPageBreak();
-    pdf.text(line, 20, yPosition);
-    yPosition += lineHeight - 1;
-  });
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(10);
-  yPosition += 8;
-  
-  addSection("General Instructions", planData.instructions_notes);
+  // Instructions Section - only if has content
+  if (planData.instructions_notes && planData.instructions_notes.trim()) {
+    addTitle("Instructions");
+    
+    // Add important tip about handwritten changes
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Important Tip:", 20, yPosition);
+    yPosition += lineHeight;
+    
+    pdf.setFont("helvetica", "italic");
+    pdf.setFontSize(9);
+    const tipText = "If you make any handwritten changes on this printed document, it is recommended to initial and date those changes for the record.";
+    const tipLines = pdf.splitTextToSize(tipText, 170);
+    tipLines.forEach((line: string) => {
+      checkPageBreak();
+      pdf.text(line, 20, yPosition);
+      yPosition += lineHeight - 1;
+    });
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(10);
+    yPosition += 8;
+    
+    addSection("General Instructions", planData.instructions_notes);
+  }
 
-  // Checklist Section
-  addTitle("Checklist");
-  
-  // Add instruction for checkboxes
-  pdf.setFontSize(10);
-  pdf.setFont("helvetica", "italic");
-  pdf.setTextColor(...colors.bodyGray);
-  pdf.text("This section details tasks you want your loved ones to complete:", marginLeft, yPosition);
-  yPosition += lineHeight + 6;
-  pdf.setFont("helvetica", "normal");
-  
+  // Checklist Section - only if has checklist items
   const checklistItems = planData.checklist_items || [];
-  if (checklistItems.length > 0 && checklistItems.some((item: string) => item && item.trim())) {
+  const hasChecklistItems = checklistItems.length > 0 && checklistItems.some((item: string) => item && item.trim());
+  
+  if (hasChecklistItems) {
+    addTitle("Checklist");
+    
+    // Add instruction for checkboxes
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "italic");
+    pdf.setTextColor(...colors.bodyGray);
+    pdf.text("This section details tasks you want your loved ones to complete:", marginLeft, yPosition);
+    yPosition += lineHeight + 6;
+    pdf.setFont("helvetica", "normal");
+    
     checklistItems.forEach((item: string, index: number) => {
       if (item && item.trim()) {
         checkPageBreak(12);
@@ -484,469 +497,541 @@ export const generatePlanPDF = (planData: PlanData) => {
       }
     });
     yPosition += 3;
-  } else {
+  }
+
+  // Personal Information Section - only if has personal profile data
+  const personalProfile = planData.personal_profile || {};
+  const hasPersonalData = !!(
+    personalProfile.full_name || personalProfile.legal_name || personalProfile.nicknames || personalProfile.maiden_name ||
+    personalProfile.dob || personalProfile.date_of_birth || personalProfile.birthplace || personalProfile.ssn ||
+    personalProfile.citizenship || personalProfile.address || personalProfile.phone || personalProfile.email ||
+    personalProfile.marital_status || personalProfile.partner_name || personalProfile.ex_spouse_name ||
+    personalProfile.religion || personalProfile.father_name || personalProfile.mother_name ||
+    (personalProfile.children && personalProfile.children.length > 0)
+  );
+  
+  if (hasPersonalData) {
+    addTitle("My Personal Information");
+    if (personalProfile.full_name || personalProfile.legal_name) addField("Full Legal Name", personalProfile.full_name || personalProfile.legal_name);
+    if (personalProfile.nicknames) addField("Nicknames", personalProfile.nicknames);
+    if (personalProfile.maiden_name) addField("Maiden Name", personalProfile.maiden_name);
+    if (personalProfile.dob || personalProfile.date_of_birth) addField("Date of Birth", personalProfile.dob || personalProfile.date_of_birth);
+    if (personalProfile.birthplace) addField("Place of Birth", personalProfile.birthplace);
+    if (personalProfile.ssn) addField("Social Security Number", personalProfile.ssn);
+    if (personalProfile.citizenship) addField("Citizenship", personalProfile.citizenship);
+    if (personalProfile.address) addField("Address", personalProfile.address, false);
+    if (personalProfile.phone) addField("Phone", personalProfile.phone);
+    if (personalProfile.email) addField("Email", personalProfile.email);
+    if (personalProfile.marital_status) addField("Marital Status", personalProfile.marital_status);
+    if (personalProfile.partner_name) addField("Spouse/Partner Name", personalProfile.partner_name);
+    if (personalProfile.partner_phone) addField("Spouse/Partner Phone", personalProfile.partner_phone);
+    if (personalProfile.partner_email) addField("Spouse/Partner Email", personalProfile.partner_email);
+    if (personalProfile.ex_spouse_name) addField("Former Spouse Name", personalProfile.ex_spouse_name);
+    if (personalProfile.religion) addField("Religion/Faith", personalProfile.religion);
+    if (personalProfile.father_name) addField("Father's Name", personalProfile.father_name);
+    if (personalProfile.father_phone) addField("Father's Phone", personalProfile.father_phone);
+    if (personalProfile.father_email) addField("Father's Email", personalProfile.father_email);
+    if (personalProfile.mother_name) addField("Mother's Name", personalProfile.mother_name);
+    if (personalProfile.mother_phone) addField("Mother's Phone", personalProfile.mother_phone);
+    if (personalProfile.mother_email) addField("Mother's Email", personalProfile.mother_email);
+    
+    // Children's Names
+    const children = personalProfile.children || [];
+    if (children.length > 0 && children.some((child: any) => child.name && child.name.trim())) {
+      checkPageBreak(15);
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Children's Names:", 20, yPosition);
+      yPosition += lineHeight + 2;
+      
+      pdf.setFont("times", "normal");
+      pdf.setFontSize(10);
+      children.forEach((child: any, index: number) => {
+        if (child.name && child.name.trim()) {
+          checkPageBreak();
+          const childText = `${index + 1}. ${sanitizeText(child.name)}`;
+          pdf.text(childText, 28, yPosition);
+          const textWidth = pdf.getTextWidth(childText);
+          pdf.setDrawColor(0, 0, 0);
+          pdf.line(28, yPosition + 1, 28 + textWidth, yPosition + 1);
+          yPosition += lineHeight + 2;
+          
+          if (child.phone) {
+            pdf.setFont("helvetica", "normal");
+            pdf.setFontSize(9);
+            pdf.text(`   Phone: ${sanitizeText(child.phone)}`, 28, yPosition);
+            yPosition += lineHeight;
+          }
+          if (child.email) {
+            pdf.setFont("helvetica", "normal");
+            pdf.setFontSize(9);
+            pdf.text(`   Email: ${sanitizeText(child.email)}`, 28, yPosition);
+            yPosition += lineHeight + 2;
+          }
+          pdf.setFont("times", "normal");
+          pdf.setFontSize(10);
+        }
+      });
+      pdf.setFont("helvetica", "normal");
+      yPosition += 5;
+    }
+    
+    // Military Service
+    if (personalProfile.vet_branch || personalProfile.vet_rank || personalProfile.vet_serial || personalProfile.vet_war || personalProfile.vet_entry || personalProfile.vet_discharge) {
+      checkPageBreak(25);
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Military Service", 20, yPosition);
+      yPosition += lineHeight + 3;
+      
+      if (personalProfile.vet_branch) addField("Branch", personalProfile.vet_branch);
+      if (personalProfile.vet_rank) addField("Rank", personalProfile.vet_rank);
+      if (personalProfile.vet_serial) addField("Serial Number", personalProfile.vet_serial);
+      if (personalProfile.vet_war) addField("War/Conflict", personalProfile.vet_war);
+      if (personalProfile.vet_entry) addField("Date of Entry", personalProfile.vet_entry);
+      if (personalProfile.vet_discharge) addField("Date of Discharge", personalProfile.vet_discharge);
+      yPosition += 5;
+    }
+  }
+
+  // About Me Section - Only show if has content
+  if (planData.about_me_notes && planData.about_me_notes.trim()) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("About Me");
+    addSection("My Story & Legacy", planData.about_me_notes);
+  }
+
+  // Key Contacts Section - Only show if has contacts
+  const contacts = planData.contacts || [];
+  const hasContacts = contacts.length > 0 && contacts.some((c: any) => c.name || c.relationship || c.contact);
+  if (hasContacts) {
+    if (yPosition > 100) {
+      pdf.addPage();
+      yPosition = 20;
+    }
+    addTitle("Key Contacts to Notify");
+    const contactData = contacts
+      .filter((c: any) => c.name || c.relationship || c.contact)
+      .map((c: any) => [
+        c.name || "",
+        c.relationship || "",
+        c.contact || "",
+        c.note || ""
+      ]);
+    addTable(["Name", "Relationship", "Contact Info", "Notes"], contactData, 0);
+  }
+
+  // Vendors Section - Only show if has vendors
+  const vendors = planData.vendors || [];
+  const hasVendors = vendors.length > 0 && vendors.some((v: any) => v.type || v.business || v.contact);
+  if (hasVendors) {
+    if (yPosition > 100) {
+      pdf.addPage();
+      yPosition = 20;
+    }
+    addTitle("Preferred Vendors");
+    const vendorData = vendors
+      .filter((v: any) => v.type || v.business || v.contact)
+      .map((v: any) => [
+        v.type || "",
+        v.business || "",
+        v.contact || "",
+        v.notes || ""
+      ]);
+    addTable(["Type", "Business Name", "Contact", "Notes"], vendorData, 0);
+  }
+
+  // Funeral Wishes Section - Only show if has funeral data
+  const funeral = planData.funeral || {};
+  const hasFuneralWishes = !!(
+    funeral.burial || funeral.cremation || funeral.donation ||
+    funeral.burial_notes || funeral.cremation_notes || funeral.donation_notes ||
+    funeral.religious_service || funeral.funeral_preference || funeral.cemetery_plot ||
+    funeral.religious_notes || funeral.flower_preferences || funeral.charity_donations ||
+    funeral.general_notes
+  );
+  
+  if (hasFuneralWishes) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("My Funeral & Memorial Wishes");
+    
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "italic");
-    pdf.setTextColor(...colors.lightGray);
-    pdf.text("(none provided)", marginLeft, yPosition);
     pdf.setTextColor(...colors.bodyGray);
+    pdf.text("This section details your specific wishes for your funeral or memorial arrangements.", marginLeft, yPosition);
+    yPosition += lineHeight + 6;
     pdf.setFont("helvetica", "normal");
-    yPosition += lineHeight + 5;
-  }
-
-  // Personal Information Section
-  addTitle("My Personal Information");
-  addField("Full Legal Name", profile.full_name || profile.legal_name);
-  addField("Nicknames", profile.nicknames);
-  addField("Maiden Name", profile.maiden_name);
-  addField("Date of Birth", profile.dob || profile.date_of_birth);
-  addField("Place of Birth", profile.birthplace);
-  addField("Social Security Number", profile.ssn);
-  addField("Citizenship", profile.citizenship);
-  addField("Address", profile.address, false);
-  addField("Phone", profile.phone);
-  addField("Email", profile.email);
-  addField("Marital Status", profile.marital_status);
-  addField("Spouse/Partner Name", profile.partner_name);
-  if (profile.partner_phone) addField("Spouse/Partner Phone", profile.partner_phone);
-  if (profile.partner_email) addField("Spouse/Partner Email", profile.partner_email);
-  addField("Former Spouse Name", profile.ex_spouse_name);
-  addField("Religion/Faith", profile.religion);
-  addField("Father's Name", profile.father_name);
-  if (profile.father_phone) addField("Father's Phone", profile.father_phone);
-  if (profile.father_email) addField("Father's Email", profile.father_email);
-  addField("Mother's Name", profile.mother_name);
-  if (profile.mother_phone) addField("Mother's Phone", profile.mother_phone);
-  if (profile.mother_email) addField("Mother's Email", profile.mother_email);
-  
-  // Children's Names
-  const children = profile.children || [];
-  if (children.length > 0 && children.some((child: any) => child.name && child.name.trim())) {
-    checkPageBreak(15);
-    pdf.setFontSize(12);
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Children's Names:", 20, yPosition);
-    yPosition += lineHeight + 2;
     
-    pdf.setFont("times", "normal");
-    pdf.setFontSize(10);
-    children.forEach((child: any, index: number) => {
-      if (child.name && child.name.trim()) {
-        checkPageBreak();
-        const childText = `${index + 1}. ${sanitizeText(child.name)}`;
-        pdf.text(childText, 28, yPosition);
-        const textWidth = pdf.getTextWidth(childText);
-        pdf.setDrawColor(0, 0, 0);
-        pdf.line(28, yPosition + 1, 28 + textWidth, yPosition + 1);
-        yPosition += lineHeight + 2;
-        
-        if (child.phone) {
-          pdf.setFont("helvetica", "normal");
-          pdf.setFontSize(9);
-          pdf.text(`   Phone: ${sanitizeText(child.phone)}`, 28, yPosition);
-          yPosition += lineHeight;
-        }
-        if (child.email) {
-          pdf.setFont("helvetica", "normal");
-          pdf.setFontSize(9);
-          pdf.text(`   Email: ${sanitizeText(child.email)}`, 28, yPosition);
-          yPosition += lineHeight + 2;
-        }
-        pdf.setFont("times", "normal");
-        pdf.setFontSize(10);
-      }
-    });
-    pdf.setFont("helvetica", "normal");
-    yPosition += 5;
-  } else {
-    addField("Children's Names", "");
-  }
-  
-  // Military Service
-  if (profile.vet_branch || profile.vet_rank || profile.vet_serial || profile.vet_war || profile.vet_entry || profile.vet_discharge) {
-    checkPageBreak(25);
-    pdf.setFontSize(14);
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Military Service", 20, yPosition);
-    yPosition += lineHeight + 3;
-    
-    addField("Branch", profile.vet_branch);
-    addField("Rank", profile.vet_rank);
-    addField("Serial Number", profile.vet_serial);
-    addField("War/Conflict", profile.vet_war);
-    addField("Date of Entry", profile.vet_entry);
-    addField("Date of Discharge", profile.vet_discharge);
-    yPosition += 5;
-  }
-
-  // About Me Section - START ON NEW PAGE
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("About Me");
-  addSection("My Story & Legacy", planData.about_me_notes);
-
-  // Key Contacts Section
-  addTitle("Key Contacts to Notify");
-  const contacts = planData.contacts || [];
-  const contactData = contacts.map((c: any) => [
-    c.name || "",
-    c.relationship || "",
-    c.contact || "",
-    c.note || ""
-  ]);
-  addTable(["Name", "Relationship", "Contact Info", "Notes"], contactData, contactData.length === 0 ? 3 : 0);
-
-  // Vendors Section
-  addTitle("Preferred Vendors");
-  const vendors = planData.vendors || [];
-  const vendorData = vendors.map((v: any) => [
-    v.type || "",
-    v.business || "",
-    v.contact || "",
-    v.notes || ""
-  ]);
-  addTable(["Type", "Business Name", "Contact", "Notes"], vendorData, vendorData.length === 0 ? 2 : 0);
-
-  // Funeral Wishes Section - START ON NEW PAGE
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("My Funeral & Memorial Wishes");
-  
-  pdf.setFontSize(10);
-  pdf.setFont("helvetica", "italic");
-  pdf.setTextColor(...colors.bodyGray);
-  pdf.text("This section details your specific wishes for your funeral or memorial arrangements.", marginLeft, yPosition);
-  yPosition += lineHeight + 6;
-  pdf.setFont("helvetica", "normal");
-  
-  const funeral = planData.funeral || {};
-  
-  // Disposition of Remains subsection
-  pdf.setFontSize(13);
-  pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(...colors.subheaderTeal);
-  pdf.text("Disposition of My Remains", marginLeft, yPosition);
-  yPosition += 10;
-  
-  // Checkboxes for disposition options
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(11);
-  pdf.setTextColor(...colors.bodyGray);
-  
-  checkPageBreak(30);
-  addCheckbox(marginLeft, yPosition, funeral.burial);
-  pdf.text("Burial", marginLeft + 7, yPosition);
-  yPosition += 8;
-  
-  addCheckbox(marginLeft, yPosition, funeral.cremation);
-  pdf.text("Cremation", marginLeft + 7, yPosition);
-  yPosition += 8;
-  
-  addCheckbox(marginLeft, yPosition, funeral.donation);
-  pdf.text("Donation to Science", marginLeft + 7, yPosition);
-  yPosition += 10;
-  
-  if (funeral.burial_notes || funeral.cremation_notes || funeral.donation_notes) {
-    addField("Notes", funeral.burial_notes || funeral.cremation_notes || funeral.donation_notes, false);
-  }
-  
-  // Memorial Service Preferences
-  pdf.setFontSize(13);
-  pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(...colors.subheaderTeal);
-  pdf.text("My Memorial Service Preferences", marginLeft, yPosition);
-  yPosition += 10;
-  
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(11);
-  pdf.setTextColor(...colors.bodyGray);
-  
-  if (funeral.religious_service) {
-    addCheckbox(marginLeft, yPosition, true);
-    pdf.text("Religious Ceremony", marginLeft + 7, yPosition);
-    yPosition += 8;
-  }
-  
-  if (funeral.funeral_preference) {
-    addField("Service Type", funeral.funeral_preference, false);
-  }
-  
-  if (funeral.cemetery_plot) addField("Location", funeral.cemetery_plot, false);
-  if (funeral.religious_notes) addField("Music or Readings", funeral.religious_notes, false);
-  if (funeral.flower_preferences) addField("Flower Preferences", funeral.flower_preferences, false);
-  if (funeral.charity_donations) addField("Memorial Donations to Charity", funeral.charity_donations, false);
-  if (funeral.general_notes) addField("Additional Wishes", funeral.general_notes, false);
-
-  // Financial Life Section
-  addTitle("Financial Life");
-  const financial = planData.financial || {};
-  const accounts = financial.accounts || [];
-  const accountData = accounts.map((a: any) => [
-    a.type || "",
-    a.institution || "",
-    a.details || ""
-  ]);
-  addTable(["Type", "Institution", "Details"], accountData, accountData.length === 0 ? 2 : 0);
-  if (financial.safe_deposit_details) addField("Safe Deposit Box", financial.safe_deposit_details, false);
-  if (financial.crypto_details) addField("Cryptocurrency", financial.crypto_details, false);
-  if (financial.business_details) addField("Business Interests", financial.business_details, false);
-  if (financial.debts_details) addField("Outstanding Debts", financial.debts_details, false);
-
-  // Insurance Section
-  addTitle("Insurance");
-  const insurance = planData.insurance || {};
-  const policies = insurance.policies || [];
-  const policyData = policies.map((p: any) => [
-    p.type || "",
-    p.company || "",
-    p.policy_number || "",
-    p.agent || ""
-  ]);
-  addTable(["Type", "Company", "Policy #", "Agent"], policyData, policyData.length === 0 ? 2 : 0);
-
-  // Property Section - START ON NEW PAGE
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("My Property");
-  const property = planData.property || {};
-  const properties = property.properties || [];
-  
-  // Property types owned
-  const propertyTypes = [];
-  if (property.has_primary_home) propertyTypes.push("Primary residence");
-  if (property.has_vacation_home) propertyTypes.push("Vacation home");
-  if (property.has_investment) propertyTypes.push("Investment property");
-  if (property.has_land) propertyTypes.push("Land or lots");
-  if (property.has_vehicles) propertyTypes.push("Vehicles");
-  if (property.has_boats_rvs) propertyTypes.push("Boats or RVs");
-  if (property.has_business) propertyTypes.push("Business ownership");
-  if (property.has_valuables) propertyTypes.push("Jewelry, art, collectibles");
-  
-  if (propertyTypes.length > 0) {
-    checkPageBreak(15);
-    pdf.setFontSize(12);
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Property I Own:", 20, yPosition);
-    yPosition += lineHeight + 2;
-    
-    pdf.setFont("times", "normal");
-    pdf.setFontSize(10);
-    propertyTypes.forEach((type: string) => {
-      checkPageBreak();
-      // Add checkbox
-      pdf.setDrawColor(0, 0, 0);
-      pdf.setFillColor(0, 0, 0);
-      pdf.rect(20, yPosition - 3, 3, 3, 'F');
-      pdf.text(sanitizeText(type), 26, yPosition);
-      yPosition += lineHeight + 1;
-    });
-    pdf.setFont("helvetica", "normal");
-    yPosition += 5;
-  }
-  
-  // Property details
-  const propertyItems = property.items || [];
-  if (propertyItems.length > 0) {
-    checkPageBreak(15);
-    pdf.setFontSize(12);
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Property Details:", 20, yPosition);
-    yPosition += lineHeight + 3;
-    
-    propertyItems.forEach((item: any, index: number) => {
-      checkPageBreak(20);
-      pdf.setFontSize(11);
+    // Disposition of Remains subsection
+    if (funeral.burial || funeral.cremation || funeral.donation || funeral.burial_notes || funeral.cremation_notes || funeral.donation_notes) {
+      pdf.setFontSize(13);
       pdf.setFont("helvetica", "bold");
-      pdf.text(sanitizeText(`Property ${index + 1}`), 20, yPosition);
-      yPosition += lineHeight;
-      addField("Type", item.type);
-      addField("Description & Details", item.description, false);
-      addField("Document Location", item.location);
-      if (item.document) {
-        pdf.setFont("helvetica", "italic");
-        pdf.setFontSize(9);
-        pdf.setTextColor(100, 100, 100);
-        pdf.text("(Document attached - see online plan)", 20, yPosition);
-        pdf.setTextColor(0, 0, 0);
-        yPosition += lineHeight;
+      pdf.setTextColor(...colors.subheaderTeal);
+      pdf.text("Disposition of My Remains", marginLeft, yPosition);
+      yPosition += 10;
+      
+      // Checkboxes for disposition options
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(11);
+      pdf.setTextColor(...colors.bodyGray);
+      
+      checkPageBreak(30);
+      if (funeral.burial) {
+        addCheckbox(marginLeft, yPosition, true);
+        pdf.text("Burial", marginLeft + 7, yPosition);
+        yPosition += 8;
       }
-      yPosition += 3;
-    });
+      
+      if (funeral.cremation) {
+        addCheckbox(marginLeft, yPosition, true);
+        pdf.text("Cremation", marginLeft + 7, yPosition);
+        yPosition += 8;
+      }
+      
+      if (funeral.donation) {
+        addCheckbox(marginLeft, yPosition, true);
+        pdf.text("Donation to Science", marginLeft + 7, yPosition);
+        yPosition += 10;
+      }
+      
+      if (funeral.burial_notes || funeral.cremation_notes || funeral.donation_notes) {
+        addField("Notes", funeral.burial_notes || funeral.cremation_notes || funeral.donation_notes, false);
+      }
+    }
+    
+    // Memorial Service Preferences
+    if (funeral.religious_service || funeral.funeral_preference || funeral.cemetery_plot || 
+        funeral.religious_notes || funeral.flower_preferences || funeral.charity_donations || funeral.general_notes) {
+      pdf.setFontSize(13);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(...colors.subheaderTeal);
+      pdf.text("My Memorial Service Preferences", marginLeft, yPosition);
+      yPosition += 10;
+      
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(11);
+      pdf.setTextColor(...colors.bodyGray);
+      
+      if (funeral.religious_service) {
+        addCheckbox(marginLeft, yPosition, true);
+        pdf.text("Religious Ceremony", marginLeft + 7, yPosition);
+        yPosition += 8;
+      }
+      
+      if (funeral.funeral_preference) {
+        addField("Service Type", funeral.funeral_preference, false);
+      }
+      
+      if (funeral.cemetery_plot) addField("Location", funeral.cemetery_plot, false);
+      if (funeral.religious_notes) addField("Music or Readings", funeral.religious_notes, false);
+      if (funeral.flower_preferences) addField("Flower Preferences", funeral.flower_preferences, false);
+      if (funeral.charity_donations) addField("Memorial Donations to Charity", funeral.charity_donations, false);
+      if (funeral.general_notes) addField("Additional Wishes", funeral.general_notes, false);
+    }
   }
 
-  // Pets Section
-  addTitle("My Pets");
-  
-  const pets = planData.pets || [];
-  if (pets.length > 0 && pets.some((pet: any) => pet.name || pet.type || pet.instructions)) {
-    pets.forEach((pet: any, index: number) => {
-      if (pet.name || pet.type || pet.instructions) {
-        checkPageBreak(30);
+  // Financial Life Section - only if has financial data
+  const financial = planData.financial || {};
+  if (hasFinancialData(financial)) {
+    if (yPosition > 100) {
+      pdf.addPage();
+      yPosition = 20;
+    }
+    addTitle("Financial Life");
+    const accounts = financial.accounts || [];
+    const accountData = accounts
+      .filter((a: any) => a.type || a.institution || a.details)
+      .map((a: any) => [
+        a.type || "",
+        a.institution || "",
+        a.details || ""
+      ]);
+    if (accountData.length > 0) {
+      addTable(["Type", "Institution", "Details"], accountData, 0);
+    }
+    if (financial.safe_deposit_details) addField("Safe Deposit Box", financial.safe_deposit_details, false);
+    if (financial.crypto_details) addField("Cryptocurrency", financial.crypto_details, false);
+    if (financial.business_details) addField("Business Interests", financial.business_details, false);
+    if (financial.debts_details) addField("Outstanding Debts", financial.debts_details, false);
+  }
+
+  // Insurance Section - only if has insurance data
+  const insurance = planData.insurance || {};
+  if (hasInsuranceData(insurance)) {
+    if (yPosition > 100) {
+      pdf.addPage();
+      yPosition = 20;
+    }
+    addTitle("Insurance");
+    const policies = insurance.policies || [];
+    const policyData = policies
+      .filter((p: any) => p.type || p.company || p.policy_number)
+      .map((p: any) => [
+        p.type || "",
+        p.company || "",
+        p.policy_number || "",
+        p.agent || ""
+      ]);
+    addTable(["Type", "Company", "Policy #", "Agent"], policyData, 0);
+  }
+
+  // Property Section - only if has property data
+  const property = planData.property || {};
+  if (hasPropertyData(property)) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("My Property");
+    
+    // Property types owned
+    const propertyTypes = [];
+    if (property.has_primary_home) propertyTypes.push("Primary residence");
+    if (property.has_vacation_home) propertyTypes.push("Vacation home");
+    if (property.has_investment) propertyTypes.push("Investment property");
+    if (property.has_land) propertyTypes.push("Land or lots");
+    if (property.has_vehicles) propertyTypes.push("Vehicles");
+    if (property.has_boats_rvs) propertyTypes.push("Boats or RVs");
+    if (property.has_business) propertyTypes.push("Business ownership");
+    if (property.has_valuables) propertyTypes.push("Jewelry, art, collectibles");
+    
+    if (propertyTypes.length > 0) {
+      checkPageBreak(15);
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Property I Own:", 20, yPosition);
+      yPosition += lineHeight + 2;
+      
+      pdf.setFont("times", "normal");
+      pdf.setFontSize(10);
+      propertyTypes.forEach((type: string) => {
+        checkPageBreak();
+        // Add checkbox
+        pdf.setDrawColor(0, 0, 0);
+        pdf.setFillColor(0, 0, 0);
+        pdf.rect(20, yPosition - 3, 3, 3, 'F');
+        pdf.text(sanitizeText(type), 26, yPosition);
+        yPosition += lineHeight + 1;
+      });
+      pdf.setFont("helvetica", "normal");
+      yPosition += 5;
+    }
+    
+    // Property details
+    const propertyItems = property.items || [];
+    if (propertyItems.length > 0 && propertyItems.some((i: any) => i.type || i.description)) {
+      checkPageBreak(15);
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Property Details:", 20, yPosition);
+      yPosition += lineHeight + 3;
+      
+      propertyItems.forEach((item: any, index: number) => {
+        if (item.type || item.description) {
+          checkPageBreak(20);
+          pdf.setFontSize(11);
+          pdf.setFont("helvetica", "bold");
+          pdf.text(sanitizeText(`Property ${index + 1}`), 20, yPosition);
+          yPosition += lineHeight;
+          if (item.type) addField("Type", item.type);
+          if (item.description) addField("Description & Details", item.description, false);
+          if (item.location) addField("Document Location", item.location);
+          if (item.document) {
+            pdf.setFont("helvetica", "italic");
+            pdf.setFontSize(9);
+            pdf.setTextColor(100, 100, 100);
+            pdf.text("(Document attached - see online plan)", 20, yPosition);
+            pdf.setTextColor(0, 0, 0);
+            yPosition += lineHeight;
+          }
+          yPosition += 3;
+        }
+      });
+    }
+  }
+
+  // Pets Section - only if has pets data
+  if (hasPetsData(planData)) {
+    if (yPosition > 100) {
+      pdf.addPage();
+      yPosition = 20;
+    }
+    addTitle("My Pets");
+    
+    const pets = planData.pets || [];
+    if (pets.length > 0 && pets.some((pet: any) => pet.name || pet.type || pet.instructions)) {
+      pets.forEach((pet: any, index: number) => {
+        if (pet.name || pet.type || pet.instructions) {
+          checkPageBreak(30);
+          pdf.setFontSize(11);
+          pdf.setFont("helvetica", "bold");
+          pdf.text(sanitizeText(`Pet ${index + 1}`), 20, yPosition);
+          yPosition += lineHeight;
+          
+          if (pet.type) addField("Type", pet.type);
+          if (pet.name) addField("Name", pet.name);
+          if (pet.instructions) addField("Care Instructions", pet.instructions, false);
+          yPosition += 5;
+        }
+      });
+    } else if (planData.pets_notes && planData.pets_notes.trim()) {
+      addSection("Pet Care Instructions", planData.pets_notes);
+    }
+  }
+
+  // Digital World Section - only if has digital data
+  const digital = planData.digital || {};
+  if (hasDigitalData(digital)) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("Digital World");
+    
+    // Digital Assets
+    const digitalAssets = [];
+    if (digital.has_social_media) digitalAssets.push("Social media accounts");
+    if (digital.has_email) digitalAssets.push("Email accounts");
+    if (digital.has_cloud_storage) digitalAssets.push("Cloud storage (Google, iCloud, Dropbox)");
+    if (digital.has_streaming) digitalAssets.push("Streaming services");
+    if (digital.has_shopping) digitalAssets.push("Shopping accounts (Amazon, etc.)");
+    if (digital.has_photo_sites) digitalAssets.push("Photo sharing sites");
+    if (digital.has_domains) digitalAssets.push("Domain names or websites");
+    if (digital.has_password_manager) digitalAssets.push("Password manager");
+    
+    if (digitalAssets.length > 0) {
+      checkPageBreak(15);
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Digital Assets I Have:", 20, yPosition);
+      yPosition += lineHeight + 2;
+      
+      pdf.setFont("times", "normal");
+      pdf.setFontSize(10);
+      digitalAssets.forEach((asset: string) => {
+        checkPageBreak();
+        pdf.setDrawColor(0, 0, 0);
+        pdf.setFillColor(0, 0, 0);
+        pdf.rect(20, yPosition - 3, 3, 3, 'F');
+        pdf.text(sanitizeText(asset), 26, yPosition);
+        yPosition += lineHeight + 1;
+      });
+      pdf.setFont("helvetica", "normal");
+      yPosition += 5;
+    }
+    
+    // Phone Accounts
+    const phones = digital.phones || [];
+    if (phones.length > 0 && phones.some((p: any) => p.carrier || p.number)) {
+      checkPageBreak(15);
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Phone Accounts:", 20, yPosition);
+      yPosition += lineHeight + 3;
+      
+      phones.forEach((phone: any, index: number) => {
+        if (phone.carrier || phone.number) {
+          checkPageBreak(20);
+          pdf.setFontSize(11);
+          pdf.setFont("helvetica", "bold");
+          pdf.text(sanitizeText(`Phone ${index + 1}`), 20, yPosition);
+          yPosition += lineHeight;
+          if (phone.carrier) addField("Carrier", phone.carrier);
+          if (phone.number) addField("Phone Number", phone.number);
+          if (phone.pin) addField("PIN/Password Location", phone.pin);
+          yPosition += 3;
+        }
+      });
+    }
+    
+    // Digital Accounts
+    const digitalAccounts = digital.accounts || [];
+    if (digitalAccounts.length > 0 && digitalAccounts.some((a: any) => a.platform || a.username)) {
+      checkPageBreak(15);
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Account Details:", 20, yPosition);
+      yPosition += lineHeight + 3;
+      
+      digitalAccounts.forEach((account: any, index: number) => {
+        if (account.platform || account.username) {
+          checkPageBreak(25);
+          pdf.setFontSize(11);
+          pdf.setFont("helvetica", "bold");
+          pdf.text(sanitizeText(`Account ${index + 1}`), 20, yPosition);
+          yPosition += lineHeight;
+          if (account.platform) addField("Platform/Service", account.platform);
+          if (account.username) addField("Username/Email", account.username);
+          
+          const actions = [];
+          if (account.action_memorialize) actions.push("Memorialize");
+          if (account.action_delete) actions.push("Delete");
+          if (account.action_transfer) actions.push("Transfer");
+          if (actions.length > 0) {
+            addField("Preferred Action", actions.join(", "));
+          }
+          
+          if (account.action_custom) {
+            addField("Additional Instructions", account.action_custom, false);
+          }
+          yPosition += 3;
+        }
+      });
+    }
+    
+    if (digital.password_manager_info) {
+      checkPageBreak(15);
+      addField("Password Manager Information", digital.password_manager_info, false);
+      yPosition += 5;
+    }
+  }
+
+  // Legal Section - only if has legal data
+  const legal = planData.legal || {};
+  if (hasLegalData(legal)) {
+    if (yPosition > 100) {
+      pdf.addPage();
+      yPosition = 20;
+    }
+    addTitle("Legal");
+    if (legal.has_will) addField("I have a will", "Yes");
+    if (legal.will_details) addField("Will Details", legal.will_details, false);
+    if (legal.has_trust) addField("I have a trust", "Yes");
+    if (legal.trust_details) addField("Trust Details", legal.trust_details, false);
+    if (legal.has_poa) addField("Power of Attorney", "Yes");
+    if (legal.poa_details) addField("POA Details", legal.poa_details, false);
+    if (legal.has_advance_directive) addField("Advance Healthcare Directive", "Yes");
+    if (legal.advance_directive_details) addField("Directive Details", legal.advance_directive_details, false);
+  }
+
+  // Messages Section - only if has messages
+  const messages = planData.messages || [];
+  if (hasMessagesData(messages)) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("Messages to Loved Ones");
+    messages.forEach((message: any, index: number) => {
+      if (message.recipients || message.text_message || message.audio_url || message.video_url) {
+        checkPageBreak(25);
         pdf.setFontSize(11);
         pdf.setFont("helvetica", "bold");
-        pdf.text(sanitizeText(`Pet ${index + 1}`), 20, yPosition);
+        pdf.text(sanitizeText(`Message ${index + 1}`), 20, yPosition);
         yPosition += lineHeight;
+        if (message.recipients) addField("To (Recipients)", message.recipients);
+        if (message.text_message) addField("Written Message", message.text_message, false);
         
-        if (pet.type) addField("Type", pet.type);
-        if (pet.name) addField("Name", pet.name);
-        if (pet.instructions) addField("Care Instructions", pet.instructions, false);
+        if (message.audio_url || message.video_url) {
+          pdf.setFont("helvetica", "italic");
+          pdf.setFontSize(9);
+          pdf.setTextColor(100, 100, 100);
+          const mediaTypes = [];
+          if (message.audio_url) mediaTypes.push("audio");
+          if (message.video_url) mediaTypes.push("video");
+          pdf.text(`(${mediaTypes.join(" and ")} message available in online plan)`, 20, yPosition);
+          pdf.setTextColor(0, 0, 0);
+          yPosition += lineHeight;
+        }
         yPosition += 5;
       }
     });
-  } else {
-    addSection("Pet Care Instructions", planData.pets_notes);
-  }
-
-  // Digital World Section - START ON NEW PAGE
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("Digital World");
-  const digital = planData.digital || {};
-  
-  // Digital Assets
-  const digitalAssets = [];
-  if (digital.has_social_media) digitalAssets.push("Social media accounts");
-  if (digital.has_email) digitalAssets.push("Email accounts");
-  if (digital.has_cloud_storage) digitalAssets.push("Cloud storage (Google, iCloud, Dropbox)");
-  if (digital.has_streaming) digitalAssets.push("Streaming services");
-  if (digital.has_shopping) digitalAssets.push("Shopping accounts (Amazon, etc.)");
-  if (digital.has_photo_sites) digitalAssets.push("Photo sharing sites");
-  if (digital.has_domains) digitalAssets.push("Domain names or websites");
-  if (digital.has_password_manager) digitalAssets.push("Password manager");
-  
-  if (digitalAssets.length > 0) {
-    checkPageBreak(15);
-    pdf.setFontSize(12);
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Digital Assets I Have:", 20, yPosition);
-    yPosition += lineHeight + 2;
-    
-    pdf.setFont("times", "normal");
-    pdf.setFontSize(10);
-    digitalAssets.forEach((asset: string) => {
-      checkPageBreak();
-      // Add checkbox
-      pdf.setDrawColor(0, 0, 0);
-      pdf.setFillColor(0, 0, 0);
-      pdf.rect(20, yPosition - 3, 3, 3, 'F');
-      pdf.text(sanitizeText(asset), 26, yPosition);
-      yPosition += lineHeight + 1;
-    });
-    pdf.setFont("helvetica", "normal");
-    yPosition += 5;
-  }
-  
-  // Phone Accounts
-  const phones = digital.phones || [];
-  if (phones.length > 0) {
-    checkPageBreak(15);
-    pdf.setFontSize(12);
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Phone Accounts:", 20, yPosition);
-    yPosition += lineHeight + 3;
-    
-    phones.forEach((phone: any, index: number) => {
-      checkPageBreak(20);
-      pdf.setFontSize(11);
-      pdf.setFont("helvetica", "bold");
-      pdf.text(sanitizeText(`Phone ${index + 1}`), 20, yPosition);
-      yPosition += lineHeight;
-      addField("Carrier", phone.carrier);
-      addField("Phone Number", phone.number);
-      addField("PIN/Password Location", phone.pin);
-      yPosition += 3;
-    });
-  }
-  
-  // Digital Accounts
-  const digitalAccounts = digital.accounts || [];
-  if (digitalAccounts.length > 0) {
-    checkPageBreak(15);
-    pdf.setFontSize(12);
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Account Details:", 20, yPosition);
-    yPosition += lineHeight + 3;
-    
-    digitalAccounts.forEach((account: any, index: number) => {
-      checkPageBreak(25);
-      pdf.setFontSize(11);
-      pdf.setFont("helvetica", "bold");
-      pdf.text(sanitizeText(`Account ${index + 1}`), 20, yPosition);
-      yPosition += lineHeight;
-      addField("Platform/Service", account.platform);
-      addField("Username/Email", account.username);
-      
-      // Preferred Action
-      const actions = [];
-      if (account.action_memorialize) actions.push("Memorialize");
-      if (account.action_delete) actions.push("Delete");
-      if (account.action_transfer) actions.push("Transfer");
-      const actionText = actions.length > 0 ? actions.join(", ") : "";
-      addField("Preferred Action", actionText);
-      
-      if (account.action_custom) {
-        addField("Additional Instructions", account.action_custom, false);
-      }
-      yPosition += 3;
-    });
-  }
-  
-  // Password Manager
-  if (digital.password_manager_info) {
-    checkPageBreak(15);
-    addField("Password Manager Information", digital.password_manager_info, false);
-    yPosition += 5;
-  }
-
-  // Legal Section
-  addTitle("Legal");
-  const legal = planData.legal || {};
-  addField("I have a will", legal.has_will ? "Yes" : "No");
-  if (legal.will_details) addField("Will Details", legal.will_details, false);
-  addField("I have a trust", legal.has_trust ? "Yes" : "No");
-  if (legal.trust_details) addField("Trust Details", legal.trust_details, false);
-  addField("Power of Attorney", legal.has_poa ? "Yes" : "No");
-  if (legal.poa_details) addField("POA Details", legal.poa_details, false);
-  addField("Advance Healthcare Directive", legal.has_advance_directive ? "Yes" : "No");
-  if (legal.advance_directive_details) addField("Directive Details", legal.advance_directive_details, false);
-
-  // Messages Section - START ON NEW PAGE
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("Messages to Loved Ones");
-  const messages = planData.messages || [];
-  if (messages.length > 0) {
-    messages.forEach((message: any, index: number) => {
-      checkPageBreak(25);
-      pdf.setFontSize(11);
-      pdf.setFont("helvetica", "bold");
-      pdf.text(sanitizeText(`Message ${index + 1}`), 20, yPosition);
-      yPosition += lineHeight;
-      addField("To (Recipients)", message.recipients);
-      addField("Written Message", message.text_message, false);
-      
-      // Note about audio/video
-      if (message.audio_url || message.video_url) {
-        pdf.setFont("helvetica", "italic");
-        pdf.setFontSize(9);
-        pdf.setTextColor(100, 100, 100);
-        const mediaTypes = [];
-        if (message.audio_url) mediaTypes.push("audio");
-        if (message.video_url) mediaTypes.push("video");
-        pdf.text(`(${mediaTypes.join(" and ")} message available in online plan)`, 20, yPosition);
-        pdf.setTextColor(0, 0, 0);
-        yPosition += lineHeight;
-      }
-      yPosition += 5;
-    });
-  } else {
-    pdf.setFontSize(10);
-    pdf.setFont("helvetica", "italic");
-    pdf.setTextColor(120, 120, 120);
-    pdf.text("(no messages added yet)", 20, yPosition);
-    pdf.setTextColor(0, 0, 0);
-    pdf.setFont("helvetica", "normal");
-    yPosition += lineHeight + 5;
   }
 
   // Revisions & Approvals Section
