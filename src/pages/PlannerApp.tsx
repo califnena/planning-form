@@ -22,6 +22,7 @@ const PreviewModeContext = createContext<{ isPreviewMode: boolean }>({ isPreview
 export const usePreviewMode = () => useContext(PreviewModeContext);
 
 // Section components
+import { SectionSettings } from "@/components/planner/sections/SectionSettings";
 import { SectionInstructions } from "@/components/planner/sections/SectionInstructions";
 import { SectionPersonal } from "@/components/planner/sections/SectionPersonal";
 import { SectionContacts } from "@/components/planner/sections/SectionContacts";
@@ -325,6 +326,7 @@ const PlannerApp = () => {
   };
 
   const sectionItems = [
+    { id: "settings", label: t("navigation.settings"), completed: false },
     { id: "checklist", label: t("navigation.checklist"), completed: !!plan.checklist_notes },
     {
       id: "instructions",
@@ -381,6 +383,9 @@ const PlannerApp = () => {
     let sectionContent;
     
     switch (activeSection) {
+      case "settings":
+        sectionContent = <SectionSettings />;
+        break;
       case "instructions":
         sectionContent = (
           <SectionInstructions
@@ -495,8 +500,8 @@ const PlannerApp = () => {
         );
     }
 
-    // Don't show navigation on guide, faq, and revisions sections
-    const showNavigation = !["guide", "faq", "revisions"].includes(activeSection);
+    // Don't show navigation on guide, faq, revisions, and settings sections
+    const showNavigation = !["guide", "faq", "revisions", "settings"].includes(activeSection);
 
     return (
       <div>
