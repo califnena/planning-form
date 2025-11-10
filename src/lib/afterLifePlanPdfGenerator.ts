@@ -1,5 +1,19 @@
 import jsPDF from "jspdf";
 import logoImage from "@/assets/efa-logo.png";
+import {
+  hasStep1Data,
+  hasStep2Data,
+  hasStep3Data,
+  hasStep4Data,
+  hasStep5Data,
+  hasStep6Data,
+  hasStep7Data,
+  hasStep8Data,
+  hasStep9Data,
+  hasStep10Data,
+  hasStep11Data,
+  hasStep12Data
+} from "./pdf_helpers";
 
 interface PlanData {
   decedentName?: string;
@@ -298,50 +312,51 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   pdf.text("Email: info@everlastingfuneraladvisors.com", pageWidth / 2, contactYPosition + 19, { align: "center" });
   pdf.text("Website: https://everlastingfuneraladvisors.com", pageWidth / 2, contactYPosition + 26, { align: "center" });
 
-  // Step 1: Immediate Needs
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("IMMEDIATE NEEDS (First 48 Hours)");
-  
+  // Step 1: Immediate Needs - only if has content
   const step1 = formData.step1 || {};
-  
-  pdf.setFontSize(11);
-  pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(...colors.bodyGray);
-  addCheckbox(marginLeft, yPosition, step1.funeralHomeContacted);
-  pdf.text("Contact funeral home", marginLeft + 8, yPosition);
-  yPosition += 7;
-  
-  addField("Name:", step1.funeralHomeName);
-  addField("Phone:", step1.funeralHomePhone);
-  yPosition += 3;
-  
-  pdf.setFont("helvetica", "bold");
-  addCheckbox(marginLeft, yPosition, step1.residenceSecured);
-  pdf.text("Secure residence", marginLeft + 8, yPosition);
-  yPosition += 7;
-  
-  addField("Notes:", step1.residenceNotes, true);
-  yPosition += 3;
-  
-  pdf.setFont("helvetica", "bold");
-  addCheckbox(marginLeft, yPosition, step1.familyNotified);
-  pdf.text("Notify immediate family", marginLeft + 8, yPosition);
-  yPosition += 7;
-  
-  addField("Contacts:", step1.familyContacts, true);
-  yPosition += 3;
-  
-  addField("Other urgent items:", step1.otherUrgent, true);
-  
-  addPageFooter();
+  if (hasStep1Data(step1)) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("IMMEDIATE NEEDS (First 48 Hours)");
+    
+    pdf.setFontSize(11);
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(...colors.bodyGray);
+    addCheckbox(marginLeft, yPosition, step1.funeralHomeContacted);
+    pdf.text("Contact funeral home", marginLeft + 8, yPosition);
+    yPosition += 7;
+    
+    addField("Name:", step1.funeralHomeName);
+    addField("Phone:", step1.funeralHomePhone);
+    yPosition += 3;
+    
+    pdf.setFont("helvetica", "bold");
+    addCheckbox(marginLeft, yPosition, step1.residenceSecured);
+    pdf.text("Secure residence", marginLeft + 8, yPosition);
+    yPosition += 7;
+    
+    addField("Notes:", step1.residenceNotes, true);
+    yPosition += 3;
+    
+    pdf.setFont("helvetica", "bold");
+    addCheckbox(marginLeft, yPosition, step1.familyNotified);
+    pdf.text("Notify immediate family", marginLeft + 8, yPosition);
+    yPosition += 7;
+    
+    addField("Contacts:", step1.familyContacts, true);
+    yPosition += 3;
+    
+    addField("Other urgent items:", step1.otherUrgent, true);
+    
+    addPageFooter();
+  }
 
-  // Step 2: Official Notifications
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("OFFICIAL NOTIFICATIONS");
-  
+  // Step 2: Official Notifications - only if has content
   const step2 = formData.step2 || {};
+  if (hasStep2Data(step2)) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("OFFICIAL NOTIFICATIONS");
   
   pdf.setFont("helvetica", "bold");
   addCheckbox(marginLeft, yPosition, step2.ssaDone);
@@ -382,62 +397,66 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   pdf.text("Utilities or Subscriptions", marginLeft + 8, yPosition);
   yPosition += 7;
   
-  addField("List:", step2.utilitiesList, true);
-  
-  addPageFooter();
+    addField("List:", step2.utilitiesList, true);
+    
+    addPageFooter();
+  }
 
-  // Step 3: Key Documents
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("KEY DOCUMENTS AND LOCATIONS");
-  
+  // Step 3: Key Documents - only if has content
   const step3 = formData.step3 || {};
+  if (hasStep3Data(step3)) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("KEY DOCUMENTS AND LOCATIONS");
   
   addField("Will or Trust Location:", step3.willLocation);
   addField("Living Trust:", step3.trustLocation);
   addField("Deeds or Titles:", step3.deedsLocation);
   addField("Insurance Policy Folder:", step3.insuranceLocation);
   addField("Tax Returns Found In:", step3.taxDocLocation);
-  addField("Safe Deposit Box:", step3.safeDepositBox);
-  
-  addPageFooter();
+    addField("Safe Deposit Box:", step3.safeDepositBox);
+    
+    addPageFooter();
+  }
 
-  // Step 4: Death Certificates
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("DEATH CERTIFICATES");
-  
+  // Step 4: Death Certificates - only if has content
   const step4 = formData.step4 || {};
+  if (hasStep4Data(step4)) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("DEATH CERTIFICATES");
   
   addField("Number Ordered:", step4.numberOrdered?.toString());
   addField("Recipients:", step4.recipients, true);
   yPosition += 3;
   
-  pdf.setFont("helvetica", "bold");
-  addCheckbox(marginLeft, yPosition, step4.allReceived);
-  pdf.text("All certificates received", marginLeft + 8, yPosition);
-  
-  addPageFooter();
+    pdf.setFont("helvetica", "bold");
+    addCheckbox(marginLeft, yPosition, step4.allReceived);
+    pdf.text("All certificates received", marginLeft + 8, yPosition);
+    
+    addPageFooter();
+  }
 
-  // Step 5: Obituary
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("OBITUARY AND ANNOUNCEMENTS");
-  
+  // Step 5: Obituary - only if has content
   const step5 = formData.step5 || {};
+  if (hasStep5Data(step5)) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("OBITUARY AND ANNOUNCEMENTS");
   
   addField("Obituary Text:", step5.obituaryText, true);
-  addField("Publication(s):", step5.publications, true);
-  addField("Online Link:", step5.onlineLink);
-  
-  addPageFooter();
+    addField("Publication(s):", step5.publications, true);
+    addField("Online Link:", step5.onlineLink);
+    
+    addPageFooter();
+  }
 
-  // Step 6: Service Details
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("SERVICE AND MEMORIAL DETAILS");
-  
+  // Step 6: Service Details - only if has content
   const step6 = formData.step6 || {};
+  if (hasStep6Data(step6)) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("SERVICE AND MEMORIAL DETAILS");
   
   addField("Service Type:", step6.serviceType);
   addField("Venue:", step6.venueName);
@@ -447,18 +466,19 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   addField("Music or Readings:", step6.musicReadings, true);
   yPosition += 3;
   
-  pdf.setFont("helvetica", "bold");
-  addCheckbox(marginLeft, yPosition, step6.confirmed);
-  pdf.text("Confirmed with funeral home", marginLeft + 8, yPosition);
-  
-  addPageFooter();
+    pdf.setFont("helvetica", "bold");
+    addCheckbox(marginLeft, yPosition, step6.confirmed);
+    pdf.text("Confirmed with funeral home", marginLeft + 8, yPosition);
+    
+    addPageFooter();
+  }
 
-  // Step 7: Finances and Estate
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("FINANCES AND ESTATE TASKS");
-  
+  // Step 7: Finances and Estate - only if has content
   const step7 = formData.step7 || {};
+  if (hasStep7Data(step7)) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("FINANCES AND ESTATE TASKS");
   
   addField("Executor:", step7.executorName);
   addField("Contact:", step7.executorContact);
@@ -467,20 +487,21 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   addField("Property Transfers:", step7.propertyTransfers, true);
   yPosition += 3;
   
-  pdf.setFont("helvetica", "bold");
-  addCheckbox(marginLeft, yPosition, step7.estateSettled);
-  pdf.text("Estate accounts settled", marginLeft + 8, yPosition);
-  
-  addPageFooter();
+    pdf.setFont("helvetica", "bold");
+    addCheckbox(marginLeft, yPosition, step7.estateSettled);
+    pdf.text("Estate accounts settled", marginLeft + 8, yPosition);
+    
+    addPageFooter();
+  }
 
-  // Step 8: Digital Accounts
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("DIGITAL ACCOUNTS AND ACCESS");
-  
+  // Step 8: Digital Accounts - only if has content
   const step8 = formData.step8 || {};
-  
-  if (step8.accounts && Array.isArray(step8.accounts)) {
+  if (hasStep8Data(step8)) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("DIGITAL ACCOUNTS AND ACCESS");
+    
+    if (step8.accounts && Array.isArray(step8.accounts)) {
     step8.accounts.forEach((account: any, index: number) => {
       checkPageBreak(25);
       
@@ -499,24 +520,25 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
       yPosition += 7;
       
       addField("Notes:", account.notes);
-      yPosition += 3;
-    });
+        yPosition += 3;
+      });
+    }
+    
+    pdf.setFont("helvetica", "bold");
+    addCheckbox(marginLeft, yPosition, step8.allClosed);
+    pdf.text("All digital accounts have been handled", marginLeft + 8, yPosition);
+    
+    addPageFooter();
   }
-  
-  pdf.setFont("helvetica", "bold");
-  addCheckbox(marginLeft, yPosition, step8.allClosed);
-  pdf.text("All digital accounts have been handled", marginLeft + 8, yPosition);
-  
-  addPageFooter();
 
-  // Step 9: Real Estate & Utilities
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("REAL ESTATE & UTILITIES");
-  
+  // Step 9: Real Estate & Utilities - only if has content
   const step9 = formData.step9 || {};
-  
-  if (step9.properties && Array.isArray(step9.properties)) {
+  if (hasStep9Data(step9)) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("REAL ESTATE & UTILITIES");
+    
+    if (step9.properties && Array.isArray(step9.properties)) {
     step9.properties.forEach((property: any, index: number) => {
       checkPageBreak(30);
       
@@ -591,22 +613,23 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
       yPosition += 7;
       
       addField("Additional Notes:", property.notes, true);
-      yPosition += 5;
-    });
-  } else {
-    addField("No properties documented", "");
+        yPosition += 5;
+      });
+    } else {
+      addField("No properties documented", "");
+    }
+    
+    addPageFooter();
   }
-  
-  addPageFooter();
 
-  // Step 10: Subscriptions
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("NON-DIGITAL SUBSCRIPTIONS");
-  
+  // Step 10: Subscriptions - only if has content
   const step10 = formData.step10 || {};
-  
-  if (step10.subscriptions && Array.isArray(step10.subscriptions)) {
+  if (hasStep10Data(step10)) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("NON-DIGITAL SUBSCRIPTIONS");
+    
+    if (step10.subscriptions && Array.isArray(step10.subscriptions)) {
     step10.subscriptions.forEach((subscription: any, index: number) => {
       checkPageBreak(20);
       
@@ -625,22 +648,23 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
       yPosition += 7;
       
       addField("Notes:", subscription.notes, true);
-      yPosition += 5;
-    });
-  } else {
-    addField("No subscriptions documented", "");
+        yPosition += 5;
+      });
+    } else {
+      addField("No subscriptions documented", "");
+    }
+    
+    addPageFooter();
   }
-  
-  addPageFooter();
 
-  // Step 11: Other Property
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("OTHER PROPERTY & POSSESSIONS");
-  
+  // Step 11: Other Property - only if has content
   const step11 = formData.step11 || {};
-  
-  if (step11.properties && Array.isArray(step11.properties)) {
+  if (hasStep11Data(step11)) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("OTHER PROPERTY & POSSESSIONS");
+    
+    if (step11.properties && Array.isArray(step11.properties)) {
     step11.properties.forEach((property: any, index: number) => {
       checkPageBreak(35);
       
@@ -661,22 +685,23 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
       pdf.setFont("helvetica", "bold");
       addCheckbox(marginLeft, yPosition, property.completed);
       pdf.text("Completed", marginLeft + 8, yPosition);
-      yPosition += 10;
-    });
-  } else {
-    addField("No property items documented", "");
+        yPosition += 10;
+      });
+    } else {
+      addField("No property items documented", "");
+    }
+    
+    addField("General Notes:", step11.generalNotes, true);
+    
+    addPageFooter();
   }
-  
-  addField("General Notes:", step11.generalNotes, true);
-  
-  addPageFooter();
 
-  // Step 12: Business
-  pdf.addPage();
-  yPosition = 20;
-  addTitle("BUSINESS OWNERSHIP & MANAGEMENT");
-  
+  // Step 12: Business - only if has content
   const step12 = formData.step12 || {};
+  if (hasStep12Data(step12)) {
+    pdf.addPage();
+    yPosition = 20;
+    addTitle("BUSINESS OWNERSHIP & MANAGEMENT");
   
   addField("Business Name:", step12.businessName);
   addField("Business Type:", step12.businessType);
@@ -713,12 +738,13 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   pdf.text("Licenses handled", marginLeft + 8, yPosition);
   yPosition += 7;
   
-  addCheckbox(marginLeft, yPosition, step12.dispositionComplete);
-  pdf.text("Disposition completed", marginLeft + 8, yPosition);
-  
-  addField("Additional Notes:", step12.notes, true);
-  
-  addPageFooter();
+    addCheckbox(marginLeft, yPosition, step12.dispositionComplete);
+    pdf.text("Disposition completed", marginLeft + 8, yPosition);
+    
+    addField("Additional Notes:", step12.notes, true);
+    
+    addPageFooter();
+  }
 
   // Update all page numbers with correct total
   updateAllPageNumbers();
