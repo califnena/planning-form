@@ -111,14 +111,19 @@ const Signup = () => {
 
   const handleGoogleSignup = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}`,
+          skipBrowserRedirect: true,
+          queryParams: { prompt: "select_account" },
         },
       });
 
       if (error) throw error;
+      if (data?.url) {
+        (window.top ?? window).location.href = data.url;
+      }
     } catch (error: any) {
       toast({
         title: "Google signup failed",
