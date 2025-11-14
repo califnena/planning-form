@@ -121,9 +121,13 @@ const Signup = () => {
       });
 
       if (error) throw error;
-      if (data?.url) {
-        (window.top ?? window).location.href = data.url;
-      }
+       if (data?.url) {
+         // Open in a new tab to avoid iframe/navigation restrictions in preview
+         const newWin = window.open(data.url, "_blank", "noopener,noreferrer");
+         if (!newWin) {
+           window.location.href = data.url;
+         }
+       }
     } catch (error: any) {
       toast({
         title: "Google signup failed",
