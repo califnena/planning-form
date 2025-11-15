@@ -84,6 +84,17 @@ const PlannerApp = () => {
   };
 
   useEffect(() => {
+    // Test mode bypass: enable with ?test=1 (persists in localStorage)
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("test") === "1") localStorage.setItem("test-mode", "1");
+    if (params.get("test") === "0") localStorage.removeItem("test-mode");
+    const isTestMode = localStorage.getItem("test-mode") === "1";
+
+    if (isTestMode) {
+      setAuthLoading(false);
+      return;
+    }
+
     const checkAuth = async () => {
       const {
         data: { session },
