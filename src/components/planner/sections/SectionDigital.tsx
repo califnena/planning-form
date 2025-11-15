@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 interface SectionDigitalProps {
   data: any;
@@ -17,6 +18,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
   const accounts = digital.accounts || [];
   const phones = digital.phones || [];
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const updateDigital = (field: string, value: any) => {
     onChange({

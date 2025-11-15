@@ -7,6 +7,7 @@ import { Plus, Trash2, Save, Mic, Video, Play, Pause, RotateCcw, Download, Chevr
 import { useToast } from "@/hooks/use-toast";
 import { useState, useRef } from "react";
 import { EmailPlanDialog } from "@/components/EmailPlanDialog";
+import { useTranslation } from "react-i18next";
 
 interface Message {
   recipients: string;
@@ -23,6 +24,7 @@ interface SectionMessagesProps {
 export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
   const messages = data.messages || [];
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [recordingIndex, setRecordingIndex] = useState<number | null>(null);
   const [recordingType, setRecordingType] = useState<'audio' | 'video' | null>(null);
   const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set([0])); // First message open by default

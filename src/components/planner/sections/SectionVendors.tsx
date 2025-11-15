@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Plus, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 interface SectionVendorsProps {
   data: any;
@@ -13,6 +14,7 @@ interface SectionVendorsProps {
 export const SectionVendors = ({ data, onChange }: SectionVendorsProps) => {
   const vendors = data.vendors || [];
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const addVendor = () => {
     onChange({

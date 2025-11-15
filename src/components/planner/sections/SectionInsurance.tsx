@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Plus, Trash2, Save, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useTranslation } from "react-i18next";
 
 interface SectionInsuranceProps {
   data: any;
@@ -17,6 +18,7 @@ export const SectionInsurance = ({ data, onChange }: SectionInsuranceProps) => {
   const insurance = data.insurance || {};
   const policies = insurance.policies || [];
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const updateInsurance = (field: string, value: any) => {
     onChange({
