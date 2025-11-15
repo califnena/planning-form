@@ -742,9 +742,9 @@ export const generatePlanPDF = (planData: PlanData) => {
     }
   }
 
-  // Financial Life Section - only if has financial data
+  // Financial Life Section - only if has financial data AND visible
   const financial = planData.financial || {};
-  if (hasFinancialData(financial)) {
+  if (hasFinancialData(financial) && isSectionVisible("financial")) {
     if (yPosition > 100) {
       pdf.addPage();
       yPosition = 20;
@@ -767,9 +767,9 @@ export const generatePlanPDF = (planData: PlanData) => {
     if (financial.debts_details) addField("Outstanding Debts", financial.debts_details, false);
   }
 
-  // Insurance Section - only if has insurance data
+  // Insurance Section - only if has insurance data AND visible
   const insurance = planData.insurance || {};
-  if (hasInsuranceData(insurance)) {
+  if (hasInsuranceData(insurance) && isSectionVisible("insurance")) {
     if (yPosition > 100) {
       pdf.addPage();
       yPosition = 20;
@@ -787,9 +787,9 @@ export const generatePlanPDF = (planData: PlanData) => {
     addTable(["Type", "Company", "Policy #", "Agent"], policyData, 0);
   }
 
-  // Property Section - only if has property data
+  // Property Section - only if has property data AND visible
   const property = planData.property || {};
-  if (hasPropertyData(property)) {
+  if (hasPropertyData(property) && isSectionVisible("property")) {
     pdf.addPage();
     yPosition = 20;
     addTitle("My Property");
@@ -860,8 +860,8 @@ export const generatePlanPDF = (planData: PlanData) => {
     }
   }
 
-  // Pets Section - only if has pets data
-  if (hasPetsData(planData)) {
+  // Pets Section - only if has pets data AND visible
+  if (hasPetsData(planData) && isSectionVisible("pets")) {
     if (yPosition > 100) {
       pdf.addPage();
       yPosition = 20;
@@ -889,9 +889,9 @@ export const generatePlanPDF = (planData: PlanData) => {
     }
   }
 
-  // Digital World Section - only if has digital data
+  // Digital World Section - only if has digital data AND visible
   const digital = planData.digital || {};
-  if (hasDigitalData(digital)) {
+  if (hasDigitalData(digital) && isSectionVisible("digital")) {
     pdf.addPage();
     yPosition = 20;
     addTitle("Digital World");
