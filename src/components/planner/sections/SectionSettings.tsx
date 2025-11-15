@@ -7,6 +7,7 @@ import { ZoomIn, ZoomOut } from "lucide-react";
 import { SectionVisibilitySettings } from "./SectionVisibilitySettings";
 import { User } from "@supabase/supabase-js";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTranslation } from "react-i18next";
 
 interface SectionSettingsProps {
   user?: User;
@@ -14,6 +15,7 @@ interface SectionSettingsProps {
 }
 
 export const SectionSettings = ({ user, onVisibilityChange }: SectionSettingsProps) => {
+  const { t } = useTranslation();
   const [fontSize, setFontSize] = useState<number>(() => {
     const saved = localStorage.getItem('appFontSize');
     return saved ? parseInt(saved) : 100;
@@ -43,17 +45,17 @@ export const SectionSettings = ({ user, onVisibilityChange }: SectionSettingsPro
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">⚙️ Settings</h2>
+        <h2 className="text-2xl font-bold mb-2">⚙️ {t("settings.title")}</h2>
         <p className="text-muted-foreground">
-          Customize your planner experience, section visibility, and preferences.
+          {t("settings.sections.description")}
         </p>
       </div>
 
       <Tabs defaultValue="sections" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="sections">Sections</TabsTrigger>
-          <TabsTrigger value="display">Display</TabsTrigger>
-          <TabsTrigger value="language">Language</TabsTrigger>
+          <TabsTrigger value="sections">{t("settings.sections.title")}</TabsTrigger>
+          <TabsTrigger value="display">{t("settings.display.title")}</TabsTrigger>
+          <TabsTrigger value="language">{t("settings.language.title")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="sections" className="mt-6">
@@ -65,21 +67,21 @@ export const SectionSettings = ({ user, onVisibilityChange }: SectionSettingsPro
         <TabsContent value="display" className="mt-6">
           <Card>
         <CardHeader>
-          <CardTitle>Display Settings</CardTitle>
+          <CardTitle>{t("settings.display.title")}</CardTitle>
           <CardDescription>
-            Adjust the text size throughout the application to your preference.
+            {t("settings.display.description")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Font Size</Label>
+            <Label>{t("settings.display.fontSize")}</Label>
             <div className="flex items-center gap-3">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={decreaseFontSize}
                 disabled={fontSize <= 70}
-                aria-label="Decrease font size"
+                aria-label={t("settings.display.decrease")}
               >
                 <ZoomOut className="h-4 w-4" />
               </Button>
@@ -96,7 +98,7 @@ export const SectionSettings = ({ user, onVisibilityChange }: SectionSettingsPro
                 size="icon"
                 onClick={increaseFontSize}
                 disabled={fontSize >= 150}
-                aria-label="Increase font size"
+                aria-label={t("settings.display.increase")}
               >
                 <ZoomIn className="h-4 w-4" />
               </Button>
@@ -108,7 +110,7 @@ export const SectionSettings = ({ user, onVisibilityChange }: SectionSettingsPro
               onClick={resetFontSize}
               className="w-full"
             >
-              Reset to default (100%)
+              {t("settings.display.reset")}
             </Button>
           </div>
           
@@ -125,9 +127,9 @@ export const SectionSettings = ({ user, onVisibilityChange }: SectionSettingsPro
         <TabsContent value="language" className="mt-6">
           <Card>
         <CardHeader>
-          <CardTitle>Language / Idioma</CardTitle>
+          <CardTitle>{t("settings.language.title")}</CardTitle>
           <CardDescription>
-            Select your preferred language for the application interface.
+            {t("settings.language.description")}
           </CardDescription>
         </CardHeader>
         <CardContent>

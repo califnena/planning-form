@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ALL_SECTIONS, REQUIRED_SECTIONS } from "@/lib/sections";
 import { User } from "@supabase/supabase-js";
 import { CheckCircle2, Circle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface SectionVisibilitySettingsProps {
   user: User;
@@ -19,6 +20,7 @@ export const SectionVisibilitySettings = ({ user, onSave }: SectionVisibilitySet
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     loadSettings();
@@ -82,14 +84,14 @@ export const SectionVisibilitySettings = ({ user, onSave }: SectionVisibilitySet
       if (error) throw error;
 
       toast({
-        title: "Settings saved",
-        description: "Your section preferences have been updated.",
+        title: t("settings.sections.saved"),
+        description: t("settings.sections.description"),
       });
 
       onSave?.();
     } catch (error: any) {
       toast({
-        title: "Error saving settings",
+        title: t("settings.sections.error"),
         description: error.message,
         variant: "destructive",
       });
@@ -99,27 +101,27 @@ export const SectionVisibilitySettings = ({ user, onSave }: SectionVisibilitySet
   };
 
   if (loading) {
-    return <div className="p-8 text-center">Loading settings...</div>;
+    return <div className="p-8 text-center">{t("settings.sections.loading")}</div>;
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Section Visibility</h2>
+        <h2 className="text-2xl font-bold mb-2">{t("settings.sections.title")}</h2>
         <p className="text-muted-foreground">
-          Choose which sections appear in your planner and PDF. Some sections are always included.
+          {t("settings.sections.description")}
         </p>
       </div>
 
       <div className="flex gap-3">
         <Button onClick={selectAll} variant="outline" size="sm">
-          Select All
+          {t("settings.sections.selectAll")}
         </Button>
         <Button onClick={clearAll} variant="outline" size="sm">
-          Clear All
+          {t("settings.sections.clearAll")}
         </Button>
         <Button onClick={saveSettings} disabled={saving} className="ml-auto">
-          {saving ? "Saving..." : "Save Settings"}
+          {saving ? t("settings.sections.saving") : t("settings.sections.saveSettings")}
         </Button>
       </div>
 
@@ -146,10 +148,10 @@ export const SectionVisibilitySettings = ({ user, onSave }: SectionVisibilitySet
                   </div>
                   <div className="flex-1 space-y-1">
                     <h3 className="font-semibold text-sm leading-tight">
-                      {section.title}
+                      {t(`settings.sections.${section.id}.title`)}
                     </h3>
                     <p className="text-xs text-muted-foreground">
-                      {section.description}
+                      {t(`settings.sections.${section.id}.description`)}
                     </p>
                   </div>
                 </div>
@@ -171,14 +173,14 @@ export const SectionVisibilitySettings = ({ user, onSave }: SectionVisibilitySet
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-sm leading-tight">
-                      {section.title}
+                      {t(`settings.sections.${section.id}.title`)}
                     </h3>
                     <Badge variant="secondary" className="text-xs">
-                      Always included
+                      {t("settings.sections.alwaysIncluded")}
                     </Badge>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {section.description}
+                    {t(`settings.sections.${section.id}.description`)}
                   </p>
                 </div>
               </div>
