@@ -4,8 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { ZoomIn, ZoomOut } from "lucide-react";
+import { SectionVisibilitySettings } from "./SectionVisibilitySettings";
+import { User } from "@supabase/supabase-js";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export const SectionSettings = () => {
+interface SectionSettingsProps {
+  user?: User;
+  onVisibilityChange?: () => void;
+}
+
+export const SectionSettings = ({ user, onVisibilityChange }: SectionSettingsProps) => {
   const [fontSize, setFontSize] = useState<number>(() => {
     const saved = localStorage.getItem('appFontSize');
     return saved ? parseInt(saved) : 100;
@@ -37,12 +45,25 @@ export const SectionSettings = () => {
       <div>
         <h2 className="text-2xl font-bold mb-2">⚙️ Settings</h2>
         <p className="text-muted-foreground">
-          Customize your experience with font size and language preferences.
+          Customize your planner experience, section visibility, and preferences.
         </p>
       </div>
 
-      {/* Font Size Settings */}
-      <Card>
+      <Tabs defaultValue="sections" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="sections">Sections</TabsTrigger>
+          <TabsTrigger value="display">Display</TabsTrigger>
+          <TabsTrigger value="language">Language</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="sections" className="mt-6">
+          {user && (
+            <SectionVisibilitySettings user={user} onSave={onVisibilityChange} />
+          )}
+        </TabsContent>
+
+        <TabsContent value="display" className="mt-6">
+          <Card>
         <CardHeader>
           <CardTitle>Display Settings</CardTitle>
           <CardDescription>
@@ -98,10 +119,11 @@ export const SectionSettings = () => {
             </p>
           </div>
         </CardContent>
-      </Card>
+          </Card>
+        </TabsContent>
 
-      {/* Language Settings */}
-      <Card>
+        <TabsContent value="language" className="mt-6">
+          <Card>
         <CardHeader>
           <CardTitle>Language / Idioma</CardTitle>
           <CardDescription>
@@ -114,7 +136,9 @@ export const SectionSettings = () => {
             <LanguageSelector />
           </div>
         </CardContent>
-      </Card>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

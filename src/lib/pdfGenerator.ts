@@ -23,6 +23,7 @@ interface PlanData {
   digital_notes?: string;
   legal_notes?: string;
   messages_notes?: string;
+  _visibleSections?: string[];
   [key: string]: any;
 }
 
@@ -36,6 +37,15 @@ export const generatePlanPDF = (planData: PlanData) => {
   const marginBottom = 35;
   const lineHeight = 6;
   const tableOfContents: { title: string; page: number }[] = [];
+  
+  // Get visible sections
+  const visibleSections = new Set(planData._visibleSections || [
+    "overview", "instructions", "personal", "legacy", "contacts", 
+    "providers", "funeral", "financial", "insurance", "property", 
+    "pets", "digital", "legal", "messages", "resources", "faq"
+  ]);
+  
+  const isSectionVisible = (sectionId: string) => visibleSections.has(sectionId);
   
   // Color palette
   const colors = {
@@ -594,18 +604,18 @@ export const generatePlanPDF = (planData: PlanData) => {
     }
   }
 
-  // About Me Section - Only show if has content
-  if (planData.about_me_notes && planData.about_me_notes.trim()) {
+  // About Me Section - Only show if has content AND visible
+  if (planData.about_me_notes && planData.about_me_notes.trim() && isSectionVisible("legacy")) {
     pdf.addPage();
     yPosition = 20;
     addTitle("About Me");
     addSection("My Story & Legacy", planData.about_me_notes);
   }
 
-  // Key Contacts Section - Only show if has contacts
+  // Key Contacts Section - Only show if has contacts AND visible
   const contacts = planData.contacts || [];
   const hasContacts = contacts.length > 0 && contacts.some((c: any) => c.name || c.relationship || c.contact);
-  if (hasContacts) {
+  if (hasContacts && isSectionVisible("contacts")) {
     if (yPosition > 100) {
       pdf.addPage();
       yPosition = 20;
@@ -622,10 +632,10 @@ export const generatePlanPDF = (planData: PlanData) => {
     addTable(["Name", "Relationship", "Contact Info", "Notes"], contactData, 0);
   }
 
-  // Vendors Section - Only show if has vendors
+  // Vendors Section - Only show if has vendors AND visible
   const vendors = planData.vendors || [];
   const hasVendors = vendors.length > 0 && vendors.some((v: any) => v.type || v.business || v.contact);
-  if (hasVendors) {
+  if (hasVendors && isSectionVisible("providers")) {
     if (yPosition > 100) {
       pdf.addPage();
       yPosition = 20;
@@ -642,7 +652,7 @@ export const generatePlanPDF = (planData: PlanData) => {
     addTable(["Type", "Business Name", "Contact", "Notes"], vendorData, 0);
   }
 
-  // Funeral Wishes Section - Only show if has funeral data
+  // Funeral Wishes Section - Only show if has funeral data AND visible
   const funeral = planData.funeral || {};
   const hasFuneralWishes = !!(
     funeral.burial || funeral.cremation || funeral.donation ||
@@ -652,7 +662,7 @@ export const generatePlanPDF = (planData: PlanData) => {
     funeral.general_notes
   );
   
-  if (hasFuneralWishes) {
+  if (hasFuneralWishes && isSectionVisible("funeral")) {
     pdf.addPage();
     yPosition = 20;
     addTitle("My Funeral & Memorial Wishes");
@@ -984,9 +994,9 @@ export const generatePlanPDF = (planData: PlanData) => {
     }
   }
 
-  // Legal Section - only if has legal data
+  // Legal Section - only if has legal data AND visible
   const legal = planData.legal || {};
-  if (hasLegalData(legal)) {
+  if (hasLegalData(legal) && isSectionVisible("legal")) {
     if (yPosition > 100) {
       pdf.addPage();
       yPosition = 20;
@@ -1002,9 +1012,9 @@ export const generatePlanPDF = (planData: PlanData) => {
     if (legal.advance_directive_details) addField("Directive Details", legal.advance_directive_details, false);
   }
 
-  // Messages Section - only if has messages
+  // Messages Section - only if has messages AND visible
   const messages = planData.messages || [];
-  if (hasMessagesData(messages)) {
+  if (hasMessagesData(messages) && isSectionVisible("messages")) {
     pdf.addPage();
     yPosition = 20;
     addTitle("Messages to Loved Ones");
