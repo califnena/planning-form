@@ -17,6 +17,21 @@ const Index = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Test mode bypass: append ?test=1 once to enable preview without auth
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('test') === '1') {
+      localStorage.setItem('test-mode', '1');
+    }
+    if (params.get('test') === '0') {
+      localStorage.removeItem('test-mode');
+    }
+    const isTestMode = localStorage.getItem('test-mode') === '1';
+
+    if (isTestMode) {
+      setLoading(false);
+      return;
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
         navigate('/login');
