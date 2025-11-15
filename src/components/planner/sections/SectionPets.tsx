@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Save, Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import {
   Select,
   SelectContent,
@@ -26,6 +27,7 @@ interface SectionPetsProps {
 
 export const SectionPets = ({ data, onChange }: SectionPetsProps) => {
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const pets: Pet[] = data.pets || [];
 

@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Trash2, Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface SectionRevisionsProps {
   data: any;
@@ -15,6 +16,7 @@ export const SectionRevisions = ({ data, onChange }: SectionRevisionsProps) => {
   const preparedBy = data.prepared_by || "";
   const [isDrawing, setIsDrawing] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { t } = useTranslation();
 
   const addRevision = () => {
     onChange({

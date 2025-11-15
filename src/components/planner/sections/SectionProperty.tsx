@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
 import { Plus, Trash2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 interface SectionPropertyProps {
   data: any;
@@ -16,6 +17,7 @@ export const SectionProperty = ({ data, onChange }: SectionPropertyProps) => {
   const property = data.property || {};
   const items = property.items || [];
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const updateProperty = (field: string, value: any) => {
     onChange({

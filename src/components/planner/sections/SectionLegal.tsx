@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 
 interface SectionLegalProps {
   data: any;
@@ -17,6 +18,7 @@ interface SectionLegalProps {
 export const SectionLegal = ({ data, onChange }: SectionLegalProps) => {
   const legal = data.legal || {};
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const updateLegal = (field: string, value: any) => {
     onChange({
