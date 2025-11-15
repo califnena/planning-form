@@ -4,9 +4,12 @@
     "instructions": "📝 Instrucciones",
     "personal": "👤 Detalles Personales y Familiares",
     "about": "💬 Historia de Vida y Legado",
+    "legacy": "💬 Historia de Vida y Legado",
     "contacts": "📞 Personas Importantes para Notificar",
     "vendors": "🪷 Proveedores de Servicios y Arreglos",
+    "providers": "🪷 Proveedores de Servicios y Arreglos",
     "checklist": "✅ Resumen de Planificación (Lista)",
+    "overview": "✅ Resumen de Planificación (Lista)",
     "funeral": "🕊️ Deseos Funerarios",
     "financial": "💰 Vida Financiera",
     "insurance": "🛡️ Seguros y Beneficios",
@@ -16,8 +19,100 @@
     "legal": "⚖️ Legal (Testamento/Fideicomiso)",
     "messages": "❤️ Cartas y Mensajes Personales",
     "guide": "📚 Recursos Útiles",
+    "resources": "📚 Recursos Útiles",
     "faq": "❓ Preguntas Comunes",
     "revisions": "🖋️ Revisiones y Aprobaciones"
+  },
+  "settings": {
+    "title": "Configuración",
+    "sections": {
+      "title": "Secciones Visibles",
+      "description": "Personaliza qué secciones aparecen en tu planificador",
+      "selectAll": "Seleccionar Todo",
+      "clearAll": "Limpiar Todo",
+      "saveSettings": "Guardar Configuración",
+      "saving": "Guardando...",
+      "saved": "Configuración guardada correctamente",
+      "error": "Error al guardar la configuración",
+      "alwaysIncluded": "Siempre incluido",
+      "loading": "Cargando configuración...",
+      "overview": {
+        "title": "Resumen de Planificación (Lista)",
+        "description": "Lista de verificación rápida para comenzar"
+      },
+      "instructions": {
+        "title": "Mis Instrucciones",
+        "description": "Tu mensaje e instrucciones para la familia"
+      },
+      "personal": {
+        "title": "Detalles Personales y Familiares",
+        "description": "Identidad básica y detalles familiares"
+      },
+      "legacy": {
+        "title": "Historia de Vida y Legado",
+        "description": "Historia de vida y momentos destacados"
+      },
+      "contacts": {
+        "title": "Personas Importantes para Notificar",
+        "description": "A quién notificar y contactos profesionales"
+      },
+      "providers": {
+        "title": "Proveedores de Servicios y Arreglos",
+        "description": "Funeraria y proveedores de servicios"
+      },
+      "funeral": {
+        "title": "Deseos Funerarios",
+        "description": "Preferencias de servicio y disposición"
+      },
+      "financial": {
+        "title": "Vida Financiera",
+        "description": "Cuentas y financiamiento funeral"
+      },
+      "insurance": {
+        "title": "Seguros y Beneficios",
+        "description": "Pólizas y contactos"
+      },
+      "property": {
+        "title": "Propiedades y Objetos de Valor",
+        "description": "Casas, vehículos, objetos de valor"
+      },
+      "pets": {
+        "title": "Instrucciones para el Cuidado de Mascotas",
+        "description": "Plan de cuidado e información veterinaria"
+      },
+      "digital": {
+        "title": "Mundo Digital",
+        "description": "Teléfonos, contraseñas, redes sociales"
+      },
+      "legal": {
+        "title": "Legal (Testamento/Fideicomiso)",
+        "description": "Testamento, fideicomiso, directivas"
+      },
+      "messages": {
+        "title": "Cartas y Mensajes Personales",
+        "description": "Cartas para seres queridos"
+      },
+      "resources": {
+        "title": "Recursos Útiles",
+        "description": "Guías y referencias"
+      },
+      "faq": {
+        "title": "Preguntas Comunes",
+        "description": "Respuestas claras a preguntas frecuentes"
+      }
+    },
+    "display": {
+      "title": "Pantalla",
+      "description": "Ajusta el tamaño del texto y otras opciones de visualización",
+      "fontSize": "Tamaño de Fuente",
+      "increase": "Aumentar tamaño de fuente",
+      "decrease": "Disminuir tamaño de fuente",
+      "reset": "Restablecer a predeterminado"
+    },
+    "language": {
+      "title": "Idioma",
+      "description": "Cambia el idioma de la aplicación"
+    }
   },
   "header": {
     "title": "Planificador Everlasting - Mis Últimos Deseos",
