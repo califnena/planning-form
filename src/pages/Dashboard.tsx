@@ -1,133 +1,145 @@
-// src/pages/Dashboard.tsx
-import { Link } from "react-router-dom"
-import { GlobalHeader } from "@/components/GlobalHeader"
-import { useTextSize } from "@/contexts/TextSizeContext"
+import { Link } from "react-router-dom";
+import { 
+  FileText, 
+  CheckCircle, 
+  Users, 
+  FileOutput, 
+  Star, 
+  MessageCircle, 
+  UserPlus, 
+  BookOpen, 
+  HelpCircle,
+  Scale
+} from "lucide-react";
+import { GlobalHeader } from "@/components/GlobalHeader";
+import { WelcomePanel } from "@/components/dashboard/WelcomePanel";
+import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
+import { QuickAccessBar } from "@/components/dashboard/QuickAccessBar";
 
 const tiles = [
   {
     key: "pre-planning",
     title: "Pre-Planning",
-    description: "Plan wishes, documents, and details in advance.",
-    icon: "📝",
+    description: "Fill in your wishes, personal details, and instructions.",
+    icon: FileText,
     href: "/app",
   },
   {
     key: "after-death",
-    title: "After Death Steps",
-    description: "Simple checklist of what to do after a loss.",
-    icon: "📌",
+    title: "After-Death Steps",
+    description: "A simple checklist for what to do after a death.",
+    icon: CheckCircle,
     href: "/next-steps",
   },
   {
     key: "vendors",
     title: "Helpful Contacts & Vendors",
-    description: "Insurance, lawyers, financial advisors, funeral providers.",
-    icon: "📇",
+    description: "Find helpful professionals and services by category and state.",
+    icon: Users,
     href: "/vendors",
   },
   {
     key: "blank-forms",
     title: "Blank / Fillable Forms",
-    description: "Printable and digital forms you can fill in.",
-    icon: "📂",
+    description: "Download or print blank forms and worksheets.",
+    icon: FileOutput,
     href: "/forms",
   },
   {
     key: "vip-coach",
     title: "VIP Coach Assistant",
-    description: "Work with a live advisor or premium support.",
-    icon: "⭐",
+    description: "Request one-on-one guidance from our team.",
+    icon: Star,
     href: "/vip-coach",
   },
   {
     key: "quote",
-    title: "Request a Quote / Contact Us",
-    description: "Ask questions, request pricing, or schedule a call.",
-    icon: "☎️",
+    title: "Request a Quote",
+    description: "Ask for pricing on products and services.",
+    icon: MessageCircle,
     href: "/contact",
   },
   {
     key: "trusted-contacts",
     title: "Trusted Contacts",
-    description: "List the people who should have access to this plan.",
-    icon: "👥",
+    description: "List the people who should receive your planner and updates.",
+    icon: UserPlus,
     href: "/app",
   },
   {
     key: "resources",
     title: "Helpful Resources",
-    description: "Guides, links, and videos to help you and your family.",
-    icon: "📚",
+    description: "Articles, guides, and links to learn more.",
+    icon: BookOpen,
     href: "/resources",
   },
   {
     key: "questions",
     title: "Common Questions",
-    description: "Short answers to common planning questions.",
-    icon: "❓",
+    description: "Short answers to the questions we hear most.",
+    icon: HelpCircle,
     href: "/faq",
   },
   {
     key: "legal-documents",
     title: "Legal Documents & Resources",
     description: "Essential legal forms, guides, and state-specific information.",
-    icon: "⚖️",
+    icon: Scale,
     href: "/legal-documents",
   },
-]
+];
 
 export default function Dashboard() {
-  const { textSize } = useTextSize()
-
-  const textSizeClass = textSize === 'small' ? 'text-sm' : textSize === 'medium' ? 'text-base' : 'text-lg'
-
-  console.log('Dashboard component rendering');
-
   return (
     <>
       <GlobalHeader />
-      <div className={`min-h-screen bg-slate-50 px-4 py-8 md:px-8 ${textSizeClass}`}>
-        <div className="mx-auto max-w-6xl">
-          {/* Top bar with greeting */}
-          <header className="mb-8">
-            <div>
-              <p className="text-sm font-medium text-slate-500">Welcome back</p>
-              <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
-                What would you like to work on today?
-              </h1>
-            </div>
-          </header>
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-7xl px-4 py-8 space-y-8">
+          {/* Welcome Panel */}
+          <WelcomePanel />
 
-        {/* Tiles grid */}
-        <section aria-label="Main actions">
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {tiles.map((tile) => (
-              <Link
-                key={tile.key}
-                to={tile.href}
-                className="group flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm outline-none transition hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-sky-500"
-              >
-                <div>
-                  <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-sky-100 text-xl">
-                    <span aria-hidden="true">{tile.icon}</span>
-                  </div>
-                  <h2 className="mb-2 text-lg font-semibold text-slate-900 group-hover:text-sky-700">
-                    {tile.title}
-                  </h2>
-                  <p className="text-sm text-slate-600">{tile.description}</p>
-                </div>
-                <span className="mt-4 inline-flex items-center text-sm font-medium text-sky-700 group-hover:underline">
-                  Open
-                  <span className="ml-1" aria-hidden="true">
-                    →
-                  </span>
-                </span>
-              </Link>
-            ))}
+          {/* Progress and Quick Access Row */}
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-1">
+              <ProgressOverview />
+            </div>
+            <div className="lg:col-span-2">
+              <QuickAccessBar />
+            </div>
           </div>
-        </section>
+
+          {/* Main Action Tiles */}
+          <section aria-label="Main actions">
+            <h2 className="text-2xl font-bold mb-6 text-foreground">What would you like to do?</h2>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {tiles.map((tile) => {
+                const Icon = tile.icon;
+                return (
+                  <Link
+                    key={tile.key}
+                    to={tile.href}
+                    className="group flex h-full flex-col rounded-xl border-2 border-border bg-card p-6 text-left shadow-sm transition-all hover:shadow-md hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  >
+                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <h3 className="mb-2 text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+                      {tile.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+                      {tile.description}
+                    </p>
+                    <span className="mt-4 inline-flex items-center text-sm font-medium text-primary group-hover:underline">
+                      Open
+                      <span className="ml-1" aria-hidden="true">→</span>
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        </div>
       </div>
-    </div>
     </>
-  )
+  );
 }

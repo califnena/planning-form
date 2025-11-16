@@ -8,7 +8,7 @@ import { User } from "@supabase/supabase-js";
 import { Switch } from "@/components/ui/switch";
 import { useTextSize } from "@/contexts/TextSizeContext";
 import { TextSizeToggle } from "@/components/TextSizeToggle";
-import { AccessibilityToggle } from "@/components/AccessibilityToggle";
+import { AccessibilityCard } from "@/components/AccessibilityCard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { TourResetButton } from "@/components/planner/TourResetButton";
@@ -184,7 +184,7 @@ export const SectionPreferences = ({ user, onSave, onContinue, showWelcome }: Se
       </div>
 
       {/* Accessibility Settings */}
-      <AccessibilityToggle />
+      <AccessibilityCard />
 
       {/* Welcome message for first-time users */}
       {showWelcome && (
