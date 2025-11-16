@@ -129,55 +129,40 @@ export const PlannerShell = ({
         onOpenChange={setShowContactDialog}
       />
       <div className="min-h-screen flex flex-col bg-background">
-      {/* Header */}
-      <header className="border-b border-border sticky top-0 bg-background z-10">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            {/* Mobile Menu Button */}
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-80 overflow-y-auto p-0 bg-[hsl(30,10%,98%)]">
-                <div className="p-4">
-                  {sidebarContent}
-                </div>
-              </SheetContent>
-            </Sheet>
-            
-            <img src={everlastingLogo} alt="Everlasting Funeral Advisors" className="h-12 w-12" />
-            <div>
-              <h1 className="text-lg font-semibold text-primary">{t("header.title")}</h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">{t("header.providedBy")}</p>
-              <a 
-                href="/about-us"
-                className="text-xs text-primary hover:underline hidden sm:block"
-              >
-                About Us
-              </a>
+        <div className="flex-1 flex">
+          {/* Mobile Menu Sheet */}
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetContent side="left" className="w-80 overflow-y-auto p-0 bg-[hsl(30,10%,98%)]">
+              <div className="p-4">
+                {sidebarContent}
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          {/* Desktop Sidebar */}
+          <aside className="w-72 border-r border-border bg-[hsl(30,10%,98%)] overflow-y-auto hidden md:flex md:flex-col">
+            <div className="p-4 flex-1">
+              {sidebarContent}
             </div>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <ProfileDropdown />
-          </div>
+          </aside>
+
+          {/* Main Content */}
+          <main className="flex-1 overflow-y-auto">
+            {/* Mobile Menu Button - Fixed position */}
+            <div className="md:hidden fixed bottom-4 left-4 z-50">
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button size="lg" className="rounded-full shadow-lg">
+                    <Menu className="h-5 w-5 mr-2" />
+                    Menu
+                  </Button>
+                </SheetTrigger>
+              </Sheet>
+            </div>
+            
+            <div className="container mx-auto px-4 py-8 max-w-4xl">{children}</div>
+          </main>
         </div>
-      </header>
-
-      <div className="flex-1 flex">
-        {/* Desktop Sidebar */}
-        <aside className="w-72 border-r border-border bg-[hsl(30,10%,98%)] overflow-y-auto hidden md:flex md:flex-col">
-          <div className="p-4 flex-1">
-            {sidebarContent}
-          </div>
-        </aside>
-
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="container mx-auto px-4 py-6 max-w-4xl">{children}</div>
-        </main>
-      </div>
       </div>
     </>
   );
