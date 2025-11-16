@@ -1,4 +1,59 @@
 {
+  "dashboard": {
+    "welcome": "Witamy, {{name}}",
+    "welcomeGeneric": "Witamy",
+    "subtitle": "Użyj tego planera, aby zorganizować swoje życzenia, ważne kontakty i instrukcje po śmierci. Możesz pracować we własnym tempie i zapisywać na bieżąco.",
+    "slogan": "Spokój Ducha Zaczyna się od Planu",
+    "heroMessage": "Jesteśmy tutaj, aby prowadzić Cię przez każdy krok. Nie spiesz się, zapisuj na bieżąco i wiedz, że dajesz swoim bliskim najlepszy dar: jasność i spokój w trudnych chwilach.",
+    "continueButton": "Kontynuuj tam, gdzie skończyłem",
+    "startNewButton": "Rozpocznij nowy planer",
+    "progressTitle": "Postęp Pre-Planowania",
+    "progressSubtext": "Możesz zatrzymać się i wrócić w dowolnym momencie.",
+    "quickActions": "Szybkie Działania",
+    "mainActionsTitle": "Co chciałbyś zrobić?",
+    "tiles": {
+      "prePlanning": {
+        "title": "Pre-Planowanie",
+        "description": "Wypełnij swoje życzenia, szczegóły osobiste i instrukcje."
+      },
+      "afterDeath": {
+        "title": "Kroki Po Śmierci",
+        "description": "Prosta lista kontrolna tego, co robić po śmierci."
+      },
+      "vendors": {
+        "title": "Przydatne Kontakty i Dostawcy",
+        "description": "Znajdź przydatnych profesjonalistów i usługi według kategorii i stanu."
+      },
+      "blankForms": {
+        "title": "Puste / Wypełniane Formularze",
+        "description": "Pobierz lub wydrukuj puste formularze i arkusze robocze."
+      },
+      "vipCoach": {
+        "title": "Asystent Coach VIP",
+        "description": "Poproś o indywidualne wskazówki od naszego zespołu."
+      },
+      "quote": {
+        "title": "Poproś o Wycenę",
+        "description": "Zapytaj o ceny produktów i usług."
+      },
+      "trustedContacts": {
+        "title": "Zaufane Kontakty",
+        "description": "Wymień osoby, które powinny otrzymać Twój planer i aktualizacje."
+      },
+      "resources": {
+        "title": "Przydatne Zasoby",
+        "description": "Artykuły, przewodniki i linki, aby dowiedzieć się więcej."
+      },
+      "questions": {
+        "title": "Często Zadawane Pytania",
+        "description": "Krótkie odpowiedzi na pytania, które słyszymy najczęściej."
+      },
+      "legalDocuments": {
+        "title": "Dokumenty Prawne i Zasoby",
+        "description": "Podstawowe formularze prawne, przewodniki i informacje specyficzne dla stanu."
+      }
+    }
+  },
   "navigation": {
     "settings": "⚙️ Ustawienia",
     "instructions": "📝 Instrukcje",
