@@ -381,7 +381,6 @@ const PlannerApp = () => {
     { id: "pets", label: t("navigation.pets"), completed: !!plan.pets_notes },
     { id: "digital", label: t("navigation.digital"), completed: !!plan.digital_notes },
     { id: "legal", label: t("navigation.legal"), completed: !!plan.legal_notes },
-    { id: "legalresources", label: t("navigation.legalresources"), completed: false },
     { id: "messages", label: t("navigation.messages"), completed: !!plan.messages_notes },
   ];
 
