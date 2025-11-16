@@ -1,4 +1,57 @@
 {
+  "dashboard": {
+    "welcome": "Welcome, {{name}}",
+    "welcomeGeneric": "Welcome",
+    "subtitle": "Use this planner to organize your wishes, important contacts, and after-death instructions. You can work at your own pace and save as you go.",
+    "continueButton": "Continue where I left off",
+    "startNewButton": "Start a new planner",
+    "progressTitle": "Pre-Planning progress",
+    "progressSubtext": "You can stop and return at any time.",
+    "quickActions": "Quick Actions",
+    "mainActionsTitle": "What would you like to do?",
+    "tiles": {
+      "prePlanning": {
+        "title": "Pre-Planning",
+        "description": "Fill in your wishes, personal details, and instructions."
+      },
+      "afterDeath": {
+        "title": "After-Death Steps",
+        "description": "A simple checklist for what to do after a death."
+      },
+      "vendors": {
+        "title": "Helpful Contacts & Vendors",
+        "description": "Find helpful professionals and services by category and state."
+      },
+      "blankForms": {
+        "title": "Blank / Fillable Forms",
+        "description": "Download or print blank forms and worksheets."
+      },
+      "vipCoach": {
+        "title": "VIP Coach Assistant",
+        "description": "Request one-on-one guidance from our team."
+      },
+      "quote": {
+        "title": "Request a Quote",
+        "description": "Ask for pricing on products and services."
+      },
+      "trustedContacts": {
+        "title": "Trusted Contacts",
+        "description": "List the people who should receive your planner and updates."
+      },
+      "resources": {
+        "title": "Helpful Resources",
+        "description": "Articles, guides, and links to learn more."
+      },
+      "questions": {
+        "title": "Common Questions",
+        "description": "Short answers to the questions we hear most."
+      },
+      "legalDocuments": {
+        "title": "Legal Documents & Resources",
+        "description": "Essential legal forms, guides, and state-specific information."
+      }
+    }
+  },
   "navigation": {
     "preferences": "⚙️ Preferences",
     "instructions": "📝 My Instructions",
