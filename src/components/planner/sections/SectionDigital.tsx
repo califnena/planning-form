@@ -77,7 +77,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
   const handleSave = () => {
     toast({
       title: "Saved",
-      description: "Digital world information has been saved.",
+      description: "Online accounts information has been saved.",
     });
   };
 
@@ -85,7 +85,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-2">💻 Digital World</h2>
+          <h2 className="text-2xl font-bold mb-2">💻 Online Accounts</h2>
           <p className="text-muted-foreground">
             Manage your digital legacy and online accounts.
           </p>
