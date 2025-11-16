@@ -7,6 +7,8 @@ import { Card } from "@/components/ui/card";
 import { Plus, Trash2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import { PrivacyModal } from "@/components/PrivacyModal";
 
 interface SectionDigitalProps {
   data: any;
@@ -19,6 +21,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
   const phones = digital.phones || [];
   const { toast } = useToast();
   const { t } = useTranslation();
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   const updateDigital = (field: string, value: any) => {
     onChange({
@@ -88,6 +91,15 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
           <h2 className="text-2xl font-bold mb-2">💻 Online Accounts</h2>
           <p className="text-muted-foreground">
             Manage your digital legacy and online accounts.
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            We do not store passwords or PINs.{" "}
+            <button
+              onClick={() => setShowPrivacyModal(true)}
+              className="underline hover:text-foreground transition-colors"
+            >
+              Privacy & Data
+            </button>
           </p>
         </div>
         <Button onClick={handleSave} size="sm">
@@ -392,6 +404,8 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
           </li>
         </ul>
       </div>
+      
+      <PrivacyModal open={showPrivacyModal} onOpenChange={setShowPrivacyModal} />
     </div>
   );
 };

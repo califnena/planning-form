@@ -5,8 +5,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { FAQDownloadButton } from "./FAQDownloadButton";
+import { useState } from "react";
+import { PrivacyModal } from "@/components/PrivacyModal";
 
 export const SectionFAQ = () => {
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -30,6 +34,39 @@ export const SectionFAQ = () => {
           the process can be overwhelming. That's because it involves emotional decisions, financial considerations, and logistical details that most 
           people don't think about until the need arises.
         </p>
+      </div>
+
+      {/* Privacy & Security Questions */}
+      <div className="space-y-3 mb-8">
+        <h3 className="text-lg font-semibold">🔒 Privacy & Security</h3>
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="privacy">
+            <AccordionTrigger>How does this app protect my privacy?</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p className="text-foreground font-semibold">
+                  Your Privacy is Protected
+                </p>
+                <p>
+                  <strong>We do NOT save sensitive personal information (PII)</strong> such as Social Security Numbers, 
+                  financial account numbers, insurance policy details, or other sensitive data.
+                </p>
+                <p>
+                  You can safely enter this information to generate your PDF, but you'll need to re-enter it each time. 
+                  This information is <strong>only used for printing</strong> and is never stored in our database.
+                </p>
+                <p className="pt-2">
+                  <button
+                    onClick={() => setShowPrivacyModal(true)}
+                    className="text-primary hover:underline font-medium"
+                  >
+                    Open Privacy & Data details →
+                  </button>
+                </p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
 
       {/* Top Questions */}
@@ -770,6 +807,8 @@ export const SectionFAQ = () => {
           </AccordionItem>
         </Accordion>
       </div>
+      
+      <PrivacyModal open={showPrivacyModal} onOpenChange={setShowPrivacyModal} />
     </div>
   );
 };
