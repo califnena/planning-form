@@ -9,6 +9,7 @@ import {
   hasLegalData,
   hasMessagesData
 } from "./pdf_helpers";
+import { pdfLabels } from "./pdfTranslations";
 
 interface PlanData {
   prepared_by?: string;
@@ -98,13 +99,13 @@ export const generatePlanPDF = (planData: PlanData) => {
     pdf.setFontSize(9);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(60, 60, 60);
-    pdf.text("provided by Everlasting Funeral Advisors – My Final Wishes Planner", pageWidth / 2, pageHeight - 15, { align: "center" });
+    pdf.text(pdfLabels.providedBy(), pageWidth / 2, pageHeight - 15, { align: "center" });
     
     // Add page number with legal name - bold and black
     pdf.setFontSize(11);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(0, 0, 0);
-    const pageNumText = totalPages ? `Page ${currentPage} of ${totalPages} (${legalName})` : `Page ${currentPage} (${legalName})`;
+    const pageNumText = totalPages ? `${pdfLabels.pageOf()} ${currentPage} ${pdfLabels.of()} ${totalPages} (${legalName})` : `${pdfLabels.pageOf()} ${currentPage} (${legalName})`;
     pdf.text(pageNumText, pageWidth / 2, pageHeight - 8, { align: "center" });
     
     pdf.setTextColor(...colors.bodyGray);
