@@ -55,9 +55,9 @@ export const SectionLegal = ({ data, onChange }: SectionLegalProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-2">⚖️ Legal (Will/Trust)</h2>
+          <h2 className="text-2xl font-bold mb-2">⚖️ Legal Document Storage</h2>
           <p className="text-muted-foreground">
-            Document location of legal documents and estate planning details.
+            Keep track of where your will, trust, and legal documents are stored - not the documents themselves, just where to find them.
           </p>
         </div>
         <Button onClick={handleSave} size="sm">
@@ -90,8 +90,8 @@ export const SectionLegal = ({ data, onChange }: SectionLegalProps) => {
                 Get free forms from trusted sources like AARP and CaringInfo.
               </p>
               <Button asChild className="w-full sm:w-auto">
-                <Link to="/legal-forms">
-                  View Legal Forms & Resources
+                <Link to="/legal-documents">
+                  View Legal Documents & Resources
                   <ExternalLink className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

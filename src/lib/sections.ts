@@ -17,8 +17,7 @@ export const ALL_SECTIONS: Section[] = [
   { id: "property", title: "Property & Valuables", description: "Homes, vehicles, valuables, and how you want them handled." },
   { id: "pets", title: "Pet Care Instructions", description: "Who will care for your pets and what they need." },
   { id: "digital", title: "Online Accounts", description: "Passwords, devices, and important digital information." },
-  { id: "legal", title: "Legal (Will/Trust)", description: "Where to find your will, trust, or other legal documents." },
-  { id: "legalresources", title: "Legal Documents & Resources", description: "Essential legal forms, guides, and state-specific information." },
+  { id: "legal", title: "Legal Document Storage", description: "Keep track of where your will, trust, and legal documents are stored." },
   { id: "messages", title: "Letters & Personal Messages", description: "Messages you want to leave for loved ones." },
 ];
 
