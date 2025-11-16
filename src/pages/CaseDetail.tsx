@@ -251,7 +251,7 @@ export default function CaseDetail() {
           onClick={handleGeneratePDF}
         >
           <Download className="mr-2 h-4 w-4 flex-shrink-0" />
-          <span className="text-left">Generate After Life Action Plan</span>
+          <span className="text-left">Generate After-Death Plan PDF</span>
         </Button>
       </div>
     </>
@@ -283,7 +283,7 @@ export default function CaseDetail() {
               </Button>
               <div>
                 <h1 className="text-lg sm:text-xl font-semibold">
-                  {caseData.decedent?.legal_name || "After-Life Action Plan"}
+                  {caseData.decedent?.legal_name || "After-Death Plan"}
                 </h1>
                 <p className="text-xs sm:text-sm text-muted-foreground">
                   {currentStep === 0 ? "Overview" : `Step ${currentStep} of ${STEPS.length - 1}`}
