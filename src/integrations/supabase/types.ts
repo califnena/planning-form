@@ -1814,6 +1814,60 @@ export type Database = {
           },
         ]
       }
+      vendor_directory: {
+        Row: {
+          address: string | null
+          category: string
+          city: string | null
+          contact_name: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          is_featured: boolean
+          name: string
+          notes: string | null
+          phone: string | null
+          state: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          category: string
+          city?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          name: string
+          notes?: string | null
+          phone?: string | null
+          state: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          category?: string
+          city?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          state?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       vendors: {
         Row: {
           contact: string | null
