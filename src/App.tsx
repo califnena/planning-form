@@ -24,6 +24,7 @@ import Forms from "./pages/Forms";
 import Contact from "./pages/Contact";
 import Resources from "./pages/Resources";
 import FAQ from "./pages/FAQ";
+import LegalDocuments from "./pages/LegalDocuments";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/resources" element={<Resources />} />
               <Route path="/faq" element={<FAQ />} />
+              <Route path="/legal-documents" element={<LegalDocuments />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

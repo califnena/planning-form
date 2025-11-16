@@ -28,7 +28,7 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
 
   // Check if user has enabled any sections (beyond preferences and always-visible)
   const hasEnabledSections = items.some(item => 
-    item.id !== "preferences" && item.id !== "resources" && item.id !== "faq"
+    item.id !== "preferences" && item.id !== "legalresources" && item.id !== "resources" && item.id !== "faq"
   );
 
   const renderNavButton = (item: NavItem) => {
@@ -76,7 +76,7 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
         }
         
         // Show always-visible sections
-        if (item.id === "resources" || item.id === "faq") {
+        if (item.id === "legalresources" || item.id === "resources" || item.id === "faq") {
           return renderNavButton(item);
         }
         

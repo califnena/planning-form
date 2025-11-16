@@ -41,6 +41,7 @@ import { SectionVendors } from "@/components/planner/sections/SectionVendors";
 import { SectionRevisions } from "@/components/planner/sections/SectionRevisions";
 import { SectionGuide } from "@/components/planner/sections/SectionGuide";
 import { SectionFAQ } from "@/components/planner/sections/SectionFAQ";
+import { SectionLegalResources } from "@/components/planner/sections/SectionLegalResources";
 import { mergeVisibleSections } from "@/lib/sections";
 
 const PlannerApp = () => {
@@ -380,6 +381,7 @@ const PlannerApp = () => {
     { id: "pets", label: t("navigation.pets"), completed: !!plan.pets_notes },
     { id: "digital", label: t("navigation.digital"), completed: !!plan.digital_notes },
     { id: "legal", label: t("navigation.legal"), completed: !!plan.legal_notes },
+    { id: "legalresources", label: t("navigation.legalresources"), completed: false },
     { id: "messages", label: t("navigation.messages"), completed: !!plan.messages_notes },
   ];
 
@@ -389,6 +391,7 @@ const PlannerApp = () => {
   // Build sidebar: preferences always first, then enabled sections, then always-visible sections
   const enabledSections = allSectionItems.filter(item => visibleIds.has(item.id));
   const alwaysVisibleSections = [
+    { id: "legalresources", label: t("navigation.legalresources"), completed: false },
     { id: "resources", label: t("navigation.guide"), completed: false },
     { id: "faq", label: t("navigation.faq"), completed: false },
   ];
@@ -549,6 +552,9 @@ const PlannerApp = () => {
       case "revisions":
         sectionContent = <SectionRevisions data={plan} onChange={updatePlan} />;
         break;
+      case "legalresources":
+        sectionContent = <SectionLegalResources />;
+        break;
       case "faq":
         sectionContent = <SectionFAQ />;
         break;
@@ -560,8 +566,8 @@ const PlannerApp = () => {
         );
     }
 
-    // Don't show navigation on resources, faq, revisions, and preferences sections
-    const showNavigation = !["resources", "faq", "revisions", "preferences"].includes(activeSection);
+    // Don't show navigation on resources, faq, revisions, preferences, and legalresources sections
+    const showNavigation = !["resources", "faq", "revisions", "preferences", "legalresources"].includes(activeSection);
 
     return (
       <div>
