@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n/config";
 import { TextSizeProvider } from "./contexts/TextSizeContext";
+import { AccessibilityProvider } from "./contexts/AccessibilityContext";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { BackToTopButton } from "./components/BackToTopButton";
 import Landing from "./pages/Landing";
@@ -35,37 +36,39 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <I18nextProvider i18n={i18n}>
       <TextSizeProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <ScrollToTop />
-            <BackToTopButton />
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/about-us" element={<AboutUs />} />
-              <Route path="/legal-forms" element={<LegalForms />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/app" element={<PlannerApp />} />
-              <Route path="/app/profile" element={<Profile />} />
-              <Route path="/app/profile/subscription" element={<Subscription />} />
-              <Route path="/vip-coach" element={<CoachAssistant />} />
-              <Route path="/next-steps" element={<NextSteps />} />
-              <Route path="/next-steps/case/:caseId" element={<CaseDetail />} />
-              <Route path="/vendors" element={<Vendors />} />
-              <Route path="/forms" element={<Forms />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/resources" element={<Resources />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/legal-documents" element={<LegalDocuments />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <AccessibilityProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <ScrollToTop />
+              <BackToTopButton />
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/about-us" element={<AboutUs />} />
+                <Route path="/legal-forms" element={<LegalForms />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/app" element={<PlannerApp />} />
+                <Route path="/app/profile" element={<Profile />} />
+                <Route path="/app/profile/subscription" element={<Subscription />} />
+                <Route path="/vip-coach" element={<CoachAssistant />} />
+                <Route path="/next-steps" element={<NextSteps />} />
+                <Route path="/next-steps/case/:caseId" element={<CaseDetail />} />
+                <Route path="/vendors" element={<Vendors />} />
+                <Route path="/forms" element={<Forms />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/resources" element={<Resources />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/legal-documents" element={<LegalDocuments />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AccessibilityProvider>
       </TextSizeProvider>
     </I18nextProvider>
   </QueryClientProvider>

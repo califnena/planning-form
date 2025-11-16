@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { useAccessibility } from "@/contexts/AccessibilityContext";
+import { SimplifiedUI } from "@/components/SimplifiedUI";
 import {
   Save,
   Eye,
@@ -37,6 +39,8 @@ export const ActionSidebar = ({
   onAfterLifePlan,
   onSave,
 }: ActionSidebarProps) => {
+  const { superSeniorMode } = useAccessibility();
+  
   // Quick Mode state
   const [quickMode, setQuickMode] = useState(() => {
     const stored = localStorage.getItem("efa-quick-mode");
@@ -139,21 +143,23 @@ export const ActionSidebar = ({
     </TooltipProvider>
   );
 
-  // Quick Mode - only show essential actions
-  if (quickMode) {
+  // Quick Mode - only show essential actions (or force simplified mode when super-senior is active)
+  if (quickMode || superSeniorMode) {
     return (
       <div className="space-y-4 px-4">
-        {/* Quick Mode Toggle */}
-        <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-          <Label htmlFor="quick-mode" className="text-sm font-medium cursor-pointer">
-            Quick Mode
-          </Label>
-          <Switch
-            id="quick-mode"
-            checked={quickMode}
-            onCheckedChange={setQuickMode}
-          />
-        </div>
+        {/* Quick Mode Toggle - hide in super-senior mode */}
+        {!superSeniorMode && (
+          <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+            <Label htmlFor="quick-mode" className="text-sm font-medium cursor-pointer">
+              Quick Mode
+            </Label>
+            <Switch
+              id="quick-mode"
+              checked={quickMode}
+              onCheckedChange={setQuickMode}
+            />
+          </div>
+        )}
 
         <div className="space-y-3">
           <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -203,12 +209,14 @@ export const ActionSidebar = ({
             </Link>
           </ActionButton>
 
-          <button
-            onClick={() => setQuickMode(false)}
-            className="w-full text-sm text-primary hover:underline mt-4 py-2"
-          >
-            Show All Options →
-          </button>
+          {!superSeniorMode && (
+            <button
+              onClick={() => setQuickMode(false)}
+              className="w-full text-sm text-primary hover:underline mt-4 py-2"
+            >
+              Show All Options →
+            </button>
+          )}
         </div>
       </div>
     );

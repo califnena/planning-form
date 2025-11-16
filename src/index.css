@@ -130,4 +130,79 @@ All colors MUST be HSL.
   html.text-size-large body {
     font-size: 1.125rem;
   }
+
+  /* Super Senior Mode - Extra Large Text and Enhanced Contrast */
+  html.super-senior-mode {
+    font-size: 20px;
+  }
+
+  html.super-senior-mode body {
+    font-size: 1.25rem;
+    line-height: 1.8;
+  }
+
+  html.super-senior-mode h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  html.super-senior-mode h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  html.super-senior-mode h3 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  html.super-senior-mode button,
+  html.super-senior-mode a {
+    font-size: 1.25rem;
+    min-height: 3.5rem;
+    padding: 1rem 1.5rem;
+  }
+
+  html.super-senior-mode input,
+  html.super-senior-mode textarea,
+  html.super-senior-mode select {
+    font-size: 1.25rem;
+    min-height: 3.5rem;
+    padding: 1rem;
+  }
+
+  html.super-senior-mode label {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  /* High Contrast Mode */
+  html.high-contrast-mode {
+    --foreground: 215 30% 10%;
+    --muted-foreground: 215 25% 25%;
+    --border: 215 25% 50%;
+  }
+
+  html.high-contrast-mode body {
+    font-weight: 500;
+  }
+
+  html.high-contrast-mode button,
+  html.high-contrast-mode a {
+    border-width: 2px;
+    font-weight: 600;
+  }
+
+  /* Reduced Motion */
+  html.reduced-motion *,
+  html.reduced-motion *::before,
+  html.reduced-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
