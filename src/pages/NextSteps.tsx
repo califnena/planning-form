@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { GlobalHeader } from "@/components/GlobalHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Plus, FileText, Eye, Download, Mail, Users, Home } from "lucide-react";
@@ -102,15 +103,17 @@ export default function NextSteps() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Everlasting Next Steps</h1>
-              <p className="text-muted-foreground mt-1">After-Life Action Plan</p>
-            </div>
-            <div className="flex gap-2">
+    <>
+      <GlobalHeader />
+      <div className="min-h-screen bg-background">
+        <header className="border-b border-border bg-card">
+          <div className="container mx-auto px-4 py-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">Everlasting Next Steps</h1>
+                <p className="text-muted-foreground mt-1">After-Life Action Plan</p>
+              </div>
+              <div className="flex gap-2">
               <Button variant="outline" onClick={() => navigate("/app")} size="lg">
                 <Home className="mr-2 h-5 w-5" />
                 Return to Home
@@ -222,5 +225,6 @@ export default function NextSteps() {
         </div>
       </main>
     </div>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import { GlobalHeader } from "@/components/GlobalHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -122,7 +123,9 @@ export default function Profile() {
   }
 
   return (
-    <div className="container max-w-2xl py-8">
+    <>
+      <GlobalHeader />
+      <div className="container max-w-2xl py-8">
       <Button 
         variant="ghost" 
         onClick={() => navigate("/app")}
@@ -199,5 +202,6 @@ export default function Profile() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

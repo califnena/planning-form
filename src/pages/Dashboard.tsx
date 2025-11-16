@@ -1,16 +1,7 @@
 // src/pages/Dashboard.tsx
-import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-
-type TextSize = "normal" | "large" | "xlarge"
-
-const TEXT_SIZE_KEY = "efa-text-size"
-
-const textSizeToClass: Record<TextSize, string> = {
-  normal: "text-base",
-  large: "text-lg",
-  xlarge: "text-xl",
-}
+import { GlobalHeader } from "@/components/GlobalHeader"
+import { useTextSize } from "@/contexts/TextSizeContext"
 
 const tiles = [
   {
@@ -79,84 +70,24 @@ const tiles = [
 ]
 
 export default function Dashboard() {
-  const [textSize, setTextSize] = useState<TextSize>("normal")
+  const { textSize } = useTextSize()
 
-  // Load saved text size from localStorage
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(TEXT_SIZE_KEY) as TextSize | null
-      if (saved && ["normal", "large", "xlarge"].includes(saved)) {
-        setTextSize(saved)
-      }
-    } catch {
-      // ignore storage errors
-    }
-  }, [])
-
-  // Save text size when it changes
-  useEffect(() => {
-    try {
-      localStorage.setItem(TEXT_SIZE_KEY, textSize)
-    } catch {
-      // ignore storage errors
-    }
-  }, [textSize])
-
-  const textSizeClass = textSizeToClass[textSize]
+  const textSizeClass = textSize === 'small' ? 'text-sm' : textSize === 'medium' ? 'text-base' : 'text-lg'
 
   return (
-    <div className={`min-h-screen bg-slate-50 px-4 py-8 md:px-8 ${textSizeClass}`}>
-      <div className="mx-auto max-w-6xl">
-        {/* Top bar with greeting and text size controls */}
-        <header className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-          <div>
-            <p className="text-sm font-medium text-slate-500">Welcome back</p>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
-              What would you like to work on today?
-            </h1>
-          </div>
-
-          {/* Text size controls */}
-          <div className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-2 shadow-sm">
-            <span className="text-xs font-medium text-slate-600">Text size</span>
-            <button
-              type="button"
-              onClick={() => setTextSize("normal")}
-              className={`rounded-full px-2 py-1 text-xs font-semibold ${
-                textSize === "normal"
-                  ? "bg-slate-900 text-white"
-                  : "text-slate-700 hover:bg-slate-100"
-              }`}
-              aria-label="Normal text size"
-            >
-              A
-            </button>
-            <button
-              type="button"
-              onClick={() => setTextSize("large")}
-              className={`rounded-full px-2 py-1 text-sm font-semibold ${
-                textSize === "large"
-                  ? "bg-slate-900 text-white"
-                  : "text-slate-700 hover:bg-slate-100"
-              }`}
-              aria-label="Large text size"
-            >
-              A
-            </button>
-            <button
-              type="button"
-              onClick={() => setTextSize("xlarge")}
-              className={`rounded-full px-2 py-1 text-base font-semibold ${
-                textSize === "xlarge"
-                  ? "bg-slate-900 text-white"
-                  : "text-slate-700 hover:bg-slate-100"
-              }`}
-              aria-label="Extra large text size"
-            >
-              A
-            </button>
-          </div>
-        </header>
+    <>
+      <GlobalHeader />
+      <div className={`min-h-screen bg-slate-50 px-4 py-8 md:px-8 ${textSizeClass}`}>
+        <div className="mx-auto max-w-6xl">
+          {/* Top bar with greeting */}
+          <header className="mb-8">
+            <div>
+              <p className="text-sm font-medium text-slate-500">Welcome back</p>
+              <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
+                What would you like to work on today?
+              </h1>
+            </div>
+          </header>
 
         {/* Tiles grid */}
         <section aria-label="Main actions">
@@ -188,5 +119,6 @@ export default function Dashboard() {
         </section>
       </div>
     </div>
+    </>
   )
 }
