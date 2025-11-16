@@ -60,16 +60,16 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
       <button
         onClick={() => onSectionChange(item.id)}
         className={cn(
-          "w-full flex items-center gap-3 px-4 py-3 text-base rounded-lg transition-all duration-200 text-left group",
-          "hover:bg-[hsl(180,35%,92%)] hover:translate-x-0.5",
+          "w-full flex items-center gap-3 px-4 py-3.5 text-base rounded-lg transition-all duration-200 text-left group",
+          "hover:bg-accent/50",
           activeSection === item.id
-            ? "bg-[hsl(180,35%,85%)] text-[hsl(180,45%,25%)] font-semibold shadow-sm"
-            : "text-foreground hover:text-[hsl(180,45%,25%)]"
+            ? "bg-primary/10 text-primary font-semibold"
+            : "text-foreground hover:text-foreground"
         )}
       >
         <Icon className={cn(
           "h-5 w-5 flex-shrink-0 transition-colors",
-          activeSection === item.id ? "text-[hsl(180,45%,35%)]" : "text-muted-foreground group-hover:text-[hsl(180,45%,35%)]"
+          activeSection === item.id ? "text-primary" : "text-muted-foreground group-hover:text-primary"
         )} />
         <span className="flex-1">{item.label}</span>
         <ProgressDot completed={item.completed} />
@@ -104,27 +104,26 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
       {/* User-selected sections */}
       {userSections.length > 0 && (
         <div className="space-y-1">
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-2">
-            My Planning Topics
+          <h3 className="text-sm font-semibold text-foreground px-4 mb-3">
+            Your Planner
           </h3>
           {userSections.map(renderNavButton)}
         </div>
       )}
-      
-      {/* Show message when no sections are enabled */}
+
+      {/* Show a message if no sections are enabled yet */}
       {!hasEnabledSections && (
-        <div className="px-4 py-4 text-sm text-muted-foreground bg-muted/30 rounded-lg mx-2">
-          <p className="font-medium mb-1">👋 Get started</p>
-          <p className="text-xs leading-relaxed">
-            Choose the topics you want to work on in <strong>Preferences</strong> below.
+        <div className="px-4 py-6 text-center bg-muted/30 rounded-lg mx-2">
+          <p className="text-sm text-muted-foreground">
+            Get started by selecting sections in <strong>Preferences</strong> below.
           </p>
         </div>
       )}
 
-      {/* Always visible sections */}
-      <div className="space-y-1 pt-4 border-t border-border">
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-2">
-          Resources & Settings
+      {/* Help & Support */}
+      <div className="space-y-1">
+        <h3 className="text-sm font-semibold text-foreground px-4 mb-3">
+          Help & Support
         </h3>
         {alwaysVisibleSections.map(renderNavButton)}
       </div>
