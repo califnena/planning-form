@@ -1,7 +1,8 @@
 import { useState, ReactNode } from "react";
 import { SidebarNav } from "./SidebarNav";
+import { ActionSidebar } from "./ActionSidebar";
 import { Button } from "@/components/ui/button";
-import { Download, Mail, MessageSquare, Facebook, FileText, Eye, Printer, Save, Sparkles, Menu } from "lucide-react";
+import { Facebook, Menu, MessageSquare } from "lucide-react";
 import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
 import { useTranslation } from "react-i18next";
@@ -65,138 +66,15 @@ export const PlannerShell = ({
       </div>
 
       {/* Actions */}
-      <div className="mt-8 space-y-2">
-        <h3 className="text-sm font-semibold text-sidebar-foreground mb-3">Actions</h3>
-        <div className="text-xs text-muted-foreground mb-3 p-2 bg-muted/30 rounded">
-          ✓ All fields auto-save
-        </div>
-        {onSave && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="w-full justify-start"
-                  onClick={onSave}
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  Save My Progress
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="right" className="bg-popover text-popover-foreground border">
-                <p>✓ All fields auto-save</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-        
-        {/* Everlasting Wishes - Pre-Planning Mode */}
-        <div className="mt-4 pt-4 border-t border-sidebar-border">
-          <h3 className="text-xs font-semibold text-sidebar-foreground mb-2 text-muted-foreground uppercase tracking-wider">
-            Everlasting Wishes
-          </h3>
-          <p className="text-xs text-muted-foreground mb-3 italic">(Pre-Planning Mode)</p>
-          <div className="space-y-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start"
-                    onClick={onPreviewPDF}
-                  >
-                    <Eye className="mr-2 h-4 w-4" />
-                    Preview Planner
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="bg-popover text-popover-foreground border">
-                  <p>Preview before downloading (PDF Format)</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start"
-                    onClick={onDownloadPDF}
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Generate My Document
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="bg-popover text-popover-foreground border">
-                  <p>Download your plan (PDF Format)</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start"
-                    onClick={onDownloadManualForm}
-                  >
-                    <Printer className="mr-2 h-4 w-4" />
-                    Blank Form
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="bg-popover text-popover-foreground border">
-                  <p>Printable blank form for handwriting</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        </div>
-
-        {/* Everlasting Next Steps - After-Life Action Plan */}
-        <div className="mt-4 pt-4 border-t border-sidebar-border">
-          <h3 className="text-xs font-semibold text-sidebar-foreground mb-2 text-muted-foreground uppercase tracking-wider">
-            Everlasting Next Steps
-          </h3>
-          <p className="text-xs text-muted-foreground mb-3 italic">(After-Life Action Plan)</p>
-          <div className="space-y-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full justify-start"
-              onClick={onAfterLifePlan}
-            >
-              <FileText className="mr-2 h-4 w-4" />
-              After Life Plan
-            </Button>
-          </div>
-        </div>
-        
-        <div className="mt-4 pt-4 border-t border-sidebar-border">
-          <Button
-            size="sm"
-            className="w-full justify-start bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
-            asChild
-          >
-            <a href="https://everlastingfuneraladvisors.com" target="_blank" rel="noopener noreferrer">
-              <FileText className="mr-2 h-4 w-4" />
-              Request a Quote
-            </a>
-          </Button>
-          
-          <Button
-            size="sm"
-            className="w-full justify-start mt-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
-            asChild
-          >
-            <Link to="/vip-coach">
-              <Sparkles className="mr-2 h-4 w-4" />
-              VIP Coach Assistant
-            </Link>
-          </Button>
-        </div>
+      <div className="mt-8">
+        <h3 className="text-sm font-semibold text-sidebar-foreground mb-4">Actions</h3>
+        <ActionSidebar
+          onPreviewPDF={onPreviewPDF}
+          onDownloadPDF={onDownloadPDF}
+          onDownloadManualForm={onDownloadManualForm}
+          onAfterLifePlan={onAfterLifePlan}
+          onSave={onSave}
+        />
       </div>
 
       {/* Contact Info */}
