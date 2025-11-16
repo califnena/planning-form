@@ -1,6 +1,8 @@
-import { MessageCircle, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import mascotCouple from "@/assets/mascot-couple.png";
 
 interface AssistantBubbleProps {
   isOpen: boolean;
@@ -25,7 +27,10 @@ export function AssistantBubble({ isOpen, onClick, unreadCount = 0 }: AssistantB
         <X className="h-6 w-6" />
       ) : (
         <>
-          <MessageCircle className="h-6 w-6" />
+          <Avatar className="h-12 w-12">
+            <AvatarImage src={mascotCouple} alt="Mr. Everlasting" className="object-cover" />
+            <AvatarFallback>EFA</AvatarFallback>
+          </Avatar>
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center font-semibold">
               {unreadCount > 9 ? '9+' : unreadCount}

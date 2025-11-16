@@ -1,4 +1,59 @@
 {
+  "dashboard": {
+    "welcome": "Bienvenue, {{name}}",
+    "welcomeGeneric": "Bienvenue",
+    "subtitle": "Utilisez ce planificateur pour organiser vos souhaits, contacts importants et instructions après le décès. Vous pouvez travailler à votre rythme et sauvegarder au fur et à mesure.",
+    "slogan": "La Tranquillité d'Esprit Commence par un Plan",
+    "heroMessage": "Nous sommes là pour vous guider à chaque étape. Prenez votre temps, sauvegardez au fur et à mesure, et sachez que vous offrez à vos proches le plus grand cadeau: la clarté et la paix dans les moments difficiles.",
+    "continueButton": "Continuer où j'en étais",
+    "startNewButton": "Commencer un nouveau planificateur",
+    "progressTitle": "Progrès de la Pré-Planification",
+    "progressSubtext": "Vous pouvez vous arrêter et revenir à tout moment.",
+    "quickActions": "Actions Rapides",
+    "mainActionsTitle": "Que souhaitez-vous faire?",
+    "tiles": {
+      "prePlanning": {
+        "title": "Pré-Planification",
+        "description": "Remplissez vos souhaits, détails personnels et instructions."
+      },
+      "afterDeath": {
+        "title": "Étapes Après le Décès",
+        "description": "Une liste de contrôle simple de ce qu'il faut faire après un décès."
+      },
+      "vendors": {
+        "title": "Contacts et Fournisseurs Utiles",
+        "description": "Trouvez des professionnels et services utiles par catégorie et état."
+      },
+      "blankForms": {
+        "title": "Formulaires Vierges / Remplissables",
+        "description": "Téléchargez ou imprimez des formulaires et feuilles de travail vierges."
+      },
+      "vipCoach": {
+        "title": "Assistant Coach VIP",
+        "description": "Demandez des conseils individuels de notre équipe."
+      },
+      "quote": {
+        "title": "Demander un Devis",
+        "description": "Renseignez-vous sur les prix des produits et services."
+      },
+      "trustedContacts": {
+        "title": "Contacts de Confiance",
+        "description": "Listez les personnes qui doivent recevoir votre planificateur et les mises à jour."
+      },
+      "resources": {
+        "title": "Ressources Utiles",
+        "description": "Articles, guides et liens pour en savoir plus."
+      },
+      "questions": {
+        "title": "Questions Fréquentes",
+        "description": "Réponses courtes aux questions que nous entendons le plus."
+      },
+      "legalDocuments": {
+        "title": "Documents Légaux et Ressources",
+        "description": "Formulaires légaux essentiels, guides et informations spécifiques à l'état."
+      }
+    }
+  },
   "navigation": {
     "settings": "⚙️ Paramètres",
     "instructions": "📝 Instructions",

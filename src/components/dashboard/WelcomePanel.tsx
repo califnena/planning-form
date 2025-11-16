@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Play, PlusCircle } from "lucide-react";
+import mascotCouple from "@/assets/mascot-couple.png";
 
 export const WelcomePanel = () => {
   const { t } = useTranslation();
@@ -43,12 +44,31 @@ export const WelcomePanel = () => {
     <Card className="border-2">
       <CardContent className="pt-6">
         <div className="space-y-6">
+          {/* Hero Banner with Slogan and Avatars */}
+          <div className="flex flex-col md:flex-row items-center gap-6 pb-6 border-b">
+            <div className="flex-shrink-0">
+              <img 
+                src={mascotCouple} 
+                alt="Everlasting Advisors" 
+                className="w-32 h-32 md:w-40 md:h-40 object-contain"
+              />
+            </div>
+            <div className="flex-1 text-center md:text-left">
+              <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-3">
+                {t("dashboard.slogan")}
+              </h1>
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+                {t("dashboard.heroMessage")}
+              </p>
+            </div>
+          </div>
+
           {/* Greeting */}
           <div>
-            <h2 className="text-3xl font-bold text-foreground mb-2">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               {firstName ? t("dashboard.welcome", { name: firstName }) : t("dashboard.welcomeGeneric")}
             </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <p className="text-base text-muted-foreground leading-relaxed">
               {t("dashboard.subtitle")}
             </p>
           </div>

@@ -1,4 +1,59 @@
 {
+  "dashboard": {
+    "welcome": "Bienvenido, {{name}}",
+    "welcomeGeneric": "Bienvenido",
+    "subtitle": "Use este planificador para organizar sus deseos, contactos importantes e instrucciones posteriores al fallecimiento. Puede trabajar a su propio ritmo y guardar mientras avanza.",
+    "slogan": "La Tranquilidad Comienza con un Plan",
+    "heroMessage": "Estamos aquí para guiarlo en cada paso. Tómese su tiempo, guarde a medida que avanza, y sepa que está dando a sus seres queridos el mejor regalo: claridad y paz en momentos difíciles.",
+    "continueButton": "Continuar donde lo dejé",
+    "startNewButton": "Iniciar un nuevo planificador",
+    "progressTitle": "Progreso de Pre-Planificación",
+    "progressSubtext": "Puede detenerse y volver en cualquier momento.",
+    "quickActions": "Acciones Rápidas",
+    "mainActionsTitle": "¿Qué le gustaría hacer?",
+    "tiles": {
+      "prePlanning": {
+        "title": "Pre-Planificación",
+        "description": "Complete sus deseos, detalles personales e instrucciones."
+      },
+      "afterDeath": {
+        "title": "Pasos Posteriores al Fallecimiento",
+        "description": "Una lista de verificación simple de qué hacer después de un fallecimiento."
+      },
+      "vendors": {
+        "title": "Contactos y Proveedores Útiles",
+        "description": "Encuentre profesionales y servicios útiles por categoría y estado."
+      },
+      "blankForms": {
+        "title": "Formularios en Blanco / Rellenables",
+        "description": "Descargue o imprima formularios y hojas de trabajo en blanco."
+      },
+      "vipCoach": {
+        "title": "Asistente Coach VIP",
+        "description": "Solicite orientación personalizada de nuestro equipo."
+      },
+      "quote": {
+        "title": "Solicitar una Cotización",
+        "description": "Pregunte por precios de productos y servicios."
+      },
+      "trustedContacts": {
+        "title": "Contactos de Confianza",
+        "description": "Liste las personas que deben recibir su planificador y actualizaciones."
+      },
+      "resources": {
+        "title": "Recursos Útiles",
+        "description": "Artículos, guías y enlaces para aprender más."
+      },
+      "questions": {
+        "title": "Preguntas Comunes",
+        "description": "Respuestas breves a las preguntas que más escuchamos."
+      },
+      "legalDocuments": {
+        "title": "Documentos Legales y Recursos",
+        "description": "Formularios legales esenciales, guías e información específica del estado."
+      }
+    }
+  },
   "navigation": {
     "settings": "⚙️ Configuración",
     "instructions": "📝 Instrucciones",

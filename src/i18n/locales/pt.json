@@ -1,4 +1,59 @@
 {
+  "dashboard": {
+    "welcome": "Bem-vindo, {{name}}",
+    "welcomeGeneric": "Bem-vindo",
+    "subtitle": "Use este planejador para organizar seus desejos, contatos importantes e instruções pós-morte. Você pode trabalhar no seu próprio ritmo e salvar conforme avança.",
+    "slogan": "A Paz de Espírito Começa com um Plano",
+    "heroMessage": "Estamos aqui para guiá-lo em cada passo. Tome seu tempo, salve conforme avança, e saiba que está dando aos seus entes queridos o maior presente: clareza e paz em momentos difíceis.",
+    "continueButton": "Continuar de onde parei",
+    "startNewButton": "Iniciar um novo planejador",
+    "progressTitle": "Progresso de Pré-Planejamento",
+    "progressSubtext": "Você pode parar e retornar a qualquer momento.",
+    "quickActions": "Ações Rápidas",
+    "mainActionsTitle": "O que você gostaria de fazer?",
+    "tiles": {
+      "prePlanning": {
+        "title": "Pré-Planejamento",
+        "description": "Preencha seus desejos, detalhes pessoais e instruções."
+      },
+      "afterDeath": {
+        "title": "Passos Pós-Morte",
+        "description": "Uma lista de verificação simples do que fazer após uma morte."
+      },
+      "vendors": {
+        "title": "Contatos e Fornecedores Úteis",
+        "description": "Encontre profissionais e serviços úteis por categoria e estado."
+      },
+      "blankForms": {
+        "title": "Formulários em Branco / Preenchíveis",
+        "description": "Baixe ou imprima formulários e planilhas em branco."
+      },
+      "vipCoach": {
+        "title": "Assistente Coach VIP",
+        "description": "Solicite orientação individual de nossa equipe."
+      },
+      "quote": {
+        "title": "Solicitar um Orçamento",
+        "description": "Pergunte sobre preços de produtos e serviços."
+      },
+      "trustedContacts": {
+        "title": "Contatos Confiáveis",
+        "description": "Liste as pessoas que devem receber seu planejador e atualizações."
+      },
+      "resources": {
+        "title": "Recursos Úteis",
+        "description": "Artigos, guias e links para aprender mais."
+      },
+      "questions": {
+        "title": "Perguntas Comuns",
+        "description": "Respostas breves às perguntas que mais ouvimos."
+      },
+      "legalDocuments": {
+        "title": "Documentos Legais e Recursos",
+        "description": "Formulários legais essenciais, guias e informações específicas do estado."
+      }
+    }
+  },
   "navigation": {
     "settings": "⚙️ Configurações",
     "instructions": "📝 Instruções",
