@@ -90,11 +90,6 @@ const Login = () => {
     }
   };
 
-  const handleEnterTestMode = () => {
-    localStorage.setItem('test-mode', '1');
-    navigate('/');
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
       <div className="absolute top-4 left-4">
@@ -179,10 +174,6 @@ const Login = () => {
               />
             </svg>
             Continue with Google
-          </Button>
-
-          <Button type="button" variant="secondary" className="w-full mt-3" onClick={handleEnterTestMode} aria-label="Enter test mode (no sign-in)">
-            Use Test Mode (no sign-in)
           </Button>
 
           <div className="mt-4 text-center text-sm">

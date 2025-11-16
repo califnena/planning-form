@@ -10,17 +10,6 @@ const AppPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Test mode bypass: enable with ?test=1 (persists in localStorage)
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("test") === "1") localStorage.setItem("test-mode", "1");
-    if (params.get("test") === "0") localStorage.removeItem("test-mode");
-    const isTestMode = localStorage.getItem("test-mode") === "1";
-
-    if (isTestMode) {
-      setLoading(false);
-      return;
-    }
-
     // Check authentication
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
