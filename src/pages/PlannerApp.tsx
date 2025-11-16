@@ -11,7 +11,6 @@ import { RevisionPromptDialog } from "@/components/planner/RevisionPromptDialog"
 import { EmailPlanDialog } from "@/components/EmailPlanDialog";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { PreviewModeBanner } from "@/components/PreviewModeBanner";
-import { PIINotice } from "@/components/planner/PIINotice";
 import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
 import { generatePlanPDF } from "@/lib/pdfGenerator";
 import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator";
@@ -570,7 +569,6 @@ const PlannerApp = () => {
         onAfterLifePlan={handleAfterLifePlan}
       >
         {isPreviewMode && <PreviewModeBanner />}
-        <PIINotice />
         {renderSection()}
       </PlannerShell>
 
