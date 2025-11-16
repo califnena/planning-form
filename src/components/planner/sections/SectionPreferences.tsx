@@ -8,6 +8,7 @@ import { User } from "@supabase/supabase-js";
 import { Switch } from "@/components/ui/switch";
 import { useTextSize } from "@/contexts/TextSizeContext";
 import { TextSizeToggle } from "@/components/TextSizeToggle";
+import { AccessibilityToggle } from "@/components/AccessibilityToggle";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { TourResetButton } from "@/components/planner/TourResetButton";
@@ -178,9 +179,12 @@ export const SectionPreferences = ({ user, onSave, onContinue, showWelcome }: Se
           </div>
         </div>
         <p className="text-lg text-muted-foreground">
-          Choose which parts of the planner you want to use. You can turn things on or off at any time.
+          Customize which sections you see and how the planner works for you.
         </p>
       </div>
+
+      {/* Accessibility Settings */}
+      <AccessibilityToggle />
 
       {/* Welcome message for first-time users */}
       {showWelcome && (
