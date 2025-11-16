@@ -8,12 +8,6 @@ import { ProfileDropdown } from "@/components/ProfileDropdown";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
   Sheet,
   SheetContent,
   SheetTrigger,
@@ -52,9 +46,9 @@ export const PlannerShell = ({
   const { t } = useTranslation();
 
   const sidebarContent = (
-    <>
-      <div className="mb-6">
-        <h2 className="font-semibold text-sidebar-foreground mb-4">Pre-Planning Sections</h2>
+    <div className="flex flex-col h-full">
+      {/* Main Navigation */}
+      <div className="flex-1 overflow-y-auto">
         <SidebarNav
           items={sectionItems}
           activeSection={activeSection}
@@ -65,9 +59,9 @@ export const PlannerShell = ({
         />
       </div>
 
-      {/* Actions */}
-      <div className="mt-8">
-        <h3 className="text-sm font-semibold text-sidebar-foreground mb-4">Actions</h3>
+      {/* Actions Section */}
+      <div className="border-t border-border pt-4 mt-4">
+        <h3 className="text-sm font-semibold text-foreground mb-4 px-4">Quick Actions</h3>
         <ActionSidebar
           onPreviewPDF={onPreviewPDF}
           onDownloadPDF={onDownloadPDF}
@@ -78,10 +72,10 @@ export const PlannerShell = ({
       </div>
 
       {/* Contact Info */}
-      <div className="mt-8 pt-4 border-t border-sidebar-border">
-        <h3 className="text-sm font-semibold text-sidebar-foreground mb-2">Provided by</h3>
-        <div className="text-xs text-sidebar-foreground/80 space-y-1">
-          <p className="font-medium">Everlasting Funeral Advisors</p>
+      <div className="mt-6 pt-4 border-t border-border px-4">
+        <h3 className="text-sm font-semibold text-foreground mb-3">Provided by</h3>
+        <div className="text-xs text-muted-foreground space-y-1.5">
+          <p className="font-medium text-foreground">Everlasting Funeral Advisors</p>
           <p>(323) 863-5804</p>
           <a
             href="mailto:info@everlastingfuneraladvisors.com"
@@ -106,8 +100,8 @@ export const PlannerShell = ({
         </div>
 
         {/* Social Media */}
-        <div className="mt-4 pt-4 border-t border-sidebar-border">
-          <h3 className="text-sm font-semibold text-sidebar-foreground mb-2">Follow Us</h3>
+        <div className="mt-4 pt-4 border-t border-border">
+          <h3 className="text-sm font-semibold text-foreground mb-2">Follow Us</h3>
           <a
             href="https://www.facebook.com/profile.php?id=61580859545223"
             target="_blank"
@@ -120,7 +114,7 @@ export const PlannerShell = ({
         </div>
 
         {/* Contact/Suggest */}
-        <div className="mt-4 pt-4 border-t border-sidebar-border">
+        <div className="mt-4 pt-4 border-t border-border">
           <Button
             variant="outline"
             size="sm"
@@ -132,7 +126,7 @@ export const PlannerShell = ({
           </Button>
         </div>
       </div>
-    </>
+    </div>
   );
 
   return (
@@ -153,23 +147,16 @@ export const PlannerShell = ({
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-80 overflow-y-auto p-4 bg-sidebar">
-                {sidebarContent}
+              <SheetContent side="left" className="w-80 overflow-y-auto p-0 bg-[hsl(30,10%,98%)]">
+                <div className="p-4">
+                  {sidebarContent}
+                </div>
               </SheetContent>
             </Sheet>
             
             <img src={everlastingLogo} alt="Everlasting Funeral Advisors" className="h-12 w-12" />
             <div>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <h1 className="text-lg font-semibold text-primary cursor-help">{t("header.title")}</h1>
-                  </TooltipTrigger>
-                  <TooltipContent className="bg-popover text-popover-foreground border max-w-xs">
-                    <p>{t("header.subtitle")}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <h1 className="text-lg font-semibold text-primary">{t("header.title")}</h1>
               <p className="text-xs text-muted-foreground hidden sm:block">{t("header.providedBy")}</p>
               <a 
                 href="/about-us"
@@ -187,8 +174,10 @@ export const PlannerShell = ({
 
       <div className="flex-1 flex">
         {/* Desktop Sidebar */}
-        <aside className="w-64 border-r border-border bg-sidebar p-4 overflow-y-auto hidden md:block">
-          {sidebarContent}
+        <aside className="w-72 border-r border-border bg-[hsl(30,10%,98%)] overflow-y-auto hidden md:flex md:flex-col">
+          <div className="p-4 flex-1">
+            {sidebarContent}
+          </div>
         </aside>
 
         {/* Main Content */}

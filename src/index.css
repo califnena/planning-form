@@ -39,7 +39,8 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
-    --sidebar-background: 215 25% 96%;
+    /* Sidebar colors - matching overall theme */
+    --sidebar-background: 30 10% 98%;
     --sidebar-foreground: 215 20% 25%;
     --sidebar-primary: 180 45% 35%;
     --sidebar-primary-foreground: 0 0% 100%;

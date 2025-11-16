@@ -112,7 +112,7 @@ export const ActionSidebar = ({
             variant={variant}
             size="lg"
             className={cn(
-              "w-full justify-start text-base py-6 transition-all duration-200",
+              "w-full justify-start text-base py-6 transition-all duration-200 hover:translate-x-0.5",
               className
             )}
             onClick={onClick}
@@ -131,6 +131,7 @@ export const ActionSidebar = ({
         <TooltipContent
           side="right"
           className="bg-popover text-popover-foreground border max-w-xs p-3 text-sm"
+          sideOffset={8}
         >
           <p>{tooltip}</p>
         </TooltipContent>
@@ -141,11 +142,11 @@ export const ActionSidebar = ({
   // Quick Mode - only show essential actions
   if (quickMode) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 px-4">
         {/* Quick Mode Toggle */}
         <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
           <Label htmlFor="quick-mode" className="text-sm font-medium cursor-pointer">
-            Quick Mode (Simplified View)
+            Quick Mode
           </Label>
           <Switch
             id="quick-mode"
@@ -155,7 +156,7 @@ export const ActionSidebar = ({
         </div>
 
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Essential Actions
           </h3>
 
@@ -193,7 +194,7 @@ export const ActionSidebar = ({
             label="VIP Coach Assistant"
             tooltip={tooltips.coach}
             variant="secondary"
-            className="bg-[hsl(270,50%,85%)] hover:bg-[hsl(270,50%,80%)] text-[hsl(270,50%,25%)]"
+            className="bg-[hsl(270,50%,88%)] hover:bg-[hsl(270,50%,83%)] text-[hsl(270,50%,25%)]"
             asChild
           >
             <Link to="/vip-coach">
@@ -204,7 +205,7 @@ export const ActionSidebar = ({
 
           <button
             onClick={() => setQuickMode(false)}
-            className="w-full text-sm text-primary hover:underline mt-4"
+            className="w-full text-sm text-primary hover:underline mt-4 py-2"
           >
             Show All Options →
           </button>
@@ -215,11 +216,11 @@ export const ActionSidebar = ({
 
   // Full Mode - show all actions with collapsible groups
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 px-4">
       {/* Quick Mode Toggle */}
       <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
         <Label htmlFor="quick-mode" className="text-sm font-medium cursor-pointer">
-          Quick Mode (Simplified View)
+          Quick Mode
         </Label>
         <Switch
           id="quick-mode"
@@ -236,7 +237,7 @@ export const ActionSidebar = ({
       {/* Your Planner (Pre-Planning Tools) */}
       <div className="space-y-2">
         <GroupHeader
-          title="Your Planner (Pre-Planning Tools)"
+          title="Your Planner"
           expanded={plannerExpanded}
           onToggle={() => setPlannerExpanded(!plannerExpanded)}
         />
@@ -315,7 +316,7 @@ export const ActionSidebar = ({
               label="Request a Quote"
               tooltip={tooltips.quote}
               variant="secondary"
-              className="bg-[hsl(45,80%,85%)] hover:bg-[hsl(45,80%,80%)] text-[hsl(45,80%,25%)]"
+              className="bg-[hsl(45,80%,88%)] hover:bg-[hsl(45,80%,83%)] text-[hsl(45,80%,25%)]"
               asChild
             >
               <a
@@ -333,7 +334,7 @@ export const ActionSidebar = ({
               label="VIP Coach Assistant"
               tooltip={tooltips.coach}
               variant="secondary"
-              className="bg-[hsl(270,50%,85%)] hover:bg-[hsl(270,50%,80%)] text-[hsl(270,50%,25%)]"
+              className="bg-[hsl(270,50%,88%)] hover:bg-[hsl(270,50%,83%)] text-[hsl(270,50%,25%)]"
               asChild
             >
               <Link to="/vip-coach">
