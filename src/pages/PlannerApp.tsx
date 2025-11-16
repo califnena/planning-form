@@ -16,6 +16,7 @@ import { generatePlanPDF } from "@/lib/pdfGenerator";
 import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator";
 import { useTranslation } from "react-i18next";
 import { AssistantWidget } from "@/components/assistant/AssistantWidget";
+import { OnboardingTour } from "@/components/planner/OnboardingTour";
 
 // Preview Mode Context
 const PreviewModeContext = createContext<{ isPreviewMode: boolean }>({ isPreviewMode: false });
@@ -56,6 +57,7 @@ const PlannerApp = () => {
   const [pendingPIIData, setPendingPIIData] = useState<any>(null);
   const [userSettings, setUserSettings] = useState<string[] | null>(null);
   const [settingsLoading, setSettingsLoading] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const loadUserSettings = async (userId: string) => {
     try {
@@ -616,6 +618,14 @@ const PlannerApp = () => {
       />
       
       <AssistantWidget />
+      
+      {user && (
+        <OnboardingTour
+          userId={user.id}
+          onComplete={() => setShowOnboarding(false)}
+          activeSection={activeSection}
+        />
+      )}
     </PreviewModeContext.Provider>
   );
 };
