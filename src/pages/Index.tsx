@@ -32,11 +32,22 @@ const Index = () => {
       return;
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) {
         navigate('/login');
       } else {
         setUser(session.user);
+        
+        // Check if user needs to complete the wizard
+        const { data: settings } = await supabase
+          .from('user_settings')
+          .select('wizard_completed')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        if (!settings || !settings.wizard_completed) {
+          navigate('/start-wizard');
+        }
       }
       setLoading(false);
     });
