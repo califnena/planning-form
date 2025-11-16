@@ -13,6 +13,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import mascotCouple from "@/assets/mascot-couple.png";
+import { useTranslation } from "react-i18next";
 
 interface SectionPreferencesProps {
   user: User;
@@ -135,6 +136,7 @@ export const SectionPreferences = ({ user, onSave, onContinue, showWelcome }: Se
   const [saving, setSaving] = useState(false);
   const [openGroups, setOpenGroups] = useState<Set<string>>(new Set(SECTION_GROUPS.map(g => g.id)));
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     loadSettings();
@@ -195,16 +197,16 @@ export const SectionPreferences = ({ user, onSave, onContinue, showWelcome }: Se
       if (error) throw error;
 
       toast({
-        title: "Preferences Saved",
-        description: "Your topic selections have been saved.",
+        title: t("preferences.preferencesSaved"),
+        description: t("preferences.preferencesSavedDesc"),
       });
 
       onSave?.();
     } catch (error) {
       console.error("Error saving preferences:", error);
       toast({
-        title: "Error",
-        description: "Failed to save your preferences. Please try again.",
+        title: t("common.error"),
+        description: t("preferences.errorSaving"),
         variant: "destructive",
       });
     } finally {
@@ -215,7 +217,7 @@ export const SectionPreferences = ({ user, onSave, onContinue, showWelcome }: Se
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-muted-foreground">Loading preferences...</div>
+        <div className="text-muted-foreground">{t("preferences.loadingPreferences")}</div>
       </div>
     );
   }
@@ -226,16 +228,16 @@ export const SectionPreferences = ({ user, onSave, onContinue, showWelcome }: Se
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border shadow-sm mb-6">
         <div className="flex items-center justify-between gap-4 px-6 py-4 flex-wrap">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-foreground">Preferences</h1>
+            <h1 className="text-2xl font-bold text-foreground">{t("preferences.title")}</h1>
             <TextSizeToggle />
           </div>
           <div className="flex items-center gap-3 flex-wrap">
             <Button onClick={saveSettings} disabled={saving} size="lg" className="shadow-sm">
-              {saving ? "Saving..." : "Save Preferences"}
+              {saving ? t("preferences.savingPreferences") : t("preferences.savePreferences")}
             </Button>
             {onContinue && (
               <Button onClick={onContinue} variant="secondary" size="lg" className="shadow-sm">
-                Continue to My Planner
+                {t("preferences.continueToPlanner")}
               </Button>
             )}
           </div>
@@ -247,7 +249,7 @@ export const SectionPreferences = ({ user, onSave, onContinue, showWelcome }: Se
         <div className="flex items-start justify-between gap-6 flex-wrap">
           <div className="flex-1">
             <p className="text-lg text-muted-foreground max-w-3xl">
-              Select which sections you want to see in your planner. You can always change these settings later.
+              {t("preferences.subtitle")}
             </p>
           </div>
           
@@ -262,7 +264,7 @@ export const SectionPreferences = ({ user, onSave, onContinue, showWelcome }: Se
                 </div>
               </TooltipTrigger>
               <TooltipContent side="left" className="max-w-xs">
-                <p className="text-sm">Need help choosing? I can explain what each section means.</p>
+                <p className="text-sm">{t("preferences.avatarTooltip")}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -291,10 +293,10 @@ export const SectionPreferences = ({ user, onSave, onContinue, showWelcome }: Se
                         </div>
                         <div className="text-left">
                           <h3 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
-                            {group.label}
+                            {t(`preferences.groups.${group.id}`)}
                           </h3>
                           <p className="text-sm text-muted-foreground mt-1">
-                            {completedCount} of {groupSections.length} selected
+                            {completedCount} {t("preferences.of")} {groupSections.length} {t("preferences.selected")}
                           </p>
                         </div>
                       </div>
@@ -333,8 +335,8 @@ export const SectionPreferences = ({ user, onSave, onContinue, showWelcome }: Se
                             <div className="flex items-center gap-4 flex-1">
                               <SectionIcon className={`h-5 w-5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
                               <div>
-                                <h4 className="font-medium text-foreground">{sectionInfo.label}</h4>
-                                <p className="text-sm text-muted-foreground mt-0.5">{sectionInfo.description}</p>
+                                <h4 className="font-medium text-foreground">{t(`preferences.sections.${sectionId}.label`)}</h4>
+                                <p className="text-sm text-muted-foreground mt-0.5">{t(`preferences.sections.${sectionId}.description`)}</p>
                               </div>
                             </div>
                             <Switch
@@ -356,11 +358,11 @@ export const SectionPreferences = ({ user, onSave, onContinue, showWelcome }: Se
         {/* Bottom Action Buttons */}
         <div className="flex gap-3 pt-6 flex-wrap">
           <Button onClick={saveSettings} disabled={saving} size="lg" className="flex-1 shadow-sm">
-            {saving ? "Saving..." : "Save Preferences"}
+            {saving ? t("preferences.savingPreferences") : t("preferences.savePreferences")}
           </Button>
           {onContinue && (
             <Button onClick={onContinue} variant="secondary" size="lg" className="flex-1 shadow-sm">
-              Continue to My Planner
+              {t("preferences.continueToPlanner")}
             </Button>
           )}
         </div>

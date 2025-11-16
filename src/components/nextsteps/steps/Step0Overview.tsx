@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import mascotImage from "@/assets/mascot-couple.png";
+import { useTranslation } from "react-i18next";
 
 interface Step0OverviewProps {
   formData: any;
@@ -30,6 +31,7 @@ const STEP_ICONS = [
 ];
 
 export function Step0Overview({ formData, onSave }: Step0OverviewProps) {
+  const { t } = useTranslation();
   const [preparedFor, setPreparedFor] = useState(formData?.preparedFor || "");
   const [overviewNotes, setOverviewNotes] = useState(formData?.overviewNotes || "");
   
@@ -110,7 +112,7 @@ export function Step0Overview({ formData, onSave }: Step0OverviewProps) {
             <AvatarImage src={mascotImage} alt="Mrs. Everlasting" />
           </Avatar>
           <p className="text-sm text-muted-foreground italic">
-            "I'm here to help guide you gently through these steps."
+            {t("afterDeathPlan.avatarMessage")}
           </p>
         </div>
       </div>
@@ -121,29 +123,28 @@ export function Step0Overview({ formData, onSave }: Step0OverviewProps) {
           onClick={handleClearAll}
           size="sm"
         >
-          Clear All Fields
+          {t("afterDeathPlan.clearAll")}
         </Button>
       </div>
 
       {/* Introduction */}
       <div className="bg-muted/30 rounded-lg p-8 space-y-4">
-        <h2 className="text-2xl font-bold text-foreground">Welcome to Your After-Death Plan</h2>
+        <h2 className="text-2xl font-bold text-foreground">{t("afterDeathPlan.title")}</h2>
         <p className="text-base text-muted-foreground leading-relaxed">
-          This plan helps your family know what to do in the hours and days after a loss. 
-          Everything is organized step-by-step to reduce stress during a difficult time.
+          {t("afterDeathPlan.introText")}
         </p>
       </div>
 
       {/* Prepared For Section */}
       <div className="bg-primary/10 border border-primary/20 rounded-lg p-6">
         <Label htmlFor="preparedFor" className="text-base font-bold text-foreground mb-3 block">
-          This plan is prepared for:
+          {t("afterDeathPlan.preparedForLabel")}:
         </Label>
         <Input
           id="preparedFor"
           value={preparedFor}
           onChange={(e) => setPreparedFor(e.target.value)}
-          placeholder="Enter the name of the deceased"
+          placeholder={t("afterDeathPlan.preparedForPlaceholder")}
           className="text-base"
         />
       </div>

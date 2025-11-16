@@ -7,6 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useTranslation } from "react-i18next";
 
 interface NavItem {
   id: string;
@@ -21,6 +22,7 @@ interface SidebarNavProps {
 }
 
 export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNavProps) => {
+  const { t } = useTranslation();
   // Define which sections have tooltips
   const tooltips: Record<string, string> = {
     overview: "A simple checklist of the most important items",
@@ -105,7 +107,7 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
       {userSections.length > 0 && (
         <div className="space-y-1">
           <h3 className="text-sm font-semibold text-foreground px-4 mb-3">
-            Your Planner
+            {t("sidebar.yourPlanner")}
           </h3>
           {userSections.map(renderNavButton)}
         </div>
@@ -115,7 +117,7 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
       {!hasEnabledSections && (
         <div className="px-4 py-6 text-center bg-muted/30 rounded-lg mx-2">
           <p className="text-sm text-muted-foreground">
-            Get started by selecting sections in <strong>Preferences</strong> below.
+            {t("sidebar.getStartedMessage")}
           </p>
         </div>
       )}
@@ -123,7 +125,7 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
       {/* Help & Support */}
       <div className="space-y-1">
         <h3 className="text-sm font-semibold text-foreground px-4 mb-3">
-          Help & Support
+          {t("sidebar.helpSupport")}
         </h3>
         {alwaysVisibleSections.map(renderNavButton)}
       </div>
