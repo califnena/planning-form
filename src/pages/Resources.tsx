@@ -167,11 +167,12 @@ const Resources = () => {
           name: "Downloads from This App",
           description: (
             <>
-              Access our downloadable guides:
+              Access our downloadable guides and blank forms:
               <ul className="list-disc ml-6 mt-2 space-y-1">
-                <li><a href="/Pre-Planning-Your-Funeral-A-Gift-of-Peace-and-Clarity.pdf" download className="text-primary hover:underline">Pre-Planning Your Funeral Guide</a></li>
-                <li><a href="/guides/Discussing-Death-Guide.pdf" download className="text-primary hover:underline">Discussing Death Guide</a></li>
-                <li><a href="/guides/My-End-of-Life-Decisions-Guide.pdf" download className="text-primary hover:underline">My End-of-Life Decisions Guide</a></li>
+                <li><a href="/Pre-Planning-Your-Funeral-A-Gift-of-Peace-and-Clarity.pdf" download className="text-primary hover:underline">Pre-Planning Your Funeral Guide (PDF)</a></li>
+                <li><a href="/guides/Discussing-Death-Guide.pdf" download className="text-primary hover:underline">Discussing Death Guide (PDF)</a></li>
+                <li><a href="/guides/My-End-of-Life-Decisions-Guide.pdf" download className="text-primary hover:underline">My End-of-Life Decisions Guide (PDF)</a></li>
+                <li><Link to="/forms" className="text-primary hover:underline">Blank Fillable Forms (Pre-Planning & After-Life Checklists)</Link></li>
               </ul>
             </>
           )
