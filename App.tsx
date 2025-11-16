@@ -9,6 +9,7 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ResetPassword from "./pages/ResetPassword";
+import Dashboard from "./pages/Dashboard";
 import PlannerApp from "./pages/PlannerApp";
 import Profile from "./pages/Profile";
 import Subscription from "./pages/Subscription";
@@ -30,6 +31,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Landing />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/about-us" element={<AboutUs />} />
             <Route path="/legal-forms" element={<LegalForms />} />
             <Route path="/login" element={<Login />} />
