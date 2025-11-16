@@ -50,11 +50,11 @@ const AfterLifePlan = () => {
 
       if (error) throw error;
 
-      toast.success('After-Life Plan created successfully');
+      toast.success('After-Death Plan created successfully');
       navigate(`/next-steps/case/${newCase.id}`);
     } catch (error) {
       console.error('Error creating case:', error);
-      toast.error('Failed to create After-Life Plan. Please try again.');
+      toast.error('Failed to create After-Death Plan. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -74,10 +74,10 @@ const AfterLifePlan = () => {
         </div>
         
         <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-          After-Life Action Plan
+          After-Death Plan
         </h1>
         <p className="text-lg text-muted-foreground mb-8">
-          A comprehensive checklist to guide your loved ones through the necessary steps after a loss. 
+          A simple 12-step guide to help your loved ones after a loss. 
           Each plan walks you through immediate needs, official notifications, funeral arrangements, 
           financial matters, and long-term tasks.
         </p>
@@ -90,7 +90,7 @@ const AfterLifePlan = () => {
             </div>
             <div className="flex-1">
               <h2 className="text-xl md:text-2xl font-semibold text-foreground mb-2">
-                Start a New After-Life Plan
+                Start a New After-Death Plan
               </h2>
               <p className="text-base text-muted-foreground mb-4">
                 Create a new comprehensive checklist to help organize and track all the tasks 

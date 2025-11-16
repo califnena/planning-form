@@ -1,16 +1,33 @@
 import { useState, useEffect } from "react";
-import { FileText, CheckCircle } from "lucide-react";
+import { CheckCircle, Clock, FileText, Phone, Building2, Church, DollarSign, Globe, Home, CreditCard, Package, Briefcase } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import mascotImage from "@/assets/mascot-couple.png";
 
 interface Step0OverviewProps {
   formData: any;
   onSave: (data: any) => void;
   caseId: string;
 }
+
+const STEP_ICONS = [
+  Clock,      // Step 1: Immediate Needs
+  Phone,      // Step 2: Official Notifications
+  FileText,   // Step 3: Key Documents
+  FileText,   // Step 4: Death Certificates
+  FileText,   // Step 5: Obituary
+  Church,     // Step 6: Service Details
+  DollarSign, // Step 7: Finances & Estate
+  Globe,      // Step 8: Digital Accounts
+  Home,       // Step 9: Real Estate & Utilities
+  CreditCard, // Step 10: Subscriptions
+  Package,    // Step 11: Other Property
+  Briefcase,  // Step 12: Business
+];
 
 export function Step0Overview({ formData, onSave }: Step0OverviewProps) {
   const [preparedFor, setPreparedFor] = useState(formData?.preparedFor || "");
@@ -69,8 +86,35 @@ export function Step0Overview({ formData, onSave }: Step0OverviewProps) {
     return () => clearTimeout(timer);
   }, [preparedFor, overviewNotes, step1Complete, step2Complete, step3Complete, step4Complete, step5Complete, step6Complete, step7Complete, step8Complete, step9Complete, step10Complete, step11Complete, step12Complete]);
 
+  const steps = [
+    { complete: step1Complete, setComplete: setStep1Complete, title: "Immediate Needs (First 48 Hours)" },
+    { complete: step2Complete, setComplete: setStep2Complete, title: "Official Notifications (Government & Services)" },
+    { complete: step3Complete, setComplete: setStep3Complete, title: "Find Key Documents (Legal Papers)" },
+    { complete: step4Complete, setComplete: setStep4Complete, title: "Death Certificates (Orders & Distribution)" },
+    { complete: step5Complete, setComplete: setStep5Complete, title: "Obituary & Announcements (Public Notices)" },
+    { complete: step6Complete, setComplete: setStep6Complete, title: "Service & Memorial Details (Planning Ceremony)" },
+    { complete: step7Complete, setComplete: setStep7Complete, title: "Finances & Estate (Money & Property)" },
+    { complete: step8Complete, setComplete: setStep8Complete, title: "Digital Accounts (Online Presence)" },
+    { complete: step9Complete, setComplete: setStep9Complete, title: "Real Estate & Utilities (Property Management)" },
+    { complete: step10Complete, setComplete: setStep10Complete, title: "Subscriptions (Non-Digital Services)" },
+    { complete: step11Complete, setComplete: setStep11Complete, title: "Other Property (Vehicles, Jewelry & More)" },
+    { complete: step12Complete, setComplete: setStep12Complete, title: "Business (Business Ownership)" },
+  ];
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 max-w-4xl mx-auto">
+      {/* Avatar Helper */}
+      <div className="flex justify-end items-start">
+        <div className="flex items-center gap-3 bg-primary/5 border border-primary/20 rounded-lg p-4 max-w-md">
+          <Avatar className="h-12 w-12 border-2 border-primary/20">
+            <AvatarImage src={mascotImage} alt="Mrs. Everlasting" />
+          </Avatar>
+          <p className="text-sm text-muted-foreground italic">
+            "I'm here to help guide you gently through these steps."
+          </p>
+        </div>
+      </div>
+
       <div className="flex justify-end">
         <Button 
           variant="outline" 
@@ -81,249 +125,94 @@ export function Step0Overview({ formData, onSave }: Step0OverviewProps) {
         </Button>
       </div>
 
-      {/* Description Block */}
-      <div className="bg-muted/30 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-3">What This Plan Helps You Do</h3>
-        <p className="text-muted-foreground">
-          The Everlasting Next Steps Plan guides family members and executors through what to do 
-          in the hours and days after a loss. It provides organized checklists, document tracking, 
-          and guidance so nothing important is missed.
+      {/* Introduction */}
+      <div className="bg-muted/30 rounded-lg p-8 space-y-4">
+        <h2 className="text-2xl font-bold text-foreground">Welcome to Your After-Death Plan</h2>
+        <p className="text-base text-muted-foreground leading-relaxed">
+          This plan helps your family know what to do in the hours and days after a loss. 
+          Everything is organized step-by-step to reduce stress during a difficult time.
         </p>
       </div>
 
-      {/* Prepared For Section - Separate Colored Box */}
+      {/* Prepared For Section */}
       <div className="bg-primary/10 border border-primary/20 rounded-lg p-6">
-        <Label htmlFor="preparedFor" className="text-base font-bold text-foreground">
+        <Label htmlFor="preparedFor" className="text-base font-bold text-foreground mb-3 block">
           This plan is prepared for:
         </Label>
         <Input
           id="preparedFor"
-          placeholder="Enter name (e.g., Smith Family, John Doe, etc.)"
           value={preparedFor}
           onChange={(e) => setPreparedFor(e.target.value)}
-          className="mt-3"
+          placeholder="Enter the name of the deceased"
+          className="text-base"
         />
-        <p className="text-xs text-muted-foreground mt-2">
-          This name will appear on the PDF cover page and throughout the document
-        </p>
       </div>
 
+      {/* 12-Step Action Plan */}
       <div className="space-y-4">
-        <h4 className="font-semibold text-foreground flex items-center gap-2">
-          <CheckCircle className="h-4 w-4 text-green-600" />
-          Your 12-Step Action Plan
-        </h4>
-
-        <div className="grid gap-3">
-          <div className="border border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
-            <div className="flex items-center gap-3 mb-1">
-              <Checkbox
-                id="step1Complete"
-                checked={step1Complete}
-                onCheckedChange={(checked) => setStep1Complete(checked as boolean)}
-              />
-              <Label htmlFor="step1Complete" className="font-medium text-foreground cursor-pointer">
-                Step 1 – Immediate Needs (First 48 Hours)
-              </Label>
-            </div>
-            <p className="text-sm text-muted-foreground ml-8">
-              • Contact funeral home • Secure residence • Notify close family
-            </p>
-          </div>
-
-          <div className="border border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
-            <div className="flex items-center gap-3 mb-1">
-              <Checkbox
-                id="step2Complete"
-                checked={step2Complete}
-                onCheckedChange={(checked) => setStep2Complete(checked as boolean)}
-              />
-              <Label htmlFor="step2Complete" className="font-medium text-foreground cursor-pointer">
-                Step 2 – Official Notifications
-              </Label>
-            </div>
-            <p className="text-sm text-muted-foreground ml-8">
-              • Social Security • Employer • Insurance • Banks
-            </p>
-          </div>
-
-          <div className="border border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
-            <div className="flex items-center gap-3 mb-1">
-              <Checkbox
-                id="step3Complete"
-                checked={step3Complete}
-                onCheckedChange={(checked) => setStep3Complete(checked as boolean)}
-              />
-              <Label htmlFor="step3Complete" className="font-medium text-foreground cursor-pointer">
-                Step 3 – Find Key Documents
-              </Label>
-            </div>
-            <p className="text-sm text-muted-foreground ml-8">
-              • Will • Trust • Property • Insurance • Taxes
-            </p>
-          </div>
-
-          <div className="border border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
-            <div className="flex items-center gap-3 mb-1">
-              <Checkbox
-                id="step4Complete"
-                checked={step4Complete}
-                onCheckedChange={(checked) => setStep4Complete(checked as boolean)}
-              />
-              <Label htmlFor="step4Complete" className="font-medium text-foreground cursor-pointer">
-                Step 4 – Death Certificates
-              </Label>
-            </div>
-            <p className="text-sm text-muted-foreground ml-8">
-              Track orders, quantities, and recipients
-            </p>
-          </div>
-
-          <div className="border border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
-            <div className="flex items-center gap-3 mb-1">
-              <Checkbox
-                id="step5Complete"
-                checked={step5Complete}
-                onCheckedChange={(checked) => setStep5Complete(checked as boolean)}
-              />
-              <Label htmlFor="step5Complete" className="font-medium text-foreground cursor-pointer">
-                Step 5 – Obituary & Announcements
-              </Label>
-            </div>
-            <p className="text-sm text-muted-foreground ml-8">
-              Draft obituary, select outlets, share memorial details
-            </p>
-          </div>
-
-          <div className="border border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
-            <div className="flex items-center gap-3 mb-1">
-              <Checkbox
-                id="step6Complete"
-                checked={step6Complete}
-                onCheckedChange={(checked) => setStep6Complete(checked as boolean)}
-              />
-              <Label htmlFor="step6Complete" className="font-medium text-foreground cursor-pointer">
-                Step 6 – Service & Memorial Details
-              </Label>
-            </div>
-            <p className="text-sm text-muted-foreground ml-8">
-              Venue, officiant, pallbearers, music, readings
-            </p>
-          </div>
-
-          <div className="border border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
-            <div className="flex items-center gap-3 mb-1">
-              <Checkbox
-                id="step7Complete"
-                checked={step7Complete}
-                onCheckedChange={(checked) => setStep7Complete(checked as boolean)}
-              />
-              <Label htmlFor="step7Complete" className="font-medium text-foreground cursor-pointer">
-                Step 7 – Finances & Estate
-              </Label>
-            </div>
-            <p className="text-sm text-muted-foreground ml-8">
-              Financial and property management tasks
-            </p>
-          </div>
-
-          <div className="border border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
-            <div className="flex items-center gap-3 mb-1">
-              <Checkbox
-                id="step8Complete"
-                checked={step8Complete}
-                onCheckedChange={(checked) => setStep8Complete(checked as boolean)}
-              />
-              <Label htmlFor="step8Complete" className="font-medium text-foreground cursor-pointer">
-                Step 8 – Digital Accounts
-              </Label>
-            </div>
-            <p className="text-sm text-muted-foreground ml-8">
-              Digital account handling and online presence
-            </p>
-          </div>
-
-          <div className="border border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
-            <div className="flex items-center gap-3 mb-1">
-              <Checkbox
-                id="step9Complete"
-                checked={step9Complete}
-                onCheckedChange={(checked) => setStep9Complete(checked as boolean)}
-              />
-              <Label htmlFor="step9Complete" className="font-medium text-foreground cursor-pointer">
-                Step 9 – Real Estate & Utilities
-              </Label>
-            </div>
-            <p className="text-sm text-muted-foreground ml-8">
-              Property management and utility transfers
-            </p>
-          </div>
-
-          <div className="border border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
-            <div className="flex items-center gap-3 mb-1">
-              <Checkbox
-                id="step10Complete"
-                checked={step10Complete}
-                onCheckedChange={(checked) => setStep10Complete(checked as boolean)}
-              />
-              <Label htmlFor="step10Complete" className="font-medium text-foreground cursor-pointer">
-                Step 10 – Non-Digital Subscriptions
-              </Label>
-            </div>
-            <p className="text-sm text-muted-foreground ml-8">
-              Magazines, newspapers, memberships
-            </p>
-          </div>
-
-          <div className="border border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
-            <div className="flex items-center gap-3 mb-1">
-              <Checkbox
-                id="step11Complete"
-                checked={step11Complete}
-                onCheckedChange={(checked) => setStep11Complete(checked as boolean)}
-              />
-              <Label htmlFor="step11Complete" className="font-medium text-foreground cursor-pointer">
-                Step 11 – Other Property & Possessions
-              </Label>
-            </div>
-            <p className="text-sm text-muted-foreground ml-8">
-              Vehicles, boats, jewelry, art, clothing
-            </p>
-          </div>
-
-          <div className="border border-border rounded-lg p-4 hover:border-primary/50 transition-colors">
-            <div className="flex items-center gap-3 mb-1">
-              <Checkbox
-                id="step12Complete"
-                checked={step12Complete}
-                onCheckedChange={(checked) => setStep12Complete(checked as boolean)}
-              />
-              <Label htmlFor="step12Complete" className="font-medium text-foreground cursor-pointer">
-                Step 12 – Business Ownership
-              </Label>
-            </div>
-            <p className="text-sm text-muted-foreground ml-8">
-              Business management and succession planning
-            </p>
-          </div>
+        <h3 className="text-xl font-semibold text-foreground">12-Step Action Plan</h3>
+        <p className="text-sm text-muted-foreground">
+          Mark each step complete as you work through them. Use the sidebar to navigate between steps.
+        </p>
+        
+        <div className="space-y-4">
+          {steps.map((step, index) => {
+            const IconComponent = STEP_ICONS[index];
+            return (
+              <div
+                key={index}
+                className="flex items-start gap-4 p-4 rounded-lg border border-border bg-card hover:bg-accent/5 transition-colors"
+              >
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="flex-shrink-0">
+                    <IconComponent className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex items-center gap-2 flex-1">
+                    <Checkbox
+                      id={`step-${index + 1}`}
+                      checked={step.complete}
+                      onCheckedChange={(checked) => step.setComplete(checked as boolean)}
+                    />
+                    <Label
+                      htmlFor={`step-${index + 1}`}
+                      className={`text-base cursor-pointer flex-1 ${
+                        step.complete ? "line-through text-muted-foreground" : "text-foreground"
+                      }`}
+                    >
+                      <span className="font-semibold mr-2">Step {index + 1}:</span>
+                      {step.title}
+                    </Label>
+                  </div>
+                  {step.complete && (
+                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="overviewNotes">Overview Notes</Label>
+      {/* Overview Notes */}
+      <div className="space-y-3">
+        <Label htmlFor="overviewNotes" className="text-base font-semibold text-foreground">
+          Overview Notes
+        </Label>
         <Textarea
           id="overviewNotes"
-          placeholder="Add any general notes or important reminders about this plan..."
           value={overviewNotes}
           onChange={(e) => setOverviewNotes(e.target.value)}
-          rows={4}
+          placeholder="Add any general notes or important information about this plan..."
+          rows={6}
+          className="resize-none text-base"
         />
       </div>
 
-      <div className="bg-muted/50 border border-border rounded-lg p-4 mt-6">
-        <p className="text-sm text-muted-foreground italic">
-          💡 <strong>Tip:</strong> Use the sidebar navigation to jump to any step. 
-          All your entries are automatically saved as you type.
+      {/* Helpful Tip */}
+      <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+        <p className="text-sm text-blue-900 dark:text-blue-100">
+          <strong>💡 Tip:</strong> Use the sidebar on the left to navigate through each step. 
+          Your progress is automatically saved as you work.
         </p>
       </div>
     </div>
