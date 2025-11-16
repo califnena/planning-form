@@ -254,7 +254,95 @@ export const SectionInsurance = ({ data, onChange }: SectionInsuranceProps) => {
         )}
       </div>
 
-      <div className="p-4 bg-muted/50 rounded-lg">
+      <div className="space-y-4 mt-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <Label className="text-base font-semibold">Benefits & Entitlements</Label>
+            <p className="text-xs text-muted-foreground mt-1">Health benefits, work benefits, pensions, and other entitlements</p>
+          </div>
+          <Button onClick={() => {
+            const benefits = insurance.benefits || [];
+            updateInsurance("benefits", [...benefits, { type: "", provider: "", details: "" }]);
+          }} size="sm" variant="outline">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Benefit
+          </Button>
+        </div>
+
+        {(insurance.benefits || []).map((benefit: any, index: number) => (
+          <Card key={index} className="p-4 space-y-4">
+            <div className="flex justify-between items-start">
+              <h4 className="font-semibold">Benefit {index + 1}</h4>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  const benefits = insurance.benefits || [];
+                  updateInsurance("benefits", benefits.filter((_: any, i: number) => i !== index));
+                }}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Benefit Type</Label>
+                <p className="text-xs text-muted-foreground">Category of benefit or entitlement</p>
+                <Input
+                  value={benefit.type || ""}
+                  onChange={(e) => {
+                    const benefits = [...(insurance.benefits || [])];
+                    benefits[index] = { ...benefits[index], type: e.target.value };
+                    updateInsurance("benefits", benefits);
+                  }}
+                  placeholder="e.g., Medicare, 401k, Pension, Union Benefits"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Provider/Employer</Label>
+                <p className="text-xs text-muted-foreground">Organization providing the benefit</p>
+                <Input
+                  value={benefit.provider || ""}
+                  onChange={(e) => {
+                    const benefits = [...(insurance.benefits || [])];
+                    benefits[index] = { ...benefits[index], provider: e.target.value };
+                    updateInsurance("benefits", benefits);
+                  }}
+                  placeholder="Provider or employer name"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Details</Label>
+              <p className="text-xs text-muted-foreground">Account numbers, coverage details, contact information, document location</p>
+              <Textarea
+                value={benefit.details || ""}
+                onChange={(e) => {
+                  const benefits = [...(insurance.benefits || [])];
+                  benefits[index] = { ...benefits[index], details: e.target.value };
+                  updateInsurance("benefits", benefits);
+                }}
+                placeholder="Account numbers, coverage details, contact information, document location"
+                rows={3}
+              />
+            </div>
+          </Card>
+        ))}
+
+        {(!insurance.benefits || insurance.benefits.length === 0) && (
+          <div className="text-center py-8 border border-dashed rounded-lg">
+            <p className="text-muted-foreground mb-3">No benefits added yet</p>
+            <Button onClick={() => {
+              updateInsurance("benefits", [{ type: "", provider: "", details: "" }]);
+            }} variant="outline" size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Your First Benefit
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <div className="p-4 bg-muted/50 rounded-lg mt-8">
         <h3 className="font-semibold mb-2">💡 Important:</h3>
         <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
           <li>Keep original policy documents in a secure location</li>
