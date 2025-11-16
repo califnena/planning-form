@@ -16,7 +16,7 @@ export const ALL_SECTIONS: Section[] = [
   { id: "insurance", title: "Insurance & Benefits", description: "Policies and contacts." },
   { id: "property", title: "Property & Valuables", description: "Homes, vehicles, valuables." },
   { id: "pets", title: "Pet Care Instructions", description: "Care plan and vet info." },
-  { id: "digital", title: "Digital World", description: "Phones, passwords, social." },
+  { id: "digital", title: "Online Accounts", description: "Phones, passwords, social." },
   { id: "legal", title: "Legal (Will/Trust)", description: "Will, trust, directives." },
   { id: "messages", title: "Letters & Personal Messages", description: "Letters to loved ones." },
 ];
@@ -26,7 +26,7 @@ export const REQUIRED_SECTIONS: Section[] = [
   { id: "faq", title: "Common Questions", description: "Plain answers to common questions." },
 ];
 
-export const SETTINGS_DEFAULT = ["overview", "funeral", "personal", "legacy", "contacts", "providers", "financial", "insurance", "property", "pets", "messages"];
+export const SETTINGS_DEFAULT = ["overview", "funeral", "personal", "legacy", "contacts", "providers", "financial", "insurance", "property", "pets", "digital", "messages"];
 
 export function mergeVisibleSections(selected: string[] | null): Section[] {
   const userSet = new Set(selected && selected.length ? selected : SETTINGS_DEFAULT);
