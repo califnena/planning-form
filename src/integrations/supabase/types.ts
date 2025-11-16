@@ -1740,24 +1740,39 @@ export type Database = {
       user_settings: {
         Row: {
           created_at: string | null
+          focus_areas: string[] | null
           id: string
+          preferred_name: string | null
+          preferred_state: string | null
           selected_sections: string[] | null
           updated_at: string | null
           user_id: string
+          user_path: string | null
+          wizard_completed: boolean | null
         }
         Insert: {
           created_at?: string | null
+          focus_areas?: string[] | null
           id?: string
+          preferred_name?: string | null
+          preferred_state?: string | null
           selected_sections?: string[] | null
           updated_at?: string | null
           user_id: string
+          user_path?: string | null
+          wizard_completed?: boolean | null
         }
         Update: {
           created_at?: string | null
+          focus_areas?: string[] | null
           id?: string
+          preferred_name?: string | null
+          preferred_state?: string | null
           selected_sections?: string[] | null
           updated_at?: string | null
           user_id?: string
+          user_path?: string | null
+          wizard_completed?: boolean | null
         }
         Relationships: [
           {
@@ -1813,6 +1828,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      vendor_directory: {
+        Row: {
+          address: string | null
+          category: string
+          city: string | null
+          contact_name: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          is_featured: boolean
+          name: string
+          notes: string | null
+          phone: string | null
+          state: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          category: string
+          city?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          name: string
+          notes?: string | null
+          phone?: string | null
+          state: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          category?: string
+          city?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          state?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
       }
       vendors: {
         Row: {
@@ -1927,6 +1996,10 @@ export type Database = {
           snippet: string
           title: string
         }[]
+      }
+      needs_onboarding_wizard: {
+        Args: { user_id_param: string }
+        Returns: boolean
       }
     }
     Enums: {
