@@ -61,7 +61,7 @@ export const PlannerShell = ({
 
       {/* Quick Actions Section */}
       <div className="border-t border-border pt-4 mt-4">
-        <h3 className="text-sm font-semibold text-foreground mb-4 px-4">Quick Actions</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-4 px-4">{t("sidebar.quickActions")}</h3>
         <ActionSidebar
           onPreviewPDF={onPreviewPDF}
           onDownloadPDF={onDownloadPDF}
@@ -74,7 +74,7 @@ export const PlannerShell = ({
       {/* Provided By Footer */}
       <div className="mt-auto pt-6">
         <div className="mx-4 p-4 rounded-lg bg-muted/30 border border-border">
-          <h3 className="text-xs font-semibold text-foreground mb-2">Provided by</h3>
+          <h3 className="text-xs font-semibold text-foreground mb-2">{t("sidebar.providedBy")}</h3>
           <div className="text-xs text-muted-foreground space-y-1">
             <p className="font-medium text-foreground">Everlasting Funeral Advisors</p>
             <p>(323) 863-5804</p>
@@ -102,7 +102,7 @@ export const PlannerShell = ({
               className="inline-flex items-center text-primary hover:underline text-xs"
             >
               <Facebook className="mr-1 h-3.5 w-3.5" />
-              Follow us
+              {t("sidebar.followUs")}
             </a>
           </div>
           
@@ -114,7 +114,7 @@ export const PlannerShell = ({
               onClick={() => setShowContactDialog(true)}
             >
               <MessageSquare className="mr-2 h-3.5 w-3.5" />
-              Contact / Suggest
+              {t("sidebar.contactSuggest")}
             </Button>
           </div>
         </div>
