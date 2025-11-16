@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { GlobalHeader } from "@/components/GlobalHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, ArrowRight, Home, Download, CheckCircle2, Menu } from "lucide-react";
@@ -257,7 +258,9 @@ export default function CaseDetail() {
   );
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <>
+      <GlobalHeader />
+      <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b border-border bg-card sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
@@ -367,5 +370,6 @@ export default function CaseDetail() {
         decedentName={caseData?.decedent?.legal_name || ""}
       />
     </div>
+    </>
   );
 }

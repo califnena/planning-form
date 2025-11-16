@@ -2,6 +2,7 @@ import { useState, useEffect, createContext, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
+import { GlobalHeader } from "@/components/GlobalHeader";
 import { PlannerShell } from "@/components/planner/PlannerShell";
 import { usePlanData } from "@/hooks/usePlanData";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
@@ -555,6 +556,7 @@ const PlannerApp = () => {
 
   return (
     <PreviewModeContext.Provider value={{ isPreviewMode }}>
+      <GlobalHeader />
       <PlannerShell
         sectionItems={sectionItems}
         activeSection={activeSection}
