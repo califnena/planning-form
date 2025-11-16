@@ -70,8 +70,8 @@ const FRIENDLY_LABELS: Record<string, { label: string; description: string }> = 
     description: "Passwords, devices, and important digital information."
   },
   legal: {
-    label: "Legal (Will/Trust)",
-    description: "Where to find your will, trust, or other legal documents."
+    label: "Legal Document Storage",
+    description: "Keep track of where your will, trust, and legal documents are stored."
   },
   messages: {
     label: "Letters & Personal Messages",

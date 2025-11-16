@@ -7,10 +7,45 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Scale, ExternalLink, FileText, AlertTriangle, ArrowRight } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Scale, ExternalLink, FileText, AlertTriangle, ArrowRight, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { US_STATES, STATE_LEGAL_INFO } from "@/lib/us-states";
 
 export const SectionLegalResources = () => {
+  const [selectedState, setSelectedState] = useState<string>("");
+
+  // Load saved state from localStorage on mount
+  useEffect(() => {
+    const savedState = localStorage.getItem("legal_selected_state");
+    if (savedState) {
+      setSelectedState(savedState);
+    }
+  }, []);
+
+  // Save state to localStorage when it changes
+  useEffect(() => {
+    if (selectedState) {
+      localStorage.setItem("legal_selected_state", selectedState);
+    }
+  }, [selectedState]);
+
+  // Get state-specific info
+  const stateInfo = selectedState && STATE_LEGAL_INFO[selectedState] 
+    ? STATE_LEGAL_INFO[selectedState] 
+    : STATE_LEGAL_INFO.DEFAULT;
+
+  const selectedStateName = selectedState 
+    ? US_STATES.find(s => s.value === selectedState)?.label 
+    : null;
+
   return (
     <div className="space-y-8 max-w-4xl">
       {/* Header */}
@@ -24,6 +59,50 @@ export const SectionLegalResources = () => {
           Find state-specific information and trusted templates for advance directives, wills, and more.
         </p>
       </div>
+
+      {/* State Selector */}
+      <Card className="border-primary/30 bg-primary/5">
+        <CardHeader>
+          <CardTitle className="text-xl flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-primary" />
+            Select Your State
+          </CardTitle>
+          <CardDescription className="text-base">
+            Choose your state to see specific legal requirements and resources
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Select value={selectedState} onValueChange={setSelectedState}>
+            <SelectTrigger className="w-full max-w-md bg-background">
+              <SelectValue placeholder="Choose your state..." />
+            </SelectTrigger>
+            <SelectContent className="bg-popover z-50 max-h-[300px]">
+              {US_STATES.map((state) => (
+                <SelectItem key={state.value} value={state.value}>
+                  {state.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {selectedState && (
+            <div className="mt-4 p-4 bg-background rounded-lg border space-y-2">
+              <h3 className="font-semibold text-base">Requirements for {selectedStateName}:</h3>
+              <ul className="space-y-1 text-sm text-muted-foreground">
+                <li>• <strong>Will Witnesses Required:</strong> {stateInfo.willWitnesses}</li>
+                <li>• <strong>Notary Required:</strong> {stateInfo.notaryRequired ? "Yes" : "No"}</li>
+                <li>• <strong>Advance Directive:</strong> {stateInfo.advanceDirectiveType}</li>
+                <li>• <strong>Probate Threshold:</strong> {stateInfo.probateThreshold}</li>
+              </ul>
+              {stateInfo.notes && (
+                <p className="text-sm text-muted-foreground pt-2 italic">
+                  ℹ️ {stateInfo.notes}
+                </p>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Legal Disclaimer - Prominent */}
       <Alert variant="destructive" className="border-2">
@@ -58,11 +137,15 @@ export const SectionLegalResources = () => {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Each state has different laws about wills, advance directives, and power of attorney. 
-              Use these trusted resources to find forms for your location.
+              {selectedState 
+                ? `Select your state above to see specific legal requirements for ${selectedStateName}.`
+                : "Each state has different laws about wills, advance directives, and power of attorney. Select your state above to see specific requirements."
+              }
             </p>
             <Button variant="outline" className="w-full" asChild>
-              <a href="#state-resources">View State Resources</a>
+              <a href="#state-resources">
+                {selectedState ? `View ${selectedStateName} Resources` : "Select a State to View Resources"}
+              </a>
             </Button>
           </CardContent>
         </Card>
@@ -238,6 +321,55 @@ export const SectionLegalResources = () => {
       {/* Trusted Resources */}
       <div className="space-y-4" id="state-resources">
         <h2 className="text-2xl font-bold">Trusted Resources & Organizations</h2>
+        
+        {/* State-Specific Resources - Show when state is selected */}
+        {selectedState && (
+          <Alert className="border-primary/30 bg-primary/5">
+            <MapPin className="h-5 w-5 text-primary" />
+            <AlertTitle className="font-bold">Resources for {selectedStateName}</AlertTitle>
+            <AlertDescription className="space-y-3 mt-2">
+              <p className="text-sm">
+                Here are some helpful starting points for finding legal forms and information specific to {selectedStateName}:
+              </p>
+              <div className="space-y-2">
+                <Button variant="outline" size="sm" asChild className="w-full justify-start">
+                  <a 
+                    href={`https://www.google.com/search?q=${encodeURIComponent(selectedStateName + " advance directive form official")}`}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    <FileText className="mr-2 h-4 w-4" />
+                    Search for {selectedStateName} Advance Directive Forms
+                    <ExternalLink className="ml-auto h-4 w-4" />
+                  </a>
+                </Button>
+                <Button variant="outline" size="sm" asChild className="w-full justify-start">
+                  <a 
+                    href={`https://www.google.com/search?q=${encodeURIComponent(selectedStateName + " last will testament requirements")}`}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    <FileText className="mr-2 h-4 w-4" />
+                    Search for {selectedStateName} Will Requirements
+                    <ExternalLink className="ml-auto h-4 w-4" />
+                  </a>
+                </Button>
+                <Button variant="outline" size="sm" asChild className="w-full justify-start">
+                  <a 
+                    href={`https://www.google.com/search?q=${encodeURIComponent(selectedStateName + " power of attorney form official")}`}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    <FileText className="mr-2 h-4 w-4" />
+                    Search for {selectedStateName} Power of Attorney Forms
+                    <ExternalLink className="ml-auto h-4 w-4" />
+                  </a>
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <div className="grid gap-4">
           <Card>
             <CardHeader>
