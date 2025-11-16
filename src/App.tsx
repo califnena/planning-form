@@ -27,6 +27,7 @@ import Contact from "./pages/Contact";
 import Settings from "./pages/Settings";
 import Resources from "./pages/Resources";
 import FAQ from "./pages/FAQ";
+import StartWizard from "./pages/StartWizard";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/start-wizard" element={<StartWizard />} />
               <Route path="/app" element={<PlannerApp />} />
               <Route path="/app/profile" element={<Profile />} />
               <Route path="/app/profile/subscription" element={<Subscription />} />
