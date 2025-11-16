@@ -74,6 +74,8 @@ export default function Dashboard() {
 
   const textSizeClass = textSize === 'small' ? 'text-sm' : textSize === 'medium' ? 'text-base' : 'text-lg'
 
+  console.log('Dashboard component rendering');
+
   return (
     <>
       <GlobalHeader />
