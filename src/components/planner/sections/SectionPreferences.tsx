@@ -10,6 +10,7 @@ import { useTextSize } from "@/contexts/TextSizeContext";
 import { TextSizeToggle } from "@/components/TextSizeToggle";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
+import { TourResetButton } from "@/components/planner/TourResetButton";
 
 interface SectionPreferencesProps {
   user: User;
@@ -169,9 +170,12 @@ export const SectionPreferences = ({ user, onSave, onContinue, showWelcome }: Se
     <div className="space-y-8 max-w-5xl mx-auto pb-12">
       {/* Header */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <h1 className="text-3xl font-bold">⚙️ Preferences</h1>
-          <TextSizeToggle />
+          <div className="flex items-center gap-3">
+            <TourResetButton userId={user.id} />
+            <TextSizeToggle />
+          </div>
         </div>
         <p className="text-lg text-muted-foreground">
           Choose which parts of the planner you want to use. You can turn things on or off at any time.

@@ -66,6 +66,25 @@ export const SectionFAQ = () => {
               </div>
             </AccordionContent>
           </AccordionItem>
+          
+          <AccordionItem value="guided-tour">
+            <AccordionTrigger>How do I see the guided tour again?</AccordionTrigger>
+            <AccordionContent>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>
+                  The guided tour appears automatically the first time you use the Pre-Planning tool. If you'd like to see it again:
+                </p>
+                <ol className="list-decimal list-inside space-y-2 ml-2">
+                  <li>Go to <strong>Preferences</strong> in the left sidebar</li>
+                  <li>Look for the <strong>"Restart Guided Tour"</strong> button at the top of the page</li>
+                  <li>Click it and refresh the page to start the tour again</li>
+                </ol>
+                <p className="pt-2">
+                  The tour will walk you through key features including how to choose topics, save your work, and create your PDF document.
+                </p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
         </Accordion>
       </div>
 
