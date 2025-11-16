@@ -22,7 +22,7 @@ const PreviewModeContext = createContext<{ isPreviewMode: boolean }>({ isPreview
 export const usePreviewMode = () => useContext(PreviewModeContext);
 
 // Section components
-import { SectionSettings } from "@/components/planner/sections/SectionSettings";
+import { SectionPreferences } from "@/components/planner/sections/SectionPreferences";
 import { SectionInstructions } from "@/components/planner/sections/SectionInstructions";
 import { SectionPersonal } from "@/components/planner/sections/SectionPersonal";
 import { SectionContacts } from "@/components/planner/sections/SectionContacts";
@@ -48,7 +48,7 @@ const PlannerApp = () => {
   const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState("settings");
+  const [activeSection, setActiveSection] = useState("preferences");
   const [showRevisionDialog, setShowRevisionDialog] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showPIIDialog, setShowPIIDialog] = useState(false);
@@ -69,7 +69,13 @@ const PlannerApp = () => {
         console.error("Error loading settings:", error);
       }
 
-      setUserSettings(data?.selected_sections || null);
+      const selectedSections = data?.selected_sections || null;
+      setUserSettings(selectedSections);
+      
+      // If no sections selected, auto-open preferences
+      if (!selectedSections || selectedSections.length === 0) {
+        setActiveSection("preferences");
+      }
     } catch (error) {
       console.error("Error loading user settings:", error);
     } finally {
@@ -373,16 +379,22 @@ const PlannerApp = () => {
     { id: "digital", label: t("navigation.digital"), completed: !!plan.digital_notes },
     { id: "legal", label: t("navigation.legal"), completed: !!plan.legal_notes },
     { id: "messages", label: t("navigation.messages"), completed: !!plan.messages_notes },
-    { id: "resources", label: t("navigation.guide"), completed: false },
-    { id: "faq", label: t("navigation.faq"), completed: false },
   ];
 
   const visibleSections = mergeVisibleSections(userSettings);
   const visibleIds = new Set(visibleSections.map(s => s.id));
   
+  // Build sidebar: preferences always first, then enabled sections, then always-visible sections
+  const enabledSections = allSectionItems.filter(item => visibleIds.has(item.id));
+  const alwaysVisibleSections = [
+    { id: "resources", label: t("navigation.guide"), completed: false },
+    { id: "faq", label: t("navigation.faq"), completed: false },
+  ];
+  
   const sectionItems = [
-    { id: "settings", label: t("navigation.settings"), completed: false },
-    ...allSectionItems.filter(item => visibleIds.has(item.id))
+    { id: "preferences", label: t("navigation.preferences"), completed: false },
+    ...enabledSections,
+    ...alwaysVisibleSections
   ];
 
   const handleNextSection = () => {
@@ -411,9 +423,20 @@ const PlannerApp = () => {
     let sectionContent;
     
     switch (activeSection) {
-      case "settings":
+      case "preferences":
         sectionContent = user ? (
-          <SectionSettings user={user} onVisibilityChange={handleVisibilityChange} />
+          <SectionPreferences 
+            user={user} 
+            onSave={handleVisibilityChange}
+            onContinue={() => {
+              // Move to first enabled section or resources
+              const firstEnabledSection = sectionItems.find(item => 
+                item.id !== "preferences" && item.id !== "resources" && item.id !== "faq"
+              );
+              setActiveSection(firstEnabledSection?.id || "resources");
+            }}
+            showWelcome={!userSettings || userSettings.length === 0}
+          />
         ) : null;
         break;
       case "overview":
@@ -535,8 +558,8 @@ const PlannerApp = () => {
         );
     }
 
-    // Don't show navigation on resources, faq, revisions, and settings sections
-    const showNavigation = !["resources", "faq", "revisions", "settings"].includes(activeSection);
+    // Don't show navigation on resources, faq, revisions, and preferences sections
+    const showNavigation = !["resources", "faq", "revisions", "preferences"].includes(activeSection);
 
     return (
       <div>

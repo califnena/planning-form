@@ -5,23 +5,24 @@ export interface Section {
 }
 
 export const ALL_SECTIONS: Section[] = [
-  { id: "overview", title: "Planning Overview (Checklist)", description: "Quick checklist to get started." },
-  { id: "instructions", title: "My Instructions", description: "Your message and instructions to family." },
-  { id: "personal", title: "Personal & Family Details", description: "Basic identity and family details." },
-  { id: "legacy", title: "Life Story & Legacy", description: "Life story and highlights." },
-  { id: "contacts", title: "Important People to Notify", description: "Who to notify and professional contacts." },
-  { id: "providers", title: "Service Providers & Arrangements", description: "Funeral home and service vendors." },
-  { id: "funeral", title: "Funeral Wishes", description: "Service preferences and disposition." },
-  { id: "financial", title: "Financial Life", description: "Accounts and funeral funding." },
-  { id: "insurance", title: "Insurance & Benefits", description: "Policies and contacts." },
-  { id: "property", title: "Property & Valuables", description: "Homes, vehicles, valuables." },
-  { id: "pets", title: "Pet Care Instructions", description: "Care plan and vet info." },
-  { id: "digital", title: "Online Accounts", description: "Phones, passwords, social." },
-  { id: "legal", title: "Legal (Will/Trust)", description: "Will, trust, directives." },
-  { id: "messages", title: "Letters & Personal Messages", description: "Letters to loved ones." },
+  { id: "overview", title: "Planning Overview", description: "A simple checklist of the most important items." },
+  { id: "instructions", title: "My Instructions", description: "Notes for your loved ones about what you want." },
+  { id: "personal", title: "Personal and Family Details", description: "Basic information about you and the people in your life." },
+  { id: "legacy", title: "Life Story & Legacy", description: "Your memories, achievements, and ideas for your obituary." },
+  { id: "contacts", title: "Important People to Notify", description: "People who should be contacted during a difficult time." },
+  { id: "providers", title: "Service Providers & Arrangements", description: "Funeral homes, churches, and other service contacts." },
+  { id: "funeral", title: "Funeral & Ceremony Wishes", description: "The kind of service you want, music, readings, and more." },
+  { id: "financial", title: "Financial Life", description: "Where your accounts are, bills, debts, and important details." },
+  { id: "insurance", title: "Insurance & Benefits", description: "Life insurance, pensions, Social Security, and other benefits." },
+  { id: "property", title: "Property & Valuables", description: "Homes, vehicles, valuables, and how you want them handled." },
+  { id: "pets", title: "Pet Care Instructions", description: "Who will care for your pets and what they need." },
+  { id: "digital", title: "Online Accounts", description: "Passwords, devices, and important digital information." },
+  { id: "legal", title: "Legal (Will/Trust)", description: "Where to find your will, trust, or other legal documents." },
+  { id: "messages", title: "Letters & Personal Messages", description: "Messages you want to leave for loved ones." },
 ];
 
 export const REQUIRED_SECTIONS: Section[] = [
+  { id: "preferences", title: "Preferences", description: "Choose which topics apply to you." },
   { id: "resources", title: "Helpful Resources", description: "Guides and references." },
   { id: "faq", title: "Common Questions", description: "Plain answers to common questions." },
 ];
