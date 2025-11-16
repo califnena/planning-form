@@ -26,6 +26,11 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
     guide: "guides"
   };
 
+  // Check if user has enabled any sections (beyond preferences and always-visible)
+  const hasEnabledSections = items.some(item => 
+    item.id !== "preferences" && item.id !== "resources" && item.id !== "faq"
+  );
+
   const renderNavButton = (item: NavItem) => {
     const button = (
       <button
@@ -64,7 +69,27 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
 
   return (
     <nav className="space-y-1">
-      {items.map((item) => renderNavButton(item))}
+      {items.map((item) => {
+        // Show preferences always
+        if (item.id === "preferences") {
+          return renderNavButton(item);
+        }
+        
+        // Show always-visible sections
+        if (item.id === "resources" || item.id === "faq") {
+          return renderNavButton(item);
+        }
+        
+        // Show other enabled sections
+        return renderNavButton(item);
+      })}
+      
+      {/* Show message when no sections are enabled */}
+      {!hasEnabledSections && (
+        <div className="px-3 py-4 text-sm text-muted-foreground italic bg-muted/30 rounded-md mt-4">
+          Choose the topics you want to work on in Preferences.
+        </div>
+      )}
     </nav>
   );
 };
