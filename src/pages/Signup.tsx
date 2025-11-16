@@ -27,7 +27,7 @@ const Signup = () => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate("/app");
+        navigate("/dashboard");
       }
     };
     checkUser();
@@ -74,7 +74,7 @@ const Signup = () => {
           title: "Account created!",
           description: "Welcome to My Final Wishes Planner.",
         });
-        navigate("/app");
+        navigate("/dashboard");
       }
     } catch (error: any) {
       toast({

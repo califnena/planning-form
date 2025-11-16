@@ -25,7 +25,7 @@ const Login = () => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate("/app");
+        navigate("/dashboard");
       }
     };
     checkUser();
@@ -48,7 +48,7 @@ const Login = () => {
           title: "Welcome back!",
           description: "Successfully logged in.",
         });
-        navigate("/app");
+        navigate("/dashboard");
       }
     } catch (error: any) {
       toast({
@@ -94,7 +94,7 @@ const Login = () => {
         title: "Test login successful",
         description: "Logged in with test account",
       });
-      navigate("/app");
+      navigate("/dashboard");
     } catch (error: any) {
       toast({
         title: "Test login failed",

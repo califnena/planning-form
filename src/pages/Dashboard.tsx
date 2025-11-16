@@ -1,95 +1,192 @@
-import { Link } from "react-router-dom";
-import { Heart, ClipboardList, Store, MessageCircle, Settings, BookOpen, HelpCircle } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+// src/pages/Dashboard.tsx
+import { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
 
-const Dashboard = () => {
-  const tiles = [
-    {
-      title: "Pre-Planning",
-      description: "Plan your funeral arrangements",
-      icon: Heart,
-      path: "/",
-      color: "bg-primary/10 hover:bg-primary/20",
-    },
-    {
-      title: "After-Life Plan",
-      description: "Steps for loved ones after death",
-      icon: ClipboardList,
-      path: "/next-steps",
-      color: "bg-secondary/10 hover:bg-secondary/20",
-    },
-    {
-      title: "Vendors",
-      description: "Find trusted service providers",
-      icon: Store,
-      path: "/vendors",
-      color: "bg-accent/10 hover:bg-accent/20",
-    },
-    {
-      title: "VIP Coach",
-      description: "Get personalized guidance",
-      icon: MessageCircle,
-      path: "/vip-coach",
-      color: "bg-primary/10 hover:bg-primary/20",
-    },
-    {
-      title: "Settings",
-      description: "Customize your preferences",
-      icon: Settings,
-      path: "/app/profile",
-      color: "bg-secondary/10 hover:bg-secondary/20",
-    },
-    {
-      title: "Helpful Resources",
-      description: "Guides and information",
-      icon: BookOpen,
-      path: "/resources",
-      color: "bg-accent/10 hover:bg-accent/20",
-    },
-    {
-      title: "Common Questions",
-      description: "Frequently asked questions",
-      icon: HelpCircle,
-      path: "/faq",
-      color: "bg-primary/10 hover:bg-primary/20",
-    },
-  ];
+type TextSize = "normal" | "large" | "xlarge"
+
+const TEXT_SIZE_KEY = "efa-text-size"
+
+const textSizeToClass: Record<TextSize, string> = {
+  normal: "text-base",
+  large: "text-lg",
+  xlarge: "text-xl",
+}
+
+const tiles = [
+  {
+    key: "pre-planning",
+    title: "Pre-Planning",
+    description: "Plan wishes, documents, and details in advance.",
+    icon: "📝",
+    href: "/app",
+  },
+  {
+    key: "after-death",
+    title: "After Death Steps",
+    description: "Simple checklist of what to do after a loss.",
+    icon: "📌",
+    href: "/next-steps",
+  },
+  {
+    key: "vendors",
+    title: "Helpful Contacts & Vendors",
+    description: "Insurance, lawyers, financial advisors, funeral providers.",
+    icon: "📇",
+    href: "/vendors",
+  },
+  {
+    key: "blank-forms",
+    title: "Blank / Fillable Forms",
+    description: "Printable and digital forms you can fill in.",
+    icon: "📂",
+    href: "/forms",
+  },
+  {
+    key: "vip-coach",
+    title: "VIP Coach Assistant",
+    description: "Work with a live advisor or premium support.",
+    icon: "⭐",
+    href: "/vip-coach",
+  },
+  {
+    key: "quote",
+    title: "Request a Quote / Contact Us",
+    description: "Ask questions, request pricing, or schedule a call.",
+    icon: "☎️",
+    href: "/contact",
+  },
+  {
+    key: "trusted-contacts",
+    title: "Trusted Contacts",
+    description: "List the people who should have access to this plan.",
+    icon: "👥",
+    href: "/app",
+  },
+  {
+    key: "resources",
+    title: "Helpful Resources",
+    description: "Guides, links, and videos to help you and your family.",
+    icon: "📚",
+    href: "/resources",
+  },
+  {
+    key: "questions",
+    title: "Common Questions",
+    description: "Short answers to common planning questions.",
+    icon: "❓",
+    href: "/faq",
+  },
+]
+
+export default function Dashboard() {
+  const [textSize, setTextSize] = useState<TextSize>("normal")
+
+  // Load saved text size from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(TEXT_SIZE_KEY) as TextSize | null
+      if (saved && ["normal", "large", "xlarge"].includes(saved)) {
+        setTextSize(saved)
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, [])
+
+  // Save text size when it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(TEXT_SIZE_KEY, textSize)
+    } catch {
+      // ignore storage errors
+    }
+  }, [textSize])
+
+  const textSizeClass = textSizeToClass[textSize]
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Welcome to Everlasting Funeral Advisors
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Choose an option below to get started
-          </p>
-        </div>
+    <div className={`min-h-screen bg-slate-50 px-4 py-8 md:px-8 ${textSizeClass}`}>
+      <div className="mx-auto max-w-6xl">
+        {/* Top bar with greeting and text size controls */}
+        <header className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <p className="text-sm font-medium text-slate-500">Welcome back</p>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
+              What would you like to work on today?
+            </h1>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {tiles.map((tile) => {
-            const Icon = tile.icon;
-            return (
-              <Link key={tile.path} to={tile.path}>
-                <Card className={`h-full transition-all duration-200 ${tile.color} border-2 hover:border-primary hover:shadow-lg cursor-pointer`}>
-                  <CardContent className="flex flex-col items-center justify-center p-8 text-center min-h-[240px]">
-                    <Icon className="w-16 h-16 mb-4 text-primary" strokeWidth={1.5} />
-                    <h2 className="text-2xl font-semibold mb-2 text-foreground">
-                      {tile.title}
-                    </h2>
-                    <p className="text-lg text-muted-foreground">
-                      {tile.description}
-                    </p>
-                  </CardContent>
-                </Card>
+          {/* Text size controls */}
+          <div className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-2 shadow-sm">
+            <span className="text-xs font-medium text-slate-600">Text size</span>
+            <button
+              type="button"
+              onClick={() => setTextSize("normal")}
+              className={`rounded-full px-2 py-1 text-xs font-semibold ${
+                textSize === "normal"
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-700 hover:bg-slate-100"
+              }`}
+              aria-label="Normal text size"
+            >
+              A
+            </button>
+            <button
+              type="button"
+              onClick={() => setTextSize("large")}
+              className={`rounded-full px-2 py-1 text-sm font-semibold ${
+                textSize === "large"
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-700 hover:bg-slate-100"
+              }`}
+              aria-label="Large text size"
+            >
+              A
+            </button>
+            <button
+              type="button"
+              onClick={() => setTextSize("xlarge")}
+              className={`rounded-full px-2 py-1 text-base font-semibold ${
+                textSize === "xlarge"
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-700 hover:bg-slate-100"
+              }`}
+              aria-label="Extra large text size"
+            >
+              A
+            </button>
+          </div>
+        </header>
+
+        {/* Tiles grid */}
+        <section aria-label="Main actions">
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {tiles.map((tile) => (
+              <Link
+                key={tile.key}
+                to={tile.href}
+                className="group flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm outline-none transition hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-sky-500"
+              >
+                <div>
+                  <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-sky-100 text-xl">
+                    <span aria-hidden="true">{tile.icon}</span>
+                  </div>
+                  <h2 className="mb-2 text-lg font-semibold text-slate-900 group-hover:text-sky-700">
+                    {tile.title}
+                  </h2>
+                  <p className="text-sm text-slate-600">{tile.description}</p>
+                </div>
+                <span className="mt-4 inline-flex items-center text-sm font-medium text-sky-700 group-hover:underline">
+                  Open
+                  <span className="ml-1" aria-hidden="true">
+                    →
+                  </span>
+                </span>
               </Link>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
-  );
-};
-
-export default Dashboard;
+  )
+}
