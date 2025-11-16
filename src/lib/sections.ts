@@ -26,7 +26,7 @@ export const REQUIRED_SECTIONS: Section[] = [
   { id: "faq", title: "Common Questions", description: "Plain answers to common questions." },
 ];
 
-export const SETTINGS_DEFAULT = ["overview", "funeral", "personal", "legacy", "contacts", "providers", "financial", "insurance", "property", "messages"];
+export const SETTINGS_DEFAULT = ["overview", "funeral", "personal", "legacy", "contacts", "providers", "financial", "insurance", "property", "pets", "messages"];
 
 export function mergeVisibleSections(selected: string[] | null): Section[] {
   const userSet = new Set(selected && selected.length ? selected : SETTINGS_DEFAULT);
