@@ -104,22 +104,3 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
-
-/* Text size controls for accessibility */
-.text-size-small {
-  font-size: 0.9rem;
-}
-
-.text-size-medium {
-  font-size: 1rem;
-}
-
-.text-size-large {
-  font-size: 1.125rem;
-}
-
-@media (min-width: 768px) {
-  .text-size-large {
-    font-size: 1.15rem;
-  }
-}
