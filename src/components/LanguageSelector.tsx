@@ -1,5 +1,4 @@
 import { Globe } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import {
   Select,
   SelectContent,
@@ -7,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const languages = [
   { code: "en", name: "English", nativeName: "English" },
@@ -18,28 +18,24 @@ const languages = [
 ];
 
 export const LanguageSelector = () => {
-  const { i18n } = useTranslation();
+  const { currentLanguage, changeLanguage, isLoading } = useLanguage();
 
-  const handleLanguageChange = (languageCode: string) => {
-    i18n.changeLanguage(languageCode);
-    localStorage.setItem('language', languageCode);
-  };
-
-  const currentLanguage = languages.find(lang => lang.code === i18n.language);
+  const selectedLanguage = languages.find(lang => lang.code === currentLanguage);
 
   return (
     <div className="flex items-center gap-2">
       <Globe className="h-5 w-5 text-muted-foreground" />
       <Select
-        value={i18n.language}
-        onValueChange={handleLanguageChange}
+        value={currentLanguage}
+        onValueChange={changeLanguage}
+        disabled={isLoading}
       >
         <SelectTrigger className="w-[160px] h-10 text-base border-2 hover:border-primary/50 transition-colors bg-background">
           <SelectValue>
-            {currentLanguage?.nativeName || "Select Language"}
+            {selectedLanguage?.nativeName || "Select Language"}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent className="bg-background border-2 shadow-lg z-50">
+        <SelectContent className="bg-background border-2 shadow-lg z-[100]">
           {languages.map((lang) => (
             <SelectItem 
               key={lang.code} 

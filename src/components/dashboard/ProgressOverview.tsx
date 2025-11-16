@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 
 export const ProgressOverview = () => {
+  const { t } = useTranslation();
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -40,14 +42,14 @@ export const ProgressOverview = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl">Pre-Planning Progress</CardTitle>
-        <p className="text-sm text-muted-foreground">You can stop and return at any time.</p>
+        <CardTitle className="text-xl">{t("dashboard.progressTitle")}</CardTitle>
+        <p className="text-sm text-muted-foreground">{t("dashboard.progressSubtext")}</p>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-2xl font-bold text-primary">{progress}%</span>
-            <span className="text-sm text-muted-foreground">Complete</span>
+            <span className="text-sm text-muted-foreground">{t("common.complete")}</span>
           </div>
           <Progress value={progress} className="h-3" />
         </div>

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { 
   FileText, 
   CheckCircle, 
@@ -16,80 +17,82 @@ import { WelcomePanel } from "@/components/dashboard/WelcomePanel";
 import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
 import { QuickAccessBar } from "@/components/dashboard/QuickAccessBar";
 
-const tiles = [
-  {
-    key: "pre-planning",
-    title: "Pre-Planning",
-    description: "Fill in your wishes, personal details, and instructions.",
-    icon: FileText,
-    href: "/app",
-  },
-  {
-    key: "after-death",
-    title: "After-Death Steps",
-    description: "A simple checklist for what to do after a death.",
-    icon: CheckCircle,
-    href: "/next-steps",
-  },
-  {
-    key: "vendors",
-    title: "Helpful Contacts & Vendors",
-    description: "Find helpful professionals and services by category and state.",
-    icon: Users,
-    href: "/vendors",
-  },
-  {
-    key: "blank-forms",
-    title: "Blank / Fillable Forms",
-    description: "Download or print blank forms and worksheets.",
-    icon: FileOutput,
-    href: "/forms",
-  },
-  {
-    key: "vip-coach",
-    title: "VIP Coach Assistant",
-    description: "Request one-on-one guidance from our team.",
-    icon: Star,
-    href: "/vip-coach",
-  },
-  {
-    key: "quote",
-    title: "Request a Quote",
-    description: "Ask for pricing on products and services.",
-    icon: MessageCircle,
-    href: "/contact",
-  },
-  {
-    key: "trusted-contacts",
-    title: "Trusted Contacts",
-    description: "List the people who should receive your planner and updates.",
-    icon: UserPlus,
-    href: "/app",
-  },
-  {
-    key: "resources",
-    title: "Helpful Resources",
-    description: "Articles, guides, and links to learn more.",
-    icon: BookOpen,
-    href: "/resources",
-  },
-  {
-    key: "questions",
-    title: "Common Questions",
-    description: "Short answers to the questions we hear most.",
-    icon: HelpCircle,
-    href: "/faq",
-  },
-  {
-    key: "legal-documents",
-    title: "Legal Documents & Resources",
-    description: "Essential legal forms, guides, and state-specific information.",
-    icon: Scale,
-    href: "/legal-documents",
-  },
-];
-
 export default function Dashboard() {
+  const { t } = useTranslation();
+
+  const tiles = [
+    {
+      key: "pre-planning",
+      title: t("dashboard.tiles.prePlanning.title"),
+      description: t("dashboard.tiles.prePlanning.description"),
+      icon: FileText,
+      href: "/app",
+    },
+    {
+      key: "after-death",
+      title: t("dashboard.tiles.afterDeath.title"),
+      description: t("dashboard.tiles.afterDeath.description"),
+      icon: CheckCircle,
+      href: "/next-steps",
+    },
+    {
+      key: "vendors",
+      title: t("dashboard.tiles.vendors.title"),
+      description: t("dashboard.tiles.vendors.description"),
+      icon: Users,
+      href: "/vendors",
+    },
+    {
+      key: "blank-forms",
+      title: t("dashboard.tiles.blankForms.title"),
+      description: t("dashboard.tiles.blankForms.description"),
+      icon: FileOutput,
+      href: "/forms",
+    },
+    {
+      key: "vip-coach",
+      title: t("dashboard.tiles.vipCoach.title"),
+      description: t("dashboard.tiles.vipCoach.description"),
+      icon: Star,
+      href: "/vip-coach",
+    },
+    {
+      key: "quote",
+      title: t("dashboard.tiles.quote.title"),
+      description: t("dashboard.tiles.quote.description"),
+      icon: MessageCircle,
+      href: "/contact",
+    },
+    {
+      key: "trusted-contacts",
+      title: t("dashboard.tiles.trustedContacts.title"),
+      description: t("dashboard.tiles.trustedContacts.description"),
+      icon: UserPlus,
+      href: "/app",
+    },
+    {
+      key: "resources",
+      title: t("dashboard.tiles.resources.title"),
+      description: t("dashboard.tiles.resources.description"),
+      icon: BookOpen,
+      href: "/resources",
+    },
+    {
+      key: "questions",
+      title: t("dashboard.tiles.questions.title"),
+      description: t("dashboard.tiles.questions.description"),
+      icon: HelpCircle,
+      href: "/faq",
+    },
+    {
+      key: "legal-documents",
+      title: t("dashboard.tiles.legalDocuments.title"),
+      description: t("dashboard.tiles.legalDocuments.description"),
+      icon: Scale,
+      href: "/legal-documents",
+    },
+  ];
+
   return (
     <>
       <GlobalHeader />
@@ -110,7 +113,7 @@ export default function Dashboard() {
 
           {/* Main Action Tiles */}
           <section aria-label="Main actions">
-            <h2 className="text-2xl font-bold mb-6 text-foreground">What would you like to do?</h2>
+            <h2 className="text-2xl font-bold mb-6 text-foreground">{t("dashboard.mainActionsTitle")}</h2>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {tiles.map((tile) => {
                 const Icon = tile.icon;

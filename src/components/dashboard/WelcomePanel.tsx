@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Play, PlusCircle } from "lucide-react";
 
 export const WelcomePanel = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState<string>("");
 
@@ -44,11 +46,10 @@ export const WelcomePanel = () => {
           {/* Greeting */}
           <div>
             <h2 className="text-3xl font-bold text-foreground mb-2">
-              Welcome{firstName ? `, ${firstName}` : ""}
+              {firstName ? t("dashboard.welcome", { name: firstName }) : t("dashboard.welcomeGeneric")}
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Use this planner to organize your wishes, important contacts, and after-death 
-              instructions. You can work at your own pace and save as you go.
+              {t("dashboard.subtitle")}
             </p>
           </div>
 
@@ -60,7 +61,7 @@ export const WelcomePanel = () => {
               className="flex-1 gap-2 h-14 text-base"
             >
               <Play className="h-5 w-5" />
-              Continue where I left off
+              {t("dashboard.continueButton")}
             </Button>
             <Button 
               onClick={handleStartNew}
@@ -69,7 +70,7 @@ export const WelcomePanel = () => {
               className="flex-1 gap-2 h-14 text-base"
             >
               <PlusCircle className="h-5 w-5" />
-              Start a new planner
+              {t("dashboard.startNewButton")}
             </Button>
           </div>
         </div>
