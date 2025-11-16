@@ -18,11 +18,13 @@ export const ALL_SECTIONS: Section[] = [
   { id: "pets", title: "Pet Care Instructions", description: "Who will care for your pets and what they need." },
   { id: "digital", title: "Online Accounts", description: "Passwords, devices, and important digital information." },
   { id: "legal", title: "Legal (Will/Trust)", description: "Where to find your will, trust, or other legal documents." },
+  { id: "legalresources", title: "Legal Documents & Resources", description: "Essential legal forms, guides, and state-specific information." },
   { id: "messages", title: "Letters & Personal Messages", description: "Messages you want to leave for loved ones." },
 ];
 
 export const REQUIRED_SECTIONS: Section[] = [
   { id: "preferences", title: "Preferences", description: "Choose which topics apply to you." },
+  { id: "legalresources", title: "Legal Documents & Resources", description: "Essential legal forms and guides." },
   { id: "resources", title: "Helpful Resources", description: "Guides and references." },
   { id: "faq", title: "Common Questions", description: "Plain answers to common questions." },
 ];

@@ -67,6 +67,13 @@ const tiles = [
     icon: "❓",
     href: "/faq",
   },
+  {
+    key: "legal-documents",
+    title: "Legal Documents & Resources",
+    description: "Essential legal forms, guides, and state-specific information.",
+    icon: "⚖️",
+    href: "/legal-documents",
+  },
 ]
 
 export default function Dashboard() {
