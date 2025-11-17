@@ -117,6 +117,18 @@ export const PlannerShell = ({
               {t("sidebar.contactSuggest")}
             </Button>
           </div>
+          
+          <div className="mt-2">
+            <Link to="/about-us" target="_blank" rel="noopener noreferrer">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start text-xs text-muted-foreground hover:text-foreground"
+              >
+                ℹ️ <span className="ml-2">{t("sidebar.aboutUs")}</span>
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

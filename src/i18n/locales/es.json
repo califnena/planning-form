@@ -225,7 +225,8 @@
     "getStartedMessage": "Comience seleccionando secciones en Preferencias a continuación.",
     "providedBy": "Proporcionado por",
     "followUs": "Síguenos",
-    "contactSuggest": "Contacto / Sugerir"
+    "contactSuggest": "Contacto / Sugerir",
+    "aboutUs": "Acerca de Nosotros"
   },
   "actions": {
     "previewPDF": "Vista Previa del Plan en PDF",
