@@ -35,7 +35,7 @@ export function PdfGenerationDialog({
       await generateAfterLifePlanPDF(formData, decedentName);
       toast({
         title: "PDF Generated",
-        description: "Your After-Life Action Plan has been downloaded successfully",
+        description: "Your After-Death Planner document has been downloaded successfully",
       });
       onOpenChange(false);
     } catch (error) {
@@ -56,7 +56,7 @@ export function PdfGenerationDialog({
       await generateBlankAfterLifePlanPDF();
       toast({
         title: "Blank PDF Generated",
-        description: "Your blank After-Life Action Plan has been downloaded successfully",
+        description: "Your blank After-Death Planner document has been downloaded successfully",
       });
       onOpenChange(false);
     } catch (error) {
@@ -75,7 +75,7 @@ export function PdfGenerationDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Generate After-Life Action Plan Document</DialogTitle>
+          <DialogTitle>Generate After-Death Planner Document</DialogTitle>
           <DialogDescription>
             Choose which version you'd like to download:
           </DialogDescription>

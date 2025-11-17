@@ -42,7 +42,7 @@ const Settings = () => {
 
   const sections = [
     { id: 'pre-planning', label: 'Pre-Planning' },
-    { id: 'after-life-plan', label: 'After-Life Plan' },
+    { id: 'after-death-planner', label: 'After-Death Planner' },
     { id: 'vendors', label: 'Vendors' },
     { id: 'forms', label: 'Blank / Fillable Forms' },
     { id: 'vip-coach', label: 'VIP Coach Assistant' },

@@ -172,7 +172,7 @@ const Resources = () => {
                 <li><a href="/Pre-Planning-Your-Funeral-A-Gift-of-Peace-and-Clarity.pdf" download className="text-primary hover:underline">Pre-Planning Your Funeral Guide (PDF)</a></li>
                 <li><a href="/guides/Discussing-Death-Guide.pdf" download className="text-primary hover:underline">Discussing Death Guide (PDF)</a></li>
                 <li><a href="/guides/My-End-of-Life-Decisions-Guide.pdf" download className="text-primary hover:underline">My End-of-Life Decisions Guide (PDF)</a></li>
-                <li><Link to="/forms" className="text-primary hover:underline">Blank Fillable Forms (Pre-Planning & After-Life Checklists)</Link></li>
+                <li><Link to="/forms" className="text-primary hover:underline">Blank Fillable Forms (Pre-Planning & After-Death Planner)</Link></li>
               </ul>
             </>
           )

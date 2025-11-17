@@ -215,14 +215,14 @@ const PlannerApp = () => {
       navigate(`/next-steps/case/${newCase.id}`);
       
       toast({
-        title: "After-Life Plan Started",
+        title: "After-Death Planner Started",
         description: "Begin the guided checklist for next steps.",
       });
     } catch (error) {
-      console.error("Error creating after-life plan:", error);
+      console.error("Error creating after-death planner:", error);
       toast({
         title: "Error",
-        description: "Failed to create after-life plan. Please try again.",
+        description: "Failed to create after-death planner. Please try again.",
         variant: "destructive",
       });
     }

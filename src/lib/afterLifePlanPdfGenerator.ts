@@ -104,7 +104,7 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
     pdf.setFontSize(9);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(60, 60, 60);
-    pdf.text("provided by Everlasting Funeral Advisors – After-Life Action Plan", pageWidth / 2, pageHeight - 15, { align: "center" });
+    pdf.text("provided by Everlasting Funeral Advisors – After-Death Planner", pageWidth / 2, pageHeight - 15, { align: "center" });
     
     // Add page number with name - bold and black (will be updated at end)
     pdf.setFontSize(11);
@@ -238,7 +238,7 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   pdf.setFontSize(28);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(...colors.headerNavy);
-  pdf.text("After-Life Action Plan", pageWidth / 2, 45, { align: "center" });
+  pdf.text("After-Death Planner", pageWidth / 2, 45, { align: "center" });
   
   pdf.setFontSize(14);
   pdf.setFont("helvetica", "normal");
