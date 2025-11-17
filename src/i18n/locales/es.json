@@ -1,4 +1,8 @@
 {
+  "search": {
+    "placeholder": "Buscar en tu planificador...",
+    "noResults": "No se encontraron coincidencias. Intenta otra palabra o revisa otra sección."
+  },
   "common": {
     "save": "Guardar",
     "cancel": "Cancelar",

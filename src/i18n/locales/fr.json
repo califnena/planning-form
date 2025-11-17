@@ -1,4 +1,8 @@
 {
+  "search": {
+    "placeholder": "Rechercher dans votre planificateur...",
+    "noResults": "Aucun résultat trouvé. Essayez un autre mot ou consultez une autre section."
+  },
   "common": {
     "save": "Enregistrer",
     "cancel": "Annuler",
