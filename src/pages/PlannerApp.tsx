@@ -585,7 +585,7 @@ const PlannerApp = () => {
 
   return (
     <PreviewModeContext.Provider value={{ isPreviewMode }}>
-      <GlobalHeader />
+      <GlobalHeader onGenerateDocument={handleDownloadPDF} />
       <PlannerShell
         sectionItems={sectionItems}
         activeSection={activeSection}
