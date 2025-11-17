@@ -20,6 +20,7 @@ import Subscription from "./pages/Subscription";
 import Plans from "./pages/Plans";
 import Products from "./pages/Products";
 import ProductBinder from "./pages/ProductBinder";
+import Pricing from "./pages/Pricing";
 import AboutUs from "./pages/AboutUs";
 import LegalForms from "./pages/LegalForms";
 import CoachAssistant from "./pages/CoachAssistant";
@@ -57,6 +58,7 @@ const App = () => (
                 <div className="flex-1">
                   <Routes>
                     <Route path="/" element={<Landing />} />
+                    <Route path="/pricing" element={<Pricing />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/about-us" element={<AboutUs />} />
                     <Route path="/legal-forms" element={<LegalForms />} />
