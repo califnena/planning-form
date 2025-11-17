@@ -154,10 +154,10 @@
     "avatarMessage": "Estoy aquí para guiarlo gentilmente a través de estos pasos.",
     "introText": "Este plan ayuda a su familia a saber qué hacer en las horas y días después de una pérdida. Todo está organizado paso a paso para reducir el estrés durante un momento difícil.",
     "preparedForLabel": "Nombre de la persona fallecida",
-    "preparedForPlaceholder": "Ingrese el nombre completo",
+    "preparedForPlaceholder": "Ingrese el nombre de la persona para quien se prepara este planificador.",
     "overviewNotesLabel": "Notas generales sobre esta situación",
     "overviewNotesPlaceholder": "Cualquier nota o información importante...",
-    "clearAll": "Borrar Todo",
+    "clearAll": "Borrar todos los pasos",
     "steps": {
       "step1": "Necesidades Inmediatas (Primeras 48 Horas)",
       "step2": "Notificaciones Oficiales (Gobierno y Servicios)",
