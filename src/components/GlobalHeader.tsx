@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Home, LogOut, User, CreditCard, Settings as SettingsIcon, RotateCcw } from "lucide-react";
+import { Home, LogOut, User, CreditCard, Settings as SettingsIcon, RotateCcw, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TextSizeToggle } from "@/components/TextSizeToggle";
 import { PrivacyModal, PrivacyLink } from "@/components/PrivacyModal";
@@ -155,6 +155,13 @@ export const GlobalHeader = () => {
                   <Link to="/app/profile/subscription" className="flex items-center gap-2 cursor-pointer">
                     <CreditCard className="h-4 w-4" />
                     Subscription
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/vip-coach" className="flex items-center gap-2 cursor-pointer">
+                    <Star className="h-4 w-4 text-yellow-500" />
+                    <span className="font-medium">VIP Coach Assistant</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

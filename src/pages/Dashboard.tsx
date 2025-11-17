@@ -16,6 +16,7 @@ import { GlobalHeader } from "@/components/GlobalHeader";
 import { WelcomePanel } from "@/components/dashboard/WelcomePanel";
 import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
 import { QuickAccessBar } from "@/components/dashboard/QuickAccessBar";
+import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -147,22 +148,38 @@ export default function Dashboard() {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {tiles.map((tile) => {
                 const Icon = tile.icon;
+                const isVipCoach = tile.key === 'vip-coach';
                 return (
                   <Link
                     key={tile.key}
                     to={tile.href}
-                    className="group flex h-full flex-col rounded-xl border-2 border-border bg-card p-6 text-left shadow-sm transition-all hover:shadow-md hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className={cn(
+                      "group flex h-full flex-col rounded-xl border-2 bg-card p-6 text-left shadow-sm transition-all hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                      isVipCoach 
+                        ? "border-yellow-500/50 bg-gradient-to-br from-yellow-50/50 to-amber-50/50 dark:from-yellow-950/20 dark:to-amber-950/20 hover:border-yellow-500"
+                        : "border-border hover:border-primary/50"
+                    )}
                   >
-                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <div className={cn(
+                      "mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg",
+                      isVipCoach ? "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400" : "bg-primary/10 text-primary"
+                    )}>
                       <Icon className="h-6 w-6" />
                     </div>
-                    <h3 className="mb-2 text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+                    <h3 className={cn(
+                      "mb-2 text-lg font-semibold transition-colors",
+                      isVipCoach ? "text-yellow-900 dark:text-yellow-100 group-hover:text-yellow-700 dark:group-hover:text-yellow-300" : "text-foreground group-hover:text-primary"
+                    )}>
                       {tile.title}
+                      {isVipCoach && <span className="ml-2 text-xs font-bold bg-yellow-500 text-white px-2 py-0.5 rounded-full">PREMIUM</span>}
                     </h3>
                     <p className="text-sm text-muted-foreground leading-relaxed flex-1">
                       {tile.description}
                     </p>
-                    <span className="mt-4 inline-flex items-center text-sm font-medium text-primary group-hover:underline">
+                    <span className={cn(
+                      "mt-4 inline-flex items-center text-sm font-medium group-hover:underline",
+                      isVipCoach ? "text-yellow-600 dark:text-yellow-400" : "text-primary"
+                    )}>
                       Open
                       <span className="ml-1" aria-hidden="true">→</span>
                     </span>
