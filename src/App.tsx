@@ -30,6 +30,10 @@ import Contact from "./pages/Contact";
 import Resources from "./pages/Resources";
 import FAQ from "./pages/FAQ";
 import LegalDocuments from "./pages/LegalDocuments";
+import PreviewPrePlanning from "./pages/PreviewPrePlanning";
+import PreviewAfterDeath from "./pages/PreviewAfterDeath";
+import PreviewLegal from "./pages/PreviewLegal";
+import PreviewPDF from "./pages/PreviewPDF";
 import NotFound from "./pages/NotFound";
 import { AppFooter } from "./components/AppFooter";
 
@@ -70,6 +74,10 @@ const App = () => (
                     <Route path="/resources" element={<Resources />} />
                     <Route path="/faq" element={<FAQ />} />
                     <Route path="/legal-documents" element={<LegalDocuments />} />
+                    <Route path="/preview/preplanning" element={<PreviewPrePlanning />} />
+                    <Route path="/preview/afterdeath" element={<PreviewAfterDeath />} />
+                    <Route path="/preview/legal" element={<PreviewLegal />} />
+                    <Route path="/preview/pdf" element={<PreviewPDF />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
