@@ -63,6 +63,83 @@
     "searchPlaceholder": "Type to search...",
     "optional": "(optional)"
   },
+  "preferences": {
+    "title": "Preferences",
+    "subtitle": "Select the sections you want to see in your planner. You can change these settings at any time.",
+    "infoCard": "Choose the topics that apply to you. You can always add or remove sections later.",
+    "totalSelected": "{{count}} sections selected",
+    "reset": "Reset to recommended",
+    "save": "Save Preferences",
+    "continue": "Continue to Planner",
+    "loadingPreferences": "Loading preferences...",
+    "preferencesSaved": "Preferences Saved",
+    "errorSaving": "Error saving your preferences. Please try again.",
+    "groups": {
+      "essentials": "Essentials",
+      "farewell": "Planning Your Farewell",
+      "finances": "Finances & Legal",
+      "digital-home": "Digital & Home",
+      "messages": "Letters & Messages"
+    },
+    "sections": {
+      "overview": {
+        "label": "Planning Overview",
+        "description": "A simple checklist of the most important items."
+      },
+      "instructions": {
+        "label": "My Instructions",
+        "description": "Notes for your loved ones about what you want."
+      },
+      "personal": {
+        "label": "Personal and Family Details",
+        "description": "Basic information about you and the people in your life."
+      },
+      "legacy": {
+        "label": "Life Story & Legacy",
+        "description": "Your memories, achievements, and ideas for your obituary."
+      },
+      "contacts": {
+        "label": "Important People to Notify",
+        "description": "People who should be contacted during a difficult time."
+      },
+      "providers": {
+        "label": "Service Providers & Arrangements",
+        "description": "Funeral homes, churches, and other service contacts."
+      },
+      "funeral": {
+        "label": "Funeral & Ceremony Wishes",
+        "description": "The kind of service you want, music, readings, and more."
+      },
+      "financial": {
+        "label": "Financial Life",
+        "description": "Where your accounts are, bills, debts, and important details."
+      },
+      "insurance": {
+        "label": "Insurance & Benefits",
+        "description": "Life insurance, pensions, Social Security, and other benefits."
+      },
+      "property": {
+        "label": "Property & Valuables",
+        "description": "Homes, vehicles, valuables, and how you want them handled."
+      },
+      "pets": {
+        "label": "Pet Care Instructions",
+        "description": "Who will care for your pets and what they need."
+      },
+      "digital": {
+        "label": "Online Accounts",
+        "description": "Passwords, devices, and important digital information."
+      },
+      "legal": {
+        "label": "Legal Document Storage",
+        "description": "Keep track of where your will, trust, and legal documents are stored."
+      },
+      "messages": {
+        "label": "Letters & Personal Messages",
+        "description": "Messages you want to leave for loved ones."
+      }
+    }
+  },
   "dashboard": {
     "welcome": "Welcome, {{name}}",
     "welcomeGeneric": "Welcome",

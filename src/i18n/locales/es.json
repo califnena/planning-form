@@ -66,6 +66,11 @@
   "preferences": {
     "title": "Preferencias",
     "subtitle": "Seleccione las secciones que desea ver en su planificador. Puede cambiar estos ajustes en cualquier momento.",
+    "infoCard": "Elija los temas que le aplican. Siempre puede agregar o quitar secciones más tarde.",
+    "totalSelected": "{{count}} secciones seleccionadas",
+    "reset": "Restablecer a recomendadas",
+    "save": "Guardar Preferencias",
+    "continue": "Continuar a Mi Planificador",
     "savePreferences": "Guardar Preferencias",
     "continueToPlanner": "Continuar a Mi Planificador",
     "avatarTooltip": "¿Necesita ayuda para elegir? Puedo explicar qué significa cada sección.",
@@ -80,7 +85,7 @@
       "essentials": "Elementos Esenciales",
       "farewell": "Planificando Su Despedida",
       "finances": "Finanzas y Asuntos Legales",
-      "digitalHome": "Digital y Hogar",
+      "digital-home": "Digital y Hogar",
       "messages": "Cartas y Mensajes"
     },
     "sections": {
