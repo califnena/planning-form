@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 
 // Import section components
 import { SectionPersonal } from "@/components/planner/sections/SectionPersonal";
+import { SectionLegacy } from "@/components/planner/sections/SectionLegacy";
 import { SectionFuneral } from "@/components/planner/sections/SectionFuneral";
 import { SectionContacts } from "@/components/planner/sections/SectionContacts";
 import { SectionFinancial } from "@/components/planner/sections/SectionFinancial";
@@ -23,6 +24,11 @@ const SECTION_CONFIG = {
     component: SectionPersonal,
     title: "Personal & Family Details",
     subtitle: "Share information about yourself and your family"
+  },
+  legacy: {
+    component: SectionLegacy,
+    title: "Life Story & Legacy",
+    subtitle: "Your memories, achievements, and ideas for your obituary"
   },
   funeral: {
     component: SectionFuneral,
