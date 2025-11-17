@@ -39,6 +39,9 @@ import PreviewAfterDeath from "./pages/PreviewAfterDeath";
 import PreviewLegal from "./pages/PreviewLegal";
 import PreviewPDF from "./pages/PreviewPDF";
 import NotFound from "./pages/NotFound";
+import CustomSong from "./pages/CustomSong";
+import SongInfo from "./pages/SongInfo";
+import SongConfirmation from "./pages/SongConfirmation";
 import { AppFooter } from "./components/AppFooter";
 
 const queryClient = new QueryClient();
@@ -71,6 +74,9 @@ const App = () => (
                     <Route path="/plans" element={<Plans />} />
                     <Route path="/products" element={<Products />} />
                     <Route path="/products/binder" element={<ProductBinder />} />
+                    <Route path="/products/custom-song" element={<CustomSong />} />
+                    <Route path="/song-info" element={<SongInfo />} />
+                    <Route path="/song-confirmation" element={<SongConfirmation />} />
                     <Route path="/vip-coach" element={<CoachAssistant />} />
                     <Route path="/next-steps" element={<NextSteps />} />
                     <Route path="/next-steps/case/:caseId" element={<CaseDetail />} />
