@@ -30,6 +30,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
 import { generatePlanPDF } from "@/lib/pdfGenerator";
+import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator";
+import { generateBlankAfterLifePlanPDF } from "@/lib/blankAfterLifePlanPdfGenerator";
 import mascotCouple from "@/assets/mascot-couple.png";
 
 export default function Dashboard() {
@@ -292,7 +294,41 @@ export default function Dashboard() {
     }
   };
 
-  // Planning Tools
+  const handleBlankPrePlanningPDF = () => {
+    try {
+      generateManuallyFillablePDF({});
+      toast({
+        title: "Blank Form Downloaded",
+        description: "Your blank Pre-Planning form is ready to print and fill out.",
+      });
+    } catch (error) {
+      console.error("Error generating blank Pre-Planning PDF:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate blank form. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleBlankAfterDeathPDF = async () => {
+    try {
+      await generateBlankAfterLifePlanPDF();
+      toast({
+        title: "Blank Form Downloaded",
+        description: "Your blank After-Death Plan form is ready to print and fill out.",
+      });
+    } catch (error) {
+      console.error("Error generating blank After-Death PDF:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate blank form. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Planning Tools (excluding Blank Forms - now integrated into action panels)
   const planningTools = [
     {
       title: t("dashboard.tiles.prePlanning.title"),
@@ -303,11 +339,6 @@ export default function Dashboard() {
       title: "After-Death Planner",
       icon: CheckCircle,
       href: "/next-steps",
-    },
-    {
-      title: t("dashboard.tiles.blankForms.title"),
-      icon: FileOutput,
-      href: "/forms",
     },
     {
       title: t("dashboard.tiles.trustedContacts.title"),
@@ -512,6 +543,16 @@ export default function Dashboard() {
                           >
                             <Download className="mr-2 h-4 w-4" />
                             {isPrePlanning ? "Generate My Document" : "Generate After-Death Plan PDF"}
+                          </Button>
+                          
+                          <Button
+                            onClick={isPrePlanning ? handleBlankPrePlanningPDF : handleBlankAfterDeathPDF}
+                            variant="ghost"
+                            className="w-full text-xs text-muted-foreground hover:text-foreground"
+                            size="sm"
+                          >
+                            <FileOutput className="mr-2 h-3.5 w-3.5" />
+                            Print blank form
                           </Button>
                         </div>
                       </CardContent>
