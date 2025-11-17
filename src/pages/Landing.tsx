@@ -114,8 +114,19 @@ const Landing = () => {
             >
               Start Your Planner
             </Button>
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="text-lg px-12 py-7"
+              onClick={() => handlePreviewClick("/preview/preplanning")}
+            >
+              1-Day Free Preview
+            </Button>
             <Link to="/login" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               Already have an account? Sign In
+            </Link>
+            <Link to="/pricing" className="text-sm text-primary hover:underline font-medium">
+              View Pricing & Plans →
             </Link>
           </div>
         </div>

@@ -44,10 +44,28 @@ const Login = () => {
       if (error) throw error;
 
       if (data.session) {
-        toast({
-          title: "Welcome back!",
-          description: "Successfully logged in.",
-        });
+        // Check if a plan was selected from pricing page
+        const selectedPlan = localStorage.getItem("selected_plan");
+        
+        if (selectedPlan) {
+          // Clear the selected plan from localStorage
+          localStorage.removeItem("selected_plan");
+          
+          // For paid plans, you would redirect to checkout here
+          // For now, just show a message and redirect to dashboard
+          if (selectedPlan !== "free") {
+            toast({
+              title: "Welcome!",
+              description: `You selected the ${selectedPlan} plan. Redirecting to dashboard...`,
+            });
+          }
+        } else {
+          toast({
+            title: "Welcome back!",
+            description: "Successfully logged in.",
+          });
+        }
+        
         navigate("/dashboard");
       }
     } catch (error: any) {
