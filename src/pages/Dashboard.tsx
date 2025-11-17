@@ -6,7 +6,9 @@ import {
   CheckCircle, 
   Users, 
   FileOutput, 
-  Star, 
+  Star,
+  Receipt,
+  Store,
   MessageCircle, 
   UserPlus, 
   BookOpen, 
@@ -17,7 +19,6 @@ import {
   Info,
   Phone,
   Mail,
-  Store,
   ChevronRight,
   Download
 } from "lucide-react";
@@ -604,6 +605,56 @@ export default function Dashboard() {
               </div>
             </section>
           </div>
+
+          {/* ========== YOUR PLAN SECTION ========== */}
+          <section className="border-t pt-8 pb-8">
+            <h2 className="text-2xl font-bold mb-6">Your Plan</h2>
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="p-2 rounded-lg bg-primary/10">
+                        <Receipt className="h-6 w-6 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-semibold">My Plan & Billing</h3>
+                    </div>
+                    <p className="text-muted-foreground">
+                      View your current subscription, manage billing, and explore upgrade options
+                    </p>
+                  </div>
+                  <Button onClick={() => navigate("/plans")} size="lg">
+                    View Plans & Billing
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+
+          {/* ========== PRODUCTS SECTION ========== */}
+          <section className="border-t pt-8 pb-8">
+            <h2 className="text-2xl font-bold mb-6">Products & Services</h2>
+            <Card className="hover:shadow-md transition-shadow border-2 border-dashed">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="p-2 rounded-lg bg-muted">
+                        <Store className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <h3 className="text-xl font-semibold">Shop Caskets & Urns</h3>
+                    </div>
+                    <p className="text-muted-foreground">
+                      Browse and order quality memorial products (Coming soon)
+                    </p>
+                  </div>
+                  <Button onClick={() => navigate("/products")} variant="outline" size="lg" disabled>
+                    Coming Soon
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
 
           {/* ========== OPTIONAL ZONE: Step by Step Sections ========== */}
           <section className="border-t pt-6 pb-24">

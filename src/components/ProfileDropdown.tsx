@@ -1,4 +1,4 @@
-import { User, LogOut, Settings, CreditCard, Sparkles } from "lucide-react";
+import { User, LogOut, Settings, CreditCard, Sparkles, Receipt } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -98,6 +98,10 @@ export const ProfileDropdown = () => {
         <DropdownMenuItem onClick={() => navigate("/app/profile")}>
           <User className="mr-2 h-4 w-4" />
           <span>Account</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate("/plans")}>
+          <Receipt className="mr-2 h-4 w-4" />
+          <span>My Plan & Billing</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/app/profile/subscription")}>
           <CreditCard className="mr-2 h-4 w-4" />
