@@ -502,36 +502,45 @@ export default function Dashboard() {
                             {t("dashboard.continueButton")}
                           </Button>
                           
-                          <Button
-                            onClick={isPrePlanning ? handlePrePlanningPDF : handleAfterDeathPDF}
-                            variant="ghost"
-                            className="w-full text-sm"
-                            size="sm"
-                          >
-                            <Download className="mr-2 h-4 w-4" />
-                            {isPrePlanning ? "Generate My Document" : "Generate After-Death Plan PDF"}
-                          </Button>
-                          
-                          <Button
-                            onClick={isPrePlanning ? handleBlankPrePlanningPDF : handleBlankAfterDeathPDF}
-                            variant="ghost"
-                            className="w-full text-xs text-muted-foreground hover:text-foreground"
-                            size="sm"
-                          >
-                            <FileOutput className="mr-2 h-3.5 w-3.5" />
-                            Print blank form
-                          </Button>
-                          
-                          {isPrePlanning && (
-                            <Link to="/products/binder">
+                          <div className="grid grid-cols-1 gap-1.5">
+                            <Button
+                              onClick={isPrePlanning ? handlePrePlanningPDF : handleAfterDeathPDF}
+                              variant="ghost"
+                              className="w-full text-xs"
+                              size="sm"
+                            >
+                              <Download className="mr-2 h-3.5 w-3.5" />
+                              {isPrePlanning ? "Generate My Document" : "Generate After-Death Plan PDF"}
+                            </Button>
+                            
+                            <Button
+                              onClick={isPrePlanning ? handleBlankPrePlanningPDF : handleBlankAfterDeathPDF}
+                              variant="ghost"
+                              className="w-full text-xs"
+                              size="sm"
+                            >
+                              <FileOutput className="mr-2 h-3.5 w-3.5" />
+                              Print blank form
+                            </Button>
+                            
+                            {isPrePlanning && (
                               <Button
+                                onClick={() => navigate("/wizard/preplanning")}
                                 variant="ghost"
-                                className="w-full text-xs text-muted-foreground hover:text-foreground"
+                                className="w-full text-xs"
                                 size="sm"
                               >
-                                <BookOpen className="mr-2 h-3.5 w-3.5" />
-                                Order Binder
+                                <Play className="mr-2 h-3.5 w-3.5" />
+                                {t("wizard.preplanning.title", "Start Pre-Planning Step-by-Step Guide")}
                               </Button>
+                            )}
+                          </div>
+                          
+                          {isPrePlanning && (
+                            <Link to="/products/binder" className="block">
+                              <button className="w-full text-xs text-muted-foreground hover:text-foreground text-left px-2 py-1">
+                                Order binder
+                              </button>
                             </Link>
                           )}
                         </div>
