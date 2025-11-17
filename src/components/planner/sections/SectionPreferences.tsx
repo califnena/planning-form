@@ -6,14 +6,12 @@ import { useToast } from "@/hooks/use-toast";
 import { ALL_SECTIONS } from "@/lib/sections";
 import { User } from "@supabase/supabase-js";
 import { Switch } from "@/components/ui/switch";
-import { TextSizeToggle } from "@/components/TextSizeToggle";
-import { CheckCircle2, ChevronDown, ChevronUp, ClipboardList, FileText, User as UserIcon, BookHeart, Users, Building, Church, DollarSign, Shield, Home, PawPrint, Globe, FolderLock, Heart } from "lucide-react";
+import { CheckCircle2, ClipboardList, FileText, User as UserIcon, BookHeart, Users, Building, Church, DollarSign, Shield, Home, PawPrint, Globe, FolderLock, Heart } from "lucide-react";
 import { TourResetButton } from "@/components/planner/TourResetButton";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import mascotCouple from "@/assets/mascot-couple.png";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 
 interface SectionPreferencesProps {
   user: User;
@@ -26,187 +24,128 @@ interface SectionPreferencesProps {
 const SECTION_GROUPS = [
   {
     id: "essentials",
-    label: "Essentials",
     icon: ClipboardList,
     sections: ["overview", "instructions", "personal"]
   },
   {
     id: "farewell",
-    label: "Planning Your Farewell",
     icon: Church,
     sections: ["legacy", "funeral", "providers"]
   },
   {
     id: "finances",
-    label: "Finances & Legal",
     icon: DollarSign,
     sections: ["financial", "insurance", "legal"]
   },
   {
     id: "digital-home",
-    label: "Digital & Home",
     icon: Home,
     sections: ["digital", "property", "pets"]
   },
   {
     id: "messages",
-    label: "Letters & Messages",
     icon: Heart,
     sections: ["messages", "contacts"]
   }
 ];
 
-// Elder-friendly labels and descriptions
-const FRIENDLY_LABELS: Record<string, { label: string; description: string; icon: any }> = {
-  overview: {
-    label: "Planning Overview",
-    description: "A simple checklist of the most important items.",
-    icon: ClipboardList
-  },
-  instructions: {
-    label: "My Instructions",
-    description: "Notes for your loved ones about what you want.",
-    icon: FileText
-  },
-  personal: {
-    label: "Personal and Family Details",
-    description: "Basic information about you and the people in your life.",
-    icon: UserIcon
-  },
-  legacy: {
-    label: "Life Story & Legacy",
-    description: "Your memories, achievements, and ideas for your obituary.",
-    icon: BookHeart
-  },
-  contacts: {
-    label: "Important People to Notify",
-    description: "People who should be contacted during a difficult time.",
-    icon: Users
-  },
-  providers: {
-    label: "Service Providers & Arrangements",
-    description: "Funeral homes, churches, and other service contacts.",
-    icon: Building
-  },
-  funeral: {
-    label: "Funeral & Ceremony Wishes",
-    description: "The kind of service you want, music, readings, and more.",
-    icon: Church
-  },
-  financial: {
-    label: "Financial Life",
-    description: "Where your accounts are, bills, debts, and important details.",
-    icon: DollarSign
-  },
-  insurance: {
-    label: "Insurance & Benefits",
-    description: "Life insurance, pensions, Social Security, and other benefits.",
-    icon: Shield
-  },
-  property: {
-    label: "Property & Valuables",
-    description: "Homes, vehicles, valuables, and how you want them handled.",
-    icon: Home
-  },
-  pets: {
-    label: "Pet Care Instructions",
-    description: "Who will care for your pets and what they need.",
-    icon: PawPrint
-  },
-  digital: {
-    label: "Online Accounts",
-    description: "Passwords, devices, and important digital information.",
-    icon: Globe
-  },
-  legal: {
-    label: "Legal Document Storage",
-    description: "Keep track of where your will, trust, and legal documents are stored.",
-    icon: FolderLock
-  },
-  messages: {
-    label: "Letters & Personal Messages",
-    description: "Messages you want to leave for loved ones.",
-    icon: Heart
-  }
+// Section icons mapping
+const SECTION_ICONS: Record<string, any> = {
+  overview: ClipboardList,
+  instructions: FileText,
+  personal: UserIcon,
+  legacy: BookHeart,
+  contacts: Users,
+  providers: Building,
+  funeral: Church,
+  financial: DollarSign,
+  insurance: Shield,
+  property: Home,
+  pets: PawPrint,
+  digital: Globe,
+  legal: FolderLock,
+  messages: Heart
 };
 
-export const SectionPreferences = ({ user, onSave, onContinue, showWelcome }: SectionPreferencesProps) => {
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+export const SectionPreferences = ({ 
+  user, 
+  onSave, 
+  onContinue, 
+  showWelcome = false 
+}: SectionPreferencesProps) => {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const [selectedSections, setSelectedSections] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set(SECTION_GROUPS.map(g => g.id)));
-  const { toast } = useToast();
-  const { t } = useTranslation();
+  const [activeGroup, setActiveGroup] = useState("essentials");
 
   useEffect(() => {
     loadSettings();
-  }, [user]);
+  }, [user.id]);
 
   const loadSettings = async () => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from("user_settings")
         .select("selected_sections")
         .eq("user_id", user.id)
         .maybeSingle();
 
-      if (error && error.code !== "PGRST116") {
-        console.error("Error loading settings:", error);
-      }
+      if (error) throw error;
 
-      const sections = data?.selected_sections || [];
-      setSelected(new Set(sections));
+      if (data?.selected_sections) {
+        setSelectedSections(data.selected_sections);
+      } else {
+        setSelectedSections(["overview", "funeral", "personal", "legacy", "contacts", "financial"]);
+      }
     } catch (error) {
-      console.error("Error loading preferences:", error);
+      console.error("Error loading settings:", error);
+      toast({
+        title: t('common.error'),
+        description: "Could not load preferences",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const toggle = (sectionId: string) => {
-    const newSelected = new Set(selected);
-    if (newSelected.has(sectionId)) {
-      newSelected.delete(sectionId);
-    } else {
-      newSelected.add(sectionId);
-    }
-    setSelected(newSelected);
-  };
-
-  const toggleGroup = (groupId: string) => {
-    const newOpenGroups = new Set(openGroups);
-    if (newOpenGroups.has(groupId)) {
-      newOpenGroups.delete(groupId);
-    } else {
-      newOpenGroups.add(groupId);
-    }
-    setOpenGroups(newOpenGroups);
+    setSelectedSections(prev =>
+      prev.includes(sectionId)
+        ? prev.filter(id => id !== sectionId)
+        : [...prev, sectionId]
+    );
   };
 
   const saveSettings = async () => {
-    setSaving(true);
     try {
+      setSaving(true);
       const { error } = await supabase
         .from("user_settings")
         .upsert({
           user_id: user.id,
-          selected_sections: Array.from(selected),
+          selected_sections: selectedSections,
           updated_at: new Date().toISOString(),
+        }, {
+          onConflict: "user_id"
         });
 
       if (error) throw error;
 
       toast({
-        title: t("preferences.preferencesSaved"),
-        description: t("preferences.preferencesSavedDesc"),
+        title: t('common.success'),
+        description: t('preferences.preferencesSaved'),
       });
 
-      onSave?.();
+      if (onSave) onSave();
     } catch (error) {
-      console.error("Error saving preferences:", error);
+      console.error("Error saving settings:", error);
       toast({
-        title: t("common.error"),
-        description: t("preferences.errorSaving"),
+        title: t('common.error'),
+        description: t('preferences.errorSaving'),
         variant: "destructive",
       });
     } finally {
@@ -214,160 +153,162 @@ export const SectionPreferences = ({ user, onSave, onContinue, showWelcome }: Se
     }
   };
 
+  const handleContinue = async () => {
+    await saveSettings();
+    if (onContinue) onContinue();
+  };
+
+  const handleReset = async () => {
+    const recommended = ["overview", "funeral", "personal", "legacy", "contacts", "financial"];
+    setSelectedSections(recommended);
+    await saveSettings();
+  };
+
+  const getGroupCount = (groupSections: string[]) => {
+    return groupSections.filter(s => selectedSections.includes(s)).length;
+  };
+
+  const activeGroupSections = SECTION_GROUPS.find(g => g.id === activeGroup)?.sections || [];
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-muted-foreground">{t("preferences.loadingPreferences")}</div>
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+          <p className="text-sm text-muted-foreground">{t('preferences.loadingPreferences')}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="pb-8">
-      {/* Sticky Action Bar */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border shadow-sm mb-6">
-        <div className="flex items-center justify-between gap-4 px-6 py-4 flex-wrap">
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-foreground">{t("preferences.title")}</h1>
-            <TextSizeToggle />
+    <div className="max-w-7xl mx-auto">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6 -mx-6 px-6 py-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl font-bold text-foreground mb-1">{t('preferences.title')}</h1>
+            <p className="text-sm text-muted-foreground">{t('preferences.subtitle')}</p>
           </div>
-          <div className="flex items-center gap-3 flex-wrap">
-            <Button onClick={saveSettings} disabled={saving} size="lg" className="shadow-sm">
-              {saving ? t("preferences.savingPreferences") : t("preferences.savePreferences")}
+          <div className="flex items-center gap-2 flex-wrap">
+            <TourResetButton userId={user.id} />
+            <Button variant="outline" onClick={handleReset}>
+              {t('preferences.reset')}
             </Button>
-            {onContinue && (
-              <Button onClick={onContinue} variant="secondary" size="lg" className="shadow-sm">
-                {t("preferences.continueToPlanner")}
-              </Button>
-            )}
+            <Button onClick={saveSettings} disabled={saving}>
+              {saving ? t('common.saving') : t('preferences.save')}
+            </Button>
+            <Button onClick={handleContinue} className="bg-primary">
+              {t('preferences.continue')}
+            </Button>
           </div>
         </div>
       </div>
 
-      <div className="px-6 space-y-6">
-        {/* Header Section with Mr. Everlasting */}
-        <div className="flex items-start justify-between gap-6 flex-wrap">
-          <div className="flex-1">
-            <p className="text-lg text-muted-foreground max-w-3xl">
-              {t("preferences.subtitle")}
-            </p>
+      <div className="grid lg:grid-cols-[280px,1fr] gap-6">
+        <div className="space-y-4">
+          <Card className="p-4 border-primary/20 bg-primary/5">
+            <div className="flex items-start gap-3 mb-3">
+              <Avatar className="h-10 w-10 border-2 border-primary/20">
+                <AvatarImage src={mascotCouple} alt="Mr. Everlasting" />
+                <AvatarFallback>ME</AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <p className="text-sm text-muted-foreground">{t('preferences.infoCard')}</p>
+              </div>
+            </div>
+            <div className="text-lg font-semibold text-primary">
+              {t('preferences.totalSelected', { count: selectedSections.length })}
+            </div>
+          </Card>
+
+          <div className="space-y-2">
+            {SECTION_GROUPS.map((group) => {
+              const Icon = group.icon;
+              const count = getGroupCount(group.sections);
+              const isActive = activeGroup === group.id;
+              
+              return (
+                <button
+                  key={group.id}
+                  onClick={() => setActiveGroup(group.id)}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-left",
+                    isActive
+                      ? "bg-primary/10 border-2 border-primary text-primary font-medium"
+                      : "bg-card border-2 border-transparent hover:border-muted hover:bg-muted/50"
+                  )}
+                >
+                  <Icon className="h-5 w-5 flex-shrink-0" />
+                  <span className="flex-1 text-sm">{t(`preferences.groups.${group.id}`)}</span>
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-background">
+                    {count}/{group.sections.length}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-          
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex-shrink-0">
-                  <Avatar className="h-20 w-20 border-2 border-primary/20 shadow-lg">
-                    <AvatarImage src={mascotCouple} alt="Mr. Everlasting" className="object-cover" />
-                    <AvatarFallback>EFA</AvatarFallback>
-                  </Avatar>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="left" className="max-w-xs">
-                <p className="text-sm">{t("preferences.avatarTooltip")}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </div>
 
-        {/* Collapsible Section Groups */}
-        <div className="space-y-4">
-          {SECTION_GROUPS.map((group) => {
-            const GroupIcon = group.icon;
-            const isOpen = openGroups.has(group.id);
-            const groupSections = group.sections.filter(sId => FRIENDLY_LABELS[sId]);
-            const completedCount = groupSections.filter(sId => selected.has(sId)).length;
-            
+        <div className="space-y-3">
+          {activeGroupSections.map((sectionId) => {
+            const section = ALL_SECTIONS.find(s => s.id === sectionId);
+            if (!section) return null;
+
+            const Icon = SECTION_ICONS[sectionId] || ClipboardList;
+            const isSelected = selectedSections.includes(sectionId);
+
             return (
-              <Collapsible
-                key={group.id}
-                open={isOpen}
-                onOpenChange={() => toggleGroup(group.id)}
+              <Card
+                key={sectionId}
+                className={cn(
+                  "p-4 cursor-pointer transition-all hover:shadow-md",
+                  isSelected
+                    ? "border-2 border-primary bg-primary/5"
+                    : "border-2 border-border hover:border-primary/50"
+                )}
+                onClick={() => toggle(sectionId)}
               >
-                <Card className="shadow-sm hover:shadow-md transition-shadow">
-                  <CollapsibleTrigger className="w-full">
-                    <div className="flex items-center justify-between p-6 cursor-pointer group">
-                      <div className="flex items-center gap-4">
-                        <div className="p-3 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
-                          <GroupIcon className="h-6 w-6" />
-                        </div>
-                        <div className="text-left">
-                          <h3 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
-                            {t(`preferences.groups.${group.id}`)}
-                          </h3>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {completedCount} {t("preferences.of")} {groupSections.length} {t("preferences.selected")}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {completedCount === groupSections.length && groupSections.length > 0 && (
-                          <CheckCircle2 className="h-5 w-5 text-green-600" />
-                        )}
-                        {isOpen ? (
-                          <ChevronUp className="h-5 w-5 text-muted-foreground" />
-                        ) : (
-                          <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                        )}
-                      </div>
+                <div className="flex items-start gap-4">
+                  <div className={cn(
+                    "p-2 rounded-lg flex-shrink-0",
+                    isSelected ? "bg-primary/20" : "bg-muted"
+                  )}>
+                    <Icon className={cn("h-5 w-5", isSelected ? "text-primary" : "text-muted-foreground")} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold text-foreground">
+                        {t(`preferences.sections.${sectionId}.label`, section.title)}
+                      </h3>
+                      {isSelected && <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0" />}
                     </div>
-                  </CollapsibleTrigger>
-                  
-                  <CollapsibleContent>
-                    <div className="px-6 pb-6 pt-0 space-y-3">
-                      {groupSections.map((sectionId) => {
-                        const sectionInfo = FRIENDLY_LABELS[sectionId];
-                        if (!sectionInfo) return null;
-                        
-                        const SectionIcon = sectionInfo.icon;
-                        const isSelected = selected.has(sectionId);
-                        
-                        return (
-                          <div
-                            key={sectionId}
-                            className={`flex items-center justify-between p-4 rounded-lg border-2 transition-all cursor-pointer ${
-                              isSelected
-                                ? "border-primary bg-primary/5 shadow-sm"
-                                : "border-border hover:border-primary/50 hover:bg-accent/50"
-                            }`}
-                            onClick={() => toggle(sectionId)}
-                          >
-                            <div className="flex items-center gap-4 flex-1">
-                              <SectionIcon className={`h-5 w-5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
-                              <div>
-                                <h4 className="font-medium text-foreground">{t(`preferences.sections.${sectionId}.label`)}</h4>
-                                <p className="text-sm text-muted-foreground mt-0.5">{t(`preferences.sections.${sectionId}.description`)}</p>
-                              </div>
-                            </div>
-                            <Switch
-                              checked={isSelected}
-                              onCheckedChange={() => toggle(sectionId)}
-                              className="ml-4"
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </CollapsibleContent>
-                </Card>
-              </Collapsible>
+                    <p className="text-sm text-muted-foreground">
+                      {t(`preferences.sections.${sectionId}.description`, section.description)}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={isSelected}
+                    onCheckedChange={() => toggle(sectionId)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex-shrink-0"
+                  />
+                </div>
+              </Card>
             );
           })}
         </div>
+      </div>
 
-        {/* Bottom Action Buttons */}
-        <div className="flex gap-3 pt-6 flex-wrap">
-          <Button onClick={saveSettings} disabled={saving} size="lg" className="flex-1 shadow-sm">
-            {saving ? t("preferences.savingPreferences") : t("preferences.savePreferences")}
-          </Button>
-          {onContinue && (
-            <Button onClick={onContinue} variant="secondary" size="lg" className="flex-1 shadow-sm">
-              {t("preferences.continueToPlanner")}
-            </Button>
-          )}
-        </div>
-
-        <TourResetButton userId={user.id} />
+      <div className="flex items-center justify-end gap-2 mt-8 pt-6 border-t">
+        <Button variant="outline" onClick={handleReset}>
+          {t('preferences.reset')}
+        </Button>
+        <Button onClick={saveSettings} disabled={saving}>
+          {saving ? t('common.saving') : t('preferences.save')}
+        </Button>
+        <Button onClick={handleContinue} className="bg-primary">
+          {t('preferences.continue')}
+        </Button>
       </div>
     </div>
   );
