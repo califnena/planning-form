@@ -20,7 +20,8 @@ import {
   Phone,
   Mail,
   ChevronRight,
-  Download
+  Download,
+  Music
 } from "lucide-react";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { cn } from "@/lib/utils";
@@ -649,6 +650,27 @@ export default function Dashboard() {
                     </div>
                     <Button onClick={() => navigate("/products/binder")} variant="outline" size="lg">
                       View Details
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-2 shadow-sm hover:shadow-md transition-shadow border-primary/30">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <Music className="h-6 w-6 text-primary" />
+                        </div>
+                        <h3 className="text-xl font-semibold">Custom Tribute Song</h3>
+                      </div>
+                      <p className="text-muted-foreground">
+                        Create a personalized musical memorial (1-2 day delivery)
+                      </p>
+                    </div>
+                    <Button onClick={() => navigate("/products/custom-song")} size="lg">
+                      Create Song
                     </Button>
                   </div>
                 </CardContent>

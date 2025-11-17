@@ -1,11 +1,13 @@
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Save } from "lucide-react";
+import { Save, Music } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { usePreviewMode } from "@/pages/PlannerApp";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface SectionLegacyProps {
   value?: string;
@@ -16,6 +18,7 @@ export const SectionLegacy = ({ value, onChange }: SectionLegacyProps) => {
   const { toast } = useToast();
   const { t } = useTranslation();
   const { isPreviewMode } = usePreviewMode();
+  const navigate = useNavigate();
 
   const handleSave = () => {
     if (isPreviewMode) {
@@ -75,6 +78,26 @@ export const SectionLegacy = ({ value, onChange }: SectionLegacyProps) => {
           <li>Ideas for your obituary or memorial tribute</li>
         </ul>
       </div>
+
+      {/* Custom Tribute Song Card */}
+      <Card className="mt-6 border-primary/20">
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-4">
+            <Music className="h-8 w-8 text-primary flex-shrink-0 mt-1" />
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg mb-2">Create a Custom Tribute Song</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Turn your life story into a beautiful personalized song. Our service uses your story 
+                to create a meaningful musical tribute delivered in 1-2 days.
+              </p>
+              <Button onClick={() => navigate('/products/custom-song')} variant="default">
+                <Music className="h-4 w-4 mr-2" />
+                Learn More About Tribute Songs
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
