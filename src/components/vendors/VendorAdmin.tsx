@@ -13,9 +13,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
-import { Pencil, Plus } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 
 type VendorDirectory = Tables<'vendor_directory'>;
 type VendorDirectoryInsert = TablesInsert<'vendor_directory'>;
@@ -51,6 +61,7 @@ const INITIAL_FORM_STATE: Partial<VendorDirectoryInsert> = {
 
 export const VendorAdmin = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<VendorDirectoryInsert>>(INITIAL_FORM_STATE);
   const queryClient = useQueryClient();
 
@@ -112,6 +123,28 @@ export const VendorAdmin = () => {
     },
     onError: (error) => {
       toast.error(`Failed to update vendor: ${error.message}`);
+    },
+  });
+
+  // Delete vendor mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('vendor_directory')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vendor-directory'] });
+      queryClient.invalidateQueries({ queryKey: ['vendor-directory-admin'] });
+      toast.success('Vendor deleted successfully');
+      setDeletingId(null);
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete vendor: ${error.message}`);
+      setDeletingId(null);
     },
   });
 
@@ -347,17 +380,47 @@ export const VendorAdmin = () => {
                   {vendor.category} • {vendor.city ? `${vendor.city}, ` : ''}{vendor.state}
                 </p>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => loadVendorForEdit(vendor)}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => loadVendorForEdit(vendor)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDeletingId(vendor.id)}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
             </div>
           ))}
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deletingId} onOpenChange={(open) => !open && setDeletingId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Vendor</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this vendor? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deletingId && deleteMutation.mutate(deletingId)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
