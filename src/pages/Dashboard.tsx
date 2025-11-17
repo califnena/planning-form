@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
 import { 
   FileText, 
   CheckCircle, 
@@ -10,88 +11,149 @@ import {
   UserPlus, 
   BookOpen, 
   HelpCircle,
-  Scale
+  Scale,
+  Play,
+  PlusCircle,
+  Info,
+  Phone,
+  Mail,
+  Store,
+  ChevronRight
 } from "lucide-react";
 import { GlobalHeader } from "@/components/GlobalHeader";
-import { WelcomePanel } from "@/components/dashboard/WelcomePanel";
-import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
-import { QuickAccessBar } from "@/components/dashboard/QuickAccessBar";
 import { cn } from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { supabase } from "@/integrations/supabase/client";
+import mascotCouple from "@/assets/mascot-couple.png";
 
 export default function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [firstName, setFirstName] = useState<string>("");
+  const [progress, setProgress] = useState(0);
 
-  const tiles = [
+  useEffect(() => {
+    const loadUserData = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Load user name
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", user.id)
+        .single();
+      
+      if (profile?.full_name) {
+        const name = profile.full_name.split(" ")[0];
+        setFirstName(name);
+      }
+
+      // Load progress
+      const { data: orgMember } = await supabase
+        .from("org_members")
+        .select("org_id")
+        .eq("user_id", user.id)
+        .eq("role", "owner")
+        .maybeSingle();
+
+      if (orgMember) {
+        const { data: plan } = await supabase
+          .from("plans")
+          .select("percent_complete")
+          .eq("org_id", orgMember.org_id)
+          .eq("owner_user_id", user.id)
+          .maybeSingle();
+
+        if (plan?.percent_complete) {
+          setProgress(plan.percent_complete);
+        }
+      }
+    };
+    loadUserData();
+  }, []);
+
+  const handleContinue = () => {
+    const lastSection = localStorage.getItem("efa-last-section");
+    navigate(lastSection || "/app");
+  };
+
+  const handleStartNew = () => {
+    navigate("/app");
+  };
+
+  // Planning Tools
+  const planningTools = [
     {
-      key: "pre-planning",
       title: t("dashboard.tiles.prePlanning.title"),
-      description: t("dashboard.tiles.prePlanning.description"),
       icon: FileText,
       href: "/app",
     },
     {
-      key: "after-death",
       title: t("dashboard.tiles.afterDeath.title"),
-      description: t("dashboard.tiles.afterDeath.description"),
       icon: CheckCircle,
       href: "/next-steps",
     },
     {
-      key: "vendors",
-      title: t("dashboard.tiles.vendors.title"),
-      description: t("dashboard.tiles.vendors.description"),
-      icon: Users,
-      href: "/vendors",
-    },
-    {
-      key: "blank-forms",
       title: t("dashboard.tiles.blankForms.title"),
-      description: t("dashboard.tiles.blankForms.description"),
       icon: FileOutput,
       href: "/forms",
     },
     {
-      key: "vip-coach",
-      title: t("dashboard.tiles.vipCoach.title"),
-      description: t("dashboard.tiles.vipCoach.description"),
-      icon: Star,
-      href: "/vip-coach",
-    },
-    {
-      key: "quote",
-      title: t("dashboard.tiles.quote.title"),
-      description: t("dashboard.tiles.quote.description"),
-      icon: MessageCircle,
-      href: "/contact",
-    },
-    {
-      key: "trusted-contacts",
       title: t("dashboard.tiles.trustedContacts.title"),
-      description: t("dashboard.tiles.trustedContacts.description"),
       icon: UserPlus,
       href: "/app",
     },
+  ];
+
+  // Resources & Vendors
+  const resourcesVendors = [
     {
-      key: "resources",
       title: t("dashboard.tiles.resources.title"),
-      description: t("dashboard.tiles.resources.description"),
       icon: BookOpen,
       href: "/resources",
     },
     {
-      key: "questions",
+      title: t("dashboard.tiles.legalDocuments.title"),
+      icon: Scale,
+      href: "/legal-documents",
+    },
+    {
       title: t("dashboard.tiles.questions.title"),
-      description: t("dashboard.tiles.questions.description"),
       icon: HelpCircle,
       href: "/faq",
     },
     {
-      key: "legal-documents",
-      title: t("dashboard.tiles.legalDocuments.title"),
-      description: t("dashboard.tiles.legalDocuments.description"),
-      icon: Scale,
-      href: "/legal-documents",
+      title: t("dashboard.tiles.vendors.title"),
+      icon: Store,
+      href: "/vendors",
+    },
+  ];
+
+  // Assistance & Support
+  const assistanceSupport = [
+    {
+      title: t("dashboard.tiles.vipCoach.title"),
+      icon: Star,
+      href: "/vip-coach",
+      isVIP: true,
+    },
+    {
+      title: t("dashboard.tiles.quote.title"),
+      icon: MessageCircle,
+      href: "/contact",
+    },
+    {
+      title: t("header.contact"),
+      icon: Phone,
+      href: "/contact",
+    },
+    {
+      title: t("footer.aboutUs"),
+      icon: Info,
+      href: "/about",
     },
   ];
 
@@ -99,95 +161,227 @@ export default function Dashboard() {
     <>
       <GlobalHeader />
       <div className="min-h-screen bg-background">
-        <div className="mx-auto max-w-7xl px-4 py-8 space-y-8">
-          {/* Welcome Panel */}
-      <WelcomePanel />
-      
-      {/* Step-by-Step Wizard Buttons */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <button
-          onClick={() => navigate("/wizard/preplanning")}
-          className="p-6 bg-card border rounded-lg hover:border-primary transition-colors text-left space-y-2"
-        >
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <span className="text-2xl">📋</span>
-            {t("wizard.preplanning.title", "Start Pre-Planning Step-by-Step Guide")}
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            {t("wizard.preplanning.description", "Complete your final wishes one section at a time with guided steps")}
-          </p>
-        </button>
-        
-        <button
-          onClick={() => navigate("/wizard/afterdeath")}
-          className="p-6 bg-card border border-orange-200 dark:border-orange-900 rounded-lg hover:border-orange-400 transition-colors text-left space-y-2"
-        >
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <span className="text-2xl">🤝</span>
-            {t("wizard.afterdeath.title", "Start After-Death Step-by-Step Guide")}
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            {t("wizard.afterdeath.description", "Complete essential tasks after a death with our guided 12-step checklist")}
-          </p>
-        </button>
-      </div>
+        <div className="mx-auto max-w-6xl px-4 py-8 space-y-10">
+          
+          {/* ========== HERO ZONE ========== */}
+          <Card className="border-2">
+            <CardContent className="pt-6">
+              <div className="space-y-6">
+                {/* Mascot and Slogan */}
+                <div className="flex flex-col sm:flex-row items-center gap-4 pb-6 border-b">
+                  <img 
+                    src={mascotCouple} 
+                    alt="Everlasting Advisors" 
+                    className="w-24 h-24 object-contain flex-shrink-0"
+                  />
+                  <div className="flex-1 text-center sm:text-left">
+                    <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                      {t("dashboard.slogan")}
+                    </h1>
+                    <p className="text-base text-muted-foreground">
+                      {t("dashboard.heroMessage")}
+                    </p>
+                  </div>
+                </div>
 
-          {/* Progress and Quick Access Row */}
-          <div className="grid gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-1">
-              <ProgressOverview />
-            </div>
-            <div className="lg:col-span-2">
-              <QuickAccessBar />
-            </div>
+                {/* Welcome and Progress */}
+                <div className="space-y-4">
+                  <div>
+                    <h2 className="text-2xl font-bold text-foreground mb-1">
+                      {firstName ? t("dashboard.welcome", { name: firstName }) : t("dashboard.welcomeGeneric")}
+                    </h2>
+                    <p className="text-base text-muted-foreground">
+                      {t("dashboard.subtitle")}
+                    </p>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="bg-muted/30 rounded-lg p-5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl font-bold text-primary">{progress}%</span>
+                      <span className="text-sm font-medium text-muted-foreground">{t("common.complete")}</span>
+                    </div>
+                    <Progress value={progress} className="h-3" />
+                  </div>
+
+                  {/* Primary Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                    <Button 
+                      onClick={handleContinue}
+                      size="lg"
+                      className="flex-1 gap-2 h-14 text-base font-semibold"
+                    >
+                      <Play className="h-5 w-5" />
+                      {t("dashboard.continueButton")}
+                    </Button>
+                    <Button 
+                      onClick={handleStartNew}
+                      variant="outline"
+                      size="lg"
+                      className="sm:w-auto gap-2 h-14 text-base font-medium"
+                    >
+                      <PlusCircle className="h-5 w-5" />
+                      {t("dashboard.startNewButton")}
+                    </Button>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground text-center pt-1">
+                    {t("dashboard.autoSaveNote", "Your entries are saved automatically as you type.")}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* ========== SUPPORT ZONE ========== */}
+          <div className="space-y-8">
+            
+            {/* A. Planning Tools */}
+            <section>
+              <h2 className="text-xl font-bold text-foreground mb-4">
+                {t("dashboard.planningToolsTitle", "Planning Tools")}
+              </h2>
+              <div className="space-y-2">
+                {planningTools.map((tool) => {
+                  const Icon = tool.icon;
+                  return (
+                    <Link
+                      key={tool.href}
+                      to={tool.href}
+                      className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group"
+                    >
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
+                        {tool.title}
+                      </span>
+                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* B. Resources & Vendors */}
+            <section>
+              <h2 className="text-xl font-bold text-foreground mb-4">
+                {t("dashboard.resourcesTitle", "Resources & Vendors")}
+              </h2>
+              <div className="space-y-2">
+                {resourcesVendors.map((resource) => {
+                  const Icon = resource.icon;
+                  return (
+                    <Link
+                      key={resource.href}
+                      to={resource.href}
+                      className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group"
+                    >
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
+                        {resource.title}
+                      </span>
+                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* C. Assistance & Support */}
+            <section>
+              <h2 className="text-xl font-bold text-foreground mb-4">
+                {t("dashboard.assistanceTitle", "Need Support?")}
+              </h2>
+              <div className="space-y-2">
+                {assistanceSupport.map((support) => {
+                  const Icon = support.icon;
+                  const isVIP = support.isVIP;
+                  return (
+                    <Link
+                      key={support.href}
+                      to={support.href}
+                      className={cn(
+                        "flex items-center gap-4 p-4 rounded-lg border transition-all group",
+                        isVIP
+                          ? "bg-gradient-to-r from-yellow-50/50 to-amber-50/50 dark:from-yellow-950/20 dark:to-amber-950/20 border-yellow-500/50 hover:border-yellow-500"
+                          : "bg-card hover:bg-accent/50 hover:border-primary/50"
+                      )}
+                    >
+                      <div className={cn(
+                        "flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center",
+                        isVIP 
+                          ? "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400" 
+                          : "bg-primary/10 text-primary"
+                      )}>
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <span className={cn(
+                        "flex-1 text-base font-medium",
+                        isVIP 
+                          ? "text-yellow-900 dark:text-yellow-100 group-hover:text-yellow-700 dark:group-hover:text-yellow-300" 
+                          : "text-foreground group-hover:text-primary"
+                      )}>
+                        {support.title}
+                        {isVIP && <span className="ml-2 text-xs font-bold bg-yellow-500 text-white px-2 py-0.5 rounded-full">PREMIUM</span>}
+                      </span>
+                      <ChevronRight className={cn(
+                        "h-5 w-5",
+                        isVIP 
+                          ? "text-yellow-600 dark:text-yellow-400" 
+                          : "text-muted-foreground group-hover:text-primary"
+                      )} />
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
           </div>
 
-          {/* Main Action Tiles */}
-          <section aria-label="Main actions">
-            <h2 className="text-2xl font-bold mb-6 text-foreground">{t("dashboard.mainActionsTitle")}</h2>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {tiles.map((tile) => {
-                const Icon = tile.icon;
-                const isVipCoach = tile.key === 'vip-coach';
-                return (
-                  <Link
-                    key={tile.key}
-                    to={tile.href}
-                    className={cn(
-                      "group flex h-full flex-col rounded-xl border-2 bg-card p-6 text-left shadow-sm transition-all hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                      isVipCoach 
-                        ? "border-yellow-500/50 bg-gradient-to-br from-yellow-50/50 to-amber-50/50 dark:from-yellow-950/20 dark:to-amber-950/20 hover:border-yellow-500"
-                        : "border-border hover:border-primary/50"
-                    )}
-                  >
-                    <div className={cn(
-                      "mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg",
-                      isVipCoach ? "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400" : "bg-primary/10 text-primary"
-                    )}>
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <h3 className={cn(
-                      "mb-2 text-lg font-semibold transition-colors",
-                      isVipCoach ? "text-yellow-900 dark:text-yellow-100 group-hover:text-yellow-700 dark:group-hover:text-yellow-300" : "text-foreground group-hover:text-primary"
-                    )}>
-                      {tile.title}
-                      {isVipCoach && <span className="ml-2 text-xs font-bold bg-yellow-500 text-white px-2 py-0.5 rounded-full">PREMIUM</span>}
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed flex-1">
-                      {tile.description}
+          {/* ========== OPTIONAL ZONE: Other Guides ========== */}
+          <section className="border-t pt-6">
+            <h3 className="text-base font-semibold text-muted-foreground mb-3">
+              {t("dashboard.otherGuidesTitle", "Other Guides")}
+            </h3>
+            <div className="space-y-2">
+              <button
+                onClick={() => navigate("/wizard/preplanning")}
+                className="w-full text-left p-4 rounded-lg border bg-card hover:bg-accent/30 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">📋</span>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">
+                      {t("wizard.preplanning.title", "Start Pre-Planning Step-by-Step Guide")}
                     </p>
-                    <span className={cn(
-                      "mt-4 inline-flex items-center text-sm font-medium group-hover:underline",
-                      isVipCoach ? "text-yellow-600 dark:text-yellow-400" : "text-primary"
-                    )}>
-                      Open
-                      <span className="ml-1" aria-hidden="true">→</span>
-                    </span>
-                  </Link>
-                );
-              })}
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {t("wizard.preplanning.description", "Complete your final wishes one section at a time with guided steps")}
+                    </p>
+                  </div>
+                </div>
+              </button>
+              
+              <button
+                onClick={() => navigate("/wizard/afterdeath")}
+                className="w-full text-left p-4 rounded-lg border bg-card hover:bg-accent/30 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">🤝</span>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">
+                      {t("wizard.afterdeath.title", "Start After-Death Step-by-Step Guide")}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {t("wizard.afterdeath.description", "Complete essential tasks after a death with our guided 12-step checklist")}
+                    </p>
+                  </div>
+                </div>
+              </button>
             </div>
           </section>
+
         </div>
       </div>
     </>
