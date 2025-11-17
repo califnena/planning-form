@@ -6,6 +6,7 @@ import { TextSizeToggle } from "@/components/TextSizeToggle";
 import { PrivacyModal, PrivacyLink } from "@/components/PrivacyModal";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { AccessibilityToggle } from "@/components/AccessibilityToggle";
+import { GlobalSearch } from "@/components/GlobalSearch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -60,6 +61,7 @@ export const GlobalHeader = () => {
           
           {/* Right: Controls and Menu */}
           <div className="flex items-center gap-2">
+            <GlobalSearch />
             <LanguageSelector />
             
             {/* Accessibility Panel */}
