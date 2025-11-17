@@ -823,5 +823,16 @@
     "no": "No",
     "saved": "Saved",
     "savedDescription": "Your changes have been saved."
+  },
+  "afterDeathPlan": {
+    "title": "After-Death Planner",
+    "subtitle": "A simple 12-step guide to help your loved ones after a loss.",
+    "avatarMessage": "I'm here to guide you gently through these steps.",
+    "introText": "This plan helps your family know what to do in the hours and days after a loss. Everything is organized step-by-step to reduce stress during a difficult time.",
+    "preparedForLabel": "This planner is prepared for:",
+    "preparedForPlaceholder": "Enter the name of the person this planner is prepared for.",
+    "overviewNotesLabel": "General notes about this situation",
+    "overviewNotesPlaceholder": "Any important notes or information...",
+    "clearAll": "Clear all steps"
   }
 }
