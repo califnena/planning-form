@@ -401,244 +401,210 @@ export default function Dashboard() {
     <>
       <GlobalHeader />
       <div className="min-h-screen bg-background">
-        <div className="mx-auto max-w-6xl px-4 py-8 space-y-10">
+        <div className="mx-auto max-w-6xl px-4 py-8 space-y-12">
           
-          {/* ========== HERO ZONE ========== */}
-          <Card className="border-2">
-            <CardContent className="pt-6">
-              <div className="space-y-6">
-                {/* Mascot and Slogan */}
-                <div className="flex flex-col sm:flex-row items-center gap-4 pb-6 border-b">
-                  <img 
-                    src={mascotCouple} 
-                    alt="Everlasting Advisors" 
-                    className="w-24 h-24 object-contain flex-shrink-0"
-                  />
-                  <div className="flex-1 text-center sm:text-left">
-                    <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                      {t("dashboard.slogan")}
-                    </h1>
-                    <p className="text-base text-muted-foreground">
-                      {t("dashboard.heroMessage")}
-                    </p>
+          {/* ▬▬ BLOCK 1: WELCOME + PROGRESS + CONTINUE ▬▬ */}
+          <section>
+            <Card className="border-2 shadow-sm">
+              <CardContent className="pt-6">
+                <div className="space-y-6">
+                  {/* Mascot and Slogan */}
+                  <div className="flex flex-col sm:flex-row items-center gap-4 pb-6 border-b">
+                    <img 
+                      src={mascotCouple} 
+                      alt="Everlasting Advisors" 
+                      className="w-24 h-24 object-contain flex-shrink-0"
+                    />
+                    <div className="flex-1 text-center sm:text-left">
+                      <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                        {t("dashboard.slogan")}
+                      </h1>
+                      <p className="text-base text-muted-foreground">
+                        {t("dashboard.heroMessage")}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Welcome and Progress */}
+                  <div className="space-y-4">
+                    <div>
+                      <h2 className="text-2xl font-bold text-foreground mb-1">
+                        {firstName ? t("dashboard.welcome", { name: firstName }) : t("dashboard.welcomeGeneric")}
+                      </h2>
+                      <p className="text-base text-muted-foreground">
+                        {t("dashboard.subtitle")}
+                      </p>
+                    </div>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </section>
 
-                {/* Welcome and Progress */}
-                <div className="space-y-4">
-                  <div>
-                    <h2 className="text-2xl font-bold text-foreground mb-1">
-                      {firstName ? t("dashboard.welcome", { name: firstName }) : t("dashboard.welcomeGeneric")}
-                    </h2>
-                    <p className="text-base text-muted-foreground">
-                      {t("dashboard.subtitle")}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* ========== SUPPORT ZONE ========== */}
-          <div className="space-y-8">
+          {/* ▬▬ BLOCK 2: PRE-PLANNING ▬▬ */}
+          <section className="border-t pt-10">
+            <div className="mb-6">
+              <h2 className="text-3xl font-bold text-foreground">Pre-Planning</h2>
+              <p className="text-base text-muted-foreground mt-2">Organize your wishes and prepare your plan</p>
+            </div>
             
-            {/* A. Planning Tools */}
-            <section>
-              <h2 className="text-xl font-semibold text-foreground mb-4">
-                {t("dashboard.planningToolsTitle", "Planning Tools")}
-              </h2>
-              <div className="space-y-2">
-                {planningTools.map((tool) => {
-                  const Icon = tool.icon;
-                  const isPrePlanning = tool.href === "/app";
-                  const isAfterDeath = tool.href === "/next-steps";
+            <Card className="border-2 shadow-sm">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-6">
+                  {/* Left: Title and Description */}
+                  <div className="flex items-start gap-4 flex-[2]">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                      <FileText className="h-6 w-6" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                        {t("dashboard.tiles.prePlanning.title")}
+                      </h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {t("dashboard.tiles.prePlanning.description")}
+                      </p>
+                    </div>
+                  </div>
                   
-                  // Regular card for non-primary tools
-                  if (!isPrePlanning && !isAfterDeath) {
-                    return (
-                      <Link
-                        key={tool.href}
-                        to={tool.href}
-                        className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group"
+                  {/* Right: Actions Panel */}
+                  <div className="flex-1 flex flex-col gap-3 min-w-[280px]">
+                    {/* Primary Action */}
+                    <Button
+                      onClick={handleContinue}
+                      className="w-full h-11 text-base font-semibold"
+                      size="lg"
+                    >
+                      <Play className="mr-2 h-4 w-4" />
+                      {t("dashboard.continueButton")}
+                    </Button>
+                    
+                    {/* Secondary Actions - Horizontal Grid */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        onClick={handlePrePlanningPDF}
+                        variant="outline"
+                        className="text-xs h-9"
+                        size="sm"
                       >
-                        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                          <Icon className="h-5 w-5" />
-                        </div>
-                        <span className="flex-1 text-base font-medium text-foreground/90 group-hover:text-primary">
-                          {tool.title}
-                        </span>
-                        <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+                        <Download className="mr-1.5 h-3.5 w-3.5" />
+                        Generate PDF
+                      </Button>
+                      
+                      <Button
+                        onClick={handleBlankPrePlanningPDF}
+                        variant="outline"
+                        className="text-xs h-9"
+                        size="sm"
+                      >
+                        <FileOutput className="mr-1.5 h-3.5 w-3.5" />
+                        Blank
+                      </Button>
+                    </div>
+                    
+                    {/* Tertiary Actions */}
+                    <div className="flex gap-2 text-xs">
+                      <button
+                        onClick={() => navigate("/wizard/preplanning")}
+                        className="flex-1 text-muted-foreground hover:text-foreground underline decoration-dotted underline-offset-4"
+                      >
+                        Step-by-Step Guide
+                      </button>
+                      <span className="text-muted-foreground">•</span>
+                      <Link
+                        to="/products/binder"
+                        className="flex-1 text-muted-foreground hover:text-foreground underline decoration-dotted underline-offset-4"
+                      >
+                        Order Binder
                       </Link>
-                    );
-                  }
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
 
-                  // Table-style layout for Pre-Planning and After-Death
-                  return (
-                    <Card key={tool.href} className="border-2">
-                      <CardContent className="p-6">
-                        <div className="flex items-start gap-6">
-                          {/* Left: Title and Description (2/3) */}
-                          <div className="flex items-start gap-4 flex-[2]">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                              <Icon className="h-6 w-6" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-lg font-semibold text-foreground mb-2">
-                                {tool.title}
-                              </h3>
-                              <p className="text-sm text-muted-foreground leading-relaxed">
-                                {isPrePlanning 
-                                  ? t("dashboard.tiles.prePlanning.description") 
-                                  : t("dashboard.tiles.afterDeath.description")}
-                              </p>
-                            </div>
-                          </div>
-                          
-                          {/* Right: Actions Panel (1/3) */}
-                          <div className="flex-1 flex flex-col gap-3 min-w-[280px]">
-                            {/* Primary Action */}
-                            <Button
-                              onClick={isPrePlanning ? handleContinue : () => navigate("/next-steps")}
-                              className="w-full h-11 text-base font-semibold"
-                              size="lg"
-                            >
-                              <Play className="mr-2 h-4 w-4" />
-                              {t("dashboard.continueButton")}
-                            </Button>
-                            
-                            {/* Secondary Actions - Horizontal Grid */}
-                            <div className="grid grid-cols-2 gap-2">
-                              <Button
-                                onClick={isPrePlanning ? handlePrePlanningPDF : handleAfterDeathPDF}
-                                variant="outline"
-                                className="text-xs h-9"
-                                size="sm"
-                              >
-                                <Download className="mr-1.5 h-3.5 w-3.5" />
-                                Generate PDF
-                              </Button>
-                              
-                              <Button
-                                onClick={isPrePlanning ? handleBlankPrePlanningPDF : handleBlankAfterDeathPDF}
-                                variant="outline"
-                                className="text-xs h-9"
-                                size="sm"
-                              >
-                                <FileOutput className="mr-1.5 h-3.5 w-3.5" />
-                                Blank
-                              </Button>
-                            </div>
-                            
-                            {/* Tertiary Actions */}
-                            <div className="flex gap-2 text-xs">
-                              {isPrePlanning && (
-                                <>
-                                  <button
-                                    onClick={() => navigate("/wizard/preplanning")}
-                                    className="flex-1 text-muted-foreground hover:text-foreground underline decoration-dotted underline-offset-4"
-                                  >
-                                    Step-by-Step Guide
-                                  </button>
-                                  <span className="text-muted-foreground">•</span>
-                                  <Link
-                                    to="/products/binder"
-                                    className="flex-1 text-muted-foreground hover:text-foreground underline decoration-dotted underline-offset-4"
-                                  >
-                                    Order Binder
-                                  </Link>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </section>
-
-            {/* B. Resources & Vendors */}
-            <section>
-              <h2 className="text-xl font-semibold text-foreground mb-4">
-                {t("dashboard.resourcesTitle", "Resources & Vendors")}
-              </h2>
-              <div className="space-y-2">
-                {resourcesVendors.map((resource) => {
-                  const Icon = resource.icon;
-                  return (
-                    <Link
-                      key={resource.href}
-                      to={resource.href}
-                      className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group"
+          {/* ▬▬ BLOCK 3: AFTER-DEATH PLANNER ▬▬ */}
+          <section className="border-t pt-10">
+            <div className="mb-6">
+              <h2 className="text-3xl font-bold text-foreground">After-Death Planner</h2>
+              <p className="text-base text-muted-foreground mt-2">Guide loved ones with a step-by-step checklist</p>
+            </div>
+            
+            <Card className="border-2 shadow-sm">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-6">
+                  {/* Left: Title and Description */}
+                  <div className="flex items-start gap-4 flex-[2]">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                      <CheckCircle className="h-6 w-6" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                        {t("dashboard.tiles.afterDeath.title")}
+                      </h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {t("dashboard.tiles.afterDeath.description")}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Right: Actions Panel */}
+                  <div className="flex-1 flex flex-col gap-3 min-w-[280px]">
+                    {/* Primary Action */}
+                    <Button
+                      onClick={() => navigate("/next-steps")}
+                      className="w-full h-11 text-base font-semibold"
+                      size="lg"
                     >
-                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <span className="flex-1 text-base font-medium text-foreground/90 group-hover:text-primary">
-                        {resource.title}
-                      </span>
-                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-                    </Link>
-                  );
-                })}
-              </div>
-            </section>
+                      <Play className="mr-2 h-4 w-4" />
+                      {t("dashboard.continueButton")}
+                    </Button>
+                    
+                    {/* Secondary Actions - Horizontal Grid */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        onClick={handleAfterDeathPDF}
+                        variant="outline"
+                        className="text-xs h-9"
+                        size="sm"
+                      >
+                        <Download className="mr-1.5 h-3.5 w-3.5" />
+                        Generate PDF
+                      </Button>
+                      
+                      <Button
+                        onClick={handleBlankAfterDeathPDF}
+                        variant="outline"
+                        className="text-xs h-9"
+                        size="sm"
+                      >
+                        <FileOutput className="mr-1.5 h-3.5 w-3.5" />
+                        Blank
+                      </Button>
+                    </div>
+                    
+                    {/* Tertiary Actions */}
+                    <div className="flex gap-2 text-xs justify-center">
+                      <button
+                        onClick={() => navigate("/wizard/afterdeath")}
+                        className="text-muted-foreground hover:text-foreground underline decoration-dotted underline-offset-4"
+                      >
+                        Step-by-Step Guide
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
 
-            {/* C. Assistance & Support */}
-            <section>
-              <h2 className="text-xl font-semibold text-foreground mb-4">
-                {t("dashboard.assistanceTitle", "Need Support?")}
-              </h2>
-              <div className="space-y-2">
-                {assistanceSupport.map((support) => {
-                  const Icon = support.icon;
-                  const isVIP = support.isVIP;
-                  return (
-                    <Link
-                      key={support.href}
-                      to={support.href}
-                      className={cn(
-                        "flex items-center gap-4 p-4 rounded-lg border transition-all group",
-                        isVIP
-                          ? "bg-gradient-to-r from-yellow-50/50 to-amber-50/50 dark:from-yellow-950/20 dark:to-amber-950/20 border-yellow-500/50 hover:border-yellow-500"
-                          : "bg-card hover:bg-accent/50 hover:border-primary/50"
-                      )}
-                    >
-                      <div className={cn(
-                        "flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center",
-                        isVIP 
-                          ? "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400" 
-                          : "bg-primary/10 text-primary"
-                      )}>
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <span className={cn(
-                        "flex-1 text-base font-medium",
-                        isVIP 
-                          ? "text-yellow-900 dark:text-yellow-100 group-hover:text-yellow-700 dark:group-hover:text-yellow-300" 
-                          : "text-foreground group-hover:text-primary"
-                      )}>
-                        {support.title}
-                        {isVIP && <span className="ml-2 text-xs font-bold bg-yellow-500 text-white px-2 py-0.5 rounded-full">PREMIUM</span>}
-                      </span>
-                      <ChevronRight className={cn(
-                        "h-5 w-5",
-                        isVIP 
-                          ? "text-yellow-600 dark:text-yellow-400" 
-                          : "text-muted-foreground group-hover:text-primary"
-                      )} />
-                    </Link>
-                  );
-                })}
-              </div>
-            </section>
-          </div>
-
-          {/* ========== YOUR PLAN SECTION ========== */}
-          <section className="border-t pt-8 pb-8">
-            <h2 className="text-2xl font-bold mb-6">Your Plan</h2>
-            <Card className="hover:shadow-md transition-shadow">
+          {/* ▬▬ BLOCK 4: MY PLAN & BILLING ▬▬ */}
+          <section className="border-t pt-10">
+            <div className="mb-6">
+              <h2 className="text-3xl font-bold text-foreground">My Plan & Billing</h2>
+              <p className="text-base text-muted-foreground mt-2">Manage your subscription and billing settings</p>
+            </div>
+            <Card className="border-2 shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
@@ -646,25 +612,28 @@ export default function Dashboard() {
                       <div className="p-2 rounded-lg bg-primary/10">
                         <Receipt className="h-6 w-6 text-primary" />
                       </div>
-                      <h3 className="text-xl font-semibold">My Plan & Billing</h3>
+                      <h3 className="text-xl font-semibold">View Plans & Billing</h3>
                     </div>
                     <p className="text-muted-foreground">
                       View your current subscription, manage billing, and explore upgrade options
                     </p>
                   </div>
                   <Button onClick={() => navigate("/plans")} size="lg">
-                    View Plans & Billing
+                    Manage Plan
                   </Button>
                 </div>
               </CardContent>
             </Card>
           </section>
 
-          {/* ========== PRODUCTS SECTION ========== */}
-          <section className="border-t pt-8 pb-8">
-            <h2 className="text-2xl font-bold mb-6">Products & Services</h2>
+          {/* ▬▬ BLOCK 5: PRODUCTS & ORDERS ▬▬ */}
+          <section className="border-t pt-10">
+            <div className="mb-6">
+              <h2 className="text-3xl font-bold text-foreground">Products & Orders</h2>
+              <p className="text-base text-muted-foreground mt-2">Browse and order physical products and services</p>
+            </div>
             <div className="space-y-3">
-              <Card className="hover:shadow-md transition-shadow border-2">
+              <Card className="border-2 shadow-sm hover:shadow-md transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
@@ -685,7 +654,7 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
               
-              <Card className="hover:shadow-md transition-shadow border-2 border-dashed">
+              <Card className="border-2 border-dashed shadow-sm hover:shadow-md transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
@@ -708,45 +677,88 @@ export default function Dashboard() {
             </div>
           </section>
 
-          {/* ========== OPTIONAL ZONE: Step by Step Sections ========== */}
-          <section className="border-t pt-6 pb-24">
-            <h3 className="text-base font-semibold text-foreground mb-3">
-              {t("dashboard.stepByStepTitle", "Step by Step Sections")}
-            </h3>
-            <div className="space-y-2">
-              <button
-                onClick={() => navigate("/wizard/preplanning")}
-                className="w-full text-left p-4 rounded-lg border bg-card hover:bg-accent/30 transition-colors"
+          {/* ▬▬ BLOCK 6: HELP & SUPPORT ▬▬ */}
+          <section className="border-t pt-10 pb-24">
+            <div className="mb-6">
+              <h2 className="text-3xl font-bold text-foreground">Help & Support</h2>
+              <p className="text-base text-muted-foreground mt-2">Resources, guidance, and assistance when you need it</p>
+            </div>
+            <div className="grid gap-2">
+              {/* VIP Coach */}
+              <Link
+                to="/vip-coach"
+                className="flex items-center gap-4 p-4 rounded-lg border transition-all group bg-gradient-to-r from-yellow-50/50 to-amber-50/50 dark:from-yellow-950/20 dark:to-amber-950/20 border-yellow-500/50 hover:border-yellow-500 shadow-sm"
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">📋</span>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">
-                      {t("wizard.preplanning.title", "Start Pre-Planning Step-by-Step Guide")}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {t("wizard.preplanning.description", "Complete your final wishes one section at a time with guided steps")}
-                    </p>
-                  </div>
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 flex items-center justify-center">
+                  <Star className="h-5 w-5" />
                 </div>
-              </button>
-              
-              <button
-                onClick={() => navigate("/wizard/afterdeath")}
-                className="w-full text-left p-4 rounded-lg border bg-card hover:bg-accent/30 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">🤝</span>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">
-                      {t("wizard.afterdeath.title", "Start After-Death Step-by-Step Guide")}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {t("wizard.afterdeath.description", "Complete essential tasks after a death with our guided 12-step checklist")}
-                    </p>
-                  </div>
+                <span className="flex-1 text-base font-medium text-yellow-900 dark:text-yellow-100 group-hover:text-yellow-700 dark:group-hover:text-yellow-300">
+                  {t("dashboard.tiles.vipCoach.title")}
+                  <span className="ml-2 text-xs font-bold bg-yellow-500 text-white px-2 py-0.5 rounded-full">PREMIUM</span>
+                </span>
+                <ChevronRight className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+              </Link>
+
+              {/* Other Help Items */}
+              <Link to="/resources" className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group">
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <BookOpen className="h-5 w-5" />
                 </div>
-              </button>
+                <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
+                  {t("dashboard.tiles.resources.title")}
+                </span>
+                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+              </Link>
+
+              <Link to="/legal-documents" className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group">
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <Scale className="h-5 w-5" />
+                </div>
+                <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
+                  {t("dashboard.tiles.legalDocuments.title")}
+                </span>
+                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+              </Link>
+
+              <Link to="/faq" className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group">
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <HelpCircle className="h-5 w-5" />
+                </div>
+                <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
+                  {t("dashboard.tiles.questions.title")}
+                </span>
+                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+              </Link>
+
+              <Link to="/vendors" className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group">
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <Store className="h-5 w-5" />
+                </div>
+                <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
+                  {t("dashboard.tiles.vendors.title")}
+                </span>
+                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+              </Link>
+
+              <Link to="/contact" className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group">
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <MessageCircle className="h-5 w-5" />
+                </div>
+                <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
+                  {t("dashboard.tiles.quote.title")}
+                </span>
+                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+              </Link>
+
+              <Link to="/about-us" className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group">
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <Info className="h-5 w-5" />
+                </div>
+                <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
+                  About Us
+                </span>
+                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+              </Link>
             </div>
           </section>
 
