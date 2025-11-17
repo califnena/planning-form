@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Facebook, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
+import qrCode from "@/assets/qr-code.png";
 
 export const AppFooter = () => {
   const { t } = useTranslation();
@@ -18,7 +19,7 @@ export const AppFooter = () => {
       
       <footer className="border-t border-border bg-muted/30 mt-auto">
         <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
             {/* Provided By */}
             <div>
               <h3 className="text-sm font-semibold text-foreground mb-3">{t("sidebar.providedBy")}</h3>
@@ -27,7 +28,7 @@ export const AppFooter = () => {
                 <p>(323) 863-5804</p>
                 <a
                   href="mailto:info@everlastingfuneraladvisors.com"
-                  className="text-primary hover:underline block"
+                  className="text-primary hover:underline block no-underline"
                 >
                   info@everlastingfuneraladvisors.com
                 </a>
@@ -35,7 +36,7 @@ export const AppFooter = () => {
                   href="https://everlastingfuneraladvisors.com/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline block"
+                  className="text-primary hover:underline block no-underline"
                 >
                   everlastingfuneraladvisors.com
                 </a>
@@ -49,7 +50,7 @@ export const AppFooter = () => {
                 to="/about-us"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-primary hover:underline"
+                className="text-sm text-primary hover:underline no-underline"
               >
                 Learn more about us
               </Link>
@@ -62,7 +63,7 @@ export const AppFooter = () => {
                 href="https://www.facebook.com/profile.php?id=61580859545223"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center text-sm text-primary hover:underline"
+                className="inline-flex items-center text-sm text-primary hover:underline no-underline"
               >
                 <Facebook className="mr-2 h-4 w-4" />
                 Facebook
@@ -73,30 +74,32 @@ export const AppFooter = () => {
             <div>
               <h3 className="text-sm font-semibold text-foreground mb-3">Get Help</h3>
               <div className="space-y-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start"
+                <button
                   onClick={() => setShowContactDialog(true)}
+                  className="w-full text-left text-sm text-primary hover:underline no-underline flex items-center gap-2"
                 >
-                  <MessageSquare className="mr-2 h-4 w-4" />
+                  <MessageSquare className="h-4 w-4" />
                   {t("sidebar.contactSuggest")}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start"
-                  asChild
+                </button>
+                <a
+                  href="https://everlastingfuneraladvisors.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-sm text-primary hover:underline no-underline"
                 >
-                  <a
-                    href="https://everlastingfuneraladvisors.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Request a Quote
-                  </a>
-                </Button>
+                  Request a Quote
+                </a>
               </div>
+            </div>
+
+            {/* QR Code */}
+            <div className="flex flex-col items-center justify-center">
+              <img 
+                src={qrCode} 
+                alt="Everlasting Funeral Advisors QR Code" 
+                className="w-32 h-32 object-contain"
+              />
+              <p className="text-xs text-muted-foreground mt-2 text-center">Scan to visit our website</p>
             </div>
           </div>
 
