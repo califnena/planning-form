@@ -536,13 +536,21 @@ export default function Dashboard() {
                             )}
                           </div>
                           
-                          {isPrePlanning && (
-                            <Link to="/products/binder" className="block">
+                          <div className="flex gap-2">
+                            {isPrePlanning && (
+                              <Link to="/products/binder" className="flex-1">
+                                <button className="w-full text-xs text-muted-foreground hover:text-foreground text-left px-2 py-1">
+                                  Order binder
+                                </button>
+                              </Link>
+                            )}
+                            <Link to="/contacts" className="flex-1">
                               <button className="w-full text-xs text-muted-foreground hover:text-foreground text-left px-2 py-1">
-                                Order binder
+                                <Users className="inline-block mr-1 h-3 w-3" />
+                                Trusted Contacts
                               </button>
                             </Link>
-                          )}
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
