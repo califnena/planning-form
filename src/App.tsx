@@ -17,6 +17,8 @@ import Dashboard from "./pages/Dashboard";
 import PlannerApp from "./pages/PlannerApp";
 import Profile from "./pages/Profile";
 import Subscription from "./pages/Subscription";
+import Plans from "./pages/Plans";
+import Products from "./pages/Products";
 import AboutUs from "./pages/AboutUs";
 import LegalForms from "./pages/LegalForms";
 import CoachAssistant from "./pages/CoachAssistant";
@@ -63,6 +65,8 @@ const App = () => (
                     <Route path="/app" element={<PlannerApp />} />
                     <Route path="/app/profile" element={<Profile />} />
                     <Route path="/app/profile/subscription" element={<Subscription />} />
+                    <Route path="/plans" element={<Plans />} />
+                    <Route path="/products" element={<Products />} />
                     <Route path="/vip-coach" element={<CoachAssistant />} />
                     <Route path="/next-steps" element={<NextSteps />} />
                     <Route path="/next-steps/case/:caseId" element={<CaseDetail />} />
