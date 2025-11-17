@@ -109,18 +109,6 @@ export function Step0Overview({ formData, onSave, planPreparedFor }: Step0Overvi
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
-      {/* Avatar Helper */}
-      <div className="flex justify-end items-start">
-        <div className="flex items-center gap-3 bg-primary/5 border border-primary/20 rounded-lg p-4 max-w-md">
-          <Avatar className="h-12 w-12 border-2 border-primary/20">
-            <AvatarImage src={mascotImage} alt="Mrs. Everlasting" />
-          </Avatar>
-          <p className="text-sm text-muted-foreground italic">
-            {t("afterDeathPlan.avatarMessage")}
-          </p>
-        </div>
-      </div>
-
       <div className="flex justify-end">
         <Button 
           variant="outline" 
@@ -142,7 +130,7 @@ export function Step0Overview({ formData, onSave, planPreparedFor }: Step0Overvi
       {/* Prepared For Section */}
       <div className="bg-primary/10 border border-primary/20 rounded-lg p-6">
         <Label htmlFor="preparedFor" className="text-base font-bold text-foreground mb-3 block">
-          {t("afterDeathPlan.preparedForLabel")}:
+          This planner is prepared for:
         </Label>
         <Input
           id="preparedFor"
