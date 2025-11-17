@@ -102,27 +102,20 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-20 items-center justify-between px-4">
-          {/* Left: Logo and Title */}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                  <div className="flex flex-col items-center gap-0.5">
-                    <img src={logo} alt="Everlasting" className="h-12 w-12" />
-                    <span className="text-xs text-muted-foreground">Dashboard Home</span>
-                  </div>
-                  <div className="hidden sm:block">
-                    <h1 className="text-lg font-semibold text-foreground">Everlasting Planner</h1>
-                    <p className="text-xs text-muted-foreground">Plan ahead. Guide your loved ones.</p>
-                  </div>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Go to Dashboard</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+        <div className="container flex h-20 items-center justify-between px-4 gap-4">
+          {/* Left: Logo and Home Button */}
+          <div className="flex items-center gap-3">
+            <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity group">
+              <div className="relative">
+                <img src={logo} alt="Everlasting" className="h-12 w-12" />
+                <Home className="absolute -bottom-1 -right-1 h-4 w-4 text-primary bg-background rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+              <div className="hidden sm:block">
+                <h1 className="text-lg font-semibold text-foreground">Everlasting Planner</h1>
+                <p className="text-xs text-muted-foreground">Plan ahead. Guide your loved ones.</p>
+              </div>
+            </Link>
+          </div>
           
           {/* Right: Controls and Menu */}
           <div className="flex items-center gap-2">
