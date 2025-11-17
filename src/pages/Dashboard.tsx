@@ -433,40 +433,6 @@ export default function Dashboard() {
                       {t("dashboard.subtitle")}
                     </p>
                   </div>
-
-                  {/* Progress Bar */}
-                  <div className="bg-muted/30 rounded-lg p-5 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xl font-bold text-primary">{progress}%</span>
-                      <span className="text-sm font-medium text-muted-foreground">{t("common.complete")}</span>
-                    </div>
-                    <Progress value={progress} className="h-3" />
-                  </div>
-
-                  {/* Primary Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                    <Button 
-                      onClick={handleContinue}
-                      size="lg"
-                      className="flex-1 gap-2 h-14 text-base font-semibold"
-                    >
-                      <Play className="h-5 w-5" />
-                      {t("dashboard.continueButton")}
-                    </Button>
-                    <Button 
-                      onClick={handleStartNew}
-                      variant="outline"
-                      size="lg"
-                      className="sm:w-auto gap-2 h-14 text-base font-medium"
-                    >
-                      <PlusCircle className="h-5 w-5" />
-                      {t("dashboard.startNewButton")}
-                    </Button>
-                  </div>
-
-                  <p className="text-xs text-muted-foreground text-center pt-1">
-                    {t("dashboard.autoSaveNote", "Your entries are saved automatically as you type.")}
-                  </p>
                 </div>
               </div>
             </CardContent>
