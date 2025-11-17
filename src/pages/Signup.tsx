@@ -137,24 +137,36 @@ const Signup = () => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}`,
-          skipBrowserRedirect: true,
-          queryParams: { prompt: "select_account" },
+          redirectTo: `${window.location.origin}/dashboard`,
+          queryParams: { 
+            access_type: 'offline',
+            prompt: 'consent'
+          },
         },
       });
 
       if (error) throw error;
-       if (data?.url) {
-         // Open in a new tab to avoid iframe/navigation restrictions in preview
-         const newWin = window.open(data.url, "_blank", "noopener,noreferrer");
-         if (!newWin) {
-           window.location.href = data.url;
-         }
-       }
+
+      // The browser will redirect to Google's OAuth page
+      // After authorization, Google redirects back to Supabase
+      // Supabase then redirects to our redirectTo URL
     } catch (error: any) {
+      let errorMessage = "Could not sign up with Google. Please try again later.";
+      
+      // Handle specific OAuth errors
+      if (error.message?.includes("redirect_uri_mismatch")) {
+        errorMessage = "Google sign-in configuration error. Please contact support.";
+        console.error("OAuth redirect_uri_mismatch error. Ensure these URLs are whitelisted in Google Cloud Console:", {
+          supabaseCallback: "https://bhhmizhxxpckibxudbrq.supabase.co/auth/v1/callback",
+          appRedirect: `${window.location.origin}/dashboard`
+        });
+      } else if (error.message?.includes("provider")) {
+        errorMessage = "Google provider not configured. Please contact support.";
+      }
+
       toast({
-        title: "Google signup failed",
-        description: error.message || "Could not sign up with Google",
+        title: "Google sign-up failed",
+        description: errorMessage,
         variant: "destructive",
       });
     }
