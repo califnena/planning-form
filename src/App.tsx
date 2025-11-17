@@ -22,6 +22,8 @@ import LegalForms from "./pages/LegalForms";
 import CoachAssistant from "./pages/CoachAssistant";
 import NextSteps from "./pages/NextSteps";
 import CaseDetail from "./pages/CaseDetail";
+import PrePlanningWizard from "./pages/PrePlanningWizard";
+import AfterDeathWizard from "./pages/AfterDeathWizard";
 import Vendors from "./pages/Vendors";
 import Forms from "./pages/Forms";
 import Contact from "./pages/Contact";
@@ -57,6 +59,8 @@ const App = () => (
                 <Route path="/vip-coach" element={<CoachAssistant />} />
                 <Route path="/next-steps" element={<NextSteps />} />
                 <Route path="/next-steps/case/:caseId" element={<CaseDetail />} />
+                <Route path="/wizard/preplanning" element={<PrePlanningWizard />} />
+                <Route path="/wizard/afterdeath" element={<AfterDeathWizard />} />
                 <Route path="/vendors" element={<Vendors />} />
                 <Route path="/forms" element={<Forms />} />
                 <Route path="/contact" element={<Contact />} />
