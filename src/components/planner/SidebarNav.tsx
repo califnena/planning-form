@@ -106,7 +106,7 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
       {/* User-selected sections */}
       {userSections.length > 0 && (
         <div className="space-y-1">
-          <h3 className="text-sm font-semibold text-foreground px-4 mb-3 uppercase tracking-wide">
+          <h3 className="text-base font-bold text-foreground mb-3 uppercase tracking-wide text-center">
             {t("sidebar.yourPlanner")}
           </h3>
           {userSections.map(renderNavButton)}
@@ -123,11 +123,11 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
       )}
 
       {/* Divider */}
-      <hr className="my-4 border-border mx-4" />
+      <hr className="my-4 border-2 border-border mx-4" />
 
       {/* Help & Support */}
       <div className="space-y-1 mt-6">
-        <h3 className="text-sm font-semibold text-foreground px-4 mb-3 uppercase tracking-wide">
+        <h3 className="text-base font-bold text-foreground mb-3 uppercase tracking-wide text-center">
           {t("sidebar.helpSupport")}
         </h3>
         {alwaysVisibleSections.map((item) => {
