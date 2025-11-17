@@ -45,7 +45,7 @@ export const AppFooter = () => {
 
             {/* About Us */}
             <div>
-              <h3 className="text-xs font-semibold text-foreground mb-3 uppercase tracking-wide">{t("sidebar.aboutUs")}</h3>
+              <h3 className="text-xs font-semibold text-foreground mb-3 tracking-wide">About Us</h3>
               <Link
                 to="/about-us"
                 target="_blank"
