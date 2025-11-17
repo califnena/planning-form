@@ -7,7 +7,6 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { Plus, Minus } from "lucide-react";
 import { useState, useEffect } from "react";
 import mascotCouple from "@/assets/mascot-couple.png";
-import { AppFooter } from "@/components/AppFooter";
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -255,8 +254,6 @@ const Pricing = () => {
           </Card>
         </div>
       </main>
-
-      <AppFooter />
     </div>
   );
 };
