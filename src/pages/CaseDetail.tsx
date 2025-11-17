@@ -56,12 +56,34 @@ export default function CaseDetail() {
   const [isSaving, setIsSaving] = useState(false);
   const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [planPreparedFor, setPlanPreparedFor] = useState<string>("");
 
   useEffect(() => {
     if (caseId) {
       fetchCaseData();
+      fetchPlanData();
     }
   }, [caseId]);
+
+  const fetchPlanData = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("plans")
+        .select("prepared_for")
+        .eq("owner_user_id", user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (data?.prepared_for) {
+        setPlanPreparedFor(data.prepared_for);
+      }
+    } catch (error) {
+      console.error("Error fetching plan data:", error);
+    }
+  };
 
   const fetchCaseData = async () => {
     try {
@@ -147,7 +169,7 @@ export default function CaseDetail() {
 
     switch (currentStep) {
       case 0:
-        return <Step0Overview {...stepProps} />;
+        return <Step0Overview {...stepProps} planPreparedFor={planPreparedFor} />;
       case 1:
         return <Step1ImmediateNeeds {...stepProps} />;
       case 2:

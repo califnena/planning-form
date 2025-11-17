@@ -13,6 +13,7 @@ interface Step0OverviewProps {
   formData: any;
   onSave: (data: any) => void;
   caseId: string;
+  planPreparedFor?: string;
 }
 
 const STEP_ICONS = [
@@ -30,9 +31,12 @@ const STEP_ICONS = [
   Briefcase,  // Step 12: Business
 ];
 
-export function Step0Overview({ formData, onSave }: Step0OverviewProps) {
+export function Step0Overview({ formData, onSave, planPreparedFor }: Step0OverviewProps) {
   const { t } = useTranslation();
   const [preparedFor, setPreparedFor] = useState(formData?.preparedFor || "");
+  
+  // Get the name to use in the intro text
+  const displayName = planPreparedFor || "This person";
   const [overviewNotes, setOverviewNotes] = useState(formData?.overviewNotes || "");
   
   const handleClearAll = () => {
@@ -129,9 +133,9 @@ export function Step0Overview({ formData, onSave }: Step0OverviewProps) {
 
       {/* Introduction */}
       <div className="bg-muted/30 rounded-lg p-8 space-y-4">
-        <h2 className="text-2xl font-bold text-foreground">{t("afterDeathPlan.title")}</h2>
+        <h2 className="text-2xl font-bold text-foreground">After-Death Planner</h2>
         <p className="text-base text-muted-foreground leading-relaxed">
-          {t("afterDeathPlan.introText")}
+          This After-Death Planner is a step-by-step guide to help you through the practical tasks that follow a loss. We are very sorry you are going through this. {displayName} cared deeply about you and wanted to make it easier for you to honor their wishes and remember them the way they hoped.
         </p>
       </div>
 
