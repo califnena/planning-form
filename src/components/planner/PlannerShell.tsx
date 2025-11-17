@@ -1,6 +1,5 @@
 import { useState, ReactNode } from "react";
 import { SidebarNav } from "./SidebarNav";
-import { ActionSidebar } from "./ActionSidebar";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -57,18 +56,6 @@ export const PlannerShell = ({
             onSectionChange(section);
             setMobileMenuOpen(false);
           }}
-        />
-      </div>
-
-      {/* Quick Actions Section */}
-      <div className="border-t border-border pt-4 mt-4">
-        <h3 className="text-sm font-semibold text-foreground mb-4 px-4">{t("sidebar.quickActions")}</h3>
-        <ActionSidebar
-          onPreviewPDF={onPreviewPDF}
-          onDownloadPDF={onDownloadPDF}
-          onDownloadManualForm={onDownloadManualForm}
-          onAfterLifePlan={onAfterLifePlan}
-          onSave={onSave}
         />
       </div>
     </div>
