@@ -6,12 +6,12 @@ import { useToast } from "@/hooks/use-toast";
 import { ALL_SECTIONS } from "@/lib/sections";
 import { User } from "@supabase/supabase-js";
 import { Switch } from "@/components/ui/switch";
-import { CheckCircle2, ClipboardList, FileText, User as UserIcon, BookHeart, Users, Building, Church, DollarSign, Shield, Home, PawPrint, Globe, FolderLock, Heart } from "lucide-react";
-import { TourResetButton } from "@/components/planner/TourResetButton";
+import { CheckCircle2, ClipboardList, FileText, User as UserIcon, BookHeart, Users, Building, Church, DollarSign, Shield, Home, PawPrint, Globe, FolderLock, Heart, HelpCircle } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import mascotCouple from "@/assets/mascot-couple.png";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface SectionPreferencesProps {
   user: User;
@@ -153,7 +153,7 @@ export const SectionPreferences = ({
     }
   };
 
-  const handleContinue = async () => {
+  const handleSaveAndContinue = async () => {
     await saveSettings();
     if (onContinue) onContinue();
   };
@@ -185,20 +185,22 @@ export const SectionPreferences = ({
     <div className="max-w-7xl mx-auto">
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6 -mx-6 px-6 py-4">
         <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold text-foreground mb-1">{t('preferences.title')}</h1>
-            <p className="text-sm text-muted-foreground">{t('preferences.subtitle')}</p>
+          <div className="flex-1 min-w-0 flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-foreground">{t('preferences.title')}</h1>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-5 w-5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>{t('preferences.tooltip')}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <TourResetButton userId={user.id} />
-            <Button variant="outline" onClick={handleReset}>
-              {t('preferences.reset')}
-            </Button>
-            <Button onClick={saveSettings} disabled={saving}>
-              {saving ? t('common.saving') : t('preferences.save')}
-            </Button>
-            <Button onClick={handleContinue} className="bg-primary">
-              {t('preferences.continue')}
+            <Button onClick={handleSaveAndContinue} disabled={saving} size="lg" className="bg-primary">
+              {saving ? t('common.saving') : t('preferences.saveAndContinue')}
             </Button>
           </div>
         </div>
@@ -299,16 +301,16 @@ export const SectionPreferences = ({
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-2 mt-8 pt-6 border-t">
-        <Button variant="outline" onClick={handleReset}>
-          {t('preferences.reset')}
+      <div className="flex flex-col items-center gap-4 mt-8 pt-6 border-t">
+        <Button onClick={handleSaveAndContinue} disabled={saving} size="lg" className="bg-primary">
+          {saving ? t('common.saving') : t('preferences.saveAndContinue')}
         </Button>
-        <Button onClick={saveSettings} disabled={saving}>
-          {saving ? t('common.saving') : t('preferences.save')}
-        </Button>
-        <Button onClick={handleContinue} className="bg-primary">
-          {t('preferences.continue')}
-        </Button>
+        <button 
+          onClick={handleReset}
+          className="text-sm text-muted-foreground hover:text-foreground underline transition-colors"
+        >
+          {t('preferences.resetLink')}
+        </button>
       </div>
     </div>
   );
