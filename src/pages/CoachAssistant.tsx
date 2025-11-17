@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { GlobalHeader } from "@/components/GlobalHeader";
+import { AppFooter } from "@/components/AppFooter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -428,6 +429,7 @@ export default function CoachAssistant() {
         </Card>
       </div>
     </div>
+    <AppFooter />
     </>
   );
 }
