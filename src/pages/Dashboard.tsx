@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { 
   FileText, 
@@ -19,6 +19,7 @@ import { QuickAccessBar } from "@/components/dashboard/QuickAccessBar";
 
 export default function Dashboard() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const tiles = [
     {
@@ -99,7 +100,36 @@ export default function Dashboard() {
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-7xl px-4 py-8 space-y-8">
           {/* Welcome Panel */}
-          <WelcomePanel />
+      <WelcomePanel />
+      
+      {/* Step-by-Step Wizard Buttons */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <button
+          onClick={() => navigate("/wizard/preplanning")}
+          className="p-6 bg-card border rounded-lg hover:border-primary transition-colors text-left space-y-2"
+        >
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <span className="text-2xl">📋</span>
+            {t("wizard.preplanning.title", "Start Pre-Planning Step-by-Step Guide")}
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            {t("wizard.preplanning.description", "Complete your final wishes one section at a time with guided steps")}
+          </p>
+        </button>
+        
+        <button
+          onClick={() => navigate("/wizard/afterdeath")}
+          className="p-6 bg-card border border-orange-200 dark:border-orange-900 rounded-lg hover:border-orange-400 transition-colors text-left space-y-2"
+        >
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <span className="text-2xl">🤝</span>
+            {t("wizard.afterdeath.title", "Start After-Death Step-by-Step Guide")}
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            {t("wizard.afterdeath.description", "Complete essential tasks after a death with our guided 12-step checklist")}
+          </p>
+        </button>
+      </div>
 
           {/* Progress and Quick Access Row */}
           <div className="grid gap-6 lg:grid-cols-3">

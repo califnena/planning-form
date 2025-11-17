@@ -257,5 +257,15 @@
     "page": "Página",
     "of": "de",
     "providedBy": "Proporcionado por"
+  },
+  "wizard": {
+    "preplanning": {
+      "title": "Iniciar Guía Paso a Paso de Pre-Planificación",
+      "description": "Complete sus deseos finales una sección a la vez con pasos guiados"
+    },
+    "afterdeath": {
+      "title": "Iniciar Guía Paso a Paso Después del Fallecimiento",
+      "description": "Complete tareas esenciales después de un fallecimiento con nuestra lista de 12 pasos guiados"
+    }
   }
 }
