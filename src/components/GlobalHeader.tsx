@@ -21,6 +21,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import logo from "@/assets/everlasting-logo.png";
 
 interface GlobalHeaderProps {
@@ -98,13 +104,25 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-20 items-center justify-between px-4">
           {/* Left: Logo and Title */}
-          <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <img src={logo} alt="Everlasting" className="h-12 w-12" />
-            <div className="hidden sm:block">
-              <h1 className="text-lg font-semibold text-foreground">Everlasting Planner</h1>
-              <p className="text-xs text-muted-foreground">Plan ahead. Guide your loved ones.</p>
-            </div>
-          </Link>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                  <div className="flex flex-col items-center gap-0.5">
+                    <img src={logo} alt="Everlasting" className="h-12 w-12" />
+                    <span className="text-xs text-muted-foreground">Dashboard Home</span>
+                  </div>
+                  <div className="hidden sm:block">
+                    <h1 className="text-lg font-semibold text-foreground">Everlasting Planner</h1>
+                    <p className="text-xs text-muted-foreground">Plan ahead. Guide your loved ones.</p>
+                  </div>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Go to Dashboard</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           
           {/* Right: Controls and Menu */}
           <div className="flex items-center gap-2">
