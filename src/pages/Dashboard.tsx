@@ -51,7 +51,7 @@ export default function Dashboard() {
         setFirstName(name);
       }
 
-      // Load progress
+      // Load progress and calculate dynamically
       const { data: orgMember } = await supabase
         .from("org_members")
         .select("org_id")
@@ -60,28 +60,126 @@ export default function Dashboard() {
         .maybeSingle();
 
       if (orgMember) {
-        const { data: plan } = await supabase
-          .from("plans")
-          .select("percent_complete")
-          .eq("org_id", orgMember.org_id)
-          .eq("owner_user_id", user.id)
+        // Get user's selected sections from preferences
+        const { data: settings } = await supabase
+          .from("user_settings")
+          .select("selected_sections")
+          .eq("user_id", user.id)
           .maybeSingle();
 
-        if (plan?.percent_complete) {
-          setProgress(plan.percent_complete);
+        const selectedSections = settings?.selected_sections || [];
+
+        if (selectedSections.length > 0) {
+          // Get plan data to check which sections have content
+          const { data: plan } = await supabase
+            .from("plans")
+            .select("*")
+            .eq("org_id", orgMember.org_id)
+            .eq("owner_user_id", user.id)
+            .maybeSingle();
+
+          if (plan) {
+            // Count sections with any data
+            let sectionsWithData = 0;
+            const noteFields = [
+              'instructions_notes', 'about_me_notes', 'checklist_notes',
+              'funeral_wishes_notes', 'financial_notes', 'insurance_notes',
+              'property_notes', 'pets_notes', 'digital_notes', 'legal_notes',
+              'messages_notes', 'to_loved_ones_message'
+            ];
+
+            noteFields.forEach(field => {
+              if (plan[field] && plan[field].trim().length > 0) {
+                sectionsWithData++;
+              }
+            });
+
+            // Calculate percentage
+            const calculatedProgress = Math.round((sectionsWithData / selectedSections.length) * 100);
+            setProgress(calculatedProgress);
+
+            // Update the plan with new percentage
+            await supabase
+              .from("plans")
+              .update({ percent_complete: calculatedProgress })
+              .eq("id", plan.id);
+          }
         }
       }
     };
     loadUserData();
   }, []);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Check if user has preferences set
+    const { data: settings } = await supabase
+      .from("user_settings")
+      .select("selected_sections")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    const selectedSections = settings?.selected_sections || [];
+
+    // If no preferences, redirect to preferences page
+    if (selectedSections.length === 0) {
+      navigate("/preferences");
+      return;
+    }
+
+    // Check last visited section from localStorage
     const lastSection = localStorage.getItem("efa-last-section");
-    navigate(lastSection || "/app");
+    if (lastSection) {
+      navigate(lastSection);
+    } else {
+      // Navigate to first active section in their preferences
+      const sectionRouteMap: Record<string, string> = {
+        'instructions': '/my-instructions',
+        'personal': '/personal-details',
+        'legacy': '/about-me',
+        'contacts': '/contacts-notify',
+        'providers': '/vendors',
+        'checklist': '/checklist',
+        'funeral': '/funeral-wishes',
+        'financial': '/financial-life',
+        'insurance': '/insurance-benefits',
+        'property': '/property-valuables',
+        'pets': '/pet-care',
+        'digital': '/digital-accounts',
+        'legal': '/legal-documents',
+        'messages': '/personal-messages'
+      };
+
+      const firstSection = selectedSections[0];
+      const route = sectionRouteMap[firstSection] || "/app";
+      navigate(route);
+    }
   };
 
-  const handleStartNew = () => {
-    navigate("/app");
+  const handleStartNew = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      navigate("/app");
+      return;
+    }
+
+    // Check if user has preferences
+    const { data: settings } = await supabase
+      .from("user_settings")
+      .select("selected_sections")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    const selectedSections = settings?.selected_sections || [];
+
+    // If no preferences, redirect to preferences
+    if (selectedSections.length === 0) {
+      navigate("/preferences");
+    } else {
+      navigate("/app");
+    }
   };
 
   // Planning Tools
@@ -92,7 +190,7 @@ export default function Dashboard() {
       href: "/app",
     },
     {
-      title: t("dashboard.tiles.afterDeath.title"),
+      title: "After-Death Planner",
       icon: CheckCircle,
       href: "/next-steps",
     },
@@ -151,9 +249,9 @@ export default function Dashboard() {
       href: "/contact",
     },
     {
-      title: t("footer.aboutUs"),
+      title: "About Us",
       icon: Info,
-      href: "/about",
+      href: "/about-us",
     },
   ];
 
@@ -238,7 +336,7 @@ export default function Dashboard() {
             
             {/* A. Planning Tools */}
             <section>
-              <h2 className="text-xl font-bold text-foreground mb-4">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
                 {t("dashboard.planningToolsTitle", "Planning Tools")}
               </h2>
               <div className="space-y-2">
@@ -253,7 +351,7 @@ export default function Dashboard() {
                       <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                         <Icon className="h-5 w-5" />
                       </div>
-                      <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
+                      <span className="flex-1 text-base font-medium text-foreground/90 group-hover:text-primary">
                         {tool.title}
                       </span>
                       <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
@@ -265,7 +363,7 @@ export default function Dashboard() {
 
             {/* B. Resources & Vendors */}
             <section>
-              <h2 className="text-xl font-bold text-foreground mb-4">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
                 {t("dashboard.resourcesTitle", "Resources & Vendors")}
               </h2>
               <div className="space-y-2">
@@ -280,7 +378,7 @@ export default function Dashboard() {
                       <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                         <Icon className="h-5 w-5" />
                       </div>
-                      <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
+                      <span className="flex-1 text-base font-medium text-foreground/90 group-hover:text-primary">
                         {resource.title}
                       </span>
                       <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
@@ -292,7 +390,7 @@ export default function Dashboard() {
 
             {/* C. Assistance & Support */}
             <section>
-              <h2 className="text-xl font-bold text-foreground mb-4">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
                 {t("dashboard.assistanceTitle", "Need Support?")}
               </h2>
               <div className="space-y-2">
@@ -340,10 +438,10 @@ export default function Dashboard() {
             </section>
           </div>
 
-          {/* ========== OPTIONAL ZONE: Other Guides ========== */}
-          <section className="border-t pt-6">
-            <h3 className="text-base font-semibold text-muted-foreground mb-3">
-              {t("dashboard.otherGuidesTitle", "Other Guides")}
+          {/* ========== OPTIONAL ZONE: Step by Step Sections ========== */}
+          <section className="border-t pt-6 pb-24">
+            <h3 className="text-base font-semibold text-foreground mb-3">
+              {t("dashboard.stepByStepTitle", "Step by Step Sections")}
             </h3>
             <div className="space-y-2">
               <button
