@@ -2,11 +2,9 @@ import { useState, ReactNode } from "react";
 import { SidebarNav } from "./SidebarNav";
 import { ActionSidebar } from "./ActionSidebar";
 import { Button } from "@/components/ui/button";
-import { Facebook, Menu, MessageSquare } from "lucide-react";
-import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
-import { ProfileDropdown } from "@/components/ProfileDropdown";
+import { Menu } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { AppFooter } from "@/components/AppFooter";
 import {
   Sheet,
   SheetContent,
@@ -17,7 +15,6 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from "@/components/ui/resizable";
-import everlastingLogo from "@/assets/everlasting-logo.png";
 
 interface PlannerShellProps {
   children: ReactNode;
@@ -46,9 +43,8 @@ export const PlannerShell = ({
   onSave,
   onAfterLifePlan,
 }: PlannerShellProps) => {
-  const [showContactDialog, setShowContactDialog] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
@@ -75,76 +71,11 @@ export const PlannerShell = ({
           onSave={onSave}
         />
       </div>
-
-      {/* Provided By Footer */}
-      <div className="mt-auto pt-6">
-        <div className="mx-4 p-4 rounded-lg bg-muted/30 border border-border">
-          <h3 className="text-xs font-semibold text-foreground mb-2">{t("sidebar.providedBy")}</h3>
-          <div className="text-xs text-muted-foreground space-y-1">
-            <p className="font-medium text-foreground">Everlasting Funeral Advisors</p>
-            <p>(323) 863-5804</p>
-            <a
-              href="mailto:info@everlastingfuneraladvisors.com"
-              className="text-primary hover:underline block"
-            >
-              info@everlastingfuneraladvisors.com
-            </a>
-            <a
-              href="https://everlastingfuneraladvisors.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline block"
-            >
-              everlastingfuneraladvisors.com
-            </a>
-          </div>
-          
-          <div className="mt-3 pt-3 border-t border-border/50">
-            <a
-              href="https://www.facebook.com/profile.php?id=61580859545223"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center text-primary hover:underline text-xs"
-            >
-              <Facebook className="mr-1 h-3.5 w-3.5" />
-              {t("sidebar.followUs")}
-            </a>
-          </div>
-          
-          <div className="mt-3">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full justify-start text-xs"
-              onClick={() => setShowContactDialog(true)}
-            >
-              <MessageSquare className="mr-2 h-3.5 w-3.5" />
-              {t("sidebar.contactSuggest")}
-            </Button>
-          </div>
-          
-          <div className="mt-2">
-            <Link to="/about-us" target="_blank" rel="noopener noreferrer">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start text-xs text-muted-foreground hover:text-foreground"
-              >
-                ℹ️ <span className="ml-2">{t("sidebar.aboutUs")}</span>
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
     </div>
   );
 
   return (
     <>
-      <ContactSuggestionDialog
-        open={showContactDialog}
-        onOpenChange={setShowContactDialog}
-      />
       <div className="min-h-screen flex flex-col bg-background">
         <div className="flex-1 flex">
           {/* Mobile Menu Sheet */}
@@ -190,6 +121,9 @@ export const PlannerShell = ({
             <div className="container mx-auto px-4 py-8 max-w-4xl">{children}</div>
           </main>
         </div>
+
+        {/* App Footer */}
+        <AppFooter />
       </div>
     </>
   );
