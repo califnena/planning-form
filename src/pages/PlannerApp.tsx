@@ -28,6 +28,7 @@ import { SectionInstructions } from "@/components/planner/sections/SectionInstru
 import { SectionPersonal } from "@/components/planner/sections/SectionPersonal";
 import { SectionContacts } from "@/components/planner/sections/SectionContacts";
 import { SectionAbout } from "@/components/planner/sections/SectionAbout";
+import { SectionLegacy } from "@/components/planner/sections/SectionLegacy";
 import { SectionChecklist } from "@/components/planner/sections/SectionChecklist";
 import { SectionFuneral } from "@/components/planner/sections/SectionFuneral";
 import { SectionFinancial } from "@/components/planner/sections/SectionFinancial";
@@ -453,7 +454,7 @@ const PlannerApp = () => {
         break;
       case "legacy":
         sectionContent = (
-          <SectionAbout
+          <SectionLegacy
             value={plan.about_me_notes}
             onChange={(value) => updatePlan({ about_me_notes: value })}
           />
