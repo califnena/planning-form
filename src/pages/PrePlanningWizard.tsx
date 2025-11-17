@@ -119,9 +119,11 @@ export default function PrePlanningWizard() {
         .from("user_settings")
         .select("selected_sections")
         .eq("user_id", uid)
-        .single();
+        .maybeSingle();
 
-      const sections = settings?.selected_sections || Object.keys(SECTION_CONFIG);
+      // Only use sections that were explicitly selected by the user
+      // If no selections exist, selectedSections will be empty and the user will be redirected to preferences
+      const sections = settings?.selected_sections || [];
       setSelectedSections(sections.filter(s => SECTION_CONFIG[s as keyof typeof SECTION_CONFIG]));
 
       // Load saved step position
