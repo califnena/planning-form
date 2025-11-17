@@ -472,77 +472,84 @@ export default function Dashboard() {
                     );
                   }
 
-                  // Enhanced cards with buttons for Pre-Planning and After-Death
+                  // Table-style layout for Pre-Planning and After-Death
                   return (
                     <Card key={tool.href} className="border-2">
-                      <CardContent className="p-4 space-y-4">
-                        <div className="flex items-start gap-4">
-                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                            <Icon className="h-5 w-5" />
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-6">
+                          {/* Left: Title and Description (2/3) */}
+                          <div className="flex items-start gap-4 flex-[2]">
+                            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                              <Icon className="h-6 w-6" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-lg font-semibold text-foreground mb-2">
+                                {tool.title}
+                              </h3>
+                              <p className="text-sm text-muted-foreground leading-relaxed">
+                                {isPrePlanning 
+                                  ? t("dashboard.tiles.prePlanning.description") 
+                                  : t("dashboard.tiles.afterDeath.description")}
+                              </p>
+                            </div>
                           </div>
-                          <div className="flex-1">
-                            <h3 className="text-base font-semibold text-foreground mb-1">
-                              {tool.title}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              {isPrePlanning 
-                                ? t("dashboard.tiles.prePlanning.description") 
-                                : t("dashboard.tiles.afterDeath.description")}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Button
-                            onClick={isPrePlanning ? handleContinue : () => navigate("/next-steps")}
-                            className="w-full h-12 text-base font-semibold"
-                            size="lg"
-                          >
-                            <Play className="mr-2 h-5 w-5" />
-                            {t("dashboard.continueButton")}
-                          </Button>
                           
-                          <div className="grid grid-cols-1 gap-1.5">
+                          {/* Right: Actions Panel (1/3) */}
+                          <div className="flex-1 flex flex-col gap-3 min-w-[280px]">
+                            {/* Primary Action */}
                             <Button
-                              onClick={isPrePlanning ? handlePrePlanningPDF : handleAfterDeathPDF}
-                              variant="ghost"
-                              className="w-full text-xs"
-                              size="sm"
+                              onClick={isPrePlanning ? handleContinue : () => navigate("/next-steps")}
+                              className="w-full h-11 text-base font-semibold"
+                              size="lg"
                             >
-                              <Download className="mr-2 h-3.5 w-3.5" />
-                              {isPrePlanning ? "Generate My Document" : "Generate After-Death Plan PDF"}
+                              <Play className="mr-2 h-4 w-4" />
+                              {t("dashboard.continueButton")}
                             </Button>
                             
-                            <Button
-                              onClick={isPrePlanning ? handleBlankPrePlanningPDF : handleBlankAfterDeathPDF}
-                              variant="ghost"
-                              className="w-full text-xs"
-                              size="sm"
-                            >
-                              <FileOutput className="mr-2 h-3.5 w-3.5" />
-                              Print blank form
-                            </Button>
-                            
-                            {isPrePlanning && (
+                            {/* Secondary Actions - Horizontal Grid */}
+                            <div className="grid grid-cols-2 gap-2">
                               <Button
-                                onClick={() => navigate("/wizard/preplanning")}
-                                variant="ghost"
-                                className="w-full text-xs"
+                                onClick={isPrePlanning ? handlePrePlanningPDF : handleAfterDeathPDF}
+                                variant="outline"
+                                className="text-xs h-9"
                                 size="sm"
                               >
-                                <Play className="mr-2 h-3.5 w-3.5" />
-                                {t("wizard.preplanning.title", "Start Pre-Planning Step-by-Step Guide")}
+                                <Download className="mr-1.5 h-3.5 w-3.5" />
+                                Generate PDF
                               </Button>
-                            )}
+                              
+                              <Button
+                                onClick={isPrePlanning ? handleBlankPrePlanningPDF : handleBlankAfterDeathPDF}
+                                variant="outline"
+                                className="text-xs h-9"
+                                size="sm"
+                              >
+                                <FileOutput className="mr-1.5 h-3.5 w-3.5" />
+                                Blank
+                              </Button>
+                            </div>
+                            
+                            {/* Tertiary Actions */}
+                            <div className="flex gap-2 text-xs">
+                              {isPrePlanning && (
+                                <>
+                                  <button
+                                    onClick={() => navigate("/wizard/preplanning")}
+                                    className="flex-1 text-muted-foreground hover:text-foreground underline decoration-dotted underline-offset-4"
+                                  >
+                                    Step-by-Step Guide
+                                  </button>
+                                  <span className="text-muted-foreground">•</span>
+                                  <Link
+                                    to="/products/binder"
+                                    className="flex-1 text-muted-foreground hover:text-foreground underline decoration-dotted underline-offset-4"
+                                  >
+                                    Order Binder
+                                  </Link>
+                                </>
+                              )}
+                            </div>
                           </div>
-                          
-                          {isPrePlanning && (
-                            <Link to="/products/binder" className="block">
-                              <button className="w-full text-xs text-muted-foreground hover:text-foreground text-left px-2 py-1">
-                                Order binder
-                              </button>
-                            </Link>
-                          )}
                         </div>
                       </CardContent>
                     </Card>
