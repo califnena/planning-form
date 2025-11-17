@@ -140,6 +140,16 @@
       }
     }
   },
+  "sidebar": {
+    "yourPlanner": "Your Planner",
+    "helpSupport": "Help & Support",
+    "quickActions": "Quick Actions",
+    "getStartedMessage": "Get started by selecting sections in Preferences below.",
+    "providedBy": "Provided by",
+    "followUs": "Follow Us",
+    "contactSuggest": "Contact / Suggest",
+    "aboutUs": "About Us"
+  },
   "dashboard": {
     "welcome": "Welcome, {{name}}",
     "welcomeGeneric": "Welcome",

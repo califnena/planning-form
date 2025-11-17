@@ -63,6 +63,16 @@
     "searchPlaceholder": "Tapez pour rechercher...",
     "optional": "(facultatif)"
   },
+  "sidebar": {
+    "yourPlanner": "Votre Planificateur",
+    "helpSupport": "Aide et Support",
+    "quickActions": "Actions Rapides",
+    "getStartedMessage": "Commencez par sélectionner des sections dans Préférences ci-dessous.",
+    "providedBy": "Fourni par",
+    "followUs": "Suivez-nous",
+    "contactSuggest": "Contact / Suggérer",
+    "aboutUs": "À Propos de Nous"
+  },
   "dashboard": {
     "welcome": "Bienvenue, {{name}}",
     "welcomeGeneric": "Bienvenue",
