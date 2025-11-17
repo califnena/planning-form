@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Home, LogOut, User, CreditCard, Settings as SettingsIcon } from "lucide-react";
+import { Home, LogOut, User, CreditCard, Settings as SettingsIcon, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TextSizeToggle } from "@/components/TextSizeToggle";
 import { PrivacyModal, PrivacyLink } from "@/components/PrivacyModal";
@@ -27,6 +27,15 @@ export const GlobalHeader = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    getUser();
+  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -41,6 +50,36 @@ export const GlobalHeader = () => {
       toast({
         title: "Error signing out",
         description: "There was a problem signing out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRestartTour = async () => {
+    if (!userId) return;
+    
+    try {
+      await supabase
+        .from("user_settings")
+        .update({
+          wizard_completed: false,
+          updated_at: new Date().toISOString()
+        })
+        .eq("user_id", userId);
+
+      toast({
+        title: "Tour Reset",
+        description: "Refresh the page to see the guided tour again.",
+      });
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      console.error("Error resetting tour:", error);
+      toast({
+        title: "Error",
+        description: "Failed to reset the tour. Please try again.",
         variant: "destructive",
       });
     }
@@ -81,6 +120,17 @@ export const GlobalHeader = () => {
                   <div>
                     <h3 className="font-semibold mb-2">Easy View Mode</h3>
                     <AccessibilityToggle />
+                  </div>
+                  <div className="pt-2 border-t">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRestartTour}
+                      className="w-full gap-2"
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                      Restart Guided Tour
+                    </Button>
                   </div>
                 </div>
               </PopoverContent>
