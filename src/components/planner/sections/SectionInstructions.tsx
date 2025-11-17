@@ -25,6 +25,14 @@ export const SectionInstructions = ({ value, onChange }: SectionInstructionsProp
         </p>
       </div>
 
+      {/* Auto-Save Notice */}
+      <div className="px-4 py-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <p className="text-sm text-blue-900 dark:text-blue-100 flex items-center gap-2">
+          <span className="text-base">💾</span>
+          <span>Your entries are saved automatically as you type.</span>
+        </p>
+      </div>
+
       {/* Important Notice About Filling Out Fields */}
       <div className="p-6 bg-primary/10 border-2 border-primary/30 rounded-lg space-y-4">
         <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
