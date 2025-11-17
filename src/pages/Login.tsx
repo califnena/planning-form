@@ -240,17 +240,15 @@ const Login = () => {
               Continue with Google
             </Button>
 
-            {import.meta.env.DEV && (
-              <Button
-                type="button"
-                variant="secondary"
-                className="w-full"
-                onClick={handleTestLogin}
-                disabled={loading}
-              >
-                Test Login (test@example.com)
-              </Button>
-            )}
+            <Button
+              type="button"
+              variant="secondary"
+              className="w-full"
+              onClick={handleTestLogin}
+              disabled={loading}
+            >
+              Test Login (test@example.com)
+            </Button>
           </div>
 
           <div className="mt-4 text-center text-sm">
