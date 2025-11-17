@@ -71,6 +71,7 @@
     "totalSelected": "{{count}} secciones seleccionadas",
     "resetLink": "Restablecer a secciones recomendadas",
     "saveAndContinue": "Guardar e ir al planificador",
+    "hiddenFromSidebar": "Esta sección estará oculta en su barra lateral.",
     "savePreferences": "Guardar Preferencias",
     "continueToPlanner": "Continuar a Mi Planificador",
     "avatarTooltip": "¿Necesita ayuda para elegir? Puedo explicar qué significa cada sección.",

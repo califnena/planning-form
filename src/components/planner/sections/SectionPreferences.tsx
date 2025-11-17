@@ -287,6 +287,11 @@ export const SectionPreferences = ({
                     <p className="text-sm text-muted-foreground">
                       {t(`preferences.sections.${sectionId}.description`, section.description)}
                     </p>
+                    {!isSelected && (
+                      <p className="text-xs text-muted-foreground/80 mt-2 italic">
+                        {t('preferences.hiddenFromSidebar')}
+                      </p>
+                    )}
                   </div>
                   <Switch
                     checked={isSelected}

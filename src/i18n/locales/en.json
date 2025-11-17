@@ -71,6 +71,7 @@
     "totalSelected": "{{count}} sections selected",
     "resetLink": "Reset to recommended sections",
     "saveAndContinue": "Save & Go to Planner",
+    "hiddenFromSidebar": "This section will be hidden from your sidebar.",
     "loadingPreferences": "Loading preferences...",
     "preferencesSaved": "Preferences Saved",
     "errorSaving": "Error saving your preferences. Please try again.",
