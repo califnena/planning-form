@@ -31,7 +31,7 @@ export const BackToTopButton = () => {
   return (
     <Button
       onClick={scrollToTop}
-      className="fixed bottom-6 right-6 z-50 rounded-full px-4 py-6 shadow-lg hover:shadow-xl transition-all"
+      className="fixed bottom-24 right-6 md:bottom-24 md:right-8 z-50 rounded-full px-4 py-6 shadow-lg hover:shadow-xl transition-all"
       size="lg"
       aria-label="Back to top"
     >

@@ -12,6 +12,11 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "@/components/ui/resizable";
 import everlastingLogo from "@/assets/everlasting-logo.png";
 
 interface PlannerShellProps {
@@ -151,17 +156,27 @@ export const PlannerShell = ({
             </SheetContent>
           </Sheet>
 
-          {/* Desktop Sidebar */}
-          <aside className="w-72 border-r border-border bg-[hsl(30,10%,98%)] overflow-y-auto hidden md:flex md:flex-col">
-            <div className="p-4 flex-1">
-              {sidebarContent}
-            </div>
-          </aside>
+          {/* Desktop Resizable Layout */}
+          <ResizablePanelGroup direction="horizontal" className="hidden md:flex flex-1">
+            <ResizablePanel defaultSize={20} minSize={15} maxSize={35}>
+              <aside className="h-full border-r border-border bg-[hsl(30,10%,98%)] overflow-y-auto">
+                <div className="p-4">
+                  {sidebarContent}
+                </div>
+              </aside>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={80}>
+              <main className="h-full overflow-y-auto">
+                <div className="container mx-auto px-4 py-8 max-w-4xl">{children}</div>
+              </main>
+            </ResizablePanel>
+          </ResizablePanelGroup>
 
-          {/* Main Content */}
-          <main className="flex-1 overflow-y-auto">
+          {/* Mobile Main Content */}
+          <main className="flex-1 overflow-y-auto md:hidden">
             {/* Mobile Menu Button - Fixed position */}
-            <div className="md:hidden fixed bottom-4 left-4 z-50">
+            <div className="fixed bottom-4 left-4 z-50">
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
                   <Button size="lg" className="rounded-full shadow-lg">
