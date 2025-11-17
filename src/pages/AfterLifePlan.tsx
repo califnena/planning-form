@@ -153,7 +153,7 @@ const AfterLifePlan = () => {
         {/* Info Section */}
         <Card className="mt-8 p-6 bg-muted/30">
           <h3 className="text-lg font-semibold text-foreground mb-3">
-            What's included in an After-Life Plan?
+            What's included in an After-Death Planner?
           </h3>
           <div className="space-y-2 text-sm text-muted-foreground">
             <p>✓ Immediate needs (first 24-72 hours)</p>

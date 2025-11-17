@@ -63,7 +63,7 @@ export const hasMessagesData = (messages: any): boolean => {
   return messages.length > 0 && messages.some((m: any) => m.recipients || m.text_message || m.audio_url || m.video_url);
 };
 
-// Helper functions for After-Life Action Plan PDF sections
+// Helper functions for After-Death Planner PDF sections
 export const hasStep1Data = (step1: any): boolean => {
   if (!step1) return false;
   return !!(

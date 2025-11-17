@@ -58,7 +58,7 @@ export default function NextSteps() {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <p className="text-muted-foreground">Loading After-Death Plan...</p>
+      <p className="text-muted-foreground">Loading After-Death Planner...</p>
     </div>
   );
 }

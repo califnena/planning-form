@@ -22,9 +22,9 @@ const Forms = () => {
   const handleDownloadAfterLifeForm = async () => {
     try {
       await generateBlankAfterLifePlanPDF();
-      toast.success('Blank After-Life Plan downloaded successfully');
+      toast.success('Blank After-Death Planner downloaded successfully');
     } catch (error) {
-      console.error('Error generating after-life form:', error);
+      console.error('Error generating after-death planner form:', error);
       toast.error('Failed to download form. Please try again.');
     }
   };
@@ -77,7 +77,7 @@ const Forms = () => {
             </div>
           </Card>
 
-          {/* After-Life Action Plan */}
+          {/* After-Death Planner */}
           <Card className="p-6 md:p-8">
             <div className="flex items-start gap-4">
               <div className="bg-primary/10 p-3 rounded-lg">
@@ -85,7 +85,7 @@ const Forms = () => {
               </div>
               <div className="flex-1">
                 <h2 className="text-xl md:text-2xl font-semibold text-foreground mb-2">
-                  After-Life Action Plan Checklist
+                  After-Death Planner Checklist
                 </h2>
                 <p className="text-base text-muted-foreground mb-4">
                   A blank checklist form to guide families through the necessary steps after a loved one passes away. 
@@ -99,7 +99,7 @@ const Forms = () => {
                 </p>
                 <Button onClick={handleDownloadAfterLifeForm} size="lg">
                   <Download className="mr-2 h-5 w-5" />
-                  Download After-Life Plan
+                  Download After-Death Planner
                 </Button>
               </div>
             </div>
