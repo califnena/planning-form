@@ -10,7 +10,7 @@ const Landing = () => {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
             <h1 className="text-xl font-semibold text-primary">Everlasting Funeral Advisors</h1>
-            <p className="text-xs text-muted-foreground">Planning with confidence and care</p>
+            <p className="text-xs text-muted-foreground">Peace of Mind Starts with a Plan</p>
           </div>
           <div className="flex items-center gap-4">
             <LanguageSelector />
