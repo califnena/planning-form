@@ -18,7 +18,8 @@ import {
   Phone,
   Mail,
   Store,
-  ChevronRight
+  ChevronRight,
+  Download
 } from "lucide-react";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { cn } from "@/lib/utils";
@@ -26,13 +27,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
+import { generatePlanPDF } from "@/lib/pdfGenerator";
 import mascotCouple from "@/assets/mascot-couple.png";
 
 export default function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [firstName, setFirstName] = useState<string>("");
   const [progress, setProgress] = useState(0);
+  const [showPIIDialog, setShowPIIDialog] = useState(false);
+  const [pendingPIIData, setPendingPIIData] = useState<any>(null);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -179,6 +186,109 @@ export default function Dashboard() {
       navigate("/preferences");
     } else {
       navigate("/app");
+    }
+  };
+
+  const handlePrePlanningPDF = () => {
+    setShowPIIDialog(true);
+  };
+
+  const handleAfterDeathPDF = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Check if user has any cases
+      const { data: cases } = await supabase
+        .from("cases")
+        .select("id, form_data")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (!cases || cases.length === 0) {
+        toast({
+          title: "No After-Death Plan",
+          description: "Start an After-Death Plan first to generate a PDF.",
+        });
+        navigate("/next-steps");
+        return;
+      }
+
+      // Get the most recent case
+      const latestCase = cases[0];
+      
+      // Get decedent name
+      const { data: decedent } = await supabase
+        .from("decedents")
+        .select("legal_name")
+        .eq("case_id", latestCase.id)
+        .maybeSingle();
+
+      const decedentName = decedent?.legal_name || "the deceased";
+      const formData = (latestCase.form_data || {}) as Record<string, any>;
+      
+      // Import the PDF generation function dynamically
+      const { generateAfterLifePlanPDF } = await import("@/lib/afterLifePlanPdfGenerator");
+      await generateAfterLifePlanPDF(formData, decedentName);
+      
+      toast({
+        title: "PDF Downloaded",
+        description: "Your After-Death Plan has been generated.",
+      });
+    } catch (error) {
+      console.error("Error generating After-Death PDF:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePIISubmit = async (piiData: any) => {
+    setPendingPIIData(piiData);
+    setShowPIIDialog(false);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get user's org
+      const { data: orgMember } = await supabase
+        .from("org_members")
+        .select("org_id")
+        .eq("user_id", user.id)
+        .eq("role", "owner")
+        .maybeSingle();
+
+      if (!orgMember) return;
+
+      // Get plan data
+      const { data: plan } = await supabase
+        .from("plans")
+        .select("*")
+        .eq("org_id", orgMember.org_id)
+        .eq("owner_user_id", user.id)
+        .maybeSingle();
+
+      if (plan) {
+        // Merge PII data into plan data
+        const planWithPII = { ...plan, ...piiData };
+        const pdf = generatePlanPDF(planWithPII);
+        pdf.save(`My-Final-Wishes-${new Date().toISOString().split('T')[0]}.pdf`);
+        toast({
+          title: "PDF Downloaded",
+          description: "Your Pre-Planning document has been generated.",
+        });
+      }
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -342,20 +452,70 @@ export default function Dashboard() {
               <div className="space-y-2">
                 {planningTools.map((tool) => {
                   const Icon = tool.icon;
+                  const isPrePlanning = tool.href === "/app";
+                  const isAfterDeath = tool.href === "/next-steps";
+                  
+                  // Regular card for non-primary tools
+                  if (!isPrePlanning && !isAfterDeath) {
+                    return (
+                      <Link
+                        key={tool.href}
+                        to={tool.href}
+                        className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group"
+                      >
+                        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <span className="flex-1 text-base font-medium text-foreground/90 group-hover:text-primary">
+                          {tool.title}
+                        </span>
+                        <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+                      </Link>
+                    );
+                  }
+
+                  // Enhanced cards with buttons for Pre-Planning and After-Death
                   return (
-                    <Link
-                      key={tool.href}
-                      to={tool.href}
-                      className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group"
-                    >
-                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <span className="flex-1 text-base font-medium text-foreground/90 group-hover:text-primary">
-                        {tool.title}
-                      </span>
-                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-                    </Link>
+                    <Card key={tool.href} className="border-2">
+                      <CardContent className="p-4 space-y-4">
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                            <Icon className="h-5 w-5" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-base font-semibold text-foreground mb-1">
+                              {tool.title}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {isPrePlanning 
+                                ? t("dashboard.tiles.prePlanning.description") 
+                                : t("dashboard.tiles.afterDeath.description")}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Button
+                            onClick={isPrePlanning ? handleContinue : () => navigate("/next-steps")}
+                            className="w-full h-12 text-base font-semibold"
+                            size="lg"
+                          >
+                            <Play className="mr-2 h-5 w-5" />
+                            {t("dashboard.continueButton")}
+                          </Button>
+                          
+                          <Button
+                            onClick={isPrePlanning ? handlePrePlanningPDF : handleAfterDeathPDF}
+                            variant="ghost"
+                            className="w-full text-sm"
+                            size="sm"
+                          >
+                            <Download className="mr-2 h-4 w-4" />
+                            {isPrePlanning ? "Generate My Document" : "Generate After-Death Plan PDF"}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
                   );
                 })}
               </div>
@@ -482,6 +642,13 @@ export default function Dashboard() {
 
         </div>
       </div>
+
+      {/* PII Collection Dialog for Pre-Planning PDF */}
+      <PIICollectionDialog
+        open={showPIIDialog}
+        onOpenChange={setShowPIIDialog}
+        onSubmit={handlePIISubmit}
+      />
     </>
   );
 }
