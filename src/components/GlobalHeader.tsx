@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Home, LogOut, User, CreditCard, Settings as SettingsIcon, RotateCcw, Star } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Home, LogOut, User, CreditCard, Settings as SettingsIcon, RotateCcw, Star, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TextSizeToggle } from "@/components/TextSizeToggle";
 import { PrivacyModal, PrivacyLink } from "@/components/PrivacyModal";
@@ -23,11 +23,19 @@ import {
 } from "@/components/ui/popover";
 import logo from "@/assets/everlasting-logo.png";
 
-export const GlobalHeader = () => {
+interface GlobalHeaderProps {
+  onGenerateDocument?: () => void;
+}
+
+export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  
+  // Check if we're on the planner page
+  const isPlannerPage = location.pathname === '/app';
 
   useEffect(() => {
     const getUser = async () => {
@@ -101,6 +109,20 @@ export const GlobalHeader = () => {
           {/* Right: Controls and Menu */}
           <div className="flex items-center gap-2">
             <GlobalSearch />
+            
+            {/* Generate Document button - only on planner page */}
+            {isPlannerPage && onGenerateDocument && (
+              <Button 
+                variant="default" 
+                size="sm" 
+                className="gap-2 hidden md:flex"
+                onClick={onGenerateDocument}
+              >
+                <FileText className="h-4 w-4" />
+                Generate My Document
+              </Button>
+            )}
+            
             <LanguageSelector />
             
             {/* Accessibility Panel */}
