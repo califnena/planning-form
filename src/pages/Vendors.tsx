@@ -25,20 +25,28 @@ const Vendors = () => {
 
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
+          console.log('No user logged in');
           setIsAdmin(false);
           setLoading(false);
           return;
         }
 
-        const { data: roles } = await supabase
+        console.log('Checking admin status for user:', user.id);
+        const { data: roles, error } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
-          .eq('role', 'admin')
-          .single();
+          .eq('role', 'admin');
 
-        setIsAdmin(!!roles);
+        if (error) {
+          console.error('Error checking admin role:', error);
+        }
+
+        const hasAdminRole = roles && roles.length > 0;
+        console.log('Admin role check result:', hasAdminRole);
+        setIsAdmin(hasAdminRole);
       } catch (error) {
+        console.error('Error in admin check:', error);
         setIsAdmin(false);
       } finally {
         setLoading(false);

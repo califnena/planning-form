@@ -129,21 +129,32 @@ export const VendorAdmin = () => {
   // Delete vendor mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
+      console.log('Attempting to delete vendor:', id);
+      const { data, error } = await supabase
         .from('vendor_directory')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .select();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Delete error:', error);
+        throw error;
+      }
+      
+      console.log('Delete successful:', data);
+      return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Delete mutation success, invalidating queries');
       queryClient.invalidateQueries({ queryKey: ['vendor-directory'] });
       queryClient.invalidateQueries({ queryKey: ['vendor-directory-admin'] });
       toast.success('Vendor deleted successfully');
       setDeletingId(null);
     },
-    onError: (error) => {
-      toast.error(`Failed to delete vendor: ${error.message}`);
+    onError: (error: any) => {
+      console.error('Delete mutation error:', error);
+      const errorMessage = error?.message || 'Unknown error occurred';
+      toast.error(`Failed to delete vendor: ${errorMessage}`);
       setDeletingId(null);
     },
   });
@@ -407,16 +418,25 @@ export const VendorAdmin = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Vendor</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this vendor? This action cannot be undone.
+              Are you sure you want to permanently delete this vendor from the directory? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => deletingId && deleteMutation.mutate(deletingId)}
+              onClick={(e) => {
+                e.preventDefault();
+                if (deletingId) {
+                  console.log('Delete button clicked for vendor:', deletingId);
+                  deleteMutation.mutate(deletingId);
+                }
+              }}
+              disabled={deleteMutation.isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
