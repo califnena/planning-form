@@ -31,6 +31,7 @@ import Resources from "./pages/Resources";
 import FAQ from "./pages/FAQ";
 import LegalDocuments from "./pages/LegalDocuments";
 import NotFound from "./pages/NotFound";
+import { AppFooter } from "./components/AppFooter";
 
 const queryClient = new QueryClient();
 
@@ -45,31 +46,36 @@ const App = () => (
             <BrowserRouter>
               <ScrollToTop />
               <BackToTopButton />
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/about-us" element={<AboutUs />} />
-                <Route path="/legal-forms" element={<LegalForms />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/app" element={<PlannerApp />} />
-                <Route path="/app/profile" element={<Profile />} />
-                <Route path="/app/profile/subscription" element={<Subscription />} />
-                <Route path="/vip-coach" element={<CoachAssistant />} />
-                <Route path="/next-steps" element={<NextSteps />} />
-                <Route path="/next-steps/case/:caseId" element={<CaseDetail />} />
-                <Route path="/wizard/preplanning" element={<PrePlanningWizard />} />
-                <Route path="/wizard/afterdeath" element={<AfterDeathWizard />} />
-                <Route path="/vendors" element={<Vendors />} />
-                <Route path="/forms" element={<Forms />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/resources" element={<Resources />} />
-                <Route path="/faq" element={<FAQ />} />
-                <Route path="/legal-documents" element={<LegalDocuments />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <div className="flex flex-col min-h-screen">
+                <div className="flex-1">
+                  <Routes>
+                    <Route path="/" element={<Landing />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/about-us" element={<AboutUs />} />
+                    <Route path="/legal-forms" element={<LegalForms />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/app" element={<PlannerApp />} />
+                    <Route path="/app/profile" element={<Profile />} />
+                    <Route path="/app/profile/subscription" element={<Subscription />} />
+                    <Route path="/vip-coach" element={<CoachAssistant />} />
+                    <Route path="/next-steps" element={<NextSteps />} />
+                    <Route path="/next-steps/case/:caseId" element={<CaseDetail />} />
+                    <Route path="/wizard/preplanning" element={<PrePlanningWizard />} />
+                    <Route path="/wizard/afterdeath" element={<AfterDeathWizard />} />
+                    <Route path="/vendors" element={<Vendors />} />
+                    <Route path="/forms" element={<Forms />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/resources" element={<Resources />} />
+                    <Route path="/faq" element={<FAQ />} />
+                    <Route path="/legal-documents" element={<LegalDocuments />} />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </div>
+                <AppFooter />
+              </div>
             </BrowserRouter>
           </TooltipProvider>
         </AccessibilityProvider>

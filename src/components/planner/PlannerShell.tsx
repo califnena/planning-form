@@ -3,7 +3,6 @@ import { SidebarNav } from "./SidebarNav";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { AppFooter } from "@/components/AppFooter";
 import {
   Sheet,
   SheetContent,
@@ -108,9 +107,6 @@ export const PlannerShell = ({
             <div className="container mx-auto px-4 py-8 max-w-4xl">{children}</div>
           </main>
         </div>
-
-        {/* App Footer */}
-        <AppFooter />
       </div>
     </>
   );
