@@ -152,8 +152,8 @@ const Landing = () => {
             <Card className="border-2 hover:border-primary/50 transition-colors">
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <FileText className="h-8 w-8 text-primary" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                    <FileText className="h-8 w-8 text-white" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
@@ -169,8 +169,8 @@ const Landing = () => {
             <Card className="border-2 hover:border-primary/50 transition-colors">
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <ClipboardList className="h-8 w-8 text-primary" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg">
+                    <ClipboardList className="h-8 w-8 text-white" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
@@ -186,8 +186,8 @@ const Landing = () => {
             <Card className="border-2 hover:border-primary/50 transition-colors">
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <CalendarCheck className="h-8 w-8 text-primary" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
+                    <CalendarCheck className="h-8 w-8 text-white" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
@@ -203,8 +203,8 @@ const Landing = () => {
             <Card className="border-2 hover:border-primary/50 transition-colors">
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <ShoppingBag className="h-8 w-8 text-primary" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg">
+                    <ShoppingBag className="h-8 w-8 text-white" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
@@ -224,8 +224,8 @@ const Landing = () => {
             >
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Users className="h-8 w-8 text-primary" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg">
+                    <Users className="h-8 w-8 text-white" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
@@ -244,8 +244,8 @@ const Landing = () => {
             >
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Headphones className="h-8 w-8 text-primary" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                    <Headphones className="h-8 w-8 text-white" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
@@ -264,8 +264,8 @@ const Landing = () => {
             >
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Music className="h-8 w-8 text-primary" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg">
+                    <Music className="h-8 w-8 text-white" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
@@ -281,8 +281,8 @@ const Landing = () => {
             <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer">
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Type className="h-8 w-8 text-primary" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-500 to-slate-600 flex items-center justify-center shadow-lg">
+                    <Type className="h-8 w-8 text-white" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
