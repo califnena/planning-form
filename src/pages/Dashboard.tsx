@@ -369,62 +369,150 @@ export default function Dashboard() {
         <div className="mx-auto max-w-6xl px-4 py-8 space-y-12">
           
           {/* Welcome Message */}
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-3">
             <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-              {firstName ? t("dashboard.welcome", { name: firstName }) : t("dashboard.welcomeGeneric")}
+              Welcome to Your Planning Dashboard
             </h1>
-            <p className="text-lg text-muted-foreground">
-              {t("dashboard.subtitle")}
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              This is the place where you can organize your wishes, important contacts, documents, and after-death instructions. You can work at your own pace, come back anytime, and everything saves automatically.
             </p>
-          </div>
-
-          {/* Accessibility Banner */}
-          <div className="bg-muted/50 border border-border rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">
-              Need larger text or clearer colors? Open <strong>"Settings"</strong> at the top right to adjust readability.
+              If you need larger text or clearer colors, tap <strong>Settings</strong> at the top right to adjust readability.
             </p>
           </div>
 
-          {/* ▬▬ SECTION 1: CUSTOMIZE YOUR PLAN ▬▬ */}
+          {/* ▬▬ SECTION 1: HOW TO GET STARTED ▬▬ */}
           <section>
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="text-center">
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                  Customize Your Plan
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
+                  <Star className="h-6 w-6 text-yellow-500" />
+                  How to Get Started
                 </h2>
                 <p className="text-muted-foreground">
-                  Choose which sections you'd like to include in your planning journey.
+                  You can choose the method that works best for you.
                 </p>
               </div>
 
+              {/* Option 1: Digital Planner */}
               <Card className="border-2 shadow-sm">
-                <CardContent className="pt-6 pb-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-md">
-                      <Compass className="h-6 w-6 text-white" />
+                <CardContent className="pt-6 pb-6 space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                      <FileText className="h-6 w-6 text-white" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-foreground mb-2">Step-by-Step Guided Tour</h3>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Not sure where to begin? We'll walk you through each section and help you decide what's most important for your situation.
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground">Option 1: Digital Planner</h3>
+                      <p className="text-sm text-muted-foreground">(Most Popular)</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pl-0 md:pl-15">
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">1</div>
+                      <div>
+                        <p className="font-semibold text-foreground">Open the Planner</p>
+                        <p className="text-sm text-muted-foreground">Click on <strong>Open My Planner</strong> to begin working through each section. The system will guide you and save everything for you.</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">2</div>
+                      <div>
+                        <p className="font-semibold text-foreground">Gather Your Information</p>
+                        <p className="text-sm text-muted-foreground">Collect important items like insurance policies, passwords, bank names, property details, and personal instructions.</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">3</div>
+                      <div>
+                        <p className="font-semibold text-foreground">Enter Your Information</p>
+                        <p className="text-sm text-muted-foreground">Fill in each section at your own pace. You may stop and return anytime.</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">4</div>
+                      <div>
+                        <p className="font-semibold text-foreground">Get Your Printable Document</p>
+                        <p className="text-sm text-muted-foreground">When you're ready, click <strong>Get a Printable Document</strong>. You can download, print, or email your completed plan.</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">5</div>
+                      <div>
+                        <p className="font-semibold text-foreground">Store Your Plan Safely</p>
+                        <p className="text-sm text-muted-foreground">Save a digital copy on your computer or email it to a trusted person. You may also print your plan at home, a local library, or a UPS store.</p>
+                        <p className="text-sm text-muted-foreground mt-2">We recommend having both a digital copy and a printed copy for extra security.</p>
+                        <p className="text-sm text-muted-foreground mt-2">You may also purchase our water-resistant, fire-resistant binder with a lock to store your printed documents safely.</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Option 2: Printable Version */}
+              <Card className="border-2 shadow-sm">
+                <CardContent className="pt-6 pb-6 space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                      <FileOutput className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground">Option 2: Printable Version</h3>
+                      <p className="text-sm text-muted-foreground">(Handwritten)</p>
+                    </div>
+                  </div>
+
+                  <p className="text-sm text-muted-foreground pl-0 md:pl-15">If you prefer handwriting:</p>
+
+                  <div className="space-y-3 pl-0 md:pl-15">
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">1</div>
+                      <div>
+                        <p className="font-semibold text-foreground">Print Blank Forms</p>
+                        <p className="text-sm text-muted-foreground">Click <strong>Print Blank Form</strong> under each planner.</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">2</div>
+                      <div>
+                        <p className="font-semibold text-foreground">Gather All Documents</p>
+                        <p className="text-sm text-muted-foreground">Collect your information before filling the pages (accounts, contacts, instructions, passwords, etc.).</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">3</div>
+                      <div>
+                        <p className="font-semibold text-foreground">Fill Out by Hand</p>
+                        <p className="text-sm text-muted-foreground">Use a pen to complete each section at your own pace.</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">4</div>
+                      <div>
+                        <p className="font-semibold text-foreground">Store the Pages Safely</p>
+                        <p className="text-sm text-muted-foreground">We recommend using our Planning Binder to keep all forms protected and in one place.</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">5</div>
+                      <div>
+                        <p className="font-semibold text-foreground">Keep Copies</p>
+                        <p className="text-sm text-muted-foreground">Store a printed copy in your home and give a copy to a trusted person.</p>
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <p className="text-sm text-muted-foreground">
+                        <strong>Tip:</strong> We recommend you visit our <Button variant="link" className="h-auto p-0 text-primary" onClick={() => navigate("/products")}>Products & Services</Button> shop for helpful tools like our Planning Binder.
                       </p>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button 
-                              variant="outline" 
-                              className="w-full md:w-auto"
-                              onClick={() => navigate("/wizard/preplanning")}
-                            >
-                              <Compass className="h-4 w-4 mr-2" />
-                              Start Guided Tour
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p className="max-w-xs">Let us walk you through everything in order, one section at a time—perfect if you want guidance on what to do next.</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
                     </div>
                   </div>
                 </CardContent>
@@ -436,11 +524,12 @@ export default function Dashboard() {
           <section>
             <div className="space-y-4">
               <div className="text-center">
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
+                  <Star className="h-6 w-6 text-yellow-500" />
                   Your Two Planning Tools
                 </h2>
                 <p className="text-muted-foreground">
-                  Each planner serves a different purpose at a different time. Click on either one to get started or continue your work.
+                  Each planner serves a different purpose at a different time.
                 </p>
               </div>
 
@@ -458,44 +547,11 @@ export default function Dashboard() {
                       <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0 shadow-md">
                         <FileText className="h-6 w-6 text-white" />
                       </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-foreground">Plan Ahead Planner</h3>
-                        <p className="text-sm text-muted-foreground">My Wishes & Information Organizer</p>
-                      </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground">1. Plan Ahead Planner</h3>
+                      <p className="text-sm text-muted-foreground">For recording your wishes, documents, and important information before anything happens.</p>
                     </div>
-
-                    <div className="space-y-2">
-                      <p className="text-sm">
-                        <strong className="text-foreground">Use this NOW to plan ahead.</strong>{" "}
-                        Record your funeral preferences, store important documents, and organize all the information that will be needed someday.
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <p className="text-sm font-semibold text-foreground">What's Inside:</p>
-                      <ul className="space-y-1 text-sm text-muted-foreground">
-                        <li className="flex items-start gap-2">
-                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                          Your funeral and burial preferences
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                          Important documents (will, insurance, etc.)
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                          Account information and passwords
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                          Property and valuables details
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                          Personal messages and instructions
-                        </li>
-                      </ul>
-                    </div>
+                  </div>
 
                     <div className="pt-4 space-y-3">
                       <Button 
@@ -529,48 +585,11 @@ export default function Dashboard() {
                       <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md">
                         <CheckCircle className="h-6 w-6 text-white" />
                       </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-foreground">After-Death Planner</h3>
-                        <p className="text-sm text-muted-foreground">Step-by-Step Action Guide</p>
-                      </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground">2. After-Death Planner</h3>
+                      <p className="text-sm text-muted-foreground">A step-by-step guide your loved ones can use after you pass away, showing them exactly what to do and helping them generate a printable action plan.</p>
                     </div>
-
-                    <div className="space-y-2">
-                      <p className="text-sm">
-                        <strong className="text-foreground">Use this AFTER someone passes away.</strong>{" "}
-                        A step-by-step checklist that walks you through everything that needs to be done—from immediate tasks to long-term responsibilities.
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <p className="text-sm font-semibold text-foreground">What's Inside:</p>
-                      <ul className="space-y-1 text-sm text-muted-foreground">
-                        <li className="flex items-start gap-2">
-                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                          First 48 hours: immediate actions
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                          Obtaining death certificates
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                          Funeral and memorial arrangements
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                          Notifying government and companies
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                          Managing property and finances
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                          Closing accounts and subscriptions
-                        </li>
-                      </ul>
-                    </div>
+                  </div>
 
                     <div className="pt-4 space-y-3">
                       <Button 
