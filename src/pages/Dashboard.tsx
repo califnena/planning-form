@@ -514,6 +514,31 @@ export default function Dashboard() {
                         <strong>Tip:</strong> We recommend you visit our <Button variant="link" className="h-auto p-0 text-primary" onClick={() => navigate("/products")}>Products & Services</Button> shop for helpful tools like our Planning Binder.
                       </p>
                     </div>
+
+                    {/* Printable Workbook Purchase */}
+                    <div className="pt-4 border-t border-border mt-4">
+                      <div className="bg-muted/30 rounded-lg p-4 space-y-3">
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                            <FileOutput className="h-5 w-5 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-base font-semibold text-foreground">Printable Planning Workbook (Blank)</h4>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Get our complete planning workbook as a downloadable PDF with blank forms you can print and fill out on paper.
+                            </p>
+                          </div>
+                        </div>
+                        <Button 
+                          variant="default" 
+                          className="w-full"
+                          onClick={handleBlankPrePlanningPDF}
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          Purchase Workbook
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -742,31 +767,6 @@ export default function Dashboard() {
 
               {/* Other Products */}
               <div className="grid md:grid-cols-2 gap-4">
-                {/* Printable Planning Workbook */}
-                <Card className="border-2 shadow-sm">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-md">
-                        <FileOutput className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-foreground">Printable Planning Workbook (Blank)</h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Prefer to write by hand? Get our complete planning workbook as a downloadable PDF format with blank forms you can print and fill out on paper.
-                        </p>
-                      </div>
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={handleBlankPrePlanningPDF}
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      Purchase Workbook
-                    </Button>
-                  </CardContent>
-                </Card>
-
                 {/* Physical Planning Binder */}
                 <Card className="border-2 shadow-sm">
                   <CardContent className="p-6">
