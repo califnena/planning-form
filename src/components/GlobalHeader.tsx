@@ -102,20 +102,17 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container relative flex h-20 items-center justify-center px-4 gap-4">
-          {/* Center: Logo */}
-          <div className="flex items-center gap-3">
-            <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <img src={logo} alt="Everlasting Funeral Advisors" className="h-12 w-12" />
-              <div className="hidden sm:block">
-                <h1 className="text-lg font-semibold text-foreground">Everlasting Planner</h1>
-                <p className="text-xs text-muted-foreground">Interactive Planning Guide</p>
-              </div>
-            </Link>
-          </div>
-          
-          {/* Right: Controls - Absolute positioned */}
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+        <div className="container flex h-20 items-center justify-between px-4">
+          {/* Left: Logo */}
+          <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <img src={logo} alt="Everlasting Funeral Advisors" className="h-12 w-12" />
+            <div className="hidden sm:block">
+              <h1 className="text-lg font-semibold text-foreground">Everlasting Planner</h1>
+              <p className="text-xs text-muted-foreground">Interactive Planning Guide</p>
+            </div>
+          </Link>
+          {/* Right: Controls */}
+          <div className="flex items-center gap-2">
             <GlobalSearch />
             
             {/* Generate Document button - only on planner page */}

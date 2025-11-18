@@ -390,7 +390,7 @@ const Landing = () => {
             Real Stories - Testimonials
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-2 bg-gradient-to-br from-rose-50 to-pink-50">
+            <Card className="border-2 bg-gradient-to-br from-yellow-50 to-amber-50">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <p className="text-muted-foreground leading-relaxed italic">
                   "When my father passed, we didn't know where anything was—no passwords, no documents, no instructions. We spent weeks searching. I wish we had something like this sooner."
@@ -401,7 +401,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-2 bg-gradient-to-br from-blue-50 to-cyan-50">
+            <Card className="border-2 bg-gradient-to-br from-yellow-50 to-amber-50">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <p className="text-muted-foreground leading-relaxed italic">
                   "My mother used this planner, and everything was organized for us. It made a painful time so much easier. We were able to focus on remembering her instead of searching for paperwork."
@@ -412,7 +412,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-2 bg-gradient-to-br from-amber-50 to-orange-50">
+            <Card className="border-2 bg-gradient-to-br from-yellow-50 to-amber-50">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <p className="text-muted-foreground leading-relaxed italic">
                   "I live alone, and I wanted to make sure someone could handle things smoothly when my time comes. This gave me comfort knowing everything is documented clearly."
@@ -425,46 +425,12 @@ const Landing = () => {
           </div>
         </div>
 
-        {/* Our Mission Section */}
+        {/* About Everlasting Funeral Advisors Section - BEFORE Mission */}
         <div className="max-w-4xl mx-auto mt-24">
           <div className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-sm">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-              Our Mission
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Everlasting Funeral Advisors
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-12">
-              Are you prepared for one of life's most difficult moments? Our mission is to guide families through the process of planning an affordable funeral with care, compassion, and expertise. From understanding your options to making thoughtful decisions, we're here to support you every step of the way. With our resources and guidance, you can create a meaningful farewell that honors your loved one's life while easing the burden on your family during a challenging time. Let us help you navigate this journey with sensitivity and understanding.
-            </p>
-
-            {/* Pre-Planning Guide Download */}
-            <div className="mb-12 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-xl p-8 border-2 border-border shadow-sm">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                <div className="flex-shrink-0">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
-                    <FileText className="h-8 w-8 text-white" />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-xl md:text-2xl font-bold text-foreground mb-2">
-                    Pre-Planning Your Funeral: A Gift of Peace and Clarity
-                  </h4>
-                  <p className="text-base text-muted-foreground leading-relaxed">
-                    A comprehensive guide to help you understand the importance of pre-planning your funeral arrangements. Learn about different burial options, service types, and how to communicate your wishes to loved ones.
-                  </p>
-                </div>
-                <div className="flex-shrink-0">
-                  <Button asChild size="lg" className="whitespace-nowrap">
-                    <a href="/guides/Pre-Planning-Guide.pdf" download>
-                      <Download className="mr-2 h-4 w-4" />
-                      Download Guide
-                    </a>
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-              About Everlasting Funeral Advisors
-            </h3>
             <p className="text-lg text-muted-foreground mb-8">
               Your trusted partner in compassionate, affordable funeral planning 🏺
             </p>
@@ -518,6 +484,43 @@ const Landing = () => {
                     <span className="text-muted-foreground">Guidance and coaching to document your funeral plans and last wishes</span>
                   </li>
                 </ul>
+              </div>
+            </div>
+
+            {/* Our Mission Section - AFTER About */}
+            <div className="mt-12 pt-8 border-t border-border">
+              <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+                Our Mission
+              </h3>
+              <p className="text-lg text-muted-foreground leading-relaxed mb-8">
+                Are you prepared for one of life's most difficult moments? Our mission is to guide families through the process of planning an affordable funeral with care, compassion, and expertise. From understanding your options to making thoughtful decisions, we're here to support you every step of the way. With our resources and guidance, you can create a meaningful farewell that honors your loved one's life while easing the burden on your family during a challenging time. Let us help you navigate this journey with sensitivity and understanding.
+              </p>
+
+              {/* Pre-Planning Guide Download */}
+              <div className="bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-xl p-8 border-2 border-border shadow-sm">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                  <div className="flex-shrink-0">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                      <FileText className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-xl md:text-2xl font-bold text-foreground mb-2">
+                      Pre-Planning Your Funeral: A Gift of Peace and Clarity
+                    </h4>
+                    <p className="text-base text-muted-foreground leading-relaxed">
+                      A comprehensive guide to help you understand the importance of pre-planning your funeral arrangements. Learn about different burial options, service types, and how to communicate your wishes to loved ones.
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <Button asChild size="lg" className="whitespace-nowrap">
+                      <a href="/guides/Pre-Planning-Guide.pdf" download>
+                        <Download className="mr-2 h-4 w-4" />
+                        Download Guide
+                      </a>
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
