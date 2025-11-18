@@ -141,7 +141,7 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2">
                   <SettingsIcon className="h-4 w-4" />
-                  <span className="hidden md:inline">Accessibility</span>
+                  <span className="hidden md:inline">Settings</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80" align="end">
