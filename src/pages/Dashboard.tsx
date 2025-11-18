@@ -188,9 +188,9 @@ export default function Dashboard() {
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Welcome Header - Centered */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-2">{t('dashboard.welcome')}</h1>
-          <p className="text-muted-foreground">
-            Your dashboard auto-saves your work as you go.
+          <h1 className="text-3xl font-bold mb-2">Welcome to the Planning Dashboard</h1>
+          <p className="text-muted-foreground max-w-4xl mx-auto">
+            Follow these simple steps to organize your wishes, important documents and instructions. Note: all sections save automatically as you work and you are not required to enter information in all the sections only what is pertinent to you and what you are willing and able to share.
           </p>
         </div>
 
@@ -238,10 +238,10 @@ export default function Dashboard() {
                     <Button onClick={handleContinuePlanner} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                       Open My Planner
                     </Button>
-                    <Button onClick={handleGeneratePDF} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                    <Button onClick={handleGeneratePDF} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Get a Printable Version
                     </Button>
-                    <Button onClick={() => navigate('/products/binder')} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                    <Button onClick={() => navigate('/products/binder')} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Purchase Physical Binder
                     </Button>
                   </div>
@@ -266,7 +266,7 @@ export default function Dashboard() {
                     <Button onClick={handleDownloadWorkbook} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                       Download Printable Workbook
                     </Button>
-                    <Button onClick={() => navigate('/products/binder')} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                    <Button onClick={() => navigate('/products/binder')} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Purchase Physical Binder
                     </Button>
                   </div>
@@ -294,7 +294,7 @@ export default function Dashboard() {
                     <Button className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                       Book Appointment
                     </Button>
-                    <Button onClick={() => navigate('/products/binder')} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                    <Button onClick={() => navigate('/products/binder')} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Purchase Physical Binder
                     </Button>
                   </div>
@@ -372,9 +372,11 @@ export default function Dashboard() {
                 <p className="text-muted-foreground mb-4">
                   Browse our selection of affordable, high-quality caskets, urns, and funeral flowers.
                 </p>
-                <Button onClick={() => navigate('/products')} className="w-full bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                  Browse Products
-                </Button>
+                <div className="flex justify-start">
+                  <Button onClick={() => navigate('/products')} size="sm" className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                    Browse Products
+                  </Button>
+                </div>
               </div>
             </div>
           </Card>
@@ -401,9 +403,11 @@ export default function Dashboard() {
                 <p className="text-muted-foreground mb-4">
                   Honor your loved one with a personalized memorial song created just for them.
                 </p>
-                <Button onClick={() => navigate('/products/custom-song')} className="w-full bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                  Create Song
-                </Button>
+                <div className="flex justify-start">
+                  <Button onClick={() => navigate('/products/custom-song')} size="sm" className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                    Create Song
+                  </Button>
+                </div>
               </div>
             </div>
           </Card>
