@@ -425,17 +425,74 @@ const Landing = () => {
           </div>
         </div>
 
-        {/* About Section */}
+        {/* Our Mission Section */}
         <div className="max-w-4xl mx-auto mt-24">
           <div className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-sm">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-              About Us
+              Our Mission
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-              We guide families through pre-planning, immediate steps after a passing, and organizing essential information. 
-              Our goal is to make difficult moments easier with clear tools and trusted guidance. Whether you're preparing 
-              in advance or helping a loved one through a loss, we're here to support you with compassion and practical resources.
+            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-12">
+              Are you prepared for one of life's most difficult moments? Our mission is to guide families through the process of planning an affordable funeral with care, compassion, and expertise. From understanding your options to making thoughtful decisions, we're here to support you every step of the way. With our resources and guidance, you can create a meaningful farewell that honors your loved one's life while easing the burden on your family during a challenging time. Let us help you navigate this journey with sensitivity and understanding.
             </p>
+
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+              About Everlasting Funeral Advisors
+            </h3>
+            <p className="text-lg text-muted-foreground mb-8">
+              Your trusted partner in compassionate, affordable funeral planning 🏺
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Affordable Products */}
+              <div>
+                <h4 className="text-xl font-semibold text-foreground mb-4">
+                  Affordable Products
+                </h4>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span className="text-muted-foreground">Premium and budget-friendly caskets</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span className="text-muted-foreground">Beautiful cremation urns in various styles</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span className="text-muted-foreground">Fresh flower arrangements and memorial tributes</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span className="text-muted-foreground">Complete funeral packages tailored to your budget</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Professional Services */}
+              <div>
+                <h4 className="text-xl font-semibold text-foreground mb-4">
+                  Professional Services
+                </h4>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span className="text-muted-foreground">Expert funeral planning advisors</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span className="text-muted-foreground">Legacy Planner (physical binder & digital platform)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span className="text-muted-foreground">Customized eulogy writing and song selection</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span className="text-muted-foreground">Guidance and coaching to document your funeral plans and last wishes</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </main>
