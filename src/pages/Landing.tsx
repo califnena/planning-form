@@ -174,10 +174,10 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Leave Clear Instructions for Loved Ones
+                  Leave Memorable Messages for Loved Ones
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Follow step-by-step guidance so your family knows exactly what to do and who to contact when the time comes.
+                  Leave heartfelt messages for your loved ones—written, video, or audio recordings of yourself with your special words they'll treasure forever.
                 </p>
               </CardContent>
             </Card>
