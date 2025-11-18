@@ -228,16 +228,31 @@ export default function Dashboard() {
         <div className="mx-auto max-w-6xl px-4 py-8 space-y-12">
           
           {/* Welcome Message */}
-          <div className="text-center space-y-3">
+          <div className="text-center space-y-4">
             <h1 className="text-3xl md:text-4xl font-bold text-foreground">
               Welcome to Your Planning Dashboard
             </h1>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Follow these steps to organize your wishes, important documents, and instructions. Everything saves automatically as you work.
+              Follow these simple steps to organize your wishes, important documents, and instructions. Everything saves automatically as you work.
             </p>
-            <p className="text-sm text-muted-foreground">
-              Need larger text or clearer colors? Tap <strong>Settings</strong> at the top right.
-            </p>
+
+            {/* Progress Tracker */}
+            <div className="flex justify-center gap-4 md:gap-8 mt-6 flex-wrap">
+              {[
+                { num: 1, label: "Plan Ahead" },
+                { num: 2, label: "Get Support" },
+                { num: 3, label: "Shop" },
+                { num: 4, label: "Personal Touch" },
+                { num: 5, label: "After-Death Guide" }
+              ].map((step) => (
+                <div key={step.num} className="flex flex-col items-center gap-1">
+                  <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg shadow-md">
+                    {step.num}
+                  </div>
+                  <span className="text-xs md:text-sm text-muted-foreground font-medium">{step.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* STEP 1 — Plan Ahead Planner (Start Here) */}
@@ -283,7 +298,7 @@ export default function Dashboard() {
                             onClick={() => setShowPIIDialog(true)}
                           >
                             <Download className="h-4 w-4 mr-2" />
-                            Get a Printable Document
+                            Get a Printable Version
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -291,6 +306,14 @@ export default function Dashboard() {
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
+                    <Button 
+                      variant="outline" 
+                      size="lg"
+                      className="flex-1"
+                      onClick={() => navigate("/products/binder")}
+                    >
+                      Purchase Physical Binder
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -309,14 +332,21 @@ export default function Dashboard() {
                       </p>
                     </div>
                   </div>
-                  <div className="pl-0 sm:pl-16">
+                  <div className="flex flex-col sm:flex-row gap-3 pl-0 sm:pl-16">
                     <Button 
-                      variant="outline" 
-                      className="w-full sm:w-auto"
+                      variant="default" 
+                      size="lg"
                       onClick={handleBlankPrePlanningPDF}
                     >
                       <Download className="h-4 w-4 mr-2" />
-                      Printable Planning Workbook (Blank)
+                      Download Printable Workbook
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="lg"
+                      onClick={() => navigate("/products/binder")}
+                    >
+                      Purchase Physical Binder
                     </Button>
                   </div>
                 </CardContent>
@@ -339,12 +369,20 @@ export default function Dashboard() {
                       </p>
                     </div>
                   </div>
-                  <div className="pl-0 sm:pl-16">
+                  <div className="flex flex-col sm:flex-row gap-3 pl-0 sm:pl-16">
                     <Button 
+                      size="lg"
                       className="bg-blue-600 hover:bg-blue-700 text-white"
                       onClick={() => navigate("/contact")}
                     >
                       Book Appointment
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="lg"
+                      onClick={() => navigate("/products/binder")}
+                    >
+                      Purchase Physical Binder
                     </Button>
                   </div>
                 </CardContent>
@@ -352,87 +390,17 @@ export default function Dashboard() {
             </div>
           </section>
 
-          {/* STEP 2 — Caskets & Urns (Optional) */}
+          {/* STEP 2 — VIP Coach Assistant */}
           <section className="border-t pt-10">
             <div className="text-center mb-6">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-bold text-lg">2</div>
-                Caskets & Urns
-              </h2>
-              <p className="text-muted-foreground">(Optional)</p>
-            </div>
-
-            <Card className="border-2 border-dashed shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center flex-shrink-0 shadow-md">
-                    <Store className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground">Shop Caskets & Urns</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Browse and order quality memorial products <strong>(Coming soon)</strong>
-                    </p>
-                  </div>
-                </div>
-                <Button 
-                  variant="outline" 
-                  disabled
-                  className="w-full sm:w-auto"
-                >
-                  <Store className="mr-2 h-4 w-4" />
-                  Shop Caskets & Urns
-                  <span className="ml-2 text-xs">(Coming Soon)</span>
-                </Button>
-              </CardContent>
-            </Card>
-          </section>
-
-          {/* STEP 3 — Physical Planning Binder (Optional) */}
-          <section className="border-t pt-10">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-bold text-lg">3</div>
-                Physical Planning Binder
-              </h2>
-              <p className="text-muted-foreground">(Optional)</p>
-            </div>
-
-            <Card className="border-2 shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0 shadow-md">
-                    <BookOpen className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground">Physical Planning Binder</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      A fireproof, waterproof binder with lock to safely store your completed plan.
-                    </p>
-                  </div>
-                </div>
-                <Button 
-                  variant="outline" 
-                  className="w-full sm:w-auto"
-                  onClick={() => navigate("/products/binder")}
-                >
-                  Order Binder
-                </Button>
-              </CardContent>
-            </Card>
-          </section>
-
-          {/* STEP 4 — VIP Coach Assistant (Optional) */}
-          <section className="border-t pt-10">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-bold text-lg">4</div>
+                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg shadow-md">2</div>
                 VIP Coach Assistant
               </h2>
-              <p className="text-muted-foreground">(Optional)</p>
+              <p className="text-lg text-muted-foreground">Get personalized access to expert guidance and support throughout your planning journey.</p>
             </div>
 
-            <Card className="border-2 border-yellow-500/50 shadow-sm bg-gradient-to-r from-yellow-50/50 to-amber-50/50 dark:from-yellow-950/20 dark:to-amber-950/20">
+            <Card className="border-2 border-yellow-500/50 shadow-lg bg-gradient-to-r from-yellow-50/50 to-amber-50/50 dark:from-yellow-950/20 dark:to-amber-950/20">
               <CardContent className="p-6">
                 <div className="flex items-start gap-6 flex-col md:flex-row">
                   <div className="flex items-start gap-4 flex-1">
@@ -442,9 +410,9 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-foreground mb-2">Upgrade to VIP Coach</h3>
+                      <h3 className="text-xl font-bold text-foreground mb-2">VIP Coach Assistant (Optional)</h3>
                       <p className="text-sm text-muted-foreground mb-4">
-                        Get unlimited access to expert guidance and personalized support throughout your planning journey.
+                        Unlimited access to expert guidance and personalized support throughout your planning journey.
                       </p>
                       <div className="space-y-2">
                         <div className="flex items-start gap-2">
@@ -476,13 +444,52 @@ export default function Dashboard() {
             </Card>
           </section>
 
-          {/* STEP 5 — Custom Memorial Song */}
+
+          {/* STEP 3 — Shop Caskets & Urns */}
           <section className="border-t pt-10">
             <div className="text-center mb-6">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-bold text-lg">5</div>
+                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg shadow-md">3</div>
+                Shop
+              </h2>
+              <p className="text-lg text-muted-foreground">Browse and order quality memorial products.</p>
+            </div>
+
+            <Card className="border-2 border-blue-500 shadow-lg bg-gradient-to-br from-blue-50/30 to-indigo-50/30 dark:from-blue-950/20 dark:to-indigo-950/20 relative">
+              <div className="absolute top-4 right-4">
+                <span className="text-xs font-bold bg-red-500 text-white px-3 py-1 rounded-full shadow-md">High Demand</span>
+              </div>
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                    <Store className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-foreground">Shop Caskets & Urns</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Browse and order quality memorial products. Coming soon!
+                    </p>
+                  </div>
+                </div>
+                <Button 
+                  variant="default"
+                  size="lg"
+                  onClick={() => navigate("/products")}
+                >
+                  Browse Products
+                </Button>
+              </CardContent>
+            </Card>
+          </section>
+
+          {/* STEP 4 — Custom Memorial Song */}
+          <section className="border-t pt-10">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg shadow-md">4</div>
                 Custom Memorial Song
               </h2>
+              <p className="text-lg text-muted-foreground">Create a personalized memorial song that tells your story.</p>
             </div>
 
             <Card className="border-2 shadow-sm">
@@ -499,8 +506,8 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <Button 
-                  variant="outline" 
-                  className="w-full sm:w-auto"
+                  variant="default"
+                  size="lg"
                   onClick={() => navigate("/products/custom-song")}
                 >
                   <Music className="mr-2 h-4 w-4" />
@@ -510,13 +517,14 @@ export default function Dashboard() {
             </Card>
           </section>
 
-          {/* STEP 6 — After-Death Planner */}
+          {/* STEP 5 — After-Death Planner */}
           <section className="border-t pt-10">
             <div className="text-center mb-6">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-bold text-lg">6</div>
+                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg shadow-md">5</div>
                 After-Death Planner
               </h2>
+              <p className="text-lg text-muted-foreground">A guided checklist your loved ones can follow after a passing.</p>
             </div>
 
             <Card className="border-2 shadow-sm">
@@ -534,7 +542,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 pl-0 sm:pl-16">
                   <Button 
-                    variant="outline" 
+                    variant="default" 
                     size="lg"
                     className="flex-1"
                     onClick={() => navigate("/next-steps")}
