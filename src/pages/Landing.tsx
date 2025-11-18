@@ -101,7 +101,7 @@ const Landing = () => {
             <img 
               src={mascotCouple} 
               alt="Everlasting Advisors" 
-              className="w-48 h-48 object-contain"
+              className="w-56 h-56 object-contain"
             />
           </div>
           
@@ -208,6 +208,47 @@ const Landing = () => {
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
                   Increase text size, turn on high contrast, or use Super-Senior Mode.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Testimonials Section */}
+        <div className="mt-24 max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
+            Real Stories. Real Peace of Mind.
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="border-2">
+              <CardContent className="pt-8 pb-8 space-y-4">
+                <p className="text-muted-foreground leading-relaxed italic">
+                  "When my father passed, we didn't know where anything was—no passwords, no documents, no instructions. We spent weeks searching. I wish we had something like this sooner."
+                </p>
+                <p className="text-sm font-semibold text-foreground">
+                  — Sarah M., Daughter
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2">
+              <CardContent className="pt-8 pb-8 space-y-4">
+                <p className="text-muted-foreground leading-relaxed italic">
+                  "My mother used this planner, and everything was organized for us. It made a painful time so much easier. We were able to focus on remembering her instead of searching for paperwork."
+                </p>
+                <p className="text-sm font-semibold text-foreground">
+                  — Robert T., Son
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2">
+              <CardContent className="pt-8 pb-8 space-y-4">
+                <p className="text-muted-foreground leading-relaxed italic">
+                  "I live alone, and I wanted to make sure someone could handle things smoothly when my time comes. This gave me comfort knowing everything is documented clearly."
+                </p>
+                <p className="text-sm font-semibold text-foreground">
+                  — Elaine K., Retired Teacher
                 </p>
               </CardContent>
             </Card>
