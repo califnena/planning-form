@@ -385,7 +385,54 @@ export default function Dashboard() {
             </p>
           </div>
 
-          {/* ▬▬ SECTION 1: YOUR TWO PLANNING TOOLS ▬▬ */}
+          {/* ▬▬ SECTION 1: CUSTOMIZE YOUR PLAN ▬▬ */}
+          <section>
+            <div className="space-y-4">
+              <div className="text-center">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                  Customize Your Plan
+                </h2>
+                <p className="text-muted-foreground">
+                  Choose which sections you'd like to include in your planning journey.
+                </p>
+              </div>
+
+              <Card className="border-2 shadow-sm">
+                <CardContent className="pt-6 pb-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                      <Compass className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-foreground mb-2">Step-by-Step Guided Tour</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Not sure where to begin? We'll walk you through each section and help you decide what's most important for your situation.
+                      </p>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant="outline" 
+                              className="w-full md:w-auto"
+                              onClick={() => navigate("/wizard/preplanning")}
+                            >
+                              <Compass className="h-4 w-4 mr-2" />
+                              Start Guided Tour
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">Let us walk you through everything in order, one section at a time—perfect if you want guidance on what to do next.</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          {/* ▬▬ SECTION 2: YOUR TWO PLANNING TOOLS ▬▬ */}
           <section>
             <div className="space-y-4">
               <div className="text-center">
@@ -466,23 +513,6 @@ export default function Dashboard() {
                         <Download className="h-4 w-4 mr-2" />
                         Get a Printable Document
                       </Button>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button 
-                              variant="secondary" 
-                              className="w-full"
-                              onClick={() => navigate("/wizard/preplanning")}
-                            >
-                              <Play className="h-4 w-4 mr-2" />
-                              Step-by-Step Guided Tour
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-sm">
-                            <p>Let us walk you through everything in order, one section at a time—perfect if you want guidance on what to do next.</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
                     </div>
                   </CardContent>
                 </Card>
