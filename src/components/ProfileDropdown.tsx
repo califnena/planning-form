@@ -101,7 +101,7 @@ export const ProfileDropdown = () => {
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/plans")}>
           <Receipt className="mr-2 h-4 w-4" />
-          <span>My Plan & Billing</span>
+          <span>Subscription & Billing</span>
         </DropdownMenuItem>
         {isVIP && (
           <>
