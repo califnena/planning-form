@@ -241,6 +241,9 @@ export default function Dashboard() {
                     <Button onClick={handleGeneratePDF} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Get a Printable Version
                     </Button>
+                    <Button onClick={() => navigate('/wizard/preplanning')} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                      Step-by-step Guide
+                    </Button>
                     <Button onClick={() => navigate('/products/binder')} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Purchase Physical Binder
                     </Button>
