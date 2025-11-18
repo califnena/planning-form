@@ -387,10 +387,10 @@ const Landing = () => {
         {/* Testimonials Section */}
         <div className="mt-24 max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-            Real Stories. Real Peace of Mind.
+            Real Stories - Testimonials
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-2">
+            <Card className="border-2 bg-gradient-to-br from-rose-50 to-pink-50">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <p className="text-muted-foreground leading-relaxed italic">
                   "When my father passed, we didn't know where anything was—no passwords, no documents, no instructions. We spent weeks searching. I wish we had something like this sooner."
@@ -401,7 +401,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-2">
+            <Card className="border-2 bg-gradient-to-br from-blue-50 to-cyan-50">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <p className="text-muted-foreground leading-relaxed italic">
                   "My mother used this planner, and everything was organized for us. It made a painful time so much easier. We were able to focus on remembering her instead of searching for paperwork."
@@ -412,7 +412,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-2">
+            <Card className="border-2 bg-gradient-to-br from-amber-50 to-orange-50">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <p className="text-muted-foreground leading-relaxed italic">
                   "I live alone, and I wanted to make sure someone could handle things smoothly when my time comes. This gave me comfort knowing everything is documented clearly."
