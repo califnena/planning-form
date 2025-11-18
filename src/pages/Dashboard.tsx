@@ -22,7 +22,8 @@ import {
   ChevronRight,
   Download,
   Music,
-  Compass
+  Compass,
+  Calendar
 } from "lucide-react";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { cn } from "@/lib/utils";
@@ -384,55 +385,7 @@ export default function Dashboard() {
             </p>
           </div>
 
-          {/* ▬▬ SECTION 1: HOW TO GET STARTED ▬▬ */}
-          <section>
-            <div className="space-y-4">
-              <div className="text-center">
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                  How to Get Started
-                </h2>
-                <p className="text-muted-foreground">
-                  Choose how you'd like to work on your planning.
-                </p>
-              </div>
-
-              <Card className="border-2 shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0">
-                      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
-                        <Compass className="h-8 w-8 text-white" />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <h3 className="text-xl font-semibold text-foreground mb-2 cursor-help inline-flex items-center gap-2">
-                              Step-by-Step Guided Tour
-                              <Info className="h-4 w-4 text-muted-foreground" />
-                            </h3>
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-sm">
-                            <p>Let us walk you through everything in order, one section at a time—perfect if you want guidance on what to do next.</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        A guided experience that takes you through each planning section step-by-step, helping you complete your plan with confidence.
-                      </p>
-                      <Button onClick={() => navigate("/wizard/preplanning")} size="lg" className="w-full md:w-auto">
-                        <Play className="mr-2 h-4 w-4" />
-                        Start Guided Tour
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </section>
-
-          {/* ▬▬ SECTION 2: YOUR TWO PLANNING TOOLS ▬▬ */}
+          {/* ▬▬ SECTION 1: YOUR TWO PLANNING TOOLS ▬▬ */}
           <section>
             <div className="space-y-4">
               <div className="text-center">
@@ -513,6 +466,23 @@ export default function Dashboard() {
                         <Download className="h-4 w-4 mr-2" />
                         Get a Printable Document
                       </Button>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant="secondary" 
+                              className="w-full"
+                              onClick={() => navigate("/wizard/preplanning")}
+                            >
+                              <Play className="h-4 w-4 mr-2" />
+                              Step-by-Step Guided Tour
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-sm">
+                            <p>Let us walk you through everything in order, one section at a time—perfect if you want guidance on what to do next.</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   </CardContent>
                 </Card>
@@ -596,7 +566,7 @@ export default function Dashboard() {
             </div>
           </section>
 
-          {/* ▬▬ SECTION 3: PRODUCTS AVAILABLE FOR PURCHASE ▬▬ */}
+          {/* ▬▬ SECTION 2: PRODUCTS AVAILABLE FOR PURCHASE ▬▬ */}
           <section className="border-t pt-10">
             <div className="space-y-4">
               <div className="text-center">
@@ -607,6 +577,65 @@ export default function Dashboard() {
                   Optional printed materials and services you can order.
                 </p>
               </div>
+
+              {/* Do It For You (One-Time) - Popular */}
+              <Card className="border-2 border-blue-500/50 shadow-sm bg-gradient-to-r from-blue-50/50 to-cyan-50/50 dark:from-blue-950/20 dark:to-cyan-950/20">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-6 flex-col md:flex-row">
+                    <div className="flex items-start gap-4 flex-1">
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-md">
+                          <Calendar className="h-6 w-6 text-white" />
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="text-xl font-bold text-foreground">Do It For You (One-Time)</h3>
+                          <span className="text-xs font-bold bg-blue-500 text-white px-2 py-0.5 rounded-full">POPULAR</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Get personalized assistance with a live one-on-one virtual session. We guide you through every question in your planner, complete the forms for you, and prepare a finalized digital copy ready to print or share.
+                        </p>
+                        <div className="space-y-2">
+                          <p className="text-sm font-semibold text-foreground">What's Included:</p>
+                          <ul className="space-y-1 text-sm text-muted-foreground">
+                            <li className="flex items-start gap-2">
+                              <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-600" />
+                              <strong>1:1 virtual interview & walkthrough</strong>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-600" />
+                              We complete your forms for you
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-600" />
+                              Fireproof binder included
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-600" />
+                              Finalized digital copy ready to print
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-600" />
+                              Includes expert support, gentle guidance, and peace of mind knowing everything is handled for you
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <Button 
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        size="lg"
+                        onClick={() => window.open("https://calendly.com/everlastingfuneraladvisors/30min", "_blank")}
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        Book Appointment
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* VIP Coach Assistant - Highlighted */}
               <Card className="border-2 border-yellow-500/50 shadow-sm bg-gradient-to-r from-yellow-50/50 to-amber-50/50 dark:from-yellow-950/20 dark:to-amber-950/20">
@@ -765,7 +794,7 @@ export default function Dashboard() {
             </div>
           </section>
 
-          {/* ▬▬ SECTION 4: HELP & SUPPORT ▬▬ */}
+          {/* ▬▬ SECTION 3: HELP & SUPPORT ▬▬ */}
           <section className="border-t pt-10 pb-24">
             <div className="space-y-4">
               <div className="text-center">
