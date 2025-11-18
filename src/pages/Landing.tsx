@@ -98,7 +98,7 @@ const Landing = () => {
           </div>
           
           <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight">
-            Plan with Confidence. Support Your Loved Ones.
+            Plan Your Final Wishes. Protect Your Family From Confusion.
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
@@ -112,14 +112,6 @@ const Landing = () => {
               onClick={handleStartPlanner}
             >
               Start Your Planner
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="text-lg px-12 py-7"
-              onClick={() => handlePreviewClick("/preview/preplanning")}
-            >
-              1-Day Free Preview
             </Button>
             <Link to="/login" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               Already have an account? Sign In
@@ -184,108 +176,6 @@ const Landing = () => {
               </CardContent>
             </Card>
           </div>
-        </div>
-
-        {/* Preview Mode Section */}
-        <div className="mt-24 max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Preview the Planner — Free 1-Day Access
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Explore sample plans and see how we help families organize and prepare.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card 
-              className="border-2 hover:border-primary/50 transition-all cursor-pointer group"
-              onClick={() => handlePreviewClick("/preview/preplanning")}
-            >
-              <CardContent className="pt-6 pb-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <FileText className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                      Sample Pre-Planning
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      See how to organize your final wishes and important information.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card 
-              className="border-2 hover:border-primary/50 transition-all cursor-pointer group"
-              onClick={() => handlePreviewClick("/preview/afterdeath")}
-            >
-              <CardContent className="pt-6 pb-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                      Sample After-Death Steps
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Explore the step-by-step guide for families after a loss.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card 
-              className="border-2 hover:border-primary/50 transition-all cursor-pointer group"
-              onClick={() => handlePreviewClick("/preview/legal")}
-            >
-              <CardContent className="pt-6 pb-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Scale className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                      Sample Legal Resources
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Browse legal documents and state-specific resources.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card 
-              className="border-2 hover:border-primary/50 transition-all cursor-pointer group"
-              onClick={() => handlePreviewClick("/preview/pdf")}
-            >
-              <CardContent className="pt-6 pb-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <FileOutput className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                      Sample PDF Preview
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      View a sample document with preview watermark.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            Preview access lasts 24 hours. Create an account to save your own plan.
-          </p>
         </div>
 
         {/* About Section */}
