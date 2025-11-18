@@ -264,7 +264,7 @@ export default function Dashboard() {
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <Button onClick={handleDownloadWorkbook} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                      Download Printable Workbook
+                      Purchase and Download Printable Workbook
                     </Button>
                     <Button onClick={() => navigate('/products/binder')} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Purchase Physical Binder
@@ -292,7 +292,7 @@ export default function Dashboard() {
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <Button className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                      Book Appointment
+                      Purchase and Book an Appointment
                     </Button>
                     <Button onClick={() => navigate('/products/binder')} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Purchase Physical Binder

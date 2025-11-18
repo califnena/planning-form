@@ -235,9 +235,9 @@ export default function CoachAssistant() {
   }
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <GlobalHeader />
-      <div className="min-h-screen bg-gradient-to-b from-[#f7f5f2] to-[#e8e2dd] p-4 md:p-8">
+      <div className="flex-1 bg-gradient-to-b from-[#f7f5f2] to-[#e8e2dd] p-4 md:p-8">
       <div className="max-w-4xl mx-auto space-y-6">
         <Card className="border-none shadow-lg">
           <CardHeader className="text-center space-y-4">
@@ -426,10 +426,10 @@ export default function CoachAssistant() {
               <strong>Note:</strong> Conversations are not saved — they will be lost if you refresh or leave this page.
             </p>
           </CardContent>
-        </Card>
+          </Card>
+        </div>
       </div>
+      <AppFooter />
     </div>
-    <AppFooter />
-    </>
   );
 }
