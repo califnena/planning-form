@@ -25,13 +25,6 @@ export const AppFooter = () => {
               <h3 className="text-xs font-semibold text-foreground mb-3 uppercase tracking-wide">{t("sidebar.providedBy")}</h3>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-foreground">Everlasting Funeral Advisors</p>
-                <p className="text-xs text-muted-foreground">(323) 863-5804</p>
-                <a
-                  href="mailto:info@everlastingfuneraladvisors.com"
-                  className="text-xs text-primary hover:underline block"
-                >
-                  info@everlastingfuneraladvisors.com
-                </a>
                 <a
                   href="https://everlastingfuneraladvisors.com/"
                   target="_blank"
@@ -48,11 +41,9 @@ export const AppFooter = () => {
               <h3 className="text-xs font-semibold text-foreground mb-3 tracking-wide">About Us</h3>
               <Link
                 to="/about-us"
-                target="_blank"
-                rel="noopener noreferrer"
                 className="text-xs text-primary hover:underline"
               >
-                Learn more about us
+                About Us
               </Link>
             </div>
 

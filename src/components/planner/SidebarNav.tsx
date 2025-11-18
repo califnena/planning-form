@@ -1,6 +1,6 @@
 import { ProgressDot } from "./ProgressDot";
 import { cn } from "@/lib/utils";
-import { getSectionIcon } from "@/lib/sectionIcons";
+import { getSectionIcon, getSectionColor } from "@/lib/sectionIcons";
 import {
   Tooltip,
   TooltipContent,
@@ -57,6 +57,7 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
 
   const renderNavButton = (item: NavItem) => {
     const Icon = getSectionIcon(item.id);
+    const colorGradient = getSectionColor(item.id);
     
     const button = (
       <button
@@ -69,10 +70,12 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
             : "text-foreground hover:text-foreground"
         )}
       >
-        <Icon className={cn(
-          "h-5 w-5 flex-shrink-0 transition-colors",
-          activeSection === item.id ? "text-primary" : "text-muted-foreground group-hover:text-primary"
-        )} />
+        <div className={cn(
+          "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gradient-to-br",
+          colorGradient
+        )}>
+          <Icon className="h-4 w-4 text-white" />
+        </div>
         <span className="flex-1">{item.label}</span>
         <ProgressDot completed={item.completed} />
       </button>
