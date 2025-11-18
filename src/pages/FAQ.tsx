@@ -296,29 +296,33 @@ const FAQ = () => {
 
         <div className="mb-8">
           {/* Featured Pre-Planning Guide */}
-          <div className="bg-card border-2 border-border rounded-lg p-6 shadow-lg mb-8">
-            <div className="text-center mb-4">
-              <h2 className="text-2xl font-bold text-foreground mb-2">📖 Pre-Planning Guide</h2>
-              <p className="text-muted-foreground">Pre-Planning Your Funeral: A Gift of Peace & Clarity</p>
-            </div>
-            <div className="w-full aspect-[8.5/11] md:h-[600px] mb-4 bg-background rounded-lg overflow-hidden">
-              <iframe
-                src="/guides/Pre-Planning-Guide.pdf"
-                className="w-full h-full"
-                title="Pre-Planning Guide"
-              />
-            </div>
-            <div className="text-center">
-              <a 
-                href="/guides/Pre-Planning-Guide.pdf" 
-                download
-                className="inline-block"
-              >
-                <Button size="lg" className="gap-2">
-                  <Download className="h-5 w-5" />
-                  Download Complete Guide (PDF)
-                </Button>
-              </a>
+          <div className="bg-card border-2 border-primary/20 rounded-lg p-6 md:p-8 shadow-lg">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+              <div className="flex-shrink-0">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                  <Download className="h-7 w-7 text-white" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">
+                  Pre-Planning Your Funeral: A Gift of Peace and Clarity
+                </h2>
+                <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                  A comprehensive guide to help you understand the importance of pre-planning your funeral arrangements. Learn about different burial options, service types, and how to communicate your wishes to loved ones.
+                </p>
+              </div>
+              <div className="flex-shrink-0">
+                <a 
+                  href="/guides/Pre-Planning-Guide.pdf" 
+                  download
+                  className="inline-block"
+                >
+                  <Button size="lg" className="gap-2 whitespace-nowrap">
+                    <Download className="h-5 w-5" />
+                    Download Guide
+                  </Button>
+                </a>
+              </div>
             </div>
           </div>
         </div>
