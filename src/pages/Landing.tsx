@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { FileText, CheckCircle, Shield, BookOpen, Scale, FileOutput, Plus, Minus } from "lucide-react";
+import { FileText, CheckCircle, Shield, BookOpen, Scale, FileOutput, Plus, Minus, ClipboardList, CalendarCheck, ShoppingBag, Users, Headphones, Music, Type, HelpCircle, Phone } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import mascotCouple from "@/assets/mascot-couple.png";
@@ -148,6 +148,7 @@ const Landing = () => {
             What You Can Do
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* 1. Record Your Funeral Preferences */}
             <Card className="border-2 hover:border-primary/50 transition-colors">
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
@@ -159,55 +160,224 @@ const Landing = () => {
                   Record Your Funeral Preferences
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Document your wishes for services, burial or cremation, and memorial details.
+                  Document your wishes for services, burial or cremation, and memorial details so nothing is left to guesswork.
                 </p>
               </CardContent>
             </Card>
 
+            {/* 2. Leave Clear Instructions for Loved Ones */}
             <Card className="border-2 hover:border-primary/50 transition-colors">
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <CheckCircle className="h-8 w-8 text-primary" />
+                    <ClipboardList className="h-8 w-8 text-primary" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
                   Leave Clear Instructions for Loved Ones
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Provide step-by-step guidance so your family knows exactly what to do.
+                  Follow step-by-step guidance so your family knows exactly what to do and who to contact when the time comes.
                 </p>
               </CardContent>
             </Card>
 
+            {/* 3. Use the After-Death Planner */}
             <Card className="border-2 hover:border-primary/50 transition-colors">
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Shield className="h-8 w-8 text-primary" />
+                    <CalendarCheck className="h-8 w-8 text-primary" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Keep Everything Secure
+                  Use the After-Death Planner
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Your personal information is protected with bank-level encryption and privacy.
+                  Give your family a simple checklist they can follow after a loss, from first-48-hour tasks to longer-term steps.
                 </p>
               </CardContent>
             </Card>
 
+            {/* 4. Purchase Affordable Funeral Products */}
             <Card className="border-2 hover:border-primary/50 transition-colors">
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <FileOutput className="h-8 w-8 text-primary" />
+                    <ShoppingBag className="h-8 w-8 text-primary" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Adjust Text Size & Display
+                  Purchase Affordable Funeral Products
+                  <span className="ml-2 text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">Coming Soon</span>
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Increase text size, turn on high contrast, or use Super-Senior Mode.
+                  Access competitively priced caskets, urns, flowers, and other funeral items in one place.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* 5. Do-It-For-You Planning Session */}
+            <Card 
+              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
+              onClick={() => navigate("/contact")}
+            >
+              <CardContent className="pt-8 pb-8 text-center space-y-4">
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Users className="h-8 w-8 text-primary" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">
+                  Do-It-For-You Planning Session
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Book a one-time session where a specialist helps you fill out your planner together and get everything ready.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* 6. VIP Coach Assistant (24/7 Support) */}
+            <Card 
+              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
+              onClick={() => navigate("/pricing")}
+            >
+              <CardContent className="pt-8 pb-8 text-center space-y-4">
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Headphones className="h-8 w-8 text-primary" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">
+                  VIP Coach Assistant (24/7 Support)
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Get ongoing support for planning questions, hard decisions, and emotional moments. A VIP coach is available when you need help.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* 7. Create a Custom Memorial Song */}
+            <Card 
+              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
+              onClick={() => navigate("/products/custom-song")}
+            >
+              <CardContent className="pt-8 pb-8 text-center space-y-4">
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Music className="h-8 w-8 text-primary" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">
+                  Create a Custom Memorial Song
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Order a personalized song to honor a loved one, based on their story, hobbies, and personality.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* 8. Adjust Text Size, Colors, and Language */}
+            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer">
+              <CardContent className="pt-8 pb-8 text-center space-y-4">
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Type className="h-8 w-8 text-primary" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">
+                  Adjust Text Size, Colors, and Language
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Increase text size, turn on high-contrast colors, reduce motion, and switch languages for an easier, senior-friendly experience.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Helpful Guides & Resources Section */}
+        <div className="mt-24 max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
+            Helpful Guides & Resources
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* 1. Helpful Articles & Guides */}
+            <Card 
+              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
+              onClick={() => navigate("/resources")}
+            >
+              <CardContent className="pt-8 pb-8 text-center space-y-4">
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
+                    <BookOpen className="h-8 w-8 text-secondary" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">
+                  Helpful Articles & Guides
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Read simple guides on planning ahead, talking with family, and understanding funeral options.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* 2. Legal Documents & Planning Basics */}
+            <Card 
+              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
+              onClick={() => navigate("/legal-documents")}
+            >
+              <CardContent className="pt-8 pb-8 text-center space-y-4">
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
+                    <Scale className="h-8 w-8 text-secondary" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">
+                  Legal Documents & Planning Basics
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Learn about common legal documents (like wills, powers of attorney, and trusts) and where they fit into your plan.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* 3. Common Questions */}
+            <Card 
+              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
+              onClick={() => navigate("/faq")}
+            >
+              <CardContent className="pt-8 pb-8 text-center space-y-4">
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
+                    <HelpCircle className="h-8 w-8 text-secondary" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">
+                  Common Questions
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  See answers to the questions families ask most often about planning, payment, and how the tool works.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* 4. Helpful Contacts & Vendors */}
+            <Card 
+              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
+              onClick={() => navigate("/vendors")}
+            >
+              <CardContent className="pt-8 pb-8 text-center space-y-4">
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
+                    <Phone className="h-8 w-8 text-secondary" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">
+                  Helpful Contacts & Vendors
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Find useful contacts, local providers, and services that can help with funeral planning and after-death tasks.
                 </p>
               </CardContent>
             </Card>
