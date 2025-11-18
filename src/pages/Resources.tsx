@@ -217,11 +217,13 @@ const Resources = () => {
                 </p>
               </div>
               <div className="flex-shrink-0">
-                <Button asChild size="lg" className="whitespace-nowrap">
-                  <a href="/guides/Pre-Planning-Guide.pdf" download>
-                    <FileText className="mr-2 h-4 w-4" />
-                    Download Guide
-                  </a>
+                <Button 
+                  size="lg" 
+                  className="whitespace-nowrap"
+                  onClick={() => window.open('/guides/Pre-Planning-Guide.pdf', '_blank')}
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  Download Guide
                 </Button>
               </div>
             </div>

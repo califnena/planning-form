@@ -67,9 +67,10 @@ const Settings = () => {
         </h1>
 
         <Tabs defaultValue="account" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-8">
             <TabsTrigger value="account" className="text-base">Account</TabsTrigger>
             <TabsTrigger value="subscription" className="text-base">Subscription</TabsTrigger>
+            <TabsTrigger value="accessibility" className="text-base">Accessibility</TabsTrigger>
             <TabsTrigger value="sections" className="text-base">Planning Sections</TabsTrigger>
           </TabsList>
 
@@ -97,6 +98,69 @@ const Settings = () => {
               <div>
                 <Label className="text-base font-semibold">Billing Details</Label>
                 <p className="mt-2 text-base text-muted-foreground">Coming soon</p>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="accessibility" className="space-y-4">
+            <div className="bg-card border rounded-lg p-6 space-y-6">
+              <div>
+                <Label className="text-base font-semibold">Text Size</Label>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Adjust the text size for better readability across the application.
+                </p>
+                <TextSizeToggle />
+              </div>
+              
+              <div className="border-t pt-6">
+                <div className="flex items-start space-x-3">
+                  <Checkbox
+                    id="senior-view"
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <Label htmlFor="senior-view" className="text-base font-semibold cursor-pointer">
+                      Senior View
+                    </Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Enable a simplified, senior-friendly interface with larger buttons, clearer labels, and reduced cognitive load. Designed specifically for elderly users and those with vision challenges.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t pt-6">
+                <div className="flex items-start space-x-3">
+                  <Checkbox
+                    id="high-contrast"
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <Label htmlFor="high-contrast" className="text-base font-semibold cursor-pointer">
+                      High Contrast Mode
+                    </Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Increase contrast between text and background for improved visibility.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t pt-6">
+                <div className="flex items-start space-x-3">
+                  <Checkbox
+                    id="reduced-motion"
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <Label htmlFor="reduced-motion" className="text-base font-semibold cursor-pointer">
+                      Reduced Motion
+                    </Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Minimize animations and transitions throughout the application.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </TabsContent>

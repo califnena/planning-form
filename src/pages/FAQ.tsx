@@ -312,16 +312,14 @@ const FAQ = () => {
                 </p>
               </div>
               <div className="flex-shrink-0">
-                <a 
-                  href="/guides/Pre-Planning-Guide.pdf" 
-                  download
-                  className="inline-block"
+                <Button 
+                  size="lg" 
+                  className="gap-2 whitespace-nowrap"
+                  onClick={() => window.open('/guides/Pre-Planning-Guide.pdf', '_blank')}
                 >
-                  <Button size="lg" className="gap-2 whitespace-nowrap">
-                    <Download className="h-5 w-5" />
-                    Download Guide
-                  </Button>
-                </a>
+                  <Download className="h-5 w-5" />
+                  Download Guide
+                </Button>
               </div>
             </div>
           </div>
