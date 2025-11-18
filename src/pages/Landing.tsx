@@ -102,8 +102,7 @@ const Landing = () => {
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-            The easiest way to organize your final wishes, guide your family during difficult times, 
-            and keep everything important in one secure place.
+            A simple guided planner for your final wishes, documents, and the steps your family will need after you pass away.
           </p>
           
           <div className="flex flex-col items-center gap-4 pt-6">
