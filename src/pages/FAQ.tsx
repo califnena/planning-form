@@ -295,16 +295,32 @@ const FAQ = () => {
         </p>
 
         <div className="mb-8">
-          <a 
-            href="/Pre-Planning-Your-Funeral-A-Gift-of-Peace-and-Clarity.pdf" 
-            download
-            className="inline-block"
-          >
-            <Button size="lg" className="gap-2">
-              <Download className="h-5 w-5" />
-              Download Complete Guide (PDF)
-            </Button>
-          </a>
+          {/* Featured Pre-Planning Guide */}
+          <div className="bg-card border-2 border-border rounded-lg p-6 shadow-lg mb-8">
+            <div className="text-center mb-4">
+              <h2 className="text-2xl font-bold text-foreground mb-2">📖 Pre-Planning Guide</h2>
+              <p className="text-muted-foreground">Pre-Planning Your Funeral: A Gift of Peace & Clarity</p>
+            </div>
+            <div className="w-full aspect-[8.5/11] md:h-[600px] mb-4 bg-background rounded-lg overflow-hidden">
+              <iframe
+                src="/guides/Pre-Planning-Guide.pdf"
+                className="w-full h-full"
+                title="Pre-Planning Guide"
+              />
+            </div>
+            <div className="text-center">
+              <a 
+                href="/guides/Pre-Planning-Guide.pdf" 
+                download
+                className="inline-block"
+              >
+                <Button size="lg" className="gap-2">
+                  <Download className="h-5 w-5" />
+                  Download Complete Guide (PDF)
+                </Button>
+              </a>
+            </div>
+          </div>
         </div>
         
         <div className="space-y-6">
