@@ -185,9 +185,9 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/app/profile/subscription" className="flex items-center gap-2 cursor-pointer">
+                  <Link to="/plans" className="flex items-center gap-2 cursor-pointer">
                     <CreditCard className="h-4 w-4" />
-                    Subscription
+                    Plan & Billing
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
