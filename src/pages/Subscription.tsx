@@ -62,13 +62,13 @@ export default function Subscription() {
 
   const open = (url: string) => window.open(url, "_blank", "noopener,noreferrer");
 
-  const PLAN_LOOKUP: Record<string, { envKey: string; mode: "subscription" | "payment" }> = {
-    [PLANS.BASIC_ANNUAL.key]: { envKey: "STRIPE_LOOKUP_BASIC", mode: "subscription" },
-    [PLANS.PREMIUM_ANNUAL.key]: { envKey: "STRIPE_LOOKUP_PREMIUM_YEAR", mode: "subscription" },
-    [PLANS.VIP_ANNUAL.key]: { envKey: "STRIPE_LOOKUP_VIP_YEAR", mode: "subscription" },
-    [PLANS.VIP_MONTHLY.key]: { envKey: "STRIPE_LOOKUP_VIP_MONTHLY", mode: "subscription" },
-    [PLANS.BINDER.key]: { envKey: "STRIPE_LOOKUP_BINDER", mode: "payment" },
-    [PLANS.DO_IT_FOR_YOU.key]: { envKey: "STRIPE_LOOKUP_DIFY", mode: "payment" },
+  const PLAN_LOOKUP: Record<string, { lookupKey: string; mode: "subscription" | "payment" }> = {
+    [PLANS.BASIC_ANNUAL.key]: { lookupKey: "EFABASIC", mode: "subscription" },
+    [PLANS.PREMIUM_ANNUAL.key]: { lookupKey: "EFAPREMIUMYEAR", mode: "subscription" },
+    [PLANS.VIP_ANNUAL.key]: { lookupKey: "EFAVIPYEAR", mode: "subscription" },
+    [PLANS.VIP_MONTHLY.key]: { lookupKey: "EFAVIPMONTHLY", mode: "subscription" },
+    [PLANS.BINDER.key]: { lookupKey: "EFABINDER", mode: "payment" },
+    [PLANS.DO_IT_FOR_YOU.key]: { lookupKey: "EFADOFORU", mode: "payment" },
   };
 
   const handleCheckout = async (planKey: string) => {
@@ -77,12 +77,16 @@ export default function Subscription() {
       const cancelUrl = `${window.location.origin}/subscription?status=cancel`;
       const mapping = PLAN_LOOKUP[planKey];
       if (!mapping) {
-        toast({ title: "Checkout error", description: "Unknown plan.", variant: "destructive" });
+        toast({ 
+          title: "Checkout error", 
+          description: "Unknown plan.", 
+          variant: "destructive" 
+        });
         return;
       }
       const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
         body: {
-          planKey: mapping.envKey,
+          lookupKey: mapping.lookupKey,
           mode: mapping.mode,
           successUrl,
           cancelUrl,
@@ -98,7 +102,11 @@ export default function Subscription() {
       }
     } catch (err) {
       console.error(err);
-      toast({ title: "Checkout error", description: "Failed to start checkout. Try again.", variant: "destructive" });
+      toast({ 
+        title: "Checkout error", 
+        description: "We're having trouble loading this price. Please try again later or contact support.", 
+        variant: "destructive" 
+      });
     }
   };
 

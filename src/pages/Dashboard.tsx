@@ -183,6 +183,47 @@ export default function Dashboard() {
     }
   };
 
+  const handleBookDoItForYou = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to continue",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const successUrl = `${window.location.origin}/subscription?status=success`;
+      const cancelUrl = `${window.location.origin}/dashboard`;
+      
+      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
+        body: {
+          lookupKey: "EFADOFORU",
+          mode: "payment",
+          successUrl,
+          cancelUrl,
+          allowPromotionCodes: true,
+        },
+      });
+      
+      if (error) throw error;
+      
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast({
+        title: "Checkout failed",
+        description: "We're having trouble loading this price. Please try again later or contact support.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <AuthenticatedLayout>
       <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -302,7 +343,7 @@ export default function Dashboard() {
                     Let our team guide you through the entire process with a personalized consultation.
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <Button className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                    <Button onClick={handleBookDoItForYou} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                       Purchase and Book an Appointment
                     </Button>
                     <Button onClick={() => navigate('/products/binder')} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">

@@ -39,19 +39,30 @@ serve(async (req) => {
       });
     }
 
-    // Get price ID from environment
-    const priceIdKey = packageType === 'standard' 
+    // Use lookup key based on package type
+    const lookupKey = packageType === 'standard' 
       ? 'STRIPE_STANDARD_SONG_PRICE_ID' 
       : 'STRIPE_PREMIUM_SONG_PRICE_ID';
     
-    const priceId = Deno.env.get(priceIdKey);
-    if (!priceId) {
-      console.error(`Missing ${priceIdKey} secret`);
-      return new Response(JSON.stringify({ error: "Price configuration missing" }), {
+    // Resolve active price by lookup key
+    const prices = await stripe.prices.list({
+      lookup_keys: [lookupKey],
+      active: true,
+      expand: ["data.product"],
+      limit: 1,
+    });
+
+    if (!prices.data.length) {
+      console.error(`No active price found for lookup key: ${lookupKey}`);
+      return new Response(JSON.stringify({ 
+        error: "We're having trouble loading this price. Please try again later or contact support." 
+      }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const priceId = prices.data[0].id;
 
     const origin = req.headers.get("origin") || "https://";
 

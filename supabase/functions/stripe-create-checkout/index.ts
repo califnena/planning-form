@@ -31,7 +31,7 @@ serve(async (req) => {
     const stripe = new Stripe(apiKey, { apiVersion: "2023-10-16" });
 
     const {
-      planKey, // e.g. "STRIPE_LOOKUP_BASIC"
+      lookupKey, // Direct lookup key like "EFABASIC"
       mode = "subscription", // "subscription" | "payment"
       successUrl,
       cancelUrl,
@@ -39,23 +39,14 @@ serve(async (req) => {
       trialDays,
     } = await req.json();
 
-    if (!planKey) {
-      return new Response(JSON.stringify({ error: "Missing planKey" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const lookupKey = Deno.env.get(planKey);
     if (!lookupKey) {
-      console.error("Missing lookup env for:", planKey);
-      return new Response(JSON.stringify({ error: "Invalid plan key" }), {
+      return new Response(JSON.stringify({ error: "Missing lookupKey" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // 1) Resolve active price by lookup key
+    // Resolve active price by lookup key
     const prices = await stripe.prices.list({
       lookup_keys: [lookupKey],
       active: true,
@@ -64,7 +55,10 @@ serve(async (req) => {
     });
 
     if (!prices.data.length) {
-      return new Response(JSON.stringify({ error: "No active price found for lookup key" }), {
+      console.error("No active price found for lookup key:", lookupKey);
+      return new Response(JSON.stringify({ 
+        error: "We're having trouble loading this price. Please try again later or contact support." 
+      }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
