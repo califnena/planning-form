@@ -330,27 +330,8 @@ export default function Dashboard() {
     }
   };
 
-  // Planning Tools (excluding Blank Forms - now integrated into action panels)
-  const planningTools = [
-    {
-      title: t("dashboard.tiles.prePlanning.title"),
-      icon: FileText,
-      href: "/app",
-    },
-    {
-      title: "After-Death Planner",
-      icon: CheckCircle,
-      href: "/next-steps",
-    },
-    {
-      title: t("dashboard.tiles.trustedContacts.title"),
-      icon: UserPlus,
-      href: "/app",
-    },
-  ];
-
-  // Resources & Vendors
-  const resourcesVendors = [
+  // Help & Support cards
+  const helpSupportCards = [
     {
       title: t("dashboard.tiles.resources.title"),
       icon: BookOpen,
@@ -368,33 +349,8 @@ export default function Dashboard() {
     },
     {
       title: t("dashboard.tiles.vendors.title"),
-      icon: Store,
-      href: "/vendors",
-    },
-  ];
-
-  // Assistance & Support
-  const assistanceSupport = [
-    {
-      title: t("dashboard.tiles.vipCoach.title"),
-      icon: Star,
-      href: "/vip-coach",
-      isVIP: true,
-    },
-    {
-      title: t("dashboard.tiles.quote.title"),
-      icon: MessageCircle,
-      href: "/contact",
-    },
-    {
-      title: t("header.contact"),
       icon: Phone,
-      href: "/contact",
-    },
-    {
-      title: "About Us",
-      icon: Info,
-      href: "/about-us",
+      href: "/vendors",
     },
   ];
 
@@ -404,400 +360,429 @@ export default function Dashboard() {
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-6xl px-4 py-8 space-y-12">
           
-          {/* ▬▬ BLOCK 1: WELCOME + PROGRESS + CONTINUE ▬▬ */}
+          {/* Welcome Message */}
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+              {firstName ? t("dashboard.welcome", { name: firstName }) : t("dashboard.welcomeGeneric")}
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              {t("dashboard.subtitle")}
+            </p>
+          </div>
+
+          {/* Accessibility Banner */}
+          <div className="bg-muted/50 border border-border rounded-lg p-4 text-center">
+            <p className="text-sm text-muted-foreground">
+              Need larger text or clearer colors? Open <strong>"Settings"</strong> at the top right to adjust readability.
+            </p>
+          </div>
+
+          {/* ▬▬ SECTION 1: YOUR TWO PLANNING TOOLS ▬▬ */}
           <section>
-            <Card className="border-2 shadow-sm">
-              <CardContent className="pt-6">
-                <div className="space-y-6">
-                  {/* Mascot and Slogan */}
-                  <div className="flex flex-col sm:flex-row items-center gap-4 pb-6 border-b">
-                    <img 
-                      src={mascotCouple} 
-                      alt="Everlasting Advisors" 
-                      className="w-24 h-24 object-contain flex-shrink-0"
-                    />
-                    <div className="flex-1 text-center sm:text-left">
-                      <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                        {t("dashboard.slogan")}
-                      </h1>
-                      <p className="text-base text-muted-foreground">
-                        {t("dashboard.heroMessage")}
-                      </p>
-                    </div>
-                  </div>
+            <div className="space-y-4">
+              <div className="text-center">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                  Your Two Planning Tools
+                </h2>
+                <p className="text-muted-foreground">
+                  Each planner serves a different purpose at a different time. Click on either one to get started or continue your work.
+                </p>
+              </div>
 
-                  {/* Welcome and Progress */}
-                  <div className="space-y-4">
-                    <div>
-                      <h2 className="text-2xl font-bold text-foreground mb-1">
-                        {firstName ? t("dashboard.welcome", { name: firstName }) : t("dashboard.welcomeGeneric")}
-                      </h2>
-                      <p className="text-base text-muted-foreground">
-                        {t("dashboard.subtitle")}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </section>
-
-          {/* ▬▬ BLOCK 2: PRE-PLANNING ▬▬ */}
-          <section className="border-t pt-10">
-            <Card className="border-2 shadow-sm">
-              <CardContent className="p-6">
-                {/* Title and Description */}
-                <div className="flex items-start gap-4 mb-6 pb-4 border-b">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                    <FileText className="h-6 w-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-foreground mb-2">
-                      Pre-Planning
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Fill in your wishes, personal details, and instructions.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Primary Action */}
-                <div className="mb-6">
-                  <Button
-                    onClick={handleContinue}
-                    className="w-full h-12 text-base font-semibold"
-                    size="lg"
-                  >
-                    <Play className="mr-2 h-5 w-5" />
-                    Open Planner
-                  </Button>
-                </div>
-
-                {/* PDF Actions */}
-                <div className="mb-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-sm font-medium text-muted-foreground min-w-[90px]">
-                      PDF Actions:
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Plan Ahead Planner Card */}
+                <Card className="border-2 shadow-sm relative">
+                  <div className="absolute top-4 right-4">
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold bg-primary/10 text-primary px-3 py-1 rounded-full">
+                      <Star className="h-3 w-3" />
+                      Recommended — Start here
                     </span>
-                    <div className="flex gap-2 flex-1">
-                      <Button
+                  </div>
+                  <CardContent className="pt-16 pb-6 space-y-4">
+                    <div className="flex items-start gap-3">
+                      <FileText className="h-8 w-8 text-primary flex-shrink-0" />
+                      <div>
+                        <h3 className="text-xl font-bold text-foreground">Plan Ahead Planner</h3>
+                        <p className="text-sm text-muted-foreground">My Wishes & Information Organizer</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <p className="text-sm">
+                        <strong className="text-foreground">Use this NOW to plan ahead.</strong>{" "}
+                        Record your funeral preferences, store important documents, and organize all the information that will be needed someday.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <p className="text-sm font-semibold text-foreground">What's Inside:</p>
+                      <ul className="space-y-1 text-sm text-muted-foreground">
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                          Your funeral and burial preferences
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                          Important documents (will, insurance, etc.)
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                          Account information and passwords
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                          Property and valuables details
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                          Personal messages and instructions
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="pt-4 space-y-3">
+                      <Button 
+                        className="w-full" 
+                        size="lg"
+                        onClick={handleContinue}
+                      >
+                        Open My Planner
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
                         onClick={handlePrePlanningPDF}
-                        variant="outline"
-                        className="text-sm h-10 flex-1"
-                        size="sm"
                       >
-                        <Download className="mr-2 h-4 w-4" />
-                        Generate PDF
+                        <Download className="h-4 w-4 mr-2" />
+                        Get a Printable Document
                       </Button>
-                      <Button
-                        onClick={handleBlankPrePlanningPDF}
-                        variant="outline"
-                        className="text-sm h-10 flex-1"
-                        size="sm"
+                      <Link 
+                        to="/wizard/preplanning" 
+                        className="flex items-center justify-center gap-2 text-sm text-primary hover:underline pt-2"
                       >
-                        <FileOutput className="mr-2 h-4 w-4" />
-                        Blank
-                      </Button>
+                        Step-by-Step Guide <ChevronRight className="h-4 w-4" />
+                      </Link>
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
 
-                {/* Tools */}
-                <div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-muted-foreground min-w-[90px]">
-                      Tools:
+                {/* After-Death Planner Card */}
+                <Card className="border-2 shadow-sm relative">
+                  <div className="absolute top-4 right-4">
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold bg-muted text-muted-foreground px-3 py-1 rounded-full">
+                      For Loved Ones
                     </span>
-                    <div className="flex gap-2 flex-1">
-                      <Button
-                        onClick={() => navigate("/wizard/preplanning")}
-                        variant="outline"
-                        className="text-sm h-10 flex-1"
-                        size="sm"
-                      >
-                        <Play className="mr-2 h-4 w-4" />
-                        Step-by-Step Guide
-                      </Button>
-                      <Button
-                        onClick={() => navigate("/products/binder")}
-                        variant="outline"
-                        className="text-sm h-10 flex-1"
-                        size="sm"
-                      >
-                        <Receipt className="mr-2 h-4 w-4" />
-                        Order Binder
-                      </Button>
-                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </section>
-
-          {/* ▬▬ BLOCK 3: AFTER-DEATH PLANNER ▬▬ */}
-          <section className="border-t pt-10">
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold text-foreground">After-Death Planner</h2>
-              <p className="text-base text-muted-foreground mt-2">Guide loved ones with a step-by-step checklist</p>
-            </div>
-            
-            <Card className="border-2 shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-6">
-                  {/* Left: Title and Description */}
-                  <div className="flex items-start gap-4 flex-[2]">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                      <CheckCircle className="h-6 w-6" />
+                  <CardContent className="pt-16 pb-6 space-y-4">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-8 w-8 text-primary flex-shrink-0" />
+                      <div>
+                        <h3 className="text-xl font-bold text-foreground">After-Death Planner</h3>
+                        <p className="text-sm text-muted-foreground">Step-by-Step Action Guide</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-foreground mb-2">
-                        {t("dashboard.tiles.afterDeath.title")}
-                      </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {t("dashboard.tiles.afterDeath.description")}
+
+                    <div className="space-y-2">
+                      <p className="text-sm">
+                        <strong className="text-foreground">Use this AFTER someone passes away.</strong>{" "}
+                        A step-by-step checklist that walks you through everything that needs to be done—from immediate tasks to long-term responsibilities.
                       </p>
                     </div>
-                  </div>
-                  
-                  {/* Right: Actions Panel */}
-                  <div className="flex-1 flex flex-col gap-3 min-w-[280px]">
-                    {/* Primary Action */}
-                    <Button
-                      onClick={() => navigate("/next-steps")}
-                      className="w-full h-11 text-base font-semibold"
-                      size="lg"
-                    >
-                      <Play className="mr-2 h-4 w-4" />
-                      {t("dashboard.continueButton")}
-                    </Button>
-                    
-                    {/* Secondary Actions - Horizontal Grid */}
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button
+
+                    <div className="space-y-2">
+                      <p className="text-sm font-semibold text-foreground">What's Inside:</p>
+                      <ul className="space-y-1 text-sm text-muted-foreground">
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                          First 48 hours: immediate actions
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                          Obtaining death certificates
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                          Funeral and memorial arrangements
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                          Notifying government and companies
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                          Managing property and finances
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                          Closing accounts and subscriptions
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="pt-4 space-y-3">
+                      <Button 
+                        variant="outline"
+                        className="w-full" 
+                        size="lg"
+                        onClick={() => navigate("/next-steps")}
+                      >
+                        Open After-Death Planner
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
                         onClick={handleAfterDeathPDF}
-                        variant="outline"
-                        className="text-xs h-9"
-                        size="sm"
                       >
-                        <Download className="mr-1.5 h-3.5 w-3.5" />
-                        Generate PDF
+                        <Download className="h-4 w-4 mr-2" />
+                        Get a Printable Document
                       </Button>
-                      
-                      <Button
-                        onClick={handleBlankAfterDeathPDF}
-                        variant="outline"
-                        className="text-xs h-9"
-                        size="sm"
+                      <Link 
+                        to="/wizard/afterdeath" 
+                        className="flex items-center justify-center gap-2 text-sm text-primary hover:underline pt-2"
                       >
-                        <FileOutput className="mr-1.5 h-3.5 w-3.5" />
-                        Blank
-                      </Button>
+                        Step-by-Step Guide <ChevronRight className="h-4 w-4" />
+                      </Link>
                     </div>
-                    
-                    {/* Tertiary Actions */}
-                    <div className="flex gap-2 text-xs justify-center">
-                      <button
-                        onClick={() => navigate("/wizard/afterdeath")}
-                        className="text-muted-foreground hover:text-foreground underline decoration-dotted underline-offset-4"
-                      >
-                        Step-by-Step Guide
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </section>
 
-          {/* ▬▬ BLOCK 4: MY PLAN & BILLING ▬▬ */}
+          {/* ▬▬ SECTION 2: HOW TO GET STARTED ▬▬ */}
           <section className="border-t pt-10">
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold text-foreground">My Plan & Billing</h2>
-              <p className="text-base text-muted-foreground mt-2">Manage your subscription and billing settings</p>
-            </div>
-            <Card className="border-2 shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <Receipt className="h-6 w-6 text-primary" />
-                      </div>
-                      <h3 className="text-xl font-semibold">View Plans & Billing</h3>
-                    </div>
-                    <p className="text-muted-foreground">
-                      View your current subscription, manage billing, and explore upgrade options
-                    </p>
-                  </div>
-                  <Button onClick={() => navigate("/plans")} size="lg">
-                    Manage Plan
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </section>
+            <div className="space-y-4">
+              <div className="text-center">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                  How to Get Started
+                </h2>
+                <p className="text-muted-foreground">
+                  Choose how you'd like to work on your planning.
+                </p>
+              </div>
 
-          {/* ▬▬ BLOCK 5: PRODUCTS & ORDERS ▬▬ */}
-          <section className="border-t pt-10">
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold text-foreground">Products & Orders</h2>
-              <p className="text-base text-muted-foreground mt-2">Browse and order physical products and services</p>
-            </div>
-            <div className="space-y-3">
-              <Card className="border-2 shadow-sm hover:shadow-md transition-shadow">
+              <Card className="border-2 shadow-sm">
                 <CardContent className="p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2 rounded-lg bg-muted">
-                          <BookOpen className="h-6 w-6 text-muted-foreground" />
-                        </div>
-                        <h3 className="text-xl font-semibold">Binder & Printed Planner Materials</h3>
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                        <Play className="h-6 w-6" />
                       </div>
-                      <p className="text-muted-foreground">
-                        Order a physical binder to store your planner and documents
-                      </p>
                     </div>
-                    <Button onClick={() => navigate("/products/binder")} variant="outline" size="lg">
-                      View Details
-                    </Button>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                        Step-by-Step Guided Planning
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Let us walk you through everything in order, one section at a time—perfect if you want guidance on what to do next.
+                      </p>
+                      <Button onClick={() => navigate("/wizard/preplanning")} size="lg">
+                        <Play className="mr-2 h-4 w-4" />
+                        Start Guided Tour
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-              
-              <Card className="border-2 shadow-sm hover:shadow-md transition-shadow border-primary/30">
+            </div>
+          </section>
+
+          {/* ▬▬ SECTION 3: PRODUCTS AVAILABLE FOR PURCHASE ▬▬ */}
+          <section className="border-t pt-10">
+            <div className="space-y-4">
+              <div className="text-center">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                  Products Available for Purchase
+                </h2>
+                <p className="text-muted-foreground">
+                  Optional printed materials and services you can order.
+                </p>
+              </div>
+
+              {/* VIP Coach Assistant - Highlighted */}
+              <Card className="border-2 border-yellow-500/50 shadow-sm bg-gradient-to-r from-yellow-50/50 to-amber-50/50 dark:from-yellow-950/20 dark:to-amber-950/20">
                 <CardContent className="p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2 rounded-lg bg-primary/10">
-                          <Music className="h-6 w-6 text-primary" />
+                  <div className="flex items-start gap-6 flex-col md:flex-row">
+                    <div className="flex items-start gap-4 flex-1">
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 rounded-lg bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 flex items-center justify-center">
+                          <Star className="h-6 w-6" />
                         </div>
-                        <h3 className="text-xl font-semibold">Custom Tribute Song</h3>
                       </div>
-                      <p className="text-muted-foreground">
-                        Create a personalized musical memorial (1-2 day delivery)
-                      </p>
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="text-xl font-bold text-foreground">VIP Coach Assistant</h3>
+                          <span className="text-xs font-bold bg-yellow-500 text-white px-2 py-0.5 rounded-full">EXCLUSIVE VIP</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Your personal AI companion for planning and emotional support. Available 24/7 to guide you through every step of your planning journey.
+                        </p>
+                        <div className="space-y-2">
+                          <p className="text-sm font-semibold text-foreground">What You Get:</p>
+                          <ul className="space-y-1 text-sm text-muted-foreground">
+                            <li className="flex items-start gap-2">
+                              <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0 text-yellow-600" />
+                              <strong>Planning Mode:</strong> Get guided through organizing your funeral wishes, legal documents, and final instructions
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0 text-yellow-600" />
+                              <strong>Companion Mode:</strong> Receive compassionate guidance when dealing with grief, anxiety, or difficult emotions
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0 text-yellow-600" />
+                              <strong>24/7 Availability:</strong> Your coach is always ready to help, anytime you need it
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0 text-yellow-600" />
+                              <strong>Private & Secure:</strong> All conversations are completely encrypted
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
                     </div>
-                    <Button onClick={() => navigate("/products/custom-song")} size="lg">
+                    <div className="flex-shrink-0">
+                      <Button 
+                        className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                        size="lg"
+                        onClick={() => navigate("/vip-coach")}
+                      >
+                        Upgrade to VIP
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Other Products */}
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Printable Planning Workbook */}
+                <Card className="border-2 shadow-sm">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-3 mb-4">
+                      <FileOutput className="h-6 w-6 text-primary flex-shrink-0" />
+                      <div>
+                        <h3 className="text-lg font-semibold text-foreground">Printable Planning Workbook (Blank)</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Prefer to write by hand? Get our complete planning workbook as a downloadable PDF format with blank forms you can print and fill out on paper.
+                        </p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={handleBlankPrePlanningPDF}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Purchase Workbook
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Physical Planning Binder */}
+                <Card className="border-2 shadow-sm">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-3 mb-4">
+                      <BookOpen className="h-6 w-6 text-primary flex-shrink-0" />
+                      <div>
+                        <h3 className="text-lg font-semibold text-foreground">Physical Planning Binder</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          A professionally printed and bound binder with all your information that you can keep at home.
+                        </p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => navigate("/products/binder")}
+                    >
+                      Order Binder
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Custom Memorial Song */}
+                <Card className="border-2 shadow-sm">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-3 mb-4">
+                      <Music className="h-6 w-6 text-primary flex-shrink-0" />
+                      <div>
+                        <h3 className="text-lg font-semibold text-foreground">Custom Memorial Song (1–2 Day Delivery)</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Create a personalized musical tribute (professionally produced, 1–2 day delivery).
+                        </p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => navigate("/products/custom-song")}
+                    >
+                      <Music className="mr-2 h-4 w-4" />
                       Create Song
                     </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-2 border-dashed shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2 rounded-lg bg-muted">
-                          <Store className="h-6 w-6 text-muted-foreground" />
-                        </div>
-                        <h3 className="text-xl font-semibold">Shop Caskets & Urns</h3>
+                  </CardContent>
+                </Card>
+
+                {/* Shop Caskets & Urns */}
+                <Card className="border-2 border-dashed shadow-sm">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-3 mb-4">
+                      <Store className="h-6 w-6 text-muted-foreground flex-shrink-0" />
+                      <div>
+                        <h3 className="text-lg font-semibold text-foreground">Shop Caskets & Urns</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Browse and order quality memorial products <strong>(Coming soon)</strong>
+                        </p>
                       </div>
-                      <p className="text-muted-foreground">
-                        Browse and order quality memorial products (Coming soon)
-                      </p>
                     </div>
-                    <Button onClick={() => navigate("/products")} variant="outline" size="lg" disabled>
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      disabled
+                    >
                       Coming Soon
                     </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </section>
 
-          {/* ▬▬ BLOCK 6: HELP & SUPPORT ▬▬ */}
+          {/* ▬▬ SECTION 4: HELP & SUPPORT ▬▬ */}
           <section className="border-t pt-10 pb-24">
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold text-foreground">Help & Support</h2>
-              <p className="text-base text-muted-foreground mt-2">Resources, guidance, and assistance when you need it</p>
-            </div>
-            <div className="grid gap-2">
-              {/* VIP Coach */}
-              <Link
-                to="/vip-coach"
-                className="flex items-center gap-4 p-4 rounded-lg border transition-all group bg-gradient-to-r from-yellow-50/50 to-amber-50/50 dark:from-yellow-950/20 dark:to-amber-950/20 border-yellow-500/50 hover:border-yellow-500 shadow-sm"
-              >
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 flex items-center justify-center">
-                  <Star className="h-5 w-5" />
-                </div>
-                <span className="flex-1 text-base font-medium text-yellow-900 dark:text-yellow-100 group-hover:text-yellow-700 dark:group-hover:text-yellow-300">
-                  {t("dashboard.tiles.vipCoach.title")}
-                  <span className="ml-2 text-xs font-bold bg-yellow-500 text-white px-2 py-0.5 rounded-full">PREMIUM</span>
-                </span>
-                <ChevronRight className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-              </Link>
+            <div className="space-y-4">
+              <div className="text-center">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                  Help & Support
+                </h2>
+                <p className="text-muted-foreground">
+                  We're here if you have questions or need assistance.
+                </p>
+              </div>
 
-              {/* Other Help Items */}
-              <Link to="/resources" className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group">
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                  <BookOpen className="h-5 w-5" />
-                </div>
-                <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
-                  {t("dashboard.tiles.resources.title")}
-                </span>
-                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-              </Link>
-
-              <Link to="/legal-documents" className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group">
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                  <Scale className="h-5 w-5" />
-                </div>
-                <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
-                  {t("dashboard.tiles.legalDocuments.title")}
-                </span>
-                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-              </Link>
-
-              <Link to="/faq" className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group">
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                  <HelpCircle className="h-5 w-5" />
-                </div>
-                <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
-                  {t("dashboard.tiles.questions.title")}
-                </span>
-                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-              </Link>
-
-              <Link to="/vendors" className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group">
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                  <Store className="h-5 w-5" />
-                </div>
-                <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
-                  {t("dashboard.tiles.vendors.title")}
-                </span>
-                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-              </Link>
-
-              <Link to="/contact" className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group">
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                  <MessageCircle className="h-5 w-5" />
-                </div>
-                <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
-                  {t("dashboard.tiles.quote.title")}
-                </span>
-                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-              </Link>
-
-              <Link to="/about-us" className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group">
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                  <Info className="h-5 w-5" />
-                </div>
-                <span className="flex-1 text-base font-medium text-foreground group-hover:text-primary">
-                  About Us
-                </span>
-                <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-              </Link>
+              <div className="grid md:grid-cols-2 gap-4">
+                {helpSupportCards.map((item, index) => (
+                  <Link
+                    key={index}
+                    to={item.href}
+                    className="flex items-center gap-4 p-6 rounded-lg border-2 bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group"
+                  >
+                    <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                      <item.icon className="h-6 w-6" />
+                    </div>
+                    <span className="flex-1 text-base font-semibold text-foreground group-hover:text-primary">
+                      {item.title}
+                    </span>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+                  </Link>
+                ))}
+              </div>
             </div>
           </section>
 
         </div>
       </div>
-
-      {/* PII Collection Dialog for Pre-Planning PDF */}
+      
       <PIICollectionDialog
         open={showPIIDialog}
         onOpenChange={setShowPIIDialog}
