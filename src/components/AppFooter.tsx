@@ -38,10 +38,9 @@ export const AppFooter = () => {
 
             {/* About Us */}
             <div>
-              <h3 className="text-xs font-semibold text-foreground mb-3 tracking-wide">About Us</h3>
               <Link
                 to="/about-us"
-                className="text-xs text-primary hover:underline"
+                className="text-xs font-semibold text-foreground hover:text-primary mb-3 tracking-wide block"
               >
                 About Us
               </Link>
@@ -90,7 +89,7 @@ export const AppFooter = () => {
                 alt="Everlasting Funeral Advisors QR Code" 
                 className="w-28 h-28 object-contain"
               />
-              <p className="text-xs text-muted-foreground mt-2 text-center">Scan to visit our website</p>
+              <p className="text-xs text-muted-foreground mt-2 text-center">Scan to contact us</p>
             </div>
           </div>
 

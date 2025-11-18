@@ -2,25 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Heart, Package, Users } from "lucide-react";
-import everlastingLogo from "@/assets/everlasting-logo.png";
+import { GlobalHeader } from "@/components/GlobalHeader";
+import { AppFooter } from "@/components/AppFooter";
 
 const AboutUs = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
-      {/* Header */}
-      <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img src={everlastingLogo} alt="Everlasting Funeral Advisors" className="h-12 w-12" />
-              <div>
-                <h1 className="text-lg font-semibold text-primary">My Final Wishes</h1>
-                <p className="text-xs text-muted-foreground">Interactive Planning Guide</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <GlobalHeader />
 
       <main className="container mx-auto px-4 py-12 max-w-5xl">
         {/* Back Button */}
@@ -173,15 +161,10 @@ const AboutUs = () => {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-border mt-16 py-8 bg-background">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2024 Everlasting Funeral Advisors. All rights reserved.</p>
-        </div>
-      </footer>
+      <AppFooter />
     </div>
   );
 };
 
+export default AboutUs;
 export default AboutUs;

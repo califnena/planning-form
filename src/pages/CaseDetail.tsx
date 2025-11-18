@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { GlobalHeader } from "@/components/GlobalHeader";
+import { AppFooter } from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, ArrowRight, Home, Download, CheckCircle2, Menu } from "lucide-react";
@@ -391,7 +392,8 @@ export default function CaseDetail() {
         formData={formData}
         decedentName={caseData?.decedent?.legal_name || ""}
       />
-    </div>
+      </div>
+      <AppFooter />
     </>
   );
 }
