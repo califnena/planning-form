@@ -13,7 +13,11 @@ import {
   Phone,
   Download,
   Music,
-  Calendar
+  Calendar,
+  Printer,
+  Users,
+  ListChecks,
+  ShoppingBag
 } from "lucide-react";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { Card, CardContent } from "@/components/ui/card";
@@ -246,7 +250,7 @@ export default function Dashboard() {
                 { num: 5, label: "After-Death Guide" }
               ].map((step) => (
                 <div key={step.num} className="flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-lg">
+                 <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-base">
                     {step.num}
                   </div>
                   <span className="text-xs md:text-sm text-muted-foreground font-medium">{step.label}</span>
@@ -259,7 +263,7 @@ export default function Dashboard() {
           <section className="border-t pt-12">
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-lg flex-shrink-0">1</div>
+                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-base flex-shrink-0">1</div>
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground">Plan Ahead Planner</h2>
               </div>
               <p className="text-base text-muted-foreground ml-13">Start here — Choose how you want to create your plan. Pick the option that works best for you.</p>
@@ -270,8 +274,8 @@ export default function Dashboard() {
               <Card className="border shadow-sm">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
-                      <FileText className="h-6 w-6 text-white" />
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
+                      <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-foreground mb-1">Option 1: Digital Planner</h3>
@@ -309,8 +313,8 @@ export default function Dashboard() {
               <Card className="border shadow-sm">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0">
-                      <FileOutput className="h-6 w-6 text-white" />
+                    <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center flex-shrink-0">
+                      <Printer className="h-4 w-4 text-green-600 dark:text-green-400" />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-foreground mb-1">Option 2: Printable Version</h3>
@@ -342,8 +346,8 @@ export default function Dashboard() {
               <Card className="border shadow-sm bg-gradient-to-r from-blue-50/50 to-cyan-50/50 dark:from-blue-950/20 dark:to-cyan-950/20">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center flex-shrink-0">
-                      <Calendar className="h-6 w-6 text-white" />
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
+                      <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
@@ -379,7 +383,7 @@ export default function Dashboard() {
           <section className="border-t pt-16">
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-lg flex-shrink-0">2</div>
+                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-base flex-shrink-0">2</div>
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground">VIP Coach Assistant</h2>
               </div>
               <p className="text-base text-muted-foreground ml-13">Get personalized access to expert guidance and support throughout your planning journey.</p>
@@ -390,8 +394,8 @@ export default function Dashboard() {
                 <div className="flex items-start gap-4 flex-col md:flex-row">
                   <div className="flex items-start gap-4 flex-1">
                     <div className="flex-shrink-0">
-                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center">
-                        <Star className="h-6 w-6 text-white" />
+                      <div className="w-8 h-8 rounded-lg bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
+                        <Star className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
                       </div>
                     </div>
                     <div className="flex-1">
@@ -433,7 +437,7 @@ export default function Dashboard() {
           <section className="border-t pt-16">
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-lg flex-shrink-0">3</div>
+                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-base flex-shrink-0">3</div>
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground">Shop</h2>
               </div>
               <p className="text-base text-muted-foreground ml-13">Browse and order quality memorial products.</p>
@@ -445,8 +449,8 @@ export default function Dashboard() {
               </div>
               <CardContent className="p-6">
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
-                    <Store className="h-6 w-6 text-white" />
+                  <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
+                    <ShoppingBag className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-foreground">Shop Caskets & Urns</h3>
@@ -469,7 +473,7 @@ export default function Dashboard() {
           <section className="border-t pt-16">
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-lg flex-shrink-0">4</div>
+                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-base flex-shrink-0">4</div>
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground">Custom Memorial Song</h2>
               </div>
               <p className="text-base text-muted-foreground ml-13">Create a personalized memorial song that tells your story.</p>
@@ -478,8 +482,8 @@ export default function Dashboard() {
             <Card className="border shadow-sm">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center flex-shrink-0">
-                    <Music className="h-6 w-6 text-white" />
+                  <div className="w-8 h-8 rounded-lg bg-pink-100 dark:bg-pink-900 flex items-center justify-center flex-shrink-0">
+                    <Music className="h-4 w-4 text-pink-600 dark:text-pink-400" />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-foreground">Custom Memorial Song (1–2 Day Delivery)</h3>
@@ -503,7 +507,7 @@ export default function Dashboard() {
           <section className="border-t pt-16">
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-lg flex-shrink-0">5</div>
+                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-base flex-shrink-0">5</div>
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground">After-Death Planner</h2>
               </div>
               <p className="text-base text-muted-foreground ml-13">A guided checklist your loved ones can follow after a passing.</p>
@@ -512,8 +516,8 @@ export default function Dashboard() {
             <Card className="border shadow-sm">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="h-6 w-6 text-white" />
+                  <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center flex-shrink-0">
+                    <ListChecks className="h-4 w-4 text-green-600 dark:text-green-400" />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-foreground mb-1">After-Death Planner</h3>
