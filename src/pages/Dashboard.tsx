@@ -469,7 +469,7 @@ export default function Dashboard() {
                     size="lg"
                   >
                     <Play className="mr-2 h-5 w-5" />
-                    Continue Where I Left Off
+                    Open Planner
                   </Button>
                 </div>
 
