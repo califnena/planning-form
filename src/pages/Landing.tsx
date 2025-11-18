@@ -106,11 +106,11 @@ const Landing = () => {
           </div>
           
           <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight">
-            Plan Your Final Wishes With Confidence. Everything Organized. All in One Secure Place.
+            End-of-Life Planning Made Simple
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-            A digital platform to organize your funeral preferences, important documents, and final instructions—all in one secure place for your loved ones.
+            Document your wishes, follow step-by-step guidance, and access affordable products—All in one place.
           </p>
           
           <div className="flex flex-col items-center gap-4 pt-6">
