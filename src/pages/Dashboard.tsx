@@ -444,79 +444,89 @@ export default function Dashboard() {
 
           {/* ▬▬ BLOCK 2: PRE-PLANNING ▬▬ */}
           <section className="border-t pt-10">
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold text-foreground">Pre-Planning</h2>
-              <p className="text-base text-muted-foreground mt-2">Organize your wishes and prepare your plan</p>
-            </div>
-            
             <Card className="border-2 shadow-sm">
               <CardContent className="p-6">
-                <div className="flex items-start gap-6">
-                  {/* Left: Title and Description */}
-                  <div className="flex items-start gap-4 flex-[2]">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                      <FileText className="h-6 w-6" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-foreground mb-2">
-                        {t("dashboard.tiles.prePlanning.title")}
-                      </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {t("dashboard.tiles.prePlanning.description")}
-                      </p>
-                    </div>
+                {/* Title and Description */}
+                <div className="flex items-start gap-4 mb-6 pb-4 border-b">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                    <FileText className="h-6 w-6" />
                   </div>
-                  
-                  {/* Right: Actions Panel */}
-                  <div className="flex-1 flex flex-col gap-3 min-w-[280px]">
-                    {/* Primary Action */}
-                    <Button
-                      onClick={handleContinue}
-                      className="w-full h-11 text-base font-semibold"
-                      size="lg"
-                    >
-                      <Play className="mr-2 h-4 w-4" />
-                      {t("dashboard.continueButton")}
-                    </Button>
-                    
-                    {/* Secondary Actions - Horizontal Grid */}
-                    <div className="grid grid-cols-2 gap-2">
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-foreground mb-2">
+                      Pre-Planning
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Fill in your wishes, personal details, and instructions.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Primary Action */}
+                <div className="mb-6">
+                  <Button
+                    onClick={handleContinue}
+                    className="w-full h-12 text-base font-semibold"
+                    size="lg"
+                  >
+                    <Play className="mr-2 h-5 w-5" />
+                    Continue Where I Left Off
+                  </Button>
+                </div>
+
+                {/* PDF Actions */}
+                <div className="mb-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-sm font-medium text-muted-foreground min-w-[90px]">
+                      PDF Actions:
+                    </span>
+                    <div className="flex gap-2 flex-1">
                       <Button
                         onClick={handlePrePlanningPDF}
                         variant="outline"
-                        className="text-xs h-9"
+                        className="text-sm h-10 flex-1"
                         size="sm"
                       >
-                        <Download className="mr-1.5 h-3.5 w-3.5" />
+                        <Download className="mr-2 h-4 w-4" />
                         Generate PDF
                       </Button>
-                      
                       <Button
                         onClick={handleBlankPrePlanningPDF}
                         variant="outline"
-                        className="text-xs h-9"
+                        className="text-sm h-10 flex-1"
                         size="sm"
                       >
-                        <FileOutput className="mr-1.5 h-3.5 w-3.5" />
+                        <FileOutput className="mr-2 h-4 w-4" />
                         Blank
                       </Button>
                     </div>
-                    
-                    {/* Tertiary Actions */}
-                    <div className="flex gap-2 text-xs">
-                      <button
+                  </div>
+                </div>
+
+                {/* Tools */}
+                <div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium text-muted-foreground min-w-[90px]">
+                      Tools:
+                    </span>
+                    <div className="flex gap-2 flex-1">
+                      <Button
                         onClick={() => navigate("/wizard/preplanning")}
-                        className="flex-1 text-muted-foreground hover:text-foreground underline decoration-dotted underline-offset-4"
+                        variant="outline"
+                        className="text-sm h-10 flex-1"
+                        size="sm"
                       >
+                        <Play className="mr-2 h-4 w-4" />
                         Step-by-Step Guide
-                      </button>
-                      <span className="text-muted-foreground">•</span>
-                      <Link
-                        to="/products/binder"
-                        className="flex-1 text-muted-foreground hover:text-foreground underline decoration-dotted underline-offset-4"
+                      </Button>
+                      <Button
+                        onClick={() => navigate("/products/binder")}
+                        variant="outline"
+                        className="text-sm h-10 flex-1"
+                        size="sm"
                       >
+                        <Receipt className="mr-2 h-4 w-4" />
                         Order Binder
-                      </Link>
+                      </Button>
                     </div>
                   </div>
                 </div>
