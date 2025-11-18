@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { TextSizeToggle } from '@/components/TextSizeToggle';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ExternalLink, FileText } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -192,6 +192,31 @@ const Resources = () => {
             </Button>
           </Link>
           <TextSizeToggle />
+        </div>
+
+        {/* Featured Guide - Embedded PDF */}
+        <div className="mb-12">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-foreground mb-2">📖 Featured Guide</h2>
+            <p className="text-muted-foreground">Pre-Planning Your Funeral: A Gift of Peace & Clarity</p>
+          </div>
+          <div className="bg-card border-2 border-border rounded-lg p-6 shadow-lg">
+            <div className="w-full aspect-[8.5/11] md:h-[700px] mb-4 bg-background rounded-lg overflow-hidden">
+              <iframe
+                src="/guides/Pre-Planning-Guide.pdf"
+                className="w-full h-full"
+                title="Pre-Planning Guide"
+              />
+            </div>
+            <div className="text-center">
+              <Button variant="default" asChild size="lg">
+                <a href="/guides/Pre-Planning-Guide.pdf" download>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Download Complete Guide
+                </a>
+              </Button>
+            </div>
+          </div>
         </div>
         
         <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">

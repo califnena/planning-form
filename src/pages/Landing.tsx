@@ -435,6 +435,33 @@ const Landing = () => {
               Are you prepared for one of life's most difficult moments? Our mission is to guide families through the process of planning an affordable funeral with care, compassion, and expertise. From understanding your options to making thoughtful decisions, we're here to support you every step of the way. With our resources and guidance, you can create a meaningful farewell that honors your loved one's life while easing the burden on your family during a challenging time. Let us help you navigate this journey with sensitivity and understanding.
             </p>
 
+            {/* Pre-Planning Guide Embedded PDF */}
+            <div className="mb-12 bg-gradient-to-br from-blue-50/30 to-indigo-50/30 dark:from-blue-950/10 dark:to-indigo-950/10 rounded-xl p-6 border border-border">
+              <div className="text-center mb-4">
+                <h4 className="text-xl font-bold text-foreground mb-2">
+                  📖 Pre-Planning Your Funeral: A Gift of Peace & Clarity
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  Our comprehensive guide to help you plan ahead with confidence
+                </p>
+              </div>
+              <div className="w-full aspect-[8.5/11] md:h-[600px] bg-background rounded-lg overflow-hidden shadow-lg">
+                <iframe
+                  src="/guides/Pre-Planning-Guide.pdf"
+                  className="w-full h-full"
+                  title="Pre-Planning Guide"
+                />
+              </div>
+              <div className="mt-4 text-center">
+                <Button variant="outline" asChild size="lg">
+                  <a href="/guides/Pre-Planning-Guide.pdf" download>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Download Complete Guide
+                  </a>
+                </Button>
+              </div>
+            </div>
+
             <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
               About Everlasting Funeral Advisors
             </h3>
