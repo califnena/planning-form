@@ -54,28 +54,36 @@ const Landing = () => {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
             <h1 className="text-xl font-semibold text-primary">Everlasting Funeral Advisors</h1>
-            <p className="text-xs text-muted-foreground">Peace of Mind Starts with a Plan</p>
+            <p className="text-xs text-muted-foreground">Simple End-of-Life Planning & Document Organization</p>
           </div>
           <div className="flex items-center gap-3">
             {/* Text Size Controls */}
-            <div className="flex items-center gap-1 border border-border rounded-md p-1">
+            <div className="flex items-center gap-2 border border-border rounded-md px-3 py-1.5">
+              <span className="text-sm text-muted-foreground font-medium">Text Size:</span>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleTextSizeChange("decrease")}
-                className="h-8 w-8 p-0"
+                className="h-7 px-2 font-semibold"
                 title="Decrease text size"
               >
-                <Minus className="h-4 w-4" />
+                A-
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 font-semibold pointer-events-none"
+              >
+                A
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleTextSizeChange("increase")}
-                className="h-8 w-8 p-0"
+                className="h-7 px-2 font-semibold"
                 title="Increase text size"
               >
-                <Plus className="h-4 w-4" />
+                A+
               </Button>
             </div>
             <LanguageSelector />
@@ -89,20 +97,20 @@ const Landing = () => {
       {/* Hero Section */}
       <main className="container mx-auto px-4 py-16 md:py-24">
         <div className="max-w-4xl mx-auto text-center space-y-8">
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-8">
             <img 
               src={mascotCouple} 
               alt="Everlasting Advisors" 
-              className="w-32 h-32 object-contain"
+              className="w-48 h-48 object-contain"
             />
           </div>
           
           <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight">
-            Plan Your Final Wishes. Protect Your Family From Confusion.
+            Plan Your Final Wishes With Confidence. Everything Organized. All in One Secure Place.
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-            A simple guided planner for your final wishes, documents, and the steps your family will need after you pass away.
+            A digital platform to organize your funeral preferences, important documents, and final instructions—all in one secure place for your loved ones.
           </p>
           
           <div className="flex flex-col items-center gap-4 pt-6">
@@ -120,14 +128,26 @@ const Landing = () => {
               View Pricing & Plans →
             </Link>
           </div>
+
+          {/* What Is the Everlasting Planner Section */}
+          <div className="mt-16 max-w-3xl mx-auto">
+            <div className="bg-card border border-border rounded-2xl p-8 md:p-10 shadow-sm">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+                What Is the Everlasting Planner?
+              </h2>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                A simple online tool that guides you through planning your funeral wishes, storing important documents, and leaving clear instructions for the people who will need them. Everything is private, secure, and easy to update anytime.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* What You Can Do Section */}
-        <div className="mt-24 max-w-5xl mx-auto">
+        <div className="mt-24 max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
             What You Can Do
           </h2>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <Card className="border-2 hover:border-primary/50 transition-colors">
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
@@ -136,10 +156,10 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Organize Your Wishes
+                  Record Your Funeral Preferences
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Personal details, instructions, documents, and preferences all in one place.
+                  Document your wishes for services, burial or cremation, and memorial details.
                 </p>
               </CardContent>
             </Card>
@@ -152,10 +172,10 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Guide Your Family
+                  Leave Clear Instructions for Loved Ones
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Step-by-step guidance for loved ones after a loss.
+                  Provide step-by-step guidance so your family knows exactly what to do.
                 </p>
               </CardContent>
             </Card>
@@ -168,10 +188,26 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Stay Secure
+                  Keep Everything Secure
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Your information protected with bank-level encryption.
+                  Your personal information is protected with bank-level encryption and privacy.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 hover:border-primary/50 transition-colors">
+              <CardContent className="pt-8 pb-8 text-center space-y-4">
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <FileOutput className="h-8 w-8 text-primary" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">
+                  Adjust Text Size & Display
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Increase text size, turn on high contrast, or use Super-Senior Mode.
                 </p>
               </CardContent>
             </Card>
