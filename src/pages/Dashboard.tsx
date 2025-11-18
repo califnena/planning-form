@@ -21,13 +21,20 @@ import {
   Mail,
   ChevronRight,
   Download,
-  Music
+  Music,
+  Compass
 } from "lucide-react";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
@@ -377,7 +384,55 @@ export default function Dashboard() {
             </p>
           </div>
 
-          {/* ▬▬ SECTION 1: YOUR TWO PLANNING TOOLS ▬▬ */}
+          {/* ▬▬ SECTION 1: HOW TO GET STARTED ▬▬ */}
+          <section>
+            <div className="space-y-4">
+              <div className="text-center">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                  How to Get Started
+                </h2>
+                <p className="text-muted-foreground">
+                  Choose how you'd like to work on your planning.
+                </p>
+              </div>
+
+              <Card className="border-2 shadow-sm hover:shadow-md transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
+                        <Compass className="h-8 w-8 text-white" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <h3 className="text-xl font-semibold text-foreground mb-2 cursor-help inline-flex items-center gap-2">
+                              Step-by-Step Guided Tour
+                              <Info className="h-4 w-4 text-muted-foreground" />
+                            </h3>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-sm">
+                            <p>Let us walk you through everything in order, one section at a time—perfect if you want guidance on what to do next.</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        A guided experience that takes you through each planning section step-by-step, helping you complete your plan with confidence.
+                      </p>
+                      <Button onClick={() => navigate("/wizard/preplanning")} size="lg" className="w-full md:w-auto">
+                        <Play className="mr-2 h-4 w-4" />
+                        Start Guided Tour
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          {/* ▬▬ SECTION 2: YOUR TWO PLANNING TOOLS ▬▬ */}
           <section>
             <div className="space-y-4">
               <div className="text-center">
@@ -400,7 +455,9 @@ export default function Dashboard() {
                   </div>
                   <CardContent className="pt-16 pb-6 space-y-4">
                     <div className="flex items-start gap-3">
-                      <FileText className="h-8 w-8 text-primary flex-shrink-0" />
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                        <FileText className="h-6 w-6 text-white" />
+                      </div>
                       <div>
                         <h3 className="text-xl font-bold text-foreground">Plan Ahead Planner</h3>
                         <p className="text-sm text-muted-foreground">My Wishes & Information Organizer</p>
@@ -456,12 +513,6 @@ export default function Dashboard() {
                         <Download className="h-4 w-4 mr-2" />
                         Get a Printable Document
                       </Button>
-                      <Link 
-                        to="/wizard/preplanning" 
-                        className="flex items-center justify-center gap-2 text-sm text-primary hover:underline pt-2"
-                      >
-                        Step-by-Step Guide <ChevronRight className="h-4 w-4" />
-                      </Link>
                     </div>
                   </CardContent>
                 </Card>
@@ -475,7 +526,9 @@ export default function Dashboard() {
                   </div>
                   <CardContent className="pt-16 pb-6 space-y-4">
                     <div className="flex items-start gap-3">
-                      <CheckCircle className="h-8 w-8 text-primary flex-shrink-0" />
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                        <CheckCircle className="h-6 w-6 text-white" />
+                      </div>
                       <div>
                         <h3 className="text-xl font-bold text-foreground">After-Death Planner</h3>
                         <p className="text-sm text-muted-foreground">Step-by-Step Action Guide</p>
@@ -536,54 +589,10 @@ export default function Dashboard() {
                         <Download className="h-4 w-4 mr-2" />
                         Get a Printable Document
                       </Button>
-                      <Link 
-                        to="/wizard/afterdeath" 
-                        className="flex items-center justify-center gap-2 text-sm text-primary hover:underline pt-2"
-                      >
-                        Step-by-Step Guide <ChevronRight className="h-4 w-4" />
-                      </Link>
                     </div>
                   </CardContent>
                 </Card>
               </div>
-            </div>
-          </section>
-
-          {/* ▬▬ SECTION 2: HOW TO GET STARTED ▬▬ */}
-          <section className="border-t pt-10">
-            <div className="space-y-4">
-              <div className="text-center">
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                  How to Get Started
-                </h2>
-                <p className="text-muted-foreground">
-                  Choose how you'd like to work on your planning.
-                </p>
-              </div>
-
-              <Card className="border-2 shadow-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0">
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                        <Play className="h-6 w-6" />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-foreground mb-2">
-                        Step-by-Step Guided Planning
-                      </h3>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Let us walk you through everything in order, one section at a time—perfect if you want guidance on what to do next.
-                      </p>
-                      <Button onClick={() => navigate("/wizard/preplanning")} size="lg">
-                        <Play className="mr-2 h-4 w-4" />
-                        Start Guided Tour
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           </section>
 
@@ -605,8 +614,8 @@ export default function Dashboard() {
                   <div className="flex items-start gap-6 flex-col md:flex-row">
                     <div className="flex items-start gap-4 flex-1">
                       <div className="flex-shrink-0">
-                        <div className="w-12 h-12 rounded-lg bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 flex items-center justify-center">
-                          <Star className="h-6 w-6" />
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center shadow-md">
+                          <Star className="h-6 w-6 text-white" />
                         </div>
                       </div>
                       <div>
@@ -659,7 +668,9 @@ export default function Dashboard() {
                 <Card className="border-2 shadow-sm">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-3 mb-4">
-                      <FileOutput className="h-6 w-6 text-primary flex-shrink-0" />
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                        <FileOutput className="h-5 w-5 text-white" />
+                      </div>
                       <div>
                         <h3 className="text-lg font-semibold text-foreground">Printable Planning Workbook (Blank)</h3>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -682,7 +693,9 @@ export default function Dashboard() {
                 <Card className="border-2 shadow-sm">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-3 mb-4">
-                      <BookOpen className="h-6 w-6 text-primary flex-shrink-0" />
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                        <BookOpen className="h-5 w-5 text-white" />
+                      </div>
                       <div>
                         <h3 className="text-lg font-semibold text-foreground">Physical Planning Binder</h3>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -704,7 +717,9 @@ export default function Dashboard() {
                 <Card className="border-2 shadow-sm">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-3 mb-4">
-                      <Music className="h-6 w-6 text-primary flex-shrink-0" />
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                        <Music className="h-5 w-5 text-white" />
+                      </div>
                       <div>
                         <h3 className="text-lg font-semibold text-foreground">Custom Memorial Song (1–2 Day Delivery)</h3>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -727,7 +742,9 @@ export default function Dashboard() {
                 <Card className="border-2 border-dashed shadow-sm">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-3 mb-4">
-                      <Store className="h-6 w-6 text-muted-foreground flex-shrink-0" />
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center flex-shrink-0 shadow-md">
+                        <Store className="h-5 w-5 text-white" />
+                      </div>
                       <div>
                         <h3 className="text-lg font-semibold text-foreground">Shop Caskets & Urns</h3>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -761,21 +778,30 @@ export default function Dashboard() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
-                {helpSupportCards.map((item, index) => (
-                  <Link
-                    key={index}
-                    to={item.href}
-                    className="flex items-center gap-4 p-6 rounded-lg border-2 bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                      <item.icon className="h-6 w-6" />
-                    </div>
-                    <span className="flex-1 text-base font-semibold text-foreground group-hover:text-primary">
-                      {item.title}
-                    </span>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-                  </Link>
-                ))}
+                {helpSupportCards.map((item, index) => {
+                  const gradients = [
+                    "from-cyan-500 to-blue-600",     // Helpful Resources
+                    "from-amber-500 to-yellow-600",  // Legal Documents
+                    "from-green-500 to-emerald-600", // Common Questions
+                    "from-red-500 to-pink-600",      // Helpful Contacts & Vendors
+                  ];
+                  
+                  return (
+                    <Link
+                      key={index}
+                      to={item.href}
+                      className="flex items-center gap-4 p-6 rounded-lg border-2 bg-card hover:bg-accent/50 hover:border-primary/50 transition-all group"
+                    >
+                      <div className={`flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br ${gradients[index]} flex items-center justify-center shadow-md`}>
+                        <item.icon className="h-6 w-6 text-white" />
+                      </div>
+                      <span className="flex-1 text-base font-semibold text-foreground group-hover:text-primary">
+                        {item.title}
+                      </span>
+                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </section>
