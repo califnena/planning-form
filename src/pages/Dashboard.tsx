@@ -1,33 +1,22 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { 
   FileText, 
-  CheckCircle, 
-  FileOutput, 
   Star,
-  Store,
   BookOpen, 
-  HelpCircle,
   Scale,
   Phone,
-  Download,
   Music,
-  Calendar,
   Printer,
   Users,
   ListChecks,
-  ShoppingBag
+  ShoppingBag,
+  Lightbulb
 } from "lucide-react";
-import { GlobalHeader } from "@/components/GlobalHeader";
-import { Card, CardContent } from "@/components/ui/card";
+import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
@@ -121,33 +110,68 @@ export default function Dashboard() {
     loadUserData();
   }, []);
 
-  const handleStartNew = async () => {
+  const handleContinuePlanner = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Check if user has preferences set
     const { data: settings } = await supabase
       .from("user_settings")
       .select("selected_sections")
       .eq("user_id", user.id)
       .maybeSingle();
 
-    // If no preferences, redirect to preferences page
-    if (!settings?.selected_sections || settings.selected_sections.length === 0) {
-      navigate("/preferences");
+    if (!settings || !settings.selected_sections || settings.selected_sections.length === 0) {
+      navigate('/preferences');
       return;
     }
 
-    // Otherwise navigate to planner
-    navigate("/app");
+    navigate('/app');
   };
 
-  const handleAfterDeathPDF = async () => {
+  const handleGeneratePDF = async () => {
+    setShowPIIDialog(true);
+  };
+
+  const handlePIISubmit = async (piiData: any) => {
+    try {
+      await generatePlanPDF(piiData);
+      toast({
+        title: "PDF Generated",
+        description: "Your Pre-Planning document has been generated successfully.",
+      });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDownloadWorkbook = async () => {
+    try {
+      await generateManuallyFillablePDF({});
+      toast({
+        title: "Workbook Downloaded",
+        description: "Your printable workbook has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error("Error downloading workbook:", error);
+      toast({
+        title: "Error",
+        description: "Failed to download workbook. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleGenerateAfterDeathPDF = async () => {
     try {
       await generateBlankAfterLifePlanPDF();
       toast({
         title: "PDF Generated",
-        description: "Your After-Death Plan PDF is ready.",
+        description: "Your After-Death Planner document has been generated successfully.",
       });
     } catch (error) {
       console.error("Error generating After-Death PDF:", error);
@@ -159,418 +183,306 @@ export default function Dashboard() {
     }
   };
 
-  const handlePIISubmit = async (piiData: any) => {
-    try {
-      const mergedData = {
-        ...pendingPIIData,
-        ...piiData,
-      };
-
-      await generatePlanPDF(mergedData);
-      toast({
-        title: "PDF Generated",
-        description: "Your Pre-Planning document is ready to download.",
-      });
-
-      setShowPIIDialog(false);
-      setPendingPIIData(null);
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      toast({
-        title: "Error",
-        description: "Failed to generate PDF. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleBlankPrePlanningPDF = () => {
-    try {
-      generateManuallyFillablePDF({});
-      toast({
-        title: "Blank Form Downloaded",
-        description: "Your blank Pre-Planning form is ready to print and fill out.",
-      });
-    } catch (error) {
-      console.error("Error generating blank Pre-Planning PDF:", error);
-      toast({
-        title: "Error",
-        description: "Failed to generate blank form. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Help & Support cards
-  const helpSupportCards = [
-    {
-      title: t("dashboard.tiles.resources.title"),
-      icon: BookOpen,
-      href: "/resources",
-    },
-    {
-      title: t("dashboard.tiles.legalDocuments.title"),
-      icon: Scale,
-      href: "/legal-documents",
-    },
-    {
-      title: t("dashboard.tiles.questions.title"),
-      icon: HelpCircle,
-      href: "/faq",
-    },
-    {
-      title: t("dashboard.tiles.vendors.title"),
-      icon: Phone,
-      href: "/vendors",
-    },
-  ];
-
   return (
-    <>
-      <GlobalHeader />
-      <div className="min-h-screen bg-background">
-        <div className="mx-auto max-w-5xl px-4 py-8 space-y-16">
-          
-          {/* Welcome Message - Left Aligned */}
-          <div className="space-y-4">
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-              Welcome to Your Planning Dashboard
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-3xl">
-              Follow these simple steps to organize your wishes, important documents, and instructions. Everything saves automatically as you work.
-            </p>
+    <AuthenticatedLayout>
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Welcome Header - Centered */}
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold mb-2">{t('dashboard.welcome')}</h1>
+          <p className="text-muted-foreground">
+            Your dashboard auto-saves your work as you go.
+          </p>
+        </div>
 
-            {/* Progress Tracker */}
-            <div className="flex gap-6 mt-8 flex-wrap">
-              {[
-                { num: 1, label: "Plan Ahead" },
-                { num: 2, label: "Get Support" },
-                { num: 3, label: "Shop" },
-                { num: 4, label: "Personal Touch" },
-                { num: 5, label: "After-Death Guide" }
-              ].map((step) => (
-                <div key={step.num} className="flex flex-col items-center gap-2">
-                 <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-base">
-                    {step.num}
-                  </div>
-                  <span className="text-xs md:text-sm text-muted-foreground font-medium">{step.label}</span>
+        {/* Progress Tracker - Centered with connecting lines */}
+        <div className="mb-12">
+          <div className="flex justify-between items-center gap-2 max-w-4xl mx-auto relative">
+            {/* Connecting line behind circles */}
+            <div className="absolute top-6 left-0 right-0 h-0.5 bg-[hsl(210,100%,45%)]/30 -z-10" style={{ marginLeft: '2.5rem', marginRight: '2.5rem' }}></div>
+            
+            {['Plan Ahead', 'Get Support', 'Shop', 'Personal Touch', 'After-Death Guide'].map((step, idx) => (
+              <div key={idx} className="flex flex-col items-center flex-1">
+                <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-semibold text-base mb-2 shadow-md">
+                  {idx + 1}
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* STEP 1 — Plan Ahead Planner */}
-          <section className="border-t pt-12">
-            <div className="mb-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-base flex-shrink-0">1</div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Plan Ahead Planner</h2>
+                <span className="text-xs text-center text-muted-foreground">{step}</span>
               </div>
-              <p className="text-base text-muted-foreground ml-13">Start here — Choose how you want to create your plan. Pick the option that works best for you.</p>
-            </div>
+            ))}
+          </div>
+        </div>
 
-            <div className="space-y-4">
+        {/* STEP 1 - Plan Ahead Planner */}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-bold text-lg shadow-md">
+              1
+            </div>
+            <h2 className="text-2xl font-bold">Plan Ahead Planner</h2>
+          </div>
+          
+          <Card className="p-6">
+            <div className="space-y-6">
               {/* Option 1: Digital Planner */}
-              <Card className="border shadow-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
-                      <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-foreground mb-1">Option 1: Digital Planner</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Fill in your personal details, important documents, preferences, and instructions using our easy-to-use digital system.
-                      </p>
-                    </div>
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <FileText className="h-4 w-4 text-primary" />
                   </div>
-                  <div className="flex flex-wrap gap-3">
-                    <Button 
-                      size="default"
-                      onClick={handleStartNew}
-                    >
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold mb-2">Option 1: Digital Planner</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Complete your planning online and save your progress as you go.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button onClick={handleContinuePlanner} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                       Open My Planner
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      size="default"
-                      onClick={() => setShowPIIDialog(true)}
-                    >
+                    <Button onClick={handleGeneratePDF} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                       Get a Printable Version
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      size="default"
-                      onClick={() => navigate("/products/binder")}
-                    >
+                    <Button onClick={() => navigate('/products/binder')} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                       Purchase Physical Binder
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
+
+              <div className="border-t pt-6" />
 
               {/* Option 2: Printable Version */}
-              <Card className="border shadow-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center flex-shrink-0">
-                      <Printer className="h-4 w-4 text-green-600 dark:text-green-400" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-foreground mb-1">Option 2: Printable Version</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Get our complete workbook as a downloadable PDF with blank forms you can print and fill out on paper.
-                      </p>
-                    </div>
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Printer className="h-4 w-4 text-primary" />
                   </div>
-                  <div className="flex flex-wrap gap-3">
-                    <Button 
-                      size="default"
-                      onClick={handleBlankPrePlanningPDF}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold mb-2">Option 2: Printable Version</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Download a blank form to fill out by hand.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button onClick={handleDownloadWorkbook} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                       Download Printable Workbook
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      size="default"
-                      onClick={() => navigate("/products/binder")}
-                    >
+                    <Button onClick={() => navigate('/products/binder')} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                       Purchase Physical Binder
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              {/* Option 3: Do It for You */}
-              <Card className="border shadow-sm bg-gradient-to-r from-blue-50/50 to-cyan-50/50 dark:from-blue-950/20 dark:to-cyan-950/20">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
-                      <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-lg font-semibold text-foreground">Option 3: Do It for You Service</h3>
-                        <span className="text-xs font-bold bg-blue-500 text-white px-2 py-0.5 rounded-full">POPULAR</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        A planning specialist helps you complete every section of your planner in a guided live session.
-                      </p>
-                    </div>
+              <div className="border-t pt-6" />
+
+              {/* Option 3: Do It For You Service */}
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Users className="h-4 w-4 text-primary" />
                   </div>
-                  <div className="flex flex-wrap gap-3">
-                    <Button 
-                      size="default"
-                      onClick={() => navigate("/contact")}
-                    >
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold">Option 3: Do It For You (One-Time Service)</h3>
+                    <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded">POPULAR</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Let our team guide you through the entire process with a personalized consultation.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                       Book Appointment
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      size="default"
-                      onClick={() => navigate("/products/binder")}
-                    >
+                    <Button onClick={() => navigate('/products/binder')} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                       Purchase Physical Binder
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          </section>
-
-          {/* STEP 2 — VIP Coach Assistant */}
-          <section className="border-t pt-16">
-            <div className="mb-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-base flex-shrink-0">2</div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">VIP Coach Assistant</h2>
-              </div>
-              <p className="text-base text-muted-foreground ml-13">Get personalized access to expert guidance and support throughout your planning journey.</p>
-            </div>
-
-            <Card className="border shadow-sm bg-gradient-to-r from-yellow-50/30 to-amber-50/30 dark:from-yellow-950/10 dark:to-amber-950/10">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4 flex-col md:flex-row">
-                  <div className="flex items-start gap-4 flex-1">
-                    <div className="flex-shrink-0">
-                      <div className="w-8 h-8 rounded-lg bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
-                        <Star className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-foreground mb-2">VIP Coach Assistant (Optional)</h3>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Unlimited access to expert guidance and personalized support throughout your planning journey.
-                      </p>
-                      <div className="space-y-2">
-                        <div className="flex items-start gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                          <p className="text-sm text-foreground">Unlimited planning sessions via video, phone, or chat</p>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                          <p className="text-sm text-foreground">Expert review of your completed plan</p>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                          <p className="text-sm text-foreground">Priority support and faster response times</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex-shrink-0">
-                    <Button 
-                      className="bg-yellow-600 hover:bg-yellow-700 text-white"
-                      size="default"
-                      onClick={() => navigate("/vip-coach")}
-                    >
-                      Upgrade to VIP
-                    </Button>
-                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          </section>
-
-          {/* STEP 3 — Shop */}
-          <section className="border-t pt-16">
-            <div className="mb-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-base flex-shrink-0">3</div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Shop</h2>
               </div>
-              <p className="text-base text-muted-foreground ml-13">Browse and order quality memorial products.</p>
             </div>
+          </Card>
+        </div>
 
-            <Card className="border-2 border-blue-500 shadow-sm bg-gradient-to-br from-blue-50/30 to-indigo-50/30 dark:from-blue-950/20 dark:to-indigo-950/20 relative">
-              <div className="absolute top-4 right-4">
-                <span className="text-xs font-bold bg-red-500 text-white px-3 py-1 rounded-full">High Demand</span>
-              </div>
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
-                    <ShoppingBag className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground">Shop Caskets & Urns</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Browse and order quality memorial products. Coming soon!
-                    </p>
-                  </div>
+        {/* STEP 2 - VIP Coach Assistant */}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-bold text-lg shadow-md">
+              2
+            </div>
+            <h2 className="text-2xl font-bold">VIP Coach Assistant</h2>
+          </div>
+          
+          <Card className="p-6 bg-yellow-50/50 border-yellow-200">
+            <div className="flex gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+                  <Star className="h-4 w-4 text-yellow-600" />
                 </div>
-                <Button 
-                  size="default"
-                  onClick={() => navigate("/products")}
-                >
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold mb-3">Get Personalized Support</h3>
+                <ul className="space-y-2 mb-4 text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <span className="text-yellow-600 mt-1">✓</span>
+                    <span>One-on-one guidance from funeral planning experts</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-yellow-600 mt-1">✓</span>
+                    <span>Help completing your planner step-by-step</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-yellow-600 mt-1">✓</span>
+                    <span>Answers to all your questions about end-of-life planning</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-yellow-600 mt-1">✓</span>
+                    <span>Compassionate support during difficult decisions</span>
+                  </li>
+                </ul>
+                <Button onClick={() => navigate('/plans')} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                  Upgrade to VIP
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* STEP 3 - Shop */}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-bold text-lg shadow-md">
+              3
+            </div>
+            <h2 className="text-2xl font-bold">Shop</h2>
+          </div>
+          
+          <Card className="p-6 border-2 border-blue-400 bg-gradient-to-br from-blue-50 to-blue-100/50 relative">
+            <div className="absolute top-4 right-4">
+              <span className="px-3 py-1 bg-red-500 text-white text-xs font-semibold rounded-full">High Demand</span>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                  <ShoppingBag className="h-4 w-4 text-blue-600" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold mb-2">Caskets, Urns & Flowers</h3>
+                <p className="text-muted-foreground mb-4">
+                  Browse our selection of affordable, high-quality caskets, urns, and funeral flowers.
+                </p>
+                <Button onClick={() => navigate('/products')} className="w-full bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                   Browse Products
                 </Button>
-              </CardContent>
-            </Card>
-          </section>
-
-          {/* STEP 4 — Custom Memorial Song */}
-          <section className="border-t pt-16">
-            <div className="mb-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-base flex-shrink-0">4</div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Custom Memorial Song</h2>
               </div>
-              <p className="text-base text-muted-foreground ml-13">Create a personalized memorial song that tells your story.</p>
             </div>
+          </Card>
+        </div>
 
-            <Card className="border shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-8 h-8 rounded-lg bg-pink-100 dark:bg-pink-900 flex items-center justify-center flex-shrink-0">
-                    <Music className="h-4 w-4 text-pink-600 dark:text-pink-400" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground">Custom Memorial Song (1–2 Day Delivery)</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Create a personalized memorial song based on your life story and preferences.
-                    </p>
-                  </div>
+        {/* STEP 4 - Custom Memorial Song */}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-bold text-lg shadow-md">
+              4
+            </div>
+            <h2 className="text-2xl font-bold">Custom Memorial Song</h2>
+          </div>
+          
+          <Card className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Music className="h-4 w-4 text-primary" />
                 </div>
-                <Button 
-                  size="default"
-                  onClick={() => navigate("/products/custom-song")}
-                >
-                  <Music className="mr-2 h-4 w-4" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold mb-2">Create a Unique Tribute Song</h3>
+                <p className="text-muted-foreground mb-4">
+                  Honor your loved one with a personalized memorial song created just for them.
+                </p>
+                <Button onClick={() => navigate('/products/custom-song')} className="w-full bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                   Create Song
                 </Button>
-              </CardContent>
-            </Card>
-          </section>
-
-          {/* STEP 5 — After-Death Planner */}
-          <section className="border-t pt-16">
-            <div className="mb-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-base flex-shrink-0">5</div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">After-Death Planner</h2>
               </div>
-              <p className="text-base text-muted-foreground ml-13">A guided checklist your loved ones can follow after a passing.</p>
             </div>
+          </Card>
+        </div>
 
-            <Card className="border shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center flex-shrink-0">
-                    <ListChecks className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground mb-1">After-Death Planner</h3>
-                    <p className="text-sm text-muted-foreground">
-                      A guided checklist your loved ones can follow after a passing.
-                    </p>
-                  </div>
+        {/* STEP 5 - After-Death Planner */}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-bold text-lg shadow-md">
+              5
+            </div>
+            <h2 className="text-2xl font-bold">After-Death Planner</h2>
+          </div>
+          
+          <Card className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <ListChecks className="h-4 w-4 text-primary" />
                 </div>
-                <div className="flex flex-wrap gap-3">
-                  <Button 
-                    size="default"
-                    onClick={() => navigate("/next-steps")}
-                  >
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold mb-2">Guided Steps for After a Loss</h3>
+                <p className="text-muted-foreground mb-4">
+                  A 12-step guide to help your loved ones navigate the practical tasks following a death.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button onClick={() => navigate('/nextsteps')} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                     Open After-Death Planner
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="default"
-                    onClick={handleAfterDeathPDF}
-                  >
-                    <Download className="h-4 w-4 mr-2" />
+                  <Button onClick={handleGenerateAfterDeathPDF} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                     Get a Printable Document
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-          </section>
+              </div>
+            </div>
+          </Card>
+        </div>
 
-          {/* Help & Support */}
-          <section className="border-t pt-16">
-            <div className="mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                Help & Support
-              </h2>
-              <p className="text-base text-muted-foreground">
-                Additional resources to guide you through the process.
-              </p>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {helpSupportCards.map((card) => (
-                <Card key={card.href} className="group hover:shadow-md transition-all duration-200 border hover:border-primary/30">
-                  <Link to={card.href}>
-                    <CardContent className="p-6 space-y-4">
-                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-teal-500 to-green-600 flex items-center justify-center group-hover:scale-105 transition-transform">
-                        <card.icon className="h-6 w-6 text-white" />
-                      </div>
-                      <h3 className="font-semibold text-foreground text-left group-hover:text-primary transition-colors">{card.title}</h3>
-                    </CardContent>
-                  </Link>
-                </Card>
-              ))}
-            </div>
-          </section>
+        {/* STEP 6 - Help & Support */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold mb-6">Help & Support</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/resources')}>
+              <div className="flex flex-col items-center text-center gap-3">
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                  <BookOpen className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="font-semibold">Helpful Resources</h3>
+              </div>
+            </Card>
+            
+            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/legal-documents')}>
+              <div className="flex flex-col items-center text-center gap-3">
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
+                  <Scale className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="font-semibold">Legal Documents & Resources</h3>
+              </div>
+            </Card>
+            
+            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/faq')}>
+              <div className="flex flex-col items-center text-center gap-3">
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
+                  <Lightbulb className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="font-semibold">Common Questions</h3>
+              </div>
+            </Card>
+            
+            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/vendors')}>
+              <div className="flex flex-col items-center text-center gap-3">
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+                  <Phone className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="font-semibold">Helpful Contacts & Vendors</h3>
+              </div>
+            </Card>
+          </div>
         </div>
       </div>
 
@@ -579,7 +491,6 @@ export default function Dashboard() {
         onOpenChange={setShowPIIDialog}
         onSubmit={handlePIISubmit}
       />
-    </>
+    </AuthenticatedLayout>
   );
 }
-

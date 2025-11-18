@@ -5,6 +5,7 @@ import { Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppFooter } from "@/components/AppFooter";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
+import { AssistantWidget } from "@/components/assistant/AssistantWidget";
 import { useState, useEffect } from "react";
 
 interface AuthenticatedLayoutProps {
@@ -38,7 +39,7 @@ export const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
       {/* Header - Same as Landing Page */}
       <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link to="/dashboard" className="hover:opacity-80 transition-opacity">
+          <Link to="/" className="hover:opacity-80 transition-opacity">
             <div>
               <h1 className="text-xl font-semibold text-primary">Everlasting Funeral Advisors</h1>
               <p className="text-xs text-muted-foreground">Peace of Mind Starts with a Plan</p>
@@ -79,6 +80,9 @@ export const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
 
       {/* Footer - Same as Landing Page */}
       <AppFooter />
+      
+      {/* Chat Assistant Widget */}
+      <AssistantWidget />
     </div>
   );
 };
