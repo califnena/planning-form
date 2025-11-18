@@ -194,27 +194,36 @@ const Resources = () => {
           <TextSizeToggle />
         </div>
 
-        {/* Featured Guide - Embedded PDF */}
+        {/* Featured Guide - Download */}
         <div className="mb-12">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-foreground mb-2">📖 Featured Guide</h2>
-            <p className="text-muted-foreground">Pre-Planning Your Funeral: A Gift of Peace & Clarity</p>
-          </div>
-          <div className="bg-card border-2 border-border rounded-lg p-6 shadow-lg">
-            <div className="w-full aspect-[8.5/11] md:h-[700px] mb-4 bg-background rounded-lg overflow-hidden">
-              <iframe
-                src="/guides/Pre-Planning-Guide.pdf"
-                className="w-full h-full"
-                title="Pre-Planning Guide"
-              />
-            </div>
-            <div className="text-center">
-              <Button variant="default" asChild size="lg">
-                <a href="/guides/Pre-Planning-Guide.pdf" download>
-                  <FileText className="mr-2 h-4 w-4" />
-                  Download Complete Guide
-                </a>
-              </Button>
+          <div className="bg-card border-2 border-primary/20 rounded-lg p-8 shadow-lg">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                  <FileText className="h-8 w-8 text-white" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <div className="mb-2">
+                  <span className="inline-block px-3 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full mb-2">
+                    📖 Featured Guide
+                  </span>
+                </div>
+                <h2 className="text-2xl font-bold text-foreground mb-3">
+                  Pre-Planning Your Funeral: A Gift of Peace and Clarity
+                </h2>
+                <p className="text-base text-muted-foreground leading-relaxed">
+                  A comprehensive guide to help you understand the importance of pre-planning your funeral arrangements. Learn about different burial options, service types, and how to communicate your wishes to loved ones.
+                </p>
+              </div>
+              <div className="flex-shrink-0">
+                <Button asChild size="lg" className="whitespace-nowrap">
+                  <a href="/guides/Pre-Planning-Guide.pdf" download>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Download Guide
+                  </a>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
