@@ -189,9 +189,17 @@ export default function Dashboard() {
         {/* Welcome Header - Centered */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold mb-2">Welcome to the Planning Dashboard</h1>
-          <p className="text-muted-foreground max-w-4xl mx-auto">
-            Follow these simple steps to organize your wishes, important documents and instructions. Note: all sections save automatically as you work and you are not required to enter information in all the sections only what is pertinent to you and what you are willing and able to share.
+          <p className="text-muted-foreground max-w-4xl mx-auto mb-3">
+            Follow these simple steps to organize your wishes, important documents and instructions.
           </p>
+          <p className="text-sm text-muted-foreground/80 max-w-3xl mx-auto italic">
+            Note: all sections save automatically as you work and you are not required to enter information in all the sections only what is pertinent to you and what you are willing and able to share.
+          </p>
+          <div className="mt-4 p-4 bg-muted/30 rounded-lg max-w-3xl mx-auto">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              <strong>Instructions for the PDF:</strong> Enter any sensitive details about you or the person you are filling out this plan for that you want included in the document generated in PDF format. All fields are optional - leave blank any information you don't want to include. Download the PDF after filling out.
+            </p>
+          </div>
         </div>
 
         {/* Progress Tracker - Centered with connecting lines */}
