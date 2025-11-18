@@ -220,10 +220,10 @@ const Resources = () => {
                 <Button 
                   size="lg" 
                   className="whitespace-nowrap"
-                  onClick={() => window.open('/guides/Pre-Planning-Guide.pdf', '_blank')}
+                  onClick={() => window.location.href = '/guide'}
                 >
                   <FileText className="mr-2 h-4 w-4" />
-                  Download Guide
+                  View Guide
                 </Button>
               </div>
             </div>

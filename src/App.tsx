@@ -41,8 +41,9 @@ import PreviewPDF from "./pages/PreviewPDF";
 import NotFound from "./pages/NotFound";
 import CustomSong from "./pages/CustomSong";
 import SongInfo from "./pages/SongInfo";
+import PrePlanningGuide from "./pages/PrePlanningGuide";
 import SongConfirmation from "./pages/SongConfirmation";
-import { AppFooter } from "./components/AppFooter";
+
 
 const queryClient = new QueryClient();
 
@@ -83,6 +84,7 @@ const App = () => (
                     <Route path="/wizard/preplanning" element={<PrePlanningWizard />} />
                     <Route path="/wizard/afterdeath" element={<AfterDeathWizard />} />
                     <Route path="/vendors" element={<Vendors />} />
+                    <Route path="/guide" element={<PrePlanningGuide />} />
                     <Route path="/forms" element={<Forms />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/resources" element={<Resources />} />
@@ -96,7 +98,6 @@ const App = () => (
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </div>
-                <AppFooter />
               </div>
             </BrowserRouter>
           </TooltipProvider>

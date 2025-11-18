@@ -384,7 +384,11 @@ export default function Dashboard() {
                   Browse our selection of affordable, high-quality caskets, urns, and funeral flowers.
                 </p>
                 <div className="flex justify-start">
-                  <Button onClick={() => navigate('/products')} size="sm" className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                  <Button 
+                    onClick={() => window.open('https://everlastingfuneraladvisors.com/shop/', '_blank')} 
+                    size="sm" 
+                    className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]"
+                  >
                     Browse Products
                   </Button>
                 </div>

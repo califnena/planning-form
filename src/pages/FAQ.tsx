@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { TextSizeToggle } from '@/components/TextSizeToggle';
-import { ArrowLeft, Download, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Download, ExternalLink, FileText } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -315,10 +315,10 @@ const FAQ = () => {
                 <Button 
                   size="lg" 
                   className="gap-2 whitespace-nowrap"
-                  onClick={() => window.open('/guides/Pre-Planning-Guide.pdf', '_blank')}
+                  onClick={() => window.location.href = '/guide'}
                 >
-                  <Download className="h-5 w-5" />
-                  Download Guide
+                  <FileText className="h-5 w-5" />
+                  View Guide
                 </Button>
               </div>
             </div>
