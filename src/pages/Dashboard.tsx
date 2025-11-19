@@ -335,6 +335,39 @@ export default function Dashboard() {
     navigate('/wizard/preplanning');
   };
 
+  const handleDownloadBlankPlanner = async () => {
+    // Check for paid subscription access (not just EFABASIC purchase)
+    const hasPaidAccess = await checkPaidAccess();
+    if (!hasPaidAccess) {
+      toast({
+        title: "Subscription Required",
+        description: "You need an active subscription (Premium, VIP, or Do It For You) to download the blank planner form. Please subscribe to continue.",
+        variant: "destructive",
+        action: (
+          <Button variant="outline" size="sm" onClick={() => navigate('/plans')}>
+            View Plans
+          </Button>
+        ),
+      });
+      return;
+    }
+
+    try {
+      await generateManuallyFillablePDF({});
+      toast({
+        title: "PDF Downloaded",
+        description: "Your blank planner form has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error("Error generating blank PDF:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleGenerateAfterDeathPDF = async () => {
     try {
       await generateBlankAfterLifePlanPDF();
@@ -501,11 +534,14 @@ export default function Dashboard() {
                 <div className="flex-1">
                   <h3 className="font-semibold mb-2">Option 2: Printable Version</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Download a blank form to fill out by hand.
+                    Download a blank form to fill out by hand or purchase the printable workbook.
                   </p>
                   <div className="flex flex-wrap gap-2">
+                    <Button onClick={handleDownloadBlankPlanner} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                      Download Blank Planner Form
+                    </Button>
                     <Button onClick={handleDownloadWorkbook} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                      Purchase and Download Printable Workbook
+                      Purchase
                     </Button>
                     <Button onClick={() => navigate('/products/binder')} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Purchase Physical Binder
