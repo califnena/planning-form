@@ -129,7 +129,7 @@ export default function Dashboard() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return false;
 
-    // Check for admin role
+    // Check for admin role (test account with admin role gets full access)
     const { data: adminRole } = await supabase
       .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
     
@@ -138,29 +138,35 @@ export default function Dashboard() {
     // Check for required Stripe subscription lookup keys
     const requiredLookupKeys = ['EFAPREMIUM', 'EFAVIPMONTHLY', 'EFAVIPYEAR', 'EFADOFORU'];
     
-    // Check subscriptions table for active subscriptions with these lookup keys
+    // Check purchases table for completed purchases with required lookup keys
+    const { data: purchases } = await supabase
+      .from('purchases')
+      .select('product_lookup_key, status')
+      .eq('user_id', user.id)
+      .eq('status', 'completed')
+      .in('product_lookup_key', requiredLookupKeys);
+
+    if (purchases && purchases.length > 0) {
+      return true;
+    }
+
+    // Check subscriptions table for active subscriptions
+    // Note: We're checking if they have any active subscription since subscription 
+    // management happens through Stripe and we trust the active status
     const { data: subscription } = await supabase
       .from("subscriptions")
-      .select("stripe_subscription_id, status")
+      .select("status, plan_type")
       .eq("user_id", user.id)
       .eq("status", "active")
       .maybeSingle();
 
-    if (subscription?.stripe_subscription_id) {
-      // If they have an active subscription, assume it's one of the valid plans
-      return true;
+    // Only grant access if they have an active subscription that matches our plans
+    if (subscription) {
+      const validPlans = ['premium', 'vip_annual', 'vip_monthly'];
+      return validPlans.includes(subscription.plan_type);
     }
 
-    // Also check purchases table for one-time EFADOFORU purchase
-    const { data: purchase } = await supabase
-      .from('purchases')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('product_lookup_key', 'EFADOFORU')
-      .eq('status', 'completed')
-      .maybeSingle();
-
-    return !!purchase;
+    return false;
   };
 
   const checkIsFreePlan = async (): Promise<boolean> => {
@@ -182,41 +188,41 @@ export default function Dashboard() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return false;
 
-    // Check for admin role
+    // Check for admin role (test account with admin role gets full access)
     const { data: adminRole } = await supabase
       .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
     
     if (adminRole) return true;
 
-    // Check subscriptions for VIP monthly or yearly
-    const { data: subscription } = await supabase
-      .from("subscriptions")
-      .select("stripe_subscription_id, status")
-      .eq("user_id", user.id)
-      .eq("status", "active")
-      .maybeSingle();
+    // Check purchases table for VIP subscriptions
+    const { data: vipPurchases } = await supabase
+      .from('purchases')
+      .select('product_lookup_key, status')
+      .eq('user_id', user.id)
+      .in('product_lookup_key', ['EFAVIPMONTHLY', 'EFAVIPYEAR'])
+      .eq('status', 'completed');
 
-    if (subscription?.stripe_subscription_id) {
-      // Check if it's a VIP subscription by checking purchases table
-      const { data: vipPurchase } = await supabase
-        .from('purchases')
-        .select('id')
-        .eq('user_id', user.id)
-        .in('product_lookup_key', ['EFAVIPMONTHLY', 'EFAVIPYEAR'])
-        .eq('status', 'completed')
-        .maybeSingle();
-
-      return !!vipPurchase;
+    if (vipPurchases && vipPurchases.length > 0) {
+      return true;
     }
 
-    return false;
+    // Check subscriptions table for VIP plans
+    const { data: subscription } = await supabase
+      .from("subscriptions")
+      .select("status, plan_type")
+      .eq("user_id", user.id)
+      .eq("status", "active")
+      .in("plan_type", ['vip_annual', 'vip_monthly'])
+      .maybeSingle();
+
+    return !!subscription;
   };
 
   const checkPrintableAccess = async (): Promise<boolean> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return false;
 
-    // Check for admin role
+    // Check for admin role (test account with admin role gets full access)
     const { data: adminRole } = await supabase
       .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
     
@@ -225,7 +231,7 @@ export default function Dashboard() {
     // Check if user has purchased EFABASIC (printable workbook)
     const { data: purchase } = await supabase
       .from('purchases')
-      .select('id')
+      .select('product_lookup_key, status')
       .eq('user_id', user.id)
       .eq('product_lookup_key', 'EFABASIC')
       .eq('status', 'completed')
