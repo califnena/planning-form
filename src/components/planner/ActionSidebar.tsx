@@ -14,6 +14,7 @@ import {
   Headphones,
   ChevronDown,
   ChevronRight,
+  ListOrdered,
 } from "lucide-react";
 import {
   Tooltip,
@@ -61,6 +62,7 @@ export const ActionSidebar = ({
     preview: "See what your full plan looks like.",
     generate: "Create a printable version of your plan.",
     blank: "Open a fresh, clean form if you want to start over.",
+    stepByStep: "Follow a guided step-by-step process to complete your planner.",
     afterDeath: "A simple guide for loved ones after a passing.",
     quote: "Ask for pricing or get product information.",
     coach: "Speak with a personal advisor for help.",
@@ -186,6 +188,19 @@ export const ActionSidebar = ({
             className="bg-[hsl(180,45%,35%)] hover:bg-[hsl(180,45%,30%)] text-white"
           />
 
+          <ActionButton
+            icon={ListOrdered}
+            label="Step-by-Step Guide"
+            tooltip={tooltips.stepByStep}
+            variant="outline"
+            asChild
+          >
+            <Link to="/wizard/preplanning">
+              <ListOrdered className="mr-3 h-5 w-5 flex-shrink-0" />
+              <span className="text-left">Step-by-Step Guide</span>
+            </Link>
+          </ActionButton>
+
           {onAfterLifePlan && (
             <ActionButton
               icon={CheckCircle}
@@ -285,6 +300,19 @@ export const ActionSidebar = ({
               tooltip={tooltips.blank}
               onClick={onDownloadManualForm}
             />
+
+            <ActionButton
+              icon={ListOrdered}
+              label="Step-by-Step Guide"
+              tooltip={tooltips.stepByStep}
+              variant="outline"
+              asChild
+            >
+              <Link to="/wizard/preplanning">
+                <ListOrdered className="mr-3 h-5 w-5 flex-shrink-0" />
+                <span className="text-left">Step-by-Step Guide</span>
+              </Link>
+            </ActionButton>
           </div>
         )}
       </div>

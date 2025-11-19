@@ -314,15 +314,19 @@ export default function CaseDetail() {
               </div>
             </div>
             <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="hidden sm:flex">
+                <Home className="mr-2 h-4 w-4" />
+                Dashboard
+              </Button>
               <Button variant="outline" size="sm" onClick={() => navigate("/app")} className="hidden sm:flex">
                 <FileText className="mr-2 h-4 w-4" />
                 Pre-Planner
               </Button>
               <Button variant="outline" size="sm" onClick={() => navigate("/after-death-planner")} className="hidden sm:flex">
-                <Home className="mr-2 h-4 w-4" />
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 After-Death Planner
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => navigate("/after-death-planner")} className="sm:hidden" title="After-Death Planner">
+              <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")} className="sm:hidden" title="Dashboard">
                 <Home className="h-4 w-4" />
               </Button>
               {isSaving && (
