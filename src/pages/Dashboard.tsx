@@ -515,7 +515,7 @@ export default function Dashboard() {
                   A 12-step guide to help your loved ones navigate the practical tasks following a death.
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <Button onClick={() => navigate('/nextsteps')} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                  <Button onClick={() => navigate('/after-death-planner')} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                     Open After-Death Planner
                   </Button>
                   <Button onClick={handleGenerateAfterDeathPDF} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
