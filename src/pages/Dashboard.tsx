@@ -272,7 +272,7 @@ export default function Dashboard() {
 
       const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
         body: { 
-          lookupKey: 'EFABASIC',
+          lookupKey: 'EFABINDER',
           mode: 'payment',
           successUrl,
           cancelUrl,
@@ -515,7 +515,7 @@ export default function Dashboard() {
                     <Button onClick={handleStartWizard} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Step-by-step Guide
                     </Button>
-                    <Button onClick={() => navigate('/products/binder')} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                    <Button onClick={handleDownloadWorkbook} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Purchase Physical Binder
                     </Button>
                   </div>
@@ -543,7 +543,7 @@ export default function Dashboard() {
                     <Button onClick={handleDownloadWorkbook} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                       Purchase
                     </Button>
-                    <Button onClick={() => navigate('/products/binder')} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                    <Button onClick={handleDownloadWorkbook} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Purchase Physical Binder
                     </Button>
                   </div>
@@ -571,7 +571,7 @@ export default function Dashboard() {
                     <Button onClick={handleBookDoItForYou} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                       Purchase and Book an Appointment
                     </Button>
-                    <Button onClick={() => navigate('/products/binder')} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                    <Button onClick={handleDownloadWorkbook} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Purchase Physical Binder
                     </Button>
                   </div>
