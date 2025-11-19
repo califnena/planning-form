@@ -146,12 +146,12 @@ export default function Dashboard() {
     
     if (adminRole) return true;
 
-    // Check if user has purchased EFABASIC (printable version)
+    // Check if user has purchased EFABINDER (printable workbook)
     const { data: purchase } = await supabase
       .from('purchases')
       .select('id')
       .eq('user_id', user.id)
-      .eq('product_lookup_key', 'EFABASIC')
+      .eq('product_lookup_key', 'EFABINDER')
       .eq('status', 'completed')
       .maybeSingle();
 
@@ -205,7 +205,7 @@ export default function Dashboard() {
       try {
         const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
           body: {
-            lookupKey: 'EFABASIC',
+            lookupKey: 'EFABINDER',
             mode: 'payment',
             successUrl: `${window.location.origin}/purchase-success?type=printable`,
             cancelUrl: `${window.location.origin}/dashboard`,
