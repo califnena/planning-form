@@ -362,11 +362,19 @@ export default function Subscription() {
               <ul className="space-y-1 mb-4 list-disc pl-5">
                 {PLANS.DO_IT_FOR_YOU.features.map((f) => <li key={f} className="text-sm">{f}</li>)}
               </ul>
-              <Button className="w-full" asChild>
-                <a href="https://calendar.app.google/2PVUy1ZuajWR1VaZ7" target="_blank" rel="noopener noreferrer">
-                  Book Appointment
-                </a>
-              </Button>
+              <p className="text-sm text-muted-foreground mb-4">
+                Purchase the Do It For You service to gain full access to the digital planner. Our team will guide you through the entire planning process.
+              </p>
+              <div className="space-y-2">
+                <Button className="w-full" onClick={() => handleCheckout(PLANS.DO_IT_FOR_YOU.key)}>
+                  Purchase Service
+                </Button>
+                <Button className="w-full" variant="outline" asChild>
+                  <a href="https://calendar.app.google/2PVUy1ZuajWR1VaZ7" target="_blank" rel="noopener noreferrer">
+                    Book Appointment
+                  </a>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>

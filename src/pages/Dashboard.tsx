@@ -110,9 +110,51 @@ export default function Dashboard() {
     loadUserData();
   }, []);
 
+  const checkPaidAccess = async (): Promise<boolean> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+
+    // Check for admin role
+    const { data: adminRole } = await supabase
+      .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
+    
+    if (adminRole) return true;
+
+    // Check subscription plan
+    const { data: subscription } = await supabase
+      .from("subscriptions")
+      .select("plan_type, status")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    // Paid plans: basic, premium, vip_annual, vip_monthly
+    const paidPlans = ['basic', 'premium', 'vip_annual', 'vip_monthly'];
+    const hasPaidPlan = subscription?.status === 'active' && 
+                        subscription?.plan_type && 
+                        paidPlans.includes(subscription.plan_type);
+
+    return hasPaidPlan;
+  };
+
   const handleContinuePlanner = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
+
+    // Check for paid access
+    const hasPaidAccess = await checkPaidAccess();
+    if (!hasPaidAccess) {
+      toast({
+        title: t('auth.authRequired'),
+        description: "You need an active subscription (Premium, VIP, or Do It For You) to access the digital planner. Please subscribe to continue.",
+        variant: "destructive",
+        action: (
+          <Button variant="outline" size="sm" onClick={() => navigate('/plans')}>
+            View Plans
+          </Button>
+        ),
+      });
+      return;
+    }
 
     const { data: settings } = await supabase
       .from("user_settings")
@@ -129,6 +171,22 @@ export default function Dashboard() {
   };
 
   const handleGeneratePDF = async () => {
+    // Check for paid access
+    const hasPaidAccess = await checkPaidAccess();
+    if (!hasPaidAccess) {
+      toast({
+        title: t('auth.authRequired'),
+        description: "You need an active subscription (Premium, VIP, or Do It For You) to generate PDF documents. Please subscribe to continue.",
+        variant: "destructive",
+        action: (
+          <Button variant="outline" size="sm" onClick={() => navigate('/plans')}>
+            View Plans
+          </Button>
+        ),
+      });
+      return;
+    }
+
     setShowPIIDialog(true);
   };
 
@@ -213,6 +271,26 @@ export default function Dashboard() {
         variant: "destructive",
       });
     }
+  };
+
+  const handleStartWizard = async () => {
+    // Check for paid access
+    const hasPaidAccess = await checkPaidAccess();
+    if (!hasPaidAccess) {
+      toast({
+        title: t('auth.authRequired'),
+        description: "You need an active subscription (Premium, VIP, or Do It For You) to use the step-by-step guide. Please subscribe to continue.",
+        variant: "destructive",
+        action: (
+          <Button variant="outline" size="sm" onClick={() => navigate('/plans')}>
+            View Plans
+          </Button>
+        ),
+      });
+      return;
+    }
+
+    navigate('/wizard/preplanning');
   };
 
   const handleGenerateAfterDeathPDF = async () => {
@@ -359,7 +437,7 @@ export default function Dashboard() {
                     <Button onClick={handleGeneratePDF} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Get a Printable Version
                     </Button>
-                    <Button onClick={() => navigate('/wizard/preplanning')} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                    <Button onClick={handleStartWizard} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Step-by-step Guide
                     </Button>
                     <Button onClick={() => navigate('/products/binder')} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
