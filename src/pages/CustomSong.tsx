@@ -16,6 +16,7 @@ export default function CustomSong() {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
+        setLoading(null);
         toast({
           title: "Authentication required",
           description: "Please sign in to continue",
@@ -24,24 +25,34 @@ export default function CustomSong() {
         return;
       }
 
+      toast({
+        title: "Processing...",
+        description: "Redirecting to secure checkout",
+      });
+
       const { data, error } = await supabase.functions.invoke('stripe-song-checkout', {
         body: { packageType, userId: user.id },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Stripe function error:', error);
+        throw error;
+      }
       
       if (data?.url) {
+        console.log('Redirecting to Stripe:', data.url);
         window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Checkout error:', error);
+      setLoading(null);
       toast({
         title: "Checkout failed",
-        description: "Unable to start checkout. Please try again.",
+        description: error.message || "Unable to start checkout. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(null);
     }
   };
 
