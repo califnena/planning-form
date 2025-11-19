@@ -136,6 +136,28 @@ export default function Dashboard() {
     return hasPaidPlan;
   };
 
+  const checkPrintableAccess = async (): Promise<boolean> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+
+    // Check for admin role
+    const { data: adminRole } = await supabase
+      .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
+    
+    if (adminRole) return true;
+
+    // Check if user has purchased EFABASIC (printable version)
+    const { data: purchase } = await supabase
+      .from('purchases')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('product_lookup_key', 'EFABASIC')
+      .eq('status', 'completed')
+      .maybeSingle();
+
+    return !!purchase;
+  };
+
   const handleContinuePlanner = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -171,19 +193,39 @@ export default function Dashboard() {
   };
 
   const handleGeneratePDF = async () => {
-    // Check for paid access
-    const hasPaidAccess = await checkPaidAccess();
-    if (!hasPaidAccess) {
-      toast({
-        title: t('auth.authRequired'),
-        description: "You need an active subscription (Premium, VIP, or Do It For You) to generate PDF documents. Please subscribe to continue.",
-        variant: "destructive",
-        action: (
-          <Button variant="outline" size="sm" onClick={() => navigate('/plans')}>
-            View Plans
-          </Button>
-        ),
-      });
+    // Check for printable access (one-time EFABASIC purchase)
+    const hasPrintableAccess = await checkPrintableAccess();
+    if (!hasPrintableAccess) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate("/login");
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
+          body: {
+            lookupKey: 'EFABASIC',
+            mode: 'payment',
+            successUrl: `${window.location.origin}/purchase-success?type=printable`,
+            cancelUrl: `${window.location.origin}/dashboard`,
+            allowPromotionCodes: true
+          },
+        });
+
+        if (error) throw error;
+        
+        if (data?.url) {
+          window.location.href = data.url;
+        }
+      } catch (error) {
+        console.error('Error creating checkout:', error);
+        toast({
+          title: "Error",
+          description: "Failed to start checkout. Please try again.",
+          variant: "destructive",
+        });
+      }
       return;
     }
 
@@ -225,12 +267,12 @@ export default function Dashboard() {
         description: "Redirecting to secure checkout",
       });
 
-      const successUrl = `${window.location.origin}/purchase-success`;
+      const successUrl = `${window.location.origin}/purchase-success?type=printable`;
       const cancelUrl = `${window.location.origin}/dashboard`;
 
       const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
         body: { 
-          lookupKey: 'EFABINDER',
+          lookupKey: 'EFABASIC',
           mode: 'payment',
           successUrl,
           cancelUrl,

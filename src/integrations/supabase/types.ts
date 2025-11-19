@@ -1445,6 +1445,45 @@ export type Database = {
           },
         ]
       }
+      purchases: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          product_lookup_key: string
+          purchased_at: string
+          status: string
+          stripe_payment_intent_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          product_lookup_key: string
+          purchased_at?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          product_lookup_key?: string
+          purchased_at?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       service_plan: {
         Row: {
           case_id: string
