@@ -5,7 +5,7 @@ import { GlobalHeader } from "@/components/GlobalHeader";
 import { AppFooter } from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, ArrowRight, Home, Download, CheckCircle2, Menu } from "lucide-react";
+import { ArrowLeft, ArrowRight, Home, Download, CheckCircle2, Menu, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -315,10 +315,14 @@ export default function CaseDetail() {
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => navigate("/app")} className="hidden sm:flex">
-                <Home className="mr-2 h-4 w-4" />
-                Home
+                <FileText className="mr-2 h-4 w-4" />
+                Pre-Planner
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => navigate("/app")} className="sm:hidden">
+              <Button variant="outline" size="sm" onClick={() => navigate("/after-death-planner")} className="hidden sm:flex">
+                <Home className="mr-2 h-4 w-4" />
+                After-Death Planner
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => navigate("/after-death-planner")} className="sm:hidden" title="After-Death Planner">
                 <Home className="h-4 w-4" />
               </Button>
               {isSaving && (
