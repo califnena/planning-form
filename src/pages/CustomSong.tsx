@@ -25,11 +25,6 @@ export default function CustomSong() {
         return;
       }
 
-      toast({
-        title: "Processing...",
-        description: "Redirecting to secure checkout",
-      });
-
       const { data, error } = await supabase.functions.invoke('stripe-song-checkout', {
         body: { packageType, userId: user.id },
       });
@@ -40,8 +35,25 @@ export default function CustomSong() {
       }
       
       if (data?.url) {
-        console.log('Redirecting to Stripe:', data.url);
-        window.location.href = data.url;
+        console.log('Opening Stripe checkout:', data.url);
+        // Open in new window to avoid blank page issues
+        const stripeWindow = window.open(data.url, '_blank');
+        
+        if (!stripeWindow) {
+          // Fallback if popup blocked
+          setLoading(null);
+          toast({
+            title: "Pop-up blocked",
+            description: "Please allow pop-ups and try again, or use the link below.",
+            variant: "destructive",
+          });
+          // Try direct navigation as fallback
+          setTimeout(() => {
+            window.location.href = data.url;
+          }, 1000);
+        } else {
+          setLoading(null);
+        }
       } else {
         throw new Error('No checkout URL received');
       }
