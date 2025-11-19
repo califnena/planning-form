@@ -8,6 +8,7 @@ export const STRIPE_LOOKUP_KEYS = {
   
   // One-Time Products
   DO_IT_FOR_YOU: 'EFADOFORU',
+  BINDER: 'EFABINDER',
   
   // Custom Songs (using existing env var pattern)
   SONG_STANDARD: 'STRIPE_STANDARD_SONG_PRICE_ID',
