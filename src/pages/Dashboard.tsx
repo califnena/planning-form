@@ -287,6 +287,58 @@ export default function Dashboard() {
       
       if (data?.url) {
         console.log('Opening Stripe checkout:', data.url);
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error: any) {
+      console.error("Error starting checkout:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to start checkout. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePurchaseBinder = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to continue",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Processing...",
+        description: "Redirecting to secure checkout",
+      });
+
+      const successUrl = `${window.location.origin}/purchase-success?type=binder`;
+      const cancelUrl = `${window.location.origin}/dashboard`;
+
+      const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
+        body: { 
+          lookupKey: 'EFABINDER',
+          mode: 'payment',
+          successUrl,
+          cancelUrl,
+          allowPromotionCodes: true
+        },
+      });
+
+      if (error) {
+        console.error('Stripe function error:', error);
+        throw error;
+      }
+      
+      if (data?.url) {
+        console.log('Opening Stripe checkout:', data.url);
         // Open in new window to avoid blank page issues
         const stripeWindow = window.open(data.url, '_blank');
         
@@ -515,7 +567,7 @@ export default function Dashboard() {
                     <Button onClick={handleStartWizard} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Step-by-step Guide
                     </Button>
-                    <Button onClick={handleDownloadWorkbook} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                    <Button onClick={handlePurchaseBinder} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Purchase Physical Binder
                     </Button>
                   </div>
@@ -543,7 +595,7 @@ export default function Dashboard() {
                     <Button onClick={handleDownloadWorkbook} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                       Purchase
                     </Button>
-                    <Button onClick={handleDownloadWorkbook} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                    <Button onClick={handlePurchaseBinder} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                       Purchase Physical Binder
                     </Button>
                   </div>
