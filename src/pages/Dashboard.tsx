@@ -120,20 +120,32 @@ export default function Dashboard() {
     
     if (adminRole) return true;
 
-    // Check subscription plan
+    // Check for required Stripe subscription lookup keys
+    const requiredLookupKeys = ['EFAPREMIUM', 'EFAVIPMONTHLY', 'EFAVIPYEAR', 'EFADOFORU'];
+    
+    // Check subscriptions table for active subscriptions with these lookup keys
     const { data: subscription } = await supabase
       .from("subscriptions")
-      .select("plan_type, status")
+      .select("stripe_subscription_id, status")
       .eq("user_id", user.id)
+      .eq("status", "active")
       .maybeSingle();
 
-    // Paid plans: basic, premium, vip_annual, vip_monthly
-    const paidPlans = ['basic', 'premium', 'vip_annual', 'vip_monthly'];
-    const hasPaidPlan = subscription?.status === 'active' && 
-                        subscription?.plan_type && 
-                        paidPlans.includes(subscription.plan_type);
+    if (subscription?.stripe_subscription_id) {
+      // If they have an active subscription, assume it's one of the valid plans
+      return true;
+    }
 
-    return hasPaidPlan;
+    // Also check purchases table for one-time EFADOFORU purchase
+    const { data: purchase } = await supabase
+      .from('purchases')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('product_lookup_key', 'EFADOFORU')
+      .eq('status', 'completed')
+      .maybeSingle();
+
+    return !!purchase;
   };
 
   const checkPrintableAccess = async (): Promise<boolean> => {
@@ -165,16 +177,7 @@ export default function Dashboard() {
     // Check for paid access
     const hasPaidAccess = await checkPaidAccess();
     if (!hasPaidAccess) {
-      toast({
-        title: t('auth.authRequired'),
-        description: "You need an active subscription (Premium, VIP, or Do It For You) to access the digital planner. Please subscribe to continue.",
-        variant: "destructive",
-        action: (
-          <Button variant="outline" size="sm" onClick={() => navigate('/plans')}>
-            View Plans
-          </Button>
-        ),
-      });
+      navigate('/pricing');
       return;
     }
 
@@ -193,39 +196,10 @@ export default function Dashboard() {
   };
 
   const handleGeneratePDF = async () => {
-    // Check for printable access (one-time EFABASIC purchase)
-    const hasPrintableAccess = await checkPrintableAccess();
-    if (!hasPrintableAccess) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/login");
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
-          body: {
-            lookupKey: 'EFABASIC',
-            mode: 'payment',
-            successUrl: `${window.location.origin}/purchase-success?type=printable`,
-            cancelUrl: `${window.location.origin}/dashboard`,
-            allowPromotionCodes: true
-          },
-        });
-
-        if (error) throw error;
-        
-        if (data?.url) {
-          window.location.href = data.url;
-        }
-      } catch (error) {
-        console.error('Error creating checkout:', error);
-        toast({
-          title: "Error",
-          description: "Failed to start checkout. Please try again.",
-          variant: "destructive",
-        });
-      }
+    // Check for paid access (subscription required)
+    const hasPaidAccess = await checkPaidAccess();
+    if (!hasPaidAccess) {
+      navigate('/pricing');
       return;
     }
 
@@ -371,16 +345,7 @@ export default function Dashboard() {
     // Check for paid access
     const hasPaidAccess = await checkPaidAccess();
     if (!hasPaidAccess) {
-      toast({
-        title: t('auth.authRequired'),
-        description: "You need an active subscription (Premium, VIP, or Do It For You) to use the step-by-step guide. Please subscribe to continue.",
-        variant: "destructive",
-        action: (
-          <Button variant="outline" size="sm" onClick={() => navigate('/plans')}>
-            View Plans
-          </Button>
-        ),
-      });
+      navigate('/pricing');
       return;
     }
 
