@@ -22,16 +22,7 @@ const Login = () => {
     setPassword("");
   };
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/dashboard");
-      }
-    };
-    checkUser();
-  }, [navigate]);
+  // Removed auto-redirect to allow users to manually enter credentials
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
