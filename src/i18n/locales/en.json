@@ -235,7 +235,8 @@
     "contact": "Contact / Suggest",
     "signOut": "Sign Out",
     "providedBy": "Provided by Everlasting Funeral Advisors",
-    "requestQuote": "Request a Quote"
+    "requestQuote": "Request a Quote",
+    "textSize": "Text Size"
   },
   "instructions": {
     "title": "My Instructions",
@@ -834,6 +835,35 @@
     "overviewNotesLabel": "General notes about this situation",
     "overviewNotesPlaceholder": "Any important notes or information...",
     "clearAll": "Clear all steps"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signInDesc": "Enter your email and password to continue",
+    "email": "Email",
+    "emailPlaceholder": "your@email.com",
+    "password": "Password",
+    "signingIn": "Signing in...",
+    "signUp": "Sign Up",
+    "createAccount": "Create Account",
+    "welcome": "Welcome!",
+    "welcomeBack": "Welcome Back!",
+    "loginSuccess": "You have successfully logged in.",
+    "loginFailed": "Sign In Failed",
+    "invalidCredentials": "Invalid email or password. Please try again.",
+    "planSelected": "You selected the {{plan}} plan.",
+    "testLoginSuccess": "Test Login Successful",
+    "testLoginDesc": "You are now logged in with the test account.",
+    "testLoginFailed": "Test Login Failed",
+    "googleSignInFailed": "Google Sign-In Failed",
+    "googleConfigError": "Google OAuth is not properly configured. Please contact support.",
+    "googleProviderError": "Google sign-in is not enabled for this application.",
+    "clearFields": "Clear",
+    "testLogin": "Test Login",
+    "googleSignIn": "Sign in with Google",
+    "noAccount": "Don't have an account?",
+    "signUpLink": "Sign up here",
+    "forgotPassword": "Forgot your password?",
+    "resetPasswordLink": "Reset it here"
   },
   "landing": {
     "companyName": "Everlasting Funeral Advisors",
