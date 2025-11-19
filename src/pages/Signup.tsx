@@ -7,8 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { BackToHomeButton } from "@/components/BackToHomeButton";
+import { useTranslation } from "react-i18next";
 
 const Signup = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
@@ -38,8 +40,8 @@ const Signup = () => {
 
     if (password !== confirmPassword) {
       toast({
-        title: "Passwords don't match",
-        description: "Please make sure both passwords are identical.",
+        title: t('auth.passwordsNoMatch'),
+        description: t('auth.passwordsNoMatchDesc'),
         variant: "destructive",
       });
       return;
@@ -47,8 +49,8 @@ const Signup = () => {
 
     if (password.length < 6) {
       toast({
-        title: "Password too short",
-        description: "Password must be at least 6 characters long.",
+        title: t('auth.passwordTooShort'),
+        description: t('auth.passwordTooShortDesc'),
         variant: "destructive",
       });
       return;
@@ -81,19 +83,19 @@ const Signup = () => {
           // For now, just show a message
           if (selectedPlan !== "free") {
             toast({
-              title: "Account created!",
-              description: `Welcome! You selected the ${selectedPlan} plan. Redirecting to dashboard...`,
+              title: t('auth.accountCreated'),
+              description: t('auth.planSelected', { plan: selectedPlan }),
             });
           } else {
             toast({
-              title: "Account created!",
-              description: "Welcome to My Final Wishes Planner.",
+              title: t('auth.accountCreated'),
+              description: t('auth.welcomeToPlanner'),
             });
           }
         } else {
           toast({
-            title: "Account created!",
-            description: "Welcome to My Final Wishes Planner.",
+            title: t('auth.accountCreated'),
+            description: t('auth.welcomeToPlanner'),
           });
         }
         
@@ -101,8 +103,8 @@ const Signup = () => {
       }
     } catch (error: any) {
       toast({
-        title: "Signup failed",
-        description: error.message || "Could not create account",
+        title: t('auth.signupFailed'),
+        description: error.message || t('auth.couldNotCreateAccount'),
         variant: "destructive",
       });
     } finally {
@@ -155,17 +157,17 @@ const Signup = () => {
       
       // Handle specific OAuth errors
       if (error.message?.includes("redirect_uri_mismatch")) {
-        errorMessage = "Google sign-in configuration error. Please contact support.";
+        errorMessage = t('auth.googleConfigError');
         console.error("OAuth redirect_uri_mismatch error. Ensure these URLs are whitelisted in Google Cloud Console:", {
           supabaseCallback: "https://bhhmizhxxpckibxudbrq.supabase.co/auth/v1/callback",
           appRedirect: `${window.location.origin}/dashboard`
         });
       } else if (error.message?.includes("provider")) {
-        errorMessage = "Google provider not configured. Please contact support.";
+        errorMessage = t('auth.googleProviderError');
       }
 
       toast({
-        title: "Google sign-up failed",
+        title: t('auth.googleSignUpFailed'),
         description: errorMessage,
         variant: "destructive",
       });
@@ -179,30 +181,30 @@ const Signup = () => {
       </div>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">Create Account</CardTitle>
+          <CardTitle className="text-2xl text-center">{t('auth.createAccount')}</CardTitle>
           <CardDescription className="text-center">
-            Start planning your final wishes today
+            {t('auth.createAccountDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder={t('auth.emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('auth.password')}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="At least 6 characters"
+                placeholder={t('auth.passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -210,11 +212,11 @@ const Signup = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="Re-enter password"
+                placeholder={t('auth.confirmPasswordPlaceholder')}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
@@ -223,7 +225,7 @@ const Signup = () => {
             </div>
             <div className="flex gap-2">
               <Button type="submit" className="flex-1" disabled={loading}>
-                {loading ? "Creating account..." : "Create Account"}
+                {loading ? t('auth.creatingAccount') : t('auth.createAccount')}
               </Button>
               <Button 
                 type="button" 
@@ -231,7 +233,7 @@ const Signup = () => {
                 onClick={handleClearFields}
                 disabled={loading}
               >
-                Clear
+                {t('common.clear')}
               </Button>
             </div>
           </form>
@@ -241,7 +243,7 @@ const Signup = () => {
               <span className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+              <span className="bg-card px-2 text-muted-foreground">{t('auth.orContinueWith')}</span>
             </div>
           </div>
 
@@ -251,31 +253,14 @@ const Signup = () => {
             className="w-full"
             onClick={handleGoogleSignup}
           >
-            <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-              <path
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                fill="#4285F4"
-              />
-              <path
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                fill="#34A853"
-              />
-              <path
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                fill="#FBBC05"
-              />
-              <path
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                fill="#EA4335"
-              />
-            </svg>
-            Continue with Google
+...
+            {t('auth.continueWithGoogle')}
           </Button>
 
           <div className="mt-4 text-center text-sm">
-            Already have an account?{" "}
+            {t('auth.alreadyHaveAccount')}{" "}
             <Link to="/login" className="text-primary hover:underline font-medium">
-              Sign in
+              {t('auth.signIn')}
             </Link>
           </div>
         </CardContent>
