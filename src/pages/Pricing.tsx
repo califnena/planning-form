@@ -52,13 +52,13 @@ const Pricing = () => {
       name: "Free Plan",
       price: "$0",
       period: "Forever",
-      description: "Start organizing your final wishes at no cost",
+      description: "Access basic resources and browse available services",
       features: [
-        "Access to Pre-Planning sections",
-        "Basic form templates",
-        "Digital document storage",
         "After-Death checklist guide",
-        "Basic resources and FAQs"
+        "Basic resources and FAQs",
+        "Ability to purchase any product or service",
+        "Browse all available planning tools",
+        "View pricing and service details"
       ],
       badge: null
     },
