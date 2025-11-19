@@ -256,23 +256,17 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   pdf.setLineWidth(1);
   pdf.roundedRect(pageWidth / 2 - boxWidth / 2, nameYPosition - 8, boxWidth, boxHeight, 3, 3, 'FD');
   
-  pdf.setFontSize(11);
-  pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(...colors.subheaderTeal);
-  pdf.text("THIS PLAN IS PREPARED FOR:", pageWidth / 2, nameYPosition, { align: "center" });
-  
-  nameYPosition += 12;
   if (preparedForDisplay) {
+    pdf.setFontSize(11);
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(...colors.subheaderTeal);
+    pdf.text("THIS PLAN IS PREPARED FOR:", pageWidth / 2, nameYPosition, { align: "center" });
+    
+    nameYPosition += 12;
     pdf.setFontSize(18);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(...colors.headerNavy);
     pdf.text(sanitizeText(preparedForDisplay), pageWidth / 2, nameYPosition, { align: "center" });
-  } else {
-    // Draw blank line for manual entry
-    pdf.setDrawColor(...colors.bodyGray);
-    pdf.setLineWidth(0.5);
-    const lineWidth = 100;
-    pdf.line(pageWidth / 2 - lineWidth / 2, nameYPosition + 2, pageWidth / 2 + lineWidth / 2, nameYPosition + 2);
   }
   
   pdf.setFontSize(10);
