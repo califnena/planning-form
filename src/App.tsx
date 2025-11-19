@@ -79,6 +79,7 @@ const App = () => (
                     <Route path="/song-info" element={<SongInfo />} />
                     <Route path="/song-confirmation" element={<SongConfirmation />} />
                     <Route path="/vip-coach" element={<CoachAssistant />} />
+                    <Route path="/after-death-planner" element={<NextSteps />} />
                     <Route path="/next-steps" element={<NextSteps />} />
                     <Route path="/next-steps/case/:caseId" element={<CaseDetail />} />
                     <Route path="/wizard/preplanning" element={<PrePlanningWizard />} />

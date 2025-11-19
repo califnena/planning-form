@@ -151,16 +151,40 @@ export default function Dashboard() {
 
   const handleDownloadWorkbook = async () => {
     try {
-      await generateManuallyFillablePDF({});
-      toast({
-        title: "Workbook Downloaded",
-        description: "Your printable workbook has been downloaded successfully.",
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to continue",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const successUrl = `${window.location.origin}/subscription?status=success`;
+      const cancelUrl = `${window.location.origin}/dashboard`;
+
+      const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
+        body: { 
+          lookupKey: 'EFABASIC',
+          mode: 'subscription',
+          successUrl,
+          cancelUrl,
+          allowPromotionCodes: true
+        },
       });
+
+      if (error) throw error;
+      
+      if (data?.url) {
+        window.location.href = data.url;
+      }
     } catch (error) {
-      console.error("Error downloading workbook:", error);
+      console.error("Error starting checkout:", error);
       toast({
         title: "Error",
-        description: "Failed to download workbook. Please try again.",
+        description: "Failed to start checkout. Please try again.",
         variant: "destructive",
       });
     }
