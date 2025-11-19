@@ -245,18 +245,18 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   pdf.setTextColor(...colors.bodyGray);
   pdf.text("Essential Steps for Loved Ones", pageWidth / 2, 58, { align: "center" });
   
-  // Prepared for - PROMINENT DISPLAY
+  // Prepared for - PROMINENT DISPLAY (only if name exists)
   let nameYPosition = 85;
   
-  // Draw a subtle box for emphasis
-  const boxWidth = 140;
-  const boxHeight = 35;
-  pdf.setFillColor(...colors.boxBg);
-  pdf.setDrawColor(...colors.subheaderTeal);
-  pdf.setLineWidth(1);
-  pdf.roundedRect(pageWidth / 2 - boxWidth / 2, nameYPosition - 8, boxWidth, boxHeight, 3, 3, 'FD');
-  
   if (preparedForDisplay) {
+    // Draw a subtle box for emphasis
+    const boxWidth = 140;
+    const boxHeight = 35;
+    pdf.setFillColor(...colors.boxBg);
+    pdf.setDrawColor(...colors.subheaderTeal);
+    pdf.setLineWidth(1);
+    pdf.roundedRect(pageWidth / 2 - boxWidth / 2, nameYPosition - 8, boxWidth, boxHeight, 3, 3, 'FD');
+    
     pdf.setFontSize(11);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(...colors.subheaderTeal);
