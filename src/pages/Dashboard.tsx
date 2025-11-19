@@ -186,8 +186,22 @@ export default function Dashboard() {
       }
       
       if (data?.url) {
-        console.log('Redirecting to Stripe:', data.url);
-        window.location.href = data.url;
+        console.log('Opening Stripe checkout:', data.url);
+        // Open in new window to avoid blank page issues
+        const stripeWindow = window.open(data.url, '_blank');
+        
+        if (!stripeWindow) {
+          // Fallback if popup blocked
+          toast({
+            title: "Pop-up blocked",
+            description: "Please allow pop-ups and try again, or use the link below.",
+            variant: "destructive",
+          });
+          // Try direct navigation as fallback
+          setTimeout(() => {
+            window.location.href = data.url;
+          }, 1000);
+        }
       } else {
         throw new Error('No checkout URL received');
       }
@@ -231,11 +245,6 @@ export default function Dashboard() {
         return;
       }
 
-      toast({
-        title: "Processing...",
-        description: "Redirecting to secure checkout",
-      });
-
       const successUrl = `${window.location.origin}/purchase-success`;
       const cancelUrl = `${window.location.origin}/dashboard`;
       
@@ -255,8 +264,22 @@ export default function Dashboard() {
       }
       
       if (data?.url) {
-        console.log('Redirecting to Stripe:', data.url);
-        window.location.href = data.url;
+        console.log('Opening Stripe checkout:', data.url);
+        // Open in new window to avoid blank page issues
+        const stripeWindow = window.open(data.url, '_blank');
+        
+        if (!stripeWindow) {
+          // Fallback if popup blocked
+          toast({
+            title: "Pop-up blocked",
+            description: "Please allow pop-ups and try again, or use the link below.",
+            variant: "destructive",
+          });
+          // Try direct navigation as fallback
+          setTimeout(() => {
+            window.location.href = data.url;
+          }, 1000);
+        }
       } else {
         throw new Error('No checkout URL received');
       }
