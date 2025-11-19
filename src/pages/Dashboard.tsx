@@ -162,7 +162,12 @@ export default function Dashboard() {
         return;
       }
 
-      const successUrl = `${window.location.origin}/subscription?status=success`;
+      toast({
+        title: "Processing...",
+        description: "Redirecting to secure checkout",
+      });
+
+      const successUrl = `${window.location.origin}/purchase-success`;
       const cancelUrl = `${window.location.origin}/dashboard`;
 
       const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
@@ -175,16 +180,22 @@ export default function Dashboard() {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Stripe function error:', error);
+        throw error;
+      }
       
       if (data?.url) {
+        console.log('Redirecting to Stripe:', data.url);
         window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error starting checkout:", error);
       toast({
         title: "Error",
-        description: "Failed to start checkout. Please try again.",
+        description: error.message || "Failed to start checkout. Please try again.",
         variant: "destructive",
       });
     }
@@ -220,7 +231,12 @@ export default function Dashboard() {
         return;
       }
 
-      const successUrl = `${window.location.origin}/subscription?status=success`;
+      toast({
+        title: "Processing...",
+        description: "Redirecting to secure checkout",
+      });
+
+      const successUrl = `${window.location.origin}/purchase-success`;
       const cancelUrl = `${window.location.origin}/dashboard`;
       
       const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
@@ -233,16 +249,22 @@ export default function Dashboard() {
         },
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Stripe function error:', error);
+        throw error;
+      }
       
       if (data?.url) {
+        console.log('Redirecting to Stripe:', data.url);
         window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Checkout error:', error);
       toast({
         title: "Checkout failed",
-        description: "We're having trouble loading this price. Please try again later or contact support.",
+        description: error.message || "Unable to start checkout. Please try again.",
         variant: "destructive",
       });
     }
