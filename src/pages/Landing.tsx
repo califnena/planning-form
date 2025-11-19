@@ -231,10 +231,10 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Do-It-For-You Planning Session
+                  {t('landing.doItForYou')}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Book a one-time session where a specialist helps you fill out your planner together and get everything ready.
+                  {t('landing.doItForYouDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -251,10 +251,10 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  VIP Coach Assistant (24/7 Support)
+                  {t('landing.vipCoach')}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Get ongoing support for planning questions, hard decisions, and emotional moments. A VIP coach is available when you need help.
+                  {t('landing.vipCoachDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -271,10 +271,10 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Create a Custom Memorial Song
+                  {t('landing.customSong')}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Order a personalized song to honor a loved one, based on their story, hobbies, and personality.
+                  {t('landing.customSongDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -288,10 +288,10 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Adjust Text Size, Colors, and Language
+                  {t('landing.adjustSettings')}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Increase text size, turn on high-contrast colors, reduce motion, and switch languages for an easier, senior-friendly experience.
+                  {t('landing.adjustSettingsDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -301,7 +301,7 @@ const Landing = () => {
         {/* Helpful Guides & Resources Section */}
         <div className="mt-24 max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-            Helpful Guides & Resources
+            {t('landing.helpfulGuides')}
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* 1. Helpful Articles & Guides */}
@@ -316,10 +316,10 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Helpful Articles & Guides
+                  {t('landing.helpfulArticles')}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Read simple guides on planning ahead, talking with family, and understanding funeral options.
+                  {t('landing.helpfulArticlesDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -336,10 +336,10 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Legal Documents & Planning Basics
+                  {t('landing.legalDocuments')}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Learn about common legal documents (like wills, powers of attorney, and trusts) and where they fit into your plan.
+                  {t('landing.legalDocumentsDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -356,10 +356,10 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Common Questions
+                  {t('landing.commonQuestions')}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  See answers to the questions families ask most often about planning, payment, and how the tool works.
+                  {t('landing.commonQuestionsDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -376,10 +376,10 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Helpful Contacts & Vendors
+                  {t('landing.helpfulContacts')}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Find useful contacts, local providers, and services that can help with funeral planning and after-death tasks.
+                  {t('landing.helpfulContactsDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -389,16 +389,16 @@ const Landing = () => {
         {/* Testimonials Section */}
         <div className="mt-24 max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-            Real Stories - Testimonials
+            {t('landing.testimonials')}
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="border-2 bg-gradient-to-br from-yellow-50 to-amber-50">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <p className="text-muted-foreground leading-relaxed italic">
-                  "When my father passed, we didn't know where anything was—no passwords, no documents, no instructions. We spent weeks searching. I wish we had something like this sooner."
+                  {t('landing.testimonial1')}
                 </p>
                 <p className="text-sm font-semibold text-foreground">
-                  — Sarah M., Daughter
+                  {t('landing.testimonial1Author')}
                 </p>
               </CardContent>
             </Card>
@@ -406,10 +406,10 @@ const Landing = () => {
             <Card className="border-2 bg-gradient-to-br from-yellow-50 to-amber-50">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <p className="text-muted-foreground leading-relaxed italic">
-                  "My mother used this planner, and everything was organized for us. It made a painful time so much easier. We were able to focus on remembering her instead of searching for paperwork."
+                  {t('landing.testimonial2')}
                 </p>
                 <p className="text-sm font-semibold text-foreground">
-                  — Robert T., Son
+                  {t('landing.testimonial2Author')}
                 </p>
               </CardContent>
             </Card>
@@ -417,10 +417,10 @@ const Landing = () => {
             <Card className="border-2 bg-gradient-to-br from-yellow-50 to-amber-50">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <p className="text-muted-foreground leading-relaxed italic">
-                  "I live alone, and I wanted to make sure someone could handle things smoothly when my time comes. This gave me comfort knowing everything is documented clearly."
+                  {t('landing.testimonial3')}
                 </p>
                 <p className="text-sm font-semibold text-foreground">
-                  — Elaine K., Retired Teacher
+                  {t('landing.testimonial3Author')}
                 </p>
               </CardContent>
             </Card>
@@ -431,34 +431,34 @@ const Landing = () => {
         <div className="max-w-4xl mx-auto mt-24">
           <div className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-sm">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Everlasting Funeral Advisors
+              {t('landing.aboutTitle')}
             </h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Your trusted partner in compassionate, affordable funeral planning 🏺
+              {t('landing.aboutTagline')}
             </p>
 
             <div className="grid md:grid-cols-2 gap-8">
               {/* Affordable Products */}
               <div>
                 <h4 className="text-xl font-semibold text-foreground mb-4">
-                  Affordable Products
+                  {t('landing.affordableProducts')}
                 </h4>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">Premium and budget-friendly caskets</span>
+                    <span className="text-muted-foreground">{t('landing.product1')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">Beautiful cremation urns in various styles</span>
+                    <span className="text-muted-foreground">{t('landing.product2')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">Fresh flower arrangements and memorial tributes</span>
+                    <span className="text-muted-foreground">{t('landing.product3')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">Complete funeral packages tailored to your budget</span>
+                    <span className="text-muted-foreground">{t('landing.product4')}</span>
                   </li>
                 </ul>
               </div>
@@ -466,24 +466,24 @@ const Landing = () => {
               {/* Professional Services */}
               <div>
                 <h4 className="text-xl font-semibold text-foreground mb-4">
-                  Professional Services
+                  {t('landing.professionalServices')}
                 </h4>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">Expert funeral planning advisors</span>
+                    <span className="text-muted-foreground">{t('landing.service1')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">Legacy Planner (physical binder & digital platform)</span>
+                    <span className="text-muted-foreground">{t('landing.service2')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">Customized eulogy writing and song selection</span>
+                    <span className="text-muted-foreground">{t('landing.service3')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">Guidance and coaching to document your funeral plans and last wishes</span>
+                    <span className="text-muted-foreground">{t('landing.service4')}</span>
                   </li>
                 </ul>
               </div>
@@ -492,10 +492,10 @@ const Landing = () => {
             {/* Our Mission Section - AFTER About */}
             <div className="mt-12 pt-8 border-t border-border">
               <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-                Our Mission
+                {t('landing.ourMission')}
               </h3>
               <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                Are you prepared for one of life's most difficult moments? Our mission is to guide families through the process of planning an affordable funeral with care, compassion, and expertise. From understanding your options to making thoughtful decisions, we're here to support you every step of the way. With our resources and guidance, you can create a meaningful farewell that honors your loved one's life while easing the burden on your family during a challenging time. Let us help you navigate this journey with sensitivity and understanding.
+                {t('landing.missionStatement')}
               </p>
 
               {/* Pre-Planning Guide Download */}
@@ -508,10 +508,10 @@ const Landing = () => {
                   </div>
                   <div className="flex-1">
                     <h4 className="text-xl md:text-2xl font-bold text-foreground mb-2">
-                      Pre-Planning Your Funeral: A Gift of Peace and Clarity
+                      {t('landing.guideTitle')}
                     </h4>
                     <p className="text-base text-muted-foreground leading-relaxed">
-                      A comprehensive guide to help you understand the importance of pre-planning your funeral arrangements. Learn about different burial options, service types, and how to communicate your wishes to loved ones.
+                      {t('landing.guideDescription')}
                     </p>
                   </div>
                   <div className="flex-shrink-0">
@@ -521,7 +521,7 @@ const Landing = () => {
                       onClick={() => window.location.href = '/guide'}
                     >
                       <FileText className="mr-2 h-4 w-4" />
-                      View Guide
+                      {t('landing.viewGuide')}
                     </Button>
                   </div>
                 </div>
