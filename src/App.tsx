@@ -43,6 +43,7 @@ import CustomSong from "./pages/CustomSong";
 import SongInfo from "./pages/SongInfo";
 import PrePlanningGuide from "./pages/PrePlanningGuide";
 import SongConfirmation from "./pages/SongConfirmation";
+import PurchaseSuccess from "./pages/PurchaseSuccess";
 
 
 const queryClient = new QueryClient();
@@ -78,6 +79,7 @@ const App = () => (
                     <Route path="/products/custom-song" element={<CustomSong />} />
                     <Route path="/song-info" element={<SongInfo />} />
                     <Route path="/song-confirmation" element={<SongConfirmation />} />
+                    <Route path="/purchase-success" element={<PurchaseSuccess />} />
                     <Route path="/vip-coach" element={<CoachAssistant />} />
                     <Route path="/after-death-planner" element={<NextSteps />} />
                     <Route path="/next-steps" element={<NextSteps />} />
