@@ -146,12 +146,12 @@ export default function Dashboard() {
     
     if (adminRole) return true;
 
-    // Check if user has purchased EFABINDER (printable workbook)
+    // Check if user has purchased EFABASIC (printable workbook)
     const { data: purchase } = await supabase
       .from('purchases')
       .select('id')
       .eq('user_id', user.id)
-      .eq('product_lookup_key', 'EFABINDER')
+      .eq('product_lookup_key', 'EFABASIC')
       .eq('status', 'completed')
       .maybeSingle();
 
@@ -205,7 +205,7 @@ export default function Dashboard() {
       try {
         const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
           body: {
-            lookupKey: 'EFABINDER',
+            lookupKey: 'EFABASIC',
             mode: 'payment',
             successUrl: `${window.location.origin}/purchase-success?type=printable`,
             cancelUrl: `${window.location.origin}/dashboard`,
@@ -272,7 +272,7 @@ export default function Dashboard() {
 
       const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
         body: { 
-          lookupKey: 'EFABINDER',
+          lookupKey: 'EFABASIC',
           mode: 'payment',
           successUrl,
           cancelUrl,
@@ -336,16 +336,16 @@ export default function Dashboard() {
   };
 
   const handleDownloadBlankPlanner = async () => {
-    // Check for paid subscription access (not just EFABASIC purchase)
-    const hasPaidAccess = await checkPaidAccess();
-    if (!hasPaidAccess) {
+    // Check for EFABASIC purchase access
+    const hasPrintableAccess = await checkPrintableAccess();
+    if (!hasPrintableAccess) {
       toast({
-        title: "Subscription Required",
-        description: "You need an active subscription (Premium, VIP, or Do It For You) to download the blank planner form. Please subscribe to continue.",
+        title: "Purchase Required",
+        description: "You need to purchase the printable workbook to download the blank planner form. Please purchase to continue.",
         variant: "destructive",
         action: (
-          <Button variant="outline" size="sm" onClick={() => navigate('/plans')}>
-            View Plans
+          <Button variant="outline" size="sm" onClick={handleDownloadWorkbook}>
+            Purchase Now
           </Button>
         ),
       });
