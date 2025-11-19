@@ -21,8 +21,8 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: localStorage.getItem('efaLanguage') || localStorage.getItem('language') || 'en',
-    fallbackLng: 'en',
+    lng: 'es', // Force Spanish only
+    fallbackLng: 'es',
     interpolation: {
       escapeValue: false,
     },

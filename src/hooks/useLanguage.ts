@@ -8,40 +8,13 @@ export const useLanguage = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load language on mount
+  // Load language on mount - Force Spanish only
   useEffect(() => {
     const loadLanguage = async () => {
       try {
-        // 1. Check if user is logged in
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (user) {
-          // 2. Try to get language from user profile
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('preferred_language')
-            .eq('id', user.id)
-            .single();
-
-          if (profile?.preferred_language) {
-            await i18n.changeLanguage(profile.preferred_language);
-            localStorage.setItem('efaLanguage', profile.preferred_language);
-            setIsLoading(false);
-            return;
-          }
-        }
-
-        // 3. Fallback to localStorage
-        const storedLanguage = localStorage.getItem('efaLanguage');
-        if (storedLanguage) {
-          await i18n.changeLanguage(storedLanguage);
-          setIsLoading(false);
-          return;
-        }
-
-        // 4. Fallback to English
-        await i18n.changeLanguage('en');
-        localStorage.setItem('efaLanguage', 'en');
+        // Always set to Spanish
+        await i18n.changeLanguage('es');
+        localStorage.setItem('efaLanguage', 'es');
         setIsLoading(false);
       } catch (error) {
         console.error('Error loading language:', error);
