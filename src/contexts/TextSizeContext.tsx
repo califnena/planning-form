@@ -9,7 +9,7 @@ interface TextSizeContextType {
 
 const TextSizeContext = createContext<TextSizeContextType | undefined>(undefined);
 
-export const TextSizeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function TextSizeProvider({ children }: { children: React.ReactNode }) {
   const [textSize, setTextSizeState] = useState<TextSize>(() => {
     const stored = localStorage.getItem('text-size');
     return (stored as TextSize) || 'medium';
@@ -30,7 +30,7 @@ export const TextSizeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       {children}
     </TextSizeContext.Provider>
   );
-};
+}
 
 export const useTextSize = () => {
   const context = useContext(TextSizeContext);
