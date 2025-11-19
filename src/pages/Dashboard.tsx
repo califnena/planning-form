@@ -167,8 +167,8 @@ export default function Dashboard() {
 
       const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
         body: { 
-          lookupKey: 'EFABASIC',
-          mode: 'subscription',
+          lookupKey: 'EFABINDER',
+          mode: 'payment',
           successUrl,
           cancelUrl,
           allowPromotionCodes: true
