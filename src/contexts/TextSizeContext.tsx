@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, FC } from 'react';
 
 type TextSize = 'small' | 'medium' | 'large';
 
@@ -9,7 +9,11 @@ interface TextSizeContextType {
 
 const TextSizeContext = createContext<TextSizeContextType | undefined>(undefined);
 
-export function TextSizeProvider({ children }: { children: React.ReactNode }) {
+interface TextSizeProviderProps {
+  children: ReactNode;
+}
+
+export const TextSizeProvider: FC<TextSizeProviderProps> = ({ children }) => {
   const [textSize, setTextSizeState] = useState<TextSize>(() => {
     const stored = localStorage.getItem('text-size');
     return (stored as TextSize) || 'medium';
@@ -30,7 +34,7 @@ export function TextSizeProvider({ children }: { children: React.ReactNode }) {
       {children}
     </TextSizeContext.Provider>
   );
-}
+};
 
 export const useTextSize = () => {
   const context = useContext(TextSizeContext);
