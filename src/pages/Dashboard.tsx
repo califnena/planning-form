@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [showPIIDialog, setShowPIIDialog] = useState(false);
   const [pendingPIIData, setPendingPIIData] = useState<any>(null);
   const [isFreePlan, setIsFreePlan] = useState(true);
+  const [hasVIPAccess, setHasVIPAccess] = useState(false);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -42,6 +43,10 @@ export default function Dashboard() {
       // Check if user is on free plan
       const freePlan = await checkIsFreePlan();
       setIsFreePlan(freePlan);
+
+      // Check if user has VIP access
+      const vipAccess = await checkVIPAccess();
+      setHasVIPAccess(vipAccess);
 
       // Load user name
       const { data: profile } = await supabase
@@ -166,6 +171,40 @@ export default function Dashboard() {
     // Check if they have any paid subscription or purchase
     const hasPaid = await checkPaidAccess();
     return !hasPaid; // If no paid access, they're on free plan
+  };
+
+  const checkVIPAccess = async (): Promise<boolean> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+
+    // Check for admin role
+    const { data: adminRole } = await supabase
+      .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
+    
+    if (adminRole) return true;
+
+    // Check subscriptions for VIP monthly or yearly
+    const { data: subscription } = await supabase
+      .from("subscriptions")
+      .select("stripe_subscription_id, status")
+      .eq("user_id", user.id)
+      .eq("status", "active")
+      .maybeSingle();
+
+    if (subscription?.stripe_subscription_id) {
+      // Check if it's a VIP subscription by checking purchases table
+      const { data: vipPurchase } = await supabase
+        .from('purchases')
+        .select('id')
+        .eq('user_id', user.id)
+        .in('product_lookup_key', ['EFAVIPMONTHLY', 'EFAVIPYEAR'])
+        .eq('status', 'completed')
+        .maybeSingle();
+
+      return !!vipPurchase;
+    }
+
+    return false;
   };
 
   const checkPrintableAccess = async (): Promise<boolean> => {
@@ -417,6 +456,114 @@ export default function Dashboard() {
       toast({
         title: "Error",
         description: "Failed to generate PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleVIPMonthly = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Sign in required",
+          description: "Please sign in to continue",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Processing...",
+        description: "Redirecting to secure checkout",
+      });
+
+      const successUrl = `${window.location.origin}/purchase-success?type=vip-monthly`;
+      const cancelUrl = `${window.location.origin}/dashboard`;
+      
+      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
+        body: {
+          lookupKey: "EFAVIPMONTHLY",
+          mode: "subscription",
+          successUrl,
+          cancelUrl,
+          allowPromotionCodes: true,
+        },
+      });
+
+      if (error) {
+        console.error("Checkout error:", error);
+        toast({
+          title: "Error",
+          description: "Failed to start checkout process",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleVIPYearly = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Sign in required",
+          description: "Please sign in to continue",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Processing...",
+        description: "Redirecting to secure checkout",
+      });
+
+      const successUrl = `${window.location.origin}/purchase-success?type=vip-yearly`;
+      const cancelUrl = `${window.location.origin}/dashboard`;
+      
+      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
+        body: {
+          lookupKey: "EFAVIPYEAR",
+          mode: "subscription",
+          successUrl,
+          cancelUrl,
+          allowPromotionCodes: true,
+        },
+      });
+
+      if (error) {
+        console.error("Checkout error:", error);
+        toast({
+          title: "Error",
+          description: "Failed to start checkout process",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
     }
@@ -690,9 +837,20 @@ export default function Dashboard() {
                     <span>Compassionate support during difficult decisions</span>
                   </li>
                 </ul>
-                <Button onClick={() => navigate(isFreePlan ? '/pricing' : '/plans')} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                  Upgrade to VIP
-                </Button>
+                {hasVIPAccess ? (
+                  <Button onClick={() => navigate('/coach')} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                    Access VIP Coach
+                  </Button>
+                ) : (
+                  <div className="flex flex-wrap gap-3">
+                    <Button onClick={handleVIPMonthly} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                      Upgrade to VIP Monthly
+                    </Button>
+                    <Button onClick={handleVIPYearly} variant="outline" className="border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                      Upgrade to VIP Yearly
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </Card>
