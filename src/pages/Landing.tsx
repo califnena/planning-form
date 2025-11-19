@@ -5,9 +5,11 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { FileText, CheckCircle, Shield, BookOpen, Scale, FileOutput, Plus, Minus, ClipboardList, CalendarCheck, ShoppingBag, Users, Headphones, Music, Type, HelpCircle, Phone, Download } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
 import mascotCouple from "@/assets/mascot-couple.png";
 
 const Landing = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [textSize, setTextSize] = useState<number>(100);
 
@@ -53,13 +55,13 @@ const Landing = () => {
       <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-xl font-semibold text-primary">Everlasting Funeral Advisors</h1>
-            <p className="text-xs text-muted-foreground">Simple End-of-Life Planning & Document Organization</p>
+            <h1 className="text-xl font-semibold text-primary">{t('landing.companyName')}</h1>
+            <p className="text-xs text-muted-foreground">{t('landing.companyTagline')}</p>
           </div>
           <div className="flex items-center gap-3">
             {/* Text Size Controls */}
             <div className="flex items-center gap-2 border border-border rounded-md px-3 py-1.5">
-              <span className="text-sm text-muted-foreground font-medium">Text Size:</span>
+              <span className="text-sm text-muted-foreground font-medium">{t('header.textSize')}</span>
               <Button
                 variant="ghost"
                 size="sm"
@@ -88,7 +90,7 @@ const Landing = () => {
             </div>
             <LanguageSelector />
             <Link to="/login">
-              <Button variant="outline" size="lg">Sign In</Button>
+              <Button variant="outline" size="lg">{t('auth.signIn')}</Button>
             </Link>
           </div>
         </div>
@@ -106,11 +108,11 @@ const Landing = () => {
           </div>
           
           <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight">
-            End-of-Life Planning Made Simple
+            {t('landing.heroTitle')}
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-            Document your wishes, follow step-by-step guidance, and access affordable products—All in one place.
+            {t('landing.heroSubtitle')}
           </p>
           
           <div className="flex flex-col items-center gap-4 pt-6">
@@ -119,13 +121,13 @@ const Landing = () => {
               className="text-lg px-12 py-7"
               onClick={handleStartPlanner}
             >
-              Start Your Planner
+              {t('landing.startYourPlanner')}
             </Button>
             <Link to="/login" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Already have an account? Sign In
+              {t('landing.alreadyHaveAccount')}
             </Link>
             <Link to="/pricing" className="text-sm text-primary hover:underline font-medium">
-              View Pricing & Plans →
+              {t('landing.viewPricing')}
             </Link>
           </div>
 
@@ -133,10 +135,10 @@ const Landing = () => {
           <div className="mt-16 max-w-3xl mx-auto">
             <div className="bg-card border border-border rounded-2xl p-8 md:p-10 shadow-sm">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-                What Is the Everlasting Planner?
+                {t('landing.whatIsEverlasting')}
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                A simple online tool that guides you through planning your funeral wishes, storing important documents, and leaving clear instructions for the people who will need them. Everything is private, secure, and easy to update anytime.
+                {t('landing.whatIsDesc')}
               </p>
             </div>
           </div>
@@ -145,7 +147,7 @@ const Landing = () => {
         {/* What You Can Do Section */}
         <div className="mt-24 max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-            What You Can Do
+            {t('landing.whatYouCanDo')}
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* 1. Record Your Funeral Preferences */}
@@ -157,10 +159,10 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Record Your Funeral Preferences
+                  {t('landing.recordPreferences')}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Document your wishes for services, burial or cremation, and memorial details so nothing is left to guesswork.
+                  {t('landing.recordPreferencesDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -174,10 +176,10 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Leave Memorable Messages for Loved Ones
+                  {t('landing.leaveInstructions')}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Leave heartfelt messages for your loved ones—written, video, or audio recordings of yourself with your special words they'll treasure forever.
+                  {t('landing.leaveInstructionsDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -191,10 +193,10 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Use the After-Death Planner
+                  {t('landing.organizeDocuments')}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Give your family a simple checklist they can follow after a loss, from first-48-hour tasks to longer-term steps.
+                  {t('landing.organizeDocumentsDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -208,11 +210,11 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Purchase Affordable Funeral Products
-                  <span className="ml-2 text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">Coming Soon</span>
+                  {t('landing.guideFamilySteps')}
+                  <span className="ml-2 text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">{t('common.comingSoon', 'Coming Soon')}</span>
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Access competitively priced caskets, urns, flowers, and other funeral items in one place.
+                  {t('landing.guideFamilyStepsDesc')}
                 </p>
               </CardContent>
             </Card>
