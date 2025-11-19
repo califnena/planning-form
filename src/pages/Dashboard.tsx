@@ -34,6 +34,7 @@ export default function Dashboard() {
   const [pendingPIIData, setPendingPIIData] = useState<any>(null);
   const [isFreePlan, setIsFreePlan] = useState(true);
   const [hasVIPAccess, setHasVIPAccess] = useState(false);
+  const [hasPrintableAccess, setHasPrintableAccess] = useState(false);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -47,6 +48,10 @@ export default function Dashboard() {
       // Check if user has VIP access
       const vipAccess = await checkVIPAccess();
       setHasVIPAccess(vipAccess);
+
+      // Check if user has printable access (EFABASIC)
+      const printableAccess = await checkPrintableAccess();
+      setHasPrintableAccess(printableAccess);
 
       // Load user name
       const { data: profile } = await supabase
@@ -412,22 +417,6 @@ export default function Dashboard() {
   };
 
   const handleDownloadBlankPlanner = async () => {
-    // Check for EFABASIC purchase access
-    const hasPrintableAccess = await checkPrintableAccess();
-    if (!hasPrintableAccess) {
-      toast({
-        title: "Purchase Required",
-        description: "You need to purchase the printable workbook to download the blank planner form. Please purchase to continue.",
-        variant: "destructive",
-        action: (
-          <Button variant="outline" size="sm" onClick={handleDownloadWorkbook}>
-            Purchase Now
-          </Button>
-        ),
-      });
-      return;
-    }
-
     try {
       await generateManuallyFillablePDF({});
       toast({
@@ -738,35 +727,21 @@ export default function Dashboard() {
                   <p className="text-sm text-muted-foreground mb-4">
                     Download a blank form to fill out by hand or purchase the printable workbook.
                   </p>
-                  {isFreePlan ? (
-                    <div className="space-y-4">
-                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                        <p className="text-sm text-amber-900 mb-3">
-                          <strong>Upgrade Required:</strong> Subscribe to access the printable workbook and blank planner downloads.
-                        </p>
-                        <Button onClick={() => navigate('/pricing')} className="bg-amber-600 hover:bg-amber-700 text-white">
-                          View Plans & Upgrade
-                        </Button>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <Button onClick={handlePurchaseBinder} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
-                          Purchase Physical Binder
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2">
+                    {hasPrintableAccess && (
                       <Button onClick={handleDownloadBlankPlanner} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
                         Download Blank Planner Form
                       </Button>
+                    )}
+                    {!hasPrintableAccess && (
                       <Button onClick={handleDownloadWorkbook} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
                         Purchase
                       </Button>
-                      <Button onClick={handlePurchaseBinder} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
-                        Purchase Physical Binder
-                      </Button>
-                    </div>
-                  )}
+                    )}
+                    <Button onClick={handlePurchaseBinder} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                      Purchase Physical Binder
+                    </Button>
+                  </div>
                 </div>
               </div>
 
