@@ -134,45 +134,6 @@ const Signup = () => {
     if (memberError) throw memberError;
   };
 
-  const handleGoogleSignup = async () => {
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-          queryParams: { 
-            access_type: 'offline',
-            prompt: 'consent'
-          },
-        },
-      });
-
-      if (error) throw error;
-
-      // The browser will redirect to Google's OAuth page
-      // After authorization, Google redirects back to Supabase
-      // Supabase then redirects to our redirectTo URL
-    } catch (error: any) {
-      let errorMessage = "Could not sign up with Google. Please try again later.";
-      
-      // Handle specific OAuth errors
-      if (error.message?.includes("redirect_uri_mismatch")) {
-        errorMessage = t('auth.googleConfigError');
-        console.error("OAuth redirect_uri_mismatch error. Ensure these URLs are whitelisted in Google Cloud Console:", {
-          supabaseCallback: "https://bhhmizhxxpckibxudbrq.supabase.co/auth/v1/callback",
-          appRedirect: `${window.location.origin}/dashboard`
-        });
-      } else if (error.message?.includes("provider")) {
-        errorMessage = t('auth.googleProviderError');
-      }
-
-      toast({
-        title: t('auth.googleSignUpFailed'),
-        description: errorMessage,
-        variant: "destructive",
-      });
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
@@ -237,25 +198,6 @@ const Signup = () => {
               </Button>
             </div>
           </form>
-
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">{t('auth.orContinueWith')}</span>
-            </div>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={handleGoogleSignup}
-          >
-...
-            {t('auth.continueWithGoogle')}
-          </Button>
 
           <div className="mt-4 text-center text-sm">
             {t('auth.alreadyHaveAccount')}{" "}
