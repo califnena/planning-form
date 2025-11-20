@@ -1,8 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.74.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -63,14 +60,41 @@ const handler = async (req: Request): Promise<Response> => {
       <p>${requestData.additionalNotes || 'Not provided'}</p>
     `;
 
-    const emailResponse = await resend.emails.send({
-      from: "Everlasting Orders <orders@resend.dev>",
-      to: ["efa.denisse@gmail.com", "efa.rickayon@gmail.com"],
-      subject: "New Tribute Song Order",
-      html: emailHtml,
+    // Use Resend HTTP API directly
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    if (!resendApiKey) {
+      console.error("RESEND_API_KEY not set");
+      return new Response(
+        JSON.stringify({ error: "Email service not configured" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    const emailResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Everlasting Orders <orders@resend.dev>",
+        to: ["efa.denisse@gmail.com", "efa.rickayon@gmail.com"],
+        subject: "New Tribute Song Order",
+        html: emailHtml,
+      }),
     });
 
-    console.log("Song order email sent successfully:", emailResponse);
+    if (!emailResponse.ok) {
+      const errorText = await emailResponse.text();
+      console.error("Resend API error:", errorText);
+      throw new Error(`Failed to send email: ${errorText}`);
+    }
+
+    const emailResult = await emailResponse.json();
+    console.log("Song order email sent successfully:", emailResult);
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

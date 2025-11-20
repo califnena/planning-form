@@ -31,20 +31,25 @@ serve(async (req) => {
     const stripe = new Stripe(apiKey, { apiVersion: "2023-10-16" });
 
     const {
-      lookupKey, // Direct lookup key like "EFABASIC"
-      mode = "subscription", // "subscription" | "payment"
+      lookupKey,
+      mode = "subscription",
       successUrl,
       cancelUrl,
       allowPromotionCodes = true,
       trialDays,
     } = await req.json();
 
+    console.log("Stripe checkout request:", { lookupKey, mode, successUrl, cancelUrl });
+
     if (!lookupKey) {
+      console.error("Missing lookupKey in request");
       return new Response(JSON.stringify({ error: "Missing lookupKey" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    console.log(`Searching for price with lookup key: ${lookupKey}`);
 
     // Resolve active price by lookup key
     const prices = await stripe.prices.list({
@@ -54,10 +59,16 @@ serve(async (req) => {
       limit: 1,
     });
 
+    console.log(`Stripe API response for lookup key ${lookupKey}:`, {
+      found: prices.data.length,
+      priceIds: prices.data.map((p: any) => p.id),
+      productNames: prices.data.map((p: any) => (p.product as any)?.name),
+    });
+
     if (!prices.data.length) {
-      console.error("No active price found for lookup key:", lookupKey);
+      console.error(`No active price found for lookup key: ${lookupKey}. Check Stripe Dashboard.`);
       return new Response(JSON.stringify({ 
-        error: "We're having trouble loading this price. Please try again later or contact support." 
+        error: `No active price found for lookup key: ${lookupKey}. Please verify the price is active and has the correct lookup key in Stripe Dashboard.`
       }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -65,18 +76,23 @@ serve(async (req) => {
     }
 
     const priceId = prices.data[0].id;
+    const product = prices.data[0].product as any;
 
-    // 2) Create Checkout Session
+    console.log(`Creating checkout session for price ${priceId} (${product?.name})`);
+
+    // Create Checkout Session
     const session = await stripe.checkout.sessions.create({
       mode: mode === "payment" ? "payment" : "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: successUrl ?? `${req.headers.get("origin") ?? "https://"}/subscription?status=success`,
-      cancel_url: cancelUrl ?? `${req.headers.get("origin") ?? "https://"}/subscription?status=cancel`,
+      success_url: successUrl ?? `${req.headers.get("origin") ?? "https://"}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl ?? `${req.headers.get("origin") ?? "https://"}/dashboard`,
       allow_promotion_codes: allowPromotionCodes === true,
       ...(mode === "subscription" && typeof trialDays === "number"
         ? { subscription_data: { trial_period_days: trialDays } }
         : {}),
     });
+
+    console.log(`Checkout session created: ${session.id}, URL: ${session.url}`);
 
     return new Response(JSON.stringify({ url: session.url }), {
       status: 200,
