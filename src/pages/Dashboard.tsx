@@ -442,18 +442,20 @@ export default function Dashboard() {
       });
 
       if (error) {
-        console.error("Checkout error:", error);
+        console.error("VIP Monthly checkout error:", error);
         toast({
           title: "Checkout failed",
-          description: "Unable to start checkout. Please try again.",
+          description: error.message || "Unable to start checkout. Please try again.",
           variant: "destructive",
         });
         return;
       }
 
       if (data?.url) {
+        console.log("Redirecting to Stripe checkout:", data.url);
         window.location.href = data.url;
       } else {
+        console.error("No checkout URL in response:", data);
         toast({
           title: "Error",
           description: "No checkout URL received. Please try again.",
@@ -486,18 +488,20 @@ export default function Dashboard() {
       });
 
       if (error) {
-        console.error("Checkout error:", error);
+        console.error("VIP Yearly checkout error:", error);
         toast({
           title: "Checkout failed",
-          description: "Unable to start checkout. Please try again.",
+          description: error.message || "Unable to start checkout. Please try again.",
           variant: "destructive",
         });
         return;
       }
 
       if (data?.url) {
+        console.log("Redirecting to Stripe checkout:", data.url);
         window.location.href = data.url;
       } else {
+        console.error("No checkout URL in response:", data);
         toast({
           title: "Error",
           description: "No checkout URL received. Please try again.",
@@ -533,15 +537,17 @@ export default function Dashboard() {
         console.error("Checkout error:", error);
         toast({
           title: "Checkout failed",
-          description: "Unable to start checkout. Please try again.",
+          description: error.message || "Unable to start checkout. Please try again.",
           variant: "destructive",
         });
         return;
       }
 
       if (data?.url) {
+        console.log("Redirecting to Stripe checkout:", data.url);
         window.location.href = data.url;
       } else {
+        console.error("No checkout URL in response:", data);
         toast({
           title: "Error",
           description: "No checkout URL received. Please try again.",

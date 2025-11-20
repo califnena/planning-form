@@ -269,11 +269,8 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
     pdf.setTextColor(...colors.headerNavy);
     pdf.text(sanitizeText(preparedForDisplay), pageWidth / 2, nameYPosition, { align: "center" });
     
-    // Add blank line for date - no text, no line crossing
-    nameYPosition += 15;
-    
-    // Adjust generatedYPosition to be below the name box
-    generatedYPosition = nameYPosition + 20;
+    // Adjust generatedYPosition to be below the name box (removed date line completely)
+    generatedYPosition = nameYPosition + 25;
   }
   
   pdf.setFontSize(10);
