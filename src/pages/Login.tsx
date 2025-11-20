@@ -168,26 +168,30 @@ const Login = () => {
             </div>
           </form>
 
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">{t('auth.or')}</span>
-            </div>
-          </div>
+          {import.meta.env.DEV && (
+            <>
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">{t('auth.or')}</span>
+                </div>
+              </div>
 
-          <div className="space-y-2">
-            <Button
-              type="button"
-              variant="secondary"
-              className="w-full"
-              onClick={handleTestLogin}
-              disabled={loading}
-            >
-              {t('auth.testLogin')}
-            </Button>
-          </div>
+              <div className="space-y-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="w-full"
+                  onClick={handleTestLogin}
+                  disabled={loading}
+                >
+                  {t('auth.testLogin')}
+                </Button>
+              </div>
+            </>
+          )}
 
           <div className="mt-4 text-center text-sm">
             <Link to="/reset-password" className="text-primary hover:underline">
