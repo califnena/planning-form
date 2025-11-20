@@ -295,17 +295,6 @@ export default function Dashboard() {
 
   const handleDownloadWorkbook = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to continue",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const successUrl = `${window.location.origin}/purchase-success?type=printable`;
       const cancelUrl = `${window.location.origin}/dashboard`;
 
@@ -350,17 +339,6 @@ export default function Dashboard() {
 
   const handlePurchaseBinder = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to continue",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const successUrl = `${window.location.origin}/purchase-success?type=binder`;
       const cancelUrl = `${window.location.origin}/dashboard`;
 
@@ -450,17 +428,6 @@ export default function Dashboard() {
 
   const handleVIPMonthly = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Sign in required",
-          description: "Please sign in to continue",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const successUrl = `${window.location.origin}/purchase-success?type=vip-monthly`;
       const cancelUrl = `${window.location.origin}/dashboard`;
       
@@ -505,17 +472,6 @@ export default function Dashboard() {
 
   const handleVIPYearly = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Sign in required",
-          description: "Please sign in to continue",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const successUrl = `${window.location.origin}/purchase-success?type=vip-yearly`;
       const cancelUrl = `${window.location.origin}/dashboard`;
       
@@ -560,17 +516,6 @@ export default function Dashboard() {
 
   const handlePremiumSubscription = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Sign in required",
-          description: "Please sign in to continue",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const successUrl = `${window.location.origin}/purchase-success?type=premium`;
       const cancelUrl = `${window.location.origin}/dashboard`;
       
@@ -615,17 +560,6 @@ export default function Dashboard() {
 
   const handleBookDoItForYou = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to continue",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const successUrl = `${window.location.origin}/purchase-success`;
       const cancelUrl = `${window.location.origin}/dashboard`;
       
