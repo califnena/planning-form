@@ -281,6 +281,7 @@
     "loginFailed": "Error al Iniciar Sesión",
     "invalidCredentials": "Correo o contraseña inválidos. Por favor intenta nuevamente.",
     "planSelected": "Seleccionaste el plan {{plan}}.",
+    "or": "o",
     "testLoginSuccess": "Inicio de Sesión de Prueba Exitoso",
     "testLoginDesc": "Ahora estás conectado con la cuenta de prueba.",
     "testLoginFailed": "Error en Inicio de Sesión de Prueba",
