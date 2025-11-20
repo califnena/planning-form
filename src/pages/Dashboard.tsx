@@ -306,11 +306,6 @@ export default function Dashboard() {
         return;
       }
 
-      toast({
-        title: "Processing...",
-        description: "Redirecting to secure checkout",
-      });
-
       const successUrl = `${window.location.origin}/purchase-success?type=printable`;
       const cancelUrl = `${window.location.origin}/dashboard`;
 
@@ -326,14 +321,22 @@ export default function Dashboard() {
 
       if (error) {
         console.error('Stripe function error:', error);
-        throw error;
+        toast({
+          title: "Checkout failed",
+          description: "Unable to start checkout. Please try again.",
+          variant: "destructive",
+        });
+        return;
       }
       
       if (data?.url) {
-        console.log('Opening Stripe checkout:', data.url);
         window.location.href = data.url;
       } else {
-        throw new Error('No checkout URL received');
+        toast({
+          title: "Error",
+          description: "No checkout URL received. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error: any) {
       console.error("Error starting checkout:", error);
@@ -358,11 +361,6 @@ export default function Dashboard() {
         return;
       }
 
-      toast({
-        title: "Processing...",
-        description: "Redirecting to secure checkout",
-      });
-
       const successUrl = `${window.location.origin}/purchase-success?type=binder`;
       const cancelUrl = `${window.location.origin}/dashboard`;
 
@@ -378,28 +376,22 @@ export default function Dashboard() {
 
       if (error) {
         console.error('Stripe function error:', error);
-        throw error;
+        toast({
+          title: "Checkout failed",
+          description: "Unable to start checkout. Please try again.",
+          variant: "destructive",
+        });
+        return;
       }
       
       if (data?.url) {
-        console.log('Opening Stripe checkout:', data.url);
-        // Open in new window to avoid blank page issues
-        const stripeWindow = window.open(data.url, '_blank');
-        
-        if (!stripeWindow) {
-          // Fallback if popup blocked
-          toast({
-            title: "Pop-up blocked",
-            description: "Please allow pop-ups and try again, or use the link below.",
-            variant: "destructive",
-          });
-          // Try direct navigation as fallback
-          setTimeout(() => {
-            window.location.href = data.url;
-          }, 1000);
-        }
+        window.location.href = data.url;
       } else {
-        throw new Error('No checkout URL received');
+        toast({
+          title: "Error",
+          description: "No checkout URL received. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error: any) {
       console.error("Error starting checkout:", error);
@@ -469,11 +461,6 @@ export default function Dashboard() {
         return;
       }
 
-      toast({
-        title: "Processing...",
-        description: "Redirecting to secure checkout",
-      });
-
       const successUrl = `${window.location.origin}/purchase-success?type=vip-monthly`;
       const cancelUrl = `${window.location.origin}/dashboard`;
       
@@ -490,8 +477,8 @@ export default function Dashboard() {
       if (error) {
         console.error("Checkout error:", error);
         toast({
-          title: "Error",
-          description: "Failed to start checkout process",
+          title: "Checkout failed",
+          description: "Unable to start checkout. Please try again.",
           variant: "destructive",
         });
         return;
@@ -499,6 +486,12 @@ export default function Dashboard() {
 
       if (data?.url) {
         window.location.href = data.url;
+      } else {
+        toast({
+          title: "Error",
+          description: "No checkout URL received. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
@@ -523,11 +516,6 @@ export default function Dashboard() {
         return;
       }
 
-      toast({
-        title: "Processing...",
-        description: "Redirecting to secure checkout",
-      });
-
       const successUrl = `${window.location.origin}/purchase-success?type=vip-yearly`;
       const cancelUrl = `${window.location.origin}/dashboard`;
       
@@ -544,8 +532,8 @@ export default function Dashboard() {
       if (error) {
         console.error("Checkout error:", error);
         toast({
-          title: "Error",
-          description: "Failed to start checkout process",
+          title: "Checkout failed",
+          description: "Unable to start checkout. Please try again.",
           variant: "destructive",
         });
         return;
@@ -553,6 +541,67 @@ export default function Dashboard() {
 
       if (data?.url) {
         window.location.href = data.url;
+      } else {
+        toast({
+          title: "Error",
+          description: "No checkout URL received. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePremiumSubscription = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Sign in required",
+          description: "Please sign in to continue",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const successUrl = `${window.location.origin}/purchase-success?type=premium`;
+      const cancelUrl = `${window.location.origin}/dashboard`;
+      
+      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
+        body: {
+          lookupKey: "EFAPREMIUM",
+          mode: "subscription",
+          successUrl,
+          cancelUrl,
+          allowPromotionCodes: true,
+        },
+      });
+
+      if (error) {
+        console.error("Checkout error:", error);
+        toast({
+          title: "Checkout failed",
+          description: "Unable to start checkout. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        toast({
+          title: "Error",
+          description: "No checkout URL received. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
@@ -592,28 +641,22 @@ export default function Dashboard() {
       
       if (error) {
         console.error('Stripe function error:', error);
-        throw error;
+        toast({
+          title: "Checkout failed",
+          description: "Unable to start checkout. Please try again.",
+          variant: "destructive",
+        });
+        return;
       }
       
       if (data?.url) {
-        console.log('Opening Stripe checkout:', data.url);
-        // Open in new window to avoid blank page issues
-        const stripeWindow = window.open(data.url, '_blank');
-        
-        if (!stripeWindow) {
-          // Fallback if popup blocked
-          toast({
-            title: "Pop-up blocked",
-            description: "Please allow pop-ups and try again, or use the link below.",
-            variant: "destructive",
-          });
-          // Try direct navigation as fallback
-          setTimeout(() => {
-            window.location.href = data.url;
-          }, 1000);
-        }
+        window.location.href = data.url;
       } else {
-        throw new Error('No checkout URL received');
+        toast({
+          title: "Error",
+          description: "No checkout URL received. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error: any) {
       console.error('Checkout error:', error);
@@ -690,8 +733,8 @@ export default function Dashboard() {
                         <p className="text-sm text-amber-900 mb-3">
                           <strong>Upgrade Required:</strong> Subscribe to Premium, VIP, or Do It For You to access the digital planner.
                         </p>
-                        <Button onClick={() => navigate('/pricing')} className="bg-amber-600 hover:bg-amber-700 text-white">
-                          View Plans & Upgrade
+                        <Button onClick={handlePremiumSubscription} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] text-white">
+                          Subscribe to Premium
                         </Button>
                       </div>
                       <div className="flex flex-wrap gap-2">

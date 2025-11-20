@@ -247,6 +247,7 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   
   // Prepared for - PROMINENT DISPLAY (only if name exists)
   let nameYPosition = 85;
+  let generatedYPosition = 110;
   
   if (preparedForDisplay) {
     // Draw a subtle box for emphasis
@@ -267,11 +268,13 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(...colors.headerNavy);
     pdf.text(sanitizeText(preparedForDisplay), pageWidth / 2, nameYPosition, { align: "center" });
+    
+    // Adjust generatedYPosition to be below the name box
+    generatedYPosition = nameYPosition + 20;
   }
   
   pdf.setFontSize(10);
   pdf.setFont("helvetica", "normal");
-  const generatedYPosition = 100;
   pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, pageWidth / 2, generatedYPosition, { align: "center" });
   
   // Add blank space
