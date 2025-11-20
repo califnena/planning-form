@@ -252,7 +252,7 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
   if (preparedForDisplay) {
     // Draw a subtle box for emphasis
     const boxWidth = 140;
-    const boxHeight = 35;
+    const boxHeight = 40;
     pdf.setFillColor(...colors.boxBg);
     pdf.setDrawColor(...colors.subheaderTeal);
     pdf.setLineWidth(1);
@@ -269,12 +269,20 @@ export const generateAfterLifePlanPDF = async (formData: PlanData, decedentName:
     pdf.setTextColor(...colors.headerNavy);
     pdf.text(sanitizeText(preparedForDisplay), pageWidth / 2, nameYPosition, { align: "center" });
     
+    // Add Date: label below the name, inside the box
+    nameYPosition += 10;
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(...colors.bodyGray);
+    pdf.text("Date: ___________________", pageWidth / 2, nameYPosition, { align: "center" });
+    
     // Adjust generatedYPosition to be below the name box
     generatedYPosition = nameYPosition + 20;
   }
   
   pdf.setFontSize(10);
   pdf.setFont("helvetica", "normal");
+  pdf.setTextColor(...colors.bodyGray);
   pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, pageWidth / 2, generatedYPosition, { align: "center" });
   
   // Add blank space
