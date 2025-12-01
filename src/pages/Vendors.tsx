@@ -32,19 +32,18 @@ const Vendors = () => {
         }
 
         console.log('Checking admin status for user:', user.id);
-        const { data: roles, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .eq('role', 'admin');
+        const { data: hasAdminRole, error } = await supabase
+          .rpc('has_app_role', { 
+            _user_id: user.id, 
+            _role: 'admin' 
+          });
 
         if (error) {
           console.error('Error checking admin role:', error);
         }
 
-        const hasAdminRole = roles && roles.length > 0;
         console.log('Admin role check result:', hasAdminRole);
-        setIsAdmin(hasAdminRole);
+        setIsAdmin(hasAdminRole || false);
       } catch (error) {
         console.error('Error in admin check:', error);
         setIsAdmin(false);
