@@ -129,7 +129,7 @@ export default function Dashboard() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return false;
 
-    // Check for admin role (test account with admin role gets full access)
+    // Check for admin role using database role check (bypasses paywall)
     const { data: adminRole } = await supabase
       .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
     
@@ -177,7 +177,7 @@ export default function Dashboard() {
     const { data: adminRole } = await supabase
       .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
     
-    if (adminRole) return false; // Admins have full access
+    if (adminRole) return false; // Admin role grants full access (bypasses free plan)
 
     // Check if they have any paid subscription or purchase
     const hasPaid = await checkPaidAccess();
@@ -188,7 +188,7 @@ export default function Dashboard() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return false;
 
-    // Check for admin role (test account with admin role gets full access)
+    // Check for admin role (admin role in user_roles table bypasses paywall)
     const { data: adminRole } = await supabase
       .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
     
@@ -222,7 +222,7 @@ export default function Dashboard() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return false;
 
-    // Check for admin role (test account with admin role gets full access)
+    // Check for admin role (admin role in user_roles table bypasses paywall)
     const { data: adminRole } = await supabase
       .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
     
