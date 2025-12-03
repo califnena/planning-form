@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.23.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.74.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,6 +21,9 @@ serve(async (req) => {
     }
 
     const apiKey = Deno.env.get("STRIPE_SECRET_KEY");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    
     if (!apiKey) {
       console.error("Missing STRIPE_SECRET_KEY secret");
       return new Response(JSON.stringify({ error: "Stripe not configured" }), {
@@ -29,6 +33,23 @@ serve(async (req) => {
     }
 
     const stripe = new Stripe(apiKey, { apiVersion: "2023-10-16" });
+
+    // Get authenticated user from JWT
+    let userId: string | null = null;
+    let userEmail: string | null = null;
+    
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader && supabaseUrl && supabaseAnonKey) {
+      const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } }
+      });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        userId = user.id;
+        userEmail = user.email || null;
+        console.log("Authenticated user:", userId, userEmail);
+      }
+    }
 
     const {
       lookupKey,
@@ -80,17 +101,24 @@ serve(async (req) => {
 
     console.log(`Creating checkout session for price ${priceId} (${product?.name})`);
 
-    // Create Checkout Session
-    const session = await stripe.checkout.sessions.create({
+    // Create Checkout Session with user metadata
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: mode === "payment" ? "payment" : "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: successUrl ?? `${req.headers.get("origin") ?? "https://"}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl ?? `${req.headers.get("origin") ?? "https://"}/dashboard`,
       allow_promotion_codes: allowPromotionCodes === true,
+      metadata: {
+        user_id: userId || "",
+        lookup_key: lookupKey,
+      },
+      ...(userEmail ? { customer_email: userEmail } : {}),
       ...(mode === "subscription" && typeof trialDays === "number"
         ? { subscription_data: { trial_period_days: trialDays } }
         : {}),
-    });
+    };
+    
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     console.log(`Checkout session created: ${session.id}, URL: ${session.url}`);
 
