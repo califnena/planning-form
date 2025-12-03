@@ -56,8 +56,14 @@ export const ProfileDropdown = () => {
         }
 
         // Check admin status
-        const adminStatus = await checkIsAdmin();
-        setIsAdmin(adminStatus);
+        try {
+          const adminStatus = await checkIsAdmin();
+          console.log('Admin status check result:', adminStatus);
+          setIsAdmin(adminStatus);
+        } catch (error) {
+          console.error('Error checking admin status:', error);
+          setIsAdmin(false);
+        }
       }
     };
 
