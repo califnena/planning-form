@@ -11,6 +11,8 @@ export interface AdminUser {
   plan_status: string | null;
   plan_renews_at: string | null;
   is_owner: boolean;
+  is_blocked: boolean;
+  banned_until: string | null;
 }
 
 export interface UserAdminMeta {
@@ -115,17 +117,30 @@ export async function listUsers(): Promise<AdminUser[]> {
   
   const ownerSet = new Set(owners?.map(o => o.user_id) || []);
 
-  // Get user emails from auth (need to use service role or edge function)
-  // For now, we'll use the profiles table and note that email needs edge function
+  // Get auth user data from edge function for emails and banned status
+  let authUsersMap = new Map<string, { email: string; banned_until: string | null }>();
+  try {
+    const { data: authData, error: authError } = await supabase.functions.invoke('admin-user-management', {
+      body: { action: 'get_users' }
+    });
+    if (!authError && authData?.users) {
+      authUsersMap = new Map(authData.users.map((u: any) => [u.id, { email: u.email, banned_until: u.banned_until }]));
+    }
+  } catch (e) {
+    console.error('Failed to fetch auth users:', e);
+  }
+
   const users: AdminUser[] = [];
 
   for (const profile of profiles || []) {
     const loginStat = loginStatsMap.get(profile.id);
     const sub = subscriptionMap.get(profile.id);
+    const authUser = authUsersMap.get(profile.id);
+    const bannedUntil = authUser?.banned_until || null;
     
     users.push({
       id: profile.id,
-      email: profile.full_name || 'Unknown', // Will be replaced by edge function
+      email: authUser?.email || profile.full_name || 'Unknown',
       created_at: profile.created_at,
       login_count: loginStat?.count || 0,
       last_login_at: loginStat?.lastLogin || null,
@@ -134,6 +149,8 @@ export async function listUsers(): Promise<AdminUser[]> {
       plan_status: sub?.status || null,
       plan_renews_at: sub?.current_period_end || null,
       is_owner: ownerSet.has(profile.id),
+      is_blocked: bannedUntil ? new Date(bannedUntil) > new Date() : false,
+      banned_until: bannedUntil,
     });
   }
 
@@ -376,4 +393,51 @@ export async function logUserLogin(userId: string, ipAddress?: string, userAgent
     // Don't block login if logging fails
     console.error('Failed to log user login:', error);
   }
+}
+
+/**
+ * Block a user (set banned_until to far future)
+ */
+export async function blockUser(userId: string): Promise<void> {
+  const isAdmin = await checkIsAdmin();
+  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
+
+  const { data, error } = await supabase.functions.invoke('admin-user-management', {
+    body: { action: 'block', targetUserId: userId }
+  });
+
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error);
+}
+
+/**
+ * Unblock a user (clear banned_until)
+ */
+export async function unblockUser(userId: string): Promise<void> {
+  const isAdmin = await checkIsAdmin();
+  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
+
+  const { data, error } = await supabase.functions.invoke('admin-user-management', {
+    body: { action: 'unblock', targetUserId: userId }
+  });
+
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error);
+}
+
+/**
+ * Invite a new user by email
+ */
+export async function inviteUser(email: string): Promise<string | undefined> {
+  const isAdmin = await checkIsAdmin();
+  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
+
+  const { data, error } = await supabase.functions.invoke('admin-user-management', {
+    body: { action: 'invite', email }
+  });
+
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error);
+  
+  return data?.userId;
 }
