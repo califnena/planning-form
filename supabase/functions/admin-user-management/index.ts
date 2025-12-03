@@ -13,9 +13,17 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
+
+    if (!supabaseUrl || !supabaseServiceKey || !supabaseAnonKey) {
+      console.error("Missing required environment variables");
+      return new Response(
+        JSON.stringify({ error: "Server configuration error: Missing required environment variables" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Create client with user's auth token to check admin status
     const authHeader = req.headers.get("Authorization");
@@ -111,6 +119,8 @@ serve(async (req) => {
         const { data: inviteData, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email);
         
         if (inviteError) {
+          console.error("Invite error:", inviteError);
+          
           // Handle specific error for existing user
           if (inviteError.code === "email_exists" || inviteError.message?.includes("already been registered")) {
             return new Response(
@@ -118,7 +128,14 @@ serve(async (req) => {
               { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } }
             );
           }
-          throw inviteError;
+          
+          // Return all other errors as 500 with the actual message
+          return new Response(
+            JSON.stringify({ 
+              error: inviteError.message || "Failed to send invitation email. Check Supabase Auth email configuration or SMTP settings." 
+            }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
         }
         result = { success: true, message: "Invitation sent", userId: inviteData.user?.id };
         break;
