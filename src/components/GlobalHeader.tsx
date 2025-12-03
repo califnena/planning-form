@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Home, LogOut, User, CreditCard, Settings as SettingsIcon, RotateCcw, Star, FileText } from "lucide-react";
+import { Home, LogOut, User, CreditCard, Settings as SettingsIcon, RotateCcw, Star, FileText, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TextSizeToggle } from "@/components/TextSizeToggle";
 import { PrivacyModal, PrivacyLink } from "@/components/PrivacyModal";
@@ -9,6 +9,7 @@ import { AccessibilityToggle } from "@/components/AccessibilityToggle";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminStatus } from "@/hooks/useAdminStatus";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,6 +40,7 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
   const { toast } = useToast();
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const { isAdmin } = useAdminStatus();
   
   // Check if we're on the planner page
   const isPlannerPage = location.pathname === '/app';
@@ -184,6 +186,17 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
                     Plan & Billing
                   </Link>
                 </DropdownMenuItem>
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="flex items-center gap-2 cursor-pointer">
+                        <Shield className="h-4 w-4 text-primary" />
+                        <span className="font-medium">Admin Panel</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link to="/vip-coach" className="flex items-center gap-2 cursor-pointer">
