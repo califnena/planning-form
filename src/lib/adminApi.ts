@@ -436,8 +436,17 @@ export async function inviteUser(email: string): Promise<string | undefined> {
     body: { action: 'invite', email }
   });
 
-  if (error) throw error;
-  if (data?.error) throw new Error(data.error);
+  // Handle function errors (including HTTP error responses)
+  if (error) {
+    // Try to extract a meaningful message from the error
+    const errorMessage = error.message || 'Failed to invite user';
+    throw new Error(errorMessage);
+  }
+  
+  // Handle application-level errors returned in data
+  if (data?.error) {
+    throw new Error(data.error);
+  }
   
   return data?.userId;
 }
