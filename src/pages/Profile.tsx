@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Upload, ArrowLeft } from "lucide-react";
+import { Loader2, Upload, ArrowLeft, Shield } from "lucide-react";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { checkIsAdmin } from "@/lib/adminApi";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ export default function Profile() {
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -43,6 +45,11 @@ export default function Profile() {
         setFullName(profile.full_name || "");
         setAvatarUrl(profile.avatar_url || "");
       }
+      
+      // Check admin status
+      const adminStatus = await checkIsAdmin();
+      setIsAdmin(adminStatus);
+      
       setLoading(false);
     };
 
@@ -199,6 +206,19 @@ export default function Profile() {
             {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {t("profile.saveChanges")}
           </Button>
+
+          {isAdmin && (
+            <div className="pt-4 border-t mt-6">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate("/admin")}
+                className="w-full"
+              >
+                <Shield className="mr-2 h-4 w-4" />
+                {t("admin.adminPanel")}
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
