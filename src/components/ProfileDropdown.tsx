@@ -1,4 +1,4 @@
-import { User, LogOut, Settings, CreditCard, Sparkles, Receipt } from "lucide-react";
+import { User, LogOut, Settings, CreditCard, Sparkles, Receipt, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { checkIsAdmin } from "@/lib/adminApi";
 
 export const ProfileDropdown = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ export const ProfileDropdown = () => {
   const [profile, setProfile] = useState<{ full_name?: string; avatar_url?: string } | null>(null);
   const [userEmail, setUserEmail] = useState<string>("");
   const [isVIP, setIsVIP] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -52,6 +54,10 @@ export const ProfileDropdown = () => {
           
           setIsVIP(subscriptionData?.plan_type === "vip_annual" || subscriptionData?.plan_type === "vip_monthly");
         }
+
+        // Check admin status
+        const adminStatus = await checkIsAdmin();
+        setIsAdmin(adminStatus);
       }
     };
 
@@ -99,6 +105,12 @@ export const ProfileDropdown = () => {
           <User className="mr-2 h-4 w-4" />
           <span>Account</span>
         </DropdownMenuItem>
+        {isAdmin && (
+          <DropdownMenuItem onClick={() => navigate("/admin")}>
+            <Shield className="mr-2 h-4 w-4" />
+            <span>Admin Panel</span>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onClick={() => navigate("/plans")}>
           <Receipt className="mr-2 h-4 w-4" />
           <span>Subscription & Billing</span>
