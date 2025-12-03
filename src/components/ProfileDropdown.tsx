@@ -21,29 +21,56 @@ export const ProfileDropdown = () => {
   const [userEmail, setUserEmail] = useState<string>("");
   const [isVIP, setIsVIP] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+    
     const loadProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserEmail(user.email || "");
-        const { data } = await supabase
+      try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+          console.error('Error getting user:', userError);
+          if (isMounted) setIsLoading(false);
+          return;
+        }
+
+        if (isMounted) {
+          setUserEmail(user.email || "");
+        }
+        
+        // Load profile data
+        const { data: profileData } = await supabase
           .from("profiles")
           .select("full_name, avatar_url")
           .eq("id", user.id)
           .single();
         
-        if (data) {
-          setProfile(data);
+        if (profileData && isMounted) {
+          setProfile(profileData);
+        }
+
+        // Check admin status FIRST and log extensively
+        console.log('Checking admin for user:', user.id, user.email);
+        const { data: adminData, error: adminError } = await supabase
+          .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
+        
+        console.log('Admin RPC response - data:', adminData, 'error:', adminError, 'type:', typeof adminData);
+        
+        if (isMounted) {
+          const adminStatus = adminData === true;
+          console.log('Setting isAdmin to:', adminStatus);
+          setIsAdmin(adminStatus);
         }
 
         // Check VIP access via role-based system
         const { data: hasVIPAccess } = await supabase
           .rpc('has_vip_access', { _user_id: user.id });
         
-        if (hasVIPAccess) {
+        if (hasVIPAccess && isMounted) {
           setIsVIP(true);
-        } else {
+        } else if (isMounted) {
           const { data: subscriptionData } = await supabase
             .from("subscriptions")
             .select("plan_type")
@@ -53,18 +80,11 @@ export const ProfileDropdown = () => {
           
           setIsVIP(subscriptionData?.plan_type === "vip_annual" || subscriptionData?.plan_type === "vip_monthly");
         }
-
-        // Check admin status directly via RPC
-        try {
-          const { data: adminData, error: adminError } = await supabase
-            .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
-          
-          console.log('Admin check for user:', user.id, 'Result:', adminData, 'Error:', adminError);
-          setIsAdmin(adminData === true);
-        } catch (error) {
-          console.error('Error checking admin status:', error);
-          setIsAdmin(false);
-        }
+        
+        if (isMounted) setIsLoading(false);
+      } catch (error) {
+        console.error('Error in loadProfile:', error);
+        if (isMounted) setIsLoading(false);
       }
     };
 
@@ -72,12 +92,16 @@ export const ProfileDropdown = () => {
 
     // Listen for auth state changes to re-check admin status
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event);
       if (event === 'SIGNED_IN' && session?.user) {
         loadProfile();
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleSignOut = async () => {
@@ -97,6 +121,9 @@ export const ProfileDropdown = () => {
     return userEmail.charAt(0).toUpperCase();
   };
 
+  // Debug log current state
+  console.log('ProfileDropdown render - isAdmin:', isAdmin, 'isLoading:', isLoading);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -107,6 +134,12 @@ export const ProfileDropdown = () => {
               {getInitials()}
             </AvatarFallback>
           </Avatar>
+          {/* Temporary debug badge - remove after confirming admin works */}
+          {isAdmin && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] px-1 rounded-full">
+              ADM
+            </span>
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
