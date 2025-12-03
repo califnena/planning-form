@@ -1,5 +1,8 @@
 project_id = "bhhmizhxxpckibxudbrq"
 
+[functions.stripe-portal]
+verify_jwt = true
+
 [functions.coach-chat]
 verify_jwt = true
 

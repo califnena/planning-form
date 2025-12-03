@@ -7,17 +7,17 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, stripe-signature",
 };
 
-// Stripe lookup key to roles mapping (mirrors src/lib/stripeRoleMapping.ts)
-const STRIPE_TO_ROLES_MAP: Record<string, string[]> = {
-  'EFABASIC': ['basic', 'printable'],
-  'EFAPREMIUM': ['basic', 'vip', 'printable'],
-  'EFAPREMIUMYEAR': ['basic', 'vip', 'printable'],
-  'EFAVIPYEAR': ['vip', 'printable'],
-  'EFAVIPMONTHLY': ['vip', 'printable'],
-  'EFADOFORU': ['done_for_you', 'basic', 'printable'],
-  'EFABINDER': ['binder'],
-  'STRIPE_STANDARD_SONG_PRICE_ID': ['song_standard'],
-  'STRIPE_PREMIUM_SONG_PRICE_ID': ['song_premium'],
+// Stripe lookup key to roles and plan codes mapping
+const PLAN_DEFINITIONS: Record<string, { planCode: string; roles: string[] }> = {
+  'EFABASIC': { planCode: 'basic', roles: ['basic', 'printable'] },
+  'EFAPREMIUM': { planCode: 'premium', roles: ['basic', 'vip', 'printable'] },
+  'EFAPREMIUMYEAR': { planCode: 'premium', roles: ['basic', 'vip', 'printable'] },
+  'EFAVIPYEAR': { planCode: 'vip_annual', roles: ['vip', 'printable'] },
+  'EFAVIPMONTHLY': { planCode: 'vip_monthly', roles: ['vip', 'printable'] },
+  'EFADOFORU': { planCode: 'done_for_you', roles: ['done_for_you', 'basic', 'printable'] },
+  'EFABINDER': { planCode: 'binder', roles: ['binder'] },
+  'STRIPE_STANDARD_SONG_PRICE_ID': { planCode: 'song_standard', roles: ['song_standard'] },
+  'STRIPE_PREMIUM_SONG_PRICE_ID': { planCode: 'song_premium', roles: ['song_premium'] },
 };
 
 serve(async (req) => {
@@ -47,7 +47,6 @@ serve(async (req) => {
 
     let event: Stripe.Event;
 
-    // Verify webhook signature if secret is configured
     if (webhookSecret && signature) {
       try {
         event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
@@ -59,7 +58,6 @@ serve(async (req) => {
         });
       }
     } else {
-      // For development/testing without webhook secret
       event = JSON.parse(body);
       console.log("WARNING: Processing webhook without signature verification");
     }
@@ -68,228 +66,27 @@ serve(async (req) => {
 
     // Handle checkout.session.completed
     if (event.type === "checkout.session.completed") {
-      const session = event.data.object as Stripe.Checkout.Session;
-      console.log("Checkout session completed:", session.id);
-
-      // Get user_id from metadata or customer email
-      let userId = session.metadata?.user_id;
-
-      if (!userId && session.customer_email) {
-        // Look up user by email
-        const { data: users, error: userError } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("id", (await supabase.auth.admin.listUsers()).data.users.find(
-            (u: any) => u.email === session.customer_email
-          )?.id)
-          .maybeSingle();
-
-        // Alternative: query auth.users through profiles join
-        const { data: authUsers } = await supabase.auth.admin.listUsers();
-        const authUser = authUsers.users.find((u: any) => u.email === session.customer_email);
-        if (authUser) {
-          userId = authUser.id;
-        }
-      }
-
-      if (!userId) {
-        console.error("Could not determine user_id for session:", session.id);
-        return new Response(JSON.stringify({ error: "User not found" }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      console.log("Processing payment for user:", userId);
-
-      // Retrieve line items to get the price lookup keys
-      const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
-        expand: ["data.price"],
-      });
-
-      const rolesToGrant: Set<string> = new Set();
-
-      for (const item of lineItems.data) {
-        const price = item.price as Stripe.Price;
-        const lookupKey = price.lookup_key;
-
-        console.log(`Processing line item: price=${price.id}, lookup_key=${lookupKey}`);
-
-        if (lookupKey && STRIPE_TO_ROLES_MAP[lookupKey]) {
-          const roles = STRIPE_TO_ROLES_MAP[lookupKey];
-          roles.forEach((role) => rolesToGrant.add(role));
-          console.log(`Lookup key ${lookupKey} grants roles:`, roles);
-        } else {
-          console.log(`No role mapping found for lookup_key: ${lookupKey}`);
-        }
-      }
-
-      // Grant roles to user
-      for (const roleName of rolesToGrant) {
-        // Get role_id from app_roles
-        const { data: roleData, error: roleError } = await supabase
-          .from("app_roles")
-          .select("id")
-          .eq("name", roleName)
-          .single();
-
-        if (roleError || !roleData) {
-          console.error(`Role not found: ${roleName}`, roleError);
-          continue;
-        }
-
-        // Upsert into user_roles (idempotent)
-        const { error: upsertError } = await supabase
-          .from("user_roles")
-          .upsert(
-            { user_id: userId, role_id: roleData.id },
-            { onConflict: "user_id,role_id", ignoreDuplicates: true }
-          );
-
-        if (upsertError) {
-          console.error(`Failed to grant role ${roleName} to user ${userId}:`, upsertError);
-        } else {
-          console.log(`Granted role ${roleName} to user ${userId}`);
-        }
-      }
-
-      // Also update purchases table for tracking (existing behavior)
-      if (session.metadata?.lookup_key) {
-        const { error: purchaseError } = await supabase
-          .from("purchases")
-          .upsert({
-            user_id: userId,
-            product_lookup_key: session.metadata.lookup_key,
-            status: "completed",
-            amount: session.amount_total || 0,
-            stripe_payment_intent_id: session.payment_intent as string,
-          }, { onConflict: "user_id,product_lookup_key" });
-
-        if (purchaseError) {
-          console.error("Failed to record purchase:", purchaseError);
-        }
-      }
-
-      // Update subscriptions table if this was a subscription
-      if (session.mode === "subscription" && session.subscription) {
-        const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
-        
-        const planType = determinePlanType(subscription);
-        
-        const { error: subError } = await supabase
-          .from("subscriptions")
-          .upsert({
-            user_id: userId,
-            stripe_subscription_id: subscription.id,
-            stripe_customer_id: subscription.customer as string,
-            status: "active",
-            plan_type: planType,
-            current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-          }, { onConflict: "user_id" });
-
-        if (subError) {
-          console.error("Failed to update subscription:", subError);
-        }
-      }
-
-      console.log("Successfully processed checkout session:", session.id);
+      await handleCheckoutCompleted(stripe, supabase, event.data.object as Stripe.Checkout.Session);
     }
 
     // Handle invoice.paid for recurring subscription payments
     if (event.type === "invoice.paid") {
-      const invoice = event.data.object as Stripe.Invoice;
-      
-      if (invoice.subscription) {
-        const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
-        const customerId = invoice.customer as string;
+      await handleInvoicePaid(stripe, supabase, event.data.object as Stripe.Invoice);
+    }
 
-        // Find user by stripe_customer_id
-        const { data: subData } = await supabase
-          .from("subscriptions")
-          .select("user_id")
-          .eq("stripe_customer_id", customerId)
-          .maybeSingle();
-
-        if (subData?.user_id) {
-          // Refresh roles based on subscription
-          console.log("Refreshing roles for recurring payment, user:", subData.user_id);
-          
-          // Get price lookup key from subscription items
-          for (const item of subscription.items.data) {
-            const lookupKey = item.price.lookup_key;
-            if (lookupKey && STRIPE_TO_ROLES_MAP[lookupKey]) {
-              const roles = STRIPE_TO_ROLES_MAP[lookupKey];
-              for (const roleName of roles) {
-                const { data: roleData } = await supabase
-                  .from("app_roles")
-                  .select("id")
-                  .eq("name", roleName)
-                  .single();
-
-                if (roleData) {
-                  await supabase
-                    .from("user_roles")
-                    .upsert(
-                      { user_id: subData.user_id, role_id: roleData.id },
-                      { onConflict: "user_id,role_id", ignoreDuplicates: true }
-                    );
-                }
-              }
-            }
-          }
-
-          // Update subscription period
-          await supabase
-            .from("subscriptions")
-            .update({
-              status: "active",
-              current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-              current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-            })
-            .eq("user_id", subData.user_id);
-        }
-      }
+    // Handle subscription updates
+    if (event.type === "customer.subscription.updated") {
+      await handleSubscriptionUpdated(stripe, supabase, event.data.object as Stripe.Subscription);
     }
 
     // Handle subscription cancellation
     if (event.type === "customer.subscription.deleted") {
-      const subscription = event.data.object as Stripe.Subscription;
-      
-      const { data: subData } = await supabase
-        .from("subscriptions")
-        .select("user_id")
-        .eq("stripe_subscription_id", subscription.id)
-        .maybeSingle();
+      await handleSubscriptionDeleted(supabase, event.data.object as Stripe.Subscription);
+    }
 
-      if (subData?.user_id) {
-        console.log("Subscription cancelled for user:", subData.user_id);
-
-        // Update subscription status
-        await supabase
-          .from("subscriptions")
-          .update({ status: "canceled" })
-          .eq("user_id", subData.user_id);
-
-        // Optionally remove subscription-based roles
-        // Note: We keep one-time purchase roles (like song_standard, binder)
-        const subscriptionRoles = ['vip', 'basic', 'printable'];
-        for (const roleName of subscriptionRoles) {
-          const { data: roleData } = await supabase
-            .from("app_roles")
-            .select("id")
-            .eq("name", roleName)
-            .single();
-
-          if (roleData) {
-            await supabase
-              .from("user_roles")
-              .delete()
-              .eq("user_id", subData.user_id)
-              .eq("role_id", roleData.id);
-          }
-        }
-      }
+    // Handle payment failures
+    if (event.type === "invoice.payment_failed") {
+      await handlePaymentFailed(supabase, event.data.object as Stripe.Invoice);
     }
 
     return new Response(JSON.stringify({ received: true }), {
@@ -305,16 +102,304 @@ serve(async (req) => {
   }
 });
 
+async function handleCheckoutCompleted(stripe: Stripe, supabase: any, session: Stripe.Checkout.Session) {
+  console.log("Checkout session completed:", session.id);
+
+  // Get user_id from metadata or customer email
+  let userId = session.metadata?.user_id;
+
+  if (!userId && session.customer_email) {
+    const { data: authUsers } = await supabase.auth.admin.listUsers();
+    const authUser = authUsers.users.find((u: any) => u.email === session.customer_email);
+    if (authUser) {
+      userId = authUser.id;
+    }
+  }
+
+  if (!userId) {
+    console.error("Could not determine user_id for session:", session.id);
+    return;
+  }
+
+  console.log("Processing payment for user:", userId);
+
+  // Retrieve line items
+  const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+    expand: ["data.price"],
+  });
+
+  const rolesToGrant: Set<string> = new Set();
+  let primaryLookupKey = session.metadata?.lookup_key || "";
+  let primaryPlanCode = "";
+
+  for (const item of lineItems.data) {
+    const price = item.price as Stripe.Price;
+    const lookupKey = price.lookup_key || "";
+
+    console.log(`Processing line item: price=${price.id}, lookup_key=${lookupKey}`);
+
+    if (lookupKey && PLAN_DEFINITIONS[lookupKey]) {
+      const def = PLAN_DEFINITIONS[lookupKey];
+      def.roles.forEach((role) => rolesToGrant.add(role));
+      if (!primaryPlanCode) primaryPlanCode = def.planCode;
+      if (!primaryLookupKey) primaryLookupKey = lookupKey;
+      console.log(`Lookup key ${lookupKey} grants roles:`, def.roles);
+    }
+  }
+
+  // Grant roles to user
+  await grantRolesToUser(supabase, userId, rolesToGrant);
+
+  // Update subscriptions table if this was a subscription
+  if (session.mode === "subscription" && session.subscription) {
+    const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+    
+    await upsertSubscription(supabase, {
+      userId,
+      stripeCustomerId: subscription.customer as string,
+      stripeSubscriptionId: subscription.id,
+      stripePriceId: subscription.items.data[0]?.price.id || null,
+      stripeProductId: subscription.items.data[0]?.price.product as string || null,
+      planCode: primaryPlanCode || determinePlanType(subscription),
+      status: "active",
+      currentPeriodStart: new Date(subscription.current_period_start * 1000),
+      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    });
+  }
+
+  // Record one-time purchases
+  if (session.mode === "payment" && primaryLookupKey) {
+    await supabase
+      .from("purchases")
+      .upsert({
+        user_id: userId,
+        product_lookup_key: primaryLookupKey,
+        status: "completed",
+        amount: session.amount_total || 0,
+        stripe_payment_intent_id: session.payment_intent as string,
+      }, { onConflict: "user_id,product_lookup_key" });
+  }
+
+  console.log("Successfully processed checkout session:", session.id);
+}
+
+async function handleInvoicePaid(stripe: Stripe, supabase: any, invoice: Stripe.Invoice) {
+  if (!invoice.subscription) return;
+
+  const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+  const customerId = invoice.customer as string;
+
+  const { data: subData } = await supabase
+    .from("subscriptions")
+    .select("user_id")
+    .eq("stripe_customer_id", customerId)
+    .maybeSingle();
+
+  if (!subData?.user_id) {
+    console.log("No user found for customer:", customerId);
+    return;
+  }
+
+  console.log("Refreshing roles for recurring payment, user:", subData.user_id);
+
+  // Refresh roles based on subscription
+  const rolesToGrant: Set<string> = new Set();
+  let planCode = "";
+
+  for (const item of subscription.items.data) {
+    const lookupKey = item.price.lookup_key;
+    if (lookupKey && PLAN_DEFINITIONS[lookupKey]) {
+      const def = PLAN_DEFINITIONS[lookupKey];
+      def.roles.forEach((role) => rolesToGrant.add(role));
+      if (!planCode) planCode = def.planCode;
+    }
+  }
+
+  await grantRolesToUser(supabase, subData.user_id, rolesToGrant);
+
+  // Update subscription period
+  await supabase
+    .from("subscriptions")
+    .update({
+      status: "active",
+      plan_type: planCode || determinePlanType(subscription),
+      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+      cancel_at_period_end: subscription.cancel_at_period_end,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", subData.user_id);
+}
+
+async function handleSubscriptionUpdated(stripe: Stripe, supabase: any, subscription: Stripe.Subscription) {
+  console.log("Subscription updated:", subscription.id);
+
+  const { data: subData } = await supabase
+    .from("subscriptions")
+    .select("user_id")
+    .eq("stripe_subscription_id", subscription.id)
+    .maybeSingle();
+
+  if (!subData?.user_id) {
+    console.log("No user found for subscription:", subscription.id);
+    return;
+  }
+
+  const planCode = determinePlanType(subscription);
+
+  await supabase
+    .from("subscriptions")
+    .update({
+      status: subscription.status,
+      plan_type: planCode,
+      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+      cancel_at_period_end: subscription.cancel_at_period_end,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", subData.user_id);
+
+  // If subscription is past_due but not canceled, keep roles for now
+  // Only revoke on full cancellation
+}
+
+async function handleSubscriptionDeleted(supabase: any, subscription: Stripe.Subscription) {
+  console.log("Subscription deleted:", subscription.id);
+
+  const { data: subData } = await supabase
+    .from("subscriptions")
+    .select("user_id")
+    .eq("stripe_subscription_id", subscription.id)
+    .maybeSingle();
+
+  if (!subData?.user_id) {
+    console.log("No user found for subscription:", subscription.id);
+    return;
+  }
+
+  // Update subscription status
+  await supabase
+    .from("subscriptions")
+    .update({ 
+      status: "canceled",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", subData.user_id);
+
+  // Revoke subscription-based roles (keep one-time purchase roles)
+  const subscriptionRoles = ['vip', 'basic', 'printable'];
+  for (const roleName of subscriptionRoles) {
+    const { data: roleData } = await supabase
+      .from("app_roles")
+      .select("id")
+      .eq("name", roleName)
+      .single();
+
+    if (roleData) {
+      await supabase
+        .from("user_roles")
+        .delete()
+        .eq("user_id", subData.user_id)
+        .eq("role_id", roleData.id);
+    }
+  }
+
+  console.log("Revoked subscription roles for user:", subData.user_id);
+}
+
+async function handlePaymentFailed(supabase: any, invoice: Stripe.Invoice) {
+  if (!invoice.subscription) return;
+
+  console.log("Payment failed for subscription:", invoice.subscription);
+
+  const { data: subData } = await supabase
+    .from("subscriptions")
+    .select("user_id")
+    .eq("stripe_subscription_id", invoice.subscription)
+    .maybeSingle();
+
+  if (subData?.user_id) {
+    await supabase
+      .from("subscriptions")
+      .update({ 
+        status: "past_due",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("user_id", subData.user_id);
+  }
+}
+
+async function grantRolesToUser(supabase: any, userId: string, roles: Set<string>) {
+  for (const roleName of roles) {
+    const { data: roleData, error: roleError } = await supabase
+      .from("app_roles")
+      .select("id")
+      .eq("name", roleName)
+      .single();
+
+    if (roleError || !roleData) {
+      console.error(`Role not found: ${roleName}`, roleError);
+      continue;
+    }
+
+    const { error: upsertError } = await supabase
+      .from("user_roles")
+      .upsert(
+        { user_id: userId, role_id: roleData.id },
+        { onConflict: "user_id,role_id", ignoreDuplicates: true }
+      );
+
+    if (upsertError) {
+      console.error(`Failed to grant role ${roleName} to user ${userId}:`, upsertError);
+    } else {
+      console.log(`Granted role ${roleName} to user ${userId}`);
+    }
+  }
+}
+
+async function upsertSubscription(supabase: any, data: {
+  userId: string;
+  stripeCustomerId: string;
+  stripeSubscriptionId: string;
+  stripePriceId: string | null;
+  stripeProductId: string | null;
+  planCode: string;
+  status: string;
+  currentPeriodStart: Date;
+  currentPeriodEnd: Date;
+  cancelAtPeriodEnd: boolean;
+}) {
+  const { error } = await supabase
+    .from("subscriptions")
+    .upsert({
+      user_id: data.userId,
+      stripe_customer_id: data.stripeCustomerId,
+      stripe_subscription_id: data.stripeSubscriptionId,
+      stripe_price_id: data.stripePriceId,
+      stripe_product_id: data.stripeProductId,
+      plan_type: data.planCode,
+      status: data.status,
+      current_period_start: data.currentPeriodStart.toISOString(),
+      current_period_end: data.currentPeriodEnd.toISOString(),
+      cancel_at_period_end: data.cancelAtPeriodEnd,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "user_id" });
+
+  if (error) {
+    console.error("Failed to upsert subscription:", error);
+  }
+}
+
 function determinePlanType(subscription: Stripe.Subscription): string {
   const item = subscription.items.data[0];
   if (!item) return "free";
 
   const lookupKey = item.price.lookup_key;
   
-  if (lookupKey === "EFAVIPYEAR") return "vip_annual";
-  if (lookupKey === "EFAVIPMONTHLY") return "vip_monthly";
-  if (lookupKey === "EFAPREMIUMYEAR" || lookupKey === "EFAPREMIUM") return "premium";
-  if (lookupKey === "EFABASIC") return "basic";
+  if (lookupKey && PLAN_DEFINITIONS[lookupKey]) {
+    return PLAN_DEFINITIONS[lookupKey].planCode;
+  }
   
   return "free";
 }
