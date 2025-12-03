@@ -110,7 +110,16 @@ serve(async (req) => {
 
         const { data: inviteData, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email);
         
-        if (inviteError) throw inviteError;
+        if (inviteError) {
+          // Handle specific error for existing user
+          if (inviteError.code === "email_exists" || inviteError.message?.includes("already been registered")) {
+            return new Response(
+              JSON.stringify({ error: "A user with this email address already exists" }),
+              { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          throw inviteError;
+        }
         result = { success: true, message: "Invitation sent", userId: inviteData.user?.id };
         break;
 
