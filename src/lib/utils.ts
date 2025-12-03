@@ -28,8 +28,8 @@ export function isTestModeEnabled(): boolean {
       localStorage.removeItem("test-mode");
     }
     const enabled = localStorage.getItem("test-mode") === "1";
-    // Only allow in dev/preview environments
-    return import.meta.env.DEV ? enabled : enabled;
+    // Only allow in dev/preview environments - NEVER in production
+    return import.meta.env.DEV && enabled;
   } catch {
     return false;
   }
