@@ -26,3 +26,12 @@ verify_jwt = true
 
 [functions.send-song-order-email]
 verify_jwt = true
+
+[functions.get-stripe-product]
+verify_jwt = false
+
+[functions.seed-assistant-data]
+verify_jwt = true
+
+[functions.stripe-webhook]
+verify_jwt = false

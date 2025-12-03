@@ -23,6 +23,12 @@ import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
 import { generatePlanPDF } from "@/lib/pdfGenerator";
 import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator";
 import { generateBlankAfterLifePlanPDF } from "@/lib/blankAfterLifePlanPdfGenerator";
+import { 
+  checkPaidAccess as checkPaidAccessFn, 
+  checkVIPAccess as checkVIPAccessFn, 
+  checkPrintableAccess as checkPrintableAccessFn,
+  checkIsFreePlan as checkIsFreePlanFn
+} from "@/lib/accessChecks";
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -125,120 +131,11 @@ export default function Dashboard() {
     loadUserData();
   }, []);
 
-  const checkPaidAccess = async (): Promise<boolean> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return false;
-
-    // Check for admin role using database role check (bypasses paywall)
-    const { data: adminRole } = await supabase
-      .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
-    
-    if (adminRole) return true;
-
-    // Check for required Stripe subscription lookup keys
-    const requiredLookupKeys = ['EFAPREMIUM', 'EFAVIPMONTHLY', 'EFAVIPYEAR', 'EFADOFORU'];
-    
-    // Check purchases table for completed purchases with required lookup keys
-    const { data: purchases } = await supabase
-      .from('purchases')
-      .select('product_lookup_key, status')
-      .eq('user_id', user.id)
-      .eq('status', 'completed')
-      .in('product_lookup_key', requiredLookupKeys);
-
-    if (purchases && purchases.length > 0) {
-      return true;
-    }
-
-    // Check subscriptions table for active subscriptions
-    // Note: We're checking if they have any active subscription since subscription 
-    // management happens through Stripe and we trust the active status
-    const { data: subscription } = await supabase
-      .from("subscriptions")
-      .select("status, plan_type")
-      .eq("user_id", user.id)
-      .eq("status", "active")
-      .maybeSingle();
-
-    // Only grant access if they have an active subscription that matches our plans
-    if (subscription) {
-      const validPlans = ['premium', 'vip_annual', 'vip_monthly'];
-      return validPlans.includes(subscription.plan_type);
-    }
-
-    return false;
-  };
-
-  const checkIsFreePlan = async (): Promise<boolean> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return true; // Not logged in = free tier
-
-    // Check for admin role
-    const { data: adminRole } = await supabase
-      .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
-    
-    if (adminRole) return false; // Admin role grants full access (bypasses free plan)
-
-    // Check if they have any paid subscription or purchase
-    const hasPaid = await checkPaidAccess();
-    return !hasPaid; // If no paid access, they're on free plan
-  };
-
-  const checkVIPAccess = async (): Promise<boolean> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return false;
-
-    // Check for admin role (admin role in user_roles table bypasses paywall)
-    const { data: adminRole } = await supabase
-      .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
-    
-    if (adminRole) return true;
-
-    // Check purchases table for VIP subscriptions
-    const { data: vipPurchases } = await supabase
-      .from('purchases')
-      .select('product_lookup_key, status')
-      .eq('user_id', user.id)
-      .in('product_lookup_key', ['EFAVIPMONTHLY', 'EFAVIPYEAR'])
-      .eq('status', 'completed');
-
-    if (vipPurchases && vipPurchases.length > 0) {
-      return true;
-    }
-
-    // Check subscriptions table for VIP plans
-    const { data: subscription } = await supabase
-      .from("subscriptions")
-      .select("status, plan_type")
-      .eq("user_id", user.id)
-      .eq("status", "active")
-      .in("plan_type", ['vip_annual', 'vip_monthly'])
-      .maybeSingle();
-
-    return !!subscription;
-  };
-
-  const checkPrintableAccess = async (): Promise<boolean> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return false;
-
-    // Check for admin role (admin role in user_roles table bypasses paywall)
-    const { data: adminRole } = await supabase
-      .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
-    
-    if (adminRole) return true;
-
-    // Check if user has purchased EFABASIC (printable workbook)
-    const { data: purchase } = await supabase
-      .from('purchases')
-      .select('product_lookup_key, status')
-      .eq('user_id', user.id)
-      .eq('product_lookup_key', 'EFABASIC')
-      .eq('status', 'completed')
-      .maybeSingle();
-
-    return !!purchase;
-  };
+  // Use imported access check functions (single source of truth)
+  const checkPaidAccess = checkPaidAccessFn;
+  const checkIsFreePlan = checkIsFreePlanFn;
+  const checkVIPAccess = checkVIPAccessFn;
+  const checkPrintableAccess = checkPrintableAccessFn;
 
   const handleContinuePlanner = async () => {
     const { data: { user } } = await supabase.auth.getUser();
