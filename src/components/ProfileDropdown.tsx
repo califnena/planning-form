@@ -1,4 +1,4 @@
-import { User, LogOut, Settings, CreditCard, Sparkles, Receipt, Shield } from "lucide-react";
+import { User, LogOut, Sparkles, Receipt, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -12,16 +12,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { useAdminStatus } from "@/hooks/useAdminStatus";
 
 export const ProfileDropdown = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [profile, setProfile] = useState<{ full_name?: string; avatar_url?: string } | null>(null);
   const [userEmail, setUserEmail] = useState<string>("");
   const [isVIP, setIsVIP] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  
+  // Use the dedicated admin status hook
+  const { isAdmin } = useAdminStatus();
 
   useEffect(() => {
     let isMounted = true;
@@ -31,8 +31,6 @@ export const ProfileDropdown = () => {
         const { data: { user }, error: userError } = await supabase.auth.getUser();
         
         if (userError || !user) {
-          console.error('Error getting user:', userError);
-          if (isMounted) setIsLoading(false);
           return;
         }
 
@@ -51,19 +49,6 @@ export const ProfileDropdown = () => {
           setProfile(profileData);
         }
 
-        // Check admin status FIRST and log extensively
-        console.log('Checking admin for user:', user.id, user.email);
-        const { data: adminData, error: adminError } = await supabase
-          .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
-        
-        console.log('Admin RPC response - data:', adminData, 'error:', adminError, 'type:', typeof adminData);
-        
-        if (isMounted) {
-          const adminStatus = adminData === true;
-          console.log('Setting isAdmin to:', adminStatus);
-          setIsAdmin(adminStatus);
-        }
-
         // Check VIP access via role-based system
         const { data: hasVIPAccess } = await supabase
           .rpc('has_vip_access', { _user_id: user.id });
@@ -80,19 +65,15 @@ export const ProfileDropdown = () => {
           
           setIsVIP(subscriptionData?.plan_type === "vip_annual" || subscriptionData?.plan_type === "vip_monthly");
         }
-        
-        if (isMounted) setIsLoading(false);
       } catch (error) {
         console.error('Error in loadProfile:', error);
-        if (isMounted) setIsLoading(false);
       }
     };
 
     loadProfile();
 
-    // Listen for auth state changes to re-check admin status
+    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state changed:', event);
       if (event === 'SIGNED_IN' && session?.user) {
         loadProfile();
       }
@@ -121,9 +102,6 @@ export const ProfileDropdown = () => {
     return userEmail.charAt(0).toUpperCase();
   };
 
-  // Debug log current state
-  console.log('ProfileDropdown render - isAdmin:', isAdmin, 'isLoading:', isLoading);
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -134,12 +112,6 @@ export const ProfileDropdown = () => {
               {getInitials()}
             </AvatarFallback>
           </Avatar>
-          {/* Temporary debug badge - remove after confirming admin works */}
-          {isAdmin && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] px-1 rounded-full">
-              ADM
-            </span>
-          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
