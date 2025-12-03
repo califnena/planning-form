@@ -1026,7 +1026,21 @@
       "roleRemoved": "Removed role: {{role}}",
       "cannotRemoveOwnerAdmin": "Cannot Remove Admin",
       "ownerAdminProtected": "The owner account's admin role cannot be removed.",
-      "ownerProtected": "Owner - protected"
+      "ownerProtected": "Owner - protected",
+      "accountStatus": "Account Status",
+      "blocked": "Blocked",
+      "blockUser": "Block User",
+      "unblockUser": "Unblock User",
+      "userBlocked": "User blocked",
+      "userUnblocked": "User unblocked",
+      "cannotBlockOwner": "Cannot Block Owner",
+      "ownerCannotBeBlocked": "The owner account cannot be blocked or modified.",
+      "inviteUser": "Invite User",
+      "inviteUserDescription": "Send an invitation email to a new user.",
+      "emailPlaceholder": "user@example.com",
+      "sendInvite": "Send Invite",
+      "inviteSent": "Invitation Sent",
+      "inviteSentDescription": "An invitation has been sent to {{email}}."
     },
     "roles": {
       "title": "Roles",

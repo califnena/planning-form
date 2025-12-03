@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Search, User, Crown } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Loader2, Search, User, Crown, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { listUsers, AdminUser } from "@/lib/adminApi";
+import { listUsers, AdminUser, inviteUser } from "@/lib/adminApi";
 import { UserDetailDrawer } from "./UserDetailDrawer";
 import { format } from "date-fns";
 
@@ -23,6 +25,9 @@ export function AdminUsersTab() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviting, setInviting] = useState(false);
 
   const loadUsers = async () => {
     setLoading(true);
@@ -80,6 +85,29 @@ export function AdminUsersTab() {
     setDrawerOpen(true);
   };
 
+  const handleInviteUser = async () => {
+    if (!inviteEmail.trim()) return;
+    setInviting(true);
+    try {
+      await inviteUser(inviteEmail.trim());
+      toast({
+        title: t("admin.users.inviteSent"),
+        description: t("admin.users.inviteSentDescription", { email: inviteEmail }),
+      });
+      setInviteEmail("");
+      setInviteDialogOpen(false);
+      loadUsers();
+    } catch (error: any) {
+      toast({
+        title: t("admin.error"),
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setInviting(false);
+    }
+  };
+
   if (loading) {
     return (
       <Card>
@@ -94,10 +122,47 @@ export function AdminUsersTab() {
     <>
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            {t("admin.users.title")} ({filteredUsers.length})
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              {t("admin.users.title")} ({filteredUsers.length})
+            </CardTitle>
+            <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  {t("admin.users.inviteUser")}
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{t("admin.users.inviteUser")}</DialogTitle>
+                  <DialogDescription>{t("admin.users.inviteUserDescription")}</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="inviteEmail">{t("admin.users.email")}</Label>
+                    <Input
+                      id="inviteEmail"
+                      type="email"
+                      value={inviteEmail}
+                      onChange={(e) => setInviteEmail(e.target.value)}
+                      placeholder={t("admin.users.emailPlaceholder")}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setInviteDialogOpen(false)}>
+                    {t("common.cancel")}
+                  </Button>
+                  <Button onClick={handleInviteUser} disabled={inviting || !inviteEmail.trim()}>
+                    {inviting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t("admin.users.sendInvite")}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </CardHeader>
         <CardContent>
           {/* Filters */}
@@ -142,73 +207,79 @@ export function AdminUsersTab() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t("admin.users.email")}</TableHead>
-                  <TableHead>{t("admin.users.created")}</TableHead>
-                  <TableHead>{t("admin.users.logins")}</TableHead>
-                  <TableHead>{t("admin.users.lastLogin")}</TableHead>
-                  <TableHead>{t("admin.users.roles")}</TableHead>
-                  <TableHead>{t("admin.users.plan")}</TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUsers.map((user) => (
-                  <TableRow key={user.id} className="cursor-pointer hover:bg-muted/50">
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {user.is_owner && <Crown className="h-4 w-4 text-yellow-500" />}
-                        <span className="font-medium">{user.email}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {format(new Date(user.created_at), "MMM d, yyyy")}
-                    </TableCell>
-                    <TableCell>{user.login_count}</TableCell>
-                    <TableCell>
-                      {user.last_login_at 
-                        ? format(new Date(user.last_login_at), "MMM d, yyyy HH:mm")
-                        : "-"
-                      }
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {user.roles.length > 0 ? (
-                          user.roles.map((role) => (
-                            <Badge key={role} variant={role === "admin" ? "destructive" : "secondary"}>
-                              {role}
-                            </Badge>
-                          ))
+                    <TableHead>{t("admin.users.email")}</TableHead>
+                    <TableHead>{t("admin.users.created")}</TableHead>
+                    <TableHead>{t("admin.users.status")}</TableHead>
+                    <TableHead>{t("admin.users.logins")}</TableHead>
+                    <TableHead>{t("admin.users.lastLogin")}</TableHead>
+                    <TableHead>{t("admin.users.roles")}</TableHead>
+                    <TableHead>{t("admin.users.plan")}</TableHead>
+                    <TableHead></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredUsers.map((user) => (
+                    <TableRow key={user.id} className="cursor-pointer hover:bg-muted/50">
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {user.is_owner && <Crown className="h-4 w-4 text-yellow-500" />}
+                          <span className="font-medium">{user.email}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {format(new Date(user.created_at), "MMM d, yyyy")}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={user.is_blocked ? "destructive" : "default"}>
+                          {user.is_blocked ? t("admin.users.blocked") : t("admin.users.active")}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{user.login_count}</TableCell>
+                      <TableCell>
+                        {user.last_login_at 
+                          ? format(new Date(user.last_login_at), "MMM d, yyyy HH:mm")
+                          : "-"
+                        }
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {user.roles.length > 0 ? (
+                            user.roles.map((role) => (
+                              <Badge key={role} variant={role === "admin" ? "destructive" : "secondary"}>
+                                {role}
+                              </Badge>
+                            ))
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {user.active_plan ? (
+                          <Badge variant="default">{user.active_plan}</Badge>
                         ) : (
-                          <span className="text-muted-foreground">-</span>
+                          <span className="text-muted-foreground">Free</span>
                         )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {user.active_plan ? (
-                        <Badge variant="default">{user.active_plan}</Badge>
-                      ) : (
-                        <span className="text-muted-foreground">Free</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleUserClick(user)}
-                      >
-                        {t("admin.users.view")}
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {filteredUsers.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                      {t("admin.users.noUsers")}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
+                      </TableCell>
+                      <TableCell>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleUserClick(user)}
+                        >
+                          {t("admin.users.view")}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {filteredUsers.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                        {t("admin.users.noUsers")}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
             </Table>
           </div>
         </CardContent>

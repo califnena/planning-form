@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Mail, Calendar, Crown, Shield, CreditCard, MessageSquare } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, Mail, Calendar, Crown, Shield, CreditCard, MessageSquare, Ban, CheckCircle, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { 
@@ -20,7 +21,9 @@ import {
   addUserRole, 
   removeUserRole,
   listRoles,
-  AppRole
+  AppRole,
+  blockUser,
+  unblockUser
 } from "@/lib/adminApi";
 
 interface UserDetailDrawerProps {
@@ -40,10 +43,12 @@ export function UserDetailDrawer({ user, open, onOpenChange, onUserUpdated }: Us
   const [adminMeta, setAdminMeta] = useState<UserAdminMeta | null>(null);
   const [notes, setNotes] = useState("");
   const [tags, setTags] = useState("");
+  const [isBlocked, setIsBlocked] = useState(false);
 
   useEffect(() => {
     if (user && open) {
       loadUserDetails();
+      setIsBlocked(user.is_blocked);
     }
   }, [user, open]);
 
@@ -155,6 +160,42 @@ export function UserDetailDrawer({ user, open, onOpenChange, onUserUpdated }: Us
     }
   };
 
+  const handleBlockToggle = async () => {
+    if (!user) return;
+    
+    // Prevent blocking owner
+    if (user.is_owner) {
+      toast({
+        title: t("admin.users.cannotBlockOwner"),
+        description: t("admin.users.ownerProtected"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      if (isBlocked) {
+        await unblockUser(user.id);
+        setIsBlocked(false);
+        toast({ title: t("admin.users.userUnblocked") });
+      } else {
+        await blockUser(user.id);
+        setIsBlocked(true);
+        toast({ title: t("admin.users.userBlocked") });
+      }
+      onUserUpdated();
+    } catch (error: any) {
+      toast({
+        title: t("admin.error"),
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -248,6 +289,55 @@ export function UserDetailDrawer({ user, open, onOpenChange, onUserUpdated }: Us
                     </div>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Account Status */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  {isBlocked ? <Ban className="h-4 w-4 text-destructive" /> : <CheckCircle className="h-4 w-4 text-green-500" />}
+                  {t("admin.users.accountStatus")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Badge variant={isBlocked ? "destructive" : "default"}>
+                      {isBlocked ? t("admin.users.blocked") : t("admin.users.active")}
+                    </Badge>
+                  </div>
+                </div>
+                
+                {user.is_owner ? (
+                  <Alert>
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                      {t("admin.users.ownerCannotBeBlocked")}
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <Button
+                    variant={isBlocked ? "default" : "destructive"}
+                    size="sm"
+                    onClick={handleBlockToggle}
+                    disabled={saving}
+                    className="w-full"
+                  >
+                    {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isBlocked ? (
+                      <>
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        {t("admin.users.unblockUser")}
+                      </>
+                    ) : (
+                      <>
+                        <Ban className="mr-2 h-4 w-4" />
+                        {t("admin.users.blockUser")}
+                      </>
+                    )}
+                  </Button>
+                )}
               </CardContent>
             </Card>
 
