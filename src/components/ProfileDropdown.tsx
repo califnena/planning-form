@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { checkIsAdmin } from "@/lib/adminApi";
 
 export const ProfileDropdown = () => {
   const navigate = useNavigate();
@@ -55,11 +54,13 @@ export const ProfileDropdown = () => {
           setIsVIP(subscriptionData?.plan_type === "vip_annual" || subscriptionData?.plan_type === "vip_monthly");
         }
 
-        // Check admin status
+        // Check admin status directly via RPC
         try {
-          const adminStatus = await checkIsAdmin();
-          console.log('Admin status check result:', adminStatus);
-          setIsAdmin(adminStatus);
+          const { data: adminData, error: adminError } = await supabase
+            .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
+          
+          console.log('Admin check for user:', user.id, 'Result:', adminData, 'Error:', adminError);
+          setIsAdmin(adminData === true);
         } catch (error) {
           console.error('Error checking admin status:', error);
           setIsAdmin(false);
@@ -68,6 +69,15 @@ export const ProfileDropdown = () => {
     };
 
     loadProfile();
+
+    // Listen for auth state changes to re-check admin status
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        loadProfile();
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleSignOut = async () => {
