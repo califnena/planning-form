@@ -14,6 +14,21 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_owner: {
+        Row: {
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       app_roles: {
         Row: {
           created_at: string
@@ -1821,6 +1836,57 @@ export type Database = {
           },
         ]
       }
+      user_admin_meta: {
+        Row: {
+          created_at: string
+          last_contacted_at: string | null
+          notes: string | null
+          tags: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          last_contacted_at?: string | null
+          notes?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          last_contacted_at?: string | null
+          notes?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_logins: {
+        Row: {
+          id: string
+          ip_address: string | null
+          logged_in_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          ip_address?: string | null
+          logged_in_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          ip_address?: string | null
+          logged_in_at?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -2060,6 +2126,14 @@ export type Database = {
           },
         ]
       }
+      user_login_stats: {
+        Row: {
+          last_login_at: string | null
+          login_count: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_user_subscription: {
@@ -2075,6 +2149,7 @@ export type Database = {
         Returns: boolean
       }
       has_vip_access: { Args: { _user_id: string }; Returns: boolean }
+      is_app_owner: { Args: { _user_id: string }; Returns: boolean }
       is_case_owner: {
         Args: { _case_id: string; _user_id: string }
         Returns: boolean

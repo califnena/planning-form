@@ -457,5 +457,47 @@
     "guideTitle": "Pre-Planificación de Tu Funeral: Un Regalo de Paz y Claridad",
     "guideDescription": "Una guía completa para ayudarte a entender tus opciones y tomar decisiones informadas sobre planificación funeraria.",
     "viewGuide": "Ver Guía"
+  },
+  "admin": {
+    "adminPanel": "Panel de Administración",
+    "title": "Panel de Administración",
+    "description": "Administra usuarios, roles y facturación desde este panel.",
+    "backToProfile": "Volver al Perfil",
+    "accessDenied": "Acceso Denegado",
+    "accessDeniedDescription": "No tienes permiso para acceder al panel de administración.",
+    "error": "Error",
+    "tabs": { "users": "Usuarios", "roles": "Roles", "billing": "Facturación" },
+    "users": {
+      "title": "Usuarios", "searchPlaceholder": "Buscar por email o ID...", "view": "Ver",
+      "email": "Email", "created": "Creado", "logins": "Inicios", "lastLogin": "Último acceso",
+      "roles": "Roles", "plan": "Plan", "noUsers": "No se encontraron usuarios",
+      "userDetails": "Detalles del Usuario", "basicInfo": "Información Básica",
+      "sendEmail": "Enviar Email", "billing": "Facturación", "currentPlan": "Plan Actual",
+      "status": "Estado", "renewsAt": "Renueva el", "adminNotes": "Notas Admin",
+      "tags": "Etiquetas", "notes": "Notas", "saveNotes": "Guardar Notas",
+      "filterByRole": "Filtrar por rol", "filterByStatus": "Filtrar por estado",
+      "allRoles": "Todos los roles", "allStatuses": "Todos los estados",
+      "active": "Activo", "canceled": "Cancelado", "noSubscription": "Sin suscripción",
+      "userId": "ID Usuario", "lastContacted": "Último contacto", "never": "Nunca",
+      "setToday": "Marcar hoy", "notesSaved": "Notas guardadas", "contactedUpdated": "Fecha actualizada",
+      "roleUpdated": "Rol actualizado", "roleAdded": "Rol añadido: {{role}}", "roleRemoved": "Rol eliminado: {{role}}",
+      "cannotRemoveOwnerAdmin": "No se puede eliminar Admin", "ownerAdminProtected": "El rol admin del propietario no puede ser eliminado.",
+      "ownerProtected": "Propietario - protegido", "tagsPlaceholder": "VIP, Alta prioridad", "notesPlaceholder": "Añadir notas internas..."
+    },
+    "roles": {
+      "title": "Roles", "description": "Administrar roles y permisos.", "addRole": "Añadir Rol",
+      "createRole": "Crear Nuevo Rol", "name": "Nombre", "descriptionLabel": "Descripción",
+      "create": "Crear", "created": "Creado", "protected": "Protegido", "builtIn": "Integrado",
+      "editRole": "Editar Rol", "roleCreated": "Rol Creado", "roleUpdated": "Rol Actualizado",
+      "roleDeleted": "Rol Eliminado", "cannotDelete": "No se puede eliminar", "protectedRole": "Este rol no puede ser eliminado.",
+      "createRoleDescription": "Añadir un nuevo rol.", "editRoleDescription": "Editar descripción de {{name}}",
+      "roleCreatedDescription": "Rol creado: {{name}}", "namePlaceholder": "ej: moderador", "descriptionPlaceholder": "Para qué se usa..."
+    },
+    "billing": {
+      "totalSubscriptions": "Total Suscripciones", "active": "Activas", "canceled": "Canceladas", "pastDue": "Vencidas",
+      "byPlan": "Por Plan", "byPlanDescription": "Desglose por tipo de plan.", "noSubscriptions": "Sin suscripciones",
+      "allSubscriptions": "Todas las Suscripciones", "allSubscriptionsDescription": "Ver todas las suscripciones.",
+      "user": "Usuario", "plan": "Plan", "status": "Estado", "periodEnd": "Fin Período", "cancelAtEnd": "Cancela al Final"
+    }
   }
 }

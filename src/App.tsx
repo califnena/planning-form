@@ -44,6 +44,8 @@ import SongInfo from "./pages/SongInfo";
 import PrePlanningGuide from "./pages/PrePlanningGuide";
 import SongConfirmation from "./pages/SongConfirmation";
 import PurchaseSuccess from "./pages/PurchaseSuccess";
+import AdminPanel from "./pages/AdminPanel";
+import Billing from "./pages/Billing";
 
 
 const queryClient = new QueryClient();
@@ -80,6 +82,8 @@ const App = () => (
                     <Route path="/song-info" element={<SongInfo />} />
                     <Route path="/song-confirmation" element={<SongConfirmation />} />
                     <Route path="/purchase-success" element={<PurchaseSuccess />} />
+                    <Route path="/admin" element={<AdminPanel />} />
+                    <Route path="/billing" element={<Billing />} />
                     <Route path="/vip-coach" element={<CoachAssistant />} />
                     <Route path="/after-death-planner" element={<NextSteps />} />
                     <Route path="/next-steps" element={<NextSteps />} />
