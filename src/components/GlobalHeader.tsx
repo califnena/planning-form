@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Home, LogOut, User, CreditCard, Settings as SettingsIcon, RotateCcw, Star, FileText, Shield } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { TextSizeToggle } from "@/components/TextSizeToggle";
 import { PrivacyModal, PrivacyLink } from "@/components/PrivacyModal";
@@ -35,6 +36,7 @@ interface GlobalHeaderProps {
 }
 
 export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -58,14 +60,14 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
       await supabase.auth.signOut();
       navigate("/");
       toast({
-        title: "Signed out successfully",
-        description: "You have been signed out of your account.",
+        title: t("header.signedOut"),
+        description: t("header.signedOutDesc"),
       });
     } catch (error) {
       console.error("Error signing out:", error);
       toast({
-        title: "Error signing out",
-        description: "There was a problem signing out. Please try again.",
+        title: t("header.signOutError"),
+        description: t("header.signOutErrorDesc"),
         variant: "destructive",
       });
     }
@@ -84,8 +86,8 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
         .eq("user_id", userId);
 
       toast({
-        title: "Tour Reset",
-        description: "Refresh the page to see the guided tour again.",
+        title: t("header.tourReset"),
+        description: t("header.tourResetDesc"),
       });
 
       setTimeout(() => {
@@ -94,8 +96,8 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
     } catch (error) {
       console.error("Error resetting tour:", error);
       toast({
-        title: "Error",
-        description: "Failed to reset the tour. Please try again.",
+        title: t("common.error"),
+        description: t("header.tourResetError"),
         variant: "destructive",
       });
     }
@@ -109,8 +111,8 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
           <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <img src={logo} alt="Everlasting Funeral Advisors" className="h-12 w-12" />
             <div className="hidden sm:block">
-              <h1 className="text-lg font-semibold text-foreground">Everlasting Planner</h1>
-              <p className="text-xs text-muted-foreground">Interactive Planning Guide</p>
+              <h1 className="text-lg font-semibold text-foreground">{t("header.plannerTitle")}</h1>
+              <p className="text-xs text-muted-foreground">{t("header.plannerSubtitle")}</p>
             </div>
           </Link>
           {/* Right: Controls */}
@@ -126,7 +128,7 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
                 onClick={onGenerateDocument}
               >
                 <FileText className="h-4 w-4" />
-                Generate My Document
+                {t("header.generateDocument")}
               </Button>
             )}
             
@@ -137,17 +139,17 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2">
                   <SettingsIcon className="h-4 w-4" />
-                  <span className="hidden md:inline">Settings</span>
+                  <span className="hidden md:inline">{t("header.settings")}</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80" align="end">
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-semibold mb-2">Display Settings</h3>
+                    <h3 className="font-semibold mb-2">{t("header.displaySettings")}</h3>
                     <TextSizeToggle />
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-2">Easy View Mode</h3>
+                    <h3 className="font-semibold mb-2">{t("header.easyViewMode")}</h3>
                     <AccessibilityToggle />
                   </div>
                   <div className="pt-2 border-t">
@@ -158,7 +160,7 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
                       className="w-full gap-2"
                     >
                       <RotateCcw className="h-4 w-4" />
-                      Restart Guided Tour
+                      {t("header.restartTour")}
                     </Button>
                   </div>
                 </div>
@@ -170,20 +172,20 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2">
                   <User className="h-4 w-4" />
-                  <span className="hidden md:inline">Account</span>
+                  <span className="hidden md:inline">{t("header.account")}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem asChild>
                   <Link to="/app/profile" className="flex items-center gap-2 cursor-pointer">
                     <User className="h-4 w-4" />
-                    My Profile
+                    {t("header.myProfile")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/plans" className="flex items-center gap-2 cursor-pointer">
                     <CreditCard className="h-4 w-4" />
-                    Plan & Billing
+                    {t("header.planBilling")}
                   </Link>
                 </DropdownMenuItem>
                 {isAdmin && (
@@ -192,7 +194,7 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
                     <DropdownMenuItem asChild>
                       <Link to="/admin" className="flex items-center gap-2 cursor-pointer">
                         <Shield className="h-4 w-4 text-primary" />
-                        <span className="font-medium">Admin Panel</span>
+                        <span className="font-medium">{t("header.adminPanel")}</span>
                       </Link>
                     </DropdownMenuItem>
                   </>
@@ -201,13 +203,13 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
                 <DropdownMenuItem asChild>
                   <Link to="/vip-coach" className="flex items-center gap-2 cursor-pointer">
                     <Star className="h-4 w-4 text-yellow-500" />
-                    <span className="font-medium">VIP Coach Assistant</span>
+                    <span className="font-medium">{t("header.vipCoachAssistant")}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut} className="flex items-center gap-2 cursor-pointer">
                   <LogOut className="h-4 w-4" />
-                  Sign Out
+                  {t("header.signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

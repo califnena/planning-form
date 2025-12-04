@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { X, ArrowRight, ArrowLeft } from "lucide-react";
@@ -50,6 +51,7 @@ const TOUR_STEPS: TourStep[] = [
 ];
 
 export const OnboardingTour = ({ userId, onComplete, activeSection }: OnboardingTourProps) => {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -200,7 +202,7 @@ export const OnboardingTour = ({ userId, onComplete, activeSection }: Onboarding
                     className="text-base px-6"
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back
+                    {t("common.back")}
                   </Button>
                 )}
 
@@ -209,7 +211,7 @@ export const OnboardingTour = ({ userId, onComplete, activeSection }: Onboarding
                   onClick={handleNext}
                   className="text-base px-8"
                 >
-                  {isLastStep ? "Get Started" : "Next"}
+                  {isLastStep ? t("common.getStarted") : t("common.next")}
                   {!isLastStep && <ArrowRight className="ml-2 h-4 w-4" />}
                 </Button>
               </div>
