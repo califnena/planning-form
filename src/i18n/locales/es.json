@@ -185,6 +185,11 @@
   "dashboard": {
     "welcome": "Bienvenido, {{name}}",
     "welcomeGeneric": "Bienvenido",
+    "welcomeTitle": "Bienvenido al Panel de Planificación",
+    "welcomeSubtitle": "Siga estos pasos simples para organizar sus deseos, documentos importantes e instrucciones.",
+    "autoSaveNote": "Nota: todas las secciones se guardan automáticamente mientras trabaja y no es necesario que ingrese información en todas las secciones, solo lo que es pertinente para usted y lo que esté dispuesto y pueda compartir.",
+    "pdfInstructionsTitle": "Instrucciones para el PDF:",
+    "pdfInstructionsText": "Ingrese cualquier detalle sensible sobre usted o la persona para quien está completando este plan que desea incluir en el documento generado en formato PDF. Todos los campos son opcionales - deje en blanco cualquier información que no desee incluir. Descargue el PDF después de completar.",
     "subtitle": "Use este planificador para organizar sus deseos, contactos importantes e instrucciones posteriores al fallecimiento. Puede trabajar a su propio ritmo y guardar mientras avanza.",
     "slogan": "La Tranquilidad Comienza con un Plan",
     "heroMessage": "Estamos aquí para guiarlo en cada paso. Tómese su tiempo, guarde a medida que avanza, y sepa que está dando a sus seres queridos el mejor regalo: claridad y paz en momentos difíciles.",
@@ -194,14 +199,62 @@
     "progressSubtext": "Puede detenerse y volver en cualquier momento.",
     "quickActions": "Acciones Rápidas",
     "mainActionsTitle": "¿Qué le gustaría hacer?",
+    "steps": {
+      "planAhead": "Planificar",
+      "getSupport": "Obtener Apoyo",
+      "shop": "Comprar",
+      "personalTouch": "Toque Personal",
+      "afterDeathGuide": "Guía Post-Fallecimiento"
+    },
+    "planAheadPlanner": "Planificador de Anticipación",
+    "option1Digital": "Opción 1: Planificador Digital",
+    "option1DigitalDesc": "Complete su planificación en línea y guarde su progreso a medida que avanza.",
+    "upgradeRequired": "Se Requiere Actualización:",
+    "upgradeRequiredDesc": "Suscríbase a Premium, VIP o Hazlo Por Mí para acceder al planificador digital.",
+    "subscribeToPremium": "Suscribirse a Premium",
+    "purchasePhysicalBinder": "Comprar Carpeta Física",
+    "openMyPlanner": "Abrir Mi Planificador",
+    "printableVersion": "Versión Imprimible",
+    "stepByStepGuide": "Guía Paso a Paso",
+    "option2Printable": "Opción 2: Versión Imprimible",
+    "option2PrintableDesc": "Descargue un formulario en blanco para completar a mano o compre el libro de trabajo imprimible.",
+    "downloadBlankPlannerForm": "Descargar Formulario en Blanco",
+    "purchase": "Comprar",
+    "option3DoItForYou": "Opción 3: Hazlo Por Mí (Servicio Único)",
+    "popular": "POPULAR",
+    "option3Desc": "Deje que nuestro equipo lo guíe a través de todo el proceso con una consulta personalizada.",
+    "purchaseAndBookAppointment": "Comprar y Agendar una Cita",
+    "vipCoach": "Asistente Coach VIP",
+    "getPersonalizedSupport": "Obtenga Apoyo Personalizado",
+    "vipBenefit1": "Orientación individual de expertos en planificación funeraria",
+    "vipBenefit2": "Ayuda para completar su planificador paso a paso",
+    "vipBenefit3": "Respuestas a todas sus preguntas sobre planificación de fin de vida",
+    "vipBenefit4": "Apoyo compasivo durante decisiones difíciles",
+    "accessVipCoach": "Acceder al Coach VIP",
+    "upgradeVipMonthly": "Actualizar a VIP Mensual",
+    "upgradeVipYearly": "Actualizar a VIP Anual",
+    "highDemand": "Alta Demanda",
+    "casketsUrnsFlowers": "Ataúdes, Urnas y Flores",
+    "shopDesc": "Explore nuestra selección de ataúdes, urnas y flores funerarias asequibles y de alta calidad.",
+    "browseProducts": "Ver Productos",
+    "customSong": "Canción Conmemorativa Personalizada",
+    "createUniqueTributeSong": "Cree una Canción de Tributo Única",
+    "customSongDesc": "Haga un pedido de una canción personalizada para usted o para honrar a su ser querido con una canción conmemorativa creada especialmente para ellos.",
+    "createSong": "Crear Canción",
+    "afterDeathPlanner": "Planificador Post-Fallecimiento",
+    "guidedStepsAfterLoss": "Pasos Guiados Para Después de una Pérdida",
+    "afterDeathDesc": "Una guía de 12 pasos para ayudar a sus seres queridos a navegar las tareas prácticas después de un fallecimiento.",
+    "openAfterDeathPlanner": "Abrir Planificador Post-Fallecimiento",
+    "getPrintableDocument": "Obtener Documento Imprimible",
+    "helpAndSupport": "Ayuda y Soporte",
     "tiles": {
       "prePlanning": {
         "title": "Pre-Planificación",
         "description": "Complete sus deseos, detalles personales e instrucciones."
       },
       "afterDeath": {
-        "title": "Planificador Después del Fallecimiento",
-        "description": "Una guía simple de 12 pasos para ayudar a sus seres queridos."
+        "title": "Planificador Post-Fallecimiento",
+        "description": "Una lista de verificación simple de qué hacer después de un fallecimiento."
       },
       "vendors": {
         "title": "Contactos y Proveedores Útiles",
@@ -216,7 +269,7 @@
         "description": "Solicite orientación personalizada de nuestro equipo."
       },
       "quote": {
-        "title": "Solicitar una Cotización",
+        "title": "Solicitar Cotización",
         "description": "Pregunte por precios de productos y servicios."
       },
       "trustedContacts": {
@@ -233,7 +286,7 @@
       },
       "legalDocuments": {
         "title": "Documentos Legales y Recursos",
-        "description": "Formularios legales esenciales y guías específicas por estado."
+        "description": "Formularios legales esenciales, guías e información específica por estado."
       }
     }
   },
@@ -281,12 +334,17 @@
     "email": "Correo electrónico",
     "emailPlaceholder": "tu@correo.com",
     "password": "Contraseña",
+    "passwordPlaceholder": "Ingresa tu contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "confirmPasswordPlaceholder": "Vuelve a ingresar tu contraseña",
     "signingIn": "Iniciando sesión...",
     "creatingAccount": "Creando cuenta...",
     "createAccount": "Crear Cuenta",
+    "createAccountDesc": "Ingresa tu información para crear una cuenta",
     "signUp": "Registrarse",
     "welcome": "¡Bienvenido!",
     "welcomeBack": "¡Bienvenido de Nuevo!",
+    "welcomeToPlanner": "¡Bienvenido al Planificador Everlasting!",
     "loginSuccess": "Has iniciado sesión exitosamente.",
     "loginFailed": "Error al Iniciar Sesión",
     "invalidCredentials": "Correo o contraseña inválidos. Por favor intenta nuevamente.",
@@ -302,6 +360,7 @@
     "testLogin": "Inicio de Prueba",
     "googleSignIn": "Iniciar con Google",
     "noAccount": "¿No tienes una cuenta?",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
     "signUpLink": "Regístrate aquí",
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "resetPasswordLink": "Restablécela aquí",
@@ -309,7 +368,6 @@
     "signInWithGoogle": "Continuar con Google",
     "signingUp": "Registrándose...",
     "fullName": "Nombre completo",
-    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
     "dontHaveAccount": "¿No tienes una cuenta?",
     "signInTitle": "Iniciar Sesión",
     "signInDescription": "Ingresa tu correo y contraseña para acceder a tu cuenta",
@@ -331,7 +389,13 @@
     "resetInstructions": "Las instrucciones para restablecer tu contraseña han sido enviadas.",
     "resetFailed": "Error al restablecer",
     "resetFailedDesc": "No se pudo enviar el correo de restablecimiento",
-    "checkEmailInstructions": "Revisa tu correo para las instrucciones de restablecimiento."
+    "checkEmailInstructions": "Revisa tu correo para las instrucciones de restablecimiento.",
+    "passwordsNoMatch": "Las contraseñas no coinciden",
+    "passwordsNoMatchDesc": "Por favor asegúrate de que las contraseñas coincidan.",
+    "passwordTooShort": "Contraseña muy corta",
+    "passwordTooShortDesc": "La contraseña debe tener al menos 6 caracteres.",
+    "signupFailed": "Error al registrarse",
+    "couldNotCreateAccount": "No se pudo crear la cuenta. Por favor intenta nuevamente."
   },
   "header": {
     "home": "Inicio",

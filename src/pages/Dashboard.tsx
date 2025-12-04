@@ -459,16 +459,16 @@ export default function Dashboard() {
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Welcome Header - Centered */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-2">Welcome to the Planning Dashboard</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('dashboard.welcomeTitle')}</h1>
           <p className="text-muted-foreground max-w-4xl mx-auto mb-3">
-            Follow these simple steps to organize your wishes, important documents and instructions.
+            {t('dashboard.welcomeSubtitle')}
           </p>
           <p className="text-sm text-muted-foreground/80 max-w-3xl mx-auto italic">
-            Note: all sections save automatically as you work and you are not required to enter information in all the sections only what is pertinent to you and what you are willing and able to share.
+            {t('dashboard.autoSaveNote')}
           </p>
           <div className="mt-4 p-4 bg-muted/30 rounded-lg max-w-3xl mx-auto">
             <p className="text-sm text-muted-foreground leading-relaxed">
-              <strong>Instructions for the PDF:</strong> Enter any sensitive details about you or the person you are filling out this plan for that you want included in the document generated in PDF format. All fields are optional - leave blank any information you don't want to include. Download the PDF after filling out.
+              <strong>{t('dashboard.pdfInstructionsTitle')}</strong> {t('dashboard.pdfInstructionsText')}
             </p>
           </div>
         </div>
@@ -482,7 +482,7 @@ export default function Dashboard() {
             marginRight: '2.5rem'
           }}></div>
             
-            {['Plan Ahead', 'Get Support', 'Shop', 'Personal Touch', 'After-Death Guide'].map((step, idx) => <div key={idx} className="flex flex-col items-center flex-1">
+            {[t('dashboard.steps.planAhead'), t('dashboard.steps.getSupport'), t('dashboard.steps.shop'), t('dashboard.steps.personalTouch'), t('dashboard.steps.afterDeathGuide')].map((step, idx) => <div key={idx} className="flex flex-col items-center flex-1">
                 <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-semibold text-base mb-2 shadow-md">
                   {idx + 1}
                 </div>
@@ -497,7 +497,7 @@ export default function Dashboard() {
             <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-bold text-lg shadow-md">
               1
             </div>
-            <h2 className="text-2xl font-bold">Plan Ahead Planner</h2>
+            <h2 className="text-2xl font-bold">{t('dashboard.planAheadPlanner')}</h2>
           </div>
           
           <Card className="p-6">
@@ -510,36 +510,36 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold mb-2">Option 1: Digital Planner</h3>
+                  <h3 className="font-semibold mb-2">{t('dashboard.option1Digital')}</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Complete your planning online and save your progress as you go.
+                    {t('dashboard.option1DigitalDesc')}
                   </p>
                   {isFreePlan ? <div className="space-y-4">
                       <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                         <p className="text-sm text-amber-900 mb-3">
-                          <strong>Upgrade Required:</strong> Subscribe to Premium, VIP, or Do It For You to access the digital planner.
+                          <strong>{t('dashboard.upgradeRequired')}</strong> {t('dashboard.upgradeRequiredDesc')}
                         </p>
                         <Button onClick={handlePremiumSubscription} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] text-white">
-                          Subscribe to Premium
+                          {t('dashboard.subscribeToPremium')}
                         </Button>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <Button onClick={handlePurchaseBinder} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
-                          Purchase Physical Binder
+                          {t('dashboard.purchasePhysicalBinder')}
                         </Button>
                       </div>
                     </div> : <div className="flex flex-wrap gap-2">
                       <Button onClick={handleContinuePlanner} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                        Open My Planner
+                        {t('dashboard.openMyPlanner')}
                       </Button>
                       <Button onClick={handleGeneratePDF} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
-                        Printable Version
+                        {t('dashboard.printableVersion')}
                       </Button>
                       <Button onClick={handleStartWizard} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
-                        Step-by-step Guide
+                        {t('dashboard.stepByStepGuide')}
                       </Button>
                       <Button onClick={handlePurchaseBinder} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
-                        Purchase Physical Binder
+                        {t('dashboard.purchasePhysicalBinder')}
                       </Button>
                     </div>}
                 </div>
@@ -555,19 +555,19 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold mb-2">Option 2: Printable Version</h3>
+                  <h3 className="font-semibold mb-2">{t('dashboard.option2Printable')}</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Download a blank form to fill out by hand or purchase the printable workbook.
+                    {t('dashboard.option2PrintableDesc')}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {hasPrintableAccess && <Button onClick={handleDownloadBlankPlanner} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] bg-blue-800 hover:bg-blue-700 text-primary-foreground">
-                        Download Blank Planner Form
+                        {t('dashboard.downloadBlankPlannerForm')}
                       </Button>}
                     {!hasPrintableAccess && <Button onClick={handleDownloadWorkbook} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                        Purchase
+                        {t('dashboard.purchase')}
                       </Button>}
                     <Button onClick={handlePurchaseBinder} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
-                      Purchase Physical Binder
+                      {t('dashboard.purchasePhysicalBinder')}
                     </Button>
                   </div>
                 </div>
@@ -584,18 +584,18 @@ export default function Dashboard() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-semibold">Option 3: Do It For You (One-Time Service)</h3>
-                    <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded">POPULAR</span>
+                    <h3 className="font-semibold">{t('dashboard.option3DoItForYou')}</h3>
+                    <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded">{t('dashboard.popular')}</span>
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Let our team guide you through the entire process with a personalized consultation.
+                    {t('dashboard.option3Desc')}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <Button onClick={handleBookDoItForYou} className="flex-1 min-w-[140px] bg-primary-foreground text-blue-700">
-                      Purchase and Book an Appointment
+                      {t('dashboard.purchaseAndBookAppointment')}
                     </Button>
                     <Button onClick={handleDownloadWorkbook} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
-                      Purchase Physical Binder
+                      {t('dashboard.purchasePhysicalBinder')}
                     </Button>
                   </div>
                 </div>
@@ -610,7 +610,7 @@ export default function Dashboard() {
             <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-bold text-lg shadow-md">
               2
             </div>
-            <h2 className="text-2xl font-bold">VIP Coach Assistant</h2>
+            <h2 className="text-2xl font-bold">{t('dashboard.vipCoach')}</h2>
           </div>
           
           <Card className="p-6 bg-yellow-50/50 border-yellow-200">
@@ -621,33 +621,33 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-semibold mb-3">Get Personalized Support</h3>
+                <h3 className="text-xl font-semibold mb-3">{t('dashboard.getPersonalizedSupport')}</h3>
                 <ul className="space-y-2 mb-4 text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <span className="text-yellow-600 mt-1">✓</span>
-                    <span>One-on-one guidance from funeral planning experts</span>
+                    <span>{t('dashboard.vipBenefit1')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-yellow-600 mt-1">✓</span>
-                    <span>Help completing your planner step-by-step</span>
+                    <span>{t('dashboard.vipBenefit2')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-yellow-600 mt-1">✓</span>
-                    <span>Answers to all your questions about end-of-life planning</span>
+                    <span>{t('dashboard.vipBenefit3')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-yellow-600 mt-1">✓</span>
-                    <span>Compassionate support during difficult decisions</span>
+                    <span>{t('dashboard.vipBenefit4')}</span>
                   </li>
                 </ul>
                 {hasVIPAccess ? <Button onClick={() => navigate('/coach')} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                    Access VIP Coach
+                    {t('dashboard.accessVipCoach')}
                   </Button> : <div className="flex flex-wrap gap-3">
                     <Button onClick={handleVIPMonthly} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                      Upgrade to VIP Monthly
+                      {t('dashboard.upgradeVipMonthly')}
                     </Button>
                     <Button onClick={handleVIPYearly} variant="outline" className="border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
-                      Upgrade to VIP Yearly
+                      {t('dashboard.upgradeVipYearly')}
                     </Button>
                   </div>}
               </div>
@@ -661,12 +661,12 @@ export default function Dashboard() {
             <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-bold text-lg shadow-md">
               3
             </div>
-            <h2 className="text-2xl font-bold">Shop</h2>
+            <h2 className="text-2xl font-bold">{t('dashboard.steps.shop')}</h2>
           </div>
           
           <Card className="p-6 border-2 border-blue-400 bg-gradient-to-br from-blue-50 to-blue-100/50 relative">
             <div className="absolute top-4 right-4">
-              <span className="px-3 py-1 bg-red-500 text-white text-xs font-semibold rounded-full">High Demand</span>
+              <span className="px-3 py-1 bg-red-500 text-white text-xs font-semibold rounded-full">{t('dashboard.highDemand')}</span>
             </div>
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0">
@@ -675,13 +675,13 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-semibold mb-2">Caskets, Urns & Flowers</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('dashboard.casketsUrnsFlowers')}</h3>
                 <p className="text-muted-foreground mb-4">
-                  Browse our selection of affordable, high-quality caskets, urns, and funeral flowers.
+                  {t('dashboard.shopDesc')}
                 </p>
                 <div className="flex justify-start">
                   <Button onClick={() => window.open('https://everlastingfuneraladvisors.com/shop/', '_blank')} size="sm" className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                    Browse Products
+                    {t('dashboard.browseProducts')}
                   </Button>
                 </div>
               </div>
@@ -695,7 +695,7 @@ export default function Dashboard() {
             <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-bold text-lg shadow-md">
               4
             </div>
-            <h2 className="text-2xl font-bold">Custom Memorial Song</h2>
+            <h2 className="text-2xl font-bold">{t('dashboard.customSong')}</h2>
           </div>
           
           <Card className="p-6">
@@ -706,13 +706,13 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-semibold mb-2">Create a Unique Tribute Song</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('dashboard.createUniqueTributeSong')}</h3>
                 <p className="text-muted-foreground mb-4">
-                  Place an order for a customized song either for you or honor your loved one with a personalized memorial song created just for them.
+                  {t('dashboard.customSongDesc')}
                 </p>
                 <div className="flex justify-start">
                   <Button onClick={() => navigate('/products/custom-song')} size="sm" className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                    Create Song
+                    {t('dashboard.createSong')}
                   </Button>
                 </div>
               </div>
@@ -726,7 +726,7 @@ export default function Dashboard() {
             <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-bold text-lg shadow-md">
               5
             </div>
-            <h2 className="text-2xl font-bold">After-Death Planner</h2>
+            <h2 className="text-2xl font-bold">{t('dashboard.afterDeathPlanner')}</h2>
           </div>
           
           <Card className="p-6">
@@ -737,16 +737,16 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-semibold mb-2">Guided Steps for After a Loss</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('dashboard.guidedStepsAfterLoss')}</h3>
                 <p className="text-muted-foreground mb-4">
-                  A 12-step guide to help your loved ones navigate the practical tasks following a death.
+                  {t('dashboard.afterDeathDesc')}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <Button onClick={() => navigate('/after-death-planner')} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                    Open After-Death Planner
+                    {t('dashboard.openAfterDeathPlanner')}
                   </Button>
                   <Button onClick={handleGenerateAfterDeathPDF} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                    Get a Printable Document
+                    {t('dashboard.getPrintableDocument')}
                   </Button>
                 </div>
               </div>
@@ -756,14 +756,14 @@ export default function Dashboard() {
 
         {/* STEP 6 - Help & Support */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Help & Support</h2>
+          <h2 className="text-2xl font-bold mb-6">{t('dashboard.helpAndSupport')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/resources')}>
               <div className="flex flex-col items-center text-center gap-3">
                 <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                   <BookOpen className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="font-semibold">Helpful Resources</h3>
+                <h3 className="font-semibold">{t('dashboard.tiles.resources.title')}</h3>
               </div>
             </Card>
             
@@ -772,7 +772,7 @@ export default function Dashboard() {
                 <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
                   <Scale className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="font-semibold">Legal Documents & Resources</h3>
+                <h3 className="font-semibold">{t('dashboard.tiles.legalDocuments.title')}</h3>
               </div>
             </Card>
             
@@ -781,7 +781,7 @@ export default function Dashboard() {
                 <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
                   <Lightbulb className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="font-semibold">Common Questions</h3>
+                <h3 className="font-semibold">{t('dashboard.tiles.questions.title')}</h3>
               </div>
             </Card>
             
@@ -790,7 +790,7 @@ export default function Dashboard() {
                 <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
                   <Phone className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="font-semibold">Helpful Contacts & Vendors</h3>
+                <h3 className="font-semibold">{t('dashboard.tiles.vendors.title')}</h3>
               </div>
             </Card>
           </div>
