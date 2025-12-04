@@ -519,26 +519,26 @@ export default function Dashboard() {
                         <p className="text-sm text-amber-900 mb-3">
                           <strong>{t('dashboard.upgradeRequired')}</strong> {t('dashboard.upgradeRequiredDesc')}
                         </p>
-                        <Button onClick={handlePremiumSubscription} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] text-white">
+                        <Button onClick={handlePremiumSubscription} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] text-white whitespace-normal h-auto py-2">
                           {t('dashboard.subscribeToPremium')}
                         </Button>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        <Button onClick={handlePurchaseBinder} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                      <div className="flex flex-col sm:flex-row flex-wrap gap-2">
+                        <Button onClick={handlePurchaseBinder} variant="outline" className="w-full sm:w-auto sm:flex-1 border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 whitespace-normal h-auto py-2">
                           {t('dashboard.purchasePhysicalBinder')}
                         </Button>
                       </div>
-                    </div> : <div className="flex flex-wrap gap-2">
-                      <Button onClick={handleContinuePlanner} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                    </div> : <div className="flex flex-col sm:flex-row flex-wrap gap-2">
+                      <Button onClick={handleContinuePlanner} className="w-full sm:w-auto sm:flex-1 bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] whitespace-normal h-auto py-2">
                         {t('dashboard.openMyPlanner')}
                       </Button>
-                      <Button onClick={handleGeneratePDF} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                      <Button onClick={handleGeneratePDF} variant="outline" className="w-full sm:w-auto sm:flex-1 border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 whitespace-normal h-auto py-2">
                         {t('dashboard.printableVersion')}
                       </Button>
-                      <Button onClick={handleStartWizard} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                      <Button onClick={handleStartWizard} variant="outline" className="w-full sm:w-auto sm:flex-1 border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 whitespace-normal h-auto py-2">
                         {t('dashboard.stepByStepGuide')}
                       </Button>
-                      <Button onClick={handlePurchaseBinder} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                      <Button onClick={handlePurchaseBinder} variant="outline" className="w-full sm:w-auto sm:flex-1 border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 whitespace-normal h-auto py-2">
                         {t('dashboard.purchasePhysicalBinder')}
                       </Button>
                     </div>}
@@ -559,14 +559,14 @@ export default function Dashboard() {
                   <p className="text-sm text-muted-foreground mb-4">
                     {t('dashboard.option2PrintableDesc')}
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    {hasPrintableAccess && <Button onClick={handleDownloadBlankPlanner} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] bg-blue-800 hover:bg-blue-700 text-primary-foreground">
+                  <div className="flex flex-col sm:flex-row flex-wrap gap-2">
+                    {hasPrintableAccess && <Button onClick={handleDownloadBlankPlanner} variant="outline" className="w-full sm:w-auto sm:flex-1 border-2 border-[hsl(210,100%,35%)] bg-blue-800 hover:bg-blue-700 text-primary-foreground whitespace-normal h-auto py-2">
                         {t('dashboard.downloadBlankPlannerForm')}
                       </Button>}
-                    {!hasPrintableAccess && <Button onClick={handleDownloadWorkbook} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                    {!hasPrintableAccess && <Button onClick={handleDownloadWorkbook} className="w-full sm:w-auto sm:flex-1 bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] whitespace-normal h-auto py-2">
                         {t('dashboard.purchase')}
                       </Button>}
-                    <Button onClick={handlePurchaseBinder} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                    <Button onClick={handlePurchaseBinder} variant="outline" className="w-full sm:w-auto sm:flex-1 border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 whitespace-normal h-auto py-2">
                       {t('dashboard.purchasePhysicalBinder')}
                     </Button>
                   </div>
@@ -590,11 +590,11 @@ export default function Dashboard() {
                   <p className="text-sm text-muted-foreground mb-4">
                     {t('dashboard.option3Desc')}
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    <Button onClick={handleBookDoItForYou} className="flex-1 min-w-[140px] bg-primary-foreground text-blue-700">
+                  <div className="flex flex-col sm:flex-row flex-wrap gap-2">
+                    <Button onClick={handleBookDoItForYou} className="w-full sm:w-auto sm:flex-1 bg-primary-foreground text-blue-700 whitespace-normal h-auto py-2">
                       {t('dashboard.purchaseAndBookAppointment')}
                     </Button>
-                    <Button onClick={handleDownloadWorkbook} variant="outline" className="flex-1 min-w-[140px] border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
+                    <Button onClick={handleDownloadWorkbook} variant="outline" className="w-full sm:w-auto sm:flex-1 border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 whitespace-normal h-auto py-2">
                       {t('dashboard.purchasePhysicalBinder')}
                     </Button>
                   </div>
@@ -741,11 +741,11 @@ export default function Dashboard() {
                 <p className="text-muted-foreground mb-4">
                   {t('dashboard.afterDeathDesc')}
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  <Button onClick={() => navigate('/after-death-planner')} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                <div className="flex flex-col sm:flex-row flex-wrap gap-2">
+                  <Button onClick={() => navigate('/after-death-planner')} className="w-full sm:w-auto sm:flex-1 bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] whitespace-normal h-auto py-2">
                     {t('dashboard.openAfterDeathPlanner')}
                   </Button>
-                  <Button onClick={handleGenerateAfterDeathPDF} className="flex-1 min-w-[140px] bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
+                  <Button onClick={handleGenerateAfterDeathPDF} className="w-full sm:w-auto sm:flex-1 bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] whitespace-normal h-auto py-2">
                     {t('dashboard.getPrintableDocument')}
                   </Button>
                 </div>
