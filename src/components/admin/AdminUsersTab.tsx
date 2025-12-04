@@ -258,7 +258,7 @@ export function AdminUsersTab() {
                         {user.active_plan ? (
                           <Badge variant="default">{user.active_plan}</Badge>
                         ) : (
-                          <span className="text-muted-foreground">Free</span>
+                          <span className="text-muted-foreground">{t("common.free")}</span>
                         )}
                       </TableCell>
                       <TableCell>

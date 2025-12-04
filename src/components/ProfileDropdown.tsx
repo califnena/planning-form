@@ -1,5 +1,6 @@
 import { User, LogOut, Sparkles, Receipt, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
 
 export const ProfileDropdown = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<{ full_name?: string; avatar_url?: string } | null>(null);
   const [userEmail, setUserEmail] = useState<string>("");
@@ -124,31 +126,31 @@ export const ProfileDropdown = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate("/app/profile")}>
           <User className="mr-2 h-4 w-4" />
-          <span>Account</span>
+          <span>{t("header.account")}</span>
         </DropdownMenuItem>
         {isAdmin && (
           <DropdownMenuItem onClick={() => navigate("/admin")}>
             <Shield className="mr-2 h-4 w-4" />
-            <span>Admin Panel</span>
+            <span>{t("header.adminPanel")}</span>
           </DropdownMenuItem>
         )}
         <DropdownMenuItem onClick={() => navigate("/plans")}>
           <Receipt className="mr-2 h-4 w-4" />
-          <span>Subscription & Billing</span>
+          <span>{t("header.subscriptionBilling")}</span>
         </DropdownMenuItem>
         {isVIP && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => navigate("/vip-coach")} className="text-primary">
               <Sparkles className="mr-2 h-4 w-4" />
-              <span>VIP Coach Assistant</span>
+              <span>{t("header.vipCoachAssistant")}</span>
             </DropdownMenuItem>
           </>
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Sign out</span>
+          <span>{t("header.signOut")}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
