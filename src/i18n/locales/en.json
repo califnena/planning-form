@@ -1186,5 +1186,120 @@
       "periodEnd": "Period End",
       "cancelAtEnd": "Cancel at End"
     }
+  },
+  "afterDeathSteps": {
+    "steps": "Steps",
+    "actions": "Actions",
+    "generatePDF": "Generate After-Death Plan PDF",
+    "generatePlan": "Generate Plan",
+    "generate": "Generate",
+    "prePlanner": "Pre-Planner",
+    "loadingWizard": "Loading wizard...",
+    "loadingPlanner": "Loading After-Death Planner...",
+    "loadingPlan": "Loading plan...",
+    "planNotFound": "Plan not found",
+    "backToPlans": "Back to Plans",
+    "errorLoadingCase": "Failed to load case data",
+    "errorSavingProgress": "Failed to save progress",
+    "errorLoadingPlan": "Failed to load plan",
+    "errorLoadingPlanDetails": "Failed to load plan details",
+    "saveFailed": "Save Failed",
+    "couldNotSaveChanges": "Could not save your changes",
+    "congratulations": "Congratulations!",
+    "completedAllSteps": "You've completed all after-death steps",
+    "overview": {
+      "title": "Overview",
+      "subtitle": "Essential Steps Guide"
+    },
+    "immediate": {
+      "title": "Immediate Needs",
+      "subtitle": "First 48 Hours"
+    },
+    "notifications": {
+      "title": "Official Notifications",
+      "subtitle": "Government & Services"
+    },
+    "documents": {
+      "title": "Find Key Documents",
+      "subtitle": "Legal Papers"
+    },
+    "certificates": {
+      "title": "Death Certificates",
+      "subtitle": "Orders & Distribution"
+    },
+    "obituary": {
+      "title": "Obituary & Announcements",
+      "subtitle": "Public Notices"
+    },
+    "service": {
+      "title": "Service & Memorial Details",
+      "subtitle": "Planning Ceremony"
+    },
+    "finances": {
+      "title": "Finances & Estate",
+      "subtitle": "Money & Property"
+    },
+    "digital": {
+      "title": "Digital Accounts",
+      "subtitle": "Online Presence"
+    },
+    "realestate": {
+      "title": "Real Estate & Utilities",
+      "subtitle": "Property Management"
+    },
+    "subscriptions": {
+      "title": "Subscriptions",
+      "subtitle": "Non-Digital Services"
+    },
+    "property": {
+      "title": "Other Property",
+      "subtitle": "Vehicles, Jewelry & More"
+    },
+    "business": {
+      "title": "Business Matters",
+      "subtitle": "Business Ownership"
+    },
+    "plannerTitle": "After-Death Planner",
+    "introText": "This After-Death Planner is a step-by-step guide to help you through the practical tasks that follow a loss. We are very sorry you are going through this.",
+    "introDynamicText": "{{name}} cared deeply about you and wanted to make it easier for you to honor their wishes and remember them the way they hoped.",
+    "preparedForLabel": "This planner is prepared for:",
+    "actionPlanTitle": "12-Step Action Plan",
+    "actionPlanDescription": "Mark each step complete as you work through them. Use the sidebar to navigate between steps.",
+    "overviewNotesLabel": "Overview Notes",
+    "overviewNotesPlaceholder": "Add any general notes or important information about this plan...",
+    "tipTitle": "Tip:",
+    "tipText": "Use the sidebar on the left to navigate through each step. Your progress is automatically saved as you work.",
+    "step1Full": "Immediate Needs (First 48 Hours)",
+    "step2Full": "Official Notifications (Government & Services)",
+    "step3Full": "Find Key Documents (Legal Papers)",
+    "step4Full": "Death Certificates (Orders & Distribution)",
+    "step5Full": "Obituary & Announcements (Public Notices)",
+    "step6Full": "Service & Memorial Details (Planning Ceremony)",
+    "step7Full": "Finances & Estate (Money & Property)",
+    "step8Full": "Digital Accounts (Online Presence)",
+    "step9Full": "Real Estate & Utilities (Property Management)",
+    "step10Full": "Subscriptions (Non-Digital Services)",
+    "step11Full": "Other Property (Vehicles, Jewelry & More)",
+    "step12Full": "Business (Business Ownership)"
+  },
+  "wizard": {
+    "preplanning": {
+      "title": "Pre-Planning Wizard",
+      "description": "Complete your final wishes one section at a time with guided steps",
+      "stepByStepTitle": "My Final Wishes – Step-by-Step Guide"
+    },
+    "afterdeath": {
+      "title": "After-Death Wizard",
+      "description": "Complete essential tasks after a death with our 12-step guided checklist",
+      "stepByStepTitle": "After-Death Steps – Step-by-Step Guide"
+    },
+    "exitToDashboard": "Exit to Dashboard",
+    "stepOf": "Step {{current}} of {{total}}",
+    "percentComplete": "{{percent}}% Complete",
+    "saveAndExit": "Save and Exit",
+    "saveAndContinue": "Save and Continue"
+  },
+  "header": {
+    "dashboard": "Dashboard"
   }
 }

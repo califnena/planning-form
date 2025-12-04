@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -7,6 +8,7 @@ export default function NextSteps() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     redirectToCase();
@@ -48,8 +50,8 @@ export default function NextSteps() {
     } catch (error) {
       console.error("Error:", error);
       toast({
-        title: "Error",
-        description: "Failed to load plan",
+        title: t("common.error"),
+        description: t("afterDeathSteps.errorLoadingPlan"),
         variant: "destructive",
       });
       setLoading(false);
@@ -58,7 +60,7 @@ export default function NextSteps() {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <p className="text-muted-foreground">Loading After-Death Planner...</p>
+      <p className="text-muted-foreground">{t("afterDeathSteps.loadingPlanner")}</p>
     </div>
   );
 }
