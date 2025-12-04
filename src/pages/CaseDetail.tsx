@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { AppFooter } from "@/components/AppFooter";
@@ -30,26 +31,27 @@ import { Step11OtherProperty } from "@/components/nextsteps/steps/Step11OtherPro
 import { Step12Business } from "@/components/nextsteps/steps/Step12Business";
 import { PdfGenerationDialog } from "@/components/nextsteps/PdfGenerationDialog";
 
-const STEPS = [
-  { id: 0, title: "Overview", subtitle: "Essential Steps Guide" },
-  { id: 1, title: "Immediate Needs", subtitle: "First 48 Hours" },
-  { id: 2, title: "Official Notifications", subtitle: "Government & Services" },
-  { id: 3, title: "Find Key Documents", subtitle: "Legal Papers" },
-  { id: 4, title: "Death Certificates", subtitle: "Orders & Distribution" },
-  { id: 5, title: "Obituary & Announcements", subtitle: "Public Notices" },
-  { id: 6, title: "Service & Memorial Details", subtitle: "Planning Ceremony" },
-  { id: 7, title: "Finances & Estate", subtitle: "Money & Property" },
-  { id: 8, title: "Digital Accounts", subtitle: "Online Presence" },
-  { id: 9, title: "Real Estate & Utilities", subtitle: "Property Management" },
-  { id: 10, title: "Subscriptions", subtitle: "Non-Digital Services" },
-  { id: 11, title: "Other Property", subtitle: "Vehicles, Jewelry & More" },
-  { id: 12, title: "Business", subtitle: "Business Ownership" },
+const STEP_KEYS = [
+  { id: 0, titleKey: "afterDeathSteps.overview.title", subtitleKey: "afterDeathSteps.overview.subtitle" },
+  { id: 1, titleKey: "afterDeathSteps.immediate.title", subtitleKey: "afterDeathSteps.immediate.subtitle" },
+  { id: 2, titleKey: "afterDeathSteps.notifications.title", subtitleKey: "afterDeathSteps.notifications.subtitle" },
+  { id: 3, titleKey: "afterDeathSteps.documents.title", subtitleKey: "afterDeathSteps.documents.subtitle" },
+  { id: 4, titleKey: "afterDeathSteps.certificates.title", subtitleKey: "afterDeathSteps.certificates.subtitle" },
+  { id: 5, titleKey: "afterDeathSteps.obituary.title", subtitleKey: "afterDeathSteps.obituary.subtitle" },
+  { id: 6, titleKey: "afterDeathSteps.service.title", subtitleKey: "afterDeathSteps.service.subtitle" },
+  { id: 7, titleKey: "afterDeathSteps.finances.title", subtitleKey: "afterDeathSteps.finances.subtitle" },
+  { id: 8, titleKey: "afterDeathSteps.digital.title", subtitleKey: "afterDeathSteps.digital.subtitle" },
+  { id: 9, titleKey: "afterDeathSteps.realestate.title", subtitleKey: "afterDeathSteps.realestate.subtitle" },
+  { id: 10, titleKey: "afterDeathSteps.subscriptions.title", subtitleKey: "afterDeathSteps.subscriptions.subtitle" },
+  { id: 11, titleKey: "afterDeathSteps.property.title", subtitleKey: "afterDeathSteps.property.subtitle" },
+  { id: 12, titleKey: "afterDeathSteps.business.title", subtitleKey: "afterDeathSteps.business.subtitle" },
 ];
 
 export default function CaseDetail() {
   const { caseId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(true);
   const [caseData, setCaseData] = useState<any>(null);
@@ -107,8 +109,8 @@ export default function CaseDetail() {
     } catch (error) {
       console.error("Error fetching plan:", error);
       toast({
-        title: "Error",
-        description: "Failed to load plan details",
+        title: t("common.error"),
+        description: t("afterDeathSteps.errorLoadingPlanDetails"),
         variant: "destructive",
       });
     } finally {
@@ -133,8 +135,8 @@ export default function CaseDetail() {
     } catch (error) {
       console.error("Error saving progress:", error);
       toast({
-        title: "Save Failed",
-        description: "Could not save your changes",
+        title: t("afterDeathSteps.saveFailed"),
+        description: t("afterDeathSteps.couldNotSaveChanges"),
         variant: "destructive",
       });
     } finally {
@@ -143,7 +145,7 @@ export default function CaseDetail() {
   };
 
   const handleNext = () => {
-    if (currentStep < STEPS.length - 1) {
+    if (currentStep < STEP_KEYS.length - 1) {
       setCurrentStep(currentStep + 1);
       window.scrollTo(0, 0);
     }
@@ -203,7 +205,7 @@ export default function CaseDetail() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-muted-foreground">Loading plan...</p>
+        <p className="text-muted-foreground">{t("afterDeathSteps.loadingPlan")}</p>
       </div>
     );
   }
@@ -212,25 +214,25 @@ export default function CaseDetail() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <p className="text-muted-foreground mb-4">Plan not found</p>
+          <p className="text-muted-foreground mb-4">{t("afterDeathSteps.planNotFound")}</p>
           <Button onClick={() => navigate("/next-steps")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Plans
+            {t("afterDeathSteps.backToPlans")}
           </Button>
         </div>
       </div>
     );
   }
 
-  const progress = (currentStep / (STEPS.length - 1)) * 100;
-  const currentStepInfo = STEPS[currentStep];
+  const progress = (currentStep / (STEP_KEYS.length - 1)) * 100;
+  const currentStepInfo = STEP_KEYS[currentStep];
 
   const sidebarContent = (
     <>
       <div className="mb-6">
-        <h2 className="font-semibold text-sidebar-foreground mb-4">Steps</h2>
+        <h2 className="font-semibold text-sidebar-foreground mb-4">{t("afterDeathSteps.steps")}</h2>
         <nav className="space-y-1">
-          {STEPS.map((step) => (
+          {STEP_KEYS.map((step) => (
             <button
               key={step.id}
               onClick={() => {
@@ -255,8 +257,8 @@ export default function CaseDetail() {
                   {step.id}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">{step.title}</div>
-                  <div className="text-xs text-muted-foreground truncate">{step.subtitle}</div>
+                  <div className="font-medium truncate">{t(step.titleKey)}</div>
+                  <div className="text-xs text-muted-foreground truncate">{t(step.subtitleKey)}</div>
                 </div>
               </div>
             </button>
@@ -266,7 +268,7 @@ export default function CaseDetail() {
 
       {/* Actions */}
       <div className="mt-8 pt-4 border-t border-sidebar-border">
-        <h3 className="text-sm font-semibold text-sidebar-foreground mb-3">Actions</h3>
+        <h3 className="text-sm font-semibold text-sidebar-foreground mb-3">{t("afterDeathSteps.actions")}</h3>
         <Button 
           variant="outline" 
           size="sm" 
@@ -274,7 +276,7 @@ export default function CaseDetail() {
           onClick={handleGeneratePDF}
         >
           <Download className="mr-2 h-4 w-4 flex-shrink-0" />
-          <span className="text-left">Generate After-Death Plan PDF</span>
+          <span className="text-left">{t("afterDeathSteps.generatePDF")}</span>
         </Button>
       </div>
     </>
@@ -306,31 +308,31 @@ export default function CaseDetail() {
               </Button>
               <div>
                 <h1 className="text-lg sm:text-xl font-semibold">
-                  {caseData.decedent?.legal_name || "After-Death Planner"}
+                  {caseData.decedent?.legal_name || t("dashboard.afterDeathPlanner")}
                 </h1>
                 <p className="text-xs sm:text-sm text-muted-foreground">
-                  {currentStep === 0 ? "Overview" : `Step ${currentStep} of ${STEPS.length - 1}`}
+                  {currentStep === 0 ? t("afterDeathSteps.overview.title") : t("wizard.stepOf", { current: currentStep, total: STEP_KEYS.length - 1 })}
                 </p>
               </div>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="hidden sm:flex">
                 <Home className="mr-2 h-4 w-4" />
-                Dashboard
+                {t("header.dashboard")}
               </Button>
               <Button variant="outline" size="sm" onClick={() => navigate("/app")} className="hidden sm:flex">
                 <FileText className="mr-2 h-4 w-4" />
-                Pre-Planner
+                {t("afterDeathSteps.prePlanner")}
               </Button>
               <Button variant="outline" size="sm" onClick={() => navigate("/after-death-planner")} className="hidden sm:flex">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                After-Death Planner
+                {t("dashboard.afterDeathPlanner")}
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")} className="sm:hidden" title="Dashboard">
+              <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")} className="sm:hidden" title={t("header.dashboard")}>
                 <Home className="h-4 w-4" />
               </Button>
               {isSaving && (
-                <span className="text-xs text-muted-foreground self-center hidden sm:inline">Saving...</span>
+                <span className="text-xs text-muted-foreground self-center hidden sm:inline">{t("common.saving")}</span>
               )}
             </div>
           </div>
@@ -354,9 +356,9 @@ export default function CaseDetail() {
             {/* Step Header */}
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-foreground mb-1">
-                {currentStepInfo.title}
+                {t(currentStepInfo.titleKey)}
               </h2>
-              <p className="text-muted-foreground">{currentStepInfo.subtitle}</p>
+              <p className="text-muted-foreground">{t(currentStepInfo.subtitleKey)}</p>
             </div>
 
             {/* Step Content */}
@@ -374,19 +376,19 @@ export default function CaseDetail() {
               className="sm:size-default"
             >
               <ArrowLeft className="mr-0 sm:mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Previous</span>
+              <span className="hidden sm:inline">{t("common.previous")}</span>
             </Button>
 
-            {currentStep < STEPS.length - 1 ? (
+            {currentStep < STEP_KEYS.length - 1 ? (
               <Button onClick={handleNext} size="sm" className="sm:size-default">
-                <span className="hidden sm:inline">Next</span>
+                <span className="hidden sm:inline">{t("common.next")}</span>
                 <ArrowRight className="ml-0 sm:ml-2 h-4 w-4" />
               </Button>
             ) : (
               <Button onClick={handleGeneratePDF} className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm">
                 <CheckCircle2 className="mr-2 h-4 w-4" />
-                <span className="hidden sm:inline">Generate Plan</span>
-                <span className="sm:hidden">Generate</span>
+                <span className="hidden sm:inline">{t("afterDeathSteps.generatePlan")}</span>
+                <span className="sm:hidden">{t("afterDeathSteps.generate")}</span>
               </Button>
             )}
             </div>

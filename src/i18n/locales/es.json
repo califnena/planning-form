@@ -591,5 +591,159 @@
       "allSubscriptions": "Todas las Suscripciones", "allSubscriptionsDescription": "Ver todas las suscripciones.",
       "user": "Usuario", "plan": "Plan", "status": "Estado", "periodEnd": "Fin Período", "cancelAtEnd": "Cancela al Final"
     }
+  },
+  "afterDeathSteps": {
+    "steps": "Pasos",
+    "actions": "Acciones",
+    "generatePDF": "Generar PDF del Plan Post-Fallecimiento",
+    "generatePlan": "Generar Plan",
+    "generate": "Generar",
+    "prePlanner": "Pre-Planificador",
+    "loadingWizard": "Cargando asistente...",
+    "loadingPlanner": "Cargando Planificador Post-Fallecimiento...",
+    "loadingPlan": "Cargando plan...",
+    "planNotFound": "Plan no encontrado",
+    "backToPlans": "Volver a Planes",
+    "errorLoadingCase": "Error al cargar los datos del caso",
+    "errorSavingProgress": "Error al guardar el progreso",
+    "errorLoadingPlan": "Error al cargar el plan",
+    "errorLoadingPlanDetails": "Error al cargar los detalles del plan",
+    "saveFailed": "Error al Guardar",
+    "couldNotSaveChanges": "No se pudieron guardar los cambios",
+    "congratulations": "¡Felicitaciones!",
+    "completedAllSteps": "Ha completado todos los pasos post-fallecimiento",
+    "overview": {
+      "title": "Resumen",
+      "subtitle": "Guía de Pasos Esenciales"
+    },
+    "immediate": {
+      "title": "Necesidades Inmediatas",
+      "subtitle": "Primeras 48 Horas"
+    },
+    "notifications": {
+      "title": "Notificaciones Oficiales",
+      "subtitle": "Gobierno y Servicios"
+    },
+    "documents": {
+      "title": "Encontrar Documentos Clave",
+      "subtitle": "Papeles Legales"
+    },
+    "certificates": {
+      "title": "Certificados de Defunción",
+      "subtitle": "Órdenes y Distribución"
+    },
+    "obituary": {
+      "title": "Obituario y Anuncios",
+      "subtitle": "Avisos Públicos"
+    },
+    "service": {
+      "title": "Detalles del Servicio Memorial",
+      "subtitle": "Planificación de la Ceremonia"
+    },
+    "finances": {
+      "title": "Finanzas y Patrimonio",
+      "subtitle": "Dinero y Propiedades"
+    },
+    "digital": {
+      "title": "Cuentas Digitales",
+      "subtitle": "Presencia en Línea"
+    },
+    "realestate": {
+      "title": "Bienes Raíces y Servicios",
+      "subtitle": "Administración de Propiedades"
+    },
+    "subscriptions": {
+      "title": "Suscripciones",
+      "subtitle": "Servicios No Digitales"
+    },
+    "property": {
+      "title": "Otras Propiedades",
+      "subtitle": "Vehículos, Joyas y Más"
+    },
+    "business": {
+      "title": "Asuntos de Negocios",
+      "subtitle": "Propiedad de Negocios"
+    },
+    "plannerTitle": "Planificador Post-Fallecimiento",
+    "introText": "Este Planificador Post-Fallecimiento es una guía paso a paso para ayudarle con las tareas prácticas que siguen a una pérdida. Lamentamos mucho que esté pasando por esto.",
+    "introDynamicText": "{{name}} se preocupó profundamente por usted y quería facilitarle honrar sus deseos y recordarle de la manera que esperaba.",
+    "preparedForLabel": "Este planificador está preparado para:",
+    "actionPlanTitle": "Plan de Acción de 12 Pasos",
+    "actionPlanDescription": "Marque cada paso como completado a medida que los trabaja. Use la barra lateral para navegar entre pasos.",
+    "overviewNotesLabel": "Notas Generales",
+    "overviewNotesPlaceholder": "Agregue cualquier nota general o información importante sobre este plan...",
+    "tipTitle": "Consejo:",
+    "tipText": "Use la barra lateral a la izquierda para navegar por cada paso. Su progreso se guarda automáticamente mientras trabaja.",
+    "step1Full": "Necesidades Inmediatas (Primeras 48 Horas)",
+    "step2Full": "Notificaciones Oficiales (Gobierno y Servicios)",
+    "step3Full": "Encontrar Documentos Clave (Papeles Legales)",
+    "step4Full": "Certificados de Defunción (Órdenes y Distribución)",
+    "step5Full": "Obituario y Anuncios (Avisos Públicos)",
+    "step6Full": "Detalles del Servicio Memorial (Planificación de Ceremonia)",
+    "step7Full": "Finanzas y Patrimonio (Dinero y Propiedades)",
+    "step8Full": "Cuentas Digitales (Presencia en Línea)",
+    "step9Full": "Bienes Raíces y Servicios (Administración de Propiedades)",
+    "step10Full": "Suscripciones (Servicios No Digitales)",
+    "step11Full": "Otras Propiedades (Vehículos, Joyas y Más)",
+    "step12Full": "Negocios (Propiedad de Negocios)"
+  },
+  "wizard": {
+    "preplanning": {
+      "title": "Asistente de Pre-Planificación",
+      "description": "Complete sus deseos finales una sección a la vez con pasos guiados",
+      "stepByStepTitle": "Mis Deseos Finales – Guía Paso a Paso"
+    },
+    "afterdeath": {
+      "title": "Asistente Post-Fallecimiento",
+      "description": "Complete tareas esenciales después de un fallecimiento con nuestra lista de 12 pasos guiados",
+      "stepByStepTitle": "Pasos Post-Fallecimiento – Guía Paso a Paso"
+    },
+    "exitToDashboard": "Salir al Panel",
+    "stepOf": "Paso {{current}} de {{total}}",
+    "percentComplete": "{{percent}}% Completado",
+    "saveAndExit": "Guardar y Salir",
+    "saveAndContinue": "Guardar y Continuar"
+  },
+  "header": {
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "myPlan": "Mi Plan",
+    "resources": "Recursos",
+    "contact": "Contacto",
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "logout": "Cerrar Sesión",
+    "language": "Idioma",
+    "plannerTitle": "Planificador Everlasting",
+    "plannerSubtitle": "Guía Interactiva de Planificación",
+    "textSize": "Tamaño de Texto",
+    "decreaseTextSize": "Reducir tamaño de texto",
+    "increaseTextSize": "Aumentar tamaño de texto",
+    "account": "Cuenta",
+    "restartTour": "Reiniciar Tour Guiado",
+    "tourReset": "Tour Reiniciado",
+    "tourResetDesc": "Actualiza la página para ver el tour guiado nuevamente.",
+    "tourResetError": "Error al reiniciar el tour. Por favor intenta nuevamente.",
+    "signOutError": "Error al cerrar sesión",
+    "title": "Planificador Everlasting - Mis Deseos Finales",
+    "subtitle": "Tu guía completa para organizar, preparar y brindar tranquilidad a tus seres queridos",
+    "downloadPDF": "Descargar PDF",
+    "emailPlan": "Enviar Plan por Correo",
+    "signOut": "Cerrar Sesión",
+    "signedOut": "Sesión cerrada exitosamente",
+    "signedOutDesc": "Has cerrado sesión de tu cuenta.",
+    "signOutErrorDesc": "Hubo un problema al cerrar sesión. Por favor intenta nuevamente.",
+    "providedBy": "Proporcionado por Everlasting Funeral Advisors",
+    "requestQuote": "Solicitar Cotización",
+    "displaySettings": "Configuración de Pantalla",
+    "easyViewMode": "Modo de Vista Fácil",
+    "myProfile": "Mi Perfil",
+    "planBilling": "Plan y Facturación",
+    "subscriptionBilling": "Suscripción y Facturación",
+    "adminPanel": "Panel de Administración",
+    "vipCoachAssistant": "Asistente Coach VIP",
+    "generateDocument": "Generar Mi Documento"
   }
 }

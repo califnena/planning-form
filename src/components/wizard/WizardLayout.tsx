@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ChevronLeft, ChevronRight, Home } from "lucide-react";
@@ -33,11 +34,12 @@ export const WizardLayout = ({
   mode,
 }: WizardLayoutProps) => {
   const { superSeniorMode } = useAccessibility();
+  const { t } = useTranslation();
   const progress = (currentStep / totalSteps) * 100;
 
   const modeTitle = mode === "preplanning" 
-    ? "My Final Wishes – Step-by-Step Guide"
-    : "After-Death Steps – Step-by-Step Guide";
+    ? t("wizard.preplanning.stepByStepTitle")
+    : t("wizard.afterdeath.stepByStepTitle");
 
   const modeColor = mode === "afterdeath" 
     ? "bg-orange-500 dark:bg-orange-600"
@@ -61,15 +63,15 @@ export const WizardLayout = ({
               className={cn(superSeniorMode && "h-12 px-6 text-lg")}
             >
               <Home className="h-4 w-4 mr-2" />
-              Exit to Dashboard
+              {t("wizard.exitToDashboard")}
             </Button>
           </div>
 
           {/* Progress Bar */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <span>Step {currentStep} of {totalSteps}</span>
-              <span>{Math.round(progress)}% Complete</span>
+              <span>{t("wizard.stepOf", { current: currentStep, total: totalSteps })}</span>
+              <span>{t("wizard.percentComplete", { percent: Math.round(progress) })}</span>
             </div>
             <Progress value={progress} className="h-3" />
           </div>
@@ -108,7 +110,7 @@ export const WizardLayout = ({
             className={cn(superSeniorMode && "h-12 px-6 text-lg")}
           >
             <ChevronLeft className="h-4 w-4 mr-2" />
-            Back
+            {t("common.back")}
           </Button>
 
           <div className="flex gap-3">
@@ -117,7 +119,7 @@ export const WizardLayout = ({
               onClick={onExit}
               className={cn(superSeniorMode && "h-12 px-6 text-lg")}
             >
-              Save and Exit
+              {t("wizard.saveAndExit")}
             </Button>
             <Button
               onClick={onNext}
@@ -127,7 +129,7 @@ export const WizardLayout = ({
                 mode === "afterdeath" && modeColor
               )}
             >
-              Save and Continue
+              {t("wizard.saveAndContinue")}
               <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
           </div>

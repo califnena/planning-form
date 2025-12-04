@@ -93,18 +93,18 @@ export function Step0Overview({ formData, onSave, planPreparedFor }: Step0Overvi
   }, [preparedFor, overviewNotes, step1Complete, step2Complete, step3Complete, step4Complete, step5Complete, step6Complete, step7Complete, step8Complete, step9Complete, step10Complete, step11Complete, step12Complete]);
 
   const steps = [
-    { complete: step1Complete, setComplete: setStep1Complete, title: "Immediate Needs (First 48 Hours)" },
-    { complete: step2Complete, setComplete: setStep2Complete, title: "Official Notifications (Government & Services)" },
-    { complete: step3Complete, setComplete: setStep3Complete, title: "Find Key Documents (Legal Papers)" },
-    { complete: step4Complete, setComplete: setStep4Complete, title: "Death Certificates (Orders & Distribution)" },
-    { complete: step5Complete, setComplete: setStep5Complete, title: "Obituary & Announcements (Public Notices)" },
-    { complete: step6Complete, setComplete: setStep6Complete, title: "Service & Memorial Details (Planning Ceremony)" },
-    { complete: step7Complete, setComplete: setStep7Complete, title: "Finances & Estate (Money & Property)" },
-    { complete: step8Complete, setComplete: setStep8Complete, title: "Digital Accounts (Online Presence)" },
-    { complete: step9Complete, setComplete: setStep9Complete, title: "Real Estate & Utilities (Property Management)" },
-    { complete: step10Complete, setComplete: setStep10Complete, title: "Subscriptions (Non-Digital Services)" },
-    { complete: step11Complete, setComplete: setStep11Complete, title: "Other Property (Vehicles, Jewelry & More)" },
-    { complete: step12Complete, setComplete: setStep12Complete, title: "Business (Business Ownership)" },
+    { complete: step1Complete, setComplete: setStep1Complete, title: t("afterDeathSteps.step1Full") },
+    { complete: step2Complete, setComplete: setStep2Complete, title: t("afterDeathSteps.step2Full") },
+    { complete: step3Complete, setComplete: setStep3Complete, title: t("afterDeathSteps.step3Full") },
+    { complete: step4Complete, setComplete: setStep4Complete, title: t("afterDeathSteps.step4Full") },
+    { complete: step5Complete, setComplete: setStep5Complete, title: t("afterDeathSteps.step5Full") },
+    { complete: step6Complete, setComplete: setStep6Complete, title: t("afterDeathSteps.step6Full") },
+    { complete: step7Complete, setComplete: setStep7Complete, title: t("afterDeathSteps.step7Full") },
+    { complete: step8Complete, setComplete: setStep8Complete, title: t("afterDeathSteps.step8Full") },
+    { complete: step9Complete, setComplete: setStep9Complete, title: t("afterDeathSteps.step9Full") },
+    { complete: step10Complete, setComplete: setStep10Complete, title: t("afterDeathSteps.step10Full") },
+    { complete: step11Complete, setComplete: setStep11Complete, title: t("afterDeathSteps.step11Full") },
+    { complete: step12Complete, setComplete: setStep12Complete, title: t("afterDeathSteps.step12Full") },
   ];
 
   return (
@@ -121,16 +121,16 @@ export function Step0Overview({ formData, onSave, planPreparedFor }: Step0Overvi
 
       {/* Introduction */}
       <div className="bg-muted/30 rounded-lg p-8 space-y-4">
-        <h2 className="text-2xl font-bold text-foreground">After-Death Planner</h2>
+        <h2 className="text-2xl font-bold text-foreground">{t("afterDeathSteps.plannerTitle")}</h2>
         <p className="text-base text-muted-foreground leading-relaxed">
-          This After-Death Planner is a step-by-step guide to help you through the practical tasks that follow a loss. We are very sorry you are going through this. {displayName} cared deeply about you and wanted to make it easier for you to honor their wishes and remember them the way they hoped.
+          {t("afterDeathSteps.introText")} {t("afterDeathSteps.introDynamicText", { name: displayName })}
         </p>
       </div>
 
       {/* Prepared For Section */}
       <div className="bg-primary/10 border border-primary/20 rounded-lg p-6">
         <Label htmlFor="preparedFor" className="text-base font-bold text-foreground mb-3 block">
-          This planner is prepared for:
+          {t("afterDeathSteps.preparedForLabel")}
         </Label>
         <Input
           id="preparedFor"
@@ -143,9 +143,9 @@ export function Step0Overview({ formData, onSave, planPreparedFor }: Step0Overvi
 
       {/* 12-Step Action Plan */}
       <div className="space-y-4">
-        <h3 className="text-xl font-semibold text-foreground">12-Step Action Plan</h3>
+        <h3 className="text-xl font-semibold text-foreground">{t("afterDeathSteps.actionPlanTitle")}</h3>
         <p className="text-sm text-muted-foreground">
-          Mark each step complete as you work through them. Use the sidebar to navigate between steps.
+          {t("afterDeathSteps.actionPlanDescription")}
         </p>
         
         <div className="space-y-4">
