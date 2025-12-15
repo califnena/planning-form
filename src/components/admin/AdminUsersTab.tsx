@@ -8,11 +8,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Loader2, Search, User, Crown, UserPlus } from "lucide-react";
+import { Loader2, Search, User, Crown, UserPlus, Shield, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { listUsers, AdminUser, inviteUser, addMember } from "@/lib/adminApi";
+import { listUsers, AdminUser, inviteUser, updateMemberRole } from "@/lib/adminApi";
 import { UserDetailDrawer } from "./UserDetailDrawer";
 import { format } from "date-fns";
+
+const ORG_ROLES = ['owner', 'admin', 'member', 'executor', 'vip'] as const;
 
 export function AdminUsersTab() {
   const { t } = useTranslation();
@@ -29,6 +31,7 @@ export function AdminUsersTab() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("member");
   const [inviting, setInviting] = useState(false);
+  const [updatingRoleFor, setUpdatingRoleFor] = useState<string | null>(null);
 
   const loadUsers = async () => {
     setLoading(true);
@@ -84,6 +87,41 @@ export function AdminUsersTab() {
   const handleUserClick = (user: AdminUser) => {
     setSelectedUser(user);
     setDrawerOpen(true);
+  };
+
+  const handleRoleChange = async (userId: string, newRole: string, isOwner: boolean) => {
+    // Prevent changing owner's role
+    if (isOwner) {
+      toast({
+        title: t("admin.error"),
+        description: "Cannot change app owner's role",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUpdatingRoleFor(userId);
+    try {
+      await updateMemberRole(userId, newRole);
+      
+      // Update local state
+      setUsers(prev => prev.map(u => 
+        u.id === userId ? { ...u, roles: [newRole] } : u
+      ));
+      
+      toast({
+        title: t("admin.users.roleUpdated"),
+        description: t("admin.users.roleUpdatedDescription", { role: newRole }),
+      });
+    } catch (error: any) {
+      toast({
+        title: t("admin.error"),
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingRoleFor(null);
+    }
   };
 
   const handleInviteOrAddUser = async () => {
@@ -278,16 +316,36 @@ export function AdminUsersTab() {
                           : "-"
                         }
                       </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {user.roles.length > 0 ? (
-                            user.roles.map((role) => (
-                              <Badge key={role} variant={role === "admin" ? "destructive" : "secondary"}>
-                                {role}
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-2">
+                          {updatingRoleFor === user.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : user.is_owner ? (
+                            <div className="flex items-center gap-1">
+                              <ShieldCheck className="h-4 w-4 text-yellow-500" />
+                              <Badge variant="default" className="bg-yellow-500 hover:bg-yellow-600">
+                                owner
                               </Badge>
-                            ))
+                            </div>
                           ) : (
-                            <span className="text-muted-foreground">-</span>
+                            <Select 
+                              value={user.roles[0] || 'member'} 
+                              onValueChange={(value) => handleRoleChange(user.id, value, user.is_owner)}
+                            >
+                              <SelectTrigger className="w-[120px] h-8">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {ORG_ROLES.filter(r => r !== 'owner').map((role) => (
+                                  <SelectItem key={role} value={role}>
+                                    <div className="flex items-center gap-2">
+                                      {role === 'admin' && <Shield className="h-3 w-3" />}
+                                      {role}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           )}
                         </div>
                       </TableCell>
