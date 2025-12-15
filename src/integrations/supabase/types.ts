@@ -567,7 +567,6 @@ export type Database = {
           pob_state: string | null
           religion: string | null
           residence_address: string | null
-          ssn_encrypted: string | null
           tod: string | null
           updated_at: string
         }
@@ -589,7 +588,6 @@ export type Database = {
           pob_state?: string | null
           religion?: string | null
           residence_address?: string | null
-          ssn_encrypted?: string | null
           tod?: string | null
           updated_at?: string
         }
@@ -611,7 +609,6 @@ export type Database = {
           pob_state?: string | null
           religion?: string | null
           residence_address?: string | null
-          ssn_encrypted?: string | null
           tod?: string | null
           updated_at?: string
         }
