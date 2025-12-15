@@ -53,27 +53,49 @@ export async function listUsers(): Promise<AdminUser[]> {
   const isAdmin = await checkIsAdmin();
   if (!isAdmin) throw new Error('Unauthorized: Admin access required');
 
-  const DEFAULT_ORG_ID = "00000000-0000-0000-0000-000000000001";
+  // Get current user to find their org
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  // Get user's org (prefer owner/admin membership)
+  const { data: userMembership, error: membershipError } = await supabase
+    .from('org_members')
+    .select('org_id, role')
+    .eq('user_id', user.id)
+    .order('role', { ascending: true }) // owner comes first alphabetically before member
+    .limit(1)
+    .maybeSingle();
+
+  if (membershipError) throw membershipError;
+  if (!userMembership) throw new Error('User is not a member of any organization');
+
+  const orgId = userMembership.org_id;
 
   // Get org_members as the primary source - this is who is in the workspace
   const { data: orgMembers, error: orgError } = await supabase
     .from('org_members')
     .select('user_id, role, created_at')
-    .eq('org_id', DEFAULT_ORG_ID);
+    .eq('org_id', orgId);
 
   if (orgError) throw orgError;
 
-  // Get profiles for user metadata (LEFT JOIN conceptually)
+  // Build list of user IDs for efficient filtering
+  const userIds = orgMembers?.map(m => m.user_id) || [];
+  if (userIds.length === 0) return [];
+
+  // Get profiles for user metadata - filtered by user IDs
   const { data: profiles } = await supabase
     .from('profiles')
-    .select('id, full_name, created_at');
+    .select('id, full_name, created_at')
+    .in('id', userIds);
 
   const profilesMap = new Map(profiles?.map(p => [p.id, p]) || []);
 
-  // Get login stats
+  // Get login stats - filtered by user IDs
   const { data: loginStats } = await supabase
     .from('user_logins')
-    .select('user_id, logged_in_at');
+    .select('user_id, logged_in_at')
+    .in('user_id', userIds);
 
   // Aggregate login stats manually
   const loginStatsMap = new Map<string, { count: number; lastLogin: string | null }>();
@@ -89,10 +111,11 @@ export async function listUsers(): Promise<AdminUser[]> {
     }
   });
 
-  // Get subscriptions for plan info (separate from workspace roles)
+  // Get subscriptions for plan info - filtered by user IDs
   const { data: subscriptions } = await supabase
     .from('subscriptions')
-    .select('user_id, plan_type, status, current_period_end');
+    .select('user_id, plan_type, status, current_period_end')
+    .in('user_id', userIds);
 
   const subscriptionMap = new Map(
     subscriptions?.map(s => [s.user_id, s]) || []
