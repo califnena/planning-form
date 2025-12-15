@@ -7,7 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Loader2, Plus, Shield, Pencil, Trash2, AlertTriangle, Crown, UserCheck, Eye, Star, Check, X } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Loader2, Plus, Shield, Pencil, Trash2, AlertTriangle, Crown, UserCheck, Eye, Star, Check, X, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { listRoles, createRole, updateRole, deleteRole, AppRole, PROTECTED_ROLES } from "@/lib/adminApi";
@@ -95,6 +97,52 @@ const CAPABILITY_LABELS = {
   accessVIP: "Access VIP Coach features",
   canBeRemoved: "Can be removed from workspace",
 };
+
+function RoleDefinitionsPopover() {
+  const { t } = useTranslation();
+  
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-6 w-6">
+          <Info className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[380px] p-0" align="start">
+        <ScrollArea className="h-[420px]">
+          <div className="p-4 space-y-3">
+            <h4 className="font-semibold text-sm border-b pb-2">{t("admin.roles.roleDefinitions")}</h4>
+            {Object.entries(ROLE_DEFINITIONS).map(([roleName, def]) => {
+              const IconComponent = def.icon;
+              return (
+                <div key={roleName} className={`rounded-lg border p-3 ${def.color}`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <IconComponent className="h-4 w-4" />
+                    <span className="font-medium capitalize text-sm">{roleName}</span>
+                  </div>
+                  <ul className="space-y-1 text-xs">
+                    {Object.entries(def.capabilities).map(([cap, hasAccess]) => (
+                      <li key={cap} className="flex items-center gap-1.5">
+                        {hasAccess ? (
+                          <Check className="h-3 w-3 text-green-600 flex-shrink-0" />
+                        ) : (
+                          <X className="h-3 w-3 text-muted-foreground/50 flex-shrink-0" />
+                        )}
+                        <span className={hasAccess ? "" : "text-muted-foreground/60"}>
+                          {CAPABILITY_LABELS[cap as keyof typeof CAPABILITY_LABELS]}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+        </ScrollArea>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 export function AdminRolesTab() {
   const { t } = useTranslation();
@@ -227,6 +275,7 @@ export function AdminRolesTab() {
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
               {t("admin.roles.title")}
+              <RoleDefinitionsPopover />
             </CardTitle>
             <CardDescription>{t("admin.roles.description")}</CardDescription>
           </div>
@@ -275,42 +324,7 @@ export function AdminRolesTab() {
           </Dialog>
         </div>
       </CardHeader>
-      <CardContent className="space-y-8">
-        {/* Role Definitions Section */}
-        <div>
-          <h3 className="text-lg font-semibold mb-4">{t("admin.roles.roleDefinitions")}</h3>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {Object.entries(ROLE_DEFINITIONS).map(([roleName, def]) => {
-              const IconComponent = def.icon;
-              return (
-                <div 
-                  key={roleName} 
-                  className={`rounded-lg border p-4 ${def.color}`}
-                >
-                  <div className="flex items-center gap-2 mb-3">
-                    <IconComponent className="h-5 w-5" />
-                    <span className="font-semibold capitalize">{roleName}</span>
-                  </div>
-                  <ul className="space-y-1.5 text-sm">
-                    {Object.entries(def.capabilities).map(([cap, hasAccess]) => (
-                      <li key={cap} className="flex items-center gap-2">
-                        {hasAccess ? (
-                          <Check className="h-3.5 w-3.5 text-green-600 flex-shrink-0" />
-                        ) : (
-                          <X className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                        )}
-                        <span className={hasAccess ? "" : "text-muted-foreground"}>
-                          {CAPABILITY_LABELS[cap as keyof typeof CAPABILITY_LABELS]}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
+      <CardContent>
         {/* Existing Roles Table */}
         <div>
           <h3 className="text-lg font-semibold mb-4">{t("admin.roles.allRoles")}</h3>
