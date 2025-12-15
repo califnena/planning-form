@@ -731,6 +731,9 @@ export type Database = {
           county: string | null
           created_at: string
           description: string | null
+          email_body: string | null
+          email_preview: string | null
+          email_subject: string | null
           event_date_end: string | null
           event_date_start: string
           event_link: string | null
@@ -738,6 +741,7 @@ export type Database = {
           id: string
           is_published: boolean
           is_vendor_friendly: boolean
+          list_summary: string | null
           name: string
           organizer_email: string | null
           organizer_name: string | null
@@ -759,6 +763,9 @@ export type Database = {
           county?: string | null
           created_at?: string
           description?: string | null
+          email_body?: string | null
+          email_preview?: string | null
+          email_subject?: string | null
           event_date_end?: string | null
           event_date_start: string
           event_link?: string | null
@@ -766,6 +773,7 @@ export type Database = {
           id?: string
           is_published?: boolean
           is_vendor_friendly?: boolean
+          list_summary?: string | null
           name: string
           organizer_email?: string | null
           organizer_name?: string | null
@@ -787,6 +795,9 @@ export type Database = {
           county?: string | null
           created_at?: string
           description?: string | null
+          email_body?: string | null
+          email_preview?: string | null
+          email_subject?: string | null
           event_date_end?: string | null
           event_date_start?: string
           event_link?: string | null
@@ -794,6 +805,7 @@ export type Database = {
           id?: string
           is_published?: boolean
           is_vendor_friendly?: boolean
+          list_summary?: string | null
           name?: string
           organizer_email?: string | null
           organizer_name?: string | null
