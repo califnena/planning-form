@@ -279,6 +279,7 @@ export type Database = {
           executor_contact_id: string | null
           form_data: Json | null
           id: string
+          org_id: string | null
           updated_at: string
           user_id: string
         }
@@ -289,6 +290,7 @@ export type Database = {
           executor_contact_id?: string | null
           form_data?: Json | null
           id?: string
+          org_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -299,6 +301,7 @@ export type Database = {
           executor_contact_id?: string | null
           form_data?: Json | null
           id?: string
+          org_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -315,6 +318,13 @@ export type Database = {
             columns: ["executor_contact_id"]
             isOneToOne: false
             referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cases_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
             referencedColumns: ["id"]
           },
         ]
