@@ -2143,6 +2143,14 @@ export type Database = {
       }
     }
     Functions: {
+      check_org_admin: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
+      check_org_membership: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
       get_user_subscription: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["subscription_plan"]
