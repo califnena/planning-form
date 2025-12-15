@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Loader2, Search, User, Crown, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { listUsers, AdminUser, inviteUser } from "@/lib/adminApi";
+import { listUsers, AdminUser, inviteUser, addMember } from "@/lib/adminApi";
 import { UserDetailDrawer } from "./UserDetailDrawer";
 import { format } from "date-fns";
 
@@ -27,6 +27,7 @@ export function AdminUsersTab() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState("member");
   const [inviting, setInviting] = useState(false);
 
   const loadUsers = async () => {
@@ -85,20 +86,31 @@ export function AdminUsersTab() {
     setDrawerOpen(true);
   };
 
-  const handleInviteUser = async () => {
+  const handleInviteOrAddUser = async () => {
     if (!inviteEmail.trim()) return;
     setInviting(true);
     try {
-      await inviteUser(inviteEmail.trim());
-      toast({
-        title: t("admin.users.inviteSent"),
-        description: t("admin.users.inviteSentDescription", { email: inviteEmail }),
-      });
+      // Try to add existing user first
+      const result = await inviteUser(inviteEmail.trim(), inviteRole);
+      
+      if (result.alreadyExisted) {
+        toast({
+          title: t("admin.users.memberAdded"),
+          description: t("admin.users.existingUserAdded", { email: inviteEmail }),
+        });
+      } else {
+        toast({
+          title: t("admin.users.inviteSent"),
+          description: t("admin.users.inviteSentDescription", { email: inviteEmail }),
+        });
+      }
+      
       setInviteEmail("");
+      setInviteRole("member");
       setInviteDialogOpen(false);
       loadUsers();
     } catch (error: any) {
-      // Check if user already exists
+      // Check if user already exists (shouldn't happen anymore since invite handles it)
       if (error.message?.includes("already exists") || error.message?.includes("already been registered")) {
         toast({
           title: t("admin.users.userAlreadyExists"),
@@ -140,13 +152,13 @@ export function AdminUsersTab() {
               <DialogTrigger asChild>
                 <Button>
                   <UserPlus className="mr-2 h-4 w-4" />
-                  {t("admin.users.inviteUser")}
+                  {t("admin.users.addMember")}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>{t("admin.users.inviteUser")}</DialogTitle>
-                  <DialogDescription>{t("admin.users.inviteUserDescription")}</DialogDescription>
+                  <DialogTitle>{t("admin.users.addMember")}</DialogTitle>
+                  <DialogDescription>{t("admin.users.addMemberDescription")}</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
@@ -159,14 +171,28 @@ export function AdminUsersTab() {
                       placeholder={t("admin.users.emailPlaceholder")}
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="inviteRole">{t("admin.users.role")}</Label>
+                    <Select value={inviteRole} onValueChange={setInviteRole}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("admin.users.selectRole")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="member">Member</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="executor">Executor</SelectItem>
+                        <SelectItem value="vip">VIP</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setInviteDialogOpen(false)}>
                     {t("common.cancel")}
                   </Button>
-                  <Button onClick={handleInviteUser} disabled={inviting || !inviteEmail.trim()}>
+                  <Button onClick={handleInviteOrAddUser} disabled={inviting || !inviteEmail.trim()}>
                     {inviting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {t("admin.users.sendInvite")}
+                    {t("admin.users.addMember")}
                   </Button>
                 </DialogFooter>
               </DialogContent>

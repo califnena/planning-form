@@ -65,7 +65,11 @@ serve(async (req) => {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    const { action, targetUserId, email } = await req.json();
+    const { action, targetUserId, email, role, orgId } = await req.json();
+    
+    // Default org ID
+    const DEFAULT_ORG_ID = "00000000-0000-0000-0000-000000000001";
+    const effectiveOrgId = orgId || DEFAULT_ORG_ID;
 
     // Check if target is app owner (protected)
     if (targetUserId) {
@@ -108,12 +112,117 @@ serve(async (req) => {
         result = { success: true, message: "User unblocked" };
         break;
 
+      case "add_member":
+        // Add an existing user to org_members by email
+        if (!email) {
+          return new Response(
+            JSON.stringify({ error: "Email required" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        // Look up user by email using admin API
+        const { data: authUsers, error: lookupError } = await adminClient.auth.admin.listUsers();
+        if (lookupError) throw lookupError;
+        
+        const targetUser = authUsers.users.find((u: any) => u.email?.toLowerCase() === email.toLowerCase());
+        
+        if (!targetUser) {
+          return new Response(
+            JSON.stringify({ error: "No user found with this email. They need to create an account first." }),
+            { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        // Validate role
+        const validRoles = ['owner', 'admin', 'member', 'executor', 'vip'];
+        const memberRole = role || 'member';
+        if (!validRoles.includes(memberRole)) {
+          return new Response(
+            JSON.stringify({ error: `Invalid role. Must be one of: ${validRoles.join(', ')}` }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        // Upsert into org_members
+        const { error: upsertError } = await adminClient
+          .from('org_members')
+          .upsert({
+            org_id: effectiveOrgId,
+            user_id: targetUser.id,
+            role: memberRole,
+            created_at: new Date().toISOString(),
+          }, { onConflict: 'org_id,user_id' });
+
+        if (upsertError) {
+          console.error("Upsert error:", upsertError);
+          throw upsertError;
+        }
+
+        console.log(`Added user ${email} to org ${effectiveOrgId} with role ${memberRole}`);
+        result = { success: true, message: "Member added", userId: targetUser.id, role: memberRole };
+        break;
+
+      case "update_member_role":
+        // Update a member's role in org_members
+        if (!targetUserId || !role) {
+          return new Response(
+            JSON.stringify({ error: "User ID and role required" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        const validUpdateRoles = ['owner', 'admin', 'member', 'executor', 'vip'];
+        if (!validUpdateRoles.includes(role)) {
+          return new Response(
+            JSON.stringify({ error: `Invalid role. Must be one of: ${validUpdateRoles.join(', ')}` }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        const { error: updateError } = await adminClient
+          .from('org_members')
+          .update({ role: role })
+          .eq('org_id', effectiveOrgId)
+          .eq('user_id', targetUserId);
+
+        if (updateError) throw updateError;
+        result = { success: true, message: "Role updated" };
+        break;
+
       case "invite":
         if (!email) {
           return new Response(
             JSON.stringify({ error: "Email required for invite" }),
             { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
+        }
+
+        // First check if user already exists
+        const { data: existingUsers } = await adminClient.auth.admin.listUsers();
+        const existingUser = existingUsers?.users.find((u: any) => u.email?.toLowerCase() === email.toLowerCase());
+        
+        if (existingUser) {
+          // User exists - add to org_members instead of inviting
+          const addRole = role || 'member';
+          const { error: addError } = await adminClient
+            .from('org_members')
+            .upsert({
+              org_id: effectiveOrgId,
+              user_id: existingUser.id,
+              role: addRole,
+              created_at: new Date().toISOString(),
+            }, { onConflict: 'org_id,user_id' });
+
+          if (addError) throw addError;
+          
+          result = { 
+            success: true, 
+            message: "User already exists - added to workspace", 
+            userId: existingUser.id,
+            alreadyExisted: true 
+          };
+          break;
         }
 
         const { data: inviteData, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email);
@@ -137,17 +246,31 @@ serve(async (req) => {
             { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
+        
+        // Add invited user to org_members with default role
+        if (inviteData.user?.id) {
+          const inviteRole = role || 'member';
+          await adminClient
+            .from('org_members')
+            .upsert({
+              org_id: effectiveOrgId,
+              user_id: inviteData.user.id,
+              role: inviteRole,
+              created_at: new Date().toISOString(),
+            }, { onConflict: 'org_id,user_id' });
+        }
+        
         result = { success: true, message: "Invitation sent", userId: inviteData.user?.id };
         break;
 
       case "get_users":
         // Get all users with their metadata including banned status
-        const { data: authUsers, error: listError } = await adminClient.auth.admin.listUsers();
+        const { data: allAuthUsers, error: listError } = await adminClient.auth.admin.listUsers();
         
         if (listError) throw listError;
         
         result = {
-          users: authUsers.users.map((u: any) => ({
+          users: allAuthUsers.users.map((u: any) => ({
             id: u.id,
             email: u.email,
             created_at: u.created_at,

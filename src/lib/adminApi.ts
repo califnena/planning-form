@@ -447,12 +447,12 @@ export async function unblockUser(userId: string): Promise<void> {
 /**
  * Invite a new user by email
  */
-export async function inviteUser(email: string): Promise<string | undefined> {
+export async function inviteUser(email: string, role?: string): Promise<{ userId?: string; alreadyExisted?: boolean }> {
   const isAdmin = await checkIsAdmin();
   if (!isAdmin) throw new Error('Unauthorized: Admin access required');
 
   const { data, error } = await supabase.functions.invoke('admin-user-management', {
-    body: { action: 'invite', email }
+    body: { action: 'invite', email, role: role || 'member' }
   });
 
   // Extract server error from various possible locations
@@ -466,5 +466,39 @@ export async function inviteUser(email: string): Promise<string | undefined> {
     throw new Error(serverError || 'Failed to invite user');
   }
   
-  return data?.userId;
+  return { userId: data?.userId, alreadyExisted: data?.alreadyExisted };
+}
+
+/**
+ * Add an existing user to the workspace by email
+ */
+export async function addMember(email: string, role: string = 'member'): Promise<{ userId: string; role: string }> {
+  const isAdmin = await checkIsAdmin();
+  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
+
+  const { data, error } = await supabase.functions.invoke('admin-user-management', {
+    body: { action: 'add_member', email, role }
+  });
+
+  if (error || data?.error) {
+    throw new Error(data?.error || error?.message || 'Failed to add member');
+  }
+  
+  return { userId: data.userId, role: data.role };
+}
+
+/**
+ * Update a member's role in the workspace
+ */
+export async function updateMemberRole(userId: string, role: string): Promise<void> {
+  const isAdmin = await checkIsAdmin();
+  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
+
+  const { data, error } = await supabase.functions.invoke('admin-user-management', {
+    body: { action: 'update_member_role', targetUserId: userId, role }
+  });
+
+  if (error || data?.error) {
+    throw new Error(data?.error || error?.message || 'Failed to update role');
+  }
 }
