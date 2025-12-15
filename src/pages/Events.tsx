@@ -37,6 +37,7 @@ interface EfaEvent {
   organizer_email: string | null;
   organizer_phone: string | null;
   tags: string[] | null;
+  list_summary: string | null;
 }
 
 const CATEGORIES = [
@@ -163,8 +164,10 @@ const Events = () => {
           </div>
         )}
 
-        {event.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2">{event.description}</p>
+        {(event.list_summary || event.description) && (
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {event.list_summary || (event.description?.substring(0, 120) + (event.description && event.description.length > 120 ? "..." : ""))}
+          </p>
         )}
 
         <div className="flex flex-wrap gap-2 pt-2">

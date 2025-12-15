@@ -14,6 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Sparkles, ChevronDown, Loader2 } from "lucide-react";
 
 interface EfaEvent {
   id: string;
@@ -39,6 +41,10 @@ interface EfaEvent {
   organizer_email: string | null;
   organizer_phone: string | null;
   is_published: boolean;
+  list_summary?: string | null;
+  email_subject?: string | null;
+  email_preview?: string | null;
+  email_body?: string | null;
 }
 
 interface EventFormDialogProps {
@@ -89,12 +95,20 @@ const initialFormState = {
   organizer_name: "",
   organizer_email: "",
   organizer_phone: "",
-  is_published: true
+  is_published: true,
+  list_summary: "",
+  email_subject: "",
+  email_preview: "",
+  email_body: ""
 };
 
 export const EventFormDialog = ({ open, onOpenChange, event }: EventFormDialogProps) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState(initialFormState);
+  const [generatingList, setGeneratingList] = useState(false);
+  const [generatingDetail, setGeneratingDetail] = useState(false);
+  const [generatingEmail, setGeneratingEmail] = useState(false);
+  const [emailOpen, setEmailOpen] = useState(false);
 
   useEffect(() => {
     if (event) {
@@ -120,12 +134,109 @@ export const EventFormDialog = ({ open, onOpenChange, event }: EventFormDialogPr
         organizer_name: event.organizer_name || "",
         organizer_email: event.organizer_email || "",
         organizer_phone: event.organizer_phone || "",
-        is_published: event.is_published
+        is_published: event.is_published,
+        list_summary: event.list_summary || "",
+        email_subject: event.email_subject || "",
+        email_preview: event.email_preview || "",
+        email_body: event.email_body || ""
       });
     } else {
       setFormData(initialFormState);
     }
   }, [event, open]);
+
+  const validateForAI = () => {
+    const missing: string[] = [];
+    if (!formData.name) missing.push("Event Name");
+    if (!formData.category) missing.push("Category");
+    if (!formData.event_date_start) missing.push("Start Date");
+    if (!formData.city && !formData.state) missing.push("City or State");
+    
+    if (missing.length > 0) {
+      toast({
+        title: "Missing Required Fields",
+        description: `Please fill in: ${missing.join(", ")}`,
+        variant: "destructive"
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const generateContent = async (type: "list" | "detail" | "email") => {
+    if (!validateForAI()) return;
+
+    const setLoading = type === "list" ? setGeneratingList : type === "detail" ? setGeneratingDetail : setGeneratingEmail;
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-event-content", {
+        body: {
+          type,
+          event: {
+            name: formData.name,
+            category: formData.category,
+            event_date_start: formData.event_date_start,
+            event_date_end: formData.event_date_end || undefined,
+            time_text: formData.time_text || undefined,
+            venue: formData.venue || undefined,
+            address: formData.address || undefined,
+            city: formData.city || undefined,
+            county: formData.county || undefined,
+            state: formData.state || undefined,
+            zip: formData.zip || undefined,
+            cost_attendee: formData.cost_attendee || undefined,
+            is_vendor_friendly: formData.is_vendor_friendly,
+            booth_fee: formData.booth_fee || undefined,
+            booth_deadline: formData.booth_deadline || undefined,
+            exhibitor_link: formData.exhibitor_link || undefined,
+            event_link: formData.event_link || undefined,
+            organizer_name: formData.organizer_name || undefined,
+            organizer_email: formData.organizer_email || undefined,
+            organizer_phone: formData.organizer_phone || undefined
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      if (type === "list" && data?.content) {
+        setFormData(prev => ({ ...prev, list_summary: data.content }));
+        toast({ title: "List Summary Generated" });
+      } else if (type === "detail" && data?.content) {
+        if (formData.description && formData.description.trim()) {
+          // Ask user if they want to replace or append
+          const shouldReplace = window.confirm("Description already has content. Replace it? (Cancel to append)");
+          if (shouldReplace) {
+            setFormData(prev => ({ ...prev, description: data.content }));
+          } else {
+            setFormData(prev => ({ ...prev, description: prev.description + "\n\n" + data.content }));
+          }
+        } else {
+          setFormData(prev => ({ ...prev, description: data.content }));
+        }
+        toast({ title: "Description Generated" });
+      } else if (type === "email") {
+        setFormData(prev => ({
+          ...prev,
+          email_subject: data.email_subject || "",
+          email_preview: data.email_preview || "",
+          email_body: data.email_body || ""
+        }));
+        setEmailOpen(true);
+        toast({ title: "Email Reminder Generated" });
+      }
+    } catch (err: any) {
+      console.error("Generation error:", err);
+      toast({
+        title: "Generation Failed",
+        description: err.message || "Could not generate content",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,7 +264,11 @@ export const EventFormDialog = ({ open, onOpenChange, event }: EventFormDialogPr
       organizer_name: formData.organizer_name || null,
       organizer_email: formData.organizer_email || null,
       organizer_phone: formData.organizer_phone || null,
-      is_published: formData.is_published
+      is_published: formData.is_published,
+      list_summary: formData.list_summary || null,
+      email_subject: formData.email_subject || null,
+      email_preview: formData.email_preview || null,
+      email_body: formData.email_body || null
     };
 
     let error;
@@ -244,10 +359,115 @@ export const EventFormDialog = ({ open, onOpenChange, event }: EventFormDialogPr
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Event description..."
-                  rows={3}
+                  rows={4}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="list_summary">List Summary <span className="text-muted-foreground text-xs">(for event cards)</span></Label>
+                  <span className="text-xs text-muted-foreground">{formData.list_summary.length}/140</span>
+                </div>
+                <Input
+                  id="list_summary"
+                  value={formData.list_summary}
+                  onChange={(e) => setFormData({ ...formData, list_summary: e.target.value.slice(0, 140) })}
+                  placeholder="Short summary for event list cards..."
+                  maxLength={140}
                 />
               </div>
             </div>
+
+            {/* AI Helpers */}
+            <div className="space-y-4 p-4 bg-muted/50 rounded-lg border">
+              <h3 className="font-semibold flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                AI Helpers
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Generate content automatically based on event details. Fill in basic info first.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => generateContent("list")}
+                  disabled={generatingList}
+                >
+                  {generatingList ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}
+                  Generate List Summary
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => generateContent("detail")}
+                  disabled={generatingDetail}
+                >
+                  {generatingDetail ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}
+                  Generate Description
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => generateContent("email")}
+                  disabled={generatingEmail}
+                >
+                  {generatingEmail ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}
+                  Generate Email Reminder
+                </Button>
+              </div>
+            </div>
+
+            {/* Email Reminder Fields */}
+            <Collapsible open={emailOpen} onOpenChange={setEmailOpen}>
+              <CollapsibleTrigger asChild>
+                <Button type="button" variant="ghost" className="w-full justify-between">
+                  Email Reminder Content
+                  <ChevronDown className={`h-4 w-4 transition-transform ${emailOpen ? "rotate-180" : ""}`} />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="email_subject">Subject Line</Label>
+                    <span className="text-xs text-muted-foreground">{formData.email_subject.length}/60</span>
+                  </div>
+                  <Input
+                    id="email_subject"
+                    value={formData.email_subject}
+                    onChange={(e) => setFormData({ ...formData, email_subject: e.target.value.slice(0, 60) })}
+                    placeholder="Email subject..."
+                    maxLength={60}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="email_preview">Preview Text</Label>
+                    <span className="text-xs text-muted-foreground">{formData.email_preview.length}/90</span>
+                  </div>
+                  <Input
+                    id="email_preview"
+                    value={formData.email_preview}
+                    onChange={(e) => setFormData({ ...formData, email_preview: e.target.value.slice(0, 90) })}
+                    placeholder="Email preview text..."
+                    maxLength={90}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email_body">Email Body</Label>
+                  <Textarea
+                    id="email_body"
+                    value={formData.email_body}
+                    onChange={(e) => setFormData({ ...formData, email_body: e.target.value })}
+                    placeholder="Email body content..."
+                    rows={6}
+                  />
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
 
             {/* Date & Time */}
             <div className="space-y-4">
