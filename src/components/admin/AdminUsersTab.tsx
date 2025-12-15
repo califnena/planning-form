@@ -193,7 +193,10 @@ export function AdminUsersTab() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t("admin.users.allRoles")}</SelectItem>
+                <SelectItem value="owner">Owner</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="member">Member</SelectItem>
+                <SelectItem value="executor">Executor</SelectItem>
                 <SelectItem value="vip">VIP</SelectItem>
                 <SelectItem value="basic">Basic</SelectItem>
               </SelectContent>

@@ -59,7 +59,7 @@ export async function listUsers(): Promise<AdminUser[]> {
   
   if (profilesError) throw profilesError;
 
-  // Get login stats - use raw query since view may not be in types
+  // Get login stats
   const { data: loginStats } = await supabase
     .from('user_logins')
     .select('user_id, logged_in_at');
@@ -78,27 +78,41 @@ export async function listUsers(): Promise<AdminUser[]> {
     }
   });
 
-  // Get user roles
+  // Get user entitlement roles from app_roles/user_roles (subscription-based)
   const { data: userRoles } = await supabase
     .from('user_roles')
     .select('user_id, role_id');
 
-  // Get all roles
   const { data: allRoles } = await supabase
     .from('app_roles')
     .select('id, name');
 
   const roleMap = new Map(allRoles?.map(r => [r.id, r.name]) || []);
   
-  // Build user roles map
-  const userRolesMap = new Map<string, string[]>();
+  // Build user entitlement roles map
+  const userEntitlementsMap = new Map<string, string[]>();
   userRoles?.forEach(ur => {
     const roleName = roleMap.get(ur.role_id);
     if (roleName) {
-      const existing = userRolesMap.get(ur.user_id) || [];
+      const existing = userEntitlementsMap.get(ur.user_id) || [];
       existing.push(roleName);
-      userRolesMap.set(ur.user_id, existing);
+      userEntitlementsMap.set(ur.user_id, existing);
     }
+  });
+
+  // Get org_members for workspace roles (admin, owner, member, executor, vip)
+  const { data: orgMembers } = await supabase
+    .from('org_members')
+    .select('user_id, role, org_id');
+
+  // Build org roles map - combine all org roles for each user
+  const orgRolesMap = new Map<string, string[]>();
+  orgMembers?.forEach(om => {
+    const existing = orgRolesMap.get(om.user_id) || [];
+    if (!existing.includes(om.role)) {
+      existing.push(om.role);
+    }
+    orgRolesMap.set(om.user_id, existing);
   });
 
   // Get subscriptions
@@ -138,13 +152,18 @@ export async function listUsers(): Promise<AdminUser[]> {
     const authUser = authUsersMap.get(profile.id);
     const bannedUntil = authUser?.banned_until || null;
     
+    // Combine entitlement roles with org roles, prioritizing org roles if present
+    const entitlementRoles = userEntitlementsMap.get(profile.id) || [];
+    const orgRoles = orgRolesMap.get(profile.id) || [];
+    const combinedRoles = [...new Set([...orgRoles, ...entitlementRoles])];
+    
     users.push({
       id: profile.id,
       email: authUser?.email || profile.full_name || 'Unknown',
       created_at: profile.created_at,
       login_count: loginStat?.count || 0,
       last_login_at: loginStat?.lastLogin || null,
-      roles: userRolesMap.get(profile.id) || [],
+      roles: combinedRoles,
       active_plan: sub?.status === 'active' ? sub.plan_type : null,
       plan_status: sub?.status || null,
       plan_renews_at: sub?.current_period_end || null,
