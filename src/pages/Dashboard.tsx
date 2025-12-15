@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
-import { FileText, Star, BookOpen, Scale, Phone, Music, Printer, Users, ListChecks, ShoppingBag, Lightbulb } from "lucide-react";
+import { FileText, Star, BookOpen, Scale, Phone, Music, Printer, Users, ListChecks, ShoppingBag, Lightbulb, CalendarDays } from "lucide-react";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -754,10 +754,10 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* STEP 6 - Help & Support */}
+        {/* STEP 6 - Education & Support */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">{t('dashboard.helpAndSupport')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <h2 className="text-2xl font-bold mb-6">{t('dashboard.educationAndSupport', 'Education & Support')}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/resources')}>
               <div className="flex flex-col items-center text-center gap-3">
                 <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
@@ -791,6 +791,15 @@ export default function Dashboard() {
                   <Phone className="h-6 w-6 text-white" />
                 </div>
                 <h3 className="font-semibold">{t('dashboard.tiles.vendors.title')}</h3>
+              </div>
+            </Card>
+            
+            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/events')}>
+              <div className="flex flex-col items-center text-center gap-3">
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
+                  <CalendarDays className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="font-semibold">{t('dashboard.tiles.events.title', 'Events')}</h3>
               </div>
             </Card>
           </div>
