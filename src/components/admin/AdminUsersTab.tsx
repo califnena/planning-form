@@ -7,14 +7,141 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
-import { Loader2, Search, User, Crown, UserPlus, Shield, ShieldCheck } from "lucide-react";
+import { Loader2, Search, User, Crown, UserPlus, Shield, ShieldCheck, Info, Star, Eye, UserCheck, Check, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { listUsers, AdminUser, inviteUser, updateMemberRole } from "@/lib/adminApi";
 import { UserDetailDrawer } from "./UserDetailDrawer";
 import { format } from "date-fns";
 
 const ORG_ROLES = ['owner', 'admin', 'member', 'executor', 'vip'] as const;
+
+// Role definitions with capabilities
+const ROLE_DEFINITIONS = {
+  owner: {
+    icon: Crown,
+    color: "text-yellow-600 bg-yellow-50 border-yellow-200",
+    capabilities: {
+      manageMembers: true,
+      manageRoles: true,
+      accessAdmin: true,
+      viewAllPlans: true,
+      editOwnPlan: true,
+      accessVIP: true,
+      canBeRemoved: false,
+    }
+  },
+  admin: {
+    icon: Shield,
+    color: "text-red-600 bg-red-50 border-red-200",
+    capabilities: {
+      manageMembers: true,
+      manageRoles: true,
+      accessAdmin: true,
+      viewAllPlans: true,
+      editOwnPlan: true,
+      accessVIP: true,
+      canBeRemoved: true,
+    }
+  },
+  vip: {
+    icon: Star,
+    color: "text-purple-600 bg-purple-50 border-purple-200",
+    capabilities: {
+      manageMembers: false,
+      manageRoles: false,
+      accessAdmin: false,
+      viewAllPlans: false,
+      editOwnPlan: true,
+      accessVIP: true,
+      canBeRemoved: true,
+    }
+  },
+  executor: {
+    icon: Eye,
+    color: "text-blue-600 bg-blue-50 border-blue-200",
+    capabilities: {
+      manageMembers: false,
+      manageRoles: false,
+      accessAdmin: false,
+      viewAllPlans: true,
+      editOwnPlan: false,
+      accessVIP: false,
+      canBeRemoved: true,
+    }
+  },
+  member: {
+    icon: UserCheck,
+    color: "text-green-600 bg-green-50 border-green-200",
+    capabilities: {
+      manageMembers: false,
+      manageRoles: false,
+      accessAdmin: false,
+      viewAllPlans: false,
+      editOwnPlan: true,
+      accessVIP: false,
+      canBeRemoved: true,
+    }
+  },
+} as const;
+
+const CAPABILITY_LABELS = {
+  manageMembers: "Add/remove workspace members",
+  manageRoles: "Change member roles",
+  accessAdmin: "Access Admin Panel",
+  viewAllPlans: "View all plans in workspace",
+  editOwnPlan: "Edit own plan",
+  accessVIP: "Access VIP Coach features",
+  canBeRemoved: "Can be removed from workspace",
+};
+
+function RoleDefinitionsPopover() {
+  const { t } = useTranslation();
+  
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-5 w-5 ml-1">
+          <Info className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[380px] p-0 z-50 bg-popover" align="start">
+        <ScrollArea className="h-[420px]">
+          <div className="p-4 space-y-3">
+            <h4 className="font-semibold text-sm border-b pb-2">{t("admin.roles.roleDefinitions", "Role Definitions & Capabilities")}</h4>
+            {Object.entries(ROLE_DEFINITIONS).map(([roleName, def]) => {
+              const IconComponent = def.icon;
+              return (
+                <div key={roleName} className={`rounded-lg border p-3 ${def.color}`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <IconComponent className="h-4 w-4" />
+                    <span className="font-medium capitalize text-sm">{roleName}</span>
+                  </div>
+                  <ul className="space-y-1 text-xs">
+                    {Object.entries(def.capabilities).map(([cap, hasAccess]) => (
+                      <li key={cap} className="flex items-center gap-1.5">
+                        {hasAccess ? (
+                          <Check className="h-3 w-3 text-green-600 flex-shrink-0" />
+                        ) : (
+                          <X className="h-3 w-3 text-muted-foreground/50 flex-shrink-0" />
+                        )}
+                        <span className={hasAccess ? "" : "text-muted-foreground/60"}>
+                          {CAPABILITY_LABELS[cap as keyof typeof CAPABILITY_LABELS]}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+        </ScrollArea>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 export function AdminUsersTab() {
   const { t } = useTranslation();
@@ -287,7 +414,12 @@ export function AdminUsersTab() {
                     <TableHead>{t("admin.users.status")}</TableHead>
                     <TableHead>{t("admin.users.logins")}</TableHead>
                     <TableHead>{t("admin.users.lastLogin")}</TableHead>
-                    <TableHead>{t("admin.users.roles")}</TableHead>
+                    <TableHead>
+                      <div className="flex items-center">
+                        {t("admin.users.roles")}
+                        <RoleDefinitionsPopover />
+                      </div>
+                    </TableHead>
                     <TableHead>{t("admin.users.plan")}</TableHead>
                     <TableHead></TableHead>
                   </TableRow>
