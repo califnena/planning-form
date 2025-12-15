@@ -6,13 +6,15 @@ import { GlobalHeader } from "@/components/GlobalHeader";
 import { AdminBanner } from "@/components/AdminBanner";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, ArrowLeft, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { checkIsAdmin } from "@/lib/adminApi";
 import { AdminUsersTab } from "@/components/admin/AdminUsersTab";
 import { AdminRolesTab } from "@/components/admin/AdminRolesTab";
 import { AdminBillingTab } from "@/components/admin/AdminBillingTab";
+import { AdminAnalyticsTab } from "@/components/admin/AdminAnalyticsTab";
+import { AssignAdminDialog } from "@/components/admin/AssignAdminDialog";
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -75,21 +77,25 @@ export default function AdminPanel() {
 
         <Card className="mb-6">
           <CardHeader>
-            <div className="flex items-center gap-3">
-              <Shield className="h-8 w-8 text-primary" />
-              <div>
-                <CardTitle className="text-2xl">{t("admin.title")}</CardTitle>
-                <CardDescription>{t("admin.description")}</CardDescription>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Shield className="h-8 w-8 text-primary" />
+                <div>
+                  <CardTitle className="text-2xl">{t("admin.title")}</CardTitle>
+                  <CardDescription>{t("admin.description")}</CardDescription>
+                </div>
               </div>
+              <AssignAdminDialog />
             </div>
           </CardHeader>
         </Card>
 
         <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-md">
+          <TabsList className="grid w-full grid-cols-4 max-w-lg">
             <TabsTrigger value="users">{t("admin.tabs.users")}</TabsTrigger>
             <TabsTrigger value="roles">{t("admin.tabs.roles")}</TabsTrigger>
             <TabsTrigger value="billing">{t("admin.tabs.billing")}</TabsTrigger>
+            <TabsTrigger value="analytics">{t("admin.tabs.analytics") || "Analytics"}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users">
@@ -102,6 +108,10 @@ export default function AdminPanel() {
 
           <TabsContent value="billing">
             <AdminBillingTab />
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <AdminAnalyticsTab />
           </TabsContent>
         </Tabs>
       </div>

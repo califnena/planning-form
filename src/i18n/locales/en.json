@@ -1087,7 +1087,8 @@
     "tabs": {
       "users": "Users",
       "roles": "Roles",
-      "billing": "Billing"
+      "billing": "Billing",
+      "analytics": "Analytics"
     },
     "users": {
       "title": "Users",
@@ -1185,6 +1186,39 @@
       "status": "Status",
       "periodEnd": "Period End",
       "cancelAtEnd": "Cancel at End"
+    },
+    "analytics": {
+      "title": "Analytics & Activity",
+      "loginStats": "Login Activity",
+      "loginStatsDesc": "User login history and activity overview",
+      "totalLogins": "Total Logins",
+      "uniqueUsers": "Unique Users Logged In",
+      "recentLogins": "Recent Logins",
+      "recentLoginsDesc": "Last 50 login events across all users",
+      "noLogins": "No login activity recorded yet",
+      "user": "User",
+      "date": "Date",
+      "ipAddress": "IP Address",
+      "purchases": "Purchase History",
+      "purchasesDesc": "All purchases and payments",
+      "noPurchases": "No purchases recorded yet",
+      "product": "Product",
+      "amount": "Amount",
+      "purchaseDate": "Date"
+    },
+    "assignAdmin": {
+      "title": "Assign Admin Role",
+      "description": "Add admin privileges to an existing user by email",
+      "emailLabel": "User Email",
+      "emailPlaceholder": "user@example.com",
+      "assignButton": "Assign Admin Role",
+      "assigning": "Assigning...",
+      "success": "Admin role assigned",
+      "successDesc": "{{email}} now has admin privileges",
+      "userNotFound": "User not found",
+      "userNotFoundDesc": "No user found with email {{email}}",
+      "alreadyAdmin": "Already Admin",
+      "alreadyAdminDesc": "{{email}} already has admin role"
     }
   },
   "afterDeathSteps": {
@@ -1298,8 +1332,5 @@
     "percentComplete": "{{percent}}% Complete",
     "saveAndExit": "Save and Exit",
     "saveAndContinue": "Save and Continue"
-  },
-  "header": {
-    "dashboard": "Dashboard"
   }
 }
