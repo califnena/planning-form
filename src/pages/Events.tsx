@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { format, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from "date-fns";
-import { Calendar as CalendarIcon, List, Search, MapPin, DollarSign, Users, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar as CalendarIcon, List, Search, MapPin, DollarSign, Users, ChevronLeft, ChevronRight, Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { AppFooter } from "@/components/AppFooter";
@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EventLeadDialog } from "@/components/events/EventLeadDialog";
+import { EventSubscribeDialog } from "@/components/events/EventSubscribeDialog";
 
 interface EfaEvent {
   id: string;
@@ -75,6 +76,7 @@ const Events = () => {
   const [selectedEvent, setSelectedEvent] = useState<EfaEvent | null>(null);
   const [leadDialogOpen, setLeadDialogOpen] = useState(false);
   const [leadType, setLeadType] = useState<"Planning Help" | "Vendor Interest" | "Reminders">("Planning Help");
+  const [subscribeDialogOpen, setSubscribeDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchEvents();
@@ -267,11 +269,17 @@ const Events = () => {
       <GlobalHeader />
       
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Events</h1>
-          <p className="text-muted-foreground">
-            Discover senior expos, estate planning workshops, grief support groups, and more in your area.
-          </p>
+        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Events</h1>
+            <p className="text-muted-foreground">
+              Discover senior expos, estate planning workshops, grief support groups, and more in your area.
+            </p>
+          </div>
+          <Button onClick={() => setSubscribeDialogOpen(true)} variant="outline">
+            <Bell className="h-4 w-4 mr-2" />
+            Get Event Reminders
+          </Button>
         </div>
 
         {/* Filters */}
@@ -466,6 +474,11 @@ const Events = () => {
         onOpenChange={setLeadDialogOpen}
         event={selectedEvent}
         leadType={leadType}
+      />
+
+      <EventSubscribeDialog
+        open={subscribeDialogOpen}
+        onOpenChange={setSubscribeDialogOpen}
       />
 
       <AppFooter />
