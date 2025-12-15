@@ -1172,6 +1172,10 @@
       "alreadyAdminDesc": "{{email}} already has the admin role."
     },
     "roles": {
+      "title": "Roles & Permissions",
+      "description": "Manage workspace roles and view their capabilities.",
+      "roleDefinitions": "Role Definitions & Capabilities",
+      "allRoles": "All Roles",
       "title": "Roles",
       "description": "Manage application roles and permissions.",
       "addRole": "Add Role",
