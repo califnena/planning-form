@@ -670,6 +670,143 @@ export type Database = {
           },
         ]
       }
+      efa_event_leads: {
+        Row: {
+          business_name: string | null
+          created_at: string
+          email: string
+          event_id: string | null
+          id: string
+          lead_type: string
+          message: string | null
+          name: string | null
+          phone: string | null
+          service_type: string | null
+          state_interest: string | null
+        }
+        Insert: {
+          business_name?: string | null
+          created_at?: string
+          email: string
+          event_id?: string | null
+          id?: string
+          lead_type: string
+          message?: string | null
+          name?: string | null
+          phone?: string | null
+          service_type?: string | null
+          state_interest?: string | null
+        }
+        Update: {
+          business_name?: string | null
+          created_at?: string
+          email?: string
+          event_id?: string | null
+          id?: string
+          lead_type?: string
+          message?: string | null
+          name?: string | null
+          phone?: string | null
+          service_type?: string | null
+          state_interest?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "efa_event_leads_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "efa_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      efa_events: {
+        Row: {
+          address: string | null
+          booth_deadline: string | null
+          booth_fee: string | null
+          category: string
+          city: string | null
+          cost_attendee: string | null
+          county: string | null
+          created_at: string
+          description: string | null
+          event_date_end: string | null
+          event_date_start: string
+          event_link: string | null
+          exhibitor_link: string | null
+          id: string
+          is_published: boolean
+          is_vendor_friendly: boolean
+          name: string
+          organizer_email: string | null
+          organizer_name: string | null
+          organizer_phone: string | null
+          state: string | null
+          tags: string[] | null
+          time_text: string | null
+          updated_at: string | null
+          venue: string | null
+          zip: string | null
+        }
+        Insert: {
+          address?: string | null
+          booth_deadline?: string | null
+          booth_fee?: string | null
+          category: string
+          city?: string | null
+          cost_attendee?: string | null
+          county?: string | null
+          created_at?: string
+          description?: string | null
+          event_date_end?: string | null
+          event_date_start: string
+          event_link?: string | null
+          exhibitor_link?: string | null
+          id?: string
+          is_published?: boolean
+          is_vendor_friendly?: boolean
+          name: string
+          organizer_email?: string | null
+          organizer_name?: string | null
+          organizer_phone?: string | null
+          state?: string | null
+          tags?: string[] | null
+          time_text?: string | null
+          updated_at?: string | null
+          venue?: string | null
+          zip?: string | null
+        }
+        Update: {
+          address?: string | null
+          booth_deadline?: string | null
+          booth_fee?: string | null
+          category?: string
+          city?: string | null
+          cost_attendee?: string | null
+          county?: string | null
+          created_at?: string
+          description?: string | null
+          event_date_end?: string | null
+          event_date_start?: string
+          event_link?: string | null
+          exhibitor_link?: string | null
+          id?: string
+          is_published?: boolean
+          is_vendor_friendly?: boolean
+          name?: string
+          organizer_email?: string | null
+          organizer_name?: string | null
+          organizer_phone?: string | null
+          state?: string | null
+          tags?: string[] | null
+          time_text?: string | null
+          updated_at?: string | null
+          venue?: string | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
       faqs: {
         Row: {
           answer: string
