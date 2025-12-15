@@ -17,10 +17,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleClearFields = () => {
-    setEmail("");
-    setPassword("");
-  };
 
   // Removed auto-redirect to allow users to manually enter credentials
 
@@ -153,19 +149,9 @@ const Login = () => {
                 required
               />
             </div>
-            <div className="flex gap-2">
-              <Button type="submit" className="flex-1" disabled={loading}>
-                {loading ? t('auth.signingIn') : t('auth.signIn')}
-              </Button>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={handleClearFields}
-                disabled={loading}
-              >
-                {t('common.clear')}
-              </Button>
-            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? t('auth.signingIn') : t('auth.signIn')}
+            </Button>
           </form>
 
           {import.meta.env.DEV && (

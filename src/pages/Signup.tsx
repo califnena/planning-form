@@ -18,11 +18,6 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleClearFields = () => {
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-  };
 
   useEffect(() => {
     // Check if user is already logged in
@@ -184,19 +179,9 @@ const Signup = () => {
                 minLength={6}
               />
             </div>
-            <div className="flex gap-2">
-              <Button type="submit" className="flex-1" disabled={loading}>
-                {loading ? t('auth.creatingAccount') : t('auth.createAccount')}
-              </Button>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={handleClearFields}
-                disabled={loading}
-              >
-                {t('common.clear')}
-              </Button>
-            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? t('auth.creatingAccount') : t('auth.createAccount')}
+            </Button>
           </form>
 
           <div className="mt-4 text-center text-sm">
