@@ -224,7 +224,6 @@ export function AdminUsersTab() {
                 <SelectItem value="member">Member</SelectItem>
                 <SelectItem value="executor">Executor</SelectItem>
                 <SelectItem value="vip">VIP</SelectItem>
-                <SelectItem value="basic">Basic</SelectItem>
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>

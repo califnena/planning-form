@@ -46,18 +46,29 @@ export async function checkIsAdmin(): Promise<boolean> {
 }
 
 /**
- * List all users with basic info, login stats, roles, and subscription status
+ * List all workspace members from org_members (single source of truth)
+ * This is filtered by the default org and shows roles from org_members.role
  */
 export async function listUsers(): Promise<AdminUser[]> {
   const isAdmin = await checkIsAdmin();
   if (!isAdmin) throw new Error('Unauthorized: Admin access required');
 
-  // Get all profiles (which links to auth.users)
-  const { data: profiles, error: profilesError } = await supabase
+  const DEFAULT_ORG_ID = "00000000-0000-0000-0000-000000000001";
+
+  // Get org_members as the primary source - this is who is in the workspace
+  const { data: orgMembers, error: orgError } = await supabase
+    .from('org_members')
+    .select('user_id, role, created_at')
+    .eq('org_id', DEFAULT_ORG_ID);
+
+  if (orgError) throw orgError;
+
+  // Get profiles for user metadata (LEFT JOIN conceptually)
+  const { data: profiles } = await supabase
     .from('profiles')
     .select('id, full_name, created_at');
-  
-  if (profilesError) throw profilesError;
+
+  const profilesMap = new Map(profiles?.map(p => [p.id, p]) || []);
 
   // Get login stats
   const { data: loginStats } = await supabase
@@ -78,44 +89,7 @@ export async function listUsers(): Promise<AdminUser[]> {
     }
   });
 
-  // Get user entitlement roles from app_roles/user_roles (subscription-based)
-  const { data: userRoles } = await supabase
-    .from('user_roles')
-    .select('user_id, role_id');
-
-  const { data: allRoles } = await supabase
-    .from('app_roles')
-    .select('id, name');
-
-  const roleMap = new Map(allRoles?.map(r => [r.id, r.name]) || []);
-  
-  // Build user entitlement roles map
-  const userEntitlementsMap = new Map<string, string[]>();
-  userRoles?.forEach(ur => {
-    const roleName = roleMap.get(ur.role_id);
-    if (roleName) {
-      const existing = userEntitlementsMap.get(ur.user_id) || [];
-      existing.push(roleName);
-      userEntitlementsMap.set(ur.user_id, existing);
-    }
-  });
-
-  // Get org_members for workspace roles (admin, owner, member, executor, vip)
-  const { data: orgMembers } = await supabase
-    .from('org_members')
-    .select('user_id, role, org_id');
-
-  // Build org roles map - combine all org roles for each user
-  const orgRolesMap = new Map<string, string[]>();
-  orgMembers?.forEach(om => {
-    const existing = orgRolesMap.get(om.user_id) || [];
-    if (!existing.includes(om.role)) {
-      existing.push(om.role);
-    }
-    orgRolesMap.set(om.user_id, existing);
-  });
-
-  // Get subscriptions
+  // Get subscriptions for plan info (separate from workspace roles)
   const { data: subscriptions } = await supabase
     .from('subscriptions')
     .select('user_id, plan_type, status, current_period_end');
@@ -146,28 +120,28 @@ export async function listUsers(): Promise<AdminUser[]> {
 
   const users: AdminUser[] = [];
 
-  for (const profile of profiles || []) {
-    const loginStat = loginStatsMap.get(profile.id);
-    const sub = subscriptionMap.get(profile.id);
-    const authUser = authUsersMap.get(profile.id);
+  // Build user list from org_members (single source of truth for workspace)
+  for (const member of orgMembers || []) {
+    const profile = profilesMap.get(member.user_id);
+    const loginStat = loginStatsMap.get(member.user_id);
+    const sub = subscriptionMap.get(member.user_id);
+    const authUser = authUsersMap.get(member.user_id);
     const bannedUntil = authUser?.banned_until || null;
     
-    // Combine entitlement roles with org roles, prioritizing org roles if present
-    const entitlementRoles = userEntitlementsMap.get(profile.id) || [];
-    const orgRoles = orgRolesMap.get(profile.id) || [];
-    const combinedRoles = [...new Set([...orgRoles, ...entitlementRoles])];
+    // Role comes from org_members.role only (single source of truth)
+    const roles = [member.role];
     
     users.push({
-      id: profile.id,
-      email: authUser?.email || profile.full_name || 'Unknown',
-      created_at: profile.created_at,
+      id: member.user_id,
+      email: authUser?.email || profile?.full_name || 'Unknown',
+      created_at: member.created_at || profile?.created_at || new Date().toISOString(),
       login_count: loginStat?.count || 0,
       last_login_at: loginStat?.lastLogin || null,
-      roles: combinedRoles,
+      roles: roles,
       active_plan: sub?.status === 'active' ? sub.plan_type : null,
       plan_status: sub?.status || null,
       plan_renews_at: sub?.current_period_end || null,
-      is_owner: ownerSet.has(profile.id),
+      is_owner: ownerSet.has(member.user_id),
       is_blocked: bannedUntil ? new Date(bannedUntil) > new Date() : false,
       banned_until: bannedUntil,
     });
