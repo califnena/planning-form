@@ -1,0 +1,485 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+interface EfaEvent {
+  id: string;
+  name: string;
+  category: string;
+  event_date_start: string;
+  event_date_end: string | null;
+  time_text: string | null;
+  venue: string | null;
+  address: string | null;
+  city: string | null;
+  county: string | null;
+  state: string | null;
+  zip: string | null;
+  description: string | null;
+  cost_attendee: string | null;
+  is_vendor_friendly: boolean;
+  booth_fee: string | null;
+  booth_deadline: string | null;
+  exhibitor_link: string | null;
+  event_link: string | null;
+  organizer_name: string | null;
+  organizer_email: string | null;
+  organizer_phone: string | null;
+  is_published: boolean;
+}
+
+interface EventFormDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  event: EfaEvent | null;
+}
+
+const CATEGORIES = [
+  "Senior Expo",
+  "Estate Planning",
+  "Probate",
+  "Grief Support",
+  "Hospice",
+  "Funeral Industry",
+  "Caregiver",
+  "Other"
+];
+
+const COUNTIES = [
+  "Hillsborough",
+  "Pinellas",
+  "Pasco",
+  "Manatee",
+  "Polk",
+  "Sarasota"
+];
+
+const initialFormState = {
+  name: "",
+  category: "Senior Expo",
+  event_date_start: "",
+  event_date_end: "",
+  time_text: "",
+  venue: "",
+  address: "",
+  city: "",
+  county: "",
+  state: "FL",
+  zip: "",
+  description: "",
+  cost_attendee: "",
+  is_vendor_friendly: false,
+  booth_fee: "",
+  booth_deadline: "",
+  exhibitor_link: "",
+  event_link: "",
+  organizer_name: "",
+  organizer_email: "",
+  organizer_phone: "",
+  is_published: true
+};
+
+export const EventFormDialog = ({ open, onOpenChange, event }: EventFormDialogProps) => {
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState(initialFormState);
+
+  useEffect(() => {
+    if (event) {
+      setFormData({
+        name: event.name,
+        category: event.category,
+        event_date_start: event.event_date_start ? event.event_date_start.split("T")[0] : "",
+        event_date_end: event.event_date_end ? event.event_date_end.split("T")[0] : "",
+        time_text: event.time_text || "",
+        venue: event.venue || "",
+        address: event.address || "",
+        city: event.city || "",
+        county: event.county || "",
+        state: event.state || "FL",
+        zip: event.zip || "",
+        description: event.description || "",
+        cost_attendee: event.cost_attendee || "",
+        is_vendor_friendly: event.is_vendor_friendly,
+        booth_fee: event.booth_fee || "",
+        booth_deadline: event.booth_deadline || "",
+        exhibitor_link: event.exhibitor_link || "",
+        event_link: event.event_link || "",
+        organizer_name: event.organizer_name || "",
+        organizer_email: event.organizer_email || "",
+        organizer_phone: event.organizer_phone || "",
+        is_published: event.is_published
+      });
+    } else {
+      setFormData(initialFormState);
+    }
+  }, [event, open]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const eventData = {
+      name: formData.name,
+      category: formData.category,
+      event_date_start: formData.event_date_start ? new Date(formData.event_date_start).toISOString() : null,
+      event_date_end: formData.event_date_end ? new Date(formData.event_date_end).toISOString() : null,
+      time_text: formData.time_text || null,
+      venue: formData.venue || null,
+      address: formData.address || null,
+      city: formData.city || null,
+      county: formData.county || null,
+      state: formData.state || null,
+      zip: formData.zip || null,
+      description: formData.description || null,
+      cost_attendee: formData.cost_attendee || null,
+      is_vendor_friendly: formData.is_vendor_friendly,
+      booth_fee: formData.booth_fee || null,
+      booth_deadline: formData.booth_deadline || null,
+      exhibitor_link: formData.exhibitor_link || null,
+      event_link: formData.event_link || null,
+      organizer_name: formData.organizer_name || null,
+      organizer_email: formData.organizer_email || null,
+      organizer_phone: formData.organizer_phone || null,
+      is_published: formData.is_published
+    };
+
+    let error;
+    if (event) {
+      const result = await supabase
+        .from("efa_events")
+        .update(eventData)
+        .eq("id", event.id);
+      error = result.error;
+    } else {
+      const result = await supabase
+        .from("efa_events")
+        .insert(eventData);
+      error = result.error;
+    }
+
+    setLoading(false);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: `Failed to ${event ? "update" : "create"} event: ${error.message}`,
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: `Event ${event ? "updated" : "created"} successfully`
+      });
+      onOpenChange(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh]">
+        <DialogHeader>
+          <DialogTitle>{event ? "Edit Event" : "Add New Event"}</DialogTitle>
+        </DialogHeader>
+
+        <ScrollArea className="max-h-[calc(90vh-100px)] pr-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Basic Info */}
+            <div className="space-y-4">
+              <h3 className="font-semibold border-b pb-2">Basic Information</h3>
+              
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="name">Event Name *</Label>
+                  <Input
+                    id="name"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Event name"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category *</Label>
+                  <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map(cat => (
+                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="cost_attendee">Cost for Attendees</Label>
+                  <Input
+                    id="cost_attendee"
+                    value={formData.cost_attendee}
+                    onChange={(e) => setFormData({ ...formData, cost_attendee: e.target.value })}
+                    placeholder="e.g., Free, $10, Varies"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Event description..."
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            {/* Date & Time */}
+            <div className="space-y-4">
+              <h3 className="font-semibold border-b pb-2">Date & Time</h3>
+              
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="space-y-2">
+                  <Label htmlFor="event_date_start">Start Date *</Label>
+                  <Input
+                    id="event_date_start"
+                    type="date"
+                    required
+                    value={formData.event_date_start}
+                    onChange={(e) => setFormData({ ...formData, event_date_start: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="event_date_end">End Date</Label>
+                  <Input
+                    id="event_date_end"
+                    type="date"
+                    value={formData.event_date_end}
+                    onChange={(e) => setFormData({ ...formData, event_date_end: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="time_text">Time</Label>
+                  <Input
+                    id="time_text"
+                    value={formData.time_text}
+                    onChange={(e) => setFormData({ ...formData, time_text: e.target.value })}
+                    placeholder="e.g., 10:00 AM – 2:00 PM"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Location */}
+            <div className="space-y-4">
+              <h3 className="font-semibold border-b pb-2">Location</h3>
+              
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="venue">Venue Name</Label>
+                  <Input
+                    id="venue"
+                    value={formData.venue}
+                    onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
+                    placeholder="Venue name"
+                  />
+                </div>
+
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    id="address"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    placeholder="Street address"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="city">City</Label>
+                  <Input
+                    id="city"
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    placeholder="City"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="county">County</Label>
+                  <Select value={formData.county} onValueChange={(v) => setFormData({ ...formData, county: v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select county" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {COUNTIES.map(county => (
+                        <SelectItem key={county} value={county}>{county}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="state">State</Label>
+                  <Input
+                    id="state"
+                    value={formData.state}
+                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                    placeholder="FL"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="zip">ZIP</Label>
+                  <Input
+                    id="zip"
+                    value={formData.zip}
+                    onChange={(e) => setFormData({ ...formData, zip: e.target.value })}
+                    placeholder="ZIP code"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Vendor Info */}
+            <div className="space-y-4">
+              <h3 className="font-semibold border-b pb-2">Vendor Information</h3>
+              
+              <div className="flex items-center gap-4">
+                <Switch
+                  checked={formData.is_vendor_friendly}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_vendor_friendly: checked })}
+                />
+                <Label>This event is vendor-friendly (allows exhibitors)</Label>
+              </div>
+
+              {formData.is_vendor_friendly && (
+                <div className="grid gap-4 sm:grid-cols-2 pl-4 border-l-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="booth_fee">Booth Fee</Label>
+                    <Input
+                      id="booth_fee"
+                      value={formData.booth_fee}
+                      onChange={(e) => setFormData({ ...formData, booth_fee: e.target.value })}
+                      placeholder="e.g., $395 starting"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="booth_deadline">Booth Registration Deadline</Label>
+                    <Input
+                      id="booth_deadline"
+                      type="date"
+                      value={formData.booth_deadline}
+                      onChange={(e) => setFormData({ ...formData, booth_deadline: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label htmlFor="exhibitor_link">Exhibitor Registration Link</Label>
+                    <Input
+                      id="exhibitor_link"
+                      type="url"
+                      value={formData.exhibitor_link}
+                      onChange={(e) => setFormData({ ...formData, exhibitor_link: e.target.value })}
+                      placeholder="https://..."
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Organizer & Links */}
+            <div className="space-y-4">
+              <h3 className="font-semibold border-b pb-2">Organizer & Links</h3>
+              
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="organizer_name">Organizer Name</Label>
+                  <Input
+                    id="organizer_name"
+                    value={formData.organizer_name}
+                    onChange={(e) => setFormData({ ...formData, organizer_name: e.target.value })}
+                    placeholder="Organizer name"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="organizer_email">Organizer Email</Label>
+                  <Input
+                    id="organizer_email"
+                    type="email"
+                    value={formData.organizer_email}
+                    onChange={(e) => setFormData({ ...formData, organizer_email: e.target.value })}
+                    placeholder="email@example.com"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="organizer_phone">Organizer Phone</Label>
+                  <Input
+                    id="organizer_phone"
+                    type="tel"
+                    value={formData.organizer_phone}
+                    onChange={(e) => setFormData({ ...formData, organizer_phone: e.target.value })}
+                    placeholder="(555) 123-4567"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="event_link">Event Website</Label>
+                  <Input
+                    id="event_link"
+                    type="url"
+                    value={formData.event_link}
+                    onChange={(e) => setFormData({ ...formData, event_link: e.target.value })}
+                    placeholder="https://..."
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Publishing */}
+            <div className="space-y-4">
+              <h3 className="font-semibold border-b pb-2">Publishing</h3>
+              
+              <div className="flex items-center gap-4">
+                <Switch
+                  checked={formData.is_published}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_published: checked })}
+                />
+                <Label>Published (visible to public)</Label>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Saving..." : (event ? "Update Event" : "Create Event")}
+              </Button>
+            </div>
+          </form>
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
+  );
+};
