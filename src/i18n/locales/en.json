@@ -1128,6 +1128,7 @@
       "notesSaved": "Notes saved",
       "contactedUpdated": "Contact date updated",
       "roleUpdated": "Role updated",
+      "roleUpdatedDescription": "User role changed to {{role}}",
       "roleAdded": "Added role: {{role}}",
       "roleRemoved": "Removed role: {{role}}",
       "cannotRemoveOwnerAdmin": "Cannot Remove Admin",
