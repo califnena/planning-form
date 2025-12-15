@@ -670,6 +670,59 @@ export type Database = {
           },
         ]
       }
+      efa_event_email_log: {
+        Row: {
+          audience_filter: Json
+          body: string
+          created_at: string
+          created_by: string | null
+          event_id: string | null
+          id: string
+          preview: string | null
+          send_type: string
+          sent_at: string | null
+          sent_to_count: number
+          status: string
+          subject: string
+        }
+        Insert: {
+          audience_filter?: Json
+          body: string
+          created_at?: string
+          created_by?: string | null
+          event_id?: string | null
+          id?: string
+          preview?: string | null
+          send_type: string
+          sent_at?: string | null
+          sent_to_count?: number
+          status?: string
+          subject: string
+        }
+        Update: {
+          audience_filter?: Json
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          event_id?: string | null
+          id?: string
+          preview?: string | null
+          send_type?: string
+          sent_at?: string | null
+          sent_to_count?: number
+          status?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "efa_event_email_log_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "efa_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       efa_event_leads: {
         Row: {
           business_name: string | null
@@ -719,6 +772,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      efa_event_subscribers: {
+        Row: {
+          category_interest: string[] | null
+          county_interest: string[] | null
+          created_at: string
+          email: string
+          first_name: string | null
+          id: string
+          is_active: boolean
+          state_interest: string[] | null
+          unsub_token: string
+          verified_at: string | null
+        }
+        Insert: {
+          category_interest?: string[] | null
+          county_interest?: string[] | null
+          created_at?: string
+          email: string
+          first_name?: string | null
+          id?: string
+          is_active?: boolean
+          state_interest?: string[] | null
+          unsub_token?: string
+          verified_at?: string | null
+        }
+        Update: {
+          category_interest?: string[] | null
+          county_interest?: string[] | null
+          created_at?: string
+          email?: string
+          first_name?: string | null
+          id?: string
+          is_active?: boolean
+          state_interest?: string[] | null
+          unsub_token?: string
+          verified_at?: string | null
+        }
+        Relationships: []
       }
       efa_events: {
         Row: {

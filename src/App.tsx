@@ -48,6 +48,7 @@ import AdminPanel from "./pages/AdminPanel";
 import AdminEvents from "./pages/AdminEvents";
 import Events from "./pages/Events";
 import Billing from "./pages/Billing";
+import Unsubscribe from "./pages/Unsubscribe";
 
 
 const queryClient = new QueryClient();
@@ -67,6 +68,7 @@ const App = () => (
                 <div className="flex-1">
                   <Routes>
                     <Route path="/" element={<Landing />} />
+                    <Route path="/unsubscribe" element={<Unsubscribe />} />
                     <Route path="/pricing" element={<Pricing />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/about-us" element={<AboutUs />} />

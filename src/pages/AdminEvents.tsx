@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
-import { Plus, Pencil, Trash2, Eye, EyeOff, Users } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, Users, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { AdminBanner } from "@/components/AdminBanner";
@@ -29,6 +29,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { EventFormDialog } from "@/components/events/EventFormDialog";
+import { AdminSendReminderModal } from "@/components/events/AdminSendReminderModal";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
 
 interface EfaEvent {
@@ -47,6 +48,9 @@ interface EfaEvent {
   booth_deadline: string | null;
   is_published: boolean;
   created_at: string;
+  email_subject: string | null;
+  email_preview: string | null;
+  email_body: string | null;
 }
 
 const AdminEvents = () => {
@@ -58,6 +62,8 @@ const AdminEvents = () => {
   const [editingEvent, setEditingEvent] = useState<EfaEvent | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<EfaEvent | null>(null);
+  const [sendReminderOpen, setSendReminderOpen] = useState(false);
+  const [selectedEventForReminder, setSelectedEventForReminder] = useState<EfaEvent | null>(null);
 
   useEffect(() => {
     if (!adminLoading && !isAdmin) {
@@ -263,6 +269,17 @@ const AdminEvents = () => {
                             <Button
                               variant="ghost"
                               size="sm"
+                              onClick={() => {
+                                setSelectedEventForReminder(event);
+                                setSendReminderOpen(true);
+                              }}
+                              title="Send Reminder"
+                            >
+                              <Send className="h-4 w-4 text-primary" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={() => handleEdit(event)}
                             >
                               <Pencil className="h-4 w-4" />
@@ -311,6 +328,12 @@ const AdminEvents = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AdminSendReminderModal
+        open={sendReminderOpen}
+        onOpenChange={setSendReminderOpen}
+        event={selectedEventForReminder}
+      />
     </div>
   );
 };
