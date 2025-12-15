@@ -581,7 +581,23 @@
       "inviteUser": "Invitar Usuario", "inviteUserDescription": "Enviar email de invitación a un nuevo usuario.",
       "emailPlaceholder": "usuario@ejemplo.com", "sendInvite": "Enviar Invitación",
       "inviteSent": "Invitación Enviada", "inviteSentDescription": "Se ha enviado una invitación a {{email}}.",
+      "userAlreadyExists": "Usuario Ya Existe",
+      "userAlreadyExistsDesc": "Ya existe un usuario con este correo. Para otorgar acceso de admin, usa 'Asignar Rol Admin'.",
       "accountStatus": "Estado de Cuenta"
+    },
+    "assignAdmin": {
+      "title": "Asignar Rol Admin",
+      "description": "Asignar el rol de administrador a un usuario existente.",
+      "emailLabel": "Email del Usuario",
+      "emailPlaceholder": "admin@ejemplo.com",
+      "assignButton": "Asignar Admin",
+      "assigning": "Asignando...",
+      "success": "Rol Admin Asignado",
+      "successDesc": "{{email}} ahora es administrador.",
+      "userNotFound": "Usuario No Encontrado",
+      "userNotFoundDesc": "No se encontró usuario con email: {{email}}. Asegúrate de que el usuario haya creado una cuenta.",
+      "alreadyAdmin": "Ya es Admin",
+      "alreadyAdminDesc": "{{email}} ya tiene el rol de administrador."
     },
     "roles": {
       "title": "Roles", "description": "Administrar roles y permisos.", "addRole": "Añadir Rol",

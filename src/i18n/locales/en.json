@@ -1146,7 +1146,23 @@
       "emailPlaceholder": "user@example.com",
       "sendInvite": "Send Invite",
       "inviteSent": "Invitation Sent",
-      "inviteSentDescription": "An invitation has been sent to {{email}}."
+      "inviteSentDescription": "An invitation has been sent to {{email}}.",
+      "userAlreadyExists": "User Already Exists",
+      "userAlreadyExistsDesc": "A user with this email is already registered. To grant admin access, use 'Assign Admin Role' instead."
+    },
+    "assignAdmin": {
+      "title": "Assign Admin Role",
+      "description": "Assign the admin role to an existing user by email.",
+      "emailLabel": "User Email",
+      "emailPlaceholder": "admin@example.com",
+      "assignButton": "Assign Admin",
+      "assigning": "Assigning...",
+      "success": "Admin Role Assigned",
+      "successDesc": "{{email}} is now an admin.",
+      "userNotFound": "User Not Found",
+      "userNotFoundDesc": "No user found with email: {{email}}. Make sure the user has created an account first.",
+      "alreadyAdmin": "Already Admin",
+      "alreadyAdminDesc": "{{email}} already has the admin role."
     },
     "roles": {
       "title": "Roles",

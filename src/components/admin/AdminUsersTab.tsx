@@ -98,11 +98,20 @@ export function AdminUsersTab() {
       setInviteDialogOpen(false);
       loadUsers();
     } catch (error: any) {
-      toast({
-        title: t("admin.error"),
-        description: error.message,
-        variant: "destructive",
-      });
+      // Check if user already exists
+      if (error.message?.includes("already exists") || error.message?.includes("already been registered")) {
+        toast({
+          title: t("admin.users.userAlreadyExists"),
+          description: t("admin.users.userAlreadyExistsDesc"),
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: t("admin.error"),
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     } finally {
       setInviting(false);
     }
