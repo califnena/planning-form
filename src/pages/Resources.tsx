@@ -63,6 +63,27 @@ const Resources = () => {
       ]
     },
     {
+      title: "Travel & Out-of-State Death",
+      icon: "✈️",
+      description: "What to know when death occurs away from home.",
+      items: [
+        {
+          name: "Travel Death Protection",
+          description: "If someone passes away while traveling far from home, the cost and logistics can be overwhelming. Travel death protection is a one-time payment plan that covers transportation of remains, international coordination, paperwork, and optional cremation services. It works worldwide and helps families avoid urgent decisions during a crisis.",
+          link: "/travel-protection",
+          isInternal: true
+        },
+        {
+          name: "Who Should Consider This",
+          description: "Travel death protection is especially useful for: frequent travelers, snowbirds, retirees, military families, and anyone with family in other states or countries. This is an optional planning tool—not a requirement—for people who travel or live part-time away from home."
+        },
+        {
+          name: "What It Covers",
+          description: "A typical travel death protection plan helps with: transportation of remains back home, international and out-of-state coordination, paperwork and local requirements, optional cremation and return of ashes, and assistance backed by an established insurance underwriter."
+        }
+      ]
+    },
+    {
       title: "After-Death Logistics",
       icon: "📋",
       description: "Practical steps for families in the first 72 hours and beyond.",
@@ -264,14 +285,23 @@ const Resources = () => {
                           item.description
                         )}
                         {item.link && (
-                          <a 
-                            href={item.link} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="text-primary hover:underline inline-flex items-center gap-1 font-medium"
-                          >
-                            Visit resource <ExternalLink className="h-3 w-3" />
-                          </a>
+                          item.isInternal ? (
+                            <Link 
+                              to={item.link} 
+                              className="text-primary hover:underline inline-flex items-center gap-1 font-medium"
+                            >
+                              Learn more <ExternalLink className="h-3 w-3" />
+                            </Link>
+                          ) : (
+                            <a 
+                              href={item.link} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="text-primary hover:underline inline-flex items-center gap-1 font-medium"
+                            >
+                              Visit resource <ExternalLink className="h-3 w-3" />
+                            </a>
+                          )
                         )}
                       </div>
                     </AccordionContent>
