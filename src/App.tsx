@@ -49,6 +49,7 @@ import AdminEvents from "./pages/AdminEvents";
 import Events from "./pages/Events";
 import Billing from "./pages/Billing";
 import Unsubscribe from "./pages/Unsubscribe";
+import TravelProtection from "./pages/TravelProtection";
 
 
 const queryClient = new QueryClient();
@@ -108,6 +109,7 @@ const App = () => (
                     <Route path="/preview/afterdeath" element={<PreviewAfterDeath />} />
                     <Route path="/preview/legal" element={<PreviewLegal />} />
                     <Route path="/preview/pdf" element={<PreviewPDF />} />
+                    <Route path="/travel-protection" element={<TravelProtection />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
