@@ -61,8 +61,8 @@ export const PlannerShell = ({
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <div className="flex-1 flex">
+    <div className="flex-1 flex flex-col bg-background">
+      <div className="flex-1 flex overflow-hidden">
         {/* Single Sheet for Mobile Menu */}
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetContent side="left" className="w-80 overflow-y-auto p-0 bg-[hsl(30,10%,98%)]">
