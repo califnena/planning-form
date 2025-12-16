@@ -212,6 +212,63 @@ const FAQ = () => {
       ]
     },
     {
+      title: "Travel & Out-of-State Death",
+      icon: "✈️",
+      questions: [
+        {
+          q: "What happens if someone dies while traveling far from home?",
+          a: (
+            <>
+              When a death occurs away from home—whether in another state or country—the logistics can be overwhelming:
+              <ul className="list-disc ml-6 mt-2 space-y-1">
+                <li>Transportation of remains can cost thousands of dollars</li>
+                <li>International paperwork, language barriers, and local laws add delays</li>
+                <li>Families often have to make urgent decisions during a crisis</li>
+              </ul>
+              <p className="mt-2">Planning ahead with travel death protection can save your family from these burdens.</p>
+              <Link to="/travel-protection" className="text-primary hover:underline inline-flex items-center gap-1 mt-2">
+                Learn about Travel Death Protection <ExternalLink className="h-3 w-3" />
+              </Link>
+            </>
+          )
+        },
+        {
+          q: "What is travel death protection?",
+          a: (
+            <>
+              Travel death protection is a one-time payment plan that covers:
+              <ul className="list-disc ml-6 mt-2 space-y-1">
+                <li>Transportation of remains back home</li>
+                <li>International and out-of-state coordination</li>
+                <li>Paperwork and local requirements</li>
+                <li>Optional cremation and return of ashes</li>
+              </ul>
+              <p className="mt-2">It works worldwide and is paid once, not monthly. The company handles the details so your family doesn't have to.</p>
+              <Link to="/travel-protection" className="text-primary hover:underline inline-flex items-center gap-1 mt-2">
+                Learn more about this optional planning tool <ExternalLink className="h-3 w-3" />
+              </Link>
+            </>
+          )
+        },
+        {
+          q: "Who should consider travel death protection?",
+          a: (
+            <>
+              This is especially useful for:
+              <ul className="list-disc ml-6 mt-2 space-y-1">
+                <li>Frequent travelers</li>
+                <li>Snowbirds who spend part of the year in another state</li>
+                <li>Retirees who travel regularly</li>
+                <li>Military families stationed away from home</li>
+                <li>Anyone with family in other states or countries</li>
+              </ul>
+              <p className="mt-2 text-sm italic">This is an optional planning tool, not a requirement.</p>
+            </>
+          )
+        }
+      ]
+    },
+    {
       title: "Unique Considerations & Extra Resources",
       icon: "🎖️",
       questions: [
