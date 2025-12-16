@@ -61,53 +61,51 @@ export const PlannerShell = ({
   );
 
   return (
-    <>
-      <div className="min-h-screen flex flex-col bg-background">
-        <div className="flex-1 flex">
-          {/* Mobile Menu Sheet */}
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetContent side="left" className="w-80 overflow-y-auto p-0 bg-[hsl(30,10%,98%)]">
+    <div className="min-h-screen flex flex-col bg-background">
+      <div className="flex-1 flex">
+        {/* Single Sheet for Mobile Menu */}
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <SheetContent side="left" className="w-80 overflow-y-auto p-0 bg-[hsl(30,10%,98%)]">
+            <div className="p-4">
+              {sidebarContent}
+            </div>
+          </SheetContent>
+        </Sheet>
+
+        {/* Desktop Resizable Layout */}
+        <ResizablePanelGroup direction="horizontal" className="hidden md:flex flex-1">
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={35}>
+            <aside className="h-full border-r border-border bg-[hsl(30,10%,98%)] overflow-y-auto">
               <div className="p-4">
                 {sidebarContent}
               </div>
-            </SheetContent>
-          </Sheet>
+            </aside>
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel defaultSize={80}>
+            <main className="h-full overflow-y-auto">
+              <div className="container mx-auto px-4 py-8 max-w-4xl">{children}</div>
+            </main>
+          </ResizablePanel>
+        </ResizablePanelGroup>
 
-          {/* Desktop Resizable Layout */}
-          <ResizablePanelGroup direction="horizontal" className="hidden md:flex flex-1">
-            <ResizablePanel defaultSize={20} minSize={15} maxSize={35}>
-              <aside className="h-full border-r border-border bg-[hsl(30,10%,98%)] overflow-y-auto">
-                <div className="p-4">
-                  {sidebarContent}
-                </div>
-              </aside>
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={80}>
-              <main className="h-full overflow-y-auto">
-                <div className="container mx-auto px-4 py-8 max-w-4xl">{children}</div>
-              </main>
-            </ResizablePanel>
-          </ResizablePanelGroup>
-
-          {/* Mobile Main Content */}
-          <main className="flex-1 overflow-y-auto md:hidden">
-            {/* Mobile Menu Button - Fixed position */}
-            <div className="fixed bottom-4 left-4 z-50">
-              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                <SheetTrigger asChild>
-                  <Button size="lg" className="rounded-full shadow-lg">
-                    <Menu className="h-5 w-5 mr-2" />
-                    Menu
-                  </Button>
-                </SheetTrigger>
-              </Sheet>
-            </div>
-            
-            <div className="container mx-auto px-4 py-8 max-w-4xl">{children}</div>
-          </main>
-        </div>
+        {/* Mobile Main Content */}
+        <main className="flex-1 overflow-y-auto md:hidden">
+          {/* Mobile Menu Button - Fixed position */}
+          <div className="fixed bottom-4 left-4 z-50">
+            <Button 
+              size="lg" 
+              className="rounded-full shadow-lg"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <Menu className="h-5 w-5 mr-2" />
+              Menu
+            </Button>
+          </div>
+          
+          <div className="container mx-auto px-4 py-8 max-w-4xl">{children}</div>
+        </main>
       </div>
-    </>
+    </div>
   );
 };
