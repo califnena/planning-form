@@ -183,7 +183,7 @@ export const SectionPreferences = ({
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6 -mx-6 px-6 py-4">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6 px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex-1 min-w-0 flex items-center gap-2">
             <h1 className="text-2xl font-bold text-foreground">{t('preferences.title')}</h1>
@@ -199,7 +199,12 @@ export const SectionPreferences = ({
             </TooltipProvider>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Button onClick={handleSaveAndContinue} disabled={saving} size="lg" className="bg-primary">
+            <Button
+              onClick={handleSaveAndContinue}
+              disabled={saving}
+              size="lg"
+              className="bg-primary hidden sm:inline-flex"
+            >
               {saving ? t('common.saving') : t('preferences.saveAndContinue')}
             </Button>
           </div>
@@ -307,7 +312,12 @@ export const SectionPreferences = ({
       </div>
 
       <div className="flex flex-col items-center gap-4 mt-8 pt-6 border-t">
-        <Button onClick={handleSaveAndContinue} disabled={saving} size="lg" className="bg-primary">
+        <Button
+          onClick={handleSaveAndContinue}
+          disabled={saving}
+          size="lg"
+          className="bg-primary w-full sm:hidden"
+        >
           {saving ? t('common.saving') : t('preferences.saveAndContinue')}
         </Button>
         <button 
