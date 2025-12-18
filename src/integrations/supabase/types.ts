@@ -2378,6 +2378,87 @@ export type Database = {
           },
         ]
       }
+      visit_events: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          id: string
+          ip_hash: string | null
+          org_id: string | null
+          path: string | null
+          referrer: string | null
+          region: string | null
+          user_agent: string | null
+          user_id: string | null
+          visitor_id: string
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          org_id?: string | null
+          path?: string | null
+          referrer?: string | null
+          region?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          visitor_id: string
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          org_id?: string | null
+          path?: string | null
+          referrer?: string | null
+          region?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          visitor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visit_events_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visit_events_visitor_id_fkey"
+            columns: ["visitor_id"]
+            isOneToOne: false
+            referencedRelation: "visitors"
+            referencedColumns: ["visitor_id"]
+          },
+        ]
+      }
+      visitors: {
+        Row: {
+          first_seen_at: string
+          last_seen_at: string
+          total_visits: number
+          visitor_id: string
+        }
+        Insert: {
+          first_seen_at?: string
+          last_seen_at?: string
+          total_visits?: number
+          visitor_id: string
+        }
+        Update: {
+          first_seen_at?: string
+          last_seen_at?: string
+          total_visits?: number
+          visitor_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       admin_plans_safe: {

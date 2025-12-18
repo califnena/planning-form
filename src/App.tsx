@@ -9,6 +9,7 @@ import { TextSizeProvider } from "./contexts/TextSizeContext";
 import { AccessibilityProvider } from "./contexts/AccessibilityContext";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { BackToTopButton } from "./components/BackToTopButton";
+import { VisitorTracker } from "./components/VisitorTracker";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -65,6 +66,7 @@ const App = () => (
             <BrowserRouter>
               <ScrollToTop />
               <BackToTopButton />
+              <VisitorTracker />
               <div className="flex flex-col min-h-screen">
                 <div className="flex-1">
                   <Routes>
