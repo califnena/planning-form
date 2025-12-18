@@ -169,6 +169,12 @@ serve(async (req: Request): Promise<Response> => {
     if (audienceFilter.state && audienceFilter.state !== "ALL") {
       query = query.contains("state_interest", [audienceFilter.state]);
     }
+    if (audienceFilter.counties && audienceFilter.counties.length > 0) {
+      query = query.overlaps("county_interest", audienceFilter.counties);
+    }
+    if (audienceFilter.categories && audienceFilter.categories.length > 0) {
+      query = query.overlaps("category_interest", audienceFilter.categories);
+    }
 
     const { data: subscribers, error: fetchError } = await query;
     if (fetchError) {
