@@ -2436,6 +2436,10 @@ export type Database = {
         Args: { _plan_id: string; _user_id: string }
         Returns: boolean
       }
+      has_org_role: {
+        Args: { _org_id: string; _roles: string[]; _user_id: string }
+        Returns: boolean
+      }
       has_vip_access: { Args: { _user_id: string }; Returns: boolean }
       is_app_owner: { Args: { _user_id: string }; Returns: boolean }
       is_case_owner: {
