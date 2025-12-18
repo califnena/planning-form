@@ -12,11 +12,18 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { Loader2, Search, User, Crown, UserPlus, Shield, ShieldCheck, Info, Star, Eye, UserCheck, Check, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { listUsers, AdminUser, inviteUser, updateMemberRole } from "@/lib/adminApi";
+import { 
+  adminListOrgUsers, 
+  adminSetOrgRole, 
+  adminAddExistingUserToOrg,
+  getCurrentUserOrg,
+  AdminUser,
+  OrgRole
+} from "@/lib/adminApi";
 import { UserDetailDrawer } from "./UserDetailDrawer";
 import { format } from "date-fns";
 
-const ORG_ROLES = ['owner', 'admin', 'member', 'executor', 'vip'] as const;
+const ORG_ROLES: OrgRole[] = ['owner', 'admin', 'member', 'executor', 'vip'];
 
 // Role definitions with capabilities
 const ROLE_DEFINITIONS = {
@@ -147,23 +154,29 @@ export function AdminUsersTab() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
+  const [orgId, setOrgId] = useState<string | null>(null);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<AdminUser[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState("member");
-  const [inviting, setInviting] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [addEmail, setAddEmail] = useState("");
+  const [addRole, setAddRole] = useState<OrgRole>("member");
+  const [adding, setAdding] = useState(false);
   const [updatingRoleFor, setUpdatingRoleFor] = useState<string | null>(null);
 
   const loadUsers = async () => {
     setLoading(true);
     try {
-      const data = await listUsers();
+      const org = await getCurrentUserOrg();
+      if (!org) {
+        throw new Error("Not a member of any organization");
+      }
+      setOrgId(org.orgId);
+      
+      const data = await adminListOrgUsers(org.orgId);
       setUsers(data);
       setFilteredUsers(data);
     } catch (error: any) {
@@ -187,53 +200,48 @@ export function AdminUsersTab() {
     // Search filter
     if (searchTerm) {
       filtered = filtered.filter(u => 
-        u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.id.toLowerCase().includes(searchTerm.toLowerCase())
+        u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.userId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.displayName?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Role filter
     if (roleFilter !== "all") {
-      filtered = filtered.filter(u => u.roles.includes(roleFilter));
-    }
-
-    // Status filter
-    if (statusFilter !== "all") {
-      if (statusFilter === "active") {
-        filtered = filtered.filter(u => u.plan_status === "active");
-      } else if (statusFilter === "none") {
-        filtered = filtered.filter(u => !u.active_plan);
-      } else {
-        filtered = filtered.filter(u => u.plan_status === statusFilter);
-      }
+      filtered = filtered.filter(u => u.orgRole === roleFilter);
     }
 
     setFilteredUsers(filtered);
-  }, [searchTerm, roleFilter, statusFilter, users]);
+  }, [searchTerm, roleFilter, users]);
 
   const handleUserClick = (user: AdminUser) => {
     setSelectedUser(user);
     setDrawerOpen(true);
   };
 
-  const handleRoleChange = async (userId: string, newRole: string, isOwner: boolean) => {
-    // Prevent changing owner's role
-    if (isOwner) {
-      toast({
-        title: t("admin.error"),
-        description: "Cannot change app owner's role",
-        variant: "destructive",
-      });
-      return;
+  const handleRoleChange = async (userId: string, newRole: OrgRole, currentRole: OrgRole | null | undefined) => {
+    if (!orgId) return;
+    
+    // Prevent changing owner's role (unless there are other owners)
+    if (currentRole === "owner") {
+      const ownerCount = users.filter(u => u.orgRole === "owner").length;
+      if (ownerCount === 1) {
+        toast({
+          title: t("admin.error"),
+          description: "Cannot change role of the only owner",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setUpdatingRoleFor(userId);
     try {
-      await updateMemberRole(userId, newRole);
+      await adminSetOrgRole({ orgId, userId, role: newRole });
       
       // Update local state
       setUsers(prev => prev.map(u => 
-        u.id === userId ? { ...u, roles: [newRole] } : u
+        u.userId === userId ? { ...u, orgRole: newRole } : u
       ));
       
       toast({
@@ -251,46 +259,33 @@ export function AdminUsersTab() {
     }
   };
 
-  const handleInviteOrAddUser = async () => {
-    if (!inviteEmail.trim()) return;
-    setInviting(true);
+  const handleAddUser = async () => {
+    if (!addEmail.trim() || !orgId) return;
+    setAdding(true);
     try {
-      // Try to add existing user first
-      const result = await inviteUser(inviteEmail.trim(), inviteRole);
+      await adminAddExistingUserToOrg({
+        orgId,
+        email: addEmail.trim(),
+        role: addRole,
+      });
       
-      if (result.alreadyExisted) {
-        toast({
-          title: t("admin.users.memberAdded"),
-          description: t("admin.users.existingUserAdded", { email: inviteEmail }),
-        });
-      } else {
-        toast({
-          title: t("admin.users.inviteSent"),
-          description: t("admin.users.inviteSentDescription", { email: inviteEmail }),
-        });
-      }
+      toast({
+        title: t("admin.users.memberAdded"),
+        description: t("admin.users.existingUserAdded", { email: addEmail }),
+      });
       
-      setInviteEmail("");
-      setInviteRole("member");
-      setInviteDialogOpen(false);
+      setAddEmail("");
+      setAddRole("member");
+      setAddDialogOpen(false);
       loadUsers();
     } catch (error: any) {
-      // Check if user already exists (shouldn't happen anymore since invite handles it)
-      if (error.message?.includes("already exists") || error.message?.includes("already been registered")) {
-        toast({
-          title: t("admin.users.userAlreadyExists"),
-          description: t("admin.users.userAlreadyExistsDesc"),
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: t("admin.error"),
-          description: error.message,
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: t("admin.error"),
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
-      setInviting(false);
+      setAdding(false);
     }
   };
 
@@ -313,7 +308,7 @@ export function AdminUsersTab() {
               <User className="h-5 w-5" />
               {t("admin.users.title")} ({filteredUsers.length})
             </CardTitle>
-            <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
+            <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <UserPlus className="mr-2 h-4 w-4" />
@@ -327,18 +322,18 @@ export function AdminUsersTab() {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label htmlFor="inviteEmail">{t("admin.users.email")}</Label>
+                    <Label htmlFor="addEmail">{t("admin.users.email")}</Label>
                     <Input
-                      id="inviteEmail"
+                      id="addEmail"
                       type="email"
-                      value={inviteEmail}
-                      onChange={(e) => setInviteEmail(e.target.value)}
+                      value={addEmail}
+                      onChange={(e) => setAddEmail(e.target.value)}
                       placeholder={t("admin.users.emailPlaceholder")}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="inviteRole">{t("admin.users.role")}</Label>
-                    <Select value={inviteRole} onValueChange={setInviteRole}>
+                    <Label htmlFor="addRole">{t("admin.users.role")}</Label>
+                    <Select value={addRole} onValueChange={(v) => setAddRole(v as OrgRole)}>
                       <SelectTrigger>
                         <SelectValue placeholder={t("admin.users.selectRole")} />
                       </SelectTrigger>
@@ -352,11 +347,11 @@ export function AdminUsersTab() {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setInviteDialogOpen(false)}>
+                  <Button variant="outline" onClick={() => setAddDialogOpen(false)}>
                     {t("common.cancel")}
                   </Button>
-                  <Button onClick={handleInviteOrAddUser} disabled={inviting || !inviteEmail.trim()}>
-                    {inviting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  <Button onClick={handleAddUser} disabled={adding || !addEmail.trim()}>
+                    {adding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {t("admin.users.addMember")}
                   </Button>
                 </DialogFooter>
@@ -391,17 +386,6 @@ export function AdminUsersTab() {
                 <SelectItem value="vip">VIP</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder={t("admin.users.filterByStatus")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("admin.users.allStatuses")}</SelectItem>
-                <SelectItem value="active">{t("admin.users.active")}</SelectItem>
-                <SelectItem value="canceled">{t("admin.users.canceled")}</SelectItem>
-                <SelectItem value="none">{t("admin.users.noSubscription")}</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Users Table */}
@@ -409,104 +393,87 @@ export function AdminUsersTab() {
             <Table>
               <TableHeader>
                 <TableRow>
-                    <TableHead>{t("admin.users.email")}</TableHead>
-                    <TableHead>{t("admin.users.created")}</TableHead>
-                    <TableHead>{t("admin.users.status")}</TableHead>
-                    <TableHead>{t("admin.users.logins")}</TableHead>
-                    <TableHead>{t("admin.users.lastLogin")}</TableHead>
-                    <TableHead>
-                      <div className="flex items-center">
-                        {t("admin.users.roles")}
-                        <RoleDefinitionsPopover />
+                  <TableHead>{t("admin.users.email")}</TableHead>
+                  <TableHead>{t("admin.users.name")}</TableHead>
+                  <TableHead>{t("admin.users.created")}</TableHead>
+                  <TableHead>{t("admin.users.lastLogin")}</TableHead>
+                  <TableHead>
+                    <div className="flex items-center">
+                      {t("admin.users.role")}
+                      <RoleDefinitionsPopover />
+                    </div>
+                  </TableHead>
+                  <TableHead></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.map((user) => (
+                  <TableRow key={user.userId} className="cursor-pointer hover:bg-muted/50">
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {user.orgRole === "owner" && <Crown className="h-4 w-4 text-yellow-500" />}
+                        <span className="font-medium">{user.email || "Unknown"}</span>
                       </div>
-                    </TableHead>
-                    <TableHead>{t("admin.users.plan")}</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredUsers.map((user) => (
-                    <TableRow key={user.id} className="cursor-pointer hover:bg-muted/50">
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {user.is_owner && <Crown className="h-4 w-4 text-yellow-500" />}
-                          <span className="font-medium">{user.email}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {format(new Date(user.created_at), "MMM d, yyyy")}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={user.is_blocked ? "destructive" : "default"}>
-                          {user.is_blocked ? t("admin.users.blocked") : t("admin.users.active")}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{user.login_count}</TableCell>
-                      <TableCell>
-                        {user.last_login_at 
-                          ? format(new Date(user.last_login_at), "MMM d, yyyy HH:mm")
-                          : "-"
-                        }
-                      </TableCell>
-                      <TableCell onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center gap-2">
-                          {updatingRoleFor === user.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : user.is_owner ? (
-                            <div className="flex items-center gap-1">
-                              <ShieldCheck className="h-4 w-4 text-yellow-500" />
-                              <Badge variant="default" className="bg-yellow-500 hover:bg-yellow-600">
-                                owner
-                              </Badge>
-                            </div>
-                          ) : (
-                            <Select 
-                              value={user.roles[0] || 'member'} 
-                              onValueChange={(value) => handleRoleChange(user.id, value, user.is_owner)}
-                            >
-                              <SelectTrigger className="w-[120px] h-8">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {ORG_ROLES.filter(r => r !== 'owner').map((role) => (
-                                  <SelectItem key={role} value={role}>
-                                    <div className="flex items-center gap-2">
-                                      {role === 'admin' && <Shield className="h-3 w-3" />}
-                                      {role}
-                                    </div>
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {user.active_plan ? (
-                          <Badge variant="default">{user.active_plan}</Badge>
+                    </TableCell>
+                    <TableCell>{user.displayName || "-"}</TableCell>
+                    <TableCell>
+                      {user.createdAt ? format(new Date(user.createdAt), "MMM d, yyyy") : "-"}
+                    </TableCell>
+                    <TableCell>
+                      {user.lastSignInAt 
+                        ? format(new Date(user.lastSignInAt), "MMM d, yyyy HH:mm")
+                        : "-"
+                      }
+                    </TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center gap-2">
+                        {updatingRoleFor === user.userId ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : user.orgRole === "owner" && users.filter(u => u.orgRole === "owner").length === 1 ? (
+                          <div className="flex items-center gap-1">
+                            <ShieldCheck className="h-4 w-4 text-yellow-500" />
+                            <Badge variant="default" className="bg-yellow-500 hover:bg-yellow-600">
+                              owner
+                            </Badge>
+                          </div>
                         ) : (
-                          <span className="text-muted-foreground">{t("common.free")}</span>
+                          <Select 
+                            value={user.orgRole || 'member'} 
+                            onValueChange={(value) => handleRoleChange(user.userId, value as OrgRole, user.orgRole)}
+                          >
+                            <SelectTrigger className="w-[120px] h-8">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {ORG_ROLES.map(role => (
+                                <SelectItem key={role} value={role}>
+                                  {role}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         )}
-                      </TableCell>
-                      <TableCell>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleUserClick(user)}
-                        >
-                          {t("admin.users.view")}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {filteredUsers.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                        {t("admin.users.noUsers")}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleUserClick(user)}
+                      >
+                        {t("admin.users.details")}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {filteredUsers.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      {t("admin.users.noUsers")}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
             </Table>
           </div>
         </CardContent>
@@ -514,6 +481,7 @@ export function AdminUsersTab() {
 
       <UserDetailDrawer
         user={selectedUser}
+        orgId={orgId}
         open={drawerOpen}
         onOpenChange={setDrawerOpen}
         onUserUpdated={loadUsers}

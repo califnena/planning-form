@@ -6,11 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Mail, Calendar, Crown, Shield, CreditCard, MessageSquare, Ban, CheckCircle, AlertTriangle } from "lucide-react";
+import { Loader2, Mail, Calendar, Crown, Shield, MessageSquare, Ban, CheckCircle, AlertTriangle, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { 
@@ -18,37 +17,31 @@ import {
   UserAdminMeta, 
   getUserAdminMeta, 
   updateUserAdminMeta, 
-  addUserRole, 
-  removeUserRole,
-  listRoles,
-  AppRole,
   blockUser,
-  unblockUser
+  unblockUser,
+  removeUserFromOrg
 } from "@/lib/adminApi";
 
 interface UserDetailDrawerProps {
   user: AdminUser | null;
+  orgId: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUserUpdated: () => void;
 }
 
-export function UserDetailDrawer({ user, open, onOpenChange, onUserUpdated }: UserDetailDrawerProps) {
+export function UserDetailDrawer({ user, orgId, open, onOpenChange, onUserUpdated }: UserDetailDrawerProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [allRoles, setAllRoles] = useState<AppRole[]>([]);
-  const [userRoles, setUserRoles] = useState<string[]>([]);
   const [adminMeta, setAdminMeta] = useState<UserAdminMeta | null>(null);
   const [notes, setNotes] = useState("");
   const [tags, setTags] = useState("");
-  const [isBlocked, setIsBlocked] = useState(false);
 
   useEffect(() => {
     if (user && open) {
       loadUserDetails();
-      setIsBlocked(user.is_blocked);
     }
   }, [user, open]);
 
@@ -56,12 +49,7 @@ export function UserDetailDrawer({ user, open, onOpenChange, onUserUpdated }: Us
     if (!user) return;
     setLoading(true);
     try {
-      const [roles, meta] = await Promise.all([
-        listRoles(),
-        getUserAdminMeta(user.id)
-      ]);
-      setAllRoles(roles);
-      setUserRoles(user.roles);
+      const meta = await getUserAdminMeta(user.userId);
       setAdminMeta(meta);
       setNotes(meta?.notes || "");
       setTags(meta?.tags?.join(", ") || "");
@@ -76,51 +64,11 @@ export function UserDetailDrawer({ user, open, onOpenChange, onUserUpdated }: Us
     }
   };
 
-  const handleRoleChange = async (roleName: string, checked: boolean) => {
-    if (!user) return;
-    
-    // Prevent removing admin from owner
-    if (roleName === "admin" && !checked && user.is_owner) {
-      toast({
-        title: t("admin.users.cannotRemoveOwnerAdmin"),
-        description: t("admin.users.ownerAdminProtected"),
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setSaving(true);
-    try {
-      if (checked) {
-        await addUserRole(user.id, roleName);
-        setUserRoles([...userRoles, roleName]);
-      } else {
-        await removeUserRole(user.id, roleName);
-        setUserRoles(userRoles.filter(r => r !== roleName));
-      }
-      toast({
-        title: t("admin.users.roleUpdated"),
-        description: checked 
-          ? t("admin.users.roleAdded", { role: roleName })
-          : t("admin.users.roleRemoved", { role: roleName }),
-      });
-      onUserUpdated();
-    } catch (error: any) {
-      toast({
-        title: t("admin.error"),
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const handleSaveNotes = async () => {
     if (!user) return;
     setSaving(true);
     try {
-      await updateUserAdminMeta(user.id, {
+      await updateUserAdminMeta(user.userId, {
         notes,
         tags: tags.split(",").map(t => t.trim()).filter(Boolean),
       });
@@ -142,7 +90,7 @@ export function UserDetailDrawer({ user, open, onOpenChange, onUserUpdated }: Us
     if (!user) return;
     setSaving(true);
     try {
-      await updateUserAdminMeta(user.id, {
+      await updateUserAdminMeta(user.userId, {
         last_contacted_at: new Date().toISOString(),
       });
       setAdminMeta(prev => prev ? { ...prev, last_contacted_at: new Date().toISOString() } : null);
@@ -161,10 +109,10 @@ export function UserDetailDrawer({ user, open, onOpenChange, onUserUpdated }: Us
   };
 
   const handleBlockToggle = async () => {
-    if (!user) return;
+    if (!user || !orgId) return;
     
     // Prevent blocking owner
-    if (user.is_owner) {
+    if (user.orgRole === "owner") {
       toast({
         title: t("admin.users.cannotBlockOwner"),
         description: t("admin.users.ownerProtected"),
@@ -175,15 +123,61 @@ export function UserDetailDrawer({ user, open, onOpenChange, onUserUpdated }: Us
 
     setSaving(true);
     try {
-      if (isBlocked) {
-        await unblockUser(user.id);
-        setIsBlocked(false);
-        toast({ title: t("admin.users.userUnblocked") });
-      } else {
-        await blockUser(user.id);
-        setIsBlocked(true);
-        toast({ title: t("admin.users.userBlocked") });
-      }
+      // We'll need to track blocked state differently since it's not in AdminUser anymore
+      // For now, we'll just call the functions
+      await blockUser(orgId, user.userId);
+      toast({ title: t("admin.users.userBlocked") });
+      onUserUpdated();
+    } catch (error: any) {
+      toast({
+        title: t("admin.error"),
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleUnblock = async () => {
+    if (!user || !orgId) return;
+    setSaving(true);
+    try {
+      await unblockUser(orgId, user.userId);
+      toast({ title: t("admin.users.userUnblocked") });
+      onUserUpdated();
+    } catch (error: any) {
+      toast({
+        title: t("admin.error"),
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleRemoveFromOrg = async () => {
+    if (!user || !orgId) return;
+    
+    if (user.orgRole === "owner") {
+      toast({
+        title: t("admin.users.cannotRemoveOwner"),
+        description: t("admin.users.ownerProtected"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!confirm(t("admin.users.confirmRemove", { email: user.email }))) {
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await removeUserFromOrg(orgId, user.userId);
+      toast({ title: t("admin.users.userRemoved") });
+      onOpenChange(false);
       onUserUpdated();
     } catch (error: any) {
       toast({
@@ -198,12 +192,14 @@ export function UserDetailDrawer({ user, open, onOpenChange, onUserUpdated }: Us
 
   if (!user) return null;
 
+  const isOwner = user.orgRole === "owner";
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
-            {user.is_owner && <Crown className="h-5 w-5 text-yellow-500" />}
+            {isOwner && <Crown className="h-5 w-5 text-yellow-500" />}
             {t("admin.users.userDetails")}
           </SheetTitle>
           <SheetDescription>{user.email}</SheetDescription>
@@ -226,21 +222,21 @@ export function UserDetailDrawer({ user, open, onOpenChange, onUserUpdated }: Us
               <CardContent className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t("admin.users.userId")}</span>
-                  <span className="font-mono text-xs">{user.id}</span>
+                  <span className="font-mono text-xs">{user.userId}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t("admin.users.name")}</span>
+                  <span>{user.displayName || "-"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t("admin.users.created")}</span>
-                  <span>{format(new Date(user.created_at), "MMM d, yyyy")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t("admin.users.logins")}</span>
-                  <span>{user.login_count}</span>
+                  <span>{user.createdAt ? format(new Date(user.createdAt), "MMM d, yyyy") : "-"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t("admin.users.lastLogin")}</span>
                   <span>
-                    {user.last_login_at 
-                      ? format(new Date(user.last_login_at), "MMM d, yyyy HH:mm")
+                    {user.lastSignInAt 
+                      ? format(new Date(user.lastSignInAt), "MMM d, yyyy HH:mm")
                       : "-"
                     }
                   </span>
@@ -255,61 +251,37 @@ export function UserDetailDrawer({ user, open, onOpenChange, onUserUpdated }: Us
               </CardContent>
             </Card>
 
-            {/* Roles */}
+            {/* Role */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Shield className="h-4 w-4" />
-                  {t("admin.users.roles")}
+                  {t("admin.users.role")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {allRoles.map((role) => (
-                    <div key={role.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={role.id}
-                        checked={userRoles.includes(role.name)}
-                        onCheckedChange={(checked) => handleRoleChange(role.name, checked as boolean)}
-                        disabled={saving || (role.name === "admin" && user.is_owner)}
-                      />
-                      <Label 
-                        htmlFor={role.id} 
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <Badge variant={role.name === "admin" ? "destructive" : "secondary"}>
-                          {role.name}
-                        </Badge>
-                        {role.name === "admin" && user.is_owner && (
-                          <span className="text-xs text-muted-foreground">
-                            ({t("admin.users.ownerProtected")})
-                          </span>
-                        )}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
+                <Badge 
+                  variant={user.orgRole === "owner" ? "default" : user.orgRole === "admin" ? "destructive" : "secondary"}
+                  className={user.orgRole === "owner" ? "bg-yellow-500" : ""}
+                >
+                  {user.orgRole || "member"}
+                </Badge>
+                <p className="text-xs text-muted-foreground mt-2">
+                  {t("admin.users.roleChangeHint")}
+                </p>
               </CardContent>
             </Card>
 
-            {/* Account Status */}
+            {/* Account Actions */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm flex items-center gap-2">
-                  {isBlocked ? <Ban className="h-4 w-4 text-destructive" /> : <CheckCircle className="h-4 w-4 text-green-500" />}
-                  {t("admin.users.accountStatus")}
+                  <Ban className="h-4 w-4" />
+                  {t("admin.users.accountActions")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Badge variant={isBlocked ? "destructive" : "default"}>
-                      {isBlocked ? t("admin.users.blocked") : t("admin.users.active")}
-                    </Badge>
-                  </div>
-                </div>
-                
-                {user.is_owner ? (
+                {isOwner ? (
                   <Alert>
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
@@ -317,62 +289,42 @@ export function UserDetailDrawer({ user, open, onOpenChange, onUserUpdated }: Us
                     </AlertDescription>
                   </Alert>
                 ) : (
-                  <Button
-                    variant={isBlocked ? "default" : "destructive"}
-                    size="sm"
-                    onClick={handleBlockToggle}
-                    disabled={saving}
-                    className="w-full"
-                  >
-                    {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {isBlocked ? (
-                      <>
-                        <CheckCircle className="mr-2 h-4 w-4" />
-                        {t("admin.users.unblockUser")}
-                      </>
-                    ) : (
-                      <>
+                  <>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={handleBlockToggle}
+                        disabled={saving}
+                        className="flex-1"
+                      >
+                        {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         <Ban className="mr-2 h-4 w-4" />
                         {t("admin.users.blockUser")}
-                      </>
-                    )}
-                  </Button>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleUnblock}
+                        disabled={saving}
+                        className="flex-1"
+                      >
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        {t("admin.users.unblockUser")}
+                      </Button>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRemoveFromOrg}
+                      disabled={saving}
+                      className="w-full text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      {t("admin.users.removeFromOrg")}
+                    </Button>
+                  </>
                 )}
-              </CardContent>
-            </Card>
-
-            {/* Billing */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <CreditCard className="h-4 w-4" />
-                  {t("admin.users.billing")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t("admin.users.currentPlan")}</span>
-                  <span>
-                    {user.active_plan ? (
-                      <Badge>{user.active_plan}</Badge>
-                    ) : (
-                      <span className="text-muted-foreground">Free</span>
-                    )}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t("admin.users.status")}</span>
-                  <span>{user.plan_status || "-"}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t("admin.users.renewsAt")}</span>
-                  <span>
-                    {user.plan_renews_at 
-                      ? format(new Date(user.plan_renews_at), "MMM d, yyyy")
-                      : "-"
-                    }
-                  </span>
-                </div>
               </CardContent>
             </Card>
 

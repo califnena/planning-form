@@ -1,303 +1,359 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+type OrgRole = "owner" | "admin" | "member" | "executor" | "vip";
+const VALID_ROLES: OrgRole[] = ["owner", "admin", "member", "executor", "vip"];
+
+interface AdminUser {
+  userId: string;
+  email: string | null;
+  createdAt: string | null;
+  lastSignInAt: string | null;
+  displayName: string | null;
+  orgRole: OrgRole | null;
+  orgId: string;
+}
+
+function ok<T>(data: T) {
+  return new Response(JSON.stringify({ ok: true, data }), {
+    status: 200,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+function err(error: string, status = 400, details?: unknown) {
+  console.error("Admin error:", error, details);
+  return new Response(JSON.stringify({ ok: false, error, details }), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
-
-    if (!supabaseUrl || !supabaseServiceKey || !supabaseAnonKey) {
-      console.error("Missing required environment variables");
-      return new Response(
-        JSON.stringify({ error: "Server configuration error: Missing required environment variables" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
+      return err("Server not configured", 500);
     }
 
-    // Create client with user's auth token to check admin status
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: "No authorization header" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return err("Unauthorized", 401);
     }
 
-    // Create user client to verify identity
+    // User client for RLS-protected queries
     const userClient = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } },
+      auth: { persistSession: false },
     });
 
-    const { data: { user }, error: userError } = await userClient.auth.getUser();
+    const { data: userData, error: userError } = await userClient.auth.getUser();
+    const user = userData?.user;
     if (userError || !user) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return err("Unauthorized", 401);
     }
 
-    // Check if user is admin
-    const { data: isAdmin } = await userClient.rpc("has_app_role", {
-      _user_id: user.id,
-      _role: "admin",
+    const payload = await req.json();
+    const { action, orgId, userId, email, role } = payload;
+
+    if (!orgId) {
+      return err("orgId is required");
+    }
+
+    // Verify caller is admin/owner in this org (uses RLS)
+    const { data: callerMembership, error: membershipErr } = await userClient
+      .from("org_members")
+      .select("role")
+      .eq("org_id", orgId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (membershipErr) {
+      return err("Authorization check failed", 500, membershipErr.message);
+    }
+
+    if (!callerMembership || !["owner", "admin"].includes(callerMembership.role)) {
+      return err("Forbidden: Admin access required", 403);
+    }
+
+    // Service client for admin operations (bypasses RLS)
+    const serviceClient = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { persistSession: false },
     });
 
-    if (!isAdmin) {
-      return new Response(
-        JSON.stringify({ error: "Admin access required" }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    // Check if target user is app owner (protected from destructive actions)
+    async function isAppOwner(targetUserId: string): Promise<boolean> {
+      const { data } = await serviceClient
+        .from("app_owner")
+        .select("user_id")
+        .eq("user_id", targetUserId)
+        .maybeSingle();
+      return !!data;
     }
-
-    // Create admin client with service role for auth operations
-    const adminClient = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
-
-    const { action, targetUserId, email, role, orgId } = await req.json();
-    
-    // Default org ID
-    const DEFAULT_ORG_ID = "00000000-0000-0000-0000-000000000001";
-    const effectiveOrgId = orgId || DEFAULT_ORG_ID;
-
-    // Check if target is app owner (protected)
-    if (targetUserId) {
-      const { data: isOwner } = await userClient.rpc("is_app_owner", {
-        _user_id: targetUserId,
-      });
-
-      if (isOwner && (action === "block" || action === "delete")) {
-        return new Response(
-          JSON.stringify({ error: "Cannot modify app owner account" }),
-          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-    }
-
-    let result;
 
     switch (action) {
-      case "block":
-        // Set banned_until to 100 years from now
-        const banDate = new Date();
-        banDate.setFullYear(banDate.getFullYear() + 100);
-        
-        const { error: blockError } = await adminClient.auth.admin.updateUserById(
-          targetUserId,
-          { ban_duration: "876000h" } // ~100 years in hours
+      case "list_org_users": {
+        // Get all org members
+        const { data: members, error: membersErr } = await serviceClient
+          .from("org_members")
+          .select("user_id, role, created_at")
+          .eq("org_id", orgId);
+
+        if (membersErr) {
+          return err("Failed to list members", 500, membersErr.message);
+        }
+
+        if (!members || members.length === 0) {
+          return ok([]);
+        }
+
+        // Get auth users for email/metadata
+        const { data: authData, error: authErr } = await serviceClient.auth.admin.listUsers();
+        if (authErr) {
+          return err("Failed to get user details", 500, authErr.message);
+        }
+
+        const authUsersMap = new Map(
+          authData.users.map((u) => [
+            u.id,
+            {
+              email: u.email,
+              createdAt: u.created_at,
+              lastSignInAt: u.last_sign_in_at,
+            },
+          ])
         );
-        
-        if (blockError) throw blockError;
-        result = { success: true, message: "User blocked" };
-        break;
 
-      case "unblock":
-        const { error: unblockError } = await adminClient.auth.admin.updateUserById(
-          targetUserId,
-          { ban_duration: "none" }
-        );
-        
-        if (unblockError) throw unblockError;
-        result = { success: true, message: "User unblocked" };
-        break;
+        // Get profiles for display names
+        const userIds = members.map((m) => m.user_id);
+        const { data: profiles } = await serviceClient
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", userIds);
 
-      case "add_member":
-        // Add an existing user to org_members by email
-        if (!email) {
-          return new Response(
-            JSON.stringify({ error: "Email required" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
+        const profilesMap = new Map(profiles?.map((p) => [p.id, p.full_name]) || []);
 
-        // Look up user by email using admin API
-        const { data: authUsers, error: lookupError } = await adminClient.auth.admin.listUsers();
-        if (lookupError) throw lookupError;
-        
-        const targetUser = authUsers.users.find((u: any) => u.email?.toLowerCase() === email.toLowerCase());
-        
-        if (!targetUser) {
-          return new Response(
-            JSON.stringify({ error: "No user found with this email. They need to create an account first." }),
-            { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-
-        // Validate role
-        const validRoles = ['owner', 'admin', 'member', 'executor', 'vip'];
-        const memberRole = role || 'member';
-        if (!validRoles.includes(memberRole)) {
-          return new Response(
-            JSON.stringify({ error: `Invalid role. Must be one of: ${validRoles.join(', ')}` }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-
-        // Upsert into org_members
-        const { error: upsertError } = await adminClient
-          .from('org_members')
-          .upsert({
-            org_id: effectiveOrgId,
-            user_id: targetUser.id,
-            role: memberRole,
-            created_at: new Date().toISOString(),
-          }, { onConflict: 'org_id,user_id' });
-
-        if (upsertError) {
-          console.error("Upsert error:", upsertError);
-          throw upsertError;
-        }
-
-        console.log(`Added user ${email} to org ${effectiveOrgId} with role ${memberRole}`);
-        result = { success: true, message: "Member added", userId: targetUser.id, role: memberRole };
-        break;
-
-      case "update_member_role":
-        // Update a member's role in org_members
-        if (!targetUserId || !role) {
-          return new Response(
-            JSON.stringify({ error: "User ID and role required" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-
-        const validUpdateRoles = ['owner', 'admin', 'member', 'executor', 'vip'];
-        if (!validUpdateRoles.includes(role)) {
-          return new Response(
-            JSON.stringify({ error: `Invalid role. Must be one of: ${validUpdateRoles.join(', ')}` }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-
-        const { error: updateError } = await adminClient
-          .from('org_members')
-          .update({ role: role })
-          .eq('org_id', effectiveOrgId)
-          .eq('user_id', targetUserId);
-
-        if (updateError) throw updateError;
-        result = { success: true, message: "Role updated" };
-        break;
-
-      case "invite":
-        if (!email) {
-          return new Response(
-            JSON.stringify({ error: "Email required for invite" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-
-        // First check if user already exists
-        const { data: existingUsers } = await adminClient.auth.admin.listUsers();
-        const existingUser = existingUsers?.users.find((u: any) => u.email?.toLowerCase() === email.toLowerCase());
-        
-        if (existingUser) {
-          // User exists - add to org_members instead of inviting
-          const addRole = role || 'member';
-          const { error: addError } = await adminClient
-            .from('org_members')
-            .upsert({
-              org_id: effectiveOrgId,
-              user_id: existingUser.id,
-              role: addRole,
-              created_at: new Date().toISOString(),
-            }, { onConflict: 'org_id,user_id' });
-
-          if (addError) throw addError;
-          
-          result = { 
-            success: true, 
-            message: "User already exists - added to workspace", 
-            userId: existingUser.id,
-            alreadyExisted: true 
+        const users: AdminUser[] = members.map((m) => {
+          const auth = authUsersMap.get(m.user_id);
+          return {
+            userId: m.user_id,
+            email: auth?.email || null,
+            createdAt: auth?.createdAt || m.created_at,
+            lastSignInAt: auth?.lastSignInAt || null,
+            displayName: profilesMap.get(m.user_id) || null,
+            orgRole: m.role as OrgRole,
+            orgId,
           };
-          break;
+        });
+
+        return ok(users);
+      }
+
+      case "set_org_role": {
+        if (!userId || !role) {
+          return err("userId and role are required");
         }
 
-        const { data: inviteData, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email);
-        
-        if (inviteError) {
-          console.error("Invite error:", inviteError);
-          
-          // Handle specific error for existing user
-          if (inviteError.code === "email_exists" || inviteError.message?.includes("already been registered")) {
-            return new Response(
-              JSON.stringify({ error: "A user with this email address already exists" }),
-              { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
+        if (!VALID_ROLES.includes(role as OrgRole)) {
+          return err(`Invalid role. Must be one of: ${VALID_ROLES.join(", ")}`);
+        }
+
+        // Protect app owner from demotion
+        if (await isAppOwner(userId)) {
+          if (role !== "owner" && role !== "admin") {
+            return err("Cannot demote app owner below admin", 403);
           }
-          
-          // Return all other errors as 500 with the actual message
-          return new Response(
-            JSON.stringify({ 
-              error: inviteError.message || "Failed to send invitation email. Check Supabase Auth email configuration or SMTP settings." 
-            }),
-            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
         }
-        
-        // Add invited user to org_members with default role
-        if (inviteData.user?.id) {
-          const inviteRole = role || 'member';
-          await adminClient
-            .from('org_members')
-            .upsert({
-              org_id: effectiveOrgId,
-              user_id: inviteData.user.id,
-              role: inviteRole,
-              created_at: new Date().toISOString(),
-            }, { onConflict: 'org_id,user_id' });
-        }
-        
-        result = { success: true, message: "Invitation sent", userId: inviteData.user?.id };
-        break;
 
-      case "get_users":
-        // Get all users with their metadata including banned status
-        const { data: allAuthUsers, error: listError } = await adminClient.auth.admin.listUsers();
-        
-        if (listError) throw listError;
-        
-        result = {
-          users: allAuthUsers.users.map((u: any) => ({
-            id: u.id,
-            email: u.email,
-            created_at: u.created_at,
-            banned_until: u.banned_until || null,
-            email_confirmed_at: u.email_confirmed_at,
-            last_sign_in_at: u.last_sign_in_at,
-          })),
-        };
-        break;
+        // Prevent last owner from being demoted
+        if (role !== "owner") {
+          const { data: owners } = await serviceClient
+            .from("org_members")
+            .select("user_id")
+            .eq("org_id", orgId)
+            .eq("role", "owner");
+
+          if (owners?.length === 1 && owners[0].user_id === userId) {
+            return err("Cannot demote the only owner of the organization");
+          }
+        }
+
+        const { error: updateErr } = await serviceClient
+          .from("org_members")
+          .update({ role })
+          .eq("org_id", orgId)
+          .eq("user_id", userId);
+
+        if (updateErr) {
+          return err("Failed to update role", 500, updateErr.message);
+        }
+
+        console.log(`Updated user ${userId} role to ${role} in org ${orgId}`);
+        return ok({ success: true });
+      }
+
+      case "add_existing_user_to_org": {
+        if (!email || !role) {
+          return err("email and role are required");
+        }
+
+        if (!VALID_ROLES.includes(role as OrgRole)) {
+          return err(`Invalid role. Must be one of: ${VALID_ROLES.join(", ")}`);
+        }
+
+        // Find user by email
+        const { data: authData, error: authErr } = await serviceClient.auth.admin.listUsers();
+        if (authErr) {
+          return err("Failed to lookup user", 500, authErr.message);
+        }
+
+        const targetUser = authData.users.find(
+          (u) => u.email?.toLowerCase() === email.toLowerCase()
+        );
+
+        if (!targetUser) {
+          return err("No user found with this email. They need to create an account first.", 404);
+        }
+
+        // Check if already a member
+        const { data: existing } = await serviceClient
+          .from("org_members")
+          .select("user_id")
+          .eq("org_id", orgId)
+          .eq("user_id", targetUser.id)
+          .maybeSingle();
+
+        if (existing) {
+          return err("User is already a member of this organization");
+        }
+
+        const { error: insertErr } = await serviceClient.from("org_members").insert({
+          org_id: orgId,
+          user_id: targetUser.id,
+          role,
+        });
+
+        if (insertErr) {
+          return err("Failed to add member", 500, insertErr.message);
+        }
+
+        console.log(`Added user ${email} to org ${orgId} with role ${role}`);
+        return ok({ success: true, userId: targetUser.id });
+      }
+
+      case "block_user": {
+        if (!userId) {
+          return err("userId is required");
+        }
+
+        if (await isAppOwner(userId)) {
+          return err("Cannot block app owner", 403);
+        }
+
+        // Verify target is in this org
+        const { data: membership } = await serviceClient
+          .from("org_members")
+          .select("user_id")
+          .eq("org_id", orgId)
+          .eq("user_id", userId)
+          .maybeSingle();
+
+        if (!membership) {
+          return err("User is not a member of this organization", 404);
+        }
+
+        const { error: banErr } = await serviceClient.auth.admin.updateUserById(userId, {
+          ban_duration: "876000h", // ~100 years
+        });
+
+        if (banErr) {
+          return err("Failed to block user", 500, banErr.message);
+        }
+
+        console.log(`Blocked user ${userId}`);
+        return ok({ success: true });
+      }
+
+      case "unblock_user": {
+        if (!userId) {
+          return err("userId is required");
+        }
+
+        // Verify target is in this org
+        const { data: membership } = await serviceClient
+          .from("org_members")
+          .select("user_id")
+          .eq("org_id", orgId)
+          .eq("user_id", userId)
+          .maybeSingle();
+
+        if (!membership) {
+          return err("User is not a member of this organization", 404);
+        }
+
+        const { error: unbanErr } = await serviceClient.auth.admin.updateUserById(userId, {
+          ban_duration: "none",
+        });
+
+        if (unbanErr) {
+          return err("Failed to unblock user", 500, unbanErr.message);
+        }
+
+        console.log(`Unblocked user ${userId}`);
+        return ok({ success: true });
+      }
+
+      case "remove_from_org": {
+        if (!userId) {
+          return err("userId is required");
+        }
+
+        if (await isAppOwner(userId)) {
+          return err("Cannot remove app owner from organization", 403);
+        }
+
+        // Prevent removing the only owner
+        const { data: owners } = await serviceClient
+          .from("org_members")
+          .select("user_id, role")
+          .eq("org_id", orgId)
+          .eq("role", "owner");
+
+        if (owners?.length === 1 && owners[0].user_id === userId) {
+          return err("Cannot remove the only owner of the organization");
+        }
+
+        const { error: deleteErr } = await serviceClient
+          .from("org_members")
+          .delete()
+          .eq("org_id", orgId)
+          .eq("user_id", userId);
+
+        if (deleteErr) {
+          return err("Failed to remove member", 500, deleteErr.message);
+        }
+
+        console.log(`Removed user ${userId} from org ${orgId}`);
+        return ok({ success: true });
+      }
 
       default:
-        return new Response(
-          JSON.stringify({ error: "Invalid action" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return err(`Unknown action: ${action}`);
     }
-
-    return new Response(
-      JSON.stringify(result),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-
-  } catch (error: any) {
-    console.error("Admin user management error:", error);
-    return new Response(
-      JSON.stringify({ error: error?.message || "Internal server error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "Unknown error";
+    return err(msg, 500);
   }
 });

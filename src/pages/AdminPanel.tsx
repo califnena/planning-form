@@ -9,12 +9,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, ArrowLeft, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { checkIsAdmin } from "@/lib/adminApi";
+import { checkIsOrgAdmin } from "@/lib/adminApi";
 import { AdminUsersTab } from "@/components/admin/AdminUsersTab";
 import { AdminRolesTab } from "@/components/admin/AdminRolesTab";
 import { AdminBillingTab } from "@/components/admin/AdminBillingTab";
 import { AdminAnalyticsTab } from "@/components/admin/AdminAnalyticsTab";
-import { AssignAdminDialog } from "@/components/admin/AssignAdminDialog";
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -31,7 +30,7 @@ export default function AdminPanel() {
         return;
       }
 
-      const adminStatus = await checkIsAdmin();
+      const adminStatus = await checkIsOrgAdmin();
       if (!adminStatus) {
         toast({
           title: t("admin.accessDenied"),
@@ -77,15 +76,12 @@ export default function AdminPanel() {
 
         <Card className="mb-6">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Shield className="h-8 w-8 text-primary" />
-                <div>
-                  <CardTitle className="text-2xl">{t("admin.title")}</CardTitle>
-                  <CardDescription>{t("admin.description")}</CardDescription>
-                </div>
+            <div className="flex items-center gap-3">
+              <Shield className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle className="text-2xl">{t("admin.title")}</CardTitle>
+                <CardDescription>{t("admin.description")}</CardDescription>
               </div>
-              <AssignAdminDialog />
             </div>
           </CardHeader>
         </Card>
