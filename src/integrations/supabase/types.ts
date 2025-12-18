@@ -782,6 +782,7 @@ export type Database = {
           first_name: string | null
           id: string
           is_active: boolean
+          org_id: string | null
           state_interest: string[] | null
           unsub_token: string
           verified_at: string | null
@@ -794,6 +795,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           is_active?: boolean
+          org_id?: string | null
           state_interest?: string[] | null
           unsub_token?: string
           verified_at?: string | null
@@ -806,6 +808,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           is_active?: boolean
+          org_id?: string | null
           state_interest?: string[] | null
           unsub_token?: string
           verified_at?: string | null
