@@ -678,6 +678,7 @@ export type Database = {
           created_by: string | null
           event_id: string | null
           id: string
+          org_id: string | null
           preview: string | null
           send_type: string
           sent_at: string | null
@@ -692,6 +693,7 @@ export type Database = {
           created_by?: string | null
           event_id?: string | null
           id?: string
+          org_id?: string | null
           preview?: string | null
           send_type: string
           sent_at?: string | null
@@ -706,6 +708,7 @@ export type Database = {
           created_by?: string | null
           event_id?: string | null
           id?: string
+          org_id?: string | null
           preview?: string | null
           send_type?: string
           sent_at?: string | null
@@ -719,6 +722,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "efa_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "efa_event_email_log_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
             referencedColumns: ["id"]
           },
         ]
@@ -813,7 +823,15 @@ export type Database = {
           unsub_token?: string
           verified_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "efa_event_subscribers_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       efa_events: {
         Row: {
@@ -838,6 +856,7 @@ export type Database = {
           is_vendor_friendly: boolean
           list_summary: string | null
           name: string
+          org_id: string | null
           organizer_email: string | null
           organizer_name: string | null
           organizer_phone: string | null
@@ -870,6 +889,7 @@ export type Database = {
           is_vendor_friendly?: boolean
           list_summary?: string | null
           name: string
+          org_id?: string | null
           organizer_email?: string | null
           organizer_name?: string | null
           organizer_phone?: string | null
@@ -902,6 +922,7 @@ export type Database = {
           is_vendor_friendly?: boolean
           list_summary?: string | null
           name?: string
+          org_id?: string | null
           organizer_email?: string | null
           organizer_name?: string | null
           organizer_phone?: string | null
@@ -912,7 +933,15 @@ export type Database = {
           venue?: string | null
           zip?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "efa_events_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       faqs: {
         Row: {
