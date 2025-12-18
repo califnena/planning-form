@@ -1362,7 +1362,6 @@ export type Database = {
           child_names: string[] | null
           citizenship: string | null
           created_at: string
-          dob: string | null
           ex_spouse_name: string | null
           father_name: string | null
           full_name: string | null
@@ -1375,7 +1374,6 @@ export type Database = {
           plan_id: string
           religion: string | null
           remembered: string | null
-          ssn: string | null
           updated_at: string
           vet_branch: string | null
           vet_discharge: string | null
@@ -1391,7 +1389,6 @@ export type Database = {
           child_names?: string[] | null
           citizenship?: string | null
           created_at?: string
-          dob?: string | null
           ex_spouse_name?: string | null
           father_name?: string | null
           full_name?: string | null
@@ -1404,7 +1401,6 @@ export type Database = {
           plan_id: string
           religion?: string | null
           remembered?: string | null
-          ssn?: string | null
           updated_at?: string
           vet_branch?: string | null
           vet_discharge?: string | null
@@ -1420,7 +1416,6 @@ export type Database = {
           child_names?: string[] | null
           citizenship?: string | null
           created_at?: string
-          dob?: string | null
           ex_spouse_name?: string | null
           father_name?: string | null
           full_name?: string | null
@@ -1433,7 +1428,6 @@ export type Database = {
           plan_id?: string
           religion?: string | null
           remembered?: string | null
-          ssn?: string | null
           updated_at?: string
           vet_branch?: string | null
           vet_discharge?: string | null
