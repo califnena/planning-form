@@ -133,6 +133,30 @@ serve(async (req: Request): Promise<Response> => {
       auth: { persistSession: false },
     });
 
+    // Validate that eventId belongs to this org
+    const { data: eventRow, error: eventErr } = await serviceClient
+      .from("efa_events")
+      .select("id, org_id")
+      .eq("id", eventId)
+      .maybeSingle();
+
+    if (eventErr) {
+      console.error("Event lookup failed:", eventErr.message);
+      return new Response(JSON.stringify({ error: "Event lookup failed" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    // If event has org_id set, verify it matches the requested orgId
+    if (eventRow?.org_id && eventRow.org_id !== orgId) {
+      console.log("Event org mismatch. Event org:", eventRow.org_id, "Requested org:", orgId);
+      return new Response(JSON.stringify({ error: "Event not found for this organization" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
     // Fetch subscribers scoped to this org
     let query = serviceClient
       .from("efa_event_subscribers")
@@ -170,7 +194,8 @@ serve(async (req: Request): Promise<Response> => {
       });
     }
 
-    const appUrl = "https://everlastingfuneraladvisors.com";
+    // Use environment variable for app URL, with fallback
+    const appUrl = Deno.env.get("APP_PUBLIC_URL") ?? "https://everlastingfuneraladvisors.com";
     const batchSize = 50;
     let sentCount = 0;
     const errors: string[] = [];
