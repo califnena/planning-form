@@ -133,10 +133,11 @@ serve(async (req: Request): Promise<Response> => {
       auth: { persistSession: false },
     });
 
-    // Fetch subscribers (note: efa_event_subscribers is global, not org-scoped)
+    // Fetch subscribers scoped to this org
     let query = serviceClient
       .from("efa_event_subscribers")
-      .select("id, email, first_name, unsub_token");
+      .select("id, email, first_name, unsub_token")
+      .eq("org_id", orgId);
 
     if (audienceFilter.activeOnly) {
       query = query.eq("is_active", true);
