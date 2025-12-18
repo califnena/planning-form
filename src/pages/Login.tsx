@@ -115,44 +115,47 @@ const Login = () => {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+    <div className="min-h-screen w-full overflow-x-hidden flex items-center justify-center px-4 py-8 bg-muted/30">
       <div className="absolute top-4 left-4">
         <BackToHomeButton />
       </div>
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">{t('auth.signIn')}</CardTitle>
-          <CardDescription className="text-center">
-            {t('auth.signInDesc')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">{t('auth.email')}</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder={t('auth.emailPlaceholder')}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">{t('auth.password')}</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? t('auth.signingIn') : t('auth.signIn')}
-            </Button>
-          </form>
+      <div className="w-full max-w-sm">
+        <Card className="w-full">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl text-center">{t('auth.signIn')}</CardTitle>
+            <CardDescription className="text-center">
+              {t('auth.signInDesc')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">{t('auth.email')}</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder={t('auth.emailPlaceholder')}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="text-base"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">{t('auth.password')}</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="text-base"
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? t('auth.signingIn') : t('auth.signIn')}
+              </Button>
+            </form>
 
           {import.meta.env.DEV && (
             <>
@@ -190,8 +193,9 @@ const Login = () => {
               {t('auth.signUp')}
             </Link>
           </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
