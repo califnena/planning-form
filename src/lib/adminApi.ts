@@ -1,19 +1,16 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export interface AdminUser {
-  id: string;
-  email: string;
-  created_at: string;
-  login_count: number;
-  last_login_at: string | null;
-  roles: string[];
-  active_plan: string | null;
-  plan_status: string | null;
-  plan_renews_at: string | null;
-  is_owner: boolean;
-  is_blocked: boolean;
-  banned_until: string | null;
-}
+export type OrgRole = "owner" | "admin" | "member" | "executor" | "vip";
+
+export type AdminUser = {
+  userId: string;
+  email: string | null;
+  createdAt: string | null;
+  lastSignInAt: string | null;
+  displayName?: string | null;
+  orgRole?: OrgRole | null;
+  orgId?: string | null;
+};
 
 export interface UserAdminMeta {
   user_id: string;
@@ -24,166 +21,122 @@ export interface UserAdminMeta {
   updated_at: string;
 }
 
-export interface AppRole {
-  id: string;
-  name: string;
-  description: string | null;
-  created_at: string;
-}
+type AdminFnResponse<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: string; details?: unknown };
 
-// Built-in roles that cannot be deleted
-export const PROTECTED_ROLES = ['admin', 'vip', 'basic', 'printable', 'song_standard', 'song_premium', 'done_for_you', 'binder'];
-
-/**
- * Check if current user is admin
- */
-export async function checkIsAdmin(): Promise<boolean> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return false;
-  
-  const { data } = await supabase.rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
-  return data === true;
-}
-
-/**
- * List all workspace members from org_members (single source of truth)
- * This is filtered by the default org and shows roles from org_members.role
- */
-export async function listUsers(): Promise<AdminUser[]> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
-
-  // Get current user to find their org
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
-
-  // Get user's org (prefer owner/admin membership)
-  const { data: userMembership, error: membershipError } = await supabase
-    .from('org_members')
-    .select('org_id, role')
-    .eq('user_id', user.id)
-    .order('role', { ascending: true }) // owner comes first alphabetically before member
-    .limit(1)
-    .maybeSingle();
-
-  if (membershipError) throw membershipError;
-  if (!userMembership) throw new Error('User is not a member of any organization');
-
-  const orgId = userMembership.org_id;
-
-  // Get org_members as the primary source - this is who is in the workspace
-  const { data: orgMembers, error: orgError } = await supabase
-    .from('org_members')
-    .select('user_id, role, created_at')
-    .eq('org_id', orgId);
-
-  if (orgError) throw orgError;
-
-  // Build list of user IDs for efficient filtering
-  const userIds = orgMembers?.map(m => m.user_id) || [];
-  if (userIds.length === 0) return [];
-
-  // Get profiles for user metadata - filtered by user IDs
-  const { data: profiles } = await supabase
-    .from('profiles')
-    .select('id, full_name, created_at')
-    .in('id', userIds);
-
-  const profilesMap = new Map(profiles?.map(p => [p.id, p]) || []);
-
-  // Get login stats - filtered by user IDs
-  const { data: loginStats } = await supabase
-    .from('user_logins')
-    .select('user_id, logged_in_at')
-    .in('user_id', userIds);
-
-  // Aggregate login stats manually
-  const loginStatsMap = new Map<string, { count: number; lastLogin: string | null }>();
-  loginStats?.forEach(login => {
-    const existing = loginStatsMap.get(login.user_id);
-    if (existing) {
-      existing.count++;
-      if (login.logged_in_at > (existing.lastLogin || '')) {
-        existing.lastLogin = login.logged_in_at;
-      }
-    } else {
-      loginStatsMap.set(login.user_id, { count: 1, lastLogin: login.logged_in_at });
-    }
-  });
-
-  // Get subscriptions for plan info - filtered by user IDs
-  const { data: subscriptions } = await supabase
-    .from('subscriptions')
-    .select('user_id, plan_type, status, current_period_end')
-    .in('user_id', userIds);
-
-  const subscriptionMap = new Map(
-    subscriptions?.map(s => [s.user_id, s]) || []
+async function callAdminFn<T>(payload: Record<string, unknown>): Promise<T> {
+  const { data, error } = await supabase.functions.invoke<AdminFnResponse<T>>(
+    "admin-user-management",
+    { body: payload }
   );
 
-  // Get app owners
-  const { data: owners } = await supabase
-    .from('app_owner')
-    .select('user_id');
-  
-  const ownerSet = new Set(owners?.map(o => o.user_id) || []);
-
-  // Get auth user data from edge function for emails and banned status
-  let authUsersMap = new Map<string, { email: string; banned_until: string | null }>();
-  try {
-    const { data: authData, error: authError } = await supabase.functions.invoke('admin-user-management', {
-      body: { action: 'get_users' }
-    });
-    if (!authError && authData?.users) {
-      authUsersMap = new Map(authData.users.map((u: any) => [u.id, { email: u.email, banned_until: u.banned_until }]));
-    }
-  } catch (e) {
-    console.error('Failed to fetch auth users:', e);
+  if (error) {
+    throw new Error(`Edge Function error: ${error.message}`);
   }
 
-  const users: AdminUser[] = [];
-
-  // Build user list from org_members (single source of truth for workspace)
-  for (const member of orgMembers || []) {
-    const profile = profilesMap.get(member.user_id);
-    const loginStat = loginStatsMap.get(member.user_id);
-    const sub = subscriptionMap.get(member.user_id);
-    const authUser = authUsersMap.get(member.user_id);
-    const bannedUntil = authUser?.banned_until || null;
-    
-    // Role comes from org_members.role only (single source of truth)
-    const roles = [member.role];
-    
-    users.push({
-      id: member.user_id,
-      email: authUser?.email || profile?.full_name || 'Unknown',
-      created_at: member.created_at || profile?.created_at || new Date().toISOString(),
-      login_count: loginStat?.count || 0,
-      last_login_at: loginStat?.lastLogin || null,
-      roles: roles,
-      active_plan: sub?.status === 'active' ? sub.plan_type : null,
-      plan_status: sub?.status || null,
-      plan_renews_at: sub?.current_period_end || null,
-      is_owner: ownerSet.has(member.user_id),
-      is_blocked: bannedUntil ? new Date(bannedUntil) > new Date() : false,
-      banned_until: bannedUntil,
-    });
+  if (!data) {
+    throw new Error("Edge Function returned no data.");
   }
 
-  return users;
+  if (!data.ok) {
+    const errorData = data as { ok: false; error: string };
+    throw new Error(errorData.error || "Admin function failed.");
+  }
+
+  return data.data;
+}
+
+/**
+ * Returns all members in this org + their org role,
+ * joined with auth user email/name so the admin panel matches the workspace.
+ */
+export async function adminListOrgUsers(orgId: string): Promise<AdminUser[]> {
+  return await callAdminFn<AdminUser[]>({
+    action: "list_org_users",
+    orgId,
+  });
+}
+
+/**
+ * Promote/demote an existing user in the org.
+ * This is the correct replacement for "Assign Admin Role".
+ */
+export async function adminSetOrgRole(params: {
+  orgId: string;
+  userId: string;
+  role: OrgRole;
+}): Promise<{ success: true }> {
+  const { orgId, userId, role } = params;
+
+  return await callAdminFn<{ success: true }>({
+    action: "set_org_role",
+    orgId,
+    userId,
+    role,
+  });
+}
+
+/**
+ * Add an existing user to the org by email.
+ * This does NOT "invite" unless they don't exist. It finds the user by email and adds to org_members.
+ */
+export async function adminAddExistingUserToOrg(params: {
+  orgId: string;
+  email: string;
+  role: OrgRole;
+}): Promise<{ success: true; userId: string }> {
+  const { orgId, email, role } = params;
+
+  return await callAdminFn<{ success: true; userId: string }>({
+    action: "add_existing_user_to_org",
+    orgId,
+    email,
+    role,
+  });
+}
+
+/**
+ * Block a user (ban them from signing in)
+ */
+export async function blockUser(orgId: string, userId: string): Promise<{ success: true }> {
+  return await callAdminFn<{ success: true }>({
+    action: "block_user",
+    orgId,
+    userId,
+  });
+}
+
+/**
+ * Unblock a user (allow them to sign in again)
+ */
+export async function unblockUser(orgId: string, userId: string): Promise<{ success: true }> {
+  return await callAdminFn<{ success: true }>({
+    action: "unblock_user",
+    orgId,
+    userId,
+  });
+}
+
+/**
+ * Remove a user from the org (delete their org_members row)
+ */
+export async function removeUserFromOrg(orgId: string, userId: string): Promise<{ success: true }> {
+  return await callAdminFn<{ success: true }>({
+    action: "remove_from_org",
+    orgId,
+    userId,
+  });
 }
 
 /**
  * Get admin meta for a specific user
  */
 export async function getUserAdminMeta(userId: string): Promise<UserAdminMeta | null> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
-
   const { data, error } = await supabase
-    .from('user_admin_meta')
-    .select('*')
-    .eq('user_id', userId)
+    .from("user_admin_meta")
+    .select("*")
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (error) throw error;
@@ -197,11 +150,8 @@ export async function updateUserAdminMeta(
   userId: string,
   meta: { tags?: string[]; notes?: string; last_contacted_at?: string | null }
 ): Promise<void> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
-
   const { error } = await supabase
-    .from('user_admin_meta')
+    .from("user_admin_meta")
     .upsert({
       user_id: userId,
       ...meta,
@@ -212,290 +162,50 @@ export async function updateUserAdminMeta(
 }
 
 /**
- * Get all roles
- */
-export async function listRoles(): Promise<AppRole[]> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
-
-  const { data, error } = await supabase
-    .from('app_roles')
-    .select('*')
-    .order('name');
-
-  if (error) throw error;
-  return data || [];
-}
-
-/**
- * Add a role to a user
- */
-export async function addUserRole(userId: string, roleName: string): Promise<void> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
-
-  // Get role id
-  const { data: role, error: roleError } = await supabase
-    .from('app_roles')
-    .select('id')
-    .eq('name', roleName)
-    .single();
-
-  if (roleError || !role) throw new Error(`Role ${roleName} not found`);
-
-  const { error } = await supabase
-    .from('user_roles')
-    .upsert({ user_id: userId, role_id: role.id }, { onConflict: 'user_id,role_id' });
-
-  if (error) throw error;
-}
-
-/**
- * Remove a role from a user (with owner protection)
- */
-export async function removeUserRole(userId: string, roleName: string): Promise<void> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
-
-  // Check if user is owner and trying to remove admin
-  if (roleName === 'admin') {
-    const { data: isOwner } = await supabase.rpc('is_app_owner', { _user_id: userId });
-    if (isOwner) {
-      throw new Error('Cannot remove admin role from app owner');
-    }
-  }
-
-  // Get role id
-  const { data: role, error: roleError } = await supabase
-    .from('app_roles')
-    .select('id')
-    .eq('name', roleName)
-    .single();
-
-  if (roleError || !role) throw new Error(`Role ${roleName} not found`);
-
-  const { error } = await supabase
-    .from('user_roles')
-    .delete()
-    .eq('user_id', userId)
-    .eq('role_id', role.id);
-
-  if (error) throw error;
-}
-
-/**
- * Create a new role
- */
-export async function createRole(name: string, description?: string): Promise<void> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
-
-  const { error } = await supabase
-    .from('app_roles')
-    .insert({ name, description });
-
-  if (error) throw error;
-}
-
-/**
- * Update a role description
- */
-export async function updateRole(roleId: string, description: string): Promise<void> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
-
-  const { error } = await supabase
-    .from('app_roles')
-    .update({ description })
-    .eq('id', roleId);
-
-  if (error) throw error;
-}
-
-/**
- * Delete a role (with protection for built-in roles)
- */
-export async function deleteRole(roleId: string): Promise<void> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
-
-  // Check if it's a protected role
-  const { data: role } = await supabase
-    .from('app_roles')
-    .select('name')
-    .eq('id', roleId)
-    .single();
-
-  if (role && PROTECTED_ROLES.includes(role.name)) {
-    throw new Error(`Cannot delete built-in role: ${role.name}`);
-  }
-
-  const { error } = await supabase
-    .from('app_roles')
-    .delete()
-    .eq('id', roleId);
-
-  if (error) throw error;
-}
-
-/**
- * Get subscription statistics for billing tab
- */
-export async function getSubscriptionStats(): Promise<{
-  total: number;
-  byPlan: Record<string, number>;
-  byStatus: Record<string, number>;
-}> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
-
-  const { data: subscriptions, error } = await supabase
-    .from('subscriptions')
-    .select('plan_type, status');
-
-  if (error) throw error;
-
-  const byPlan: Record<string, number> = {};
-  const byStatus: Record<string, number> = {};
-
-  subscriptions?.forEach(sub => {
-    byPlan[sub.plan_type] = (byPlan[sub.plan_type] || 0) + 1;
-    byStatus[sub.status] = (byStatus[sub.status] || 0) + 1;
-  });
-
-  return {
-    total: subscriptions?.length || 0,
-    byPlan,
-    byStatus,
-  };
-}
-
-/**
- * List all subscriptions for admin view
- */
-export async function listSubscriptions(): Promise<Array<{
-  id: string;
-  user_id: string;
-  plan_type: string;
-  status: string;
-  current_period_end: string | null;
-  cancel_at_period_end: boolean;
-}>> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
-
-  const { data, error } = await supabase
-    .from('subscriptions')
-    .select('id, user_id, plan_type, status, current_period_end, cancel_at_period_end')
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
-}
-
-/**
  * Log a user login
  */
-export async function logUserLogin(userId: string, ipAddress?: string, userAgent?: string): Promise<void> {
+export async function logUserLogin(
+  userId: string,
+  ipAddress?: string,
+  userAgent?: string
+): Promise<void> {
   try {
-    await supabase
-      .from('user_logins')
-      .insert({
-        user_id: userId,
-        ip_address: ipAddress || null,
-        user_agent: userAgent || null,
-      });
+    await supabase.from("user_logins").insert({
+      user_id: userId,
+      ip_address: ipAddress || null,
+      user_agent: userAgent || null,
+    });
   } catch (error) {
-    // Don't block login if logging fails
-    console.error('Failed to log user login:', error);
+    console.error("Failed to log user login:", error);
   }
 }
 
 /**
- * Block a user (set banned_until to far future)
+ * Get current user's org membership (for determining which org to manage)
  */
-export async function blockUser(userId: string): Promise<void> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
+export async function getCurrentUserOrg(): Promise<{ orgId: string; role: OrgRole } | null> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
 
-  const { data, error } = await supabase.functions.invoke('admin-user-management', {
-    body: { action: 'block', targetUserId: userId }
-  });
+  const { data, error } = await supabase
+    .from("org_members")
+    .select("org_id, role")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
 
-  if (error) throw error;
-  if (data?.error) throw new Error(data.error);
+  if (error || !data) return null;
+  return { orgId: data.org_id, role: data.role as OrgRole };
 }
 
 /**
- * Unblock a user (clear banned_until)
+ * Check if current user is an admin in their org
  */
-export async function unblockUser(userId: string): Promise<void> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
-
-  const { data, error } = await supabase.functions.invoke('admin-user-management', {
-    body: { action: 'unblock', targetUserId: userId }
-  });
-
-  if (error) throw error;
-  if (data?.error) throw new Error(data.error);
-}
-
-/**
- * Invite a new user by email
- */
-export async function inviteUser(email: string, role?: string): Promise<{ userId?: string; alreadyExisted?: boolean }> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
-
-  const { data, error } = await supabase.functions.invoke('admin-user-management', {
-    body: { action: 'invite', email, role: role || 'member' }
-  });
-
-  // Extract server error from various possible locations
-  const serverError =
-    data?.error ||
-    (error as any)?.context?.error ||
-    error?.message;
-
-  // Check for errors from either the function invocation or the response data
-  if (error || data?.error) {
-    throw new Error(serverError || 'Failed to invite user');
-  }
-  
-  return { userId: data?.userId, alreadyExisted: data?.alreadyExisted };
-}
-
-/**
- * Add an existing user to the workspace by email
- */
-export async function addMember(email: string, role: string = 'member'): Promise<{ userId: string; role: string }> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
-
-  const { data, error } = await supabase.functions.invoke('admin-user-management', {
-    body: { action: 'add_member', email, role }
-  });
-
-  if (error || data?.error) {
-    throw new Error(data?.error || error?.message || 'Failed to add member');
-  }
-  
-  return { userId: data.userId, role: data.role };
-}
-
-/**
- * Update a member's role in the workspace
- */
-export async function updateMemberRole(userId: string, role: string): Promise<void> {
-  const isAdmin = await checkIsAdmin();
-  if (!isAdmin) throw new Error('Unauthorized: Admin access required');
-
-  const { data, error } = await supabase.functions.invoke('admin-user-management', {
-    body: { action: 'update_member_role', targetUserId: userId, role }
-  });
-
-  if (error || data?.error) {
-    throw new Error(data?.error || error?.message || 'Failed to update role');
-  }
+export async function checkIsOrgAdmin(): Promise<boolean> {
+  const org = await getCurrentUserOrg();
+  if (!org) return false;
+  return ["owner", "admin"].includes(org.role);
 }
