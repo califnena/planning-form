@@ -44,3 +44,9 @@ verify_jwt = true
 
 [functions.send-event-reminder]
 verify_jwt = true
+
+[functions.track-visit]
+verify_jwt = false
+
+[functions.admin-user-management]
+verify_jwt = true
