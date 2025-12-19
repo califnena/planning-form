@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Home, LogOut, User, CreditCard, Settings as SettingsIcon, RotateCcw, Star, FileText, Shield } from "lucide-react";
+import { LogOut, User, CreditCard, Settings as SettingsIcon, RotateCcw, Star, FileText, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { TextSizeToggle } from "@/components/TextSizeToggle";
-import { PrivacyModal, PrivacyLink } from "@/components/PrivacyModal";
+import { PrivacyModal } from "@/components/PrivacyModal";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { AccessibilityToggle } from "@/components/AccessibilityToggle";
 import { GlobalSearch } from "@/components/GlobalSearch";
@@ -23,12 +23,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import logo from "@/assets/everlasting-logo.png";
 
 interface GlobalHeaderProps {
@@ -44,7 +38,6 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
   const [userId, setUserId] = useState<string | null>(null);
   const { isAdmin } = useAdminStatus();
   
-  // Check if we're on the planner page
   const isPlannerPage = location.pathname === '/app';
 
   useEffect(() => {
@@ -106,20 +99,26 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-20 items-center justify-between px-4">
+        <div className="container flex h-14 md:h-20 items-center justify-between px-2 md:px-4">
           {/* Left: Logo */}
-          <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <img src={logo} alt="Everlasting Funeral Advisors" className="h-12 w-12" />
+          <Link to="/dashboard" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity shrink-0">
+            <img src={logo} alt="Everlasting Funeral Advisors" className="h-8 w-8 md:h-12 md:w-12" />
             <div className="hidden sm:block">
               <h1 className="text-lg font-semibold text-foreground">{t("header.plannerTitle")}</h1>
               <p className="text-xs text-muted-foreground">{t("header.plannerSubtitle")}</p>
             </div>
           </Link>
+
           {/* Right: Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 md:gap-2">
             <GlobalSearch />
             
-            {/* Generate Document button - only on planner page */}
+            {/* Mobile: A-/A+ buttons */}
+            <div className="flex items-center md:hidden">
+              <TextSizeToggle compact />
+            </div>
+            
+            {/* Generate Document button - only on planner page, desktop only */}
             {isPlannerPage && onGenerateDocument && (
               <Button 
                 variant="default" 
@@ -132,18 +131,26 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
               </Button>
             )}
             
-            <LanguageSelector />
+            {/* Desktop: Language selector */}
+            <div className="hidden md:block">
+              <LanguageSelector />
+            </div>
             
-            {/* Accessibility Panel */}
+            {/* Settings Panel */}
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
+                <Button variant="ghost" size="icon" className="h-8 w-8 md:h-9 md:w-auto md:px-3 md:gap-2">
                   <SettingsIcon className="h-4 w-4" />
                   <span className="hidden md:inline">{t("header.settings")}</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80" align="end">
                 <div className="space-y-4">
+                  {/* Mobile: Language dropdown inside settings */}
+                  <div className="md:hidden">
+                    <h3 className="font-semibold mb-2">{t("header.language")}</h3>
+                    <LanguageSelector />
+                  </div>
                   <div>
                     <h3 className="font-semibold mb-2">{t("header.displaySettings")}</h3>
                     <TextSizeToggle />
@@ -170,7 +177,7 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
             {/* Account Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
+                <Button variant="ghost" size="icon" className="h-8 w-8 md:h-9 md:w-auto md:px-3 md:gap-2">
                   <User className="h-4 w-4" />
                   <span className="hidden md:inline">{t("header.account")}</span>
                 </Button>

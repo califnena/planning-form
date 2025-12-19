@@ -366,7 +366,8 @@
     "subscriptionBilling": "Subscription & Billing",
     "adminPanel": "Admin Panel",
     "vipCoachAssistant": "VIP Coach Assistant",
-    "generateDocument": "Generate My Document"
+    "generateDocument": "Generate My Document",
+    "language": "Language"
   },
   "instructions": {
     "title": "My Instructions",

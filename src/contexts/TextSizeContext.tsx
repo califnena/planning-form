@@ -1,10 +1,15 @@
 import { createContext, useContext, useState, useEffect, ReactNode, FC } from 'react';
 
-type TextSize = 'small' | 'medium' | 'large';
+// Font scales: 0.9, 1.0, 1.1, 1.2
+const FONT_SCALES = [0.9, 1.0, 1.1, 1.2] as const;
+type FontScale = typeof FONT_SCALES[number];
 
 interface TextSizeContextType {
-  textSize: TextSize;
-  setTextSize: (size: TextSize) => void;
+  fontScale: FontScale;
+  increase: () => void;
+  decrease: () => void;
+  canIncrease: boolean;
+  canDecrease: boolean;
 }
 
 const TextSizeContext = createContext<TextSizeContextType | undefined>(undefined);
@@ -14,23 +19,40 @@ interface TextSizeProviderProps {
 }
 
 export const TextSizeProvider: FC<TextSizeProviderProps> = ({ children }) => {
-  const [textSize, setTextSizeState] = useState<TextSize>(() => {
-    const stored = localStorage.getItem('text-size');
-    return (stored as TextSize) || 'medium';
+  const [fontScale, setFontScale] = useState<FontScale>(() => {
+    const stored = localStorage.getItem('efa-font-scale');
+    const parsed = stored ? parseFloat(stored) : 1.0;
+    return FONT_SCALES.includes(parsed as FontScale) ? (parsed as FontScale) : 1.0;
   });
 
-  const setTextSize = (size: TextSize) => {
-    setTextSizeState(size);
-    localStorage.setItem('text-size', size);
+  const currentIndex = FONT_SCALES.indexOf(fontScale);
+  const canIncrease = currentIndex < FONT_SCALES.length - 1;
+  const canDecrease = currentIndex > 0;
+
+  const increase = () => {
+    if (canIncrease) {
+      const newScale = FONT_SCALES[currentIndex + 1];
+      setFontScale(newScale);
+      localStorage.setItem('efa-font-scale', String(newScale));
+    }
+  };
+
+  const decrease = () => {
+    if (canDecrease) {
+      const newScale = FONT_SCALES[currentIndex - 1];
+      setFontScale(newScale);
+      localStorage.setItem('efa-font-scale', String(newScale));
+    }
   };
 
   useEffect(() => {
-    document.documentElement.classList.remove('text-size-small', 'text-size-medium', 'text-size-large');
-    document.documentElement.classList.add(`text-size-${textSize}`);
-  }, [textSize]);
+    // Apply font scale to the main app container
+    document.documentElement.style.setProperty('--app-font-scale', String(fontScale));
+    document.documentElement.style.fontSize = `${fontScale * 100}%`;
+  }, [fontScale]);
 
   return (
-    <TextSizeContext.Provider value={{ textSize, setTextSize }}>
+    <TextSizeContext.Provider value={{ fontScale, increase, decrease, canIncrease, canDecrease }}>
       {children}
     </TextSizeContext.Provider>
   );
