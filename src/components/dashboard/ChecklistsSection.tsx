@@ -12,7 +12,6 @@ import {
   Handshake,
   Star,
   Music,
-  Settings,
   BookOpen,
   Info
 } from "lucide-react";
@@ -41,7 +40,7 @@ const CARD_DEFINITIONS = {
   'done-for-you': { id: 'done_for_you', name: "We'll Help You Complete Your Plan" },
   'vip-coach': { id: 'vip_coach', name: 'VIP Coach Assistance' },
   'memorial-song': { id: 'memorial_song', name: 'Create a Custom Memorial Song' },
-  'accessibility': { id: 'accessibility', name: 'Adjust Settings for Easier Reading' },
+  'free-checklists': { id: 'free_checklists', name: 'Download Free Planning Checklists' },
 } as const;
 
 export const ChecklistsSection = () => {
@@ -182,7 +181,7 @@ export const ChecklistsSection = () => {
   const showDoneForYou = isOwner;
   const showVipCoach = isOwner;
   const showMemorialSong = isOwner;
-  const showAccessibility = isLoggedIn;
+  const showFreeChecklists = isOwner || (isTrustedContact && (permissions.canViewAfterDeathChecklist || permissions.canViewAfterDeathPlanner));
 
   // If trusted contact has no permissions enabled
   const trustedContactHasNoAccess = isTrustedContact && !showInstructions && !showAfterDeathChecklist;
@@ -481,32 +480,60 @@ export const ChecklistsSection = () => {
           </Card>
         )}
 
-        {/* CARD 8 — ACCESSIBILITY (All Logged-in Users) */}
-        {showAccessibility && (
+        {/* CARD 8 — FREE CHECKLISTS */}
+        {showFreeChecklists && (
           <Card 
-            ref={setCardRef('accessibility')}
-            data-card-id="accessibility"
-            className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-gray-500"
+            ref={setCardRef('free_checklists')}
+            data-card-id="free_checklists"
+            className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-blue-400"
           >
             <div className="flex items-start justify-between mb-3">
-              <Settings className="h-6 w-6 text-gray-600" />
-              <Badge variant="secondary" className="bg-gray-100 text-gray-800 text-xs">
-                Optional Support
+              <Download className="h-6 w-6 text-blue-500" />
+              <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
+                Free Downloads
               </Badge>
             </div>
-            <h4 className="font-semibold mb-1">Adjust Settings for Easier Reading</h4>
+            <h4 className="font-semibold mb-1">Download Free Planning Checklists</h4>
             <p className="text-sm text-muted-foreground mb-4">
-              Increase text size and adjust display options to make planning comfortable and accessible.
+              Get printable checklists you can download and keep. These tools help you organize your wishes now and guide loved ones later.
             </p>
             <div className="flex flex-col gap-2">
+              {/* Account holders see both checklists */}
+              {isOwner && (
+                <Button 
+                  size="sm" 
+                  className="w-full gap-2"
+                  onClick={() => handleCardClick('free-checklists', 'Download Pre-Planning Checklist', 'download', () => handleDownload('pre-planning'))}
+                  disabled={generating === 'pre-planning'}
+                >
+                  <Download className="h-3 w-3" />
+                  {generating === 'pre-planning' ? 'Downloading...' : 'Download Pre-Planning Checklist'}
+                </Button>
+              )}
+              {/* Both account holders and trusted contacts (with permission) see after-death */}
               <Button 
                 size="sm" 
+                variant={isOwner ? "outline" : "default"}
                 className="w-full gap-2"
-                onClick={() => handleCardClick('accessibility', 'Adjust Settings', 'internal', () => navigate('/settings'))}
+                onClick={() => handleCardClick('free-checklists', 'Download After-Death Checklist', 'download', () => handleDownload('after-death'))}
+                disabled={generating === 'after-death'}
               >
-                <Settings className="h-3 w-3" />
-                Adjust Settings
+                <Download className="h-3 w-3" />
+                {generating === 'after-death' ? 'Downloading...' : 'Download After-Death Checklist'}
               </Button>
+              {/* Reference guide only for account holders */}
+              {isOwner && (
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  className="w-full gap-1"
+                  onClick={() => handleCardClick('free-checklists', 'View Reference Guide', 'download', () => handleDownload('reference-guide'))}
+                  disabled={generating === 'reference-guide'}
+                >
+                  <BookOpen className="h-3 w-3" />
+                  {generating === 'reference-guide' ? 'Downloading...' : 'View Reference Guide'}
+                </Button>
+              )}
             </div>
           </Card>
         )}
