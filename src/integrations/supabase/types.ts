@@ -670,6 +670,54 @@ export type Database = {
           },
         ]
       }
+      efa_event_contacts: {
+        Row: {
+          contact_url: string | null
+          created_at: string
+          event_id: string
+          id: string
+          org_id: string | null
+          organizer_email: string | null
+          organizer_name: string | null
+          organizer_phone: string | null
+        }
+        Insert: {
+          contact_url?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          org_id?: string | null
+          organizer_email?: string | null
+          organizer_name?: string | null
+          organizer_phone?: string | null
+        }
+        Update: {
+          contact_url?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          org_id?: string | null
+          organizer_email?: string | null
+          organizer_name?: string | null
+          organizer_phone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "efa_event_contacts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "efa_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "efa_event_contacts_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       efa_event_email_log: {
         Row: {
           audience_filter: Json
@@ -857,9 +905,7 @@ export type Database = {
           list_summary: string | null
           name: string
           org_id: string | null
-          organizer_email: string | null
           organizer_name: string | null
-          organizer_phone: string | null
           state: string | null
           tags: string[] | null
           time_text: string | null
@@ -890,9 +936,7 @@ export type Database = {
           list_summary?: string | null
           name: string
           org_id?: string | null
-          organizer_email?: string | null
           organizer_name?: string | null
-          organizer_phone?: string | null
           state?: string | null
           tags?: string[] | null
           time_text?: string | null
@@ -923,9 +967,7 @@ export type Database = {
           list_summary?: string | null
           name?: string
           org_id?: string | null
-          organizer_email?: string | null
           organizer_name?: string | null
-          organizer_phone?: string | null
           state?: string | null
           tags?: string[] | null
           time_text?: string | null
