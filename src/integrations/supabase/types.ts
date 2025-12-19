@@ -2152,6 +2152,53 @@ export type Database = {
           },
         ]
       }
+      trusted_contact_permissions: {
+        Row: {
+          can_view_after_death_checklist: boolean | null
+          can_view_after_death_planner: boolean | null
+          can_view_instructions: boolean | null
+          can_view_shared_documents: boolean | null
+          created_at: string
+          granted_by_user_id: string
+          id: string
+          org_id: string
+          trusted_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          can_view_after_death_checklist?: boolean | null
+          can_view_after_death_planner?: boolean | null
+          can_view_instructions?: boolean | null
+          can_view_shared_documents?: boolean | null
+          created_at?: string
+          granted_by_user_id: string
+          id?: string
+          org_id: string
+          trusted_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          can_view_after_death_checklist?: boolean | null
+          can_view_after_death_planner?: boolean | null
+          can_view_instructions?: boolean | null
+          can_view_shared_documents?: boolean | null
+          created_at?: string
+          granted_by_user_id?: string
+          id?: string
+          org_id?: string
+          trusted_user_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trusted_contact_permissions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_admin_meta: {
         Row: {
           created_at: string
@@ -2541,6 +2588,10 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
+      get_user_org_role: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
       get_user_subscription: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["subscription_plan"]
@@ -2555,6 +2606,10 @@ export type Database = {
       }
       has_org_role: {
         Args: { _org_id: string; _roles: string[]; _user_id: string }
+        Returns: boolean
+      }
+      has_trusted_permission: {
+        Args: { _org_id: string; _permission: string; _user_id: string }
         Returns: boolean
       }
       has_vip_access: { Args: { _user_id: string }; Returns: boolean }
@@ -2594,7 +2649,14 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "owner" | "member" | "executor" | "admin" | "vip"
+      app_role:
+        | "owner"
+        | "member"
+        | "executor"
+        | "admin"
+        | "vip"
+        | "trusted_contact"
+        | "coach"
       insurance_type: "health" | "life" | "other"
       property_kind: "primary" | "investment"
       subscription_plan:
@@ -2731,7 +2793,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["owner", "member", "executor", "admin", "vip"],
+      app_role: [
+        "owner",
+        "member",
+        "executor",
+        "admin",
+        "vip",
+        "trusted_contact",
+        "coach",
+      ],
       insurance_type: ["health", "life", "other"],
       property_kind: ["primary", "investment"],
       subscription_plan: [
