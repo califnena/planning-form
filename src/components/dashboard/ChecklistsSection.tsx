@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,8 +23,26 @@ import { generateReferenceGuidePDF } from "@/lib/referenceGuidePdfGenerator";
 import { useToast } from "@/hooks/use-toast";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Skeleton } from "@/components/ui/skeleton";
+import { analytics } from "@/lib/analytics";
+import { 
+  useEfaToasts, 
+  ReadOnlyBanner, 
+  DownloadFailedDialog 
+} from "@/components/ui/efa-messages";
 
 type DownloadType = 'pre-planning' | 'after-death' | 'reference-guide';
+
+// Card definitions for analytics tracking
+const CARD_DEFINITIONS = {
+  'pre-planning': { id: 'pre_planning_checklist', name: 'Plan Your Wishes in Advance' },
+  'instructions': { id: 'read_this_first', name: 'Create "Read This First" Instructions' },
+  'documents': { id: 'organize_documents', name: 'Organize Accounts & Documents' },
+  'after-death': { id: 'after_death_checklist', name: 'After-Death Checklist for Loved Ones' },
+  'done-for-you': { id: 'done_for_you', name: "We'll Help You Complete Your Plan" },
+  'vip-coach': { id: 'vip_coach', name: 'VIP Coach Assistance' },
+  'memorial-song': { id: 'memorial_song', name: 'Create a Custom Memorial Song' },
+  'accessibility': { id: 'accessibility', name: 'Adjust Settings for Easier Reading' },
+} as const;
 
 export const ChecklistsSection = () => {
   const navigate = useNavigate();
@@ -38,8 +56,53 @@ export const ChecklistsSection = () => {
     isLoading 
   } = useUserRole();
 
+  const efaToasts = useEfaToasts();
+  const [downloadFailedOpen, setDownloadFailedOpen] = useState(false);
+  const [failedDownloadType, setFailedDownloadType] = useState<DownloadType | null>(null);
+  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const impressedCards = useRef<Set<string>>(new Set());
+
+  // Track card impressions using Intersection Observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const cardId = entry.target.getAttribute('data-card-id');
+          if (entry.isIntersecting && cardId && !impressedCards.current.has(cardId)) {
+            impressedCards.current.add(cardId);
+            const cardDef = Object.values(CARD_DEFINITIONS).find(c => c.id === cardId);
+            if (cardDef) {
+              analytics.trackCardImpression(cardDef.id, cardDef.name, 'card_grid');
+            }
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    cardRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, [isLoading]);
+
+  const getDocType = (type: DownloadType): 'pre_planning_checklist' | 'after_death_checklist' | 'reference_guide' => {
+    switch (type) {
+      case 'pre-planning': return 'pre_planning_checklist';
+      case 'after-death': return 'after_death_checklist';
+      case 'reference-guide': return 'reference_guide';
+    }
+  };
+
   const handleDownload = async (type: DownloadType) => {
     setGenerating(type);
+    const docType = getDocType(type);
+    
+    // Track download click
+    analytics.trackDownloadClick(docType, 'pdf', 'card_grid');
+    efaToasts.showDownloadStarted();
+
     try {
       switch (type) {
         case 'pre-planning':
@@ -52,19 +115,42 @@ export const ChecklistsSection = () => {
           await generateReferenceGuidePDF();
           break;
       }
-      toast({
-        title: "PDF Downloaded",
-        description: "Your document has been downloaded successfully."
-      });
+      
+      // Track download success
+      analytics.trackDownloadSuccess(docType, 'pdf', undefined, 'card_grid');
     } catch (error) {
       console.error("Error generating PDF:", error);
-      toast({
-        title: "Error",
-        description: "Failed to generate PDF. Please try again.",
-        variant: "destructive"
-      });
+      
+      // Track download failed
+      analytics.trackDownloadFailed(docType, 'pdf', 'unknown', 'card_grid');
+      
+      setFailedDownloadType(type);
+      setDownloadFailedOpen(true);
     } finally {
       setGenerating(null);
+    }
+  };
+
+  const handleCardClick = (
+    cardKey: keyof typeof CARD_DEFINITIONS,
+    ctaLabel: string,
+    destinationType: 'internal' | 'download' | 'checkout',
+    action: () => void
+  ) => {
+    const cardDef = CARD_DEFINITIONS[cardKey];
+    analytics.trackCardClick(cardDef.id, cardDef.name, ctaLabel, destinationType, 'card_grid');
+    action();
+  };
+
+  const handleCheckoutClick = (product: 'vip' | 'do_it_for_you' | 'memorial_song', route: string) => {
+    const billingPeriod = product === 'vip' ? 'monthly' : 'one_time';
+    analytics.trackCheckoutStart(product, billingPeriod as 'one_time' | 'monthly' | 'annual');
+    navigate(route);
+  };
+
+  const setCardRef = (cardId: string) => (el: HTMLDivElement | null) => {
+    if (el) {
+      cardRefs.current.set(cardId, el);
     }
   };
 
@@ -122,10 +208,17 @@ export const ChecklistsSection = () => {
         </Alert>
       )}
 
+      {/* Read-only banner for trusted contacts */}
+      {isTrustedContact && <ReadOnlyBanner />}
+
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {/* CARD 1 — PRE-PLANNING CHECKLIST (Account Holder Only) */}
         {showPrePlanningChecklist && (
-          <Card className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
+          <Card 
+            ref={setCardRef('pre_planning_checklist')}
+            data-card-id="pre_planning_checklist"
+            className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-blue-500"
+          >
             <div className="flex items-start justify-between mb-3">
               <ClipboardList className="h-6 w-6 text-blue-600" />
               <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
@@ -140,7 +233,7 @@ export const ChecklistsSection = () => {
               <Button 
                 size="sm" 
                 className="w-full gap-2"
-                onClick={() => handleDownload('pre-planning')}
+                onClick={() => handleCardClick('pre-planning', 'Download Pre-Planning Checklist', 'download', () => handleDownload('pre-planning'))}
                 disabled={generating === 'pre-planning'}
               >
                 <Download className="h-3 w-3" />
@@ -150,7 +243,7 @@ export const ChecklistsSection = () => {
                 size="sm" 
                 variant="ghost" 
                 className="w-full gap-1"
-                onClick={() => navigate('/app?section=overview')}
+                onClick={() => handleCardClick('pre-planning', 'Continue in Planner', 'internal', () => navigate('/app?section=overview'))}
               >
                 <FolderOpen className="h-3 w-3" />
                 Continue in Planner
@@ -162,7 +255,11 @@ export const ChecklistsSection = () => {
 
         {/* CARD 2 — READ THIS FIRST / INSTRUCTIONS */}
         {showInstructions && (
-          <Card className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-green-500">
+          <Card 
+            ref={setCardRef('read_this_first')}
+            data-card-id="read_this_first"
+            className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-green-500"
+          >
             <div className="flex items-start justify-between mb-3">
               <FileText className="h-6 w-6 text-green-600" />
               <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-xs">
@@ -180,7 +277,7 @@ export const ChecklistsSection = () => {
               <Button 
                 size="sm" 
                 className="w-full gap-2"
-                onClick={() => navigate('/app?section=instructions')}
+                onClick={() => handleCardClick('instructions', isTrustedContact ? 'View Instructions' : 'Write My Instructions', 'internal', () => navigate('/app?section=instructions'))}
               >
                 <FileText className="h-3 w-3" />
                 {isTrustedContact ? 'View Instructions' : 'Write My Instructions'}
@@ -190,7 +287,7 @@ export const ChecklistsSection = () => {
                   size="sm" 
                   variant="ghost" 
                   className="w-full gap-1"
-                  onClick={() => navigate('/app?section=guide')}
+                  onClick={() => handleCardClick('instructions', 'Learn More', 'internal', () => navigate('/app?section=guide'))}
                 >
                   <BookOpen className="h-3 w-3" />
                   Learn More
@@ -203,7 +300,11 @@ export const ChecklistsSection = () => {
 
         {/* CARD 3 — DOCUMENTS & ACCOUNTS (Account Holder Only) */}
         {showOrganizeDocuments && (
-          <Card className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-purple-500">
+          <Card 
+            ref={setCardRef('organize_documents')}
+            data-card-id="organize_documents"
+            className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-purple-500"
+          >
             <div className="flex items-start justify-between mb-3">
               <FolderOpen className="h-6 w-6 text-purple-600" />
               <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
@@ -218,7 +319,7 @@ export const ChecklistsSection = () => {
               <Button 
                 size="sm" 
                 className="w-full gap-2"
-                onClick={() => navigate('/app?section=financial')}
+                onClick={() => handleCardClick('documents', 'Organize in Planner', 'internal', () => navigate('/app?section=financial'))}
               >
                 <FolderOpen className="h-3 w-3" />
                 Organize in Planner
@@ -227,7 +328,7 @@ export const ChecklistsSection = () => {
                 size="sm" 
                 variant="outline" 
                 className="w-full gap-1"
-                onClick={() => handleDownload('reference-guide')}
+                onClick={() => handleCardClick('documents', 'Download Reference Guide', 'download', () => handleDownload('reference-guide'))}
                 disabled={generating === 'reference-guide'}
               >
                 <Download className="h-3 w-3" />
@@ -239,7 +340,11 @@ export const ChecklistsSection = () => {
 
         {/* CARD 4 — AFTER-DEATH CHECKLIST */}
         {showAfterDeathChecklist && (
-          <Card className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-amber-500">
+          <Card 
+            ref={setCardRef('after_death_checklist')}
+            data-card-id="after_death_checklist"
+            className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-amber-500"
+          >
             <div className="flex items-start justify-between mb-3">
               <ClipboardList className="h-6 w-6 text-amber-600" />
               <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
@@ -254,7 +359,7 @@ export const ChecklistsSection = () => {
               <Button 
                 size="sm" 
                 className="w-full gap-2"
-                onClick={() => handleDownload('after-death')}
+                onClick={() => handleCardClick('after-death', 'Download After-Death Checklist', 'download', () => handleDownload('after-death'))}
                 disabled={generating === 'after-death'}
               >
                 <Download className="h-3 w-3" />
@@ -264,7 +369,7 @@ export const ChecklistsSection = () => {
                 size="sm" 
                 variant="ghost" 
                 className="w-full gap-1"
-                onClick={() => navigate('/after-death-planner')}
+                onClick={() => handleCardClick('after-death', 'View After-Death Planner', 'internal', () => navigate('/after-death-planner'))}
               >
                 <ClipboardList className="h-3 w-3" />
                 View After-Death Planner
@@ -279,7 +384,11 @@ export const ChecklistsSection = () => {
 
         {/* CARD 5 — DONE-FOR-YOU SERVICE (Account Holder Only) */}
         {showDoneForYou && (
-          <Card className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-red-500">
+          <Card 
+            ref={setCardRef('done_for_you')}
+            data-card-id="done_for_you"
+            className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-red-500"
+          >
             <div className="flex items-start justify-between mb-3">
               <Handshake className="h-6 w-6 text-red-600" />
               <Badge variant="secondary" className="bg-amber-100 text-amber-800 text-xs">
@@ -294,7 +403,10 @@ export const ChecklistsSection = () => {
               <Button 
                 size="sm" 
                 className="w-full gap-2"
-                onClick={() => navigate('/pricing')}
+                onClick={() => {
+                  handleCardClick('done-for-you', 'Get Help Completing My Plan', 'checkout', () => {});
+                  handleCheckoutClick('do_it_for_you', '/pricing');
+                }}
               >
                 <Handshake className="h-3 w-3" />
                 Get Help Completing My Plan
@@ -305,7 +417,11 @@ export const ChecklistsSection = () => {
 
         {/* CARD 6 — VIP COACH (Account Holder Only) */}
         {showVipCoach && (
-          <Card className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-blue-600">
+          <Card 
+            ref={setCardRef('vip_coach')}
+            data-card-id="vip_coach"
+            className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-blue-600"
+          >
             <div className="flex items-start justify-between mb-3">
               <Star className="h-6 w-6 text-blue-700" />
               <Badge variant="secondary" className="bg-amber-100 text-amber-800 text-xs">
@@ -320,7 +436,10 @@ export const ChecklistsSection = () => {
               <Button 
                 size="sm" 
                 className="w-full gap-2"
-                onClick={() => navigate('/pricing')}
+                onClick={() => {
+                  handleCardClick('vip-coach', 'Upgrade to VIP Coaching', 'checkout', () => {});
+                  handleCheckoutClick('vip', '/pricing');
+                }}
               >
                 <Star className="h-3 w-3" />
                 Upgrade to VIP Coaching
@@ -331,7 +450,11 @@ export const ChecklistsSection = () => {
 
         {/* CARD 7 — CUSTOM MEMORIAL SONG (Account Holder Only) */}
         {showMemorialSong && (
-          <Card className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-green-600">
+          <Card 
+            ref={setCardRef('memorial_song')}
+            data-card-id="memorial_song"
+            className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-green-600"
+          >
             <div className="flex items-start justify-between mb-3">
               <Music className="h-6 w-6 text-green-700" />
               <Badge variant="secondary" className="bg-amber-100 text-amber-800 text-xs">
@@ -346,7 +469,10 @@ export const ChecklistsSection = () => {
               <Button 
                 size="sm" 
                 className="w-full gap-2"
-                onClick={() => navigate('/custom-song')}
+                onClick={() => {
+                  handleCardClick('memorial-song', 'Create My Memorial Song', 'checkout', () => {});
+                  handleCheckoutClick('memorial_song', '/custom-song');
+                }}
               >
                 <Music className="h-3 w-3" />
                 Create My Memorial Song
@@ -357,7 +483,11 @@ export const ChecklistsSection = () => {
 
         {/* CARD 8 — ACCESSIBILITY (All Logged-in Users) */}
         {showAccessibility && (
-          <Card className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-gray-500">
+          <Card 
+            ref={setCardRef('accessibility')}
+            data-card-id="accessibility"
+            className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-gray-500"
+          >
             <div className="flex items-start justify-between mb-3">
               <Settings className="h-6 w-6 text-gray-600" />
               <Badge variant="secondary" className="bg-gray-100 text-gray-800 text-xs">
@@ -372,7 +502,7 @@ export const ChecklistsSection = () => {
               <Button 
                 size="sm" 
                 className="w-full gap-2"
-                onClick={() => navigate('/settings')}
+                onClick={() => handleCardClick('accessibility', 'Adjust Settings', 'internal', () => navigate('/settings'))}
               >
                 <Settings className="h-3 w-3" />
                 Adjust Settings
@@ -381,6 +511,26 @@ export const ChecklistsSection = () => {
           </Card>
         )}
       </div>
+
+      {/* Download Failed Dialog */}
+      <DownloadFailedDialog
+        open={downloadFailedOpen}
+        onOpenChange={setDownloadFailedOpen}
+        onTryAgain={() => {
+          setDownloadFailedOpen(false);
+          if (failedDownloadType) {
+            handleDownload(failedDownloadType);
+          }
+        }}
+        onDownloadWord={() => {
+          setDownloadFailedOpen(false);
+          // Could implement DOCX download here
+          toast({
+            title: "Word download",
+            description: "Word format download will be available soon.",
+          });
+        }}
+      />
     </div>
   );
 };
