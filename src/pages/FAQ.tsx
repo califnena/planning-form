@@ -328,6 +328,167 @@ const FAQ = () => {
           )
         }
       ]
+    },
+    {
+      title: "Funeral Planning & Consumer Rights",
+      icon: "⚖️",
+      description: "Educational information based on FTC consumer guidance. Not legal advice.",
+      source: "https://consumer.ftc.gov/articles/shopping-funeral-services",
+      questions: [
+        {
+          q: "Do I have to buy a funeral package?",
+          a: "No. You are allowed to buy only the goods and services you want. Funeral homes must give you an itemized price list and cannot force you to purchase a package.",
+          category: "Rights"
+        },
+        {
+          q: "Am I required to buy a casket from the funeral home?",
+          a: "No. You can buy a casket or urn from any seller, including online retailers. Funeral homes must accept outside caskets without charging extra fees.",
+          category: "Rights"
+        },
+        {
+          q: "Is embalming required by law?",
+          a: "Usually, no. Embalming is not required for most funerals. It may be required only in specific situations, such as delayed burial or certain transport cases. Refrigeration is often an alternative.",
+          category: "Burial"
+        },
+        {
+          q: "Can I have a viewing or funeral without embalming?",
+          a: "Yes. In many cases, a viewing can be held without embalming, especially if refrigeration is used and services occur shortly after death.",
+          category: "Burial"
+        },
+        {
+          q: "What is the Funeral Rule?",
+          a: (
+            <>
+              The FTC Funeral Rule is a federal law that:
+              <ul className="list-disc ml-6 mt-2 space-y-1">
+                <li>Requires funeral homes to give price lists</li>
+                <li>Allows consumers to choose only what they want</li>
+                <li>Prohibits misleading statements</li>
+                <li>Prevents extra charges for outside caskets</li>
+              </ul>
+              <a href="https://consumer.ftc.gov/articles/shopping-funeral-services" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1 mt-2">
+                Learn more from the FTC <ExternalLink className="h-3 w-3" />
+              </a>
+            </>
+          ),
+          category: "Rights"
+        },
+        {
+          q: "What price lists am I entitled to receive?",
+          a: (
+            <>
+              Funeral homes must provide:
+              <ul className="list-disc ml-6 mt-2 space-y-1">
+                <li>General Price List (GPL)</li>
+                <li>Casket Price List</li>
+                <li>Outer Burial Container Price List</li>
+              </ul>
+              <p className="mt-2">You can ask for these before discussing arrangements.</p>
+            </>
+          ),
+          category: "Pricing"
+        },
+        {
+          q: "Do I have to buy a vault or burial container?",
+          a: "Not always. Vaults or grave liners are often required by cemeteries, not by law. The funeral home must explain this clearly.",
+          category: "Burial"
+        },
+        {
+          q: "Are cremation services less expensive?",
+          a: "Often, yes. Direct cremation usually costs less than traditional burial. Prices vary by provider and services selected.",
+          category: "Cremation"
+        },
+        {
+          q: "Can I plan and pay for funeral services in advance?",
+          a: "Yes. This is called pre-need planning. You can document your wishes and prepay through insurance or funeral trusts. Always review refund and transfer terms.",
+          category: "Planning"
+        },
+        {
+          q: "What happens if I change my mind after prepaying?",
+          a: (
+            <>
+              It depends on the contract. Some plans are revocable, others are not. Always ask:
+              <ul className="list-disc ml-6 mt-2 space-y-1">
+                <li>Can I cancel?</li>
+                <li>Can I transfer providers?</li>
+                <li>Are there fees or penalties?</li>
+              </ul>
+            </>
+          ),
+          category: "Planning"
+        },
+        {
+          q: "Are funeral prices regulated?",
+          a: "Prices are not capped, but disclosure is regulated. Funeral homes must be transparent and truthful.",
+          category: "Pricing"
+        },
+        {
+          q: "Can I compare funeral homes before making a decision?",
+          a: "Yes, and you should. You are allowed to call, ask questions, and request price lists without pressure.",
+          category: "Rights"
+        },
+        {
+          q: "Is it okay to negotiate funeral prices?",
+          a: "Yes. Some prices may be negotiable, especially on packages or non-essential services.",
+          category: "Pricing"
+        },
+        {
+          q: "What is a direct burial or direct cremation?",
+          a: "These options include only basic services without ceremonies or viewing. They are often the lowest-cost choices.",
+          category: "Cremation"
+        },
+        {
+          q: "Who is responsible for paying funeral costs?",
+          a: (
+            <>
+              Payment responsibility depends on:
+              <ul className="list-disc ml-6 mt-2 space-y-1">
+                <li>Prepaid arrangements</li>
+                <li>Available funds</li>
+                <li>Family agreements</li>
+              </ul>
+              <p className="mt-2">No one is personally required to pay unless they agree to.</p>
+            </>
+          ),
+          category: "Pricing"
+        },
+        {
+          q: "Can a funeral home refuse services if I ask questions?",
+          a: "No. You have the right to ask questions and receive written pricing without being pressured.",
+          category: "Rights"
+        },
+        {
+          q: "What should I do if I think a funeral home violated the rules?",
+          a: (
+            <>
+              You can file a complaint with:
+              <ul className="list-disc ml-6 mt-2 space-y-1">
+                <li>The Federal Trade Commission (FTC)</li>
+                <li>Your state consumer protection agency</li>
+              </ul>
+              <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1 mt-2">
+                File a complaint with the FTC <ExternalLink className="h-3 w-3" />
+              </a>
+            </>
+          ),
+          category: "Rights"
+        },
+        {
+          q: "How can planning ahead help my family?",
+          a: (
+            <>
+              Planning:
+              <ul className="list-disc ml-6 mt-2 space-y-1">
+                <li>Reduces stress</li>
+                <li>Prevents overspending</li>
+                <li>Ensures wishes are honored</li>
+                <li>Helps avoid family conflict</li>
+              </ul>
+            </>
+          ),
+          category: "Planning"
+        }
+      ]
     }
   ];
 
@@ -384,11 +545,26 @@ const FAQ = () => {
         
         <div className="space-y-6">
           {faqSections.map((section, sectionIndex) => (
-            <div key={sectionIndex} className="bg-white border border-border rounded-xl shadow-sm p-5 md:p-6">
-              <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4 flex items-center gap-3">
+            <div key={sectionIndex} className="bg-card border border-border rounded-xl shadow-sm p-5 md:p-6">
+              <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2 flex items-center gap-3">
                 <span className="text-2xl" aria-hidden="true">{section.icon}</span>
                 {section.title}
               </h2>
+              
+              {section.description && (
+                <p className="text-sm text-muted-foreground mb-2">{section.description}</p>
+              )}
+              
+              {section.source && (
+                <a 
+                  href={section.source} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-xs text-primary hover:underline inline-flex items-center gap-1 mb-4"
+                >
+                  Source: FTC Consumer Guidance <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
               
               <Accordion type="single" collapsible className="w-full">
                 {section.questions.map((qa, qIndex) => (
@@ -408,6 +584,26 @@ const FAQ = () => {
               </Accordion>
             </div>
           ))}
+        </div>
+        
+        {/* Footer Disclaimer */}
+        <div className="mt-12 pt-6 border-t border-border">
+          <p className="text-xs text-muted-foreground text-center max-w-3xl mx-auto">
+            This information is provided for educational purposes only and is based on public consumer guidance from the Federal Trade Commission. Everlasting Funeral Advisors does not provide legal advice or funeral services directly.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4 mt-4">
+            <Link to="/resources">
+              <Button variant="outline" size="sm" className="gap-2">
+                <Download className="h-4 w-4" />
+                Download the Funeral Planning Checklist
+              </Button>
+            </Link>
+            <Link to="/contact">
+              <Button variant="outline" size="sm">
+                Book a Planning Consultation
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
