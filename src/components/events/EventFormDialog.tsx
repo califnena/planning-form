@@ -38,13 +38,22 @@ interface EfaEvent {
   exhibitor_link: string | null;
   event_link: string | null;
   organizer_name: string | null;
-  organizer_email: string | null;
-  organizer_phone: string | null;
   is_published: boolean;
+  org_id: string | null;
   list_summary?: string | null;
   email_subject?: string | null;
   email_preview?: string | null;
   email_body?: string | null;
+}
+
+interface EventContact {
+  id: string;
+  event_id: string;
+  org_id: string | null;
+  organizer_name: string | null;
+  organizer_email: string | null;
+  organizer_phone: string | null;
+  contact_url: string | null;
 }
 
 interface EventFormDialogProps {
@@ -93,13 +102,15 @@ const initialFormState = {
   exhibitor_link: "",
   event_link: "",
   organizer_name: "",
-  organizer_email: "",
-  organizer_phone: "",
   is_published: true,
   list_summary: "",
   email_subject: "",
   email_preview: "",
-  email_body: ""
+  email_body: "",
+  // Contact fields (stored separately in efa_event_contacts)
+  organizer_email: "",
+  organizer_phone: "",
+  contact_url: ""
 };
 
 export const EventFormDialog = ({ open, onOpenChange, event }: EventFormDialogProps) => {
@@ -111,37 +122,60 @@ export const EventFormDialog = ({ open, onOpenChange, event }: EventFormDialogPr
   const [emailOpen, setEmailOpen] = useState(false);
 
   useEffect(() => {
-    if (event) {
-      setFormData({
-        name: event.name,
-        category: event.category,
-        event_date_start: event.event_date_start ? event.event_date_start.split("T")[0] : "",
-        event_date_end: event.event_date_end ? event.event_date_end.split("T")[0] : "",
-        time_text: event.time_text || "",
-        venue: event.venue || "",
-        address: event.address || "",
-        city: event.city || "",
-        county: event.county || "",
-        state: event.state || "FL",
-        zip: event.zip || "",
-        description: event.description || "",
-        cost_attendee: event.cost_attendee || "",
-        is_vendor_friendly: event.is_vendor_friendly,
-        booth_fee: event.booth_fee || "",
-        booth_deadline: event.booth_deadline || "",
-        exhibitor_link: event.exhibitor_link || "",
-        event_link: event.event_link || "",
-        organizer_name: event.organizer_name || "",
-        organizer_email: event.organizer_email || "",
-        organizer_phone: event.organizer_phone || "",
-        is_published: event.is_published,
-        list_summary: event.list_summary || "",
-        email_subject: event.email_subject || "",
-        email_preview: event.email_preview || "",
-        email_body: event.email_body || ""
-      });
-    } else {
-      setFormData(initialFormState);
+    const loadData = async () => {
+      if (event) {
+        // Load base event data
+        const baseFormData = {
+          name: event.name,
+          category: event.category,
+          event_date_start: event.event_date_start ? event.event_date_start.split("T")[0] : "",
+          event_date_end: event.event_date_end ? event.event_date_end.split("T")[0] : "",
+          time_text: event.time_text || "",
+          venue: event.venue || "",
+          address: event.address || "",
+          city: event.city || "",
+          county: event.county || "",
+          state: event.state || "FL",
+          zip: event.zip || "",
+          description: event.description || "",
+          cost_attendee: event.cost_attendee || "",
+          is_vendor_friendly: event.is_vendor_friendly,
+          booth_fee: event.booth_fee || "",
+          booth_deadline: event.booth_deadline || "",
+          exhibitor_link: event.exhibitor_link || "",
+          event_link: event.event_link || "",
+          organizer_name: event.organizer_name || "",
+          is_published: event.is_published,
+          list_summary: event.list_summary || "",
+          email_subject: event.email_subject || "",
+          email_preview: event.email_preview || "",
+          email_body: event.email_body || "",
+          organizer_email: "",
+          organizer_phone: "",
+          contact_url: ""
+        };
+
+        // Load contact data from efa_event_contacts (admin only)
+        const { data: contactData } = await supabase
+          .from("efa_event_contacts")
+          .select("*")
+          .eq("event_id", event.id)
+          .maybeSingle();
+
+        if (contactData) {
+          baseFormData.organizer_email = contactData.organizer_email || "";
+          baseFormData.organizer_phone = contactData.organizer_phone || "";
+          baseFormData.contact_url = contactData.contact_url || "";
+        }
+
+        setFormData(baseFormData);
+      } else {
+        setFormData(initialFormState);
+      }
+    };
+    
+    if (open) {
+      loadData();
     }
   }, [event, open]);
 
@@ -262,8 +296,6 @@ export const EventFormDialog = ({ open, onOpenChange, event }: EventFormDialogPr
       exhibitor_link: formData.exhibitor_link || null,
       event_link: formData.event_link || null,
       organizer_name: formData.organizer_name || null,
-      organizer_email: formData.organizer_email || null,
-      organizer_phone: formData.organizer_phone || null,
       is_published: formData.is_published,
       list_summary: formData.list_summary || null,
       email_subject: formData.email_subject || null,
@@ -272,6 +304,8 @@ export const EventFormDialog = ({ open, onOpenChange, event }: EventFormDialogPr
     };
 
     let error;
+    let eventId = event?.id;
+    
     if (event) {
       const result = await supabase
         .from("efa_events")
@@ -281,8 +315,32 @@ export const EventFormDialog = ({ open, onOpenChange, event }: EventFormDialogPr
     } else {
       const result = await supabase
         .from("efa_events")
-        .insert(eventData);
+        .insert(eventData)
+        .select("id")
+        .single();
       error = result.error;
+      if (result.data) {
+        eventId = result.data.id;
+      }
+    }
+
+    // Save contact data to efa_event_contacts (upsert)
+    if (!error && eventId) {
+      const contactData = {
+        event_id: eventId,
+        organizer_name: formData.organizer_name || null,
+        organizer_email: formData.organizer_email || null,
+        organizer_phone: formData.organizer_phone || null,
+        contact_url: formData.contact_url || null
+      };
+
+      const { error: contactError } = await supabase
+        .from("efa_event_contacts")
+        .upsert(contactData, { onConflict: "event_id" });
+
+      if (contactError) {
+        console.error("Failed to save contact data:", contactError);
+      }
     }
 
     setLoading(false);
@@ -642,7 +700,7 @@ export const EventFormDialog = ({ open, onOpenChange, event }: EventFormDialogPr
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="organizer_email">Organizer Email</Label>
+                  <Label htmlFor="organizer_email">Organizer Email <span className="text-muted-foreground text-xs">(Admin only)</span></Label>
                   <Input
                     id="organizer_email"
                     type="email"
@@ -653,13 +711,24 @@ export const EventFormDialog = ({ open, onOpenChange, event }: EventFormDialogPr
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="organizer_phone">Organizer Phone</Label>
+                  <Label htmlFor="organizer_phone">Organizer Phone <span className="text-muted-foreground text-xs">(Admin only)</span></Label>
                   <Input
                     id="organizer_phone"
                     type="tel"
                     value={formData.organizer_phone}
                     onChange={(e) => setFormData({ ...formData, organizer_phone: e.target.value })}
                     placeholder="(555) 123-4567"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="contact_url">Public Contact URL <span className="text-muted-foreground text-xs">(Shown to users)</span></Label>
+                  <Input
+                    id="contact_url"
+                    type="url"
+                    value={formData.contact_url}
+                    onChange={(e) => setFormData({ ...formData, contact_url: e.target.value })}
+                    placeholder="https://organizer-website.com/contact"
                   />
                 </div>
 
@@ -674,6 +743,9 @@ export const EventFormDialog = ({ open, onOpenChange, event }: EventFormDialogPr
                   />
                 </div>
               </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Note: Organizer email and phone are visible only to admins. Use "Public Contact URL" to provide a way for public users to contact the organizer.
+              </p>
             </div>
 
             {/* Publishing */}

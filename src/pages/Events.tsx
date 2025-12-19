@@ -35,8 +35,6 @@ interface EfaEvent {
   exhibitor_link: string | null;
   event_link: string | null;
   organizer_name: string | null;
-  organizer_email: string | null;
-  organizer_phone: string | null;
   tags: string[] | null;
   list_summary: string | null;
 }
