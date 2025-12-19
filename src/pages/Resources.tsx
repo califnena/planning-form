@@ -8,6 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { ResourcesDownloadSection } from '@/components/resources/ResourcesDownloadSection';
 
 const Resources = () => {
   const resourceSections = [
@@ -249,6 +250,10 @@ const Resources = () => {
               </div>
             </div>
           </div>
+        </div>
+        {/* Resources & Downloads Section */}
+        <div className="mb-12">
+          <ResourcesDownloadSection />
         </div>
         
         <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">

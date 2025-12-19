@@ -12,6 +12,7 @@ import { generatePlanPDF } from "@/lib/pdfGenerator";
 import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator";
 import { generateBlankAfterLifePlanPDF } from "@/lib/blankAfterLifePlanPdfGenerator";
 import { checkPaidAccess as checkPaidAccessFn, checkVIPAccess as checkVIPAccessFn, checkPrintableAccess as checkPrintableAccessFn, checkIsFreePlan as checkIsFreePlanFn } from "@/lib/accessChecks";
+import { ChecklistsSection } from "@/components/dashboard/ChecklistsSection";
 export default function Dashboard() {
   const {
     t
@@ -795,6 +796,11 @@ export default function Dashboard() {
               </div>
             </div>
           </Card>
+        </div>
+
+        {/* Checklists Section */}
+        <div className="mb-12">
+          <ChecklistsSection />
         </div>
 
         {/* STEP 6 - Education & Support */}
