@@ -55,7 +55,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     const emailResponse = await resend.emails.send({
       from: "My Final Wishes <onboarding@resend.dev>",
-      to: ["califnena@gmail.com"],
+      to: ["efa.rickayon@gmail.com", "efa.denisse@gmail.com"],
       reply_to: sanitizedEmail,
       subject: `${subject} from ${sanitizedName}`,
       html: `
