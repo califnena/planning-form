@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { FileText, CheckCircle, Shield, BookOpen, Scale, FileOutput, Plus, Minus, ClipboardList, CalendarCheck, ShoppingBag, Users, Headphones, Music, FileCheck, HelpCircle, Phone, Download } from "lucide-react";
+import { BookOpen, CheckCircle, Shield, Scale, FileText, ClipboardList, ShoppingBag, Users, Headphones, Music, HelpCircle, Phone, Download, Heart, ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
@@ -14,7 +14,6 @@ const Landing = () => {
   const [textSize, setTextSize] = useState<number>(100);
 
   useEffect(() => {
-    // Load text size from localStorage
     const savedSize = localStorage.getItem("landing_text_size");
     if (savedSize) {
       const size = parseInt(savedSize);
@@ -40,13 +39,6 @@ const Landing = () => {
     } else {
       navigate("/login");
     }
-  };
-
-  const handlePreviewClick = (path: string) => {
-    // Set preview mode timestamp
-    const expiryTime = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
-    localStorage.setItem("preview_mode_expiry", expiryTime.toString());
-    navigate(path);
   };
 
   return (
@@ -96,8 +88,8 @@ const Landing = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
       <main className="container mx-auto px-4 py-16 md:py-24">
+        {/* SECTION 1: Hero */}
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <div className="flex justify-center mb-8">
             <img 
@@ -130,204 +122,223 @@ const Landing = () => {
               {t('landing.viewPricing')}
             </Link>
           </div>
+        </div>
 
-          {/* How the Everlasting Funeral Advisors System Works */}
-          <div className="mt-16 max-w-5xl mx-auto">
-            <div className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-sm">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">
-                {t('landing.howSystemWorks')}
-              </h2>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                {t('landing.howSystemWorksDesc')}
-              </p>
-              
-              <div className="grid md:grid-cols-3 gap-6 mb-8">
-                {/* Complete Reference Guide */}
-                <div className="bg-secondary/5 rounded-xl p-6 text-left">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                    <BookOpen className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-foreground mb-2">{t('landing.referenceGuide')}</h3>
-                  <p className="text-sm text-muted-foreground">{t('landing.referenceGuideDesc')}</p>
-                </div>
-                
-                {/* Step-by-Step Checklists */}
-                <div className="bg-secondary/5 rounded-xl p-6 text-left">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                    <CheckCircle className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-foreground mb-2">{t('landing.stepByStepChecklists')}</h3>
-                  <p className="text-sm text-muted-foreground">{t('landing.stepByStepChecklistsDesc')}</p>
-                </div>
-                
-                {/* Easy-to-Use App */}
-                <div className="bg-secondary/5 rounded-xl p-6 text-left">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                    <Shield className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-foreground mb-2">{t('landing.easyToUseApp')}</h3>
-                  <p className="text-sm text-muted-foreground">{t('landing.easyToUseAppDesc')}</p>
-                </div>
-              </div>
-
-              {/* Download Section */}
-              <div className="border-t border-border pt-6">
-                <h3 className="font-semibold text-foreground mb-4 text-center">{t('landing.downloadFreeGuides')}</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                  <a 
-                    href="/guides/EFA-Pre-Planning-Checklist.pdf" 
-                    download 
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm"
-                  >
-                    <Download className="h-4 w-4" />
-                    {t('landing.downloadPrePlanningChecklist')}
-                  </a>
-                  <a 
-                    href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
-                    download 
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors font-medium text-sm"
-                  >
-                    <Download className="h-4 w-4" />
-                    {t('landing.downloadAfterDeathChecklist')}
-                  </a>
-                  <a 
-                    href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" 
-                    download 
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm"
-                  >
-                    <Download className="h-4 w-4" />
-                    {t('landing.downloadPrePlanningGuide')}
-                  </a>
-                  <a 
-                    href="/guides/Protect-Your-Familys-Future-Today.pdf" 
-                    download 
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm"
-                  >
-                    <Download className="h-4 w-4" />
-                    {t('landing.downloadAfterDeathGuide')}
-                  </a>
-                  <a 
-                    href="/guides/Know-Your-Rights-When-Arranging-a-Funeral.pdf" 
-                    download 
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm col-span-1 sm:col-span-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    {t('landing.downloadFuneralRights')}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* What Is the Everlasting Planner Section */}
-          <div className="mt-16 max-w-3xl mx-auto">
-            <div className="bg-card border border-border rounded-2xl p-8 md:p-10 shadow-sm">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-                {t('landing.whatIsEverlasting')}
-              </h2>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                {t('landing.whatIsDesc')}
-              </p>
-            </div>
+        {/* SECTION 2: A Simple, Compassionate Way to Protect Your Family */}
+        <div className="mt-24 max-w-4xl mx-auto">
+          <div className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-sm text-center">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">
+              {t('landing.compassionateWayTitle')}
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+              {t('landing.compassionateWayDesc1')}
+            </p>
+            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+              {t('landing.compassionateWayDesc2')}
+            </p>
+            <p className="text-lg text-foreground font-medium">
+              {t('landing.compassionateWayDesc3')}
+            </p>
           </div>
         </div>
 
-        {/* What You Can Do Section */}
+        {/* SECTION 3: How We Help - 4 Clear Cards */}
         <div className="mt-24 max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-            {t('landing.whatYouCanDo')}
+            {t('landing.howWeHelpTitle')}
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* 1. Record Your Funeral Preferences */}
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* CARD 1: Learn & Understand */}
             <Card className="border-2 hover:border-primary/50 transition-colors">
-              <CardContent className="pt-8 pb-8 text-center space-y-4">
+              <CardContent className="pt-8 pb-8 space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                    <FileText className="h-8 w-8 text-white" />
+                    <BookOpen className="h-8 w-8 text-white" />
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  {t('landing.recordPreferences')}
+                <h3 className="text-xl font-semibold text-foreground text-center">
+                  {t('landing.card1Title')}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t('landing.recordPreferencesDesc')}
+                <p className="text-muted-foreground leading-relaxed text-center">
+                  {t('landing.card1Desc')}
                 </p>
+                <div className="flex flex-col gap-3 pt-4">
+                  <Button variant="outline" onClick={() => navigate("/guide")} className="w-full">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    {t('landing.openReferenceGuide')}
+                  </Button>
+                  <a 
+                    href="/guides/Know-Your-Rights-When-Arranging-a-Funeral.pdf" 
+                    download 
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-muted transition-colors text-sm font-medium"
+                  >
+                    <Shield className="h-4 w-4" />
+                    {t('landing.knowYourRights')}
+                  </a>
+                  <Button variant="ghost" onClick={() => navigate("/faq")} className="w-full">
+                    <HelpCircle className="h-4 w-4 mr-2" />
+                    {t('landing.viewFAQs')}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
-            {/* 2. Leave Clear Instructions for Loved Ones */}
+            {/* CARD 2: Plan Ahead (Pre-Planning) */}
             <Card className="border-2 hover:border-primary/50 transition-colors">
-              <CardContent className="pt-8 pb-8 text-center space-y-4">
+              <CardContent className="pt-8 pb-8 space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg">
                     <ClipboardList className="h-8 w-8 text-white" />
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  {t('landing.leaveInstructions')}
+                <h3 className="text-xl font-semibold text-foreground text-center">
+                  {t('landing.card2Title')}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t('landing.leaveInstructionsDesc')}
+                <p className="text-muted-foreground leading-relaxed text-center">
+                  {t('landing.card2Desc')}
                 </p>
-              </CardContent>
-            </Card>
-
-            {/* 3. Use the After-Death Planner */}
-            <Card className="border-2 hover:border-primary/50 transition-colors">
-              <CardContent className="pt-8 pb-8 text-center space-y-4">
-                <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
-                    <CalendarCheck className="h-8 w-8 text-white" />
-                  </div>
+                <div className="flex flex-col gap-3 pt-4">
+                  <a 
+                    href="/guides/EFA-Pre-Planning-Checklist.pdf" 
+                    download 
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium"
+                  >
+                    <Download className="h-4 w-4" />
+                    {t('landing.downloadPrePlanningChecklist')}
+                  </a>
+                  <Button variant="outline" onClick={handleStartPlanner} className="w-full">
+                    <FileText className="h-4 w-4 mr-2" />
+                    {t('landing.startPrePlanningApp')}
+                  </Button>
+                  <Button variant="ghost" onClick={() => navigate("/contact")} className="w-full">
+                    <Users className="h-4 w-4 mr-2" />
+                    {t('landing.getHelpCompletingPlan')}
+                  </Button>
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  {t('landing.organizeDocuments')}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t('landing.organizeDocumentsDesc')}
-                </p>
               </CardContent>
             </Card>
 
-            {/* 4. Purchase Affordable Funeral Products */}
+            {/* CARD 3: Affordable Funeral Products */}
             <Card className="border-2 hover:border-primary/50 transition-colors">
-              <CardContent className="pt-8 pb-8 text-center space-y-4">
+              <CardContent className="pt-8 pb-8 space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg">
                     <ShoppingBag className="h-8 w-8 text-white" />
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  {t('landing.guideFamilySteps')}
-                  <span className="ml-2 text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">{t('common.comingSoon', 'Coming Soon')}</span>
+                <h3 className="text-xl font-semibold text-foreground text-center">
+                  {t('landing.card3Title')}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t('landing.guideFamilyStepsDesc')}
+                <p className="text-muted-foreground leading-relaxed text-center">
+                  {t('landing.card3Desc')}
                 </p>
+                <div className="flex flex-col gap-3 pt-4">
+                  <Button variant="outline" onClick={() => navigate("/products")} className="w-full">
+                    <ShoppingBag className="h-4 w-4 mr-2" />
+                    {t('landing.browseCasketsUrns')}
+                  </Button>
+                  <Button variant="ghost" onClick={() => navigate("/products/binder")} className="w-full">
+                    <FileText className="h-4 w-4 mr-2" />
+                    {t('landing.viewPlanningBinder')}
+                  </Button>
+                  <Button variant="ghost" onClick={() => navigate("/products/custom-song")} className="w-full">
+                    <Music className="h-4 w-4 mr-2" />
+                    {t('landing.createMemorialSong')}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
-            {/* 5. Do-It-For-You Planning Session */}
-            <Card 
-              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
-              onClick={() => navigate("/contact")}
-            >
-              <CardContent className="pt-8 pb-8 text-center space-y-4">
+            {/* CARD 4: When a Death Occurs */}
+            <Card className="border-2 hover:border-primary/50 transition-colors">
+              <CardContent className="pt-8 pb-8 space-y-4">
                 <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg">
-                    <Users className="h-8 w-8 text-white" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
+                    <Heart className="h-8 w-8 text-white" />
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  {t('landing.doItForYou')}
+                <h3 className="text-xl font-semibold text-foreground text-center">
+                  {t('landing.card4Title')}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t('landing.doItForYouDesc')}
+                <p className="text-muted-foreground leading-relaxed text-center">
+                  {t('landing.card4Desc')}
                 </p>
+                <div className="flex flex-col gap-3 pt-4">
+                  <a 
+                    href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
+                    download 
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium"
+                  >
+                    <Download className="h-4 w-4" />
+                    {t('landing.downloadAfterDeathChecklist')}
+                  </a>
+                  <Button variant="outline" onClick={() => navigate("/after-death-planner")} className="w-full">
+                    <ClipboardList className="h-4 w-4 mr-2" />
+                    {t('landing.startAfterDeathPlanner')}
+                  </Button>
+                  <Button variant="ghost" onClick={() => navigate("/vip-coach")} className="w-full">
+                    <Headphones className="h-4 w-4 mr-2" />
+                    {t('landing.speakWithCoach')}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
+          </div>
+        </div>
 
-            {/* 6. VIP Coach Assistant (24/7 Support) */}
+        {/* SECTION 4: Free Downloads */}
+        <div className="mt-24 max-w-4xl mx-auto">
+          <div className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-sm">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">
+              {t('landing.freePlanningToolsTitle')}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <a 
+                href="/guides/EFA-Pre-Planning-Checklist.pdf" 
+                download 
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm"
+              >
+                <Download className="h-4 w-4" />
+                {t('landing.downloadPrePlanningChecklist')}
+              </a>
+              <a 
+                href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
+                download 
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors font-medium text-sm"
+              >
+                <Download className="h-4 w-4" />
+                {t('landing.downloadAfterDeathChecklist')}
+              </a>
+              <a 
+                href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" 
+                download 
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm"
+              >
+                <Download className="h-4 w-4" />
+                {t('landing.downloadReferenceGuide')}
+              </a>
+              <a 
+                href="/guides/Know-Your-Rights-When-Arranging-a-Funeral.pdf" 
+                download 
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm"
+              >
+                <Download className="h-4 w-4" />
+                {t('landing.downloadFuneralRights')}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 5: Optional Support */}
+        <div className="mt-24 max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
+            {t('landing.optionalSupportTitle')}
+          </h2>
+          <p className="text-lg text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+            {t('landing.optionalSupportDesc')}
+          </p>
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* VIP Coach */}
             <Card 
               className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
               onClick={() => navigate("/pricing")}
@@ -347,7 +358,27 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            {/* 7. Create a Custom Memorial Song */}
+            {/* Do-It-For-You */}
+            <Card 
+              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
+              onClick={() => navigate("/contact")}
+            >
+              <CardContent className="pt-8 pb-8 text-center space-y-4">
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg">
+                    <Users className="h-8 w-8 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">
+                  {t('landing.doItForYou')}
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  {t('landing.doItForYouDesc')}
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Custom Song */}
             <Card 
               className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
               onClick={() => navigate("/products/custom-song")}
@@ -366,41 +397,6 @@ const Landing = () => {
                 </p>
               </CardContent>
             </Card>
-
-            {/* 8. Free Checklists */}
-            <Card className="border-2 hover:border-primary/50 transition-colors">
-              <CardContent className="pt-8 pb-8 text-center space-y-4">
-                <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg">
-                    <FileCheck className="h-8 w-8 text-white" />
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  {t('landing.freeChecklists')}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t('landing.freeChecklistsDesc')}
-                </p>
-                <div className="flex flex-col gap-2 pt-2">
-                  <a 
-                    href="/checklists/Pre-Planning-Checklist.png" 
-                    download 
-                    className="inline-flex items-center justify-center gap-2 text-sm text-primary hover:underline"
-                  >
-                    <Download className="h-4 w-4" />
-                    {t('landing.downloadPrePlanning')}
-                  </a>
-                  <a 
-                    href="/checklists/After-Death-Checklist.png" 
-                    download 
-                    className="inline-flex items-center justify-center gap-2 text-sm text-primary hover:underline"
-                  >
-                    <Download className="h-4 w-4" />
-                    {t('landing.downloadAfterDeath')}
-                  </a>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
 
@@ -410,7 +406,6 @@ const Landing = () => {
             {t('landing.helpfulGuides')}
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* 1. Helpful Articles & Guides */}
             <Card 
               className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
               onClick={() => navigate("/resources")}
@@ -430,7 +425,6 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            {/* 2. Legal Documents & Planning Basics */}
             <Card 
               className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
               onClick={() => navigate("/legal-documents")}
@@ -450,7 +444,6 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            {/* 3. Common Questions */}
             <Card 
               className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
               onClick={() => navigate("/faq")}
@@ -470,7 +463,6 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            {/* 4. Helpful Contacts & Vendors */}
             <Card 
               className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
               onClick={() => navigate("/vendors")}
@@ -498,7 +490,7 @@ const Landing = () => {
             {t('landing.testimonials')}
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-2 bg-gradient-to-br from-yellow-50 to-amber-50">
+            <Card className="border-2 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <p className="text-muted-foreground leading-relaxed italic">
                   {t('landing.testimonial1')}
@@ -509,7 +501,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-2 bg-gradient-to-br from-yellow-50 to-amber-50">
+            <Card className="border-2 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <p className="text-muted-foreground leading-relaxed italic">
                   {t('landing.testimonial2')}
@@ -520,7 +512,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-2 bg-gradient-to-br from-yellow-50 to-amber-50">
+            <Card className="border-2 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <p className="text-muted-foreground leading-relaxed italic">
                   {t('landing.testimonial3')}
@@ -533,7 +525,7 @@ const Landing = () => {
           </div>
         </div>
 
-        {/* About Everlasting Funeral Advisors Section - BEFORE Mission */}
+        {/* About & Mission Section */}
         <div className="max-w-4xl mx-auto mt-24">
           <div className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-sm">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -595,7 +587,7 @@ const Landing = () => {
               </div>
             </div>
 
-            {/* Our Mission Section - AFTER About */}
+            {/* Our Mission */}
             <div className="mt-12 pt-8 border-t border-border">
               <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
                 {t('landing.ourMission')}
@@ -634,6 +626,13 @@ const Landing = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Final Note */}
+        <div className="mt-16 max-w-3xl mx-auto text-center">
+          <p className="text-lg text-muted-foreground italic">
+            {t('landing.finalNote')}
+          </p>
         </div>
       </main>
     </div>
