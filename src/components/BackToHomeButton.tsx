@@ -3,10 +3,10 @@ import everlastingLogo from "@/assets/everlasting-logo.png";
 
 export function BackToHomeButton() {
   return (
-    <Link to="/" className="inline-block hover:opacity-80 transition-opacity">
+    <Link to="/dashboard" className="inline-block hover:opacity-80 transition-opacity">
       <img 
         src={everlastingLogo} 
-        alt="Everlasting - Back to Home" 
+        alt="Everlasting - Back to Dashboard" 
         className="h-8 w-auto"
       />
     </Link>

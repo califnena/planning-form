@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
 import mascotPlanningAhead from "@/assets/mascot-planning-ahead.png";
 import mascotFamiliesChoose from "@/assets/mascot-families-choose.png";
+import mascotHeroCouple from "@/assets/mascot-hero-couple.png";
 
 const Landing = () => {
   const { t } = useTranslation();
@@ -109,18 +110,13 @@ const Landing = () => {
       <main className="container mx-auto px-4 py-12 md:py-20">
         {/* HERO SECTION */}
         <div className="max-w-5xl mx-auto text-center space-y-8">
-          {/* Hero Image Placeholder - For real photography */}
+          {/* Hero Image */}
           <div className="relative mx-auto max-w-2xl">
-            <div className="aspect-[16/9] rounded-2xl bg-gradient-to-br from-stone-100 to-amber-50 border-2 border-dashed border-stone-300 flex items-center justify-center">
-              <div className="text-center p-8">
-                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-200 flex items-center justify-center">
-                  <Users className="h-10 w-10 text-stone-400" />
-                </div>
-                <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-                  {t('landing.heroImagePlaceholder')}
-                </p>
-              </div>
-            </div>
+            <img 
+              src={mascotHeroCouple} 
+              alt="Planning Ahead is a Gift of Love" 
+              className="w-full rounded-2xl shadow-lg"
+            />
           </div>
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
@@ -301,9 +297,16 @@ const Landing = () => {
                   </li>
                 </ul>
                 <div className="pt-4">
-                  <Button variant="outline" onClick={() => navigate("/products")} className="w-full">
-                    {t('landing.viewProducts')}
-                  </Button>
+                  <a 
+                    href="https://everlastingfuneraladvisors.com/shop/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-full"
+                  >
+                    <Button variant="outline" className="w-full">
+                      {t('landing.viewProducts')}
+                    </Button>
+                  </a>
                 </div>
               </CardContent>
             </Card>

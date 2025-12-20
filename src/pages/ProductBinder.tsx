@@ -1,8 +1,53 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { BookOpen, ShoppingCart, Loader2 } from "lucide-react";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import binderImage from "@/assets/fireproof-binder.png";
 
 export default function ProductBinder() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handlePurchaseBinder = async () => {
+    setIsLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Sign in required",
+          description: "Please sign in to purchase the binder.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
+        body: {
+          lookupKey: 'EFABINDER',
+          successUrl: `${window.location.origin}/purchase-success?product=binder`,
+          cancelUrl: window.location.href,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error("Error creating checkout:", error);
+      toast({
+        title: "Error",
+        description: "Could not start checkout. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AuthenticatedLayout>
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -10,30 +55,63 @@ export default function ProductBinder() {
           {/* Header */}
           <div className="text-center">
             <BookOpen className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h1 className="text-3xl font-bold text-foreground">Binder & Printed Planner Materials</h1>
-            <p className="text-muted-foreground mt-2">Order a physical binder to store your planner and documents</p>
+            <h1 className="text-3xl font-bold text-foreground">Fireproof Document Binder</h1>
+            <p className="text-muted-foreground mt-2">A secure, organized way to keep your important documents in one place</p>
           </div>
 
-          {/* Coming Soon Card */}
+          {/* Product Card */}
           <Card className="border-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5 text-primary" />
-                Fireproof Document Binder
+                Fireproof Planning Binder
               </CardTitle>
               <CardDescription>
-                A secure, organized way to keep your important documents in one place
+                Keep your planner, documents, and important papers safe and organized
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <p className="text-lg text-muted-foreground mb-4">
-                  Binder ordering coming soon
-                </p>
-                <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                  We're preparing a high-quality binder solution to help you organize your planner and documents. 
-                  Check back soon or contact us for more information.
-                </p>
+              <div className="flex flex-col md:flex-row gap-8 items-center">
+                <div className="w-full md:w-1/2">
+                  <img 
+                    src={binderImage} 
+                    alt="Fireproof Planning Binder" 
+                    className="w-full rounded-lg shadow-md"
+                  />
+                </div>
+                <div className="w-full md:w-1/2 space-y-4">
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">✓</span>
+                      Fireproof and waterproof protection
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">✓</span>
+                      Organized sections for all your documents
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">✓</span>
+                      Includes printed planner worksheets
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">✓</span>
+                      Secure locking mechanism
+                    </li>
+                  </ul>
+                  <Button 
+                    onClick={handlePurchaseBinder} 
+                    disabled={isLoading}
+                    size="lg"
+                    className="w-full gap-2"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <ShoppingCart className="h-4 w-4" />
+                    )}
+                    {isLoading ? "Loading..." : "Purchase Binder"}
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
