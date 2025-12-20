@@ -127,18 +127,18 @@ const Landing = () => {
             {t('landing.heroSubtitle')}
           </p>
 
-          {/* Returning User Welcome */}
+          {/* Returning User Welcome - only shown when authenticated */}
           {userName && (
             <div className="bg-primary/10 border border-primary/20 rounded-lg px-6 py-4 inline-block">
               <p className="text-primary font-medium">
-                {t('landing.welcomeBack', { name: userName })}
+                Welcome back, {userName}!
               </p>
               <Button 
                 variant="link" 
                 className="text-primary p-0 h-auto mt-1"
                 onClick={() => navigate("/dashboard")}
               >
-                {t('landing.resumePlanning')}
+                Continue to Your Dashboard →
               </Button>
             </div>
           )}
@@ -345,46 +345,6 @@ const Landing = () => {
           </div>
         </div>
 
-        {/* FREE RESOURCES */}
-        <div className="mt-24 max-w-4xl mx-auto">
-          <div className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-sm">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 text-center">
-              {t('landing.freeResourcesTitle')}
-            </h2>
-            <p className="text-muted-foreground text-center mb-8">
-              {t('landing.freeResourcesDesc')}
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <a 
-                href="/guides/EFA-Pre-Planning-Checklist.pdf" 
-                download 
-                className="inline-flex items-center justify-center gap-2 px-5 py-4 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm"
-              >
-                <Download className="h-4 w-4" />
-                {t('landing.prePlanningChecklist')}
-              </a>
-              <a 
-                href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
-                download 
-                className="inline-flex items-center justify-center gap-2 px-5 py-4 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors font-medium text-sm"
-              >
-                <Download className="h-4 w-4" />
-                {t('landing.afterDeathChecklist')}
-              </a>
-              <a 
-                href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" 
-                download 
-                className="inline-flex items-center justify-center gap-2 px-5 py-4 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm"
-              >
-                <Download className="h-4 w-4" />
-                {t('landing.educationGuide')}
-              </a>
-            </div>
-            <p className="text-sm text-muted-foreground text-center mt-6">
-              {t('landing.freeResourcesNote')}
-            </p>
-          </div>
-        </div>
 
         {/* TRANSPARENCY & TRUST STRIP */}
         <div className="mt-16 max-w-4xl mx-auto">
@@ -489,31 +449,46 @@ const Landing = () => {
         </div>
 
         {/* TESTIMONIALS */}
-        <div className="mt-24 max-w-5xl mx-auto">
+        <div className="mt-24 max-w-5xl mx-auto bg-gradient-to-br from-stone-50/50 to-amber-50/30 dark:from-stone-900/20 dark:to-amber-900/10 rounded-2xl p-8 md:p-12">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-            {t('landing.testimonials')}
+            What Families Are Saying
           </h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <Card className="border-2 bg-gradient-to-br from-stone-50 to-amber-50/50 dark:from-stone-900/30 dark:to-amber-900/20">
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Testimonial 1 */}
+            <Card className="border-2 bg-background/80 backdrop-blur">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <Quote className="h-8 w-8 text-primary/30" />
-                <p className="text-foreground leading-relaxed text-lg">
-                  {t('landing.testimonial1')}
+                <p className="text-foreground leading-relaxed">
+                  "Having everything written down ahead of time gave us such peace of mind. We didn't realize how many small decisions there were until we started, and having clear guidance made all the difference. Our family knows exactly what we want, and that alone is priceless."
                 </p>
                 <p className="text-sm font-medium text-muted-foreground">
-                  {t('landing.testimonial1Author')}
+                  — Mr. and Mrs. Anne Miller
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-2 bg-gradient-to-br from-stone-50 to-amber-50/50 dark:from-stone-900/30 dark:to-amber-900/20">
+            {/* Testimonial 2 */}
+            <Card className="border-2 bg-background/80 backdrop-blur">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <Quote className="h-8 w-8 text-primary/30" />
-                <p className="text-foreground leading-relaxed text-lg">
-                  {t('landing.testimonial2')}
+                <p className="text-foreground leading-relaxed">
+                  "I appreciated that nothing felt rushed or sales-driven. The education helped me understand my options, and I was able to move forward at my own pace. Knowing my wishes are organized and accessible gives me a deep sense of relief."
                 </p>
                 <p className="text-sm font-medium text-muted-foreground">
-                  {t('landing.testimonial2Author')}
+                  — Joanne Barrington
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Testimonial 3 */}
+            <Card className="border-2 bg-background/80 backdrop-blur">
+              <CardContent className="pt-8 pb-8 space-y-4">
+                <Quote className="h-8 w-8 text-primary/30" />
+                <p className="text-foreground leading-relaxed">
+                  "When my wife passed, having a clear plan already in place removed so much stress. The step-by-step guidance helped me focus on honoring her instead of trying to figure everything out during a difficult time."
+                </p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  — James Blake
                 </p>
               </CardContent>
             </Card>
@@ -556,11 +531,47 @@ const Landing = () => {
           </div>
         </div>
 
-        {/* Helpful Guides & Resources Section */}
+        {/* Helpful Guides & Resources Section - Now includes free downloads */}
         <div className="mt-24 max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
             {t('landing.helpfulGuides')}
           </h2>
+          <p className="text-lg text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+            Free educational resources to help you understand your options and plan with confidence.
+          </p>
+          
+          {/* Free Downloads Row */}
+          <div className="bg-card border border-border rounded-xl p-6 mb-8">
+            <h3 className="text-lg font-semibold text-foreground mb-4 text-center">Free Downloadable Guides</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <a 
+                href="/guides/EFA-Pre-Planning-Checklist.pdf" 
+                download 
+                className="inline-flex items-center justify-center gap-2 px-5 py-4 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm"
+              >
+                <Download className="h-4 w-4" />
+                Pre-Planning Checklist
+              </a>
+              <a 
+                href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
+                download 
+                className="inline-flex items-center justify-center gap-2 px-5 py-4 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors font-medium text-sm"
+              >
+                <Download className="h-4 w-4" />
+                After-Death Checklist
+              </a>
+              <a 
+                href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" 
+                download 
+                className="inline-flex items-center justify-center gap-2 px-5 py-4 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm"
+              >
+                <Download className="h-4 w-4" />
+                Education Guide
+              </a>
+            </div>
+          </div>
+
+          {/* Resource Cards */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <Card 
               className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
@@ -653,10 +664,10 @@ const Landing = () => {
               </div>
               <div>
                 <h3 className="text-2xl font-bold text-foreground mb-4">
-                  {t('landing.ourMission')}
+                  Our Mission
                 </h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  {t('landing.missionStatement')}
+                  Our mission is to help individuals and families organize their wishes clearly and thoughtfully—so their loved ones are not left guessing during life's most difficult moments. We believe planning ahead is an act of love, clarity, and care.
                 </p>
               </div>
             </div>
