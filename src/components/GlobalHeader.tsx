@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, User, CreditCard, Settings as SettingsIcon, RotateCcw, Star, FileText, Shield, Eye } from "lucide-react";
+import { LogOut, User, CreditCard, Settings as SettingsIcon, RotateCcw, Star, FileText, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { TextSizeToggle } from "@/components/TextSizeToggle";
@@ -38,7 +38,7 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const { isAdmin } = useAdminStatus();
-  const { superSeniorMode, toggleSuperSeniorMode } = useAccessibility();
+  const { superSeniorMode } = useAccessibility();
   
   const isPlannerPage = location.pathname === '/app';
 
@@ -133,16 +133,11 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
               </Button>
             )}
             
-            {/* Easy View Mode Toggle - Prominent button */}
-            <Button
-              variant={superSeniorMode ? "default" : "outline"}
-              size="sm"
-              onClick={toggleSuperSeniorMode}
-              className="gap-2 h-8 md:h-9"
-            >
-              <Eye className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("header.easyView")}</span>
-            </Button>
+            {/* Text Size Controls - Prominent */}
+            <div className="hidden sm:flex items-center gap-1 border border-border rounded-md px-2 py-1">
+              <span className="text-xs text-muted-foreground font-medium">{t("header.textSize")}</span>
+              <TextSizeToggle compact />
+            </div>
             
             {/* Settings Panel */}
             <Popover>
