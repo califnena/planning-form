@@ -743,7 +743,7 @@ export default function Dashboard() {
                   {t('dashboard.afterDeathDesc')}
                 </p>
                 <div className="flex flex-col sm:flex-row flex-wrap gap-2">
-                  <Button onClick={() => navigate('/after-death-planner')} className="w-full sm:w-auto sm:flex-1 bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] whitespace-normal h-auto py-2">
+                  <Button onClick={() => navigate('/after-death')} className="w-full sm:w-auto sm:flex-1 bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] whitespace-normal h-auto py-2">
                     {t('dashboard.openAfterDeathPlanner')}
                   </Button>
                   <Button onClick={handleGenerateAfterDeathPDF} className="w-full sm:w-auto sm:flex-1 bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] whitespace-normal h-auto py-2">
