@@ -254,6 +254,32 @@ export default function AfterDeathLanding() {
           </div>
         </div>
 
+        {/* Embedded Guide Video */}
+        <div className="max-w-4xl mx-auto mb-16">
+          <Card className="border-2 overflow-hidden">
+            <CardHeader className="text-center bg-primary/5 border-b">
+              <CardTitle className="flex items-center justify-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
+                After-Death Planner Guide
+              </CardTitle>
+              <CardDescription>
+                A comprehensive walkthrough to help you navigate each step
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="flex justify-center bg-muted/30">
+                <iframe 
+                  src="https://gamma.app/embed/13licam9flg6gcq" 
+                  style={{ width: '700px', maxWidth: '100%', height: '450px' }} 
+                  allow="fullscreen" 
+                  title="EFA After-Death Planner Guide"
+                  className="border-0"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Free Downloads Section */}
         <div className="max-w-4xl mx-auto mb-16">
           <Card className="border-2">
