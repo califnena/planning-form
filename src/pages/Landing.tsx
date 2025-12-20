@@ -340,7 +340,7 @@ const Landing = () => {
                   </li>
                 </ul>
                 <div className="pt-4">
-                  <Button onClick={() => navigate("/after-death-planner")} className="w-full">
+                  <Button onClick={() => navigate("/after-death")} className="w-full">
                     {t('landing.getGuidanceNow')}
                   </Button>
                 </div>

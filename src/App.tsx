@@ -52,6 +52,7 @@ import Billing from "./pages/Billing";
 import Unsubscribe from "./pages/Unsubscribe";
 import TravelProtection from "./pages/TravelProtection";
 import LandingAlt from "./pages/LandingAlt";
+import AfterDeathLanding from "./pages/AfterDeathLanding";
 
 
 const queryClient = new QueryClient();
@@ -114,6 +115,7 @@ const App = () => (
                     <Route path="/preview/pdf" element={<PreviewPDF />} />
                     <Route path="/travel-protection" element={<TravelProtection />} />
                     <Route path="/preview-landing" element={<LandingAlt />} />
+                    <Route path="/after-death" element={<AfterDeathLanding />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
