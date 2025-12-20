@@ -2,16 +2,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { BookOpen, CheckCircle, Shield, Scale, FileText, ClipboardList, ShoppingBag, Users, Headphones, Music, HelpCircle, Phone, Download, Heart, ExternalLink } from "lucide-react";
+import { BookOpen, CheckCircle, Shield, Scale, FileText, ClipboardList, ShoppingBag, Users, Headphones, Music, HelpCircle, Phone, Download, Heart, Quote } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
-import mascotCouple from "@/assets/mascot-couple.png";
+import mascotPlanningAhead from "@/assets/mascot-planning-ahead.png";
+import mascotFamiliesChoose from "@/assets/mascot-families-choose.png";
 
 const Landing = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [textSize, setTextSize] = useState<number>(100);
+  const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
     const savedSize = localStorage.getItem("landing_text_size");
@@ -20,6 +22,22 @@ const Landing = () => {
       setTextSize(size);
       document.documentElement.style.fontSize = `${size}%`;
     }
+
+    // Check if user is logged in for personalized greeting
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single();
+        if (profile?.full_name) {
+          setUserName(profile.full_name.split(' ')[0]);
+        }
+      }
+    };
+    checkUser();
   }, []);
 
   const handleTextSizeChange = (direction: "increase" | "decrease") => {
@@ -42,7 +60,7 @@ const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50/40 via-background to-background">
       {/* Header */}
       <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -52,7 +70,7 @@ const Landing = () => {
           </div>
           <div className="flex items-center gap-3">
             {/* Text Size Controls */}
-            <div className="flex items-center gap-2 border border-border rounded-md px-3 py-1.5">
+            <div className="hidden sm:flex items-center gap-2 border border-border rounded-md px-3 py-1.5">
               <span className="text-sm text-muted-foreground font-medium">{t('header.textSize')}</span>
               <Button
                 variant="ghost"
@@ -88,255 +106,326 @@ const Landing = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-16 md:py-24">
-        {/* SECTION 1: Hero */}
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          <div className="flex justify-center mb-8">
-            <img 
-              src={mascotCouple} 
-              alt="Everlasting Advisors" 
-              className="w-56 h-56 object-contain"
-            />
+      <main className="container mx-auto px-4 py-12 md:py-20">
+        {/* HERO SECTION */}
+        <div className="max-w-5xl mx-auto text-center space-y-8">
+          {/* Hero Image Placeholder - For real photography */}
+          <div className="relative mx-auto max-w-2xl">
+            <div className="aspect-[16/9] rounded-2xl bg-gradient-to-br from-stone-100 to-amber-50 border-2 border-dashed border-stone-300 flex items-center justify-center">
+              <div className="text-center p-8">
+                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-stone-200 flex items-center justify-center">
+                  <Users className="h-10 w-10 text-stone-400" />
+                </div>
+                <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+                  {t('landing.heroImagePlaceholder')}
+                </p>
+              </div>
+            </div>
           </div>
           
-          <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
             {t('landing.heroTitle')}
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
             {t('landing.heroSubtitle')}
           </p>
+
+          {/* Returning User Welcome */}
+          {userName && (
+            <div className="bg-primary/10 border border-primary/20 rounded-lg px-6 py-4 inline-block">
+              <p className="text-primary font-medium">
+                {t('landing.welcomeBack', { name: userName })}
+              </p>
+              <Button 
+                variant="link" 
+                className="text-primary p-0 h-auto mt-1"
+                onClick={() => navigate("/dashboard")}
+              >
+                {t('landing.resumePlanning')}
+              </Button>
+            </div>
+          )}
           
-          <div className="flex flex-col items-center gap-4 pt-6">
+          <div className="flex flex-col items-center gap-4 pt-4">
             <Button 
               size="lg" 
-              className="text-lg px-12 py-7"
+              className="text-lg px-10 py-7"
               onClick={handleStartPlanner}
             >
-              {t('landing.startYourPlanner')}
+              {t('landing.startWithFreeTools')}
             </Button>
-            <Link to="/login" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              {t('landing.alreadyHaveAccount')}
-            </Link>
-            <Link to="/pricing" className="text-sm text-primary hover:underline font-medium">
-              {t('landing.viewPricing')}
-            </Link>
-          </div>
-        </div>
-
-        {/* SECTION 2: A Simple, Compassionate Way to Protect Your Family */}
-        <div className="mt-24 max-w-4xl mx-auto">
-          <div className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-sm text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">
-              {t('landing.compassionateWayTitle')}
-            </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-              {t('landing.compassionateWayDesc1')}
+            <Button 
+              variant="outline"
+              size="lg"
+              onClick={() => {
+                document.getElementById('how-we-help')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              {t('landing.seeHowItWorks')}
+            </Button>
+            
+            {/* Trust note */}
+            <p className="text-sm text-muted-foreground mt-2">
+              {t('landing.trustNote')}
             </p>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-              {t('landing.compassionateWayDesc2')}
-            </p>
-            <p className="text-lg text-foreground font-medium">
-              {t('landing.compassionateWayDesc3')}
-            </p>
-          </div>
-        </div>
-
-        {/* SECTION 3: How We Help - 4 Clear Cards */}
-        <div className="mt-24 max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-            {t('landing.howWeHelpTitle')}
-          </h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* CARD 1: Learn & Understand */}
-            <Card className="border-2 hover:border-primary/50 transition-colors">
-              <CardContent className="pt-8 pb-8 space-y-4">
-                <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                    <BookOpen className="h-8 w-8 text-white" />
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-foreground text-center">
-                  {t('landing.card1Title')}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed text-center">
-                  {t('landing.card1Desc')}
-                </p>
-                <div className="flex flex-col gap-3 pt-4">
-                  <Button variant="outline" onClick={() => navigate("/guide")} className="w-full">
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    {t('landing.openReferenceGuide')}
-                  </Button>
-                  <a 
-                    href="/guides/Know-Your-Rights-When-Arranging-a-Funeral.pdf" 
-                    download 
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-muted transition-colors text-sm font-medium"
-                  >
-                    <Shield className="h-4 w-4" />
-                    {t('landing.knowYourRights')}
-                  </a>
-                  <Button variant="ghost" onClick={() => navigate("/faq")} className="w-full">
-                    <HelpCircle className="h-4 w-4 mr-2" />
-                    {t('landing.viewFAQs')}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* CARD 2: Plan Ahead (Pre-Planning) */}
-            <Card className="border-2 hover:border-primary/50 transition-colors">
-              <CardContent className="pt-8 pb-8 space-y-4">
-                <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg">
-                    <ClipboardList className="h-8 w-8 text-white" />
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-foreground text-center">
-                  {t('landing.card2Title')}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed text-center">
-                  {t('landing.card2Desc')}
-                </p>
-                <div className="flex flex-col gap-3 pt-4">
-                  <a 
-                    href="/guides/EFA-Pre-Planning-Checklist.pdf" 
-                    download 
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium"
-                  >
-                    <Download className="h-4 w-4" />
-                    {t('landing.downloadPrePlanningChecklist')}
-                  </a>
-                  <Button variant="outline" onClick={handleStartPlanner} className="w-full">
-                    <FileText className="h-4 w-4 mr-2" />
-                    {t('landing.startPrePlanningApp')}
-                  </Button>
-                  <Button variant="ghost" onClick={() => navigate("/contact")} className="w-full">
-                    <Users className="h-4 w-4 mr-2" />
-                    {t('landing.getHelpCompletingPlan')}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* CARD 3: Affordable Funeral Products */}
-            <Card className="border-2 hover:border-primary/50 transition-colors">
-              <CardContent className="pt-8 pb-8 space-y-4">
-                <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg">
-                    <ShoppingBag className="h-8 w-8 text-white" />
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-foreground text-center">
-                  {t('landing.card3Title')}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed text-center">
-                  {t('landing.card3Desc')}
-                </p>
-                <div className="flex flex-col gap-3 pt-4">
-                  <Button variant="outline" onClick={() => navigate("/products")} className="w-full">
-                    <ShoppingBag className="h-4 w-4 mr-2" />
-                    {t('landing.browseCasketsUrns')}
-                  </Button>
-                  <Button variant="ghost" onClick={() => navigate("/products/binder")} className="w-full">
-                    <FileText className="h-4 w-4 mr-2" />
-                    {t('landing.viewPlanningBinder')}
-                  </Button>
-                  <Button variant="ghost" onClick={() => navigate("/products/custom-song")} className="w-full">
-                    <Music className="h-4 w-4 mr-2" />
-                    {t('landing.createMemorialSong')}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* CARD 4: When a Death Occurs */}
-            <Card className="border-2 hover:border-primary/50 transition-colors">
-              <CardContent className="pt-8 pb-8 space-y-4">
-                <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
-                    <Heart className="h-8 w-8 text-white" />
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-foreground text-center">
-                  {t('landing.card4Title')}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed text-center">
-                  {t('landing.card4Desc')}
-                </p>
-                <div className="flex flex-col gap-3 pt-4">
-                  <a 
-                    href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
-                    download 
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium"
-                  >
-                    <Download className="h-4 w-4" />
-                    {t('landing.downloadAfterDeathChecklist')}
-                  </a>
-                  <Button variant="outline" onClick={() => navigate("/after-death-planner")} className="w-full">
-                    <ClipboardList className="h-4 w-4 mr-2" />
-                    {t('landing.startAfterDeathPlanner')}
-                  </Button>
-                  <Button variant="ghost" onClick={() => navigate("/vip-coach")} className="w-full">
-                    <Headphones className="h-4 w-4 mr-2" />
-                    {t('landing.speakWithCoach')}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* SECTION 4: Free Downloads */}
-        <div className="mt-24 max-w-4xl mx-auto">
-          <div className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-sm">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">
-              {t('landing.freePlanningToolsTitle')}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <a 
-                href="/guides/EFA-Pre-Planning-Checklist.pdf" 
-                download 
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm"
-              >
-                <Download className="h-4 w-4" />
-                {t('landing.downloadPrePlanningChecklist')}
-              </a>
-              <a 
-                href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
-                download 
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors font-medium text-sm"
-              >
-                <Download className="h-4 w-4" />
-                {t('landing.downloadAfterDeathChecklist')}
-              </a>
-              <a 
-                href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" 
-                download 
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm"
-              >
-                <Download className="h-4 w-4" />
-                {t('landing.downloadReferenceGuide')}
-              </a>
-              <a 
-                href="/guides/Know-Your-Rights-When-Arranging-a-Funeral.pdf" 
-                download 
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm"
-              >
-                <Download className="h-4 w-4" />
-                {t('landing.downloadFuneralRights')}
-              </a>
+            
+            <div className="flex items-center gap-4 pt-2">
+              <Link to="/login" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                {t('landing.alreadyHaveAccount')}
+              </Link>
+              <span className="text-muted-foreground">•</span>
+              <Link to="/pricing" className="text-sm text-primary hover:underline font-medium">
+                {t('landing.viewPricing')}
+              </Link>
             </div>
           </div>
         </div>
 
-        {/* SECTION 5: Optional Support */}
+        {/* WHAT WE DO - Single Simple Explanation */}
+        <div className="mt-24 max-w-4xl mx-auto" id="how-we-help">
+          <div className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-sm">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6 text-center">
+              {t('landing.howWeHelpHeading')}
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed text-center max-w-3xl mx-auto">
+              {t('landing.howWeHelpBody')}
+            </p>
+          </div>
+        </div>
+
+        {/* FOUR PATHS - Core Navigation */}
+        <div className="mt-24 max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
+            {t('landing.choosePathTitle')}
+          </h2>
+          <p className="text-lg text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+            {t('landing.choosePathDesc')}
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* CARD 1: Understanding Your Options */}
+            <Card className="border-2 hover:border-primary/50 transition-colors group">
+              <CardContent className="pt-8 pb-8 space-y-4">
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                    <BookOpen className="h-8 w-8 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground text-center">
+                  {t('landing.path1Title')}
+                </h3>
+                <p className="text-muted-foreground leading-relaxed text-center">
+                  {t('landing.path1Desc')}
+                </p>
+                <ul className="text-sm text-muted-foreground space-y-2 pl-4">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                    {t('landing.path1Item1')}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                    {t('landing.path1Item2')}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                    {t('landing.path1Item3')}
+                  </li>
+                </ul>
+                <div className="pt-4">
+                  <Button variant="outline" onClick={() => navigate("/guide")} className="w-full">
+                    {t('landing.learnTheBasics')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* CARD 2: Plan Ahead */}
+            <Card className="border-2 hover:border-primary/50 transition-colors group">
+              <CardContent className="pt-8 pb-8 space-y-4">
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                    <ClipboardList className="h-8 w-8 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground text-center">
+                  {t('landing.path2Title')}
+                </h3>
+                <p className="text-muted-foreground leading-relaxed text-center">
+                  {t('landing.path2Desc')}
+                </p>
+                <ul className="text-sm text-muted-foreground space-y-2 pl-4">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                    {t('landing.path2Item1')}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                    {t('landing.path2Item2')}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                    {t('landing.path2Item3')}
+                  </li>
+                </ul>
+                <div className="pt-4">
+                  <Button onClick={handleStartPlanner} className="w-full">
+                    {t('landing.startPrePlanning')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* CARD 3: Affordable Products */}
+            <Card className="border-2 hover:border-primary/50 transition-colors group">
+              <CardContent className="pt-8 pb-8 space-y-4">
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                    <ShoppingBag className="h-8 w-8 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground text-center">
+                  {t('landing.path3Title')}
+                </h3>
+                <p className="text-muted-foreground leading-relaxed text-center">
+                  {t('landing.path3Desc')}
+                </p>
+                <ul className="text-sm text-muted-foreground space-y-2 pl-4">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                    {t('landing.path3Item1')}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                    {t('landing.path3Item2')}
+                  </li>
+                </ul>
+                <div className="pt-4">
+                  <Button variant="outline" onClick={() => navigate("/products")} className="w-full">
+                    {t('landing.viewProducts')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* CARD 4: After a Death */}
+            <Card className="border-2 hover:border-primary/50 transition-colors group">
+              <CardContent className="pt-8 pb-8 space-y-4">
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                    <Heart className="h-8 w-8 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground text-center">
+                  {t('landing.path4Title')}
+                </h3>
+                <p className="text-muted-foreground leading-relaxed text-center">
+                  {t('landing.path4Desc')}
+                </p>
+                <ul className="text-sm text-muted-foreground space-y-2 pl-4">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                    {t('landing.path4Item1')}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                    {t('landing.path4Item2')}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                    {t('landing.path4Item3')}
+                  </li>
+                </ul>
+                <div className="pt-4">
+                  <Button onClick={() => navigate("/after-death-planner")} className="w-full">
+                    {t('landing.getGuidanceNow')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* FREE RESOURCES */}
+        <div className="mt-24 max-w-4xl mx-auto">
+          <div className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-sm">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 text-center">
+              {t('landing.freeResourcesTitle')}
+            </h2>
+            <p className="text-muted-foreground text-center mb-8">
+              {t('landing.freeResourcesDesc')}
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <a 
+                href="/guides/EFA-Pre-Planning-Checklist.pdf" 
+                download 
+                className="inline-flex items-center justify-center gap-2 px-5 py-4 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm"
+              >
+                <Download className="h-4 w-4" />
+                {t('landing.prePlanningChecklist')}
+              </a>
+              <a 
+                href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
+                download 
+                className="inline-flex items-center justify-center gap-2 px-5 py-4 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors font-medium text-sm"
+              >
+                <Download className="h-4 w-4" />
+                {t('landing.afterDeathChecklist')}
+              </a>
+              <a 
+                href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" 
+                download 
+                className="inline-flex items-center justify-center gap-2 px-5 py-4 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm"
+              >
+                <Download className="h-4 w-4" />
+                {t('landing.educationGuide')}
+              </a>
+            </div>
+            <p className="text-sm text-muted-foreground text-center mt-6">
+              {t('landing.freeResourcesNote')}
+            </p>
+          </div>
+        </div>
+
+        {/* TRANSPARENCY & TRUST STRIP */}
+        <div className="mt-16 max-w-4xl mx-auto">
+          <div className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-xl px-8 py-6 border border-primary/20">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 text-center">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-primary" />
+                <span className="font-medium text-foreground">{t('landing.trustClearPricing')}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-primary" />
+                <span className="font-medium text-foreground">{t('landing.trustNoPressure')}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-primary" />
+                <span className="font-medium text-foreground">{t('landing.trustYouChoose')}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* PAYMENT EXPECTATION - Subtle but honest */}
+        <div className="mt-8 max-w-3xl mx-auto text-center">
+          <p className="text-muted-foreground">
+            {t('landing.paymentExpectation')}
+          </p>
+        </div>
+
+        {/* OPTIONAL SUPPORT */}
         <div className="mt-24 max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
             {t('landing.optionalSupportTitle')}
           </h2>
-          <p className="text-lg text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground text-center mb-4 max-w-2xl mx-auto">
             {t('landing.optionalSupportDesc')}
           </p>
+          <p className="text-sm text-muted-foreground text-center mb-12 max-w-2xl mx-auto italic">
+            {t('landing.optionalSupportReassurance')}
+          </p>
+          
           <div className="grid md:grid-cols-3 gap-8">
             {/* VIP Coach */}
             <Card 
@@ -400,6 +489,74 @@ const Landing = () => {
           </div>
         </div>
 
+        {/* TESTIMONIALS */}
+        <div className="mt-24 max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
+            {t('landing.testimonials')}
+          </h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            <Card className="border-2 bg-gradient-to-br from-stone-50 to-amber-50/50 dark:from-stone-900/30 dark:to-amber-900/20">
+              <CardContent className="pt-8 pb-8 space-y-4">
+                <Quote className="h-8 w-8 text-primary/30" />
+                <p className="text-foreground leading-relaxed text-lg">
+                  {t('landing.testimonial1')}
+                </p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  {t('landing.testimonial1Author')}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 bg-gradient-to-br from-stone-50 to-amber-50/50 dark:from-stone-900/30 dark:to-amber-900/20">
+              <CardContent className="pt-8 pb-8 space-y-4">
+                <Quote className="h-8 w-8 text-primary/30" />
+                <p className="text-foreground leading-relaxed text-lg">
+                  {t('landing.testimonial2')}
+                </p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  {t('landing.testimonial2Author')}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* WHY FAMILIES CHOOSE US - With Mascot */}
+        <div className="mt-24 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <img 
+                src={mascotFamiliesChoose} 
+                alt="Why families choose Everlasting" 
+                className="w-full max-w-md mx-auto rounded-2xl shadow-lg"
+              />
+            </div>
+            <div className="space-y-6">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+                {t('landing.whyFamiliesChoose')}
+              </h2>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="h-6 w-6 text-primary mt-0.5 flex-shrink-0" />
+                  <span className="text-lg text-muted-foreground">{t('landing.whyReason1')}</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="h-6 w-6 text-primary mt-0.5 flex-shrink-0" />
+                  <span className="text-lg text-muted-foreground">{t('landing.whyReason2')}</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="h-6 w-6 text-primary mt-0.5 flex-shrink-0" />
+                  <span className="text-lg text-muted-foreground">{t('landing.whyReason3')}</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="h-6 w-6 text-primary mt-0.5 flex-shrink-0" />
+                  <span className="text-lg text-muted-foreground">{t('landing.whyReason4')}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
         {/* Helpful Guides & Resources Section */}
         <div className="mt-24 max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
@@ -413,7 +570,7 @@ const Landing = () => {
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <BookOpen className="h-8 w-8 text-secondary" />
+                    <BookOpen className="h-8 w-8 text-secondary-foreground" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
@@ -432,7 +589,7 @@ const Landing = () => {
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <Scale className="h-8 w-8 text-secondary" />
+                    <Scale className="h-8 w-8 text-secondary-foreground" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
@@ -451,7 +608,7 @@ const Landing = () => {
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <HelpCircle className="h-8 w-8 text-secondary" />
+                    <HelpCircle className="h-8 w-8 text-secondary-foreground" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
@@ -470,7 +627,7 @@ const Landing = () => {
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <Phone className="h-8 w-8 text-secondary" />
+                    <Phone className="h-8 w-8 text-secondary-foreground" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
@@ -484,155 +641,44 @@ const Landing = () => {
           </div>
         </div>
 
-        {/* Testimonials Section */}
-        <div className="mt-24 max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
-            {t('landing.testimonials')}
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-2 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20">
-              <CardContent className="pt-8 pb-8 space-y-4">
-                <p className="text-muted-foreground leading-relaxed italic">
-                  {t('landing.testimonial1')}
-                </p>
-                <p className="text-sm font-semibold text-foreground">
-                  {t('landing.testimonial1Author')}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20">
-              <CardContent className="pt-8 pb-8 space-y-4">
-                <p className="text-muted-foreground leading-relaxed italic">
-                  {t('landing.testimonial2')}
-                </p>
-                <p className="text-sm font-semibold text-foreground">
-                  {t('landing.testimonial2Author')}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20">
-              <CardContent className="pt-8 pb-8 space-y-4">
-                <p className="text-muted-foreground leading-relaxed italic">
-                  {t('landing.testimonial3')}
-                </p>
-                <p className="text-sm font-semibold text-foreground">
-                  {t('landing.testimonial3Author')}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* About & Mission Section */}
-        <div className="max-w-4xl mx-auto mt-24">
-          <div className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-sm">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              {t('landing.aboutTitle')}
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              {t('landing.aboutTagline')}
-            </p>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Affordable Products */}
-              <div>
-                <h4 className="text-xl font-semibold text-foreground mb-4">
-                  {t('landing.affordableProducts')}
-                </h4>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">{t('landing.product1')}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">{t('landing.product2')}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">{t('landing.product3')}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">{t('landing.product4')}</span>
-                  </li>
-                </ul>
+        {/* MISSION STATEMENT */}
+        <div className="mt-24 max-w-4xl mx-auto">
+          <div className="bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-2xl p-8 md:p-12">
+            <div className="flex flex-col md:flex-row gap-8 items-center">
+              <div className="flex-shrink-0">
+                <img 
+                  src={mascotPlanningAhead} 
+                  alt="Planning ahead is a gift of love" 
+                  className="w-48 h-48 object-contain rounded-xl"
+                />
               </div>
-
-              {/* Professional Services */}
               <div>
-                <h4 className="text-xl font-semibold text-foreground mb-4">
-                  {t('landing.professionalServices')}
-                </h4>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">{t('landing.service1')}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">{t('landing.service2')}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">{t('landing.service3')}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">{t('landing.service4')}</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Our Mission */}
-            <div className="mt-12 pt-8 border-t border-border">
-              <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-                {t('landing.ourMission')}
-              </h3>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                {t('landing.missionStatement')}
-              </p>
-
-              {/* Pre-Planning Guide Download */}
-              <div className="bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-xl p-8 border-2 border-border shadow-sm">
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                  <div className="flex-shrink-0">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
-                      <FileText className="h-8 w-8 text-white" />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-xl md:text-2xl font-bold text-foreground mb-2">
-                      {t('landing.guideTitle')}
-                    </h4>
-                    <p className="text-base text-muted-foreground leading-relaxed">
-                      {t('landing.guideDescription')}
-                    </p>
-                  </div>
-                  <div className="flex-shrink-0">
-                    <Button 
-                      size="lg" 
-                      className="whitespace-nowrap"
-                      onClick={() => window.location.href = '/guide'}
-                    >
-                      <FileText className="mr-2 h-4 w-4" />
-                      {t('landing.viewGuide')}
-                    </Button>
-                  </div>
-                </div>
+                <h3 className="text-2xl font-bold text-foreground mb-4">
+                  {t('landing.ourMission')}
+                </h3>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  {t('landing.missionStatement')}
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Final Note */}
-        <div className="mt-16 max-w-3xl mx-auto text-center">
-          <p className="text-lg text-muted-foreground italic">
-            {t('landing.finalNote')}
+        {/* FINAL CTA */}
+        <div className="mt-24 max-w-3xl mx-auto text-center space-y-6">
+          <p className="text-xl text-muted-foreground">
+            {t('landing.emotionalClose1')}
           </p>
+          <p className="text-lg text-muted-foreground">
+            {t('landing.emotionalClose2')}
+          </p>
+          <Button 
+            size="lg" 
+            className="text-lg px-10 py-7 mt-4"
+            onClick={handleStartPlanner}
+          >
+            {t('landing.startWithFreeTools')}
+          </Button>
         </div>
       </main>
     </div>
