@@ -206,6 +206,14 @@ const Landing = () => {
                     <Download className="h-4 w-4" />
                     {t('landing.downloadAfterDeathGuide')}
                   </a>
+                  <a 
+                    href="/guides/Know-Your-Rights-When-Arranging-a-Funeral.pdf" 
+                    download 
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm col-span-1 sm:col-span-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    {t('landing.downloadFuneralRights')}
+                  </a>
                 </div>
               </div>
             </div>
