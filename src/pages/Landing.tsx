@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { FileText, CheckCircle, Shield, BookOpen, Scale, FileOutput, Plus, Minus, ClipboardList, CalendarCheck, ShoppingBag, Users, Headphones, Music, Type, HelpCircle, Phone, Download } from "lucide-react";
+import { FileText, CheckCircle, Shield, BookOpen, Scale, FileOutput, Plus, Minus, ClipboardList, CalendarCheck, ShoppingBag, Users, Headphones, Music, FileCheck, HelpCircle, Phone, Download } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
@@ -279,20 +279,38 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            {/* 8. Adjust Text Size, Colors, and Language */}
-            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer">
+            {/* 8. Free Checklists */}
+            <Card className="border-2 hover:border-primary/50 transition-colors">
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-500 to-slate-600 flex items-center justify-center shadow-lg">
-                    <Type className="h-8 w-8 text-white" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg">
+                    <FileCheck className="h-8 w-8 text-white" />
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  {t('landing.adjustSettings')}
+                  {t('landing.freeChecklists')}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  {t('landing.adjustSettingsDesc')}
+                  {t('landing.freeChecklistsDesc')}
                 </p>
+                <div className="flex flex-col gap-2 pt-2">
+                  <a 
+                    href="/checklists/Pre-Planning-Checklist.png" 
+                    download 
+                    className="inline-flex items-center justify-center gap-2 text-sm text-primary hover:underline"
+                  >
+                    <Download className="h-4 w-4" />
+                    {t('landing.downloadPrePlanning')}
+                  </a>
+                  <a 
+                    href="/checklists/After-Death-Checklist.png" 
+                    download 
+                    className="inline-flex items-center justify-center gap-2 text-sm text-primary hover:underline"
+                  >
+                    <Download className="h-4 w-4" />
+                    {t('landing.downloadAfterDeath')}
+                  </a>
+                </div>
               </CardContent>
             </Card>
           </div>
