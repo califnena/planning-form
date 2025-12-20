@@ -336,38 +336,37 @@ const FAQ = () => {
       source: "https://consumer.ftc.gov/articles/shopping-funeral-services",
       questions: [
         {
-          q: "Do I have to buy a funeral package?",
-          a: "No. You are allowed to buy only the goods and services you want. Funeral homes must give you an itemized price list and cannot force you to purchase a package.",
-          category: "Rights"
-        },
-        {
-          q: "Am I required to buy a casket from the funeral home?",
-          a: "No. You can buy a casket or urn from any seller, including online retailers. Funeral homes must accept outside caskets without charging extra fees.",
-          category: "Rights"
-        },
-        {
-          q: "Is embalming required by law?",
-          a: "Usually, no. Embalming is not required for most funerals. It may be required only in specific situations, such as delayed burial or certain transport cases. Refrigeration is often an alternative.",
-          category: "Burial"
-        },
-        {
-          q: "Can I have a viewing or funeral without embalming?",
-          a: "Yes. In many cases, a viewing can be held without embalming, especially if refrigeration is used and services occur shortly after death.",
-          category: "Burial"
-        },
-        {
           q: "What is the Funeral Rule?",
+          a: "The Funeral Rule is a federal law that protects consumers when arranging funeral services. It requires funeral providers to give clear pricing and allows families to choose only what they want.",
+          category: "Rights"
+        },
+        {
+          q: "Do I have to buy everything the funeral home offers?",
+          a: "No. You can decline any service or item you do not want.",
+          category: "Rights"
+        },
+        {
+          q: "Can a funeral home require embalming?",
+          a: "Usually no. Embalming is rarely required by law, and funeral homes must disclose this.",
+          category: "Burial"
+        },
+        {
+          q: "Do I have to buy a casket from the funeral home?",
+          a: "No. Funeral homes must accept caskets or urns purchased elsewhere.",
+          category: "Rights"
+        },
+        {
+          q: "Can I ask for prices in writing?",
+          a: "Yes. You have the right to receive a General Price List (GPL) that shows itemized pricing.",
+          category: "Pricing"
+        },
+        {
+          q: "Where can I report a concern?",
           a: (
             <>
-              The FTC Funeral Rule is a federal law that:
-              <ul className="list-disc ml-6 mt-2 space-y-1">
-                <li>Requires funeral homes to give price lists</li>
-                <li>Allows consumers to choose only what they want</li>
-                <li>Prohibits misleading statements</li>
-                <li>Prevents extra charges for outside caskets</li>
-              </ul>
-              <a href="https://consumer.ftc.gov/articles/shopping-funeral-services" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1 mt-2">
-                Learn more from the FTC <ExternalLink className="h-3 w-3" />
+              You can report concerns to the Federal Trade Commission at:{" "}
+              <a href="https://reportfraud.ftc.gov" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                reportfraud.ftc.gov
               </a>
             </>
           ),
