@@ -173,21 +173,37 @@ const Landing = () => {
               {/* Download Section */}
               <div className="border-t border-border pt-6">
                 <h3 className="font-semibold text-foreground mb-4 text-center">{t('landing.downloadFreeGuides')}</h3>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                  <a 
+                    href="/guides/EFA-Pre-Planning-Checklist.pdf" 
+                    download 
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm"
+                  >
+                    <Download className="h-4 w-4" />
+                    {t('landing.downloadPrePlanningChecklist')}
+                  </a>
+                  <a 
+                    href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
+                    download 
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors font-medium text-sm"
+                  >
+                    <Download className="h-4 w-4" />
+                    {t('landing.downloadAfterDeathChecklist')}
+                  </a>
                   <a 
                     href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" 
                     download 
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm"
                   >
-                    <Download className="h-5 w-5" />
+                    <Download className="h-4 w-4" />
                     {t('landing.downloadPrePlanningGuide')}
                   </a>
                   <a 
                     href="/guides/Protect-Your-Familys-Future-Today.pdf" 
                     download 
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors font-medium"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm"
                   >
-                    <Download className="h-5 w-5" />
+                    <Download className="h-4 w-4" />
                     {t('landing.downloadAfterDeathGuide')}
                   </a>
                 </div>
