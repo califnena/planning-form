@@ -79,6 +79,10 @@ export const SECTION_LEARN_MORE: Record<string, { title: string; content: string
     title: 'Planning Your Service',
     content: 'Whether you prefer a traditional funeral, celebration of life, or simple gathering, documenting your preferences gives your family peace of mind and guidance.'
   },
+  funeralRule: {
+    title: 'Your Rights Under the Funeral Rule (FTC)',
+    content: 'The Funeral Rule is a federal consumer protection law enforced by the Federal Trade Commission (FTC). It gives you the right to clear pricing, itemized choices, and freedom from pressure when arranging funeral services. Key rights include: receiving a General Price List (GPL) when asking about prices, declining any item you do not want, purchasing caskets or urns from any seller, understanding that embalming is not required by law in most cases, and receiving itemized pricing rather than bundled packages without consent.'
+  },
   financial: {
     title: 'Organizing Financial Information',
     content: 'Locating accounts, understanding debts, and knowing where important documents are stored helps your family manage practical matters during a difficult time.'
@@ -144,6 +148,9 @@ export const PRE_PLANNING_CHECKLIST: Record<string, string[]> = {
     'Specify dress code or attire',
     'Document any special requests'
   ],
+  'Your Rights (FTC Funeral Rule)': [
+    'I understand my rights under the FTC Funeral Rule and know I can request itemized pricing'
+  ],
   'Financial Information': [
     'List all bank accounts with locations',
     'Document investment and retirement accounts',
@@ -193,6 +200,7 @@ export const PRE_PLANNING_CHECKLIST: Record<string, string[]> = {
 export const AFTER_DEATH_CHECKLIST: Record<string, string[]> = {
   'First 24-48 Hours': [
     'Contact funeral home to arrange transport',
+    'Request the funeral home\'s General Price List (GPL) and review itemized options',
     'Locate important documents (will, insurance policies)',
     'Secure the residence if applicable',
     'Notify immediate family members',

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { TextSizeToggle } from '@/components/TextSizeToggle';
-import { ArrowLeft, ExternalLink, FileText } from 'lucide-react';
+import { ArrowLeft, ExternalLink, FileText, Download } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -17,6 +17,12 @@ const Resources = () => {
       icon: "🕊️",
       description: "Basics for understanding funeral decisions, legal requirements, and consumer rights.",
       items: [
+        {
+          name: "Know Your Rights Under the Funeral Rule (FTC)",
+          description: "The FTC Funeral Rule protects consumers when arranging funerals. You have the right to: receive a General Price List, choose only the services you want, buy caskets/urns from any seller, and decline embalming in most cases. Report concerns to the FTC at reportfraud.ftc.gov.",
+          link: "/guides/Complying-with-the-Funeral-Rule.pdf",
+          isDownload: true
+        },
         {
           name: "FTC Funeral Consumer Guide",
           description: "Official guidance on planning your own funeral, comparing prices, and avoiding scams.",
@@ -290,7 +296,15 @@ const Resources = () => {
                           item.description
                         )}
                         {item.link && (
-                          item.isInternal ? (
+                          item.isDownload ? (
+                            <a 
+                              href={item.link} 
+                              download
+                              className="text-primary hover:underline inline-flex items-center gap-1 font-medium"
+                            >
+                              Download PDF <Download className="h-3 w-3" />
+                            </a>
+                          ) : item.isInternal ? (
                             <Link 
                               to={item.link} 
                               className="text-primary hover:underline inline-flex items-center gap-1 font-medium"
