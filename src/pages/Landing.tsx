@@ -141,7 +141,7 @@ const Landing = () => {
                 {t('landing.howSystemWorksDesc')}
               </p>
               
-              <div className="grid md:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
                 {/* Complete Reference Guide */}
                 <div className="bg-secondary/5 rounded-xl p-6 text-left">
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
@@ -167,6 +167,29 @@ const Landing = () => {
                   </div>
                   <h3 className="font-semibold text-foreground mb-2">{t('landing.easyToUseApp')}</h3>
                   <p className="text-sm text-muted-foreground">{t('landing.easyToUseAppDesc')}</p>
+                </div>
+              </div>
+
+              {/* Download Section */}
+              <div className="border-t border-border pt-6">
+                <h3 className="font-semibold text-foreground mb-4 text-center">{t('landing.downloadFreeGuides')}</h3>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <a 
+                    href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" 
+                    download 
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
+                  >
+                    <Download className="h-5 w-5" />
+                    {t('landing.downloadPrePlanningGuide')}
+                  </a>
+                  <a 
+                    href="/guides/Protect-Your-Familys-Future-Today.pdf" 
+                    download 
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors font-medium"
+                  >
+                    <Download className="h-5 w-5" />
+                    {t('landing.downloadAfterDeathGuide')}
+                  </a>
                 </div>
               </div>
             </div>
