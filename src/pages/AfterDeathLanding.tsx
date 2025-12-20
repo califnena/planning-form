@@ -18,7 +18,6 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/everlasting-logo.png";
-import afterDeathChecklist from "@/assets/after-death-checklist.png";
 
 export default function AfterDeathLanding() {
   const navigate = useNavigate();
@@ -146,40 +145,6 @@ export default function AfterDeathLanding() {
           </p>
         </div>
 
-        {/* Checklist Image - Visible Without Login */}
-        <div className="max-w-4xl mx-auto mb-16">
-          <Card className="border-2 overflow-hidden">
-            <CardHeader className="bg-primary/5 border-b">
-              <CardTitle className="flex items-center gap-2">
-                <ClipboardCheck className="h-5 w-5 text-primary" />
-                After-Death Checklist
-              </CardTitle>
-              <CardDescription>
-                A quick reference guide for what needs to be done and when
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <img 
-                src={afterDeathChecklist} 
-                alt="Everlasting Funeral Advisors After-Death Planner & Checklist" 
-                className="w-full"
-              />
-            </CardContent>
-          </Card>
-          
-          {/* Download Button */}
-          <div className="flex justify-center mt-6">
-            <a 
-              href="/checklists/After-Death-Checklist.png" 
-              download="After-Death-Checklist.png"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
-            >
-              <Download className="h-4 w-4" />
-              Download Checklist Image
-            </a>
-          </div>
-        </div>
-
         {/* Checklist Details */}
         <div className="max-w-5xl mx-auto mb-16">
           <h2 className="text-2xl font-bold text-center mb-8">What to Do & When</h2>
@@ -275,6 +240,18 @@ export default function AfterDeathLanding() {
           <p className="text-center text-muted-foreground mt-6 italic">
             You do not need to do everything at once. One step at a time.
           </p>
+          
+          {/* Download Checklist Button */}
+          <div className="flex justify-center mt-8">
+            <a 
+              href="/checklists/After-Death-Checklist.png" 
+              download="After-Death-Checklist.png"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
+            >
+              <Download className="h-4 w-4" />
+              Download Checklist Image
+            </a>
+          </div>
         </div>
 
         {/* Free Downloads Section */}
