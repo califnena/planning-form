@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, User, CreditCard, Settings as SettingsIcon, RotateCcw, Star, FileText, Shield } from "lucide-react";
+import { LogOut, User, CreditCard, Settings as SettingsIcon, RotateCcw, Star, FileText, Shield, Eye } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { TextSizeToggle } from "@/components/TextSizeToggle";
@@ -11,6 +11,7 @@ import { GlobalSearch } from "@/components/GlobalSearch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
+import { useAccessibility } from "@/contexts/AccessibilityContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,6 +38,7 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const { isAdmin } = useAdminStatus();
+  const { superSeniorMode, toggleSuperSeniorMode } = useAccessibility();
   
   const isPlannerPage = location.pathname === '/app';
 
@@ -131,10 +133,16 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
               </Button>
             )}
             
-            {/* Desktop: Language selector */}
-            <div className="hidden md:block">
-              <LanguageSelector />
-            </div>
+            {/* Easy View Mode Toggle - Prominent button */}
+            <Button
+              variant={superSeniorMode ? "default" : "outline"}
+              size="sm"
+              onClick={toggleSuperSeniorMode}
+              className="gap-2 h-8 md:h-9"
+            >
+              <Eye className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("header.easyView")}</span>
+            </Button>
             
             {/* Settings Panel */}
             <Popover>
@@ -146,8 +154,8 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
               </PopoverTrigger>
               <PopoverContent className="w-80" align="end">
                 <div className="space-y-4">
-                  {/* Mobile: Language dropdown inside settings */}
-                  <div className="md:hidden">
+                  {/* Language Selection */}
+                  <div>
                     <h3 className="font-semibold mb-2">{t("header.language")}</h3>
                     <LanguageSelector />
                   </div>

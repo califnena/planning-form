@@ -1,4 +1,7 @@
 {
+  "header": {
+    "easyView": "Easy View"
+  },
   "search": {
     "placeholder": "Search your planner...",
     "noResults": "No matches found. Try another word or check a different section."
