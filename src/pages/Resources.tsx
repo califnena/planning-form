@@ -261,6 +261,47 @@ const Resources = () => {
         <div className="mb-12">
           <ResourcesDownloadSection />
         </div>
+
+        {/* Know Your Rights Visual Card */}
+        <div className="mb-12">
+          <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+            <div className="p-6 md:p-8">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">⚖️</span>
+                <h2 className="text-xl md:text-2xl font-bold text-foreground">
+                  Know Your Rights Under the Funeral Rule
+                </h2>
+              </div>
+              <p className="text-muted-foreground mb-6">
+                The Federal Trade Commission's Funeral Rule protects consumers when arranging funeral services. Understanding these rights helps families avoid unnecessary costs and pressure during an emotional time.
+              </p>
+              <img 
+                src="/images/Know-Your-Rights-When-Arranging-a-Funeral.png" 
+                alt="Know Your Rights When Arranging a Funeral - Federal protections under the FTC Funeral Rule including requesting price lists, choosing only what you want, declining unwanted items, buying from any provider, receiving itemized pricing, and understanding embalming is usually not required"
+                className="w-full rounded-lg border border-border shadow-sm mb-6"
+              />
+              <div className="flex flex-wrap gap-3">
+                <a 
+                  href="/guides/Know-Your-Rights-When-Arranging-a-Funeral.pdf" 
+                  download 
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm"
+                >
+                  <Download className="h-4 w-4" />
+                  Download PDF
+                </a>
+                <a 
+                  href="https://reportfraud.ftc.gov" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Report a Concern (FTC)
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
         
         <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
           Helpful Resources
