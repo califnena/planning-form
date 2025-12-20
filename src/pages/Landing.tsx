@@ -131,6 +131,47 @@ const Landing = () => {
             </Link>
           </div>
 
+          {/* How the Everlasting Funeral Advisors System Works */}
+          <div className="mt-16 max-w-5xl mx-auto">
+            <div className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-sm">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">
+                {t('landing.howSystemWorks')}
+              </h2>
+              <p className="text-lg text-muted-foreground leading-relaxed mb-8">
+                {t('landing.howSystemWorksDesc')}
+              </p>
+              
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Complete Reference Guide */}
+                <div className="bg-secondary/5 rounded-xl p-6 text-left">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                    <BookOpen className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">{t('landing.referenceGuide')}</h3>
+                  <p className="text-sm text-muted-foreground">{t('landing.referenceGuideDesc')}</p>
+                </div>
+                
+                {/* Step-by-Step Checklists */}
+                <div className="bg-secondary/5 rounded-xl p-6 text-left">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                    <CheckCircle className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">{t('landing.stepByStepChecklists')}</h3>
+                  <p className="text-sm text-muted-foreground">{t('landing.stepByStepChecklistsDesc')}</p>
+                </div>
+                
+                {/* Easy-to-Use App */}
+                <div className="bg-secondary/5 rounded-xl p-6 text-left">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                    <Shield className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">{t('landing.easyToUseApp')}</h3>
+                  <p className="text-sm text-muted-foreground">{t('landing.easyToUseAppDesc')}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* What Is the Everlasting Planner Section */}
           <div className="mt-16 max-w-3xl mx-auto">
             <div className="bg-card border border-border rounded-2xl p-8 md:p-10 shadow-sm">
