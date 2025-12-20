@@ -51,6 +51,7 @@ import Events from "./pages/Events";
 import Billing from "./pages/Billing";
 import Unsubscribe from "./pages/Unsubscribe";
 import TravelProtection from "./pages/TravelProtection";
+import LandingAlt from "./pages/LandingAlt";
 
 
 const queryClient = new QueryClient();
@@ -112,6 +113,7 @@ const App = () => (
                     <Route path="/preview/legal" element={<PreviewLegal />} />
                     <Route path="/preview/pdf" element={<PreviewPDF />} />
                     <Route path="/travel-protection" element={<TravelProtection />} />
+                    <Route path="/preview-landing" element={<LandingAlt />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
