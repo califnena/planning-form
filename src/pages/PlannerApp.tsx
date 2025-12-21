@@ -49,6 +49,7 @@ import { SectionRevisions } from "@/components/planner/sections/SectionRevisions
 import { SectionGuide } from "@/components/planner/sections/SectionGuide";
 import { SectionFAQ } from "@/components/planner/sections/SectionFAQ";
 import { SectionLegalResources } from "@/components/planner/sections/SectionLegalResources";
+import { SectionWillPrep } from "@/components/planner/sections/SectionWillPrep";
 import { mergeVisibleSections } from "@/lib/sections";
 
 const PlannerApp = () => {
@@ -470,6 +471,7 @@ const PlannerApp = () => {
     { id: "digital", label: t("navigation.digital"), completed: !!plan.digital_notes },
     { id: "legal", label: t("navigation.legal"), completed: !!plan.legal_notes },
     { id: "messages", label: t("navigation.messages"), completed: !!plan.messages_notes },
+    { id: "willprep", label: "Prepare Information for a Will", completed: false },
   ];
 
   const visibleSections = mergeVisibleSections(userSettings);
@@ -654,6 +656,9 @@ const PlannerApp = () => {
       case "faq":
         sectionContent = <SectionFAQ />;
         break;
+      case "willprep":
+        sectionContent = <SectionWillPrep data={plan} />;
+        break;
       default:
         sectionContent = (
           <div className="text-center text-muted-foreground py-12">
@@ -662,11 +667,11 @@ const PlannerApp = () => {
         );
     }
 
-    // Don't show navigation on resources, faq, revisions, preferences, overview, and legalresources sections
-    const showNavigation = !["resources", "faq", "revisions", "preferences", "legalresources", "overview"].includes(activeSection);
+    // Don't show navigation on resources, faq, revisions, preferences, overview, legalresources, and willprep sections
+    const showNavigation = !["resources", "faq", "revisions", "preferences", "legalresources", "overview", "willprep"].includes(activeSection);
     
     // Sections that should NOT be locked in preview mode (read-only sections)
-    const readOnlySections = ["resources", "faq", "legalresources", "preferences", "overview"];
+    const readOnlySections = ["resources", "faq", "legalresources", "preferences", "overview", "willprep"];
     const shouldLock = !readOnlySections.includes(activeSection);
 
     // Sections that allow archive/reset

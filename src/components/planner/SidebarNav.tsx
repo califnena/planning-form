@@ -59,6 +59,7 @@ export const SidebarNav = ({
     legalresources: "Essential legal forms and state-specific guides",
     resources: "Helpful guides and references",
     faq: "Plain answers to common questions",
+    willprep: "Organize your wishes and create a draft to review with an attorney",
   };
 
   // Check if user has enabled any sections (beyond preferences)
