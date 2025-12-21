@@ -8,6 +8,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { Package, Heart, UserCheck } from "lucide-react";
 
 interface NavItem {
   id: string;
@@ -22,6 +24,13 @@ interface SidebarNavProps {
   hideResources?: boolean; // Hide Help & Resources section for focused flow
 }
 
+// Support & Services items that route to external pages
+const supportServicesItems = [
+  { id: "order-binder", label: "Order Binder", route: "/pricing", icon: Package },
+  { id: "compassionate-guidance", label: "Compassionate Guidance", route: "/care-support", icon: Heart },
+  { id: "done-for-you", label: "Done-For-You Service", route: "/done-for-you", icon: UserCheck },
+];
+
 export const SidebarNav = ({ 
   items, 
   activeSection, 
@@ -29,6 +38,7 @@ export const SidebarNav = ({
   hideResources = false
 }: SidebarNavProps) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   // Define which sections have tooltips
   const tooltips: Record<string, string> = {
     overview: "A simple checklist of the most important items",
@@ -51,15 +61,13 @@ export const SidebarNav = ({
     faq: "Plain answers to common questions",
   };
 
-  // Check if user has enabled any sections (beyond preferences and always-visible)
+  // Check if user has enabled any sections (beyond preferences)
   const hasEnabledSections = items.some(item => 
-    item.id !== "preferences" && item.id !== "legalresources" && item.id !== "resources" && item.id !== "faq"
+    item.id !== "preferences"
   );
 
-  // Separate always-visible sections from user-selected sections
-  const alwaysVisibleIds = new Set(["preferences", "legalresources", "resources", "faq"]);
-  const userSections = items.filter(item => !alwaysVisibleIds.has(item.id));
-  const alwaysVisibleSections = items.filter(item => alwaysVisibleIds.has(item.id));
+  // All items are now user sections (no more always-visible "resources" sections)
+  const userSections = items;
 
   const renderNavButton = (item: NavItem) => {
     const Icon = getSectionIcon(item.id);
@@ -134,59 +142,34 @@ export const SidebarNav = ({
         </div>
       )}
 
-      {/* Help & Resources - only show if not hidden */}
-      {!hideResources && alwaysVisibleSections.length > 0 && (
+      {/* Support & Services Section */}
+      {!hideResources && (
         <>
           {/* Divider */}
           <hr className="my-4 border-2 border-border mx-4" />
 
           <div className="space-y-1 mt-6">
             <h3 className="text-base font-bold text-foreground mb-3 uppercase tracking-wide text-center">
-              {t("sidebar.helpResources")}
+              Support & Services
             </h3>
-            {alwaysVisibleSections.map((item) => {
-              const Icon = getSectionIcon(item.id);
+            {supportServicesItems.map((item) => {
+              const Icon = item.icon;
               
-              const button = (
-                <button
-                  onClick={() => onSectionChange(item.id)}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-4 py-3.5 text-base rounded-lg transition-all duration-200 text-left group",
-                    "hover:bg-accent/50",
-                    activeSection === item.id
-                      ? "bg-primary/10 text-primary font-semibold"
-                      : "text-foreground hover:text-foreground"
-                  )}
-                >
-                  <Icon className={cn(
-                    "h-5 w-5 flex-shrink-0 transition-colors",
-                    activeSection === item.id ? "text-primary" : "text-muted-foreground/70 group-hover:text-primary"
-                  )} />
-                  <span className="flex-1">{item.label}</span>
-                  <ProgressDot completed={item.completed} />
-                </button>
+              return (
+                <div key={item.id}>
+                  <button
+                    onClick={() => navigate(item.route)}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-4 py-3.5 text-base rounded-lg transition-all duration-200 text-left group",
+                      "hover:bg-accent/50",
+                      "text-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Icon className="h-5 w-5 flex-shrink-0 text-muted-foreground/70 group-hover:text-primary transition-colors" />
+                    <span className="flex-1">{item.label}</span>
+                  </button>
+                </div>
               );
-
-              if (tooltips[item.id]) {
-                return (
-                  <TooltipProvider key={item.id} delayDuration={300}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        {button}
-                      </TooltipTrigger>
-                      <TooltipContent 
-                        side="right" 
-                        className="bg-popover text-popover-foreground border max-w-xs p-3 text-sm"
-                        sideOffset={8}
-                      >
-                        <p>{tooltips[item.id]}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                );
-              }
-
-              return <div key={item.id}>{button}</div>;
             })}
           </div>
         </>
