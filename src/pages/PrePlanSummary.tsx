@@ -24,8 +24,15 @@ import {
   MessageSquare,
   BookHeart,
   AlertTriangle,
-  ArrowRight
+  ArrowRight,
+  X
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { generatePlanPDF } from "@/lib/pdfGenerator";
@@ -58,6 +65,20 @@ export default function PrePlanSummary() {
   const [userEmail, setUserEmail] = useState<string>("");
   const [profile, setProfile] = useState<any>(null);
   const [contacts, setContacts] = useState<any[]>([]);
+  const [showFirstTimeHelper, setShowFirstTimeHelper] = useState(false);
+
+  // Check if first-time visitor to summary page
+  useEffect(() => {
+    const hasSeenHelper = localStorage.getItem("preplan_summary_helper_seen");
+    if (!hasSeenHelper) {
+      setShowFirstTimeHelper(true);
+    }
+  }, []);
+
+  const dismissFirstTimeHelper = () => {
+    localStorage.setItem("preplan_summary_helper_seen", "true");
+    setShowFirstTimeHelper(false);
+  };
 
   // Check for print param
   useEffect(() => {
@@ -408,6 +429,18 @@ export default function PrePlanSummary() {
           )}
         </div>
 
+        {/* First-time helper */}
+        {showFirstTimeHelper && (
+          <Alert className="mb-6 border-primary/30 bg-primary/5 print:hidden">
+            <AlertDescription className="flex items-center justify-between">
+              <span>This page is where you can view, print, or share everything you've entered.</span>
+              <Button variant="ghost" size="sm" onClick={dismissFirstTimeHelper} className="h-6 w-6 p-0">
+                <X className="h-4 w-4" />
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Disclaimer */}
         <Alert className="mb-6 border-amber-200 bg-amber-50/50 dark:bg-amber-950/20 print:hidden">
           <AlertTriangle className="h-4 w-4 text-amber-600" />
@@ -426,24 +459,55 @@ export default function PrePlanSummary() {
 
         {/* Sticky Action Bar */}
         <div className="sticky top-14 z-40 bg-background/95 backdrop-blur border-b mb-6 -mx-4 px-4 py-3 print:hidden">
-          <div className="flex flex-wrap gap-2 justify-center">
-            <Button onClick={handleDownloadPDF} className="gap-2">
-              <Download className="h-4 w-4" />
-              Download PDF
-            </Button>
-            <Button variant="outline" onClick={handlePrint} className="gap-2">
-              <Printer className="h-4 w-4" />
-              Print
-            </Button>
-            <Button variant="outline" onClick={() => setShowShareDialog(true)} className="gap-2">
-              <Mail className="h-4 w-4" />
-              Email a Copy
-            </Button>
-            <Button variant="outline" onClick={handleSaveConfirmation} className="gap-2">
-              <Save className="h-4 w-4" />
-              Save for Later
-            </Button>
-          </div>
+          <TooltipProvider>
+            <div className="flex flex-wrap gap-2 justify-center">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button onClick={handleDownloadPDF} className="gap-2">
+                    <Download className="h-4 w-4" />
+                    Download PDF
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Downloads your complete planning document</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" onClick={handlePrint} className="gap-2">
+                    <Printer className="h-4 w-4" />
+                    Print
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Prints the full planning summary</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" onClick={() => setShowShareDialog(true)} className="gap-2">
+                    <Mail className="h-4 w-4" />
+                    Email a Copy
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Sends the full planning summary</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" onClick={handleSaveConfirmation} className="gap-2">
+                    <Save className="h-4 w-4" />
+                    Save for Later
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Your summary is automatically saved</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="secondary" onClick={() => toast({ title: "Coming soon", description: "For My Family view is being prepared." })} className="gap-2">
+                    <Heart className="h-4 w-4" />
+                    For My Family
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Shares a simplified version for loved ones</TooltipContent>
+              </Tooltip>
+            </div>
+          </TooltipProvider>
         </div>
 
         {/* Content Sections */}
