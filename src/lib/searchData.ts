@@ -75,7 +75,7 @@ export function buildSearchIndex(): SearchResult[] {
       description: section.description || '',
       type: 'section',
       category: 'Planner Sections',
-      url: `/app#${section.id}`,
+      url: `/preplansteps#${section.id}`,
     });
   });
 
@@ -88,7 +88,7 @@ export function buildSearchIndex(): SearchResult[] {
         description: section.description || '',
         type: 'section',
         category: 'Planner Sections',
-        url: '/app/preferences',
+        url: '/preplansteps/preferences',
       });
     } else if (section.id === 'legalresources') {
       results.push({

@@ -129,7 +129,7 @@ export default function Profile() {
       <div className="container max-w-2xl py-8">
       <Button 
         variant="ghost" 
-        onClick={() => navigate("/app")}
+        onClick={() => navigate("/preplansteps")}
         className="mb-6"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />

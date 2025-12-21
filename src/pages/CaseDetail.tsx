@@ -303,7 +303,7 @@ export default function CaseDetail() {
                 </SheetContent>
               </Sheet>
               
-              <Button variant="ghost" size="sm" onClick={() => navigate("/app")} className="hidden sm:flex">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/preplansteps")} className="hidden sm:flex">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <div>
@@ -320,7 +320,7 @@ export default function CaseDetail() {
                 <Home className="mr-2 h-4 w-4" />
                 {t("header.dashboard")}
               </Button>
-              <Button variant="outline" size="sm" onClick={() => navigate("/app")} className="hidden sm:flex">
+              <Button variant="outline" size="sm" onClick={() => navigate("/preplansteps")} className="hidden sm:flex">
                 <FileText className="mr-2 h-4 w-4" />
                 {t("afterDeathSteps.prePlanner")}
               </Button>

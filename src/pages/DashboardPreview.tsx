@@ -83,12 +83,12 @@ export default function DashboardPreview() {
                     Document your wishes step by step. Save your progress and come back anytime.
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <Button onClick={() => handleLoginRequired("/app")} variant="outline" className="gap-2 opacity-70">
+                    <Button onClick={() => handleLoginRequired("/preplansteps")} variant="outline" className="gap-2 opacity-70">
                       <Lock className="h-4 w-4" />
                       Begin Planning
                       <span className="text-xs text-muted-foreground">(Login required)</span>
                     </Button>
-                    <Button onClick={() => handleLoginRequired("/app")} variant="outline" className="gap-2 opacity-70">
+                    <Button onClick={() => handleLoginRequired("/preplansteps")} variant="outline" className="gap-2 opacity-70">
                       <Lock className="h-4 w-4" />
                       Generate PDF
                       <span className="text-xs text-muted-foreground">(Login required)</span>

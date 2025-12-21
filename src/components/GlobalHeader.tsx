@@ -40,7 +40,7 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
   const { isAdmin } = useAdminStatus();
   const { superSeniorMode } = useAccessibility();
   
-  const isPlannerPage = location.pathname === '/app';
+  const isPlannerPage = location.pathname === '/preplansteps';
 
   useEffect(() => {
     const getUser = async () => {
@@ -187,7 +187,7 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem asChild>
-                  <Link to="/app/profile" className="flex items-center gap-2 cursor-pointer">
+                  <Link to="/preplansteps/profile" className="flex items-center gap-2 cursor-pointer">
                     <User className="h-4 w-4" />
                     {t("header.myProfile")}
                   </Link>

@@ -88,7 +88,7 @@ export default function Plans() {
                     {currentPlan === "Free" ? "Limited access to features" : "Full access to selected features"}
                   </p>
                 </div>
-                <Button onClick={() => navigate("/app/profile/subscription")}>
+                <Button onClick={() => navigate("/preplansteps/profile/subscription")}>
                   Manage Subscription
                 </Button>
               </div>
@@ -119,7 +119,7 @@ export default function Plans() {
                       </li>
                     ))}
                   </ul>
-                  <Button className="w-full mt-6" variant="outline" onClick={() => navigate("/app/profile/subscription")}>
+                  <Button className="w-full mt-6" variant="outline" onClick={() => navigate("/preplansteps/profile/subscription")}>
                     Select Plan
                   </Button>
                 </CardContent>
@@ -148,7 +148,7 @@ export default function Plans() {
                       </li>
                     ))}
                   </ul>
-                  <Button className="w-full mt-6" onClick={() => navigate("/app/profile/subscription")}>
+                  <Button className="w-full mt-6" onClick={() => navigate("/preplansteps/profile/subscription")}>
                     Select Plan
                   </Button>
                 </CardContent>
@@ -175,7 +175,7 @@ export default function Plans() {
                       </li>
                     ))}
                   </ul>
-                  <Button className="w-full mt-6" onClick={() => navigate("/app/profile/subscription")}>
+                  <Button className="w-full mt-6" onClick={() => navigate("/preplansteps/profile/subscription")}>
                     Select Plan
                   </Button>
                 </CardContent>

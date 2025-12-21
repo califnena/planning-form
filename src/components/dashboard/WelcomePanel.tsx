@@ -33,11 +33,11 @@ export const WelcomePanel = () => {
 
   const handleContinue = () => {
     const lastSection = localStorage.getItem("efa-last-section");
-    navigate(lastSection || "/app");
+    navigate(lastSection || "/preplansteps");
   };
 
   const handleStartNew = () => {
-    navigate("/app");
+    navigate("/preplansteps");
   };
 
   return (

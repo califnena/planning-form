@@ -160,7 +160,7 @@ export default function Subscription() {
     <div className="container mx-auto py-10">
       <Button 
         variant="ghost" 
-        onClick={() => navigate("/app")}
+        onClick={() => navigate("/preplansteps")}
         className="mb-6"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />

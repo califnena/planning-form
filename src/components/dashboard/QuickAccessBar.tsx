@@ -18,7 +18,7 @@ export const QuickAccessBar = () => {
   };
 
   const handlePreview = () => {
-    navigate("/app");
+    navigate("/preplansteps");
   };
 
   const handleChecklist = () => {

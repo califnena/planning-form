@@ -473,7 +473,7 @@ export const SectionLegalResources = () => {
           </ul>
           <div className="flex gap-3 pt-4">
             <Button size="lg" asChild>
-              <Link to="/app">
+              <Link to="/preplansteps">
                 Go to Pre-Planning Tool <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>

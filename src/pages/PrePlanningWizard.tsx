@@ -192,7 +192,7 @@ export default function PrePlanningWizard() {
             Please select sections in your Preferences before starting the wizard.
           </p>
           <button
-            onClick={() => navigate("/app?section=preferences")}
+            onClick={() => navigate("/preplansteps?section=preferences")}
             className="text-primary underline"
           >
             Go to Preferences
