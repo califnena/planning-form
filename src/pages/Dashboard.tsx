@@ -605,50 +605,53 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* STEP 2 - VIP Coach Assistant */}
+        {/* STEP 2 - Compassionate Guidance & Support */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-bold text-lg shadow-md">
               2
             </div>
-            <h2 className="text-2xl font-bold">{t('dashboard.vipCoach')}</h2>
+            <h2 className="text-2xl font-bold">Compassionate Guidance & Support</h2>
           </div>
           
-          <Card className="p-6 bg-yellow-50/50 border-yellow-200">
+          <Card className="p-6 bg-amber-50/50 border-amber-200">
             <div className="flex gap-4">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center">
-                  <Star className="h-4 w-4 text-yellow-600" />
+                <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                  <Star className="h-4 w-4 text-amber-600" />
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-semibold mb-3">{t('dashboard.getPersonalizedSupport')}</h3>
+                <h3 className="text-xl font-semibold mb-2">For Those Who Want Reassurance, Not Just Forms</h3>
+                <p className="text-muted-foreground mb-4">
+                  Personal support goes beyond planning—offering compassionate check-ins, help during moments of distress, and steady guidance before or after a loss.
+                </p>
                 <ul className="space-y-2 mb-4 text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <span className="text-yellow-600 mt-1">✓</span>
-                    <span>{t('dashboard.vipBenefit1')}</span>
+                    <span className="text-amber-600 mt-1">✓</span>
+                    <span>One-on-one guidance through your planning steps</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-yellow-600 mt-1">✓</span>
-                    <span>{t('dashboard.vipBenefit2')}</span>
+                    <span className="text-amber-600 mt-1">✓</span>
+                    <span>Help organizing thoughts when decisions feel heavy</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-yellow-600 mt-1">✓</span>
-                    <span>{t('dashboard.vipBenefit3')}</span>
+                    <span className="text-amber-600 mt-1">✓</span>
+                    <span>Clear explanations without pressure or sales</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-yellow-600 mt-1">✓</span>
-                    <span>{t('dashboard.vipBenefit4')}</span>
+                    <span className="text-amber-600 mt-1">✓</span>
+                    <span>A real person who walks at your pace</span>
                   </li>
                 </ul>
-                {hasVIPAccess ? <Button onClick={() => navigate('/coach')} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                    {t('dashboard.accessVipCoach')}
+                {hasVIPAccess ? <Button onClick={() => navigate('/vip-coach')} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] min-h-[48px]">
+                    Talk With a Planning Guide
                   </Button> : <div className="flex flex-wrap gap-3">
-                    <Button onClick={handleVIPMonthly} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)]">
-                      {t('dashboard.upgradeVipMonthly')}
+                    <Button onClick={handleVIPMonthly} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] min-h-[48px]">
+                      Get Monthly Support
                     </Button>
-                    <Button onClick={handleVIPYearly} variant="outline" className="border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10">
-                      {t('dashboard.upgradeVipYearly')}
+                    <Button onClick={handleVIPYearly} variant="outline" className="border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 min-h-[48px]">
+                      Get Yearly Support (Save 20%)
                     </Button>
                   </div>}
               </div>
