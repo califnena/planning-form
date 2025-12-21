@@ -1929,6 +1929,36 @@ export type Database = {
         }
         Relationships: []
       }
+      section_archives: {
+        Row: {
+          archived_at: string
+          created_at: string
+          id: string
+          note: string | null
+          section_data: Json
+          section_id: string
+          user_id: string
+        }
+        Insert: {
+          archived_at?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          section_data: Json
+          section_id: string
+          user_id: string
+        }
+        Update: {
+          archived_at?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          section_data?: Json
+          section_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       service_plan: {
         Row: {
           case_id: string
@@ -2371,10 +2401,12 @@ export type Database = {
       }
       user_settings: {
         Row: {
+          completed_sections: string[] | null
           created_at: string | null
           focus_areas: string[] | null
           id: string
           last_planner_activity: string | null
+          last_step_index: number | null
           planner_mode: string | null
           preferred_name: string | null
           preferred_state: string | null
@@ -2385,10 +2417,12 @@ export type Database = {
           wizard_completed: boolean | null
         }
         Insert: {
+          completed_sections?: string[] | null
           created_at?: string | null
           focus_areas?: string[] | null
           id?: string
           last_planner_activity?: string | null
+          last_step_index?: number | null
           planner_mode?: string | null
           preferred_name?: string | null
           preferred_state?: string | null
@@ -2399,10 +2433,12 @@ export type Database = {
           wizard_completed?: boolean | null
         }
         Update: {
+          completed_sections?: string[] | null
           created_at?: string | null
           focus_areas?: string[] | null
           id?: string
           last_planner_activity?: string | null
+          last_step_index?: number | null
           planner_mode?: string | null
           preferred_name?: string | null
           preferred_state?: string | null

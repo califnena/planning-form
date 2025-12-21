@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { debounce } from "@/lib/utils";
@@ -29,15 +29,30 @@ export interface PlanData {
   }>;
 }
 
+export interface SaveState {
+  saving: boolean;
+  lastSaved: Date | null;
+  error: boolean;
+}
+
 export const usePlanData = (userId: string) => {
   const [plan, setPlan] = useState<PlanData>({});
   const [loading, setLoading] = useState(true);
+  const [saveState, setSaveState] = useState<SaveState>({
+    saving: false,
+    lastSaved: null,
+    error: false
+  });
   const { toast } = useToast();
+  const saveInProgressRef = useRef(false);
 
   // Debounced save to Supabase
   const saveToDB = useCallback(
     debounce(async (data: PlanData) => {
       if (!data.id) return;
+
+      saveInProgressRef.current = true;
+      setSaveState(prev => ({ ...prev, saving: true, error: false }));
 
       try {
         const { error } = await supabase
@@ -49,11 +64,29 @@ export const usePlanData = (userId: string) => {
           .eq("id", data.id);
 
         if (error) throw error;
+        
+        setSaveState({
+          saving: false,
+          lastSaved: new Date(),
+          error: false
+        });
+
+        // Also update last_planner_activity
+        await supabase
+          .from("user_settings")
+          .upsert({
+            user_id: userId,
+            last_planner_activity: new Date().toISOString()
+          }, { onConflict: 'user_id' });
+
       } catch (error: any) {
         console.error("Error saving to DB:", error);
+        setSaveState(prev => ({ ...prev, saving: false, error: true }));
+      } finally {
+        saveInProgressRef.current = false;
       }
     }, 800),
-    []
+    [userId]
   );
 
   // Load plan from Supabase
@@ -188,5 +221,5 @@ export const usePlanData = (userId: string) => {
     [userId, saveToDB]
   );
 
-  return { plan, loading, updatePlan };
+  return { plan, loading, updatePlan, saveState };
 };

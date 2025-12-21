@@ -19,9 +19,15 @@ interface SidebarNavProps {
   items: NavItem[];
   activeSection: string;
   onSectionChange: (section: string) => void;
+  hideResources?: boolean; // Hide Help & Resources section for focused flow
 }
 
-export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNavProps) => {
+export const SidebarNav = ({ 
+  items, 
+  activeSection, 
+  onSectionChange,
+  hideResources = false
+}: SidebarNavProps) => {
   const { t } = useTranslation();
   // Define which sections have tooltips
   const tooltips: Record<string, string> = {
@@ -128,59 +134,63 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
         </div>
       )}
 
-      {/* Divider */}
-      <hr className="my-4 border-2 border-border mx-4" />
+      {/* Help & Resources - only show if not hidden */}
+      {!hideResources && alwaysVisibleSections.length > 0 && (
+        <>
+          {/* Divider */}
+          <hr className="my-4 border-2 border-border mx-4" />
 
-      {/* Help & Resources */}
-      <div className="space-y-1 mt-6">
-        <h3 className="text-base font-bold text-foreground mb-3 uppercase tracking-wide text-center">
-          {t("sidebar.helpResources")}
-        </h3>
-        {alwaysVisibleSections.map((item) => {
-          const Icon = getSectionIcon(item.id);
-          
-          const button = (
-            <button
-              onClick={() => onSectionChange(item.id)}
-              className={cn(
-                "w-full flex items-center gap-3 px-4 py-3.5 text-base rounded-lg transition-all duration-200 text-left group",
-                "hover:bg-accent/50",
-                activeSection === item.id
-                  ? "bg-primary/10 text-primary font-semibold"
-                  : "text-foreground hover:text-foreground"
-              )}
-            >
-              <Icon className={cn(
-                "h-5 w-5 flex-shrink-0 transition-colors",
-                activeSection === item.id ? "text-primary" : "text-muted-foreground/70 group-hover:text-primary"
-              )} />
-              <span className="flex-1">{item.label}</span>
-              <ProgressDot completed={item.completed} />
-            </button>
-          );
+          <div className="space-y-1 mt-6">
+            <h3 className="text-base font-bold text-foreground mb-3 uppercase tracking-wide text-center">
+              {t("sidebar.helpResources")}
+            </h3>
+            {alwaysVisibleSections.map((item) => {
+              const Icon = getSectionIcon(item.id);
+              
+              const button = (
+                <button
+                  onClick={() => onSectionChange(item.id)}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-4 py-3.5 text-base rounded-lg transition-all duration-200 text-left group",
+                    "hover:bg-accent/50",
+                    activeSection === item.id
+                      ? "bg-primary/10 text-primary font-semibold"
+                      : "text-foreground hover:text-foreground"
+                  )}
+                >
+                  <Icon className={cn(
+                    "h-5 w-5 flex-shrink-0 transition-colors",
+                    activeSection === item.id ? "text-primary" : "text-muted-foreground/70 group-hover:text-primary"
+                  )} />
+                  <span className="flex-1">{item.label}</span>
+                  <ProgressDot completed={item.completed} />
+                </button>
+              );
 
-          if (tooltips[item.id]) {
-            return (
-              <TooltipProvider key={item.id} delayDuration={300}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    {button}
-                  </TooltipTrigger>
-                  <TooltipContent 
-                    side="right" 
-                    className="bg-popover text-popover-foreground border max-w-xs p-3 text-sm"
-                    sideOffset={8}
-                  >
-                    <p>{tooltips[item.id]}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            );
-          }
+              if (tooltips[item.id]) {
+                return (
+                  <TooltipProvider key={item.id} delayDuration={300}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        {button}
+                      </TooltipTrigger>
+                      <TooltipContent 
+                        side="right" 
+                        className="bg-popover text-popover-foreground border max-w-xs p-3 text-sm"
+                        sideOffset={8}
+                      >
+                        <p>{tooltips[item.id]}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                );
+              }
 
-          return <div key={item.id}>{button}</div>;
-        })}
-      </div>
+              return <div key={item.id}>{button}</div>;
+            })}
+          </div>
+        </>
+      )}
     </nav>
   );
 };
