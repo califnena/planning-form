@@ -325,6 +325,23 @@ const Pricing = () => {
         </div>
       </header>
 
+      {/* Navigation Links - Below Header */}
+      <div className="border-b border-border bg-muted/30">
+        <div className="container mx-auto px-4 py-2">
+          <div className="flex justify-center gap-3 flex-wrap">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
+              Home
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
+              Dashboard
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/billing")}>
+              View Subscription
+            </Button>
+          </div>
+        </div>
+      </div>
+
       <main className="container mx-auto px-4 py-12 flex-1">
         {/* Current Plan Context Header - only for logged-in users with a plan */}
         {isLoggedIn && currentPlanName && (
@@ -365,19 +382,6 @@ const Pricing = () => {
             <p className="text-lg text-muted-foreground">
               Start simple. Add more only if you want.
             </p>
-          </div>
-
-          {/* Navigation Links */}
-          <div className="flex justify-center gap-3 flex-wrap">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
-              Home
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
-              Dashboard
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/subscription")}>
-              View Subscription
-            </Button>
           </div>
 
           {/* Stripe Validation Alert - shows issues to admins */}

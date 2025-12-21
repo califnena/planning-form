@@ -1,14 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Music, Clock, Heart, CheckCircle, Users, Gift, BookOpen } from "lucide-react";
+import { Music, Clock, Heart, CheckCircle, Users, Gift, BookOpen, Home, LayoutDashboard } from "lucide-react";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function CustomSong() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState<string | null>(null);
 
   const handlePurchase = async (packageType: 'standard' | 'premium') => {
@@ -70,6 +72,18 @@ export default function CustomSong() {
     <AuthenticatedLayout>
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-10">
+          {/* Navigation Links */}
+          <div className="flex justify-center gap-3 flex-wrap">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
+              <Home className="h-4 w-4 mr-2" />
+              Home
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
+              <LayoutDashboard className="h-4 w-4 mr-2" />
+              Return to Dashboard
+            </Button>
+          </div>
+
           {/* Header */}
           <div className="text-center space-y-4">
             <Music className="h-16 w-16 mx-auto text-primary" />
