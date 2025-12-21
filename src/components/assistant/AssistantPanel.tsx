@@ -312,7 +312,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2">
               <MessageCircle className="h-5 w-5 text-primary" />
-              Ask Everlasting
+              Ask Claire
             </CardTitle>
             <Button
               variant="ghost"
@@ -350,8 +350,8 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
             <div className="space-y-4">
               {messages.length === 0 && (
                 <div className="text-center text-muted-foreground text-sm py-8">
-                  <p>👋 Hello! I'm your Everlasting Assistant.</p>
-                  <p className="mt-2">Ask me anything about end-of-life planning.</p>
+                  <p>👋 Hi, it's Claire!</p>
+                  <p className="mt-2">What would you like help with today?</p>
                 </div>
               )}
               

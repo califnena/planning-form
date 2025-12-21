@@ -26,7 +26,7 @@ import ProductBinder from "./pages/ProductBinder";
 import Pricing from "./pages/Pricing";
 import AboutUs from "./pages/AboutUs";
 import LegalForms from "./pages/LegalForms";
-import CoachAssistant from "./pages/CoachAssistant";
+import CareSupport from "./pages/CareSupport";
 import NextSteps from "./pages/NextSteps";
 import CaseDetail from "./pages/CaseDetail";
 import PrePlanningWizard from "./pages/PrePlanningWizard";
@@ -109,7 +109,14 @@ const App = () => (
                       <Route path="/admin/events" element={<AdminEvents />} />
                       <Route path="/events" element={<Events />} />
                       <Route path="/billing" element={<Billing />} />
-                      <Route path="/vip-coach" element={<CoachAssistant />} />
+                      <Route path="/care-support" element={<CareSupport />} />
+                      {/* Redirects from old routes */}
+                      <Route path="/vip-coach" element={<CareSupport />} />
+                      <Route path="/vip" element={<CareSupport />} />
+                      <Route path="/vip-planning-support" element={<CareSupport />} />
+                      <Route path="/planning-coach" element={<CareSupport />} />
+                      <Route path="/support-coach" element={<CareSupport />} />
+                      <Route path="/coach-assistant" element={<CareSupport />} />
                       <Route path="/after-death-planner" element={<NextSteps />} />
                       <Route path="/next-steps" element={<NextSteps />} />
                       <Route path="/next-steps/case/:caseId" element={<CaseDetail />} />
