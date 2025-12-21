@@ -49,17 +49,9 @@ const Landing = () => {
     document.documentElement.style.fontSize = `${newSize}%`;
     localStorage.setItem("landing_text_size", newSize.toString());
   };
-  const handleStartPlanner = async () => {
-    const {
-      data: {
-        user
-      }
-    } = await supabase.auth.getUser();
-    if (user) {
-      navigate("/dashboard");
-    } else {
-      navigate("/login");
-    }
+  const handleStartPlanner = () => {
+    // Go directly to Plan Ahead landing page (public) - no login required
+    navigate("/plan-ahead");
   };
   return <div className="min-h-screen bg-gradient-to-b from-amber-50/40 via-background to-background">
       {/* Header */}

@@ -3,49 +3,36 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, ClipboardCheck, FileText, Star, BookOpen, Music, Lock, CheckCircle, Heart, Loader2 } from "lucide-react";
-import { LanguageSelector } from "@/components/LanguageSelector";
+import { PublicHeader } from "@/components/PublicHeader";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { AppFooter } from "@/components/AppFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import logo from "@/assets/everlasting-logo.png";
+
 export default function AfterDeathLanding() {
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [textSize, setTextSize] = useState<number>(100);
-  const handleTextSizeChange = (direction: "increase" | "decrease") => {
-    const newSize = direction === "increase" ? Math.min(textSize + 10, 150) : Math.max(textSize - 10, 80);
-    setTextSize(newSize);
-    document.documentElement.style.fontSize = `${newSize}%`;
-  };
+
   const handlePremiumAccess = async () => {
     setIsLoading(true);
     try {
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        // Not logged in - redirect to login
         navigate("/login?redirect=/after-death-planner");
         return;
       }
 
-      // Check subscription status
-      const {
-        data: subscription
-      } = await supabase.from('subscriptions').select('plan_type, status').eq('user_id', user.id).single();
+      const { data: subscription } = await supabase
+        .from('subscriptions')
+        .select('plan_type, status')
+        .eq('user_id', user.id)
+        .single();
+
       if (subscription?.status === 'active' && ['premium', 'vip', 'do_it_for_you'].includes(subscription.plan_type)) {
-        // Has premium access
         navigate("/after-death-planner");
       } else {
-        // Needs to upgrade - create checkout
-        const {
-          data,
-          error
-        } = await supabase.functions.invoke('stripe-create-checkout', {
+        const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
           body: {
             lookupKey: 'EFAPREMIUM',
             successUrl: `${window.location.origin}/after-death-planner`,
@@ -68,40 +55,15 @@ export default function AfterDeathLanding() {
       setIsLoading(false);
     }
   };
-  return <div className="min-h-screen bg-gradient-to-b from-stone-50 via-background to-background">
-      {/* Header */}
-      <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <img src={logo} alt="Everlasting Funeral Advisors" className="h-10 w-10" />
-            <div>
-              <h1 className="text-lg font-semibold text-primary">Everlasting Funeral Advisors</h1>
-              <p className="text-xs text-muted-foreground">After-Death Guidance</p>
-            </div>
-          </Link>
-          <div className="flex items-center gap-3">
-            {/* Text Size Controls */}
-            <div className="hidden sm:flex items-center gap-2 border border-border rounded-md px-3 py-1.5">
-              <span className="text-sm text-muted-foreground font-medium">Text Size</span>
-              <Button variant="ghost" size="sm" onClick={() => handleTextSizeChange("decrease")} className="h-7 px-2 font-semibold">
-                A-
-              </Button>
-              <Button variant="ghost" size="sm" className="h-7 px-2 font-semibold pointer-events-none">
-                A
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => handleTextSizeChange("increase")} className="h-7 px-2 font-semibold">
-                A+
-              </Button>
-            </div>
-            <LanguageSelector />
-            <Link to="/login">
-              <Button variant="outline" size="sm">Sign In</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
 
-      <main className="container mx-auto px-4 py-12 text-sidebar-foreground bg-transparent">
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-stone-50 via-background to-background">
+      <PublicHeader />
+
+      <main className="container mx-auto px-4 py-8">
+        {/* Breadcrumbs */}
+        <Breadcrumbs className="mb-6" />
+        
         {/* Hero Section */}
         <div className="max-w-4xl mx-auto text-center space-y-6 mb-16">
           <div className="inline-flex items-center gap-2 text-primary px-4 py-2 rounded-full text-sm font-medium bg-amber-400">
@@ -354,29 +316,10 @@ export default function AfterDeathLanding() {
           <p className="text-lg text-muted-foreground mb-6">
             We're here to help you through this difficult time. Take things one step at a time.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/">
-              
-            </Link>
-            <Link to="/contact">
-              
-            </Link>
-          </div>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t bg-muted/30 py-8">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Everlasting Funeral Advisors. All rights reserved.</p>
-          <p className="mt-2">
-            <Link to="/about-us" className="hover:text-primary">About Us</Link>
-            {" • "}
-            <Link to="/contact" className="hover:text-primary">Contact</Link>
-            {" • "}
-            <Link to="/faq" className="hover:text-primary">FAQ</Link>
-          </p>
-        </div>
-      </footer>
-    </div>;
+      <AppFooter />
+    </div>
+  );
 }
