@@ -17,6 +17,7 @@ import { ChecklistsSection } from "@/components/dashboard/ChecklistsSection";
 import { ResumeCard } from "@/components/dashboard/ResumeCard";
 import { MyPlanningDocumentCard } from "@/components/dashboard/MyPlanningDocumentCard";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
+import { usePlanDataStatus } from "@/hooks/usePlanDataStatus";
 
 export default function Dashboard() {
   const {
@@ -53,6 +54,9 @@ export default function Dashboard() {
   const [hasVIPAccess, setHasVIPAccess] = useState(false);
   const [hasPrintableAccess, setHasPrintableAccess] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  
+  // Use shared hook for accurate plan data detection
+  const planDataStatus = usePlanDataStatus();
   useEffect(() => {
     const loadUserData = async () => {
       const {
@@ -620,7 +624,7 @@ export default function Dashboard() {
 
         {/* My Planning Document Card */}
         <div className="mb-8">
-          <MyPlanningDocumentCard hasData={progress > 0} />
+          <MyPlanningDocumentCard hasData={planDataStatus.hasAnyData} />
         </div>
 
         {/* STEP 1 - My Planning Steps */}

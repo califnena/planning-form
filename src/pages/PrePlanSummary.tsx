@@ -40,6 +40,8 @@ import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
 import { ShareSummaryDialog } from "@/components/summary/ShareSummaryDialog";
 import { WhatsMissingIndicator } from "@/components/summary/WhatsMissingIndicator";
 import { ReminderEmailOptIn } from "@/components/summary/ReminderEmailOptIn";
+import { usePlanDataStatus } from "@/hooks/usePlanDataStatus";
+import { PlanDebugPanel } from "@/components/admin/PlanDebugPanel";
 
 interface SectionData {
   id: string;
@@ -66,7 +68,9 @@ export default function PrePlanSummary() {
   const [profile, setProfile] = useState<any>(null);
   const [contacts, setContacts] = useState<any[]>([]);
   const [showFirstTimeHelper, setShowFirstTimeHelper] = useState(false);
-
+  
+  // Use shared hook for plan data status (admin debug panel)
+  const planDataStatus = usePlanDataStatus();
   // Check if first-time visitor to summary page
   useEffect(() => {
     const hasSeenHelper = localStorage.getItem("preplan_summary_helper_seen");
@@ -449,11 +453,21 @@ export default function PrePlanSummary() {
     );
   }
 
-  // Only show empty state if no org exists (user hasn't started at all)
-  if (!planData) {
+  // Only show empty state if:
+  // 1. No plan exists AND
+  // 2. Shared hook confirms no data exists (checks all related tables)
+  const showEmptyState = !planData && !planDataStatus.loading && !planDataStatus.hasAnyData;
+  
+  if (showEmptyState) {
     return (
       <AuthenticatedLayout>
         <div className="container mx-auto px-4 py-8 max-w-4xl">
+          {/* Admin Debug Panel */}
+          <PlanDebugPanel 
+            orgId={planDataStatus.orgId} 
+            planId={planDataStatus.planId} 
+            counts={planDataStatus.counts} 
+          />
           <Card className="p-8 text-center">
             <h2 className="text-xl font-semibold mb-4">Your Planning Document</h2>
             <p className="text-muted-foreground mb-6">
@@ -473,6 +487,13 @@ export default function PrePlanSummary() {
   return (
     <AuthenticatedLayout>
       <div className="container mx-auto px-4 py-8 max-w-4xl print:p-0">
+        {/* Admin Debug Panel */}
+        <PlanDebugPanel 
+          orgId={planDataStatus.orgId} 
+          planId={planDataStatus.planId} 
+          counts={planDataStatus.counts} 
+        />
+        
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">Your Planning Summary</h1>
