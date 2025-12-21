@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { checkPaidAccess } from "@/lib/accessChecks";
 import { PlannerModeModal } from "@/components/planner/PlannerModeModal";
 
 /**
  * Single entry point for the planner.
- * Handles: auth check, paid access check, mode selection, and routing.
- * NEVER redirects to /profile or logs out users.
+ * Guard order:
+ *  1) Auth session
+ *  2) Paid access (subscription)
+ *  3) Mode selection
+ *  4) Route into planner
  */
 export default function PlannerStart() {
   const navigate = useNavigate();
-  const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [showModeModal, setShowModeModal] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -20,54 +21,70 @@ export default function PlannerStart() {
   useEffect(() => {
     const initializePlanner = async () => {
       try {
-        // Step 1: Auth check
+        // 1) Auth check
         const { data: { session } } = await supabase.auth.getSession();
-        
+
         if (!session) {
-          // Save return URL and redirect to login
+          // Login should bounce straight back here
           localStorage.setItem("efa_last_visited_route", "/planner/start");
-          navigate("/login", { replace: true });
+          navigate("/login?redirect=/planner/start", { replace: true });
           return;
         }
 
         setUserId(session.user.id);
 
-        // Step 2: Paid access check
-        const hasPaidAccess = await checkPaidAccess();
+        // 2) Paid access check (subscription-based; never send paid users to login)
+        const { data: isAdmin } = await supabase.rpc("has_app_role", {
+          _user_id: session.user.id,
+          _role: "admin",
+        });
+
+        let hasPaidAccess = !!isAdmin;
+
+        if (!hasPaidAccess) {
+          const { data: planType, error: planError } = await supabase.rpc("get_user_subscription", {
+            _user_id: session.user.id,
+          });
+
+          if (!planError) {
+            hasPaidAccess = !!planType && planType !== "free";
+          }
+        }
+
         if (!hasPaidAccess) {
           navigate("/pricing", { replace: true });
           return;
         }
 
-        // Step 3: Load user settings
+        // 3) Load user settings
         const { data: settings } = await supabase
           .from("user_settings")
-          .select("planner_mode, selected_sections, last_step_index")
+          .select("planner_mode, selected_sections")
           .eq("user_id", session.user.id)
           .maybeSingle();
 
-        // Step 4: Check planner mode
+        // 4) Mode choice if not set
         if (!settings?.planner_mode) {
           setShowModeModal(true);
           setIsLoading(false);
           return;
         }
 
-        // Step 5: Check if sections are selected
+        // 5) Must have selected sections
         if (!settings?.selected_sections || settings.selected_sections.length === 0) {
           navigate("/preferences", { replace: true });
           return;
         }
 
-        // Step 6: Route based on mode
-        if (settings.planner_mode === 'guided') {
+        // 6) Route into planner (resume handled inside wizard/planner pages)
+        if (settings.planner_mode === "guided") {
           navigate("/wizard/preplanning", { replace: true });
         } else {
           navigate("/preplansteps", { replace: true });
         }
       } catch (error) {
         console.error("Error initializing planner:", error);
-        // On error, try to continue to planner without losing user
+        // Fail open into the planner app if something non-auth breaks
         navigate("/preplansteps", { replace: true });
       }
     };
@@ -75,25 +92,26 @@ export default function PlannerStart() {
     initializePlanner();
   }, [navigate]);
 
-  const handleModeSelected = async (mode: 'guided' | 'free') => {
+  const handleModeSelected = async (mode: "guided" | "free") => {
     setShowModeModal(false);
     setIsLoading(true);
 
     if (!userId) {
-      navigate("/login", { replace: true });
+      navigate("/login?redirect=/planner/start", { replace: true });
       return;
     }
 
     try {
-      // Save the mode
       await supabase
         .from("user_settings")
-        .upsert({
-          user_id: userId,
-          planner_mode: mode
-        }, { onConflict: 'user_id' });
+        .upsert(
+          {
+            user_id: userId,
+            planner_mode: mode,
+          },
+          { onConflict: "user_id" }
+        );
 
-      // Check if sections are selected
       const { data: settings } = await supabase
         .from("user_settings")
         .select("selected_sections")
@@ -105,15 +123,13 @@ export default function PlannerStart() {
         return;
       }
 
-      // Route based on mode
-      if (mode === 'guided') {
+      if (mode === "guided") {
         navigate("/wizard/preplanning", { replace: true });
       } else {
         navigate("/preplansteps", { replace: true });
       }
     } catch (error) {
       console.error("Error saving mode:", error);
-      // On error, proceed to free mode
       navigate("/preplansteps", { replace: true });
     }
   };
@@ -136,8 +152,11 @@ export default function PlannerStart() {
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center space-y-4">
         <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-        <p className="text-muted-foreground">Preparing your planner...</p>
+        <p className="text-muted-foreground">
+          {isLoading ? "Preparing your planner..." : ""}
+        </p>
       </div>
     </div>
   );
 }
+

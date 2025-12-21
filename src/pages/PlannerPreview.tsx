@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -61,8 +63,16 @@ const PREVIEW_SECTIONS = [
 export default function PlannerPreview() {
   const navigate = useNavigate();
 
+  // Safety net: authenticated users should never be in preview mode.
+  // Redirect them to the single planner entry route.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) navigate("/planner/start", { replace: true });
+    });
+  }, [navigate]);
+
   const handleSignIn = () => {
-    navigate("/login");
+    navigate("/login?redirect=/planner/start");
   };
 
   const handleViewPricing = () => {

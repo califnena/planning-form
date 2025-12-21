@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -26,17 +26,30 @@ const Login = () => {
     // First check URL params (e.g., /login?redirect=/app)
     const urlRedirect = searchParams.get("redirect");
     if (urlRedirect) return urlRedirect;
-    
+
     // Then check localStorage for last visited route
     const lastVisited = localStorage.getItem(LAST_VISITED_KEY);
     if (lastVisited) {
       localStorage.removeItem(LAST_VISITED_KEY); // Clear after use
       return lastVisited;
     }
-    
+
     // Default to dashboard
     return "/dashboard";
   };
+
+  // Safety net: if user is already authenticated, never show the login screen.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) return;
+
+      const redirectUrl = getRedirectUrl();
+      if (redirectUrl.startsWith("/login")) return;
+
+      navigate(redirectUrl, { replace: true });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle pending checkout after successful login
   const processPendingCheckout = async (): Promise<boolean> => {

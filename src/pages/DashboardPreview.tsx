@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FileText, Star, BookOpen, Music, Printer, Users, ListChecks, ShoppingBag, Plane, Lock, Eye } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -16,6 +17,11 @@ export default function DashboardPreview() {
   const navigate = useNavigate();
   const location = useLocation();
   const { openLockedModal, saveLastVisitedRoute, isLoggedIn } = usePreviewModeContext();
+
+  // Safety net: authenticated users should never land on preview dashboard.
+  useEffect(() => {
+    if (isLoggedIn) navigate("/dashboard", { replace: true });
+  }, [isLoggedIn, navigate]);
 
   const handleLoginRequired = (redirect: string) => {
     if (isLoggedIn) {
