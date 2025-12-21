@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { GlobalHeader } from "@/components/GlobalHeader";
+import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { PlannerShell } from "@/components/planner/PlannerShell";
 import { usePlanData } from "@/hooks/usePlanData";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
@@ -568,10 +569,18 @@ const PlannerApp = () => {
 
     // Don't show navigation on resources, faq, revisions, preferences, and legalresources sections
     const showNavigation = !["resources", "faq", "revisions", "preferences", "legalresources"].includes(activeSection);
+    
+    // Sections that should NOT be locked in preview mode (read-only sections)
+    const readOnlySections = ["resources", "faq", "legalresources", "preferences"];
+    const shouldLock = !readOnlySections.includes(activeSection);
 
     return (
       <div>
-        {sectionContent}
+        {shouldLock ? (
+          <PreviewModeWrapper>{sectionContent}</PreviewModeWrapper>
+        ) : (
+          sectionContent
+        )}
         {showNavigation && (
           <SectionNavigation
             currentSection={activeSection}

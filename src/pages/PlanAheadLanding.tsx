@@ -138,8 +138,8 @@ export default function PlanAheadLanding() {
     }
   };
 
-  const handlePreviewDashboard = () => {
-    navigate("/dashboard-preview");
+  const handlePreviewPlanner = () => {
+    navigate("/preplansteps");
   };
 
   return (
@@ -357,9 +357,9 @@ export default function PlanAheadLanding() {
                   Best for: People who want clarity and structure.
                 </p>
                 <div className="space-y-2">
-                  <Button onClick={handlePreviewDashboard} variant="outline" className="w-full min-h-[48px] gap-2">
+                  <Button onClick={handlePreviewPlanner} variant="outline" className="w-full min-h-[48px] gap-2">
                     <Eye className="h-4 w-4" />
-                    Preview Planning Menu First
+                    Preview Planner
                   </Button>
                   <Button onClick={handleStartPlanning} disabled={isLoading} className="w-full min-h-[48px]">
                     {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
@@ -416,7 +416,7 @@ export default function PlanAheadLanding() {
                 <p className="text-sm text-muted-foreground mb-4">
                   Explore the planning menu in preview mode. See the structure before committing.
                 </p>
-                <Button onClick={handlePreviewDashboard} variant="outline" className="min-h-[48px]">
+                <Button onClick={handlePreviewPlanner} variant="outline" className="min-h-[48px]">
                   Preview Planning Menu
                 </Button>
               </CardContent>
