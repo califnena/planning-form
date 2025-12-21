@@ -99,6 +99,9 @@ export default function PrePlanSummary() {
         return;
       }
       setUserEmail(user.email || "");
+      
+      // DEBUG: Log user context
+      console.log("[PrePlanSummary] Loading data for user:", user.id);
 
       // Get user's org
       const { data: orgMember } = await supabase
@@ -107,8 +110,12 @@ export default function PrePlanSummary() {
         .eq("user_id", user.id)
         .eq("role", "owner")
         .maybeSingle();
+      
+      // DEBUG: Log org lookup
+      console.log("[PrePlanSummary] Org member lookup:", { userId: user.id, orgMember });
 
       if (!orgMember) {
+        console.log("[PrePlanSummary] No org found for user");
         setLoading(false);
         return;
       }
@@ -120,6 +127,19 @@ export default function PrePlanSummary() {
         .eq("org_id", orgMember.org_id)
         .eq("owner_user_id", user.id)
         .maybeSingle();
+
+      // DEBUG: Log plan data
+      console.log("[PrePlanSummary] Plan query result:", { 
+        orgId: orgMember.org_id, 
+        userId: user.id, 
+        planId: plan?.id,
+        hasAboutMe: !!plan?.about_me_notes,
+        hasFuneral: !!plan?.funeral_wishes_notes,
+        hasFinancial: !!plan?.financial_notes,
+        hasProperty: !!plan?.property_notes,
+        hasLegal: !!plan?.legal_notes,
+        error 
+      });
 
       if (error) throw error;
       

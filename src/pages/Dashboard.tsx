@@ -84,9 +84,16 @@ export default function Dashboard() {
       }
 
       // Load progress and calculate dynamically
+      // DEBUG: Log user context
+      console.log("[Dashboard] Loading data for user:", user.id);
+      
       const {
         data: orgMember
       } = await supabase.from("org_members").select("org_id").eq("user_id", user.id).eq("role", "owner").maybeSingle();
+      
+      // DEBUG: Log org lookup
+      console.log("[Dashboard] Org member lookup:", { userId: user.id, orgMember });
+      
       if (orgMember) {
         // Get user's selected sections from preferences
         const {
@@ -98,6 +105,18 @@ export default function Dashboard() {
           const {
             data: plan
           } = await supabase.from("plans").select("*").eq("org_id", orgMember.org_id).eq("owner_user_id", user.id).maybeSingle();
+          
+          // DEBUG: Log plan data
+          console.log("[Dashboard] Plan query result:", { 
+            orgId: orgMember.org_id, 
+            userId: user.id, 
+            planId: plan?.id,
+            hasAboutMe: !!plan?.about_me_notes,
+            hasFuneral: !!plan?.funeral_wishes_notes,
+            hasFinancial: !!plan?.financial_notes,
+            hasProperty: !!plan?.property_notes,
+            hasLegal: !!plan?.legal_notes
+          });
           if (plan) {
             // Count sections with any data
             let sectionsWithData = 0;
