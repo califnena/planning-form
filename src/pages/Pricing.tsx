@@ -7,6 +7,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { Plus, Minus } from "lucide-react";
 import { useState, useEffect } from "react";
 import mascotCouple from "@/assets/mascot-couple.png";
+import { savePendingCheckout, PendingCheckout } from "@/lib/pendingCheckout";
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -32,10 +33,35 @@ const Pricing = () => {
     localStorage.setItem("landing_text_size", newSize.toString());
   };
 
+  // Map plan IDs to their lookup keys and checkout details
+  const planCheckoutConfig: Record<string, PendingCheckout> = {
+    basic: {
+      lookupKey: "EFABASIC",
+      mode: "payment",
+      successUrl: `${window.location.origin}/purchase-success?type=printable`,
+      cancelUrl: `${window.location.origin}/pricing`,
+    },
+    premium: {
+      lookupKey: "EFAPREMIUM",
+      mode: "subscription",
+      successUrl: `${window.location.origin}/purchase-success?type=premium`,
+      cancelUrl: `${window.location.origin}/pricing`,
+    },
+    vip: {
+      lookupKey: "EFAVIPMONTHLY",
+      mode: "subscription",
+      successUrl: `${window.location.origin}/purchase-success?type=vip`,
+      cancelUrl: `${window.location.origin}/pricing`,
+    },
+  };
+
   const handleChoosePlan = (planType: string) => {
-    // Store selected plan in localStorage
-    localStorage.setItem("selected_plan", planType);
-    // Redirect to signup/login
+    const checkoutConfig = planCheckoutConfig[planType];
+    if (checkoutConfig) {
+      // Save pending checkout so login/signup can continue to Stripe
+      savePendingCheckout(checkoutConfig);
+    }
+    // Redirect to login (which will auto-continue to checkout)
     navigate("/login");
   };
 

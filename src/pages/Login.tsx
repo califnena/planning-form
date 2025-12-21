@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { BackToHomeButton } from "@/components/BackToHomeButton";
 import { useTranslation } from "react-i18next";
+import { getPendingCheckout, clearPendingCheckout, openCheckoutUrl, getProductName } from "@/lib/pendingCheckout";
 
 const LAST_VISITED_KEY = "efa_last_visited_route";
 
@@ -37,6 +38,40 @@ const Login = () => {
     return "/dashboard";
   };
 
+  // Handle pending checkout after successful login
+  const processPendingCheckout = async (): Promise<boolean> => {
+    const pending = getPendingCheckout();
+    if (!pending) return false;
+
+    try {
+      clearPendingCheckout();
+      
+      toast({
+        title: "Continuing to checkout",
+        description: `Redirecting to purchase ${getProductName(pending.lookupKey)}...`,
+      });
+
+      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
+        body: pending,
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        openCheckoutUrl(data.url, (title, desc) => toast({ title, description: desc }));
+        return true; // Indicate we're handling redirect
+      }
+    } catch (error) {
+      console.error("Error processing pending checkout:", error);
+      toast({
+        title: "Checkout Error",
+        description: "Unable to continue to checkout. Please try again.",
+        variant: "destructive",
+      });
+    }
+    return false;
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -50,24 +85,20 @@ const Login = () => {
       if (error) throw error;
 
       if (data.session) {
-        // Check if a plan was selected from pricing page
-        const selectedPlan = localStorage.getItem("selected_plan");
-        
-        if (selectedPlan) {
-          localStorage.removeItem("selected_plan");
-          
-          if (selectedPlan !== "free") {
-            toast({
-              title: t('auth.welcome'),
-              description: t('auth.planSelected', { plan: selectedPlan }),
-            });
-          }
-        } else {
-          toast({
-            title: t('auth.welcomeBack'),
-            description: t('auth.loginSuccess'),
-          });
+        // Check for pending checkout FIRST
+        const handledCheckout = await processPendingCheckout();
+        if (handledCheckout) {
+          setLoading(false);
+          return; // Stripe redirect is handling navigation
         }
+
+        // Remove old selected_plan handling
+        localStorage.removeItem("selected_plan");
+        
+        toast({
+          title: t('auth.welcomeBack'),
+          description: t('auth.loginSuccess'),
+        });
         
         // Redirect to saved route or dashboard
         const redirectUrl = getRedirectUrl();
@@ -109,6 +140,13 @@ const Login = () => {
         });
 
         if (loginError) throw loginError;
+      }
+
+      // Check for pending checkout after test login too
+      const handledCheckout = await processPendingCheckout();
+      if (handledCheckout) {
+        setLoading(false);
+        return;
       }
 
       toast({
