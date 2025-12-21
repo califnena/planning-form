@@ -39,10 +39,10 @@ serve(async (req) => {
       });
     }
 
-    // Use lookup key based on package type
+    // Use lookup key based on package type (matches Stripe price lookup keys)
     const lookupKey = packageType === 'standard' 
-      ? 'STRIPE_STANDARD_SONG_PRICE_ID' 
-      : 'STRIPE_PREMIUM_SONG_PRICE_ID';
+      ? 'STANDARDSONG' 
+      : 'PREMIUMSONG';
     
     // Resolve active price by lookup key
     const prices = await stripe.prices.list({
