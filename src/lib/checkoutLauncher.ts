@@ -28,6 +28,42 @@ export type CheckoutResult = {
 };
 
 /**
+ * Get the last checkout URL for recovery
+ */
+export function getLastCheckoutUrl(): string | null {
+  return localStorage.getItem("efa_last_checkout_url");
+}
+
+/**
+ * Safely open Stripe checkout URL
+ * Returns true if successful, false if blocked
+ */
+function openStripeCheckoutSafely(checkoutUrl: string): boolean {
+  if (!checkoutUrl || !checkoutUrl.includes("stripe.com")) {
+    return false;
+  }
+
+  // Store for recovery
+  localStorage.setItem("efa_last_checkout_url", checkoutUrl);
+  localStorage.setItem("efa_checkout_return_url", window.location.pathname);
+
+  // Try opening in a new tab first (reduces preview/CSP issues)
+  const newTab = window.open(checkoutUrl, "_blank", "noopener,noreferrer");
+
+  // If popups blocked, fall back to same-tab redirect
+  if (!newTab) {
+    try {
+      window.location.href = checkoutUrl;
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
  * Launch Stripe Checkout with proper handling for logged-out users
  * and error fallbacks.
  */
@@ -80,11 +116,21 @@ export async function launchCheckout({
       throw new Error('No checkout URL returned from server');
     }
 
-    // Store the URL in case user needs to retry
-    sessionStorage.setItem('efa_last_checkout_url', data.url);
-
-    // Redirect to Stripe hosted checkout (top-level navigation)
-    window.location.href = data.url;
+    // Try to open Stripe checkout safely
+    const opened = openStripeCheckoutSafely(data.url);
+    
+    if (!opened) {
+      toast.error("Payment page blocked", {
+        description: "Your browser blocked the payment window. Visit Payment Help for troubleshooting steps.",
+        action: {
+          label: "Get Help",
+          onClick: () => navigate('/payment-help'),
+        },
+        duration: 10000,
+      });
+      onLoadingChange?.(false);
+      return { success: false, redirected: false, error: "Payment page blocked" };
+    }
     
     return { success: true, redirected: true, stripeUrl: data.url };
 
@@ -92,14 +138,20 @@ export async function launchCheckout({
     console.error('Checkout launch error:', error);
     
     // Show error with helpful fallback options
-    const lastUrl = sessionStorage.getItem('efa_last_checkout_url');
+    const lastUrl = getLastCheckoutUrl();
     
     toast.error("Unable to start checkout", {
-      description: "Please try again. If the payment page looks blank, disable ad blockers or try a different browser.",
-      action: lastUrl ? {
-        label: "Open in new tab",
-        onClick: () => window.open(lastUrl, '_blank'),
-      } : undefined,
+      description: "Please try again. If the payment page looks blank, visit Payment Help.",
+      action: {
+        label: lastUrl ? "Open in new tab" : "Get Help",
+        onClick: () => {
+          if (lastUrl) {
+            window.open(lastUrl, '_blank');
+          } else {
+            navigate('/payment-help');
+          }
+        },
+      },
       duration: 10000,
     });
 
@@ -112,7 +164,7 @@ export async function launchCheckout({
  * Retry checkout with the last known Stripe URL
  */
 export function retryLastCheckout(): boolean {
-  const lastUrl = sessionStorage.getItem('efa_last_checkout_url');
+  const lastUrl = getLastCheckoutUrl();
   if (lastUrl) {
     window.open(lastUrl, '_blank');
     return true;
