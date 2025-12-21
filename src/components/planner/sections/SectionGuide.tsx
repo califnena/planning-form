@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Download, Eye, FileText, ExternalLink, Scale } from "lucide-react";
+import { Download, Eye, FileText, ExternalLink, Scale, BookOpen, CheckSquare, Maximize2 } from "lucide-react";
 import { useState } from "react";
 
 interface Guide {
@@ -38,6 +38,7 @@ const guides: Guide[] = [
 
 export const SectionGuide = () => {
   const [viewingGuide, setViewingGuide] = useState<Guide | null>(null);
+  const [activeEmbed, setActiveEmbed] = useState<'guide' | 'checklist' | null>(null);
 
   const handleDownload = (guide: Guide) => {
     const link = document.createElement('a');
@@ -55,6 +56,59 @@ export const SectionGuide = () => {
   const handleCloseViewer = () => {
     setViewingGuide(null);
   };
+
+  const handleFullScreen = (url: string) => {
+    window.open(url, "_blank");
+  };
+
+  // Interactive Guide/Checklist Viewer
+  if (activeEmbed) {
+    const isGuide = activeEmbed === 'guide';
+    const embedUrl = isGuide 
+      ? "https://gamma.app/embed/om4wcs6irh1s18e"
+      : "https://gamma.app/embed/plsn9a9j7cvzdh5";
+    const title = isGuide ? "Pre-Planning Guide" : "Pre-Planning Checklist";
+    
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-start">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+              {isGuide ? <BookOpen className="h-6 w-6 text-blue-600" /> : <CheckSquare className="h-6 w-6 text-green-600" />}
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold">{title}</h2>
+              <p className="text-muted-foreground">
+                {isGuide 
+                  ? "Learn how funeral pre-planning works and what decisions matter most"
+                  : "See what you'll be documenting in your plan"
+                }
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={() => handleFullScreen(embedUrl)} variant="outline" size="sm" className="gap-2">
+              <Maximize2 className="h-4 w-4" />
+              Full Screen
+            </Button>
+            <Button onClick={() => setActiveEmbed(null)} variant="default">
+              Back to Guides
+            </Button>
+          </div>
+        </div>
+
+        <div className="border border-border rounded-lg overflow-hidden bg-muted/30">
+          <iframe
+            src={embedUrl}
+            style={{ width: '100%', height: 'calc(100vh - 300px)', minHeight: '500px' }}
+            allow="fullscreen"
+            title={title}
+            className="border-0"
+          />
+        </div>
+      </div>
+    );
+  }
 
   if (viewingGuide) {
     return (
@@ -91,50 +145,115 @@ export const SectionGuide = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">📚 Guides</h2>
+        <h2 className="text-2xl font-bold mb-2">📚 Guides & Resources</h2>
         <p className="text-muted-foreground">
           Comprehensive guidance and resources for end-of-life planning. View or download these helpful guides.
         </p>
       </div>
 
+      {/* Interactive Pre-Planning Guide & Checklist */}
       <div className="grid md:grid-cols-2 gap-6">
-        {guides.map((guide) => (
-          <Card key={guide.id} className="flex flex-col">
-            <CardHeader>
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <FileText className="h-6 w-6 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <CardTitle className="text-lg mb-2">{guide.title}</CardTitle>
-                  <CardDescription className="text-sm">
-                    {guide.description}
-                  </CardDescription>
-                </div>
+        <Card className="border-2 border-blue-200 bg-blue-50/50 hover:border-blue-300 transition-colors cursor-pointer group" onClick={() => setActiveEmbed('guide')}>
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+                <BookOpen className="h-7 w-7 text-blue-600" />
               </div>
-            </CardHeader>
-            <CardContent className="flex-1 flex items-end">
-              <div className="flex gap-2 w-full">
-                <Button 
-                  onClick={() => handleView(guide)} 
-                  className="flex-1 gap-2"
-                  variant="default"
-                >
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-700 transition-colors">
+                  Interactive Pre-Planning Guide
+                </h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  A walk-through explaining the sections, choices, and how families typically use this information.
+                </p>
+                <Button variant="outline" size="sm" className="gap-2">
                   <Eye className="h-4 w-4" />
                   View Guide
                 </Button>
-                <Button 
-                  onClick={() => handleDownload(guide)} 
-                  className="flex-1 gap-2"
-                  variant="outline"
-                >
-                  <Download className="h-4 w-4" />
-                  Download
-                </Button>
               </div>
-            </CardContent>
-          </Card>
-        ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-2 border-green-200 bg-green-50/50 hover:border-green-300 transition-colors cursor-pointer group" onClick={() => setActiveEmbed('checklist')}>
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 group-hover:bg-green-200 transition-colors">
+                <CheckSquare className="h-7 w-7 text-green-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg mb-2 group-hover:text-green-700 transition-colors">
+                  Pre-Planning Checklist
+                </h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  See what you'll be documenting—helpful to review before you begin planning.
+                </p>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Eye className="h-4 w-4" />
+                    View Checklist
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Downloadable Checklist */}
+      <div className="flex justify-center">
+        <a 
+          href="/checklists/Pre-Planning-Checklist-2.png" 
+          download="Pre-Planning-Checklist.png"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium"
+        >
+          <Download className="h-4 w-4" />
+          Download Checklist as Image
+        </a>
+      </div>
+
+      {/* PDF Guides Section */}
+      <div className="pt-4">
+        <h3 className="text-lg font-semibold mb-4">Downloadable PDF Guides</h3>
+        <div className="grid md:grid-cols-2 gap-6">
+          {guides.map((guide) => (
+            <Card key={guide.id} className="flex flex-col">
+              <CardHeader>
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <FileText className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-lg mb-2">{guide.title}</CardTitle>
+                    <CardDescription className="text-sm">
+                      {guide.description}
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="flex-1 flex items-end">
+                <div className="flex gap-2 w-full">
+                  <Button 
+                    onClick={() => handleView(guide)} 
+                    className="flex-1 gap-2"
+                    variant="default"
+                  >
+                    <Eye className="h-4 w-4" />
+                    View Guide
+                  </Button>
+                  <Button 
+                    onClick={() => handleDownload(guide)} 
+                    className="flex-1 gap-2"
+                    variant="outline"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
 
       {/* Legal Documents & State-Specific Forms Section */}
