@@ -336,7 +336,7 @@ const Landing = () => {
           
           <div className="grid md:grid-cols-3 gap-8">
             {/* Compassionate Guidance */}
-            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/pricing")}>
+            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/vip-coach")}>
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg">
