@@ -61,13 +61,13 @@ export default function DashboardPreview() {
           </div>
         </div>
 
-        {/* STEP 1 - Plan Ahead Planner (Preview) */}
+        {/* STEP 1 - My Planning Steps (Preview) */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg shadow-md">
               1
             </div>
-            <h2 className="text-2xl font-bold">Plan Ahead Planner</h2>
+            <h2 className="text-2xl font-bold">My Planning Steps</h2>
           </div>
           
           <Card className="p-6">
@@ -85,7 +85,7 @@ export default function DashboardPreview() {
                   <div className="flex flex-wrap gap-2">
                     <Button onClick={() => handleLoginRequired("/app")} variant="outline" className="gap-2 opacity-70">
                       <Lock className="h-4 w-4" />
-                      Open My Planner
+                      Begin Planning
                       <span className="text-xs text-muted-foreground">(Login required)</span>
                     </Button>
                     <Button onClick={() => handleLoginRequired("/app")} variant="outline" className="gap-2 opacity-70">
@@ -99,13 +99,13 @@ export default function DashboardPreview() {
 
               <div className="border-t pt-6" />
 
-              {/* Printable Version */}
+              {/* Printable Documents */}
               <div className="flex items-start gap-4">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Printer className="h-4 w-4 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold mb-2">Printable Version</h3>
+                  <h3 className="font-semibold mb-2">Printable Documents</h3>
                   <p className="text-sm text-muted-foreground mb-4">
                     Prefer paper? Purchase a professionally formatted printable form.
                   </p>
@@ -117,18 +117,18 @@ export default function DashboardPreview() {
 
               <div className="border-t pt-6" />
 
-              {/* Do It For You */}
+              {/* Do-It-For-You Planning */}
               <div className="flex items-start gap-4">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Users className="h-4 w-4 text-primary" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-semibold">Done-For-You Service</h3>
+                    <h3 className="font-semibold">Do-It-For-You Planning</h3>
                     <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded">Popular</span>
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Let us guide you through the process with personalized assistance.
+                    We help organize your wishes and complete the planning with you.
                   </p>
                   <Button onClick={() => navigate("/plan-ahead")} variant="outline">
                     Learn More
@@ -139,13 +139,13 @@ export default function DashboardPreview() {
           </Card>
         </div>
 
-        {/* STEP 2 - Compassionate Guidance */}
+        {/* STEP 2 - VIP Planning Support */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg shadow-md">
               2
             </div>
-            <h2 className="text-2xl font-bold">Compassionate Guidance & Support</h2>
+            <h2 className="text-2xl font-bold">VIP Planning Support</h2>
           </div>
           
           <Card className="p-6 bg-amber-50/50 border-amber-200">
@@ -154,9 +154,9 @@ export default function DashboardPreview() {
                 <Star className="h-4 w-4 text-amber-600" />
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-semibold mb-2">For Those Who Want Reassurance, Not Just Forms</h3>
+                <h3 className="text-xl font-semibold mb-2">One-on-one guidance through your planning process</h3>
                 <p className="text-muted-foreground mb-4">
-                  Personal support goes beyond planning—offering compassionate check-ins and steady guidance.
+                  VIP Planning Support goes beyond planning—offering compassionate check-ins and steady guidance.
                 </p>
                 <ul className="space-y-2 mb-4 text-muted-foreground">
                   <li className="flex items-start gap-2">
@@ -173,7 +173,7 @@ export default function DashboardPreview() {
                   </li>
                 </ul>
                 <Button onClick={() => navigate("/vip-coach")} variant="outline" className="min-h-[48px]">
-                  Talk With a Planning Guide
+                  Add VIP Planning Support
                 </Button>
               </div>
             </div>
@@ -284,13 +284,13 @@ export default function DashboardPreview() {
           </Card>
         </div>
 
-        {/* Education & Support */}
+        {/* Education & Planning Support */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Education & Support</h2>
+          <h2 className="text-2xl font-bold mb-6">Helpful Guides & Planning Support</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { icon: BookOpen, label: "Resources", href: "/resources" },
-              { icon: ListChecks, label: "Legal Forms", href: "/legal-forms" },
+              { icon: BookOpen, label: "Helpful Guides", href: "/resources" },
+              { icon: ListChecks, label: "Planning Forms", href: "/legal-forms" },
               { icon: Users, label: "FAQ", href: "/faq" },
               { icon: FileText, label: "Contact", href: "/contact" },
             ].map((item, i) => (

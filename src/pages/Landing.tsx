@@ -103,7 +103,7 @@ const Landing = () => {
           {userName && <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 max-w-md mx-auto">
               <p className="text-foreground font-medium">Welcome back, {userName}!</p>
               <Button onClick={() => navigate("/dashboard")} className="mt-2">
-                Continue to Your Dashboard →
+                Continue to Your Planning Menu →
               </Button>
             </div>}
           

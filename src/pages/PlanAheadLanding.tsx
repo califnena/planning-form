@@ -355,11 +355,11 @@ export default function PlanAheadLanding() {
                 <div className="space-y-2">
                   <Button onClick={handlePreviewDashboard} variant="outline" className="w-full min-h-[48px] gap-2">
                     <Eye className="h-4 w-4" />
-                    Preview Dashboard First
+                    Preview Planning Menu First
                   </Button>
                   <Button onClick={handleStartPlanning} disabled={isLoading} className="w-full min-h-[48px]">
                     {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    Access Digital Planner
+                    Begin Planning
                   </Button>
                 </div>
                 <p className="text-xs text-center text-muted-foreground mt-2">
@@ -376,14 +376,14 @@ export default function PlanAheadLanding() {
                     <HandHelping className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">Done-For-You Planning</CardTitle>
+                    <CardTitle className="text-lg">Do-It-For-You Planning</CardTitle>
                     <span className="text-xs text-muted-foreground">One-time service</span>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-4">
-                  For those who do not want to manage the process themselves.
+                  We help organize your wishes and complete the planning with you.
                 </p>
                 <ul className="space-y-2 mb-4 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
@@ -399,7 +399,7 @@ export default function PlanAheadLanding() {
                   Best for: Busy individuals who want hands-on help.
                 </p>
                 <Button onClick={handlePurchaseDoItForYou} variant="outline" className="w-full min-h-[48px]">
-                  Get Started
+                  Request Do-It-For-You Planning
                 </Button>
               </CardContent>
             </Card>
@@ -410,10 +410,10 @@ export default function PlanAheadLanding() {
                 <Eye className="h-8 w-8 text-muted-foreground mb-3" />
                 <h3 className="font-semibold mb-2">Not Sure Yet?</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Explore the dashboard in preview mode. See the structure before committing.
+                  Explore the planning menu in preview mode. See the structure before committing.
                 </p>
                 <Button onClick={handlePreviewDashboard} variant="outline" className="min-h-[48px]">
-                  Preview Dashboard
+                  Preview Planning Menu
                 </Button>
               </CardContent>
             </Card>
@@ -468,21 +468,21 @@ export default function PlanAheadLanding() {
                     <Star className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">Compassionate Guidance</CardTitle>
+                    <CardTitle className="text-lg">VIP Planning Support</CardTitle>
                     <span className="text-xs text-muted-foreground">Optional upgrade</span>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-4">
-                  One-on-one support with a planning guide. Calm explanations without sales pressure.
+                  One-on-one guidance through your planning process.
                 </p>
                 <p className="text-xs text-muted-foreground mb-4 italic">
                   Best for: Anyone who wants a human voice during a sensitive process.
                 </p>
                 <Link to="/vip-coach">
                   <Button variant="outline" className="w-full min-h-[48px]">
-                    Talk With a Planning Guide
+                    Add VIP Planning Support
                   </Button>
                 </Link>
               </CardContent>
