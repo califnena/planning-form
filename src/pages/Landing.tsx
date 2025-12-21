@@ -509,27 +509,11 @@ const Landing = () => {
                 <h3 className="text-xl font-semibold text-foreground">
                   {t('landing.helpfulArticles')}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t('landing.helpfulArticlesDesc')}
-                </p>
+                
               </CardContent>
             </Card>
 
-            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/legal-documents")}>
-              <CardContent className="pt-8 pb-8 text-center space-y-4">
-                <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <Scale className="h-8 w-8 text-secondary-foreground" />
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  {t('landing.legalDocuments')}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t('landing.legalDocumentsDesc')}
-                </p>
-              </CardContent>
-            </Card>
+            
 
             <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/faq")}>
               <CardContent className="pt-8 pb-8 text-center space-y-4">
