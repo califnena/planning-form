@@ -128,8 +128,8 @@ export default function Dashboard() {
   const checkVIPAccess = checkVIPAccessFn;
   const checkPrintableAccess = checkPrintableAccessFn;
   const handleStartDigitalPlanner = () => {
-    // Single entry route (auth + gating handled inside /planner/start)
-    navigate('/planner/start');
+    // Start Digital Planner → go to /plan-ahead entry
+    navigate('/plan-ahead');
   };
 
   const handlePlannerModeSelected = async (mode: 'guided' | 'free') => {
