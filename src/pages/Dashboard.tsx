@@ -458,11 +458,11 @@ export default function Dashboard() {
   };
   return <AuthenticatedLayout>
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* Welcome Header - Centered */}
+        {/* Planning Menu Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-2">{t('dashboard.welcomeTitle')}</h1>
+          <h1 className="text-3xl font-bold mb-2">Your Planning Menu</h1>
           <p className="text-muted-foreground max-w-4xl mx-auto mb-3">
-            {t('dashboard.welcomeSubtitle')}
+            This is your planning menu. You can explore freely. Sign in only when you want to save, download, or continue.
           </p>
           <p className="text-sm text-muted-foreground/80 max-w-3xl mx-auto italic">
             {t('dashboard.autoSaveNote')}
