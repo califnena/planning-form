@@ -18,6 +18,18 @@ export const STRIPE_LOOKUP_KEYS = {
   SONG_PREMIUM: 'PREMIUMSONG',
 } as const;
 
+// All canonical lookup keys - the source of truth for validation
+export const ALL_CANONICAL_LOOKUP_KEYS = [
+  'EFABASIC',
+  'EFAPREMIUM',
+  'EFABINDER',
+  'EFAVIPMONTHLY',
+  'EFAVIPYEAR',
+  'EFADOFORU',
+  'STANDARDSONG',
+  'PREMIUMSONG',
+] as const;
+
 export type StripeLookupKey = typeof STRIPE_LOOKUP_KEYS[keyof typeof STRIPE_LOOKUP_KEYS];
 
 // All lookup keys as an array - used for validation

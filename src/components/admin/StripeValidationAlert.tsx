@@ -107,7 +107,7 @@ export const StripeValidationAlert = ({ lookupKeys, isAdmin }: StripeValidationA
       return (
         <Alert className="mb-6 border-amber-300 bg-amber-50 dark:bg-amber-950/30">
           <AlertTriangle className="h-4 w-4 text-amber-600" />
-          <AlertTitle className="text-amber-800 dark:text-amber-200">Stripe Setup Issue</AlertTitle>
+          <AlertTitle className="text-amber-800 dark:text-amber-200">Stripe setup issue detected</AlertTitle>
           <AlertDescription className="text-amber-700 dark:text-amber-300 mt-3 space-y-3">
             {validationResult.missing.length > 0 && (
               <div>
@@ -122,7 +122,7 @@ export const StripeValidationAlert = ({ lookupKeys, isAdmin }: StripeValidationA
             
             {validationResult.inactive.length > 0 && (
               <div>
-                <strong>Inactive lookup keys:</strong>
+                <strong>Inactive prices:</strong>
                 <ul className="list-disc list-inside mt-1">
                   {validationResult.inactive.map(key => (
                     <li key={key} className="font-mono text-sm">{key}</li>
@@ -133,19 +133,19 @@ export const StripeValidationAlert = ({ lookupKeys, isAdmin }: StripeValidationA
             
             {validationResult.duplicates.length > 0 && (
               <div>
-                <strong>Duplicate lookup keys detected:</strong>
+                <strong>Duplicate active prices:</strong>
                 <ul className="list-disc list-inside mt-1">
                   {validationResult.duplicates.map(dup => (
                     <li key={dup.lookupKey} className="font-mono text-sm">
-                      {dup.lookupKey} ({dup.count} prices)
+                      {dup.lookupKey} ({dup.count} active prices found)
                     </li>
                   ))}
                 </ul>
               </div>
             )}
 
-            <p className="text-sm mt-4">
-              Fix these in your Stripe Dashboard and refresh this page.
+            <p className="text-sm mt-4 text-amber-600 dark:text-amber-400">
+              Fix these in Stripe and refresh this page.
             </p>
             
             <Button variant="outline" size="sm" onClick={validate} className="mt-2">

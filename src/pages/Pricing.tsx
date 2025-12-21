@@ -45,7 +45,8 @@ function formatMoney(unitAmount: number | null | undefined, currency?: string) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: (currency || "usd").toUpperCase(),
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(amount);
 }
 
