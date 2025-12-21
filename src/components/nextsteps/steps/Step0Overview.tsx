@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import mascotImage from "@/assets/mascot-couple.png";
 import { useTranslation } from "react-i18next";
+import { PrePlanInfoBanner } from "@/components/summary/PrePlanInfoBanner";
 
 interface Step0OverviewProps {
   formData: any;
@@ -109,6 +110,16 @@ export function Step0Overview({ formData, onSave, planPreparedFor }: Step0Overvi
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
+      {/* Pre-Planning Info Banner */}
+      <PrePlanInfoBanner 
+        onUseInfo={() => {
+          // Pre-fill the prepared for field if available
+          if (planPreparedFor) {
+            setPreparedFor(planPreparedFor);
+          }
+        }}
+      />
+
       <div className="flex justify-end">
         <Button 
           variant="outline" 

@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
-import { FileText, Star, BookOpen, Scale, Phone, Music, Printer, Users, ListChecks, ShoppingBag, Lightbulb, CalendarDays, Plane } from "lucide-react";
+import { FileText, Star, BookOpen, Scale, Phone, Music, Printer, Users, ListChecks, ShoppingBag, Lightbulb, CalendarDays, Plane, ClipboardList } from "lucide-react";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { checkPaidAccess as checkPaidAccessFn, checkVIPAccess as checkVIPAccessF
 import { ChecklistsSection } from "@/components/dashboard/ChecklistsSection";
 import { ResumeCard } from "@/components/dashboard/ResumeCard";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
+
 export default function Dashboard() {
   const {
     t
@@ -506,6 +507,24 @@ export default function Dashboard() {
               </div>)}
           </div>
         </div>
+
+        {/* My Pre-Planning Summary Card */}
+        <Card className="p-6 mb-8 border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-full bg-primary/10">
+              <ClipboardList className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold">My Pre-Planning Summary</h3>
+              <p className="text-sm text-muted-foreground">
+                Review, download, or share a summary of your planning information
+              </p>
+            </div>
+            <Button onClick={() => navigate("/preplan-summary")} variant="outline">
+              View Summary
+            </Button>
+          </div>
+        </Card>
 
         {/* STEP 1 - My Planning Steps */}
         <div className="mb-12">

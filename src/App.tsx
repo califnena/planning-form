@@ -66,6 +66,7 @@ import DoItForYouIntakeSubmitted from "./pages/DoItForYouIntakeSubmitted";
 import PaymentHelp from "./pages/PaymentHelp";
 import ClaireFAQ from "./pages/ClaireFAQ";
 import PlannerPreview from "./pages/PlannerPreview";
+import PrePlanSummary from "./pages/PrePlanSummary";
 
 const queryClient = new QueryClient();
 
@@ -141,6 +142,7 @@ const App = () => (
                       <Route path="/after-death" element={<AfterDeathLanding />} />
                       <Route path="/plan-ahead" element={<PlanAheadLanding />} />
                       <Route path="/planner-preview" element={<PlannerPreview />} />
+                      <Route path="/preplan-summary" element={<PrePlanSummary />} />
                       <Route path="/plan-ahead/guide" element={<PlanAheadGuideViewer />} />
                       <Route path="/preferences" element={<Settings />} />
                       <Route path="/settings" element={<Settings />} />
