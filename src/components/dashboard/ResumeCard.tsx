@@ -80,12 +80,8 @@ export const ResumeCard = () => {
     : 0;
 
   const handleContinue = () => {
-    // Navigate based on planner mode
-    if (progress.plannerMode === 'guided') {
-      navigate('/wizard/preplanning');
-    } else {
-      navigate('/preplansteps');
-    }
+    // Always route to /plan-ahead with resume flag - it handles the redirect
+    navigate('/plan-ahead?resume=1');
   };
 
   return (

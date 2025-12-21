@@ -5,10 +5,43 @@ import { TextSizeToggle } from '@/components/TextSizeToggle';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { ShareLinksManager } from '@/components/sharing/ShareLinksManager';
+import { LanguageSelector } from '@/components/LanguageSelector';
+import { useTextSize, TextSizePreset } from '@/contexts/TextSizeContext';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+
+// Text size preset selector component
+const TextSizePresetSelector = () => {
+  const { preset, setPreset } = useTextSize();
+  
+  const presets: { value: TextSizePreset; label: string; description: string }[] = [
+    { value: 'compact', label: 'Compact', description: 'Smaller text, tighter spacing' },
+    { value: 'standard', label: 'Standard', description: 'Default size and spacing' },
+    { value: 'senior', label: 'Senior', description: 'Larger text, more spacing' },
+    { value: 'easy-view', label: 'Easy View', description: 'Largest text, maximum readability' },
+  ];
+
+  return (
+    <RadioGroup value={preset} onValueChange={(value) => setPreset(value as TextSizePreset)}>
+      <div className="grid gap-3">
+        {presets.map((p) => (
+          <div key={p.value} className="flex items-center space-x-3">
+            <RadioGroupItem value={p.value} id={p.value} />
+            <div className="flex-1">
+              <Label htmlFor={p.value} className="text-base font-medium cursor-pointer">
+                {p.label}
+              </Label>
+              <p className="text-sm text-muted-foreground">{p.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </RadioGroup>
+  );
+};
 
 const Settings = () => {
   const [user, setUser] = useState<any>(null);
@@ -129,31 +162,26 @@ const Settings = () => {
 
           <TabsContent value="accessibility" className="space-y-4">
             <div className="bg-card border rounded-lg p-6 space-y-6">
+              {/* Language Section */}
               <div>
-                <Label className="text-base font-semibold">Text Size</Label>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Adjust the text size for better readability across the application.
-                </p>
-                <TextSizeToggle />
-              </div>
-              
-              <div className="border-t pt-6">
-                <div className="flex items-start space-x-3">
-                  <Checkbox
-                    id="senior-view"
-                    className="mt-1"
-                  />
-                  <div className="flex-1">
-                    <Label htmlFor="senior-view" className="text-base font-semibold cursor-pointer">
-                      Senior View
-                    </Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Enable a simplified, senior-friendly interface with larger buttons, clearer labels, and reduced cognitive load. Designed specifically for elderly users and those with vision challenges.
-                    </p>
-                  </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Globe className="h-5 w-5 text-muted-foreground" />
+                  <Label className="text-base font-semibold">Language</Label>
                 </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Choose your preferred language. Applies across the app.
+                </p>
+                <LanguageSelector />
               </div>
 
+              <div className="border-t pt-6">
+                <Label className="text-base font-semibold">Text Size Preset</Label>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Choose a text size preset for better readability across the application.
+                </p>
+                <TextSizePresetSelector />
+              </div>
+              
               <div className="border-t pt-6">
                 <div className="flex items-start space-x-3">
                   <Checkbox

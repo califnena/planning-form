@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,13 +23,64 @@ import {
 export default function PlanAheadLanding() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [learnOpen, setLearnOpen] = useState(false);
   const [hasPlannerProgress, setHasPlannerProgress] = useState(false);
+  const [plannerMode, setPlannerMode] = useState<string | null>(null);
+  const [isResuming, setIsResuming] = useState(false);
   const { isLoggedIn, hasPaidAccess, hasPrintableAccess, openLockedModal, saveLastVisitedRoute } = usePreviewModeContext();
 
-  // Check for planner progress on mount
+  // Handle resume logic
+  useEffect(() => {
+    const handleResume = async () => {
+      const resume = searchParams.get('resume');
+      if (resume !== '1') return;
+
+      // Step 1: Confirm auth
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        // Redirect to login with return URL
+        navigate('/login?return=/plan-ahead?resume=1');
+        return;
+      }
+
+      setIsResuming(true);
+
+      // Step 2: Get user's planner settings
+      const { data: settings } = await supabase
+        .from('user_settings')
+        .select('planner_mode, selected_sections, last_step_index, completed_sections')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const settingsData = settings as {
+        planner_mode?: string;
+        selected_sections?: string[];
+        last_step_index?: number;
+        completed_sections?: string[];
+      } | null;
+
+      // Step 3: Determine where to redirect
+      if (settingsData?.planner_mode === 'guided') {
+        // Guided mode → wizard
+        navigate('/wizard/preplanning');
+      } else if (settingsData?.selected_sections?.length) {
+        // Free mode → preplansteps
+        navigate('/preplansteps');
+      } else {
+        // No progress, fallback to planner preview
+        navigate('/planner-preview');
+      }
+    };
+
+    if (isLoggedIn !== undefined) {
+      handleResume();
+    }
+  }, [searchParams, isLoggedIn, navigate]);
+
+  // Check for planner progress on mount (for button labels)
   useEffect(() => {
     const checkProgress = async () => {
       if (!isLoggedIn) return;
@@ -45,6 +96,7 @@ export default function PlanAheadLanding() {
       
       const hasProgress = !!(settings?.planner_mode || settings?.selected_sections);
       setHasPlannerProgress(hasProgress);
+      setPlannerMode(settings?.planner_mode ?? null);
     };
     checkProgress();
   }, [isLoggedIn]);
@@ -66,13 +118,25 @@ export default function PlanAheadLanding() {
 
   const handleStartPlanning = () => {
     if (isLoggedIn && hasPlannerProgress) {
-      // Continue Planning → go to dashboard
-      navigate("/dashboard");
+      // Continue Planning → go to plan-ahead with resume flag
+      navigate("/plan-ahead?resume=1");
     } else {
       // Start Digital Planner → go to planner preview
       navigate("/planner-preview");
     }
   };
+
+  // Show loading state when resuming
+  if (isResuming) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground">Resuming where you left off...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleUseStepByStepPlanner = async () => {
     const successUrl = `${window.location.origin}/purchase-success?type=planner`;
