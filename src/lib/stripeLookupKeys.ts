@@ -11,9 +11,9 @@ export const STRIPE_LOOKUP_KEYS = {
   DO_IT_FOR_YOU: 'EFADOFORU',
   BINDER: 'EFABINDER',
   
-  // Custom Songs (using existing env var pattern)
-  SONG_STANDARD: 'STRIPE_STANDARD_SONG_PRICE_ID',
-  SONG_PREMIUM: 'STRIPE_PREMIUM_SONG_PRICE_ID',
+  // Custom Songs
+  SONG_STANDARD: 'STANDARDSONG',
+  SONG_PREMIUM: 'PREMIUMSONG',
 } as const;
 
 export type StripeLookupKey = typeof STRIPE_LOOKUP_KEYS[keyof typeof STRIPE_LOOKUP_KEYS];
