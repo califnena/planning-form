@@ -9,6 +9,8 @@ import { useState, useEffect, useMemo } from "react";
 import mascotCouple from "@/assets/mascot-couple.png";
 import { launchCheckout } from "@/lib/checkoutLauncher";
 import { supabase } from "@/integrations/supabase/client";
+import { AppFooter } from "@/components/AppFooter";
+import { AssistantWidget } from "@/components/assistant/AssistantWidget";
 
 type StripePriceInfo = {
   lookupKey: string;
@@ -468,33 +470,11 @@ const Pricing = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-muted/30">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex flex-wrap justify-center gap-4 text-sm">
-              <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
-                Home
-              </Link>
-              <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
-                Dashboard
-              </Link>
-              <Link to="/subscription" className="text-muted-foreground hover:text-foreground transition-colors">
-                View Subscription
-              </Link>
-              <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
-                Contact Us
-              </Link>
-              <Link to="/payment-help" className="text-muted-foreground hover:text-foreground transition-colors">
-                Payment Help
-              </Link>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} Everlasting Funeral Advisors. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      {/* Global Footer */}
+      <AppFooter />
+
+      {/* Assistant Widget */}
+      <AssistantWidget />
     </div>
   );
 };
