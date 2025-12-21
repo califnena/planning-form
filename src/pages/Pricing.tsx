@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Loader2, Check, X, ChevronDown } from "lucide-react";
+import { CheckCircle, Loader2, Check, X, ChevronDown, User } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Plus, Minus } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import mascotCouple from "@/assets/mascot-couple.png";
 import { launchCheckout } from "@/lib/checkoutLauncher";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +29,13 @@ type StripePriceInfo = {
 type StripePricesMap = Record<string, StripePriceInfo>;
 
 const PRICING_LOOKUP_KEYS = ["EFAPREMIUM", "EFABASIC", "EFABINDER"];
+
+// Map lookup keys to plan IDs
+const LOOKUP_KEY_TO_PLAN_ID: Record<string, string> = {
+  "EFAPREMIUM": "digital",
+  "EFABASIC": "printable",
+  "EFABINDER": "binder"
+};
 
 function formatMoney(unitAmount: number | null | undefined, currency?: string) {
   if (unitAmount == null) return "";
@@ -90,11 +97,16 @@ const FAQS = [
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const planCardsRef = useRef<HTMLDivElement>(null);
   const [textSize, setTextSize] = useState<number>(100);
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [loadingPrices, setLoadingPrices] = useState(true);
   const [stripePrices, setStripePrices] = useState<StripePricesMap>({});
   const [recommendedPlan, setRecommendedPlan] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [currentPlanId, setCurrentPlanId] = useState<string | null>(null);
+  const [currentPlanName, setCurrentPlanName] = useState<string | null>(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState<boolean>(true);
 
   // Core plans - simplified to 3
   const plans = [
@@ -157,6 +169,51 @@ const Pricing = () => {
   // Check for recommendation
   useEffect(() => {
     setRecommendedPlan(getRecommendedPlan());
+  }, []);
+
+  // Check auth state and current plan
+  useEffect(() => {
+    const checkAuthAndPlan = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          setIsLoggedIn(true);
+          
+          // Check for active purchases to determine current plan
+          const { data: purchases } = await supabase
+            .from('purchases')
+            .select('product_lookup_key, status')
+            .eq('user_id', user.id)
+            .eq('status', 'completed')
+            .order('purchased_at', { ascending: false })
+            .limit(1);
+          
+          if (purchases && purchases.length > 0) {
+            const lookupKey = purchases[0].product_lookup_key;
+            const planId = LOOKUP_KEY_TO_PLAN_ID[lookupKey];
+            if (planId) {
+              setCurrentPlanId(planId);
+              // Set display name
+              const planNames: Record<string, string> = {
+                digital: "Digital Planner",
+                printable: "Printable Planner",
+                binder: "Physical Binder"
+              };
+              setCurrentPlanName(planNames[planId] || null);
+            }
+          }
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error('Error checking auth/plan:', error);
+      } finally {
+        setIsLoadingAuth(false);
+      }
+    };
+
+    checkAuthAndPlan();
   }, []);
 
   // Load Stripe prices
@@ -242,14 +299,46 @@ const Pricing = () => {
               </Button>
             </div>
             <LanguageSelector />
-            <Link to="/login">
-              <Button variant="outline" size="lg">Sign In</Button>
-            </Link>
+            {/* Auth-aware header button */}
+            {!isLoadingAuth && (
+              isLoggedIn ? (
+                <Button variant="outline" size="lg" onClick={() => navigate("/dashboard")}>
+                  <User className="h-4 w-4 mr-2" />
+                  Account
+                </Button>
+              ) : (
+                <Link to="/login">
+                  <Button variant="outline" size="lg">Sign In</Button>
+                </Link>
+              )
+            )}
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-12 flex-1">
+        {/* Current Plan Context Header - only for logged-in users with a plan */}
+        {isLoggedIn && currentPlanName && (
+          <div className="max-w-5xl mx-auto mb-8">
+            <div className="flex items-center justify-between py-3 px-4 bg-muted/30 rounded-lg border border-border/50">
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Your current plan</p>
+                <p className="text-sm font-medium text-foreground">{currentPlanName}</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <p className="text-xs text-muted-foreground hidden sm:block">
+                  You can review options without changing anything.
+                </p>
+                <button
+                  onClick={() => planCardsRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                  className="text-sm text-primary hover:underline"
+                >
+                  Change plan
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="max-w-5xl mx-auto space-y-12">
           
           {/* Hero - Simple */}
@@ -283,7 +372,7 @@ const Pricing = () => {
           </div>
 
           {/* Plans Grid - 3 Cards */}
-          <div className="grid md:grid-cols-3 gap-6">
+          <div ref={planCardsRef} className="grid md:grid-cols-3 gap-6 scroll-mt-8">
             {plans.map((plan) => {
               const priceText = loadingPrices ? (
                 <span className="flex items-center justify-center gap-2">
@@ -292,14 +381,24 @@ const Pricing = () => {
               ) : getDisplayedPrice(plan.lookupKey);
               const isBuying = loadingPlan === plan.id;
               const isRecommended = recommendedPlan === plan.id;
+              const isCurrentPlan = currentPlanId === plan.id;
 
               return (
                 <Card 
                   key={plan.id} 
-                  className={`relative flex flex-col ${plan.featured ? "border-primary border-2" : ""}`}
+                  className={`relative flex flex-col ${plan.featured ? "border-primary border-2" : ""} ${isCurrentPlan ? "ring-2 ring-primary/20" : ""}`}
                 >
-                  {/* Recommendation Badge - only if justified */}
-                  {isRecommended && (
+                  {/* Current Plan Badge */}
+                  {isCurrentPlan && (
+                    <Badge 
+                      className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary/10 text-primary border-primary/30"
+                      variant="outline"
+                    >
+                      Current plan
+                    </Badge>
+                  )}
+                  {/* Recommendation Badge - only if justified and not current plan */}
+                  {isRecommended && !isCurrentPlan && (
                     <Badge 
                       className="absolute -top-3 left-1/2 -translate-x-1/2 bg-muted text-muted-foreground border"
                       variant="outline"
