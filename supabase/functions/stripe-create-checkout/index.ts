@@ -58,6 +58,7 @@ serve(async (req) => {
       cancelUrl,
       allowPromotionCodes = true,
       trialDays,
+      collectPhone = true,
     } = await req.json();
 
     console.log("Stripe checkout request:", { lookupKey, mode, successUrl, cancelUrl });
@@ -69,6 +70,16 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Log admin notification: Attempt started
+    console.log("=== ADMIN NOTIFICATION: PURCHASE ATTEMPT STARTED ===");
+    console.log(`Event: Attempt started`);
+    console.log(`Product key: ${lookupKey}`);
+    console.log(`Time: ${new Date().toISOString()}`);
+    console.log(`User (if known): ${userId || "anonymous"}`);
+    console.log(`Email (if known): ${userEmail || "not yet collected"}`);
+    console.log(`Notes: Customer is being sent to Stripe Checkout.`);
+    console.log("=== END ADMIN NOTIFICATION ===");
 
     console.log(`Searching for price with lookup key: ${lookupKey}`);
 
@@ -101,19 +112,46 @@ serve(async (req) => {
 
     console.log(`Creating checkout session for price ${priceId} (${product?.name})`);
 
+    // Determine checkout mode based on price type
+    const priceType = prices.data[0].type;
+    const checkoutMode = priceType === "recurring" ? "subscription" : "payment";
+
     // Create Checkout Session with user metadata
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
-      mode: mode === "payment" ? "payment" : "subscription",
+      mode: checkoutMode,
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: successUrl ?? `${req.headers.get("origin") ?? "https://"}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl ?? `${req.headers.get("origin") ?? "https://"}/dashboard`,
       allow_promotion_codes: allowPromotionCodes === true,
+      
+      // Collect customer contact info
+      customer_creation: checkoutMode === "payment" ? "always" : undefined,
+      billing_address_collection: "auto",
+      
+      // Phone collection (optional but requested)
+      phone_number_collection: collectPhone ? { enabled: true } : undefined,
+      
+      // Put lookupKey in metadata so webhook can map access cleanly
       metadata: {
         user_id: userId || "",
         lookup_key: lookupKey,
       },
+      
+      // Also attach metadata to payment intent for one-time payments
+      ...(checkoutMode === "payment" ? {
+        payment_intent_data: {
+          metadata: {
+            user_id: userId || "",
+            lookup_key: lookupKey,
+          }
+        }
+      } : {}),
+      
+      // Pre-fill customer email if known
       ...(userEmail ? { customer_email: userEmail } : {}),
-      ...(mode === "subscription" && typeof trialDays === "number"
+      
+      // Trial period for subscriptions
+      ...(checkoutMode === "subscription" && typeof trialDays === "number"
         ? { subscription_data: { trial_period_days: trialDays } }
         : {}),
     };

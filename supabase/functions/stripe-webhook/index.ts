@@ -7,15 +7,26 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, stripe-signature",
 };
 
-// Stripe lookup key to roles and plan codes mapping
+/**
+ * Stripe lookup key to roles mapping (per spec)
+ * 
+ * Grant Rules:
+ * - EFABASIC → printable (access_basic_printables)
+ * - EFAPREMIUM → premium + printable (access_premium_tools + access_basic_printables)
+ * - EFABINDER → premium + printable (same as EFAPREMIUM)
+ * - STANDARDSONG → song_standard (access_song_request)
+ * - EFAVIPMONTHLY/EFAVIPYEAR → vip + premium + printable (access_full_platform)
+ * - EFADOFORU → done_for_you + vip + premium + printable (access_full_platform + access_do_it_for_you)
+ */
 const PLAN_DEFINITIONS: Record<string, { planCode: string; roles: string[] }> = {
-  'EFABASIC': { planCode: 'basic', roles: ['basic', 'printable'] },
-  'EFAPREMIUM': { planCode: 'premium', roles: ['basic', 'vip', 'printable'] },
-  'EFAPREMIUMYEAR': { planCode: 'premium', roles: ['basic', 'vip', 'printable'] },
-  'EFAVIPYEAR': { planCode: 'vip_annual', roles: ['vip', 'printable'] },
-  'EFAVIPMONTHLY': { planCode: 'vip_monthly', roles: ['vip', 'printable'] },
-  'EFADOFORU': { planCode: 'done_for_you', roles: ['done_for_you', 'basic', 'printable'] },
-  'EFABINDER': { planCode: 'binder', roles: ['binder'] },
+  'EFABASIC': { planCode: 'basic', roles: ['printable'] },
+  'EFAPREMIUM': { planCode: 'premium', roles: ['premium', 'printable'] },
+  'EFAPREMIUMYEAR': { planCode: 'premium', roles: ['premium', 'printable'] },
+  'EFAVIPYEAR': { planCode: 'vip_annual', roles: ['vip', 'premium', 'printable'] },
+  'EFAVIPMONTHLY': { planCode: 'vip_monthly', roles: ['vip', 'premium', 'printable'] },
+  'EFADOFORU': { planCode: 'done_for_you', roles: ['done_for_you', 'vip', 'premium', 'printable'] },
+  'EFABINDER': { planCode: 'binder', roles: ['premium', 'printable'] }, // Same as EFAPREMIUM
+  'STANDARDSONG': { planCode: 'song_standard', roles: ['song_standard'] },
   'STRIPE_STANDARD_SONG_PRICE_ID': { planCode: 'song_standard', roles: ['song_standard'] },
   'STRIPE_PREMIUM_SONG_PRICE_ID': { planCode: 'song_premium', roles: ['song_premium'] },
 };
@@ -76,7 +87,7 @@ serve(async (req) => {
 
     console.log(`Processing Stripe event: ${event.type}`);
 
-    // Handle checkout.session.completed
+    // Handle checkout.session.completed - MAIN SUCCESS EVENT
     if (event.type === "checkout.session.completed") {
       await handleCheckoutCompleted(stripe, supabase, event.data.object as Stripe.Checkout.Session);
     }
@@ -101,6 +112,11 @@ serve(async (req) => {
       await handlePaymentFailed(supabase, event.data.object as Stripe.Invoice);
     }
 
+    // Handle checkout session expired (abandoned)
+    if (event.type === "checkout.session.expired") {
+      await handleCheckoutExpired(event.data.object as Stripe.Checkout.Session);
+    }
+
     return new Response(JSON.stringify({ received: true }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -117,12 +133,28 @@ serve(async (req) => {
 async function handleCheckoutCompleted(stripe: Stripe, supabase: any, session: Stripe.Checkout.Session) {
   console.log("Checkout session completed:", session.id);
 
+  const lookupKey = session.metadata?.lookup_key || "";
+  const customerEmail = session.customer_details?.email || session.customer_email || "";
+  const customerName = session.customer_details?.name || "";
+  const customerId = session.customer as string || "";
+
+  // Log admin notification: Purchase Success
+  console.log("=== ADMIN NOTIFICATION: PURCHASE SUCCESS ===");
+  console.log(`Event: Payment success`);
+  console.log(`Product key: ${lookupKey}`);
+  console.log(`Time: ${new Date().toISOString()}`);
+  console.log(`Email: ${customerEmail}`);
+  console.log(`Name: ${customerName}`);
+  console.log(`Stripe Customer ID: ${customerId}`);
+  console.log(`Checkout Session ID: ${session.id}`);
+  console.log(`Amount: ${session.amount_total} ${session.currency?.toUpperCase()}`);
+
   // Get user_id from metadata or customer email
   let userId = session.metadata?.user_id;
 
-  if (!userId && session.customer_email) {
+  if (!userId && customerEmail) {
     const { data: authUsers } = await supabase.auth.admin.listUsers();
-    const authUser = authUsers.users.find((u: any) => u.email === session.customer_email);
+    const authUser = authUsers.users.find((u: any) => u.email === customerEmail);
     if (authUser) {
       userId = authUser.id;
     }
@@ -130,6 +162,7 @@ async function handleCheckoutCompleted(stripe: Stripe, supabase: any, session: S
 
   if (!userId) {
     console.error("Could not determine user_id for session:", session.id);
+    console.log("=== END ADMIN NOTIFICATION (no user found) ===");
     return;
   }
 
@@ -141,23 +174,40 @@ async function handleCheckoutCompleted(stripe: Stripe, supabase: any, session: S
   });
 
   const rolesToGrant: Set<string> = new Set();
-  let primaryLookupKey = session.metadata?.lookup_key || "";
+  let primaryLookupKey = lookupKey;
   let primaryPlanCode = "";
 
   for (const item of lineItems.data) {
     const price = item.price as Stripe.Price;
-    const lookupKey = price.lookup_key || "";
+    const itemLookupKey = price.lookup_key || "";
 
-    console.log(`Processing line item: price=${price.id}, lookup_key=${lookupKey}`);
+    console.log(`Processing line item: price=${price.id}, lookup_key=${itemLookupKey}`);
 
-    if (lookupKey && PLAN_DEFINITIONS[lookupKey]) {
-      const def = PLAN_DEFINITIONS[lookupKey];
+    if (itemLookupKey && PLAN_DEFINITIONS[itemLookupKey]) {
+      const def = PLAN_DEFINITIONS[itemLookupKey];
       def.roles.forEach((role) => rolesToGrant.add(role));
       if (!primaryPlanCode) primaryPlanCode = def.planCode;
-      if (!primaryLookupKey) primaryLookupKey = lookupKey;
-      console.log(`Lookup key ${lookupKey} grants roles:`, def.roles);
+      if (!primaryLookupKey) primaryLookupKey = itemLookupKey;
+      console.log(`Lookup key ${itemLookupKey} grants roles:`, def.roles);
     }
   }
+
+  // Also check session-level lookup key
+  if (lookupKey && PLAN_DEFINITIONS[lookupKey]) {
+    const def = PLAN_DEFINITIONS[lookupKey];
+    def.roles.forEach((role) => rolesToGrant.add(role));
+    if (!primaryPlanCode) primaryPlanCode = def.planCode;
+  }
+
+  // Log access granted
+  const accessFlags = mapAccessFromRoles(rolesToGrant);
+  console.log("Access granted:");
+  console.log(`  basic_printables: ${accessFlags.access_basic_printables}`);
+  console.log(`  premium_tools: ${accessFlags.access_premium_tools}`);
+  console.log(`  song_request: ${accessFlags.access_song_request}`);
+  console.log(`  full_platform: ${accessFlags.access_full_platform}`);
+  console.log(`  do_it_for_you: ${accessFlags.access_do_it_for_you}`);
+  console.log("=== END ADMIN NOTIFICATION ===");
 
   // Grant roles to user
   await grantRolesToUser(supabase, userId, rolesToGrant);
@@ -271,9 +321,6 @@ async function handleSubscriptionUpdated(stripe: Stripe, supabase: any, subscrip
       updated_at: new Date().toISOString(),
     })
     .eq("user_id", subData.user_id);
-
-  // If subscription is past_due but not canceled, keep roles for now
-  // Only revoke on full cancellation
 }
 
 async function handleSubscriptionDeleted(supabase: any, subscription: Stripe.Subscription) {
@@ -299,8 +346,8 @@ async function handleSubscriptionDeleted(supabase: any, subscription: Stripe.Sub
     })
     .eq("user_id", subData.user_id);
 
-  // Revoke subscription-based roles (keep one-time purchase roles)
-  const subscriptionRoles = ['vip', 'basic', 'printable'];
+  // Revoke subscription-based roles (keep one-time purchase roles like done_for_you)
+  const subscriptionRoles = ['vip', 'premium', 'printable'];
   for (const roleName of subscriptionRoles) {
     const { data: roleData } = await supabase
       .from("app_roles")
@@ -323,7 +370,14 @@ async function handleSubscriptionDeleted(supabase: any, subscription: Stripe.Sub
 async function handlePaymentFailed(supabase: any, invoice: Stripe.Invoice) {
   if (!invoice.subscription) return;
 
-  console.log("Payment failed for subscription:", invoice.subscription);
+  console.log("=== ADMIN NOTIFICATION: PAYMENT FAILED ===");
+  console.log(`Event: Payment failed`);
+  console.log(`Time: ${new Date().toISOString()}`);
+  console.log(`Email: ${invoice.customer_email || "unknown"}`);
+  console.log(`Stripe Payment Intent: ${invoice.payment_intent}`);
+  console.log(`Reason: ${invoice.last_finalization_error?.message || "Unknown"}`);
+  console.log(`Next step: User must retry checkout.`);
+  console.log("=== END ADMIN NOTIFICATION ===");
 
   const { data: subData } = await supabase
     .from("subscriptions")
@@ -340,6 +394,20 @@ async function handlePaymentFailed(supabase: any, invoice: Stripe.Invoice) {
       })
       .eq("user_id", subData.user_id);
   }
+}
+
+async function handleCheckoutExpired(session: Stripe.Checkout.Session) {
+  const lookupKey = session.metadata?.lookup_key || "unknown";
+  const email = session.customer_details?.email || session.customer_email || "unknown";
+
+  console.log("=== ADMIN NOTIFICATION: CHECKOUT ABANDONED ===");
+  console.log(`Event: Checkout expired`);
+  console.log(`Time: ${new Date().toISOString()}`);
+  console.log(`Product key: ${lookupKey}`);
+  console.log(`Session ID: ${session.id}`);
+  console.log(`Email: ${email}`);
+  console.log(`Notes: No access granted.`);
+  console.log("=== END ADMIN NOTIFICATION ===");
 }
 
 async function grantRolesToUser(supabase: any, userId: string, roles: Set<string>) {
@@ -414,4 +482,20 @@ function determinePlanType(subscription: Stripe.Subscription): string {
   }
   
   return "free";
+}
+
+function mapAccessFromRoles(roles: Set<string>): {
+  access_basic_printables: boolean;
+  access_premium_tools: boolean;
+  access_song_request: boolean;
+  access_full_platform: boolean;
+  access_do_it_for_you: boolean;
+} {
+  return {
+    access_basic_printables: roles.has('printable'),
+    access_premium_tools: roles.has('premium') || roles.has('vip') || roles.has('done_for_you'),
+    access_song_request: roles.has('song_standard') || roles.has('song_premium'),
+    access_full_platform: roles.has('vip') || roles.has('done_for_you'),
+    access_do_it_for_you: roles.has('done_for_you'),
+  };
 }
