@@ -1,16 +1,22 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Star, Loader2 } from "lucide-react";
+import { CheckCircle, Loader2, Check, X, ChevronDown } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Plus, Minus } from "lucide-react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import mascotCouple from "@/assets/mascot-couple.png";
 import { launchCheckout } from "@/lib/checkoutLauncher";
 import { supabase } from "@/integrations/supabase/client";
 import { AppFooter } from "@/components/AppFooter";
 import { AssistantWidget } from "@/components/assistant/AssistantWidget";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 type StripePriceInfo = {
   lookupKey: string;
@@ -18,33 +24,11 @@ type StripePriceInfo = {
   unitAmount: number | null;
   type: "one_time" | "recurring";
   interval?: "month" | "year" | null;
-  intervalCount?: number | null;
-  productName?: string | null;
-  productDescription?: string | null;
 };
 
 type StripePricesMap = Record<string, StripePriceInfo>;
 
-type Plan = {
-  id: string;
-  title: string;
-  subtitle: string;
-  bullets: string[];
-  lookupKey: string;
-  successPath: string;
-  badge?: string;
-  category: "one_time" | "subscription" | "service";
-};
-
-const PRICING_LOOKUP_KEYS = [
-  "EFABASIC",
-  "EFAPREMIUM",
-  "EFAVIPMONTHLY",
-  "EFAVIPYEAR",
-  "EFABINDER",
-  "EFADOFORU",
-  "STANDARDSONG",
-];
+const PRICING_LOOKUP_KEYS = ["EFAPREMIUM", "EFABASIC", "EFABINDER"];
 
 function formatMoney(unitAmount: number | null | undefined, currency?: string) {
   if (unitAmount == null) return "";
@@ -52,20 +36,57 @@ function formatMoney(unitAmount: number | null | undefined, currency?: string) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: (currency || "usd").toUpperCase(),
-    maximumFractionDigits: 2,
+    maximumFractionDigits: 0,
   }).format(amount);
 }
 
 function priceLabel(p?: StripePriceInfo) {
-  if (!p) return "See price at checkout";
+  if (!p) return "See price";
   const amt = formatMoney(p.unitAmount, p.currency);
-  if (!amt) return "See price at checkout";
-  if (p.type === "recurring") {
-    const interval = p.interval === "year" ? "/year" : "/month";
-    return `${amt}${interval}`;
-  }
+  if (!amt) return "See price";
   return amt;
 }
+
+// Determine recommendation based on user preferences
+function getRecommendedPlan(): string | null {
+  const plannerMode = localStorage.getItem("planner_mode");
+  const previewPath = localStorage.getItem("last_preview_path");
+  
+  // If user chose guided mode, recommend digital
+  if (plannerMode === "guided") return "digital";
+  
+  // If user explored printable preview, recommend printable
+  if (previewPath?.includes("printable")) return "printable";
+  
+  // If user explored digital preview, recommend digital
+  if (previewPath?.includes("preplanning") || previewPath?.includes("digital")) return "digital";
+  
+  // No recommendation if no data
+  return null;
+}
+
+const FAQS = [
+  {
+    question: "Do I have to fill out everything?",
+    answer: "No. Fill out only what you want. You can skip sections and come back anytime."
+  },
+  {
+    question: "Can I switch between guided and explore mode?",
+    answer: "Yes. You can change your preference at any time in the planner settings."
+  },
+  {
+    question: "Can I download my plan anytime?",
+    answer: "Yes. You can download your completed plan as a PDF at any point."
+  },
+  {
+    question: "Is this legal advice?",
+    answer: "No. This is educational planning guidance only. For legal matters, consult an attorney."
+  },
+  {
+    question: "Can my family access it later?",
+    answer: "Yes. You control who can view your plan. You can share access with trusted contacts."
+  }
+];
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -73,102 +94,57 @@ const Pricing = () => {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [loadingPrices, setLoadingPrices] = useState(true);
   const [stripePrices, setStripePrices] = useState<StripePricesMap>({});
+  const [recommendedPlan, setRecommendedPlan] = useState<string | null>(null);
 
-  // Plans shown on the page
-  const plans: Plan[] = useMemo(() => [
+  // Core plans - simplified to 3
+  const plans = [
     {
-      id: "printable",
-      title: "Printable Planning Form",
-      subtitle: "One-time purchase",
+      id: "digital",
+      title: "Digital Planner",
+      whoItsFor: "For people who want guidance and flexibility online.",
       bullets: [
-        "Clean printable planning form",
-        "Fill out by hand or digitally",
-        "Keep for your records or binder",
-      ],
-      lookupKey: "EFABASIC",
-      successPath: "/purchase-success?type=printable",
-      category: "one_time",
-    },
-    {
-      id: "guided",
-      title: "Step-by-Step Guided Planner",
-      subtitle: "One-time purchase",
-      bullets: [
-        "Guided walk-through, one section at a time",
-        "Save progress and update anytime",
-        "Plain-language explanations",
+        "Interactive digital planner",
+        "Step-by-step or explore-freely option",
+        "Save progress automatically",
+        "Download your plan as a PDF",
+        "Access from any device"
       ],
       lookupKey: "EFAPREMIUM",
       successPath: "/purchase-success?type=premium",
-      badge: "Most Popular",
-      category: "one_time",
+      buttonLabel: "Start Digital Planner",
+      featured: true
     },
     {
-      id: "vip-monthly",
-      title: "CARE Support",
-      subtitle: "Monthly subscription",
+      id: "printable",
+      title: "Printable Planner",
+      whoItsFor: "For people who prefer paper or want something tangible.",
       bullets: [
-        "Personal planning help from Claire",
-        "Help organizing decisions and next steps",
-        "Cancel anytime",
+        "Printable planning forms",
+        "Fill only what you want",
+        "Download and print anytime"
       ],
-      lookupKey: "EFAVIPMONTHLY",
-      successPath: "/purchase-success?type=vip",
-      category: "subscription",
-    },
-    {
-      id: "vip-yearly",
-      title: "CARE Support",
-      subtitle: "Yearly subscription",
-      bullets: [
-        "Same support as monthly",
-        "Better value for ongoing help",
-        "Cancel anytime",
-      ],
-      lookupKey: "EFAVIPYEAR",
-      successPath: "/purchase-success?type=vip",
-      category: "subscription",
-    },
-    {
-      id: "do-for-you",
-      title: "Do-It-For-You Planning",
-      subtitle: "One-time service",
-      bullets: [
-        "We help organize your wishes and complete the planning with you",
-        "You review and approve everything",
-        "Next step is a short intake form",
-      ],
-      lookupKey: "EFADOFORU",
-      successPath: "/do-it-for-you/confirmation",
-      category: "service",
+      lookupKey: "EFABASIC",
+      successPath: "/purchase-success?type=printable",
+      buttonLabel: "Download Printable Version",
+      featured: false
     },
     {
       id: "binder",
-      title: "Planning Binder",
-      subtitle: "One-time purchase",
+      title: "Physical Binder",
+      whoItsFor: "For families who want everything organized in one place.",
       bullets: [
-        "Physical binder to organize planning documents",
-        "Easy for family members to find when needed",
+        "Printed planner pages",
+        "Organized binder",
+        "Shipped to your home"
       ],
       lookupKey: "EFABINDER",
       successPath: "/purchase-success?type=binder",
-      category: "one_time",
-    },
-    {
-      id: "song",
-      title: "Custom Memorial Song",
-      subtitle: "One-time purchase",
-      bullets: [
-        "Personalized tribute based on your answers",
-        "Delivered as a digital audio file",
-      ],
-      lookupKey: "STANDARDSONG",
-      successPath: "/purchase-success?type=song",
-      category: "one_time",
-    },
-  ], []);
+      buttonLabel: "Purchase Binder",
+      featured: false
+    }
+  ];
 
-  // Load text size from localStorage
+  // Load text size
   useEffect(() => {
     const savedSize = localStorage.getItem("landing_text_size");
     if (savedSize) {
@@ -178,22 +154,23 @@ const Pricing = () => {
     }
   }, []);
 
-  // Load live Stripe prices
+  // Check for recommendation
+  useEffect(() => {
+    setRecommendedPlan(getRecommendedPlan());
+  }, []);
+
+  // Load Stripe prices
   useEffect(() => {
     let mounted = true;
-
     (async () => {
       setLoadingPrices(true);
       try {
         const { data, error } = await supabase.functions.invoke("stripe-list-prices", {
           body: { lookupKeys: PRICING_LOOKUP_KEYS },
         });
-
         if (error) throw error;
-
-        const prices = (data?.prices || {}) as StripePricesMap;
         if (!mounted) return;
-        setStripePrices(prices);
+        setStripePrices((data?.prices || {}) as StripePricesMap);
       } catch (err) {
         console.error("Failed to load Stripe prices:", err);
         if (!mounted) return;
@@ -203,28 +180,22 @@ const Pricing = () => {
         setLoadingPrices(false);
       }
     })();
-
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, []);
 
   const handleTextSizeChange = (direction: "increase" | "decrease") => {
     const newSize = direction === "increase" 
       ? Math.min(textSize + 10, 150) 
       : Math.max(textSize - 10, 80);
-    
     setTextSize(newSize);
     document.documentElement.style.fontSize = `${newSize}%`;
     localStorage.setItem("landing_text_size", newSize.toString());
   };
 
-  const handleChoosePlan = async (plan: Plan) => {
+  const handleChoosePlan = async (plan: typeof plans[0]) => {
     const successUrl = `${window.location.origin}${plan.successPath}`;
     const cancelUrl = window.location.href;
-
     setLoadingPlan(plan.id);
-    
     await launchCheckout({
       lookupKey: plan.lookupKey,
       successUrl,
@@ -234,12 +205,6 @@ const Pricing = () => {
         if (!loading) setLoadingPlan(null);
       },
     });
-  };
-
-  const handlePreview = (path: string) => {
-    const expiryTime = Date.now() + (24 * 60 * 60 * 1000);
-    localStorage.setItem("preview_mode_expiry", expiryTime.toString());
-    navigate(path);
   };
 
   const getDisplayedPrice = (lookupKey: string) => priceLabel(stripePrices[lookupKey]);
@@ -284,196 +249,187 @@ const Pricing = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-16 flex-1">
-        <div className="max-w-6xl mx-auto space-y-12">
-          {/* Hero Section */}
-          <div className="text-center space-y-4">
+      <main className="container mx-auto px-4 py-12 flex-1">
+        <div className="max-w-5xl mx-auto space-y-12">
+          
+          {/* Hero - Simple */}
+          <div className="text-center space-y-3">
             <div className="flex justify-center mb-4">
               <img 
                 src={mascotCouple} 
                 alt="Everlasting Advisors" 
-                className="w-24 h-24 object-contain"
+                className="w-20 h-20 object-contain"
               />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-              Compare Pricing & Options
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+              Choose what works best for you.
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Choose the level of support that feels right. You can review options before purchasing.
+            <p className="text-lg text-muted-foreground">
+              Start simple. Add more only if you want.
             </p>
           </div>
 
           {/* Navigation Links */}
-          <div className="flex justify-center gap-4 flex-wrap">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate("/")}
-            >
-              Return to Home
+          <div className="flex justify-center gap-3 flex-wrap">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
+              Home
             </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => navigate("/dashboard")}
-            >
-              Return to Dashboard
+            <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
+              Dashboard
             </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => navigate("/subscription")}
-            >
-              View Current Subscription
+            <Button variant="ghost" size="sm" onClick={() => navigate("/subscription")}>
+              View Subscription
             </Button>
           </div>
 
-          {/* Plans Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Plans Grid - 3 Cards */}
+          <div className="grid md:grid-cols-3 gap-6">
             {plans.map((plan) => {
               const priceText = loadingPrices ? (
-                <span className="flex items-center gap-2">
+                <span className="flex items-center justify-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Loading...
                 </span>
               ) : getDisplayedPrice(plan.lookupKey);
               const isBuying = loadingPlan === plan.id;
+              const isRecommended = recommendedPlan === plan.id;
 
               return (
                 <Card 
                   key={plan.id} 
-                  className={`relative flex flex-col ${plan.badge === "Most Popular" ? "border-primary border-2" : ""}`}
+                  className={`relative flex flex-col ${plan.featured ? "border-primary border-2" : ""}`}
                 >
-                  {plan.badge && (
+                  {/* Recommendation Badge - only if justified */}
+                  {isRecommended && (
                     <Badge 
-                      className="absolute -top-3 left-1/2 -translate-x-1/2"
-                      variant="secondary"
+                      className="absolute -top-3 left-1/2 -translate-x-1/2 bg-muted text-muted-foreground border"
+                      variant="outline"
                     >
-                      {plan.badge === "Premium" ? <Star className="h-3 w-3 mr-1" /> : null}
-                      {plan.badge}
+                      Recommended for you
                     </Badge>
                   )}
-                  <CardHeader className="text-center pb-4">
+                  
+                  <CardHeader className="text-center pb-2">
                     <CardTitle className="text-xl">{plan.title}</CardTitle>
-                    <div className="mt-4">
+                    <div className="mt-3">
                       <span className="text-3xl font-bold text-primary">{priceText}</span>
                     </div>
-                    <CardDescription className="mt-2">
-                      {plan.category === "subscription"
-                        ? "Renews automatically until canceled."
-                        : "One-time purchase. No renewal."}
-                    </CardDescription>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {plan.whoItsFor}
+                    </p>
                   </CardHeader>
-                  <CardContent className="flex-1 flex flex-col space-y-6">
-                    <ul className="space-y-3 flex-1">
+                  
+                  <CardContent className="flex-1 flex flex-col space-y-4">
+                    <ul className="space-y-2 flex-1">
                       {plan.bullets.map((bullet, index) => (
                         <li key={index} className="flex items-start gap-2">
-                          <CheckCircle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                          <CheckCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                           <span className="text-sm">{bullet}</span>
                         </li>
                       ))}
                     </ul>
                     
-                    <div className="space-y-2 pt-4">
-                      <Button 
-                        className="w-full" 
-                        size="lg"
-                        onClick={() => handleChoosePlan(plan)}
-                        disabled={isBuying || loadingPrices}
-                      >
-                        {isBuying ? (
-                          <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Starting checkout...
-                          </>
-                        ) : (
-                          "Purchase"
-                        )}
-                      </Button>
-
-                      {/* Plan-specific learn more links */}
-                      {plan.lookupKey === "EFADOFORU" && (
-                        <Button 
-                          variant="outline" 
-                          className="w-full"
-                          onClick={() => navigate("/do-it-for-you")}
-                        >
-                          Learn More
-                        </Button>
-                      )}
-
-                      {(plan.lookupKey === "EFAVIPMONTHLY" || plan.lookupKey === "EFAVIPYEAR") && (
+                    <Button 
+                      className="w-full" 
+                      size="lg"
+                      variant={plan.featured ? "default" : "outline"}
+                      onClick={() => handleChoosePlan(plan)}
+                      disabled={isBuying || loadingPrices}
+                    >
+                      {isBuying ? (
                         <>
-                          <Button 
-                            variant="outline" 
-                            className="w-full"
-                            onClick={() => navigate("/care-support")}
-                          >
-                            Learn About CARE Support
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            className="w-full text-muted-foreground"
-                            onClick={() => navigate("/subscription")}
-                          >
-                            Manage or Cancel Subscription
-                          </Button>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Loading...
                         </>
+                      ) : (
+                        plan.buttonLabel
                       )}
-                    </div>
-
-                    <p className="text-xs text-muted-foreground text-center">
-                      Trouble paying?{" "}
-                      <button 
-                        onClick={() => navigate("/payment-help")}
-                        className="underline hover:text-foreground"
-                      >
-                        Payment Help
-                      </button>
-                    </p>
+                    </Button>
                   </CardContent>
                 </Card>
               );
             })}
           </div>
 
-          {/* Additional Info */}
-          <Card className="bg-muted/50">
-            <CardContent className="p-8 text-center space-y-4">
-              <h3 className="text-xl font-semibold">Not sure which option is right for you?</h3>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Try our 1-day free preview to explore features without creating an account. 
-                No credit card required.
+          {/* Comparison Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Feature</th>
+                  <th className="text-center py-3 px-4 font-medium">Digital</th>
+                  <th className="text-center py-3 px-4 font-medium">Printable</th>
+                  <th className="text-center py-3 px-4 font-medium">Binder</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-border/50">
+                  <td className="py-3 px-4">Online access</td>
+                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
+                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
+                </tr>
+                <tr className="border-b border-border/50">
+                  <td className="py-3 px-4">Step-by-step guidance</td>
+                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
+                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
+                </tr>
+                <tr className="border-b border-border/50">
+                  <td className="py-3 px-4">Printable</td>
+                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                </tr>
+                <tr className="border-b border-border/50">
+                  <td className="py-3 px-4">Physical copy shipped</td>
+                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
+                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
+                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Reassurance Strip */}
+          <div className="flex flex-wrap justify-center gap-6 py-6 text-sm text-muted-foreground border-y border-border">
+            <span>Educational only.</span>
+            <span>You're in control.</span>
+            <span>No obligation to finish or share.</span>
+          </div>
+
+          {/* FAQ */}
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-xl font-semibold text-center mb-6">Common Questions</h2>
+            <Accordion type="single" collapsible className="w-full">
+              {FAQS.map((faq, index) => (
+                <AccordionItem key={index} value={`faq-${index}`}>
+                  <AccordionTrigger className="text-left text-sm">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+
+          {/* Additional Services Note */}
+          <Card className="bg-muted/30 border-dashed">
+            <CardContent className="p-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Looking for more support? We also offer{" "}
+                <Link to="/care-support" className="underline hover:text-foreground">CARE Support</Link>,{" "}
+                <Link to="/do-it-for-you" className="underline hover:text-foreground">Do-It-For-You Planning</Link>, and{" "}
+                <Link to="/custom-song" className="underline hover:text-foreground">Custom Memorial Songs</Link>.
               </p>
-              <div className="flex gap-4 justify-center flex-wrap">
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  onClick={() => handlePreview("/preview/preplanning")}
-                >
-                  Start Free Preview
-                </Button>
-                <Link to="/contact">
-                  <Button variant="outline" size="lg">
-                    Contact Us
-                  </Button>
-                </Link>
-              </div>
             </CardContent>
           </Card>
 
-          {/* Payment Help Note */}
-          <p className="text-sm text-muted-foreground text-center">
-            Note: If a payment page looks blank, it is usually caused by an ad blocker, privacy extension, or restricted network.{" "}
-            <Link to="/payment-help" className="underline hover:text-foreground">
-              Visit Payment Help
-            </Link>{" "}
-            for quick fixes.
-          </p>
         </div>
       </main>
 
-      {/* Global Footer */}
       <AppFooter />
-
-      {/* Assistant Widget */}
       <AssistantWidget />
     </div>
   );
