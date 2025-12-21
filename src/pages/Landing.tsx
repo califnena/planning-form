@@ -9,13 +9,13 @@ import { useTranslation } from "react-i18next";
 import mascotPlanningAhead from "@/assets/mascot-planning-ahead.png";
 import mascotFamiliesChoose from "@/assets/mascot-families-choose.png";
 import mascotHeroCouple from "@/assets/mascot-hero-couple.png";
-
 const Landing = () => {
-  const { t } = useTranslation();
+  const {
+    t
+  } = useTranslation();
   const navigate = useNavigate();
   const [textSize, setTextSize] = useState<number>(100);
   const [userName, setUserName] = useState<string | null>(null);
-
   useEffect(() => {
     const savedSize = localStorage.getItem("landing_text_size");
     if (savedSize) {
@@ -26,13 +26,15 @@ const Landing = () => {
 
     // Check if user is logged in for personalized greeting
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
       if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('id', user.id)
-          .single();
+        const {
+          data: profile
+        } = await supabase.from('profiles').select('full_name').eq('id', user.id).single();
         if (profile?.full_name) {
           setUserName(profile.full_name.split(' ')[0]);
         }
@@ -40,28 +42,25 @@ const Landing = () => {
     };
     checkUser();
   }, []);
-
   const handleTextSizeChange = (direction: "increase" | "decrease") => {
-    const newSize = direction === "increase" 
-      ? Math.min(textSize + 10, 150) 
-      : Math.max(textSize - 10, 80);
-    
+    const newSize = direction === "increase" ? Math.min(textSize + 10, 150) : Math.max(textSize - 10, 80);
     setTextSize(newSize);
     document.documentElement.style.fontSize = `${newSize}%`;
     localStorage.setItem("landing_text_size", newSize.toString());
   };
-
   const handleStartPlanner = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: {
+        user
+      }
+    } = await supabase.auth.getUser();
     if (user) {
       navigate("/dashboard");
     } else {
       navigate("/login");
     }
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/40 via-background to-background">
+  return <div className="min-h-screen bg-gradient-to-b from-amber-50/40 via-background to-background">
       {/* Header */}
       <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -73,29 +72,13 @@ const Landing = () => {
             {/* Text Size Controls */}
             <div className="hidden sm:flex items-center gap-2 border border-border rounded-md px-3 py-1.5">
               <span className="text-sm text-muted-foreground font-medium">{t('header.textSize')}</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleTextSizeChange("decrease")}
-                className="h-7 px-2 font-semibold"
-                title="Decrease text size"
-              >
+              <Button variant="ghost" size="sm" onClick={() => handleTextSizeChange("decrease")} className="h-7 px-2 font-semibold" title="Decrease text size">
                 A-
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 font-semibold pointer-events-none"
-              >
+              <Button variant="ghost" size="sm" className="h-7 px-2 font-semibold pointer-events-none">
                 A
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleTextSizeChange("increase")}
-                className="h-7 px-2 font-semibold"
-                title="Increase text size"
-              >
+              <Button variant="ghost" size="sm" onClick={() => handleTextSizeChange("increase")} className="h-7 px-2 font-semibold" title="Increase text size">
                 A+
               </Button>
             </div>
@@ -107,16 +90,12 @@ const Landing = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-12 md:py-20">
+      <main className="container mx-auto px-4 py-12 md:py-20 bg-secondary">
         {/* HERO SECTION */}
         <div className="max-w-5xl mx-auto text-center space-y-8">
           {/* Hero Image */}
           <div className="relative mx-auto max-w-2xl">
-            <img 
-              src={mascotHeroCouple} 
-              alt="Planning Ahead is a Gift of Love" 
-              className="w-full rounded-2xl shadow-lg"
-            />
+            <img src={mascotHeroCouple} alt="Planning Ahead is a Gift of Love" className="w-full rounded-2xl shadow-lg" />
           </div>
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
@@ -128,43 +107,20 @@ const Landing = () => {
           </p>
 
           {/* Returning User Welcome - only shown when authenticated */}
-          {userName && (
-            <div className="bg-primary/10 border border-primary/20 rounded-lg px-6 py-4 inline-block">
-              <p className="text-primary font-medium">
-                Welcome back, {userName}!
-              </p>
-              <Button 
-                variant="link" 
-                className="text-primary p-0 h-auto mt-1"
-                onClick={() => navigate("/dashboard")}
-              >
-                Continue to Your Dashboard →
-              </Button>
-            </div>
-          )}
+          {userName}
           
           <div className="flex flex-col items-center gap-4 pt-4">
-            <Button 
-              size="lg" 
-              className="text-lg px-10 py-7"
-              onClick={handleStartPlanner}
-            >
-              {t('landing.startWithFreeTools')}
-            </Button>
-            <Button 
-              variant="outline"
-              size="lg"
-              onClick={() => {
-                document.getElementById('how-we-help')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
+            
+            <Button variant="outline" size="lg" onClick={() => {
+            document.getElementById('how-we-help')?.scrollIntoView({
+              behavior: 'smooth'
+            });
+          }}>
               {t('landing.seeHowItWorks')}
             </Button>
             
             {/* Trust note */}
-            <p className="text-sm text-muted-foreground mt-2">
-              {t('landing.trustNote')}
-            </p>
+            
             
             <div className="flex items-center gap-4 pt-2">
               <Link to="/login" className="text-sm text-muted-foreground hover:text-primary transition-colors">
@@ -293,12 +249,7 @@ const Landing = () => {
                   </li>
                 </ul>
                 <div className="pt-4">
-                  <a 
-                    href="https://everlastingfuneraladvisors.com/shop/" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="w-full"
-                  >
+                  <a href="https://everlastingfuneraladvisors.com/shop/" target="_blank" rel="noopener noreferrer" className="w-full">
                     <Button variant="outline" className="w-full">
                       {t('landing.viewProducts')}
                     </Button>
@@ -387,10 +338,7 @@ const Landing = () => {
           
           <div className="grid md:grid-cols-3 gap-8">
             {/* VIP Coach */}
-            <Card 
-              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
-              onClick={() => navigate("/pricing")}
-            >
+            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/pricing")}>
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg">
@@ -407,10 +355,7 @@ const Landing = () => {
             </Card>
 
             {/* Do-It-For-You */}
-            <Card 
-              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
-              onClick={() => navigate("/contact")}
-            >
+            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/contact")}>
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg">
@@ -427,10 +372,7 @@ const Landing = () => {
             </Card>
 
             {/* Custom Song */}
-            <Card 
-              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
-              onClick={() => navigate("/products/custom-song")}
-            >
+            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/products/custom-song")}>
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg">
@@ -499,11 +441,7 @@ const Landing = () => {
         <div className="mt-24 max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <img 
-                src={mascotFamiliesChoose} 
-                alt="Why families choose Everlasting" 
-                className="w-full max-w-md mx-auto rounded-2xl shadow-lg"
-              />
+              <img src={mascotFamiliesChoose} alt="Why families choose Everlasting" className="w-full max-w-md mx-auto rounded-2xl shadow-lg" />
             </div>
             <div className="space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold text-foreground">
@@ -544,27 +482,15 @@ const Landing = () => {
           <div className="bg-card border border-border rounded-xl p-6 mb-8">
             <h3 className="text-lg font-semibold text-foreground mb-4 text-center">Free Downloadable Guides</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <a 
-                href="/guides/EFA-Pre-Planning-Checklist.pdf" 
-                download 
-                className="inline-flex items-center justify-center gap-2 px-5 py-4 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm"
-              >
+              <a href="/guides/EFA-Pre-Planning-Checklist.pdf" download className="inline-flex items-center justify-center gap-2 px-5 py-4 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm">
                 <Download className="h-4 w-4" />
                 Pre-Planning Checklist
               </a>
-              <a 
-                href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
-                download 
-                className="inline-flex items-center justify-center gap-2 px-5 py-4 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors font-medium text-sm"
-              >
+              <a href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" download className="inline-flex items-center justify-center gap-2 px-5 py-4 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors font-medium text-sm">
                 <Download className="h-4 w-4" />
                 After-Death Checklist
               </a>
-              <a 
-                href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" 
-                download 
-                className="inline-flex items-center justify-center gap-2 px-5 py-4 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm"
-              >
+              <a href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" download className="inline-flex items-center justify-center gap-2 px-5 py-4 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm">
                 <Download className="h-4 w-4" />
                 Education Guide
               </a>
@@ -573,10 +499,7 @@ const Landing = () => {
 
           {/* Resource Cards */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card 
-              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
-              onClick={() => navigate("/resources")}
-            >
+            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/resources")}>
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
@@ -592,10 +515,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card 
-              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
-              onClick={() => navigate("/legal-documents")}
-            >
+            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/legal-documents")}>
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
@@ -611,10 +531,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card 
-              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
-              onClick={() => navigate("/faq")}
-            >
+            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/faq")}>
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
@@ -630,10 +547,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card 
-              className="border-2 hover:border-primary/50 transition-colors cursor-pointer"
-              onClick={() => navigate("/vendors")}
-            >
+            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/vendors")}>
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
@@ -656,11 +570,7 @@ const Landing = () => {
           <div className="bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-2xl p-8 md:p-12">
             <div className="flex flex-col md:flex-row gap-8 items-center">
               <div className="flex-shrink-0">
-                <img 
-                  src={mascotPlanningAhead} 
-                  alt="Planning ahead is a gift of love" 
-                  className="w-48 h-48 object-contain rounded-xl"
-                />
+                <img src={mascotPlanningAhead} alt="Planning ahead is a gift of love" className="w-48 h-48 object-contain rounded-xl" />
               </div>
               <div>
                 <h3 className="text-2xl font-bold text-foreground mb-4">
@@ -682,17 +592,11 @@ const Landing = () => {
           <p className="text-lg text-muted-foreground">
             {t('landing.emotionalClose2')}
           </p>
-          <Button 
-            size="lg" 
-            className="text-lg px-10 py-7 mt-4"
-            onClick={handleStartPlanner}
-          >
+          <Button size="lg" className="text-lg px-10 py-7 mt-4" onClick={handleStartPlanner}>
             {t('landing.startWithFreeTools')}
           </Button>
         </div>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default Landing;
