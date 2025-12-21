@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { BackToHomeButton } from "@/components/BackToHomeButton";
 import { useTranslation } from "react-i18next";
-import { getPendingCheckout, clearPendingCheckout, openCheckoutUrl, getProductName } from "@/lib/pendingCheckout";
+import { getPendingCheckout, clearPendingCheckout, getProductName } from "@/lib/pendingCheckout";
 
 const Signup = () => {
   const { t } = useTranslation();
@@ -84,7 +84,7 @@ const Signup = () => {
             });
 
             if (!checkoutError && checkoutData?.url) {
-              openCheckoutUrl(checkoutData.url, (title, desc) => toast({ title, description: desc }));
+              window.location.href = checkoutData.url;
               setLoading(false);
               return; // Stripe redirect handles navigation
             }

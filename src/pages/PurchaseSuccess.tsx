@@ -6,10 +6,24 @@ import { Button } from "@/components/ui/button";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { supabase } from "@/integrations/supabase/client";
 
+// Map purchase types to next destination routes
+const nextRouteMap: Record<string, string> = {
+  printable: "/dashboard",
+  binder: "/dashboard",
+  premium: "/preplansteps",
+  vip: "/vip-planning-support",
+  "vip-monthly": "/vip-planning-support",
+  "vip-yearly": "/vip-planning-support",
+  done_for_you: "/dashboard",
+  dfy: "/dashboard",
+  song: "/custom-song",
+};
+
 export default function PurchaseSuccess() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
+  const type = searchParams.get("type");
   const [orderDetails, setOrderDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -38,23 +52,44 @@ export default function PurchaseSuccess() {
   };
 
   const getOrderType = () => {
+    // First check URL param
+    if (type) {
+      const typeNames: Record<string, string> = {
+        printable: "Printable Planning Form",
+        binder: "Physical Binder & Printable Workbook",
+        premium: "Premium Subscription",
+        vip: "VIP Planning Support",
+        "vip-monthly": "VIP Planning Support (Monthly)",
+        "vip-yearly": "VIP Planning Support (Yearly)",
+        done_for_you: "Do-It-For-You Service",
+        dfy: "Do-It-For-You Service",
+        song: "Custom Memorial Song",
+      };
+      return typeNames[type] || "Your Purchase";
+    }
+    
     if (!orderDetails) return "Your Purchase";
     
     const metadata = orderDetails.metadata || {};
     if (metadata.type === "song") return "Custom Memorial Song";
     if (metadata.type === "binder") return "Physical Binder & Printable Workbook";
-    if (metadata.type === "dfy") return "Do It For You Service";
+    if (metadata.type === "dfy") return "Do-It-For-You Service";
     if (orderDetails.mode === "subscription") return "Subscription Plan";
     
     return "Your Purchase";
   };
 
+  const getNextRoute = (): string => {
+    if (type && nextRouteMap[type]) {
+      return nextRouteMap[type];
+    }
+    return "/dashboard";
+  };
+
   const getNextSteps = () => {
-    if (!orderDetails) return null;
+    const purchaseType = type || orderDetails?.metadata?.type;
     
-    const metadata = orderDetails.metadata || {};
-    
-    if (metadata.type === "song") {
+    if (purchaseType === "song") {
       return (
         <div className="space-y-2">
           <p className="font-medium">What happens next?</p>
@@ -67,7 +102,7 @@ export default function PurchaseSuccess() {
       );
     }
     
-    if (metadata.type === "binder") {
+    if (purchaseType === "binder") {
       return (
         <div className="space-y-2">
           <p className="font-medium">What happens next?</p>
@@ -80,7 +115,7 @@ export default function PurchaseSuccess() {
       );
     }
     
-    if (metadata.type === "dfy") {
+    if (purchaseType === "done_for_you" || purchaseType === "dfy") {
       return (
         <div className="space-y-2">
           <p className="font-medium">What happens next?</p>
@@ -92,8 +127,34 @@ export default function PurchaseSuccess() {
         </div>
       );
     }
+
+    if (purchaseType === "vip" || purchaseType === "vip-monthly" || purchaseType === "vip-yearly") {
+      return (
+        <div className="space-y-2">
+          <p className="font-medium">What happens next?</p>
+          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+            <li>Access VIP Planning Support from your dashboard</li>
+            <li>Schedule your first coaching session</li>
+            <li>Get personalized guidance through your planning journey</li>
+          </ul>
+        </div>
+      );
+    }
+
+    if (purchaseType === "printable") {
+      return (
+        <div className="space-y-2">
+          <p className="font-medium">What happens next?</p>
+          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+            <li>Download your printable planning form from the dashboard</li>
+            <li>Fill it out at your own pace—by hand or digitally</li>
+            <li>Keep it with your important documents</li>
+          </ul>
+        </div>
+      );
+    }
     
-    if (orderDetails.mode === "subscription") {
+    if (purchaseType === "premium" || orderDetails?.mode === "subscription") {
       return (
         <div className="space-y-2">
           <p className="font-medium">What's included:</p>
@@ -108,6 +169,10 @@ export default function PurchaseSuccess() {
     }
     
     return null;
+  };
+
+  const handleContinue = () => {
+    navigate(getNextRoute());
   };
 
   if (loading) {
@@ -140,7 +205,7 @@ export default function PurchaseSuccess() {
           <CardContent className="space-y-6">
             <div className="bg-muted/50 rounded-lg p-4">
               <p className="text-sm text-muted-foreground mb-2">Order confirmation has been sent to your email.</p>
-              {orderDetails && (
+              {sessionId && (
                 <p className="text-sm font-mono text-muted-foreground">
                   Order ID: {sessionId?.slice(0, 20)}...
                 </p>
@@ -159,8 +224,8 @@ export default function PurchaseSuccess() {
             </div>
 
             <div className="flex gap-4 pt-4">
-              <Button onClick={() => navigate("/dashboard")} className="flex-1">
-                Return to Dashboard
+              <Button onClick={handleContinue} className="flex-1">
+                Continue
               </Button>
             </div>
           </CardContent>

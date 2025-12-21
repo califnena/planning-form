@@ -9,7 +9,7 @@ import { AppFooter } from "@/components/AppFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { usePreviewModeContext } from "@/contexts/PreviewModeContext";
-import { savePendingCheckout, openCheckoutUrl, PendingCheckout } from "@/lib/pendingCheckout";
+import { setPendingCheckout } from "@/lib/pendingCheckout";
 
 export default function PlanAheadLanding() {
   const navigate = useNavigate();
@@ -18,17 +18,16 @@ export default function PlanAheadLanding() {
   const [isLoading, setIsLoading] = useState(false);
   const { isLoggedIn, hasPaidAccess, hasPrintableAccess, hasVIPAccess, openLockedModal, saveLastVisitedRoute } = usePreviewModeContext();
 
-  // Helper to start checkout or save pending and prompt login
-  const startCheckoutOrLogin = async (pending: PendingCheckout, onSuccess: () => void) => {
-    if (!isLoggedIn) {
-      // Save what they're trying to buy
-      savePendingCheckout(pending);
-      saveLastVisitedRoute(location.pathname);
-      openLockedModal("Sign in to continue with your purchase.");
-      return;
-    }
-    // Already logged in - proceed with checkout
-    onSuccess();
+  // Queue checkout and prompt login
+  const queueCheckoutAndLogin = (lookupKey: string, successUrl: string) => {
+    setPendingCheckout({
+      lookupKey,
+      successUrl,
+      cancelUrl: window.location.href,
+      postSuccessRedirect: "/dashboard",
+    });
+    saveLastVisitedRoute(location.pathname);
+    openLockedModal("Sign in to continue with your purchase.");
   };
 
   const handleStartPlanning = async () => {
@@ -57,98 +56,107 @@ export default function PlanAheadLanding() {
     }
   };
 
-  const showCheckoutToast = (title: string, description: string) => {
-    toast({ title, description });
-  };
-
   const handlePurchasePrintable = async () => {
-    const pending: PendingCheckout = {
-      lookupKey: "EFABASIC",
-      mode: "payment",
-      successUrl: `${window.location.origin}/purchase-success?type=printable`,
-      cancelUrl: window.location.href,
-    };
+    const successUrl = `${window.location.origin}/purchase-success?type=printable`;
 
-    startCheckoutOrLogin(pending, async () => {
-      try {
-        // If user already has printable access, go to dashboard
-        if (hasPrintableAccess) {
-          navigate("/dashboard");
-          toast({
-            title: "Access Granted",
-            description: "You already have printable access. Visit your dashboard to download.",
-          });
-          return;
-        }
+    if (!isLoggedIn) {
+      queueCheckoutAndLogin("EFABASIC", successUrl);
+      return;
+    }
 
-        const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
-          body: pending,
-        });
-        if (error) throw error;
-        if (data?.url) openCheckoutUrl(data.url, showCheckoutToast);
-      } catch (error) {
-        console.error("Error:", error);
-        toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });
-      }
-    });
+    // Already paid?
+    if (hasPrintableAccess) {
+      navigate("/dashboard");
+      toast({
+        title: "Access Granted",
+        description: "You already have printable access. Visit your Planning Menu to download.",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
+        body: { lookupKey: "EFABASIC", successUrl, cancelUrl: window.location.href },
+      });
+      if (error) throw error;
+      if (data?.url) window.location.href = data.url;
+    } catch (error) {
+      console.error("Error:", error);
+      toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handlePurchaseBinder = async () => {
-    const pending: PendingCheckout = {
-      lookupKey: "EFABINDER",
-      mode: "payment",
-      successUrl: `${window.location.origin}/purchase-success?type=binder`,
-      cancelUrl: window.location.href,
-    };
+    const successUrl = `${window.location.origin}/purchase-success?type=binder`;
 
-    startCheckoutOrLogin(pending, async () => {
-      try {
-        const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
-          body: pending,
-        });
-        if (error) throw error;
-        if (data?.url) openCheckoutUrl(data.url, showCheckoutToast);
-      } catch (error) {
-        console.error("Error:", error);
-        toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });
-      }
-    });
+    if (!isLoggedIn) {
+      queueCheckoutAndLogin("EFABINDER", successUrl);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
+        body: { lookupKey: "EFABINDER", successUrl, cancelUrl: window.location.href },
+      });
+      if (error) throw error;
+      if (data?.url) window.location.href = data.url;
+    } catch (error) {
+      console.error("Error:", error);
+      toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handlePurchaseDoItForYou = async () => {
-    const pending: PendingCheckout = {
-      lookupKey: "EFADOFORU",
-      mode: "payment",
-      successUrl: `${window.location.origin}/purchase-success?type=dfy`,
-      cancelUrl: window.location.href,
-    };
+    const successUrl = `${window.location.origin}/purchase-success?type=done_for_you`;
 
-    startCheckoutOrLogin(pending, async () => {
-      try {
-        const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
-          body: pending,
-        });
-        if (error) throw error;
-        if (data?.url) openCheckoutUrl(data.url, showCheckoutToast);
-      } catch (error) {
-        console.error("Error:", error);
-        toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });
-      }
-    });
-  };
-
-  const handleVIPSupport = () => {
     if (!isLoggedIn) {
-      saveLastVisitedRoute(location.pathname);
-      openLockedModal("Sign in to access VIP support.");
+      queueCheckoutAndLogin("EFADOFORU", successUrl);
       return;
     }
-    
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
+        body: { lookupKey: "EFADOFORU", successUrl, cancelUrl: window.location.href },
+      });
+      if (error) throw error;
+      if (data?.url) window.location.href = data.url;
+    } catch (error) {
+      console.error("Error:", error);
+      toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVIPSupport = async () => {
+    const successUrl = `${window.location.origin}/purchase-success?type=vip`;
+
+    if (!isLoggedIn) {
+      queueCheckoutAndLogin("EFAVIPMONTHLY", successUrl);
+      return;
+    }
+
     if (hasVIPAccess) {
-      navigate("/vip-coach");
-    } else {
-      // Redirect to VIP checkout
-      navigate("/pricing");
+      navigate("/vip-planning-support");
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
+        body: { lookupKey: "EFAVIPMONTHLY", successUrl, cancelUrl: window.location.href },
+      });
+      if (error) throw error;
+      if (data?.url) window.location.href = data.url;
+    } catch (error) {
+      console.error("Error:", error);
+      toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });
     }
   };
 

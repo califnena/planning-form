@@ -7,7 +7,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { Plus, Minus } from "lucide-react";
 import { useState, useEffect } from "react";
 import mascotCouple from "@/assets/mascot-couple.png";
-import { savePendingCheckout, PendingCheckout } from "@/lib/pendingCheckout";
+import { setPendingCheckout, PendingCheckout } from "@/lib/pendingCheckout";
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -59,7 +59,7 @@ const Pricing = () => {
     const checkoutConfig = planCheckoutConfig[planType];
     if (checkoutConfig) {
       // Save pending checkout so login/signup can continue to Stripe
-      savePendingCheckout(checkoutConfig);
+      setPendingCheckout(checkoutConfig);
     }
     // Redirect to login (which will auto-continue to checkout)
     navigate("/login");
