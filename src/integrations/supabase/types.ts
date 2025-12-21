@@ -2374,6 +2374,7 @@ export type Database = {
           created_at: string | null
           focus_areas: string[] | null
           id: string
+          last_planner_activity: string | null
           preferred_name: string | null
           preferred_state: string | null
           selected_sections: string[] | null
@@ -2386,6 +2387,7 @@ export type Database = {
           created_at?: string | null
           focus_areas?: string[] | null
           id?: string
+          last_planner_activity?: string | null
           preferred_name?: string | null
           preferred_state?: string | null
           selected_sections?: string[] | null
@@ -2398,6 +2400,7 @@ export type Database = {
           created_at?: string | null
           focus_areas?: string[] | null
           id?: string
+          last_planner_activity?: string | null
           preferred_name?: string | null
           preferred_state?: string | null
           selected_sections?: string[] | null
