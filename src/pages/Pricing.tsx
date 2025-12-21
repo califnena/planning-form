@@ -11,6 +11,8 @@ import { launchCheckout } from "@/lib/checkoutLauncher";
 import { supabase } from "@/integrations/supabase/client";
 import { AppFooter } from "@/components/AppFooter";
 import { AssistantWidget } from "@/components/assistant/AssistantWidget";
+import { PRICING_PAGE_LOOKUP_KEYS } from "@/lib/stripeLookupKeys";
+import { StripeValidationAlert } from "@/components/admin/StripeValidationAlert";
 import {
   Accordion,
   AccordionContent,
@@ -28,7 +30,7 @@ type StripePriceInfo = {
 
 type StripePricesMap = Record<string, StripePriceInfo>;
 
-const PRICING_LOOKUP_KEYS = ["EFAPREMIUM", "EFABASIC", "EFABINDER"];
+const PRICING_LOOKUP_KEYS_LOCAL = ["EFAPREMIUM", "EFABASIC", "EFABINDER"];
 
 // Map lookup keys to plan IDs
 const LOOKUP_KEY_TO_PLAN_ID: Record<string, string> = {
@@ -107,6 +109,7 @@ const Pricing = () => {
   const [currentPlanId, setCurrentPlanId] = useState<string | null>(null);
   const [currentPlanName, setCurrentPlanName] = useState<string | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState<boolean>(true);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   // Core plans - simplified to 3
   const plans = [
@@ -180,6 +183,11 @@ const Pricing = () => {
         if (user) {
           setIsLoggedIn(true);
           
+          // Check if user is admin
+          const { data: adminRole } = await supabase
+            .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
+          setIsAdmin(!!adminRole);
+          
           // Check for active purchases to determine current plan
           const { data: purchases } = await supabase
             .from('purchases')
@@ -223,7 +231,7 @@ const Pricing = () => {
       setLoadingPrices(true);
       try {
         const { data, error } = await supabase.functions.invoke("stripe-list-prices", {
-          body: { lookupKeys: PRICING_LOOKUP_KEYS },
+          body: { lookupKeys: PRICING_LOOKUP_KEYS_LOCAL },
         });
         if (error) throw error;
         if (!mounted) return;
@@ -370,6 +378,12 @@ const Pricing = () => {
               View Subscription
             </Button>
           </div>
+
+          {/* Stripe Validation Alert - shows issues to admins */}
+          <StripeValidationAlert 
+            lookupKeys={PRICING_PAGE_LOOKUP_KEYS} 
+            isAdmin={isAdmin} 
+          />
 
           {/* Plans Grid - 3 Cards */}
           <div ref={planCardsRef} className="grid md:grid-cols-3 gap-6 scroll-mt-8">

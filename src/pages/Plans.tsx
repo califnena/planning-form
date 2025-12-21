@@ -6,8 +6,9 @@ import { CheckCircle, Sparkles, Star, RefreshCw, AlertCircle } from "lucide-reac
 import { supabase } from "@/integrations/supabase/client";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { useNavigate } from "react-router-dom";
-import { STRIPE_LOOKUP_KEYS } from "@/lib/stripeLookupKeys";
+import { STRIPE_LOOKUP_KEYS, PLANS_PAGE_LOOKUP_KEYS } from "@/lib/stripeLookupKeys";
 import { PLANS } from "@/lib/plans";
+import { StripeValidationAlert } from "@/components/admin/StripeValidationAlert";
 
 interface StripePrice {
   lookupKey: string;
@@ -41,8 +42,9 @@ export default function Plans() {
   const [prices, setPrices] = useState<Record<string, StripePrice>>({});
   const [pricesError, setPricesError] = useState<string | null>(null);
   const [pricesLoading, setPricesLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  // Fetch user subscription status
+  // Fetch user subscription status and admin check
   useEffect(() => {
     const loadSubscription = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -53,6 +55,8 @@ export default function Plans() {
 
       const { data: adminRole } = await supabase
         .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
+      
+      setIsAdmin(!!adminRole);
       
       if (adminRole) {
         setCurrentPlan("Master Account");
@@ -168,6 +172,12 @@ export default function Plans() {
           {/* Available Plans */}
           <div>
             <h2 className="text-2xl font-bold mb-4">Available Plans</h2>
+            
+            {/* Stripe Validation Alert - shows issues to admins */}
+            <StripeValidationAlert 
+              lookupKeys={PLANS_PAGE_LOOKUP_KEYS} 
+              isAdmin={isAdmin} 
+            />
             
             {/* Error State */}
             {pricesError && (
