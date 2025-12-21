@@ -1,14 +1,38 @@
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { TextSizeToggle } from '@/components/TextSizeToggle';
-import { Home, ExternalLink, FileText, Download } from 'lucide-react';
+import { ExternalLink, FileText, Download, Search } from 'lucide-react';
 import { GlobalHeader } from '@/components/GlobalHeader';
 import { AppFooter } from '@/components/AppFooter';
-import { BackNavigation } from '@/components/BackNavigation';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ResourcesDownloadSection } from '@/components/resources/ResourcesDownloadSection';
+import { ResourcesSidebar, resourceSections } from '@/components/resources/ResourcesSidebar';
+import { Input } from '@/components/ui/input';
+
 const Resources = () => {
-  const resourceSections = [{
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeSection, setActiveSection] = useState(searchParams.get('section') || 'getting-started');
+  const [activeSubItem, setActiveSubItem] = useState<string | undefined>(searchParams.get('sub') || undefined);
+  const [faqSearch, setFaqSearch] = useState('');
+
+  // Update URL when section changes
+  useEffect(() => {
+    const params = new URLSearchParams();
+    params.set('section', activeSection);
+    if (activeSubItem) {
+      params.set('sub', activeSubItem);
+    }
+    setSearchParams(params, { replace: true });
+  }, [activeSection, activeSubItem, setSearchParams]);
+
+  const handleSectionChange = (sectionId: string, subItemId?: string) => {
+    setActiveSection(sectionId);
+    setActiveSubItem(subItemId);
+  };
+
+  // Legacy resource sections data
+  const legacyResourceSections = [{
     title: "Funeral Planning Essentials",
     icon: "🕊️",
     description: "Basics for understanding funeral decisions, legal requirements, and consumer rights.",
@@ -51,228 +75,578 @@ const Resources = () => {
       name: "Safe Deposit Box Guide",
       description: "Safe deposit boxes are sealed upon death in some states. Don't store your will there—keep it with your attorney or in a home safe. Good for: jewelry, deeds, titles, bonds. Bad for: items needed immediately after death."
     }]
-  }, {
-    title: "Travel & Out-of-State Death",
-    icon: "✈️",
-    description: "What to know when death occurs away from home.",
-    items: [{
-      name: "Travel Death Protection",
-      description: "If someone passes away while traveling far from home, the cost and logistics can be overwhelming. Travel death protection is a one-time payment plan that covers transportation of remains, international coordination, paperwork, and optional cremation services. It works worldwide and helps families avoid urgent decisions during a crisis.",
-      link: "/travel-protection",
-      isInternal: true
-    }, {
-      name: "Who Should Consider This",
-      description: "Travel death protection is especially useful for: frequent travelers, snowbirds, retirees, military families, and anyone with family in other states or countries. This is an optional planning tool—not a requirement—for people who travel or live part-time away from home."
-    }, {
-      name: "What It Covers",
-      description: "A typical travel death protection plan helps with: transportation of remains back home, international and out-of-state coordination, paperwork and local requirements, optional cremation and return of ashes, and assistance backed by an established insurance underwriter."
-    }]
-  }, {
-    title: "After-Death Logistics",
-    icon: "📋",
-    description: "Practical steps for families in the first 72 hours and beyond.",
-    items: [{
-      name: "Who to Notify First",
-      description: "If expected death (hospice/home): Call hospice nurse or family doctor first. If unexpected: Call 911. Then notify: funeral home, immediate family, employer, and close friends. Within days: insurance companies, banks, Social Security, pension providers."
-    }, {
-      name: "Death Certificates: How Many to Order",
-      description: "Order 10-15 certified copies from the funeral home or vital records office. Each organization needs an original: banks, insurance, Social Security, pension, property transfers, vehicle titles. Ordering later costs more and takes longer."
-    }, {
-      name: "Social Security Guide",
-      description: "Notify Social Security immediately—funeral home often does this. Benefits include: $255 lump-sum death benefit (if eligible), survivor benefits for spouses and children. Learn more at:",
-      link: "https://www.ssa.gov/benefits/survivors/"
-    }, {
-      name: "Employer & Pension Notifications",
-      description: "Contact HR within days. Documents needed: death certificate, marriage certificate, beneficiary forms. Ask about: final paycheck, unused PTO, retirement accounts, life insurance, pension survivor benefits, COBRA health coverage for dependents."
-    }, {
-      name: "Closing Accounts & Memberships",
-      description: "Create a checklist: credit cards, subscriptions (streaming, gym, magazines), utilities, memberships (AAA, AARP, clubs), loyalty programs. Cancel to avoid recurring charges. Some may offer refunds."
-    }]
-  }, {
-    title: "Digital Life & Passwords",
-    icon: "💻",
-    description: "Managing digital accounts and online presence after death.",
-    items: [{
-      name: "Apple Legacy Contact",
-      description: "Set up a Legacy Contact to give someone access to your Apple account and data after you die. Go to: Settings → [Your Name] → Sign-In & Security → Legacy Contact. Give them the access key. They'll need it plus your death certificate to request access.",
-      link: "https://support.apple.com/en-us/102431"
-    }, {
-      name: "Google Inactive Account Manager",
-      description: "Tell Google what to do with your account if you're inactive for a chosen period (3-18 months). Options: delete account, share data with trusted contacts, or keep it. Set up at:",
-      link: "https://myaccount.google.com/inactive"
-    }, {
-      name: "Social Media: Memorialize or Delete",
-      description: "Facebook: Set Legacy Contact or choose to delete. Instagram: Account can be memorialized or deleted by family. TikTok: Family can request account removal. LinkedIn: Family can close account with death certificate. Check each platform's help center for specific steps."
-    }, {
-      name: "Password Manager Recommendations",
-      description: "Use a password manager (1Password, Bitwarden, Dashlane) to store all login credentials. Set up emergency access or share master password with executor. Alternative: write critical passwords in a fireproof safe or safe deposit box."
-    }, {
-      name: "Digital Executor Overview",
-      description: "Choose someone tech-savvy you trust. Give them: list of accounts, where passwords are stored, instructions for each account (close, memorialize, transfer). Include: email, social media, cloud storage, financial accounts, subscriptions."
-    }]
-  }, {
-    title: "Special Groups (Veterans, Parents, Pet Owners)",
-    icon: "🎖️",
-    description: "Resources for veterans, parents of minors, and pet owners.",
-    items: [{
-      name: "Veterans' Burial Benefits",
-      description: "Eligible veterans and spouses can receive: free burial in a national cemetery, government headstone or marker, burial flag, Presidential Memorial Certificate. No charge for plot, opening/closing, or marker. Learn more:",
-      link: "https://www.va.gov/burials-memorials/"
-    }, {
-      name: "Benefits for Spouses of Veterans",
-      description: "Spouses and dependent children may be buried in a national cemetery with the veteran at no cost. Spouses can also receive a headstone or marker. Eligibility varies—check with the VA."
-    }, {
-      name: "Planning for Pets",
-      description: "Steps: (1) Choose a trusted caregiver and confirm they agree. (2) Document their contact info and care instructions. (3) Name them in your will or create a pet trust. (4) Set aside funds for food, vet care, and supplies. Some states allow formal pet trusts for long-term care."
-    }, {
-      name: "Resources for Parents",
-      description: "If you have minor children: Name a guardian in your will. Discuss with them first. Create an emergency binder with: medical info, school contacts, routines, preferences. Consider life insurance to provide for their care. Consult a family law attorney."
-    }]
-  }, {
-    title: "External Tools & Printable Guides",
-    icon: "🔗",
-    description: "Trusted organizations and downloadable resources.",
-    items: [{
-      name: "FTC Funeral Assistance Resources",
-      description: "Consumer information on funeral planning, costs, and rights.",
-      link: "https://consumer.ftc.gov/funerals"
-    }, {
-      name: "Funeral Consumers Alliance",
-      description: "Nonprofit consumer group with guides, checklists, and funeral home reviews. Helps families make informed, affordable choices.",
-      link: "https://funerals.org"
-    }, {
-      name: "VA Burial Benefits",
-      description: "Complete guide to VA burial allowances, headstones, flags, and cemetery eligibility.",
-      link: "https://www.va.gov/burials-memorials/veterans-burial-allowance/"
-    }, {
-      name: "Downloads from This App",
-      description: <>
-              Access our downloadable guides and blank forms:
-              <ul className="list-disc ml-6 mt-2 space-y-1">
-                <li><a href="/Pre-Planning-Your-Funeral-A-Gift-of-Peace-and-Clarity.pdf" download className="text-primary hover:underline">Pre-Planning Your Funeral Guide (PDF)</a></li>
-                <li><a href="/guides/Discussing-Death-Guide.pdf" download className="text-primary hover:underline">Discussing Death Guide (PDF)</a></li>
-                <li><a href="/guides/My-End-of-Life-Decisions-Guide.pdf" download className="text-primary hover:underline">My End-of-Life Decisions Guide (PDF)</a></li>
-                <li><Link to="/forms" className="text-primary hover:underline">Blank Fillable Forms (Pre-Planning & After-Death Planner)</Link></li>
-              </ul>
-            </>
-    }]
   }];
-  return <div className="min-h-screen bg-background flex flex-col">
-      <GlobalHeader />
-      <div className="flex-1 max-w-5xl mx-auto px-4 py-8 md:py-12 w-full">
-        <div className="flex justify-between items-start mb-8">
-          <BackNavigation />
-          <TextSizeToggle />
-        </div>
 
-        {/* Featured Guide - Gamma Embed */}
-        <div className="mb-12">
-          <div className="bg-card border-2 border-primary/20 rounded-lg p-6 md:p-8 shadow-lg">
-            <div className="mb-4">
-              <span className="inline-block px-3 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full mb-2">
-                📖 Featured Guide
-              </span>
-              <h2 className="text-2xl font-bold text-foreground">
-                Planning Your Funeral: A Gift of Peace & Clarity
-              </h2>
-            </div>
-            <div className="flex justify-center">
-              <iframe src="https://gamma.app/embed/rwk4xlwaixs6gbj" style={{
-              width: '700px',
-              maxWidth: '100%',
-              height: '450px'
-            }} allow="fullscreen" title="Planning Your Funeral: A Gift of Peace & Clarity" className="rounded-lg border border-border" />
-            </div>
-          </div>
-        </div>
-        {/* Resources & Downloads Section */}
-        <div className="mb-12">
-          <ResourcesDownloadSection />
-        </div>
+  // Render content based on active section
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'getting-started':
+        return renderGettingStarted();
+      case 'planning-guides':
+        return renderPlanningGuides();
+      case 'forms-worksheets':
+        return renderFormsWorksheets();
+      case 'faqs':
+        return renderFAQs();
+      case 'learn-library':
+        return renderLearnLibrary();
+      case 'events-workshops':
+        return renderEventsWorkshops();
+      case 'tools-calculators':
+        return renderToolsCalculators();
+      case 'support-help':
+        return renderSupportHelp();
+      default:
+        return renderGettingStarted();
+    }
+  };
 
-        {/* Know Your Rights Visual Card */}
-        <div className="mb-12">
-          <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
-            <div className="p-6 md:p-8">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl">⚖️</span>
-                <h2 className="text-xl md:text-2xl font-bold text-foreground">
-                  Know Your Rights Under the Funeral Rule
-                </h2>
-              </div>
-              <p className="text-muted-foreground mb-6">
-                The Federal Trade Commission's Funeral Rule protects consumers when arranging funeral services. Understanding these rights helps families avoid unnecessary costs and pressure during an emotional time.
-              </p>
-              <img src="/images/Know-Your-Rights-When-Arranging-a-Funeral.png" alt="Know Your Rights When Arranging a Funeral - Federal protections under the FTC Funeral Rule including requesting price lists, choosing only what you want, declining unwanted items, buying from any provider, receiving itemized pricing, and understanding embalming is usually not required" className="w-full rounded-lg border border-border shadow-sm mb-6" />
-              <div className="flex flex-wrap gap-3">
-                <a href="/guides/Know-Your-Rights-When-Arranging-a-Funeral.pdf" download className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm">
-                  <Download className="h-4 w-4" />
-                  Download PDF
-                </a>
-                <a href="https://reportfraud.ftc.gov" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm">
-                  <ExternalLink className="h-4 w-4" />
-                  Report a Concern (FTC)
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-          Helpful Resources
-        </h1>
-        <p className="text-base md:text-lg text-muted-foreground mb-8">
-          Quick guides, trusted tools, and important information to help you and your family feel prepared.
+  const renderGettingStarted = () => (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Getting Started</h1>
+        <p className="text-muted-foreground">
+          Welcome! This section helps you understand how this app works and where to begin.
         </p>
-        
-        <div className="space-y-6">
-          {resourceSections.map((section, sectionIndex) => <div key={sectionIndex} className="bg-white border border-border rounded-xl shadow-sm p-5 md:p-6">
-              <h2 className="text-lg md:text-xl font-semibold text-foreground mb-2 flex items-center gap-3">
-                <span className="text-2xl" aria-hidden="true">{section.icon}</span>
-                {section.title}
-              </h2>
-              <p className="text-sm md:text-base text-muted-foreground mb-4">{section.description}</p>
-              
-              <Accordion type="single" collapsible className="w-full">
-                {section.items.map((item, itemIndex) => <AccordionItem key={itemIndex} value={`section-${sectionIndex}-item-${itemIndex}`} className="border-b last:border-b-0">
-                    <AccordionTrigger className="text-left text-sm md:text-base font-semibold text-foreground py-3 hover:no-underline">
-                      {item.name}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-sm md:text-base text-muted-foreground pb-3">
-                      <div className="space-y-2">
-                        {typeof item.description === 'string' ? <p>{item.description}</p> : item.description}
-                        {item.link && (item.isDownload ? <a href={item.link} download className="text-primary hover:underline inline-flex items-center gap-1 font-medium">
-                              Download PDF <Download className="h-3 w-3" />
-                            </a> : item.isInternal ? <Link to={item.link} className="text-primary hover:underline inline-flex items-center gap-1 font-medium">
-                              Learn more <ExternalLink className="h-3 w-3" />
-                            </Link> : <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1 font-medium">
-                              Visit resource <ExternalLink className="h-3 w-3" />
-                            </a>)}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>)}
-              </Accordion>
-            </div>)}
-        </div>
+      </div>
 
-        <div className="mt-8 bg-muted/30 border border-border rounded-xl p-6">
-          <h3 className="text-lg md:text-xl font-semibold text-foreground mb-3">Need More Help?</h3>
-          <p className="text-sm md:text-base text-muted-foreground mb-4">
-            Our team is here to support you through every step of the planning process.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link to="/contact">
-              
-            </Link>
-            <Link to="/faq">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                View Common Questions
-              </Button>
-            </Link>
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <span>🎯</span> Overview
+        </h2>
+        <p className="text-muted-foreground mb-4">
+          This app helps you organize your end-of-life plans in one place. Whether you're planning ahead
+          or helping a family member after a loss, everything you need is here.
+        </p>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="bg-muted/30 rounded-lg p-4">
+            <h3 className="font-medium mb-2">Plan Ahead</h3>
+            <p className="text-sm text-muted-foreground">
+              Document your wishes, organize important contacts, and give your family peace of mind.
+            </p>
+          </div>
+          <div className="bg-muted/30 rounded-lg p-4">
+            <h3 className="font-medium mb-2">After a Death</h3>
+            <p className="text-sm text-muted-foreground">
+              Step-by-step guidance for what to do in the first days and weeks after losing someone.
+            </p>
           </div>
         </div>
       </div>
+
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <span>📖</span> How This App Works
+        </h2>
+        <ol className="space-y-3 text-muted-foreground">
+          <li className="flex gap-3">
+            <span className="bg-primary/10 text-primary font-medium rounded-full w-6 h-6 flex items-center justify-center text-sm shrink-0">1</span>
+            <span>Create an account to save your progress securely</span>
+          </li>
+          <li className="flex gap-3">
+            <span className="bg-primary/10 text-primary font-medium rounded-full w-6 h-6 flex items-center justify-center text-sm shrink-0">2</span>
+            <span>Choose which sections you want to complete (you can skip any)</span>
+          </li>
+          <li className="flex gap-3">
+            <span className="bg-primary/10 text-primary font-medium rounded-full w-6 h-6 flex items-center justify-center text-sm shrink-0">3</span>
+            <span>Answer questions at your own pace — save and come back anytime</span>
+          </li>
+          <li className="flex gap-3">
+            <span className="bg-primary/10 text-primary font-medium rounded-full w-6 h-6 flex items-center justify-center text-sm shrink-0">4</span>
+            <span>Download or share your summary with loved ones</span>
+          </li>
+        </ol>
+      </div>
+
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <span>✅</span> What To Do First
+        </h2>
+        <ul className="space-y-2 text-muted-foreground">
+          <li className="flex items-start gap-2">
+            <span className="text-primary">•</span>
+            Start with the sections that feel most important to you
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-primary">•</span>
+            Don't worry about completing everything — progress is saved automatically
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-primary">•</span>
+            If you need help, Claire (our assistant) is available anytime
+          </li>
+        </ul>
+      </div>
+
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
+        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-amber-800">
+          <span>⚠️</span> Common Mistakes to Avoid
+        </h2>
+        <ul className="space-y-2 text-amber-700">
+          <li className="flex items-start gap-2">
+            <span>•</span>
+            <span><strong>Trying to do everything at once</strong> — take breaks, this isn't urgent</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span>•</span>
+            <span><strong>Not telling anyone</strong> — make sure at least one person knows this exists</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span>•</span>
+            <span><strong>Skipping the basics</strong> — start with contacts and simple wishes first</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+
+  const renderPlanningGuides = () => (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Planning Guides</h1>
+        <p className="text-muted-foreground">
+          Educational content to help you make informed decisions.
+        </p>
+      </div>
+
+      {/* Featured Guide */}
+      <div className="bg-card border-2 border-primary/20 rounded-lg p-6 shadow-lg">
+        <div className="mb-4">
+          <span className="inline-block px-3 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full mb-2">
+            📖 Featured Guide
+          </span>
+          <h2 className="text-xl font-bold text-foreground">
+            Planning Your Funeral: A Gift of Peace & Clarity
+          </h2>
+        </div>
+        <div className="flex justify-center">
+          <iframe 
+            src="https://gamma.app/embed/rwk4xlwaixs6gbj" 
+            style={{ width: '700px', maxWidth: '100%', height: '450px' }}
+            allow="fullscreen" 
+            title="Planning Your Funeral: A Gift of Peace & Clarity" 
+            className="rounded-lg border border-border" 
+          />
+        </div>
+      </div>
+
+      {legacyResourceSections.map((section, idx) => (
+        <div key={idx} className="bg-card border border-border rounded-xl shadow-sm p-5 md:p-6">
+          <h2 className="text-lg md:text-xl font-semibold text-foreground mb-2 flex items-center gap-3">
+            <span className="text-2xl" aria-hidden="true">{section.icon}</span>
+            {section.title}
+          </h2>
+          <p className="text-sm md:text-base text-muted-foreground mb-4">{section.description}</p>
+          
+          <Accordion type="single" collapsible className="w-full">
+            {section.items.map((item, itemIndex) => (
+              <AccordionItem key={itemIndex} value={`section-${idx}-item-${itemIndex}`} className="border-b last:border-b-0">
+                <AccordionTrigger className="text-left text-sm md:text-base font-semibold text-foreground py-3 hover:no-underline">
+                  {item.name}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm md:text-base text-muted-foreground pb-3">
+                  <div className="space-y-2">
+                    <p>{item.description}</p>
+                    {item.link && (item.isDownload ? 
+                      <a href={item.link} download className="text-primary hover:underline inline-flex items-center gap-1 font-medium">
+                        Download PDF <Download className="h-3 w-3" />
+                      </a> : 
+                      <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1 font-medium">
+                        Visit resource <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderFormsWorksheets = () => (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Forms & Worksheets</h1>
+        <p className="text-muted-foreground">
+          Printable forms, checklists, and downloadable resources.
+        </p>
+      </div>
+
+      <ResourcesDownloadSection />
+
+      {/* Know Your Rights Card */}
+      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+        <div className="p-6 md:p-8">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-2xl">⚖️</span>
+            <h2 className="text-xl md:text-2xl font-bold text-foreground">
+              Know Your Rights Under the Funeral Rule
+            </h2>
+          </div>
+          <p className="text-muted-foreground mb-6">
+            The Federal Trade Commission's Funeral Rule protects consumers when arranging funeral services.
+          </p>
+          <img 
+            src="/images/Know-Your-Rights-When-Arranging-a-Funeral.png" 
+            alt="Know Your Rights When Arranging a Funeral" 
+            className="w-full rounded-lg border border-border shadow-sm mb-6" 
+          />
+          <div className="flex flex-wrap gap-3">
+            <a href="/guides/Know-Your-Rights-When-Arranging-a-Funeral.pdf" download className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm">
+              <Download className="h-4 w-4" />
+              Download PDF
+            </a>
+            <a href="https://reportfraud.ftc.gov" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm">
+              <ExternalLink className="h-4 w-4" />
+              Report a Concern (FTC)
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h2 className="text-lg font-semibold mb-4">Additional Forms</h2>
+        <ul className="space-y-3">
+          <li>
+            <Link to="/forms" className="text-primary hover:underline flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Blank Fillable Forms (Pre-Planning & After-Death Planner)
+            </Link>
+          </li>
+          <li>
+            <a href="/Pre-Planning-Your-Funeral-A-Gift-of-Peace-and-Clarity.pdf" download className="text-primary hover:underline flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Pre-Planning Your Funeral Guide (PDF)
+            </a>
+          </li>
+          <li>
+            <a href="/guides/Discussing-Death-Guide.pdf" download className="text-primary hover:underline flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Discussing Death Guide (PDF)
+            </a>
+          </li>
+          <li>
+            <a href="/guides/My-End-of-Life-Decisions-Guide.pdf" download className="text-primary hover:underline flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              My End-of-Life Decisions Guide (PDF)
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+
+  const renderFAQs = () => (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Frequently Asked Questions</h1>
+        <p className="text-muted-foreground mb-4">
+          Find answers to common questions about planning and using this app.
+        </p>
+        
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search FAQs..."
+            value={faqSearch}
+            onChange={(e) => setFaqSearch(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h2 className="text-lg font-semibold mb-4">General Questions</h2>
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="faq-1">
+            <AccordionTrigger className="text-left">What is this app for?</AccordionTrigger>
+            <AccordionContent className="text-muted-foreground">
+              This app helps you organize your end-of-life wishes and important information in one secure place.
+              It's designed to make planning easier for you and to help your family when the time comes.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="faq-2">
+            <AccordionTrigger className="text-left">Is my information secure?</AccordionTrigger>
+            <AccordionContent className="text-muted-foreground">
+              Yes. Your data is encrypted and stored securely. Only you and people you choose to share with can access your information.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="faq-3">
+            <AccordionTrigger className="text-left">Can I change my answers later?</AccordionTrigger>
+            <AccordionContent className="text-muted-foreground">
+              Absolutely. You can update any section at any time. We recommend reviewing your plan at least once a year or after major life events.
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
+
+      <div className="text-center py-4">
+        <Link to="/faq">
+          <Button variant="outline">
+            View All FAQs
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
+
+  const renderLearnLibrary = () => (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Learn Library</h1>
+        <p className="text-muted-foreground">
+          Articles, videos, and trusted resources for deeper learning.
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <span>📄</span> Articles
+          </h2>
+          <ul className="space-y-2 text-muted-foreground">
+            <li>
+              <a href="https://consumer.ftc.gov/articles/planning-your-own-funeral" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                Planning Your Own Funeral (FTC)
+              </a>
+            </li>
+            <li>
+              <a href="https://funerals.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                Funeral Consumers Alliance
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <span>🎥</span> Videos
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            Video content coming soon. Check back for educational videos on planning topics.
+          </p>
+        </div>
+
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <span>🔗</span> Trusted Resources
+          </h2>
+          <ul className="space-y-2 text-muted-foreground">
+            <li>
+              <a href="https://www.va.gov/burials-memorials/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                VA Burial Benefits
+              </a>
+            </li>
+            <li>
+              <a href="https://www.ssa.gov/benefits/survivors/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                Social Security Survivor Benefits
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <span>📖</span> Glossary
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            Plain-language definitions for common terms. Coming soon.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderEventsWorkshops = () => (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Events & Workshops</h1>
+        <p className="text-muted-foreground">
+          Upcoming events, seminars, and virtual workshops.
+        </p>
+      </div>
+
+      <div className="bg-card border border-border rounded-xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Upcoming Events</h2>
+          <Link to="/events">
+            <Button variant="outline" size="sm">View All Events</Button>
+          </Link>
+        </div>
+        <p className="text-muted-foreground">
+          Visit our events page to see upcoming educational seminars and workshops in your area.
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h3 className="font-semibold mb-2">Local Seminars</h3>
+          <p className="text-sm text-muted-foreground">
+            In-person educational sessions held at community centers, libraries, and partner locations.
+          </p>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h3 className="font-semibold mb-2">Virtual Workshops</h3>
+          <p className="text-sm text-muted-foreground">
+            Online sessions you can attend from home. Great for those with mobility concerns.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderToolsCalculators = () => (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Tools & Calculators</h1>
+        <p className="text-muted-foreground">
+          Practical tools to help with planning decisions.
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h3 className="font-semibold mb-2 flex items-center gap-2">
+            <span>💰</span> Cost Estimator
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Get a general idea of funeral costs based on your choices.
+          </p>
+          <Button variant="outline" size="sm" disabled>Coming Soon</Button>
+        </div>
+        
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h3 className="font-semibold mb-2 flex items-center gap-2">
+            <span>📊</span> Planning Progress
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Track which sections you've completed in your plan.
+          </p>
+          <Link to="/dashboard">
+            <Button variant="outline" size="sm">View Dashboard</Button>
+          </Link>
+        </div>
+        
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h3 className="font-semibold mb-2 flex items-center gap-2">
+            <span>🤔</span> Decision Helper
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Guided questions to help you make important choices.
+          </p>
+          <Button variant="outline" size="sm" disabled>Coming Soon</Button>
+        </div>
+        
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h3 className="font-semibold mb-2 flex items-center gap-2">
+            <span>✅</span> Document Checklist
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Generate a personalized list of documents you need.
+          </p>
+          <Link to="/forms">
+            <Button variant="outline" size="sm">View Checklists</Button>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderSupportHelp = () => (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Support & Help</h1>
+        <p className="text-muted-foreground">
+          Get help with the app or connect with our support team.
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <Link to="/contact" className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-colors">
+          <h3 className="font-semibold mb-2 flex items-center gap-2">
+            <span>📧</span> Contact Support
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Send us a message and we'll get back to you as soon as possible.
+          </p>
+        </Link>
+        
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h3 className="font-semibold mb-2 flex items-center gap-2">
+            <span>💬</span> How to Get Help
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Click the Claire button in the corner anytime to ask questions or get guidance.
+          </p>
+        </div>
+        
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h3 className="font-semibold mb-2 flex items-center gap-2">
+            <span>🐛</span> Report an Issue
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Found a bug or something not working right? Let us know.
+          </p>
+          <Link to="/contact">
+            <Button variant="outline" size="sm">Report Issue</Button>
+          </Link>
+        </div>
+        
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h3 className="font-semibold mb-2 flex items-center gap-2">
+            <span>💡</span> Feedback
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Have ideas to improve the app? We'd love to hear from you.
+          </p>
+          <Link to="/contact">
+            <Button variant="outline" size="sm">Share Feedback</Button>
+          </Link>
+        </div>
+      </div>
+
+      <div className="bg-muted/30 border border-border rounded-xl p-6">
+        <h3 className="text-lg font-semibold mb-3">Need More Help?</h3>
+        <p className="text-muted-foreground mb-4">
+          Our team is here to support you through every step of the planning process.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link to="/care-support">
+            <Button>Learn About CARE Support</Button>
+          </Link>
+          <Link to="/faq">
+            <Button variant="outline">View All FAQs</Button>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <GlobalHeader />
+      
+      <div className="flex-1 flex">
+        <ResourcesSidebar 
+          activeSection={activeSection}
+          activeSubItem={activeSubItem}
+          onSectionChange={handleSectionChange}
+        />
+        
+        <main className="flex-1 max-w-4xl px-4 py-8 md:py-12">
+          <div className="flex justify-end mb-4">
+            <TextSizeToggle />
+          </div>
+          
+          {renderContent()}
+        </main>
+      </div>
+      
       <AppFooter />
-    </div>;
+    </div>
+  );
 };
+
 export default Resources;
