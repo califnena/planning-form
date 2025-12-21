@@ -111,21 +111,13 @@ const Landing = () => {
           
           <div className="flex flex-col items-center gap-4 pt-4">
             
-            <Button variant="outline" size="lg" onClick={() => {
-            document.getElementById('how-we-help')?.scrollIntoView({
-              behavior: 'smooth'
-            });
-          }}>
-              {t('landing.seeHowItWorks')}
-            </Button>
+            
             
             {/* Trust note */}
             
             
             <div className="flex items-center gap-4 pt-2">
-              <Link to="/login" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                {t('landing.alreadyHaveAccount')}
-              </Link>
+              
               <span className="text-muted-foreground">•</span>
               <Link to="/pricing" className="text-sm text-primary hover:underline font-medium">
                 {t('landing.viewPricing')}
@@ -319,9 +311,7 @@ const Landing = () => {
 
         {/* PAYMENT EXPECTATION - Subtle but honest */}
         <div className="mt-8 max-w-3xl mx-auto text-center">
-          <p className="text-muted-foreground">
-            {t('landing.paymentExpectation')}
-          </p>
+          
         </div>
 
         {/* OPTIONAL SUPPORT */}
@@ -408,7 +398,7 @@ const Landing = () => {
             </Card>
 
             {/* Testimonial 2 */}
-            <Card className="border-2 bg-background/80 backdrop-blur">
+            <Card className="border-2 backdrop-blur bg-amber-200">
               <CardContent className="pt-8 pb-8 space-y-4 bg-yellow-200">
                 <Quote className="h-8 w-8 text-primary/30" />
                 <p className="text-foreground leading-relaxed">
@@ -421,7 +411,7 @@ const Landing = () => {
             </Card>
 
             {/* Testimonial 3 */}
-            <Card className="border-2 bg-background/80 backdrop-blur">
+            <Card className="border-2 backdrop-blur bg-amber-200">
               <CardContent className="pt-8 pb-8 space-y-4 bg-yellow-200">
                 <Quote className="h-8 w-8 text-primary/30" />
                 <p className="text-foreground leading-relaxed">
@@ -468,7 +458,7 @@ const Landing = () => {
         </div>
 
         {/* Helpful Guides & Resources Section - Now includes free downloads */}
-        <div className="mt-24 max-w-6xl mx-auto">
+        <div className="mt-24 max-w-6xl mx-auto bg-indigo-50">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
             {t('landing.helpfulGuides')}
           </h2>
