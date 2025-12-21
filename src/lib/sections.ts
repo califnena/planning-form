@@ -25,8 +25,6 @@ export const ALL_SECTIONS: Section[] = [
 export const REQUIRED_SECTIONS: Section[] = [
   { id: "preferences", title: "Preferences", description: "Choose which topics apply to you." },
   { id: "legalresources", title: "Legal Documents & Resources", description: "Essential legal forms and guides." },
-  { id: "resources", title: "Helpful Resources", description: "Guides and references." },
-  { id: "faq", title: "Common Questions", description: "Plain answers to common questions." },
 ];
 
 export const SETTINGS_DEFAULT = ["overview", "funeral", "personal", "legacy", "contacts", "providers", "financial", "insurance", "property", "pets", "digital", "legal", "messages"];
