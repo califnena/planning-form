@@ -175,6 +175,42 @@ export type Database = {
           },
         ]
       }
+      audit_log: {
+        Row: {
+          archive_id: string | null
+          changed_fields_count: number | null
+          created_at: string
+          event_type: string
+          id: string
+          note: string | null
+          planner_mode: string | null
+          section_id: string
+          user_id: string
+        }
+        Insert: {
+          archive_id?: string | null
+          changed_fields_count?: number | null
+          created_at?: string
+          event_type: string
+          id?: string
+          note?: string | null
+          planner_mode?: string | null
+          section_id: string
+          user_id: string
+        }
+        Update: {
+          archive_id?: string | null
+          changed_fields_count?: number | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          note?: string | null
+          planner_mode?: string | null
+          section_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       bank_accounts: {
         Row: {
           account_number: string | null
@@ -2054,6 +2090,83 @@ export type Database = {
         }
         Relationships: []
       }
+      share_link_access_log: {
+        Row: {
+          accessed_at: string
+          country: string | null
+          device_type: string | null
+          id: string
+          ip_hash: string | null
+          share_link_id: string
+        }
+        Insert: {
+          accessed_at?: string
+          country?: string | null
+          device_type?: string | null
+          id?: string
+          ip_hash?: string | null
+          share_link_id: string
+        }
+        Update: {
+          accessed_at?: string
+          country?: string | null
+          device_type?: string | null
+          id?: string
+          ip_hash?: string | null
+          share_link_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "share_link_access_log_share_link_id_fkey"
+            columns: ["share_link_id"]
+            isOneToOne: false
+            referencedRelation: "share_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      share_links: {
+        Row: {
+          created_at: string
+          id: string
+          is_enabled: boolean
+          label: string
+          last_accessed_at: string | null
+          permissions_scope: string
+          share_archives: boolean
+          token: string
+          total_views: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          label: string
+          last_accessed_at?: string | null
+          permissions_scope?: string
+          share_archives?: boolean
+          token?: string
+          total_views?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          label?: string
+          last_accessed_at?: string | null
+          permissions_scope?: string
+          share_archives?: boolean
+          token?: string
+          total_views?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       social_accounts: {
         Row: {
           action: string | null
@@ -2411,6 +2524,7 @@ export type Database = {
           preferred_name: string | null
           preferred_state: string | null
           selected_sections: string[] | null
+          skip_share_confirmation: boolean | null
           updated_at: string | null
           user_id: string
           user_path: string | null
@@ -2427,6 +2541,7 @@ export type Database = {
           preferred_name?: string | null
           preferred_state?: string | null
           selected_sections?: string[] | null
+          skip_share_confirmation?: boolean | null
           updated_at?: string | null
           user_id: string
           user_path?: string | null
@@ -2443,6 +2558,7 @@ export type Database = {
           preferred_name?: string | null
           preferred_state?: string | null
           selected_sections?: string[] | null
+          skip_share_confirmation?: boolean | null
           updated_at?: string | null
           user_id?: string
           user_path?: string | null

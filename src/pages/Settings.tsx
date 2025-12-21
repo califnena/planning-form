@@ -8,9 +8,11 @@ import { Label } from '@/components/ui/label';
 import { ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { ShareLinksManager } from '@/components/sharing/ShareLinksManager';
 
 const Settings = () => {
   const [user, setUser] = useState<any>(null);
+  const [ownerName, setOwnerName] = useState<string>("");
   const [visibleSections, setVisibleSections] = useState<string[]>([
     'pre-planning',
     'after-life-plan',
@@ -21,10 +23,23 @@ const Settings = () => {
   ]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const loadUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user);
-      // TODO: Load visible_sections from user settings in database
-    });
+      
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", session.user.id)
+          .maybeSingle();
+        
+        if (profile?.full_name) {
+          setOwnerName(profile.full_name);
+        }
+      }
+    };
+    loadUser();
   }, []);
 
   const handleSectionToggle = (sectionId: string) => {
@@ -33,7 +48,6 @@ const Settings = () => {
         ? prev.filter(id => id !== sectionId)
         : [...prev, sectionId]
     );
-    // TODO: Save to database
     toast({
       title: "Settings updated",
       description: "Your section preferences have been saved.",
@@ -67,11 +81,12 @@ const Settings = () => {
         </h1>
 
         <Tabs defaultValue="account" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
-            <TabsTrigger value="account" className="text-base">Account</TabsTrigger>
-            <TabsTrigger value="subscription" className="text-base">Subscription</TabsTrigger>
-            <TabsTrigger value="accessibility" className="text-base">Accessibility</TabsTrigger>
-            <TabsTrigger value="sections" className="text-base">Planning Sections</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5 mb-8">
+            <TabsTrigger value="account" className="text-sm">Account</TabsTrigger>
+            <TabsTrigger value="subscription" className="text-sm">Subscription</TabsTrigger>
+            <TabsTrigger value="sharing" className="text-sm">Sharing</TabsTrigger>
+            <TabsTrigger value="accessibility" className="text-sm">Accessibility</TabsTrigger>
+            <TabsTrigger value="sections" className="text-sm">Sections</TabsTrigger>
           </TabsList>
 
           <TabsContent value="account" className="space-y-4">
@@ -99,6 +114,16 @@ const Settings = () => {
                 <Label className="text-base font-semibold">Billing Details</Label>
                 <p className="mt-2 text-base text-muted-foreground">Coming soon</p>
               </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="sharing" className="space-y-4">
+            <div className="bg-card border rounded-lg p-6">
+              {user ? (
+                <ShareLinksManager userId={user.id} ownerName={ownerName} />
+              ) : (
+                <p className="text-muted-foreground">Loading...</p>
+              )}
             </div>
           </TabsContent>
 
