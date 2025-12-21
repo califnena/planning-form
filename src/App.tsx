@@ -54,6 +54,7 @@ import TravelProtection from "./pages/TravelProtection";
 import LandingAlt from "./pages/LandingAlt";
 import AfterDeathLanding from "./pages/AfterDeathLanding";
 import PlanAheadLanding from "./pages/PlanAheadLanding";
+import DashboardPreview from "./pages/DashboardPreview";
 
 
 const queryClient = new QueryClient();
@@ -77,6 +78,7 @@ const App = () => (
                     <Route path="/unsubscribe" element={<Unsubscribe />} />
                     <Route path="/pricing" element={<Pricing />} />
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/dashboard-preview" element={<DashboardPreview />} />
                     <Route path="/about-us" element={<AboutUs />} />
                     <Route path="/legal-forms" element={<LegalForms />} />
                     <Route path="/login" element={<Login />} />
