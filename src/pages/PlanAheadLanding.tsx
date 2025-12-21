@@ -8,6 +8,7 @@ import { Download, FileText, CheckCircle, Loader2, Printer, HandHelping, Chevron
 import { PublicHeader } from "@/components/PublicHeader";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { AppFooter } from "@/components/AppFooter";
+import mascotFamilyPlanning from "@/assets/mascot-family-planning.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { usePreviewModeContext } from "@/contexts/PreviewModeContext";
@@ -135,8 +136,15 @@ export default function PlanAheadLanding() {
       <main className="container mx-auto px-4 py-8">
         <Breadcrumbs className="mb-6" />
 
-        {/* Hero Section - Simplified */}
+        {/* Hero Section - Simplified with Mascot */}
         <div className="max-w-3xl mx-auto text-center space-y-4 mb-10">
+          <div className="flex justify-center mb-4">
+            <img 
+              src={mascotFamilyPlanning} 
+              alt="Planning together" 
+              className="w-full max-w-md rounded-xl shadow-lg"
+            />
+          </div>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
             Plan Ahead. On Your Terms.
           </h1>
