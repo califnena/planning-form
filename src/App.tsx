@@ -45,6 +45,7 @@ import NotFound from "./pages/NotFound";
 import CustomSong from "./pages/CustomSong";
 import SongInfo from "./pages/SongInfo";
 import PrePlanningGuide from "./pages/PrePlanningGuide";
+import PlanAheadGuideViewer from "./pages/PlanAheadGuideViewer";
 import SongConfirmation from "./pages/SongConfirmation";
 import PurchaseSuccess from "./pages/PurchaseSuccess";
 import AdminPanel from "./pages/AdminPanel";
@@ -124,6 +125,7 @@ const App = () => (
                       <Route path="/preview-landing" element={<LandingAlt />} />
                       <Route path="/after-death" element={<AfterDeathLanding />} />
                       <Route path="/plan-ahead" element={<PlanAheadLanding />} />
+                      <Route path="/plan-ahead/guide" element={<PlanAheadGuideViewer />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>

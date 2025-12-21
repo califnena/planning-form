@@ -209,64 +209,68 @@ export default function PlanAheadLanding() {
             </div>
           </div>
           
-          {/* Pre-Planning Guide Embed */}
-          <Card className="border-2 overflow-hidden mb-6">
-            <CardHeader className="text-center bg-blue-50 border-b">
-              <CardTitle className="flex items-center justify-center gap-2 text-blue-900">
-                <BookOpen className="h-5 w-5" />
-                Preview the Pre-Planning Guide
-              </CardTitle>
-              <CardDescription>
-                This walk-through explains the sections, the choices, and how families typically use this information later.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="flex justify-center bg-muted/30">
-                <iframe 
-                  src="https://gamma.app/embed/om4wcs6irh1s18e" 
-                  style={{ width: '700px', maxWidth: '100%', height: '450px' }} 
-                  allow="fullscreen" 
-                  title="EFA Pre-Planning Guide" 
-                  className="border-0" 
-                />
+          {/* Pre-Planning Guide Preview Tile */}
+          <Card className="border-2 hover:border-primary/30 transition-colors cursor-pointer group" onClick={() => navigate('/plan-ahead/guide')}>
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+                  <BookOpen className="h-7 w-7 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
+                    Pre-Planning Guide
+                  </h3>
+                  <ul className="space-y-1.5 text-sm text-muted-foreground mb-4">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      Learn how funeral pre-planning works
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      Understand what decisions matter most
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                      See how families use this information
+                    </li>
+                  </ul>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Eye className="h-4 w-4" />
+                    View Guide
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Checklist Preview */}
-          <Card className="border-2 overflow-hidden">
-            <CardHeader className="text-center bg-green-50 border-b">
-              <CardTitle className="flex items-center justify-center gap-2 text-green-900">
-                <FileText className="h-5 w-5" />
-                Pre-Planning Checklist Preview
-              </CardTitle>
-              <CardDescription>
-                See what you'll be documenting
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="flex justify-center bg-muted/30">
-                <iframe 
-                  src="https://gamma.app/embed/plsn9a9j7cvzdh5" 
-                  style={{ width: '700px', maxWidth: '100%', height: '450px' }} 
-                  allow="fullscreen" 
-                  title="Pre-Planning Checklist" 
-                  className="border-0" 
-                />
+          {/* Checklist Preview Tile */}
+          <Card className="border-2 mt-6">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <FileText className="h-7 w-7 text-green-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg mb-2">
+                    Pre-Planning Checklist
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    A quick reference of what you'll be documenting—helpful to review before you begin.
+                  </p>
+                  <a 
+                    href="/checklists/Pre-Planning-Checklist-2.png" 
+                    download="Pre-Planning-Checklist.png"
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Download className="h-4 w-4" />
+                    Download Checklist
+                  </a>
+                </div>
               </div>
             </CardContent>
           </Card>
           
-          <div className="flex justify-center mt-6">
-            <a 
-              href="/checklists/Pre-Planning-Checklist-2.png" 
-              download="Pre-Planning-Checklist.png"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium min-h-[48px]"
-            >
-              <Download className="h-4 w-4" />
-              Download Checklist Image
-            </a>
-          </div>
         </div>
 
         {/* ============ SECTION 2: CHOOSE YOUR PATH ============ */}
