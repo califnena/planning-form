@@ -48,21 +48,6 @@ const Pricing = () => {
 
   const plans = [
     {
-      id: "free",
-      name: "Free Plan",
-      price: "$0",
-      period: "Forever",
-      description: "Access basic resources and browse available services",
-      features: [
-        "After-Death checklist guide",
-        "Basic resources and FAQs",
-        "Ability to purchase any product or service",
-        "Browse all available planning tools",
-        "View pricing and service details"
-      ],
-      badge: null
-    },
-    {
       id: "basic",
       name: "Basic Plan",
       price: "$9.99",
