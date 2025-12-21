@@ -141,7 +141,7 @@ export default function TravelProtection() {
         {/* Back Button */}
         <div className="mt-8 text-center">
           <Button variant="outline" onClick={() => navigate('/app')}>
-            {t('common.backToDashboard', 'Back to Dashboard')}
+            Back to Planning Menu
           </Button>
         </div>
       </div>

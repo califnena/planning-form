@@ -62,7 +62,7 @@ const Vendors = () => {
           <Link to="/">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+              Back to Planning Menu
             </Button>
           </Link>
           <TextSizeToggle />

@@ -64,7 +64,7 @@ export const PublicHeader = () => {
               className="gap-2"
             >
               <LayoutDashboard className="h-4 w-4" />
-              Dashboard
+              Planning Menu
             </Button>
           </Link>
           <Link to="/resources">
@@ -74,7 +74,7 @@ export const PublicHeader = () => {
               className="gap-2"
             >
               <HelpCircle className="h-4 w-4" />
-              Resources
+              Help
             </Button>
           </Link>
         </nav>
@@ -122,10 +122,10 @@ export const PublicHeader = () => {
           Home
         </Link>
         <Link to="/dashboard" className={`text-sm ${isActive("/dashboard") ? "text-primary font-medium" : "text-muted-foreground"}`}>
-          Dashboard
+          Planning Menu
         </Link>
         <Link to="/resources" className={`text-sm ${isActive("/resources") ? "text-primary font-medium" : "text-muted-foreground"}`}>
-          Resources
+          Help
         </Link>
       </div>
     </header>

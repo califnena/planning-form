@@ -67,7 +67,7 @@ const AfterLifePlan = () => {
           <Link to="/">
             <Button variant="ghost" size="sm" className="mb-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+              Back to Planning Menu
             </Button>
           </Link>
           <TextSizeToggle />

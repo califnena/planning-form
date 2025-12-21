@@ -492,13 +492,13 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* STEP 1 - Plan Ahead Planner */}
+        {/* STEP 1 - My Planning Steps */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-bold text-lg shadow-md">
               1
             </div>
-            <h2 className="text-2xl font-bold">{t('dashboard.planAheadPlanner')}</h2>
+            <h2 className="text-2xl font-bold">My Planning Steps</h2>
           </div>
           
           <Card className="p-6">
@@ -531,7 +531,7 @@ export default function Dashboard() {
                       </div>
                     </div> : <div className="flex flex-col sm:flex-row flex-wrap gap-2">
                       <Button onClick={handleContinuePlanner} className="w-full sm:w-auto sm:flex-1 bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] whitespace-normal h-auto py-2">
-                        {t('dashboard.openMyPlanner')}
+                        Begin Planning
                       </Button>
                       <Button onClick={handleGeneratePDF} variant="outline" className="w-full sm:w-auto sm:flex-1 border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 whitespace-normal h-auto py-2">
                         {t('dashboard.printableVersion')}
@@ -548,7 +548,7 @@ export default function Dashboard() {
 
               <div className="border-t pt-6" />
 
-              {/* Option 2: Printable Version */}
+              {/* Option 2: Printable Documents */}
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -556,7 +556,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold mb-2">{t('dashboard.option2Printable')}</h3>
+                  <h3 className="font-semibold mb-2">Printable Documents</h3>
                   <p className="text-sm text-muted-foreground mb-4">
                     {t('dashboard.option2PrintableDesc')}
                   </p>
@@ -576,7 +576,7 @@ export default function Dashboard() {
 
               <div className="border-t pt-6" />
 
-              {/* Option 3: Do It For You Service */}
+              {/* Option 3: Do-It-For-You Planning */}
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -585,15 +585,15 @@ export default function Dashboard() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-semibold">{t('dashboard.option3DoItForYou')}</h3>
+                    <h3 className="font-semibold">Do-It-For-You Planning</h3>
                     <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded">{t('dashboard.popular')}</span>
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
-                    {t('dashboard.option3Desc')}
+                    We help organize your wishes and complete the planning with you.
                   </p>
                   <div className="flex flex-col sm:flex-row flex-wrap gap-2">
                     <Button onClick={handleBookDoItForYou} className="w-full sm:w-auto sm:flex-1 bg-primary-foreground text-blue-700 whitespace-normal h-auto py-2">
-                      {t('dashboard.purchaseAndBookAppointment')}
+                      Request Do-It-For-You Planning
                     </Button>
                     <Button onClick={handleDownloadWorkbook} variant="outline" className="w-full sm:w-auto sm:flex-1 border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 whitespace-normal h-auto py-2">
                       {t('dashboard.purchasePhysicalBinder')}
@@ -605,13 +605,13 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* STEP 2 - Compassionate Guidance & Support */}
+        {/* STEP 2 - VIP Planning Support */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-bold text-lg shadow-md">
               2
             </div>
-            <h2 className="text-2xl font-bold">Compassionate Guidance & Support</h2>
+            <h2 className="text-2xl font-bold">VIP Planning Support</h2>
           </div>
           
           <Card className="p-6 bg-amber-50/50 border-amber-200">
@@ -622,9 +622,9 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-semibold mb-2">For Those Who Want Reassurance, Not Just Forms</h3>
+                <h3 className="text-xl font-semibold mb-2">One-on-one guidance through your planning process</h3>
                 <p className="text-muted-foreground mb-4">
-                  Personal support goes beyond planning—offering compassionate check-ins, help during moments of distress, and steady guidance before or after a loss.
+                  VIP Planning Support goes beyond planning—offering compassionate check-ins, help during moments of distress, and steady guidance before or after a loss.
                 </p>
                 <ul className="space-y-2 mb-4 text-muted-foreground">
                   <li className="flex items-start gap-2">
@@ -648,10 +648,10 @@ export default function Dashboard() {
                     Talk With a Planning Guide
                   </Button> : <div className="flex flex-wrap gap-3">
                     <Button onClick={handleVIPMonthly} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] min-h-[48px]">
-                      Get Monthly Support
+                      Add VIP Planning Support
                     </Button>
                     <Button onClick={handleVIPYearly} variant="outline" className="border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 min-h-[48px]">
-                      Get Yearly Support (Save 20%)
+                      Yearly VIP Support (Save 20%)
                     </Button>
                   </div>}
               </div>
@@ -806,16 +806,16 @@ export default function Dashboard() {
           <ChecklistsSection />
         </div>
 
-        {/* STEP 6 - Education & Support */}
+        {/* STEP 6 - Helpful Guides & Planning Support */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">{t('dashboard.educationAndSupport', 'Education & Support')}</h2>
+          <h2 className="text-2xl font-bold mb-6">Helpful Guides & Planning Support</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/resources')}>
               <div className="flex flex-col items-center text-center gap-3">
                 <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                   <BookOpen className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="font-semibold">{t('dashboard.tiles.resources.title')}</h3>
+                <h3 className="font-semibold">Helpful Guides</h3>
               </div>
             </Card>
             
@@ -824,7 +824,7 @@ export default function Dashboard() {
                 <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
                   <Scale className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="font-semibold">{t('dashboard.tiles.legalDocuments.title')}</h3>
+                <h3 className="font-semibold">Printable Documents</h3>
               </div>
             </Card>
             

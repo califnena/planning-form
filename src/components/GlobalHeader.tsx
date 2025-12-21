@@ -213,7 +213,7 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
                 <DropdownMenuItem asChild>
                   <Link to="/vip-coach" className="flex items-center gap-2 cursor-pointer">
                     <Star className="h-4 w-4 text-yellow-500" />
-                    <span className="font-medium">{t("header.vipCoachAssistant")}</span>
+                    <span className="font-medium">VIP Planning Support</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
