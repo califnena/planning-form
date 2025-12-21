@@ -63,6 +63,7 @@ import DoItForYou from "./pages/DoItForYou";
 import DoItForYouConfirmation from "./pages/DoItForYouConfirmation";
 import DoItForYouIntake from "./pages/DoItForYouIntake";
 import DoItForYouIntakeSubmitted from "./pages/DoItForYouIntakeSubmitted";
+import PaymentHelp from "./pages/PaymentHelp";
 
 const queryClient = new QueryClient();
 
@@ -136,6 +137,7 @@ const App = () => (
                       <Route path="/do-it-for-you/confirmation" element={<DoItForYouConfirmation />} />
                       <Route path="/do-it-for-you/intake" element={<DoItForYouIntake />} />
                       <Route path="/do-it-for-you/intake-submitted" element={<DoItForYouIntakeSubmitted />} />
+                      <Route path="/payment-help" element={<PaymentHelp />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
