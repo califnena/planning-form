@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { GlobalHeader } from "@/components/GlobalHeader";
@@ -18,6 +18,9 @@ import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator"
 import { useTranslation } from "react-i18next";
 import { AssistantWidget } from "@/components/assistant/AssistantWidget";
 import { OnboardingTour } from "@/components/planner/OnboardingTour";
+import { AppFooter } from "@/components/AppFooter";
+import { Button } from "@/components/ui/button";
+import { Home } from "lucide-react";
 
 // Preview Mode Context
 const PreviewModeContext = createContext<{ isPreviewMode: boolean }>({ isPreviewMode: false });
@@ -31,6 +34,7 @@ import { SectionContacts } from "@/components/planner/sections/SectionContacts";
 import { SectionAbout } from "@/components/planner/sections/SectionAbout";
 import { SectionLegacy } from "@/components/planner/sections/SectionLegacy";
 import { SectionChecklist } from "@/components/planner/sections/SectionChecklist";
+import { SectionOverview } from "@/components/planner/sections/SectionOverview";
 import { SectionFuneral } from "@/components/planner/sections/SectionFuneral";
 import { SectionFinancial } from "@/components/planner/sections/SectionFinancial";
 import { SectionInsurance } from "@/components/planner/sections/SectionInsurance";
@@ -370,7 +374,8 @@ const PlannerApp = () => {
 
   // Map section IDs to labels and completion status
   const allSectionItems = [
-    { id: "overview", label: t("navigation.checklist"), completed: !!plan.checklist_notes },
+    { id: "overview", label: "Overview", completed: false },
+    { id: "checklist", label: t("navigation.checklist"), completed: !!plan.checklist_notes },
     { id: "instructions", label: t("navigation.instructions"), completed: !!plan.instructions_notes },
     { id: "personal", label: t("navigation.personal"), completed: false },
     { id: "legacy", label: t("navigation.about"), completed: !!plan.about_me_notes },
@@ -389,8 +394,8 @@ const PlannerApp = () => {
   const visibleSections = mergeVisibleSections(userSettings);
   const visibleIds = new Set(visibleSections.map(s => s.id));
   
-  // Build sidebar: preferences always first, then enabled sections, then always-visible sections
-  const enabledSections = allSectionItems.filter(item => visibleIds.has(item.id));
+  // Build sidebar: preferences always first, then overview, then enabled sections, then always-visible sections
+  const enabledSections = allSectionItems.filter(item => visibleIds.has(item.id) && item.id !== "overview");
   const alwaysVisibleSections = [
     { id: "legalresources", label: t("navigation.legalresources"), completed: false },
     { id: "resources", label: t("navigation.guide"), completed: false },
@@ -399,6 +404,7 @@ const PlannerApp = () => {
   
   const sectionItems = [
     { id: "preferences", label: t("navigation.preferences"), completed: false },
+    { id: "overview", label: "Overview", completed: false },
     ...enabledSections,
     ...alwaysVisibleSections
   ];
@@ -446,6 +452,13 @@ const PlannerApp = () => {
         ) : null;
         break;
       case "overview":
+        sectionContent = (
+          <SectionOverview
+            onNavigateToChecklist={() => setActiveSection("checklist")}
+          />
+        );
+        break;
+      case "checklist":
         sectionContent = (
           <SectionChecklist
             data={plan}
@@ -567,11 +580,11 @@ const PlannerApp = () => {
         );
     }
 
-    // Don't show navigation on resources, faq, revisions, preferences, and legalresources sections
-    const showNavigation = !["resources", "faq", "revisions", "preferences", "legalresources"].includes(activeSection);
+    // Don't show navigation on resources, faq, revisions, preferences, overview, and legalresources sections
+    const showNavigation = !["resources", "faq", "revisions", "preferences", "legalresources", "overview"].includes(activeSection);
     
     // Sections that should NOT be locked in preview mode (read-only sections)
-    const readOnlySections = ["resources", "faq", "legalresources", "preferences"];
+    const readOnlySections = ["resources", "faq", "legalresources", "preferences", "overview"];
     const shouldLock = !readOnlySections.includes(activeSection);
 
     return (
@@ -597,51 +610,64 @@ const PlannerApp = () => {
     <PreviewModeContext.Provider value={{ isPreviewMode }}>
       <div className="min-h-screen flex flex-col bg-background">
         <GlobalHeader onGenerateDocument={handleDownloadPDF} />
+        
+        {/* Home Button */}
+        <div className="container mx-auto px-4 py-2">
+          <Link to="/">
+            <Button variant="ghost" size="sm" className="gap-2">
+              <Home className="h-4 w-4" />
+              Home
+            </Button>
+          </Link>
+        </div>
+        
         <PlannerShell
-        sectionItems={sectionItems}
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-        onPreviewPDF={handlePreviewPDF}
-        onDownloadPDF={handleDownloadPDF}
-        onDownloadManualForm={handleDownloadManualForm}
-        onEmailPlan={handleEmailPlan}
-        onSignOut={handleSignOut}
-        onSave={handleManualSave}
-        onAfterLifePlan={handleAfterLifePlan}
-      >
-        {isPreviewMode && <PreviewModeBanner />}
-        {renderSection()}
-      </PlannerShell>
-
-      <RevisionPromptDialog
-        open={showRevisionDialog}
-        onOpenChange={setShowRevisionDialog}
-        onConfirm={handleRevisionConfirm}
-        preparedBy={plan.prepared_by || ""}
-      />
-
-      <PIICollectionDialog
-        open={showPIIDialog}
-        onOpenChange={setShowPIIDialog}
-        onSubmit={handlePIISubmit}
-      />
-
-      <EmailPlanDialog
-        open={showEmailDialog}
-        onOpenChange={setShowEmailDialog}
-        planData={{ ...plan, _pii: pendingPIIData }}
-        preparedBy={plan.prepared_by || ""}
-      />
-      
-      <AssistantWidget />
-      
-      {user && (
-        <OnboardingTour
-          userId={user.id}
-          onComplete={() => setShowOnboarding(false)}
+          sectionItems={sectionItems}
           activeSection={activeSection}
+          onSectionChange={setActiveSection}
+          onPreviewPDF={handlePreviewPDF}
+          onDownloadPDF={handleDownloadPDF}
+          onDownloadManualForm={handleDownloadManualForm}
+          onEmailPlan={handleEmailPlan}
+          onSignOut={handleSignOut}
+          onSave={handleManualSave}
+          onAfterLifePlan={handleAfterLifePlan}
+        >
+          {isPreviewMode && <PreviewModeBanner />}
+          {renderSection()}
+        </PlannerShell>
+
+        <RevisionPromptDialog
+          open={showRevisionDialog}
+          onOpenChange={setShowRevisionDialog}
+          onConfirm={handleRevisionConfirm}
+          preparedBy={plan.prepared_by || ""}
         />
-      )}
+
+        <PIICollectionDialog
+          open={showPIIDialog}
+          onOpenChange={setShowPIIDialog}
+          onSubmit={handlePIISubmit}
+        />
+
+        <EmailPlanDialog
+          open={showEmailDialog}
+          onOpenChange={setShowEmailDialog}
+          planData={{ ...plan, _pii: pendingPIIData }}
+          preparedBy={plan.prepared_by || ""}
+        />
+        
+        <AssistantWidget />
+        
+        {user && (
+          <OnboardingTour
+            userId={user.id}
+            onComplete={() => setShowOnboarding(false)}
+            activeSection={activeSection}
+          />
+        )}
+        
+        <AppFooter />
       </div>
     </PreviewModeContext.Provider>
   );
