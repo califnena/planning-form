@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,7 +26,28 @@ export default function PlanAheadLanding() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [learnOpen, setLearnOpen] = useState(false);
+  const [hasPlannerProgress, setHasPlannerProgress] = useState(false);
   const { isLoggedIn, hasPaidAccess, hasPrintableAccess, openLockedModal, saveLastVisitedRoute } = usePreviewModeContext();
+
+  // Check for planner progress on mount
+  useEffect(() => {
+    const checkProgress = async () => {
+      if (!isLoggedIn) return;
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      const { data: settings } = await supabase
+        .from('user_settings')
+        .select('planner_mode, selected_sections')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      const hasProgress = !!(settings?.planner_mode || settings?.selected_sections);
+      setHasPlannerProgress(hasProgress);
+    };
+    checkProgress();
+  }, [isLoggedIn]);
 
   const queueCheckoutAndLogin = (lookupKey: string, successUrl: string) => {
     setPendingCheckout({
@@ -44,7 +65,13 @@ export default function PlanAheadLanding() {
   };
 
   const handleStartPlanning = () => {
-    navigate("/planner-preview");
+    if (isLoggedIn && hasPlannerProgress) {
+      // Continue Planning → go to dashboard
+      navigate("/dashboard");
+    } else {
+      // Start Digital Planner → go to planner preview
+      navigate("/planner-preview");
+    }
   };
 
   const handleUseStepByStepPlanner = async () => {
@@ -149,7 +176,7 @@ export default function PlanAheadLanding() {
               size="lg"
               className="min-h-[56px] text-lg px-8"
             >
-              Start Planning
+              {isLoggedIn && hasPlannerProgress ? "Continue Planning" : "Start Digital Planner"}
             </Button>
             <Button 
               variant="outline"
