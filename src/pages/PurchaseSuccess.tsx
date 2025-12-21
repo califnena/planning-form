@@ -1,236 +1,240 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { CheckCircle2 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle2, Loader2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
+import { PublicHeader } from "@/components/PublicHeader";
+import { AppFooter } from "@/components/AppFooter";
 import { supabase } from "@/integrations/supabase/client";
 
-// Map purchase types to next destination routes
-const nextRouteMap: Record<string, string> = {
-  printable: "/dashboard",
-  binder: "/dashboard",
-  premium: "/preplansteps",
-  vip: "/vip-planning-support",
-  "vip-monthly": "/vip-planning-support",
-  "vip-yearly": "/vip-planning-support",
-  done_for_you: "/dashboard",
-  dfy: "/dashboard",
-  song: "/custom-song",
+type VerifiedItem = {
+  lookupKey: string;
+  name: string;
+  type: "one_time" | "recurring";
+  interval?: "month" | "year" | null;
+};
+
+// Map lookupKeys to next destination routes with highlights
+const ROUTE_BY_LOOKUP: Record<string, string> = {
+  EFABASIC: "/dashboard?highlight=printable",
+  EFAPREMIUM: "/preplansteps?highlight=guided",
+  EFAVIPMONTHLY: "/coach-assistant?highlight=vip",
+  EFAVIPYEAR: "/coach-assistant?highlight=vip",
+  EFABINDER: "/dashboard?highlight=binder",
+  EFADOFORU: "/do-it-for-you/confirmation",
+  STANDARDSONG: "/custom-song?highlight=song",
+};
+
+// Fallback names for type param (backwards compatibility)
+const TYPE_NAMES: Record<string, string> = {
+  printable: "Printable Planning Form",
+  binder: "Physical Planning Binder",
+  premium: "Step-by-Step Guided Planner",
+  vip: "VIP Planning Support",
+  "vip-monthly": "VIP Planning Support (Monthly)",
+  "vip-yearly": "VIP Planning Support (Yearly)",
+  done_for_you: "Do-It-For-You Planning",
+  dfy: "Do-It-For-You Planning",
+  song: "Custom Memorial Song",
+};
+
+const TYPE_ROUTES: Record<string, string> = {
+  printable: "/dashboard?highlight=printable",
+  binder: "/dashboard?highlight=binder",
+  premium: "/preplansteps?highlight=guided",
+  vip: "/coach-assistant?highlight=vip",
+  "vip-monthly": "/coach-assistant?highlight=vip",
+  "vip-yearly": "/coach-assistant?highlight=vip",
+  done_for_you: "/do-it-for-you/confirmation",
+  dfy: "/do-it-for-you/confirmation",
+  song: "/custom-song?highlight=song",
 };
 
 export default function PurchaseSuccess() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  
   const sessionId = searchParams.get("session_id");
-  const type = searchParams.get("type");
-  const [orderDetails, setOrderDetails] = useState<any>(null);
+  const typeParam = searchParams.get("type");
+
   const [loading, setLoading] = useState(true);
+  const [paid, setPaid] = useState<boolean | null>(null);
+  const [items, setItems] = useState<VerifiedItem[]>([]);
+
+  const planningMenuRoute = "/dashboard";
+
+  // Compute best route based on verified items or fallback to type param
+  const bestNextRoute = useMemo(() => {
+    // First try verified items
+    for (const it of items) {
+      const route = ROUTE_BY_LOOKUP[it.lookupKey];
+      if (route) return route;
+    }
+    // Fallback to type param
+    if (typeParam && TYPE_ROUTES[typeParam]) {
+      return TYPE_ROUTES[typeParam];
+    }
+    return planningMenuRoute;
+  }, [items, typeParam]);
+
+  const lastVisitedRoute = useMemo(() => {
+    return localStorage.getItem("efa_last_visited_route") || "";
+  }, []);
 
   useEffect(() => {
-    if (sessionId) {
-      fetchOrderDetails();
-    } else {
-      setLoading(false);
-    }
-  }, [sessionId]);
+    let mounted = true;
 
-  const fetchOrderDetails = async () => {
-    try {
-      // Fetch session details from Stripe via edge function
-      const { data, error } = await supabase.functions.invoke('get-stripe-session', {
-        body: { sessionId },
-      });
+    (async () => {
+      setLoading(true);
 
-      if (error) throw error;
-      setOrderDetails(data);
-    } catch (error) {
-      console.error("Error fetching order details:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+      // If no session_id, try to use type param for display
+      if (!sessionId) {
+        if (!mounted) return;
+        setPaid(typeParam ? true : null); // Assume paid if type param exists
+        setItems([]);
+        setLoading(false);
+        return;
+      }
 
-  const getOrderType = () => {
-    // First check URL param
-    if (type) {
-      const typeNames: Record<string, string> = {
-        printable: "Printable Planning Form",
-        binder: "Physical Binder & Printable Workbook",
-        premium: "Premium Subscription",
-        vip: "VIP Planning Support",
-        "vip-monthly": "VIP Planning Support (Monthly)",
-        "vip-yearly": "VIP Planning Support (Yearly)",
-        done_for_you: "Do-It-For-You Service",
-        dfy: "Do-It-For-You Service",
-        song: "Custom Memorial Song",
-      };
-      return typeNames[type] || "Your Purchase";
-    }
-    
-    if (!orderDetails) return "Your Purchase";
-    
-    const metadata = orderDetails.metadata || {};
-    if (metadata.type === "song") return "Custom Memorial Song";
-    if (metadata.type === "binder") return "Physical Binder & Printable Workbook";
-    if (metadata.type === "dfy") return "Do-It-For-You Service";
-    if (orderDetails.mode === "subscription") return "Subscription Plan";
-    
-    return "Your Purchase";
-  };
+      try {
+        const { data, error } = await supabase.functions.invoke("stripe-verify-checkout", {
+          body: { sessionId },
+        });
 
-  const getNextRoute = (): string => {
-    if (type && nextRouteMap[type]) {
-      return nextRouteMap[type];
-    }
-    return "/dashboard";
-  };
+        if (error) throw error;
 
-  const getNextSteps = () => {
-    const purchaseType = type || orderDetails?.metadata?.type;
-    
-    if (purchaseType === "song") {
-      return (
-        <div className="space-y-2">
-          <p className="font-medium">What happens next?</p>
-          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-            <li>Complete your song request form to provide details</li>
-            <li>Our team will create your custom memorial song</li>
-            <li>You'll receive your finished song within 7-10 business days</li>
-          </ul>
-        </div>
-      );
-    }
-    
-    if (purchaseType === "binder") {
-      return (
-        <div className="space-y-2">
-          <p className="font-medium">What happens next?</p>
-          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-            <li>Your physical binder will ship within 3-5 business days</li>
-            <li>Download your printable workbook from the dashboard</li>
-            <li>Track your shipping via the email confirmation</li>
-          </ul>
-        </div>
-      );
-    }
-    
-    if (purchaseType === "done_for_you" || purchaseType === "dfy") {
-      return (
-        <div className="space-y-2">
-          <p className="font-medium">What happens next?</p>
-          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-            <li>Our team will contact you within 24 hours to schedule your session</li>
-            <li>Complete your personalized planner with expert guidance</li>
-            <li>Receive your finished planner and fireproof binder</li>
-          </ul>
-        </div>
-      );
-    }
+        if (!mounted) return;
+        setPaid(!!data?.paid);
+        setItems((data?.items || []) as VerifiedItem[]);
+      } catch (err) {
+        console.error("Error verifying checkout:", err);
+        if (!mounted) return;
+        // Fall back to type param if verification fails
+        setPaid(typeParam ? true : null);
+        setItems([]);
+      } finally {
+        if (!mounted) return;
+        setLoading(false);
+      }
+    })();
 
-    if (purchaseType === "vip" || purchaseType === "vip-monthly" || purchaseType === "vip-yearly") {
-      return (
-        <div className="space-y-2">
-          <p className="font-medium">What happens next?</p>
-          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-            <li>Access VIP Planning Support from your dashboard</li>
-            <li>Schedule your first coaching session</li>
-            <li>Get personalized guidance through your planning journey</li>
-          </ul>
-        </div>
-      );
-    }
+    return () => {
+      mounted = false;
+    };
+  }, [sessionId, typeParam]);
 
-    if (purchaseType === "printable") {
-      return (
-        <div className="space-y-2">
-          <p className="font-medium">What happens next?</p>
-          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-            <li>Download your printable planning form from the dashboard</li>
-            <li>Fill it out at your own pace—by hand or digitally</li>
-            <li>Keep it with your important documents</li>
-          </ul>
-        </div>
-      );
+  // Build purchased lines for display
+  const purchasedLines = useMemo(() => {
+    if (items.length > 0) {
+      return items.map((i) => i.name);
     }
-    
-    if (purchaseType === "premium" || orderDetails?.mode === "subscription") {
-      return (
-        <div className="space-y-2">
-          <p className="font-medium">What's included:</p>
-          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-            <li>Full access to the digital planner</li>
-            <li>After-Death Planner for your loved ones</li>
-            <li>PDF generation and document downloads</li>
-            <li>Unlimited updates and revisions</li>
-          </ul>
-        </div>
-      );
+    // Fallback to type param
+    if (typeParam && TYPE_NAMES[typeParam]) {
+      return [TYPE_NAMES[typeParam]];
     }
-    
-    return null;
-  };
+    return ["Your purchase was recorded"];
+  }, [items, typeParam]);
 
-  const handleContinue = () => {
-    navigate(getNextRoute());
-  };
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <PublicHeader />
 
-  if (loading) {
-    return (
-      <AuthenticatedLayout>
-        <div className="container max-w-2xl mx-auto py-8 px-4">
-          <Card>
-            <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">Loading order details...</p>
+      <main className="flex-1 container mx-auto px-4 py-12">
+        <div className="max-w-xl mx-auto">
+          <Card className="border-2">
+            <CardContent className="pt-8 pb-8 space-y-8">
+              {/* Success Icon */}
+              <div className="flex justify-center">
+                <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center">
+                  <CheckCircle2 className="h-12 w-12 text-green-600" />
+                </div>
+              </div>
+
+              {/* Title */}
+              <h1 className="text-3xl font-bold text-center">Payment Complete</h1>
+
+              {/* Status Message */}
+              {loading ? (
+                <div className="flex items-center justify-center gap-3 text-muted-foreground">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span>Confirming your payment…</span>
+                </div>
+              ) : paid === false ? (
+                <p className="text-center text-muted-foreground">
+                  We could not confirm payment yet. If you completed payment, sign in and check your Planning Menu.
+                </p>
+              ) : paid === null && !typeParam ? (
+                <p className="text-center text-muted-foreground">
+                  We could not confirm the payment details on this page. If you completed payment, your access should still be available in your Planning Menu.
+                </p>
+              ) : (
+                <p className="text-center text-muted-foreground text-lg">
+                  Thank you. Your payment was successful.<br />
+                  Your access is now available in your Planning Menu.
+                </p>
+              )}
+
+              {/* What You Purchased Box */}
+              <div className="border-2 rounded-xl p-6 bg-muted/30">
+                <h2 className="font-semibold text-lg mb-4 text-center">You purchased</h2>
+                <ul className="space-y-2">
+                  {purchasedLines.map((line, idx) => (
+                    <li key={idx} className="flex items-center gap-3 text-lg">
+                      <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                      <span>{line}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                {/* Primary CTA */}
+                <Button 
+                  onClick={() => navigate(planningMenuRoute)} 
+                  size="lg"
+                  className="w-full min-h-[56px] text-lg"
+                >
+                  Go to My Planning Menu
+                </Button>
+
+                {/* Secondary buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => navigate(bestNextRoute)}
+                    className="min-h-[48px]"
+                  >
+                    Continue
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => navigate(lastVisitedRoute || planningMenuRoute)}
+                    className="min-h-[48px]"
+                  >
+                    Continue where I left off
+                  </Button>
+                </div>
+
+                <Button 
+                  variant="ghost" 
+                  onClick={() => navigate("/contact")}
+                  className="w-full"
+                >
+                  Need help? Contact us
+                </Button>
+              </div>
+
+              {/* Help Note */}
+              <p className="text-sm text-muted-foreground text-center">
+                If you do not see access right away, refresh the page or sign out and sign back in.
+              </p>
             </CardContent>
           </Card>
         </div>
-      </AuthenticatedLayout>
-    );
-  }
+      </main>
 
-  return (
-    <AuthenticatedLayout>
-      <div className="container max-w-2xl mx-auto py-8 px-4">
-        <Card>
-          <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              <CheckCircle2 className="h-16 w-16 text-green-600" />
-            </div>
-            <CardTitle className="text-2xl">Purchase Successful!</CardTitle>
-            <CardDescription>
-              Thank you for your purchase of {getOrderType()}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="bg-muted/50 rounded-lg p-4">
-              <p className="text-sm text-muted-foreground mb-2">Order confirmation has been sent to your email.</p>
-              {sessionId && (
-                <p className="text-sm font-mono text-muted-foreground">
-                  Order ID: {sessionId?.slice(0, 20)}...
-                </p>
-              )}
-            </div>
-
-            {getNextSteps()}
-
-            <div className="space-y-2 pt-4">
-              <p className="text-sm text-muted-foreground">
-                <strong>Need help?</strong> Contact us at{" "}
-                <a href="mailto:support@everlastingfuneraladvisors.com" className="text-primary hover:underline">
-                  support@everlastingfuneraladvisors.com
-                </a>
-              </p>
-            </div>
-
-            <div className="flex gap-4 pt-4">
-              <Button onClick={handleContinue} className="flex-1">
-                Continue
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </AuthenticatedLayout>
+      <AppFooter />
+    </div>
   );
 }
