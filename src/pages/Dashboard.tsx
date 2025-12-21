@@ -758,49 +758,6 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Travel Death Protection - Optional Planning Tool */}
-        <div className="mb-12">
-          <Card className="p-6 border-l-4 border-l-sky-500">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center">
-                  <Plane className="h-6 w-6 text-white" />
-                </div>
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-xl font-semibold">{t('dashboard.travelProtection.title', 'Travel Death Protection')}</h3>
-                  <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
-                    {t('dashboard.travelProtection.optional', 'Optional')}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  {t('dashboard.travelProtection.subtitle', 'One Less Thing for Your Family to Worry About')}
-                </p>
-                <p className="text-muted-foreground mb-4">
-                  {t('dashboard.travelProtection.description', 'If someone passes away while traveling far from home, the cost and logistics can be overwhelming. This travel protection plan covers the coordination and transportation needed to bring your loved one home. It works worldwide and is paid once, not monthly.')}
-                </p>
-                <div className="bg-muted/50 rounded-lg p-3 mb-4">
-                  <p className="text-sm font-medium mb-2">{t('dashboard.travelProtection.bestFor', 'Best for:')}</p>
-                  <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-                    <span>• {t('dashboard.travelProtection.frequentTravelers', 'Frequent travelers')}</span>
-                    <span>• {t('dashboard.travelProtection.snowbirds', 'Snowbirds')}</span>
-                    <span>• {t('dashboard.travelProtection.retirees', 'Retirees')}</span>
-                    <span>• {t('dashboard.travelProtection.militaryFamilies', 'Military families')}</span>
-                  </div>
-                </div>
-                <Button 
-                  onClick={() => navigate('/travel-protection')} 
-                  variant="outline"
-                  className="border-sky-500 text-sky-600 hover:bg-sky-50"
-                >
-                  {t('dashboard.travelProtection.learnMore', 'Learn More About Travel Protection')}
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-
         {/* Checklists Section */}
         <div className="mb-12">
           <ChecklistsSection />
@@ -855,6 +812,49 @@ export default function Dashboard() {
               </div>
             </Card>
           </div>
+        </div>
+
+        {/* Travel Death Protection - Optional Planning Tool */}
+        <div className="mb-12">
+          <Card className="p-6 border-l-4 border-l-sky-500">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center">
+                  <Plane className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-xl font-semibold">{t('dashboard.travelProtection.title', 'Travel Death Protection')}</h3>
+                  <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
+                    {t('dashboard.travelProtection.optional', 'Optional')}
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {t('dashboard.travelProtection.subtitle', 'One Less Thing for Your Family to Worry About')}
+                </p>
+                <p className="text-muted-foreground mb-4">
+                  {t('dashboard.travelProtection.description', 'If someone passes away while traveling far from home, the cost and logistics can be overwhelming. This travel protection plan covers the coordination and transportation needed to bring your loved one home. It works worldwide and is paid once, not monthly.')}
+                </p>
+                <div className="bg-muted/50 rounded-lg p-3 mb-4">
+                  <p className="text-sm font-medium mb-2">{t('dashboard.travelProtection.bestFor', 'Best for:')}</p>
+                  <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+                    <span>• {t('dashboard.travelProtection.frequentTravelers', 'Frequent travelers')}</span>
+                    <span>• {t('dashboard.travelProtection.snowbirds', 'Snowbirds')}</span>
+                    <span>• {t('dashboard.travelProtection.retirees', 'Retirees')}</span>
+                    <span>• {t('dashboard.travelProtection.militaryFamilies', 'Military families')}</span>
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => navigate('/travel-protection')} 
+                  variant="outline"
+                  className="border-sky-500 text-sky-600 hover:bg-sky-50"
+                >
+                  {t('dashboard.travelProtection.learnMore', 'Learn More About Travel Protection')}
+                </Button>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
 
