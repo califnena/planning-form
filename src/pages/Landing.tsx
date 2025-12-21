@@ -356,7 +356,7 @@ const Landing = () => {
             </Card>
 
             {/* Done-For-You Coordination */}
-            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/contact")}>
+            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/do-it-for-you")}>
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg">
