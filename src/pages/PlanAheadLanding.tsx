@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download, FileText, CheckCircle, Users, Laptop, BookOpen, Loader2, Printer, Star, HandHelping, Eye } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Download, FileText, CheckCircle, Loader2, Printer, HandHelping, ChevronDown, ChevronUp, HelpCircle, Phone, MessageCircle } from "lucide-react";
 import { PublicHeader } from "@/components/PublicHeader";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { AppFooter } from "@/components/AppFooter";
@@ -10,13 +12,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { usePreviewModeContext } from "@/contexts/PreviewModeContext";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function PlanAheadLanding() {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const { isLoggedIn, hasPaidAccess, hasPrintableAccess, hasVIPAccess, openLockedModal, saveLastVisitedRoute } = usePreviewModeContext();
+  const [learnOpen, setLearnOpen] = useState(false);
+  const { isLoggedIn, hasPaidAccess, hasPrintableAccess, openLockedModal, saveLastVisitedRoute } = usePreviewModeContext();
 
   // Queue checkout and prompt login
   const queueCheckoutAndLogin = (lookupKey: string, successUrl: string) => {
@@ -30,10 +39,14 @@ export default function PlanAheadLanding() {
     openLockedModal("Sign in to continue with your purchase.");
   };
 
-  const handleStartPlanning = async () => {
+  const handleTryGuidedPlanning = () => {
+    navigate("/preplansteps");
+  };
+
+  const handleContinueAndSave = async () => {
     if (!isLoggedIn) {
       saveLastVisitedRoute(location.pathname);
-      openLockedModal("Sign in to access the digital planner.");
+      openLockedModal("Sign in to save your progress.");
       return;
     }
     
@@ -56,7 +69,7 @@ export default function PlanAheadLanding() {
     }
   };
 
-  const handlePurchasePrintable = async () => {
+  const handleDownloadPrintable = async () => {
     const successUrl = `${window.location.origin}/purchase-success?type=printable`;
 
     if (!isLoggedIn) {
@@ -64,7 +77,6 @@ export default function PlanAheadLanding() {
       return;
     }
 
-    // Already paid?
     if (hasPrintableAccess) {
       navigate("/dashboard");
       toast({
@@ -87,6 +99,10 @@ export default function PlanAheadLanding() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleTalkToGuide = () => {
+    navigate("/do-it-for-you");
   };
 
   const handlePurchaseBinder = async () => {
@@ -112,403 +128,217 @@ export default function PlanAheadLanding() {
     }
   };
 
-  const handlePurchaseDoItForYou = async () => {
-    const successUrl = `${window.location.origin}/purchase-success?type=done_for_you`;
-
-    if (!isLoggedIn) {
-      queueCheckoutAndLogin("EFADOFORU", successUrl);
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
-        body: { lookupKey: "EFADOFORU", successUrl, cancelUrl: window.location.href },
-      });
-      if (error) throw error;
-      if (data?.url) window.location.href = data.url;
-    } catch (error) {
-      console.error("Error:", error);
-      toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVIPSupport = async () => {
-    const successUrl = `${window.location.origin}/purchase-success?type=vip`;
-
-    if (!isLoggedIn) {
-      queueCheckoutAndLogin("EFAVIPMONTHLY", successUrl);
-      return;
-    }
-
-    if (hasVIPAccess) {
-      navigate("/vip-planning-support");
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
-        body: { lookupKey: "EFAVIPMONTHLY", successUrl, cancelUrl: window.location.href },
-      });
-      if (error) throw error;
-      if (data?.url) window.location.href = data.url;
-    } catch (error) {
-      console.error("Error:", error);
-      toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });
-    }
-  };
-
-  const handlePreviewPlanner = () => {
-    navigate("/preplansteps");
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-50 via-background to-background">
       <PublicHeader />
 
       <main className="container mx-auto px-4 py-8">
-        {/* Breadcrumbs */}
         <Breadcrumbs className="mb-6" />
 
-        {/* Hero Section */}
-        <div className="max-w-4xl mx-auto text-center space-y-6 mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">
+        {/* Hero Section - Simplified */}
+        <div className="max-w-3xl mx-auto text-center space-y-4 mb-10">
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
             Plan Ahead. On Your Terms.
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Planning ahead means your family does not have to guess, argue, or scramble later.
-            This guide helps you clearly document your wishes in a way that is practical, organized, and easy to update.
-          </p>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            You can start slowly. Nothing is required upfront.<br />
-            You only pay when you choose how much help you want.
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            Write down your wishes so your family doesn't have to guess.
           </p>
         </div>
 
-        {/* What This Planner Helps You Do */}
-        <div className="max-w-4xl mx-auto mb-16">
-          <Card className="border-2">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl">What This Planner Helps You Do</CardTitle>
+        {/* How This Works Box */}
+        <div className="max-w-2xl mx-auto mb-12">
+          <Card className="border-2 bg-primary/5">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl text-center">How this works</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {[
-                  "Write down your funeral and memorial wishes",
-                  "Choose burial or cremation preferences",
-                  "Organize key instructions and contacts",
-                  "Leave personal notes for your loved ones",
-                  "Reduce stress, confusion, and rushed decisions later"
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">{item}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-6 pt-6 border-t text-center">
-                <p className="text-muted-foreground italic">
-                  This is not about making final decisions today.<br />
-                  It is about making sure your voice is known.
-                </p>
+              <div className="flex flex-col sm:flex-row justify-center gap-6 text-center">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">1</div>
+                  <span className="text-sm text-muted-foreground">Pick a path</span>
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">2</div>
+                  <span className="text-sm text-muted-foreground">Write down your wishes</span>
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">3</div>
+                  <span className="text-sm text-muted-foreground">Save or print when ready</span>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* ============ SECTION 1: LEARN ============ */}
-        <div className="max-w-5xl mx-auto mb-20">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xl border-2 border-blue-200">
-              1
-            </div>
-            <div>
-              <span className="text-xs font-medium text-blue-600 uppercase tracking-wide">Step 1</span>
-              <h2 className="text-2xl font-bold">Learn Before You Decide</h2>
-              <p className="text-muted-foreground">Get a clear overview of what planning ahead actually involves and why it matters.</p>
-            </div>
+        {/* ============ MAIN CHOOSER: 3 Big Buttons ============ */}
+        <div className="max-w-2xl mx-auto mb-16">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold mb-2">Choose how you want to plan</h2>
+            <p className="text-muted-foreground">Start with the easiest option. You can switch later.</p>
           </div>
-          
-          {/* Pre-Planning Guide Preview Tile */}
-          <Card className="border-2 hover:border-primary/30 transition-colors cursor-pointer group" onClick={() => navigate('/plan-ahead/guide')}>
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
-                  <BookOpen className="h-7 w-7 text-blue-600" />
+
+          <div className="space-y-4">
+            {/* Button 1: Guided Planning - RECOMMENDED */}
+            <button
+              onClick={handleTryGuidedPlanning}
+              className="w-full text-left p-6 rounded-xl border-2 border-primary bg-primary/5 hover:bg-primary/10 transition-colors group relative"
+            >
+              <Badge className="absolute -top-3 left-4 bg-primary text-primary-foreground">
+                Recommended
+              </Badge>
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/30 transition-colors">
+                  <FileText className="h-7 w-7 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
-                    Pre-Planning Guide
-                  </h3>
-                  <ul className="space-y-1.5 text-sm text-muted-foreground mb-4">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                      Learn how funeral pre-planning works
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                      Understand what decisions matter most
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                      See how families use this information
-                    </li>
-                  </ul>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Eye className="h-4 w-4" />
-                    View Guide
-                  </Button>
+                  <h3 className="text-xl font-semibold mb-1">Start with Guided Planning</h3>
+                  <p className="text-muted-foreground">We walk you through it step by step.</p>
+                  <p className="text-sm text-primary mt-2">Best if you want help without pressure.</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </button>
 
-          {/* Checklist Preview Tile */}
-          <Card className="border-2 mt-6">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <FileText className="h-7 w-7 text-green-600" />
+            {/* Button 2: Printable Form */}
+            <button
+              onClick={handleDownloadPrintable}
+              disabled={isLoading}
+              className="w-full text-left p-6 rounded-xl border-2 border-border hover:border-primary/50 bg-background hover:bg-muted/30 transition-colors group"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center flex-shrink-0 group-hover:bg-muted/80 transition-colors">
+                  <Printer className="h-7 w-7 text-muted-foreground" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-2">
-                    Pre-Planning Checklist
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    A quick reference of what you'll be documenting—helpful to review before you begin.
-                  </p>
-                  <a 
-                    href="/checklists/Pre-Planning-Checklist-2.png" 
-                    download="Pre-Planning-Checklist.png"
-                    className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Download className="h-4 w-4" />
-                    Download Checklist
-                  </a>
+                  <h3 className="text-xl font-semibold mb-1">Download Printable Form</h3>
+                  <p className="text-muted-foreground">Write it down on paper.</p>
+                </div>
+                {isLoading && <Loader2 className="h-5 w-5 animate-spin" />}
+              </div>
+            </button>
+
+            {/* Button 3: Talk to a Guide */}
+            <button
+              onClick={handleTalkToGuide}
+              className="w-full text-left p-6 rounded-xl border-2 border-border hover:border-primary/50 bg-background hover:bg-muted/30 transition-colors group"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center flex-shrink-0 group-hover:bg-muted/80 transition-colors">
+                  <HandHelping className="h-7 w-7 text-muted-foreground" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold mb-1">Talk to a Planning Guide</h3>
+                  <p className="text-muted-foreground">We help you complete it.</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </button>
+          </div>
+
+          {/* Continue and Save */}
+          <div className="mt-8 text-center space-y-3">
+            <Button 
+              onClick={handleContinueAndSave} 
+              disabled={isLoading}
+              size="lg"
+              className="min-h-[56px] text-lg px-8"
+            >
+              {isLoading ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : null}
+              Continue and Save
+            </Button>
+            <p className="text-sm text-muted-foreground">
+              Sign in is only needed to save your progress.
+            </p>
+          </div>
+
+          {/* Not sure yet link */}
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => navigate("/preplansteps")}
+              className="text-sm text-muted-foreground hover:text-foreground underline"
+            >
+              Not sure yet? Preview the planner first
+            </button>
+          </div>
+        </div>
+
+        {/* ============ LEARN FIRST (Collapsed by default) ============ */}
+        <div className="max-w-2xl mx-auto mb-16">
+          <Collapsible open={learnOpen} onOpenChange={setLearnOpen}>
+            <CollapsibleTrigger asChild>
+              <button className="w-full flex items-center justify-between p-4 rounded-lg border-2 border-dashed hover:border-primary/30 transition-colors">
+                <span className="text-lg font-medium">Learn first (optional)</span>
+                {learnOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4 space-y-4">
+              {/* Pre-Planning Guide */}
+              <Card className="border">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-medium">Pre-Planning Guide</h3>
+                      <p className="text-sm text-muted-foreground">Learn how funeral pre-planning works.</p>
+                    </div>
+                    <Button variant="outline" onClick={() => navigate('/plan-ahead/guide')}>
+                      View Guide
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Checklist */}
+              <Card className="border">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-medium">Pre-Planning Checklist</h3>
+                      <p className="text-sm text-muted-foreground">A quick reference of what you'll document.</p>
+                    </div>
+                    <a 
+                      href="/checklists/Pre-Planning-Checklist-2.png" 
+                      download="Pre-Planning-Checklist.png"
+                    >
+                      <Button variant="outline" className="gap-2">
+                        <Download className="h-4 w-4" />
+                        Download
+                      </Button>
+                    </a>
+                  </div>
+                </CardContent>
+              </Card>
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+
+        {/* ============ OPTIONAL ADD-ONS (Lower priority) ============ */}
+        <div className="max-w-2xl mx-auto mb-16">
+          <h3 className="text-lg font-medium text-center mb-4 text-muted-foreground">
+            Optional add-ons (only if you want them)
+          </h3>
           
-        </div>
-
-        {/* ============ SECTION 2: CHOOSE YOUR PATH ============ */}
-        <div className="max-w-5xl mx-auto mb-20">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold text-xl border-2 border-green-200">
-              2
-            </div>
-            <div>
-              <span className="text-xs font-medium text-green-600 uppercase tracking-wide">Step 2</span>
-              <h2 className="text-2xl font-bold">Choose Your Path</h2>
-              <p className="text-muted-foreground">You decide the level of support. Each option is separate and clearly priced.</p>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Option 1: Printable */}
-            <Card className="border-2">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-stone-400 to-stone-600 flex items-center justify-center">
-                    <Printer className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">Printable Planning Form</CardTitle>
-                    <span className="text-xs text-muted-foreground">One-time purchase</span>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  For those who prefer to write things down on paper at their own pace.
-                </p>
-                <ul className="space-y-2 mb-4 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                    Clean, structured printable form
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                    Fill out by hand or digitally
-                  </li>
-                </ul>
-                <p className="text-xs text-muted-foreground mb-4 italic">
-                  Best for: Independent planners who want a simple document.
-                </p>
-                <Button onClick={handlePurchasePrintable} className="w-full min-h-[48px]">
-                  Purchase Printable Form
-                </Button>
-                <p className="text-xs text-center text-muted-foreground mt-2">
-                  You can come back later. Nothing is lost.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Option 2: Digital Step-by-Step */}
-            <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                    <Laptop className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">Step-by-Step Digital Planner</CardTitle>
-                    <span className="text-xs text-primary font-medium">Digital access</span>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  For those who want guidance without pressure.
-                </p>
-                <ul className="space-y-2 mb-4 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                    Walk-through format, one section at a time
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                    Save progress as you go
-                  </li>
-                </ul>
-                <p className="text-xs text-muted-foreground mb-4 italic">
-                  Best for: People who want clarity and structure.
-                </p>
-                <div className="space-y-2">
-                  <Button onClick={handlePreviewPlanner} variant="outline" className="w-full min-h-[48px] gap-2">
-                    <Eye className="h-4 w-4" />
-                    Preview Planner
-                  </Button>
-                  <Button onClick={handleStartPlanning} disabled={isLoading} className="w-full min-h-[48px]">
-                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    Begin Planning
-                  </Button>
-                </div>
-                <p className="text-xs text-center text-muted-foreground mt-2">
-                  Requires login to save progress
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Option 3: Do-It-For-You */}
-            <Card className="border-2">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-                    <HandHelping className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">Do-It-For-You Planning</CardTitle>
-                    <span className="text-xs text-muted-foreground">One-time service</span>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  We help organize your wishes and complete the planning with you.
-                </p>
-                <ul className="space-y-2 mb-4 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                    Guided consultation
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                    We help organize your wishes
-                  </li>
-                </ul>
-                <p className="text-xs text-muted-foreground mb-4 italic">
-                  Best for: Busy individuals who want hands-on help.
-                </p>
-                <Button onClick={handlePurchaseDoItForYou} variant="outline" className="w-full min-h-[48px]">
-                  Request Do-It-For-You Planning
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Preview Card */}
-            <Card className="border-2 border-dashed bg-muted/20">
-              <CardContent className="py-8 text-center flex flex-col items-center justify-center h-full">
-                <Eye className="h-8 w-8 text-muted-foreground mb-3" />
-                <h3 className="font-semibold mb-2">Not Sure Yet?</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Explore the planning menu in preview mode. See the structure before committing.
-                </p>
-                <Button onClick={handlePreviewPlanner} variant="outline" className="min-h-[48px]">
-                  Preview Planning Menu
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* ============ SECTION 3: ADD SUPPORT (Optional) ============ */}
-        <div className="max-w-5xl mx-auto mb-16">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-xl border-2 border-amber-200">
-              3
-            </div>
-            <div>
-              <span className="text-xs font-medium text-amber-600 uppercase tracking-wide">Optional</span>
-              <h2 className="text-2xl font-bold">Add Support</h2>
-              <p className="text-muted-foreground">Additional tools and personal guidance—only if you want it.</p>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid sm:grid-cols-2 gap-4">
             {/* Binder */}
-            <Card className="border-2">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-                    <BookOpen className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">Physical Planning Binder</CardTitle>
-                    <span className="text-xs text-muted-foreground">Optional add-on</span>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Durable, professionally organized binder. Easy for family members to find when needed.
+            <Card className="border">
+              <CardContent className="p-4">
+                <h4 className="font-medium mb-1">Planning Binder</h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  A printed binder to keep everything in one place.
                 </p>
-                <p className="text-xs text-muted-foreground mb-4 italic">
-                  Best for: Households that want a single, physical reference point.
-                </p>
-                <Button onClick={handlePurchaseBinder} variant="outline" className="w-full min-h-[48px]">
-                  Purchase Binder
+                <Button variant="outline" size="sm" onClick={handlePurchaseBinder} className="w-full">
+                  Add Binder
                 </Button>
               </CardContent>
             </Card>
 
-            {/* Compassionate Guidance */}
-            <Card className="border-2">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                    <Star className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">VIP Planning Support</CardTitle>
-                    <span className="text-xs text-muted-foreground">Optional upgrade</span>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  One-on-one guidance through your planning process.
+            {/* VIP Support */}
+            <Card className="border">
+              <CardContent className="p-4">
+                <h4 className="font-medium mb-1">VIP Planning Support</h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Extra help from a real person when you need it.
                 </p>
-                <p className="text-xs text-muted-foreground mb-4 italic">
-                  Best for: Anyone who wants a human voice during a sensitive process.
-                </p>
-                <Link to="/vip-coach">
-                  <Button variant="outline" className="w-full min-h-[48px]">
-                    Add VIP Planning Support
+                <Link to="/coach-assistant">
+                  <Button variant="outline" size="sm" className="w-full">
+                    Learn More
                   </Button>
                 </Link>
               </CardContent>
@@ -516,38 +346,62 @@ export default function PlanAheadLanding() {
           </div>
         </div>
 
-        {/* Important to Know */}
-        <div className="max-w-4xl mx-auto mb-16">
-          <Card className="border-2 bg-muted/30">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl">Important to Know</CardTitle>
+        {/* Good to Know */}
+        <div className="max-w-2xl mx-auto mb-16">
+          <Card className="border bg-muted/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg text-center">Good to know</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid sm:grid-cols-2 gap-4 mb-6">
-                {[
-                  "You can start with education only. No payment required to preview.",
-                  "You only pay for the tools or support you choose.",
-                  "Your information stays private.",
-                  "You can update your plans anytime."
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">{item}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="text-center pt-4 border-t">
-                <p className="text-muted-foreground italic text-lg">
-                  Planning ahead is not about being finished.<br />
-                  It is about being prepared.
-                </p>
-              </div>
+              <ul className="space-y-2">
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <span className="text-muted-foreground">No payment required to read the guide</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <span className="text-muted-foreground">You only pay for tools you choose</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <span className="text-muted-foreground">You can change your plan anytime</span>
+                </li>
+              </ul>
             </CardContent>
           </Card>
         </div>
       </main>
 
       <AppFooter />
+
+      {/* Sticky Help Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              size="lg" 
+              className="rounded-full shadow-lg min-h-[56px] gap-2"
+            >
+              <HelpCircle className="h-5 w-5" />
+              Need help?
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem onClick={() => navigate("/contact")}>
+              <Phone className="h-4 w-4 mr-2" />
+              Contact Us
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/coach-assistant")}>
+              <MessageCircle className="h-4 w-4 mr-2" />
+              VIP Planning Support
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/do-it-for-you")}>
+              <HandHelping className="h-4 w-4 mr-2" />
+              Do-It-For-You Planning
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   );
 }
