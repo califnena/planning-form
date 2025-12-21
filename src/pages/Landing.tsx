@@ -61,8 +61,7 @@ const Landing = () => {
       navigate("/login");
     }
   };
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/40 via-background to-background">
+  return <div className="min-h-screen bg-gradient-to-b from-amber-50/40 via-background to-background">
       {/* Header */}
       <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -109,19 +108,15 @@ const Landing = () => {
           </p>
 
           {/* Returning User Welcome - only shown when authenticated */}
-          {userName && (
-            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 max-w-md mx-auto">
+          {userName && <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 max-w-md mx-auto">
               <p className="text-foreground font-medium">Welcome back, {userName}!</p>
               <Button onClick={() => navigate("/dashboard")} className="mt-2">
                 Continue to Your Dashboard →
               </Button>
-            </div>
-          )}
+            </div>}
           
           <div className="flex flex-col items-center gap-4 pt-4">
-            <p className="text-sm text-muted-foreground">
-              Preview tools and education first. Upgrade only if and when it makes sense for you.
-            </p>
+            
           </div>
         </div>
 
@@ -475,24 +470,15 @@ const Landing = () => {
                 <h3 className="text-xl font-semibold text-foreground">Learn About Funeral Planning</h3>
               </div>
               <div className="space-y-3">
-                <button 
-                  onClick={() => navigate("/resources")} 
-                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3"
-                >
+                <button onClick={() => navigate("/resources")} className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3">
                   <BookOpen className="h-5 w-5 text-muted-foreground" />
                   <span className="text-foreground">Helpful Articles</span>
                 </button>
-                <button 
-                  onClick={() => navigate("/faq")} 
-                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3"
-                >
+                <button onClick={() => navigate("/faq")} className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3">
                   <HelpCircle className="h-5 w-5 text-muted-foreground" />
                   <span className="text-foreground">Common Questions & Answers</span>
                 </button>
-                <button 
-                  onClick={() => navigate("/legal-documents")} 
-                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3"
-                >
+                <button onClick={() => navigate("/legal-documents")} className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3">
                   <FileText className="h-5 w-5 text-muted-foreground" />
                   <span className="text-foreground">Legal Documents & State Resources</span>
                 </button>
@@ -508,27 +494,15 @@ const Landing = () => {
                 <h3 className="text-xl font-semibold text-foreground">Use Planning Tools</h3>
               </div>
               <div className="space-y-3">
-                <a 
-                  href="/guides/EFA-Pre-Planning-Checklist.pdf" 
-                  download 
-                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3"
-                >
+                <a href="/guides/EFA-Pre-Planning-Checklist.pdf" download className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3">
                   <Download className="h-5 w-5 text-muted-foreground" />
                   <span className="text-foreground">Pre-Planning Checklist</span>
                 </a>
-                <a 
-                  href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
-                  download 
-                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3"
-                >
+                <a href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" download className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3">
                   <Download className="h-5 w-5 text-muted-foreground" />
                   <span className="text-foreground">After-Death Checklist</span>
                 </a>
-                <a 
-                  href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" 
-                  download 
-                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3"
-                >
+                <a href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" download className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3">
                   <Download className="h-5 w-5 text-muted-foreground" />
                   <span className="text-foreground">Education & Planning Guide</span>
                 </a>
@@ -558,8 +532,6 @@ const Landing = () => {
       </main>
       
       <AppFooter />
-    </div>
-  );
+    </div>;
 };
-
 export default Landing;
