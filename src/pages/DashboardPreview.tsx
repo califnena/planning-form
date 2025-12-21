@@ -37,11 +37,11 @@ export default function DashboardPreview() {
         {/* Preview Mode Banner */}
         <PreviewModeBanner />
 
-        {/* Welcome Header */}
+        {/* Planning Menu Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-2">Planning Dashboard Preview</h1>
+          <h1 className="text-3xl font-bold mb-2">Your Planning Menu</h1>
           <p className="text-muted-foreground max-w-4xl mx-auto mb-3">
-            This is what your planning dashboard looks like. Sign in only when you're ready to save or personalize.
+            This is your planning menu. You can explore freely. Sign in only when you want to save, download, or continue.
           </p>
         </div>
 

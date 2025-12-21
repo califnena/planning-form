@@ -142,7 +142,7 @@ const Landing = () => {
           </p>
           
           <div className="grid md:grid-cols-2 gap-8">
-            {/* CARD 1: Understanding Your Options */}
+            {/* CARD 1: Understand the Process */}
             <Card className="border-2 hover:border-primary/50 transition-colors group">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <div className="flex justify-center">
@@ -151,29 +151,51 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground text-center">
-                  {t('landing.path1Title')}
+                  Understand the Process
                 </h3>
                 <p className="text-muted-foreground leading-relaxed text-center">
-                  {t('landing.path1Desc')}
+                  Before making any decisions, take time to understand how planning works, what choices matter, and what your rights are.
                 </p>
-                <ul className="text-sm text-muted-foreground space-y-2 pl-4">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                    {t('landing.path1Item1')}
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                    {t('landing.path1Item2')}
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                    {t('landing.path1Item3')}
-                  </li>
-                </ul>
-                <div className="pt-4">
-                  <Button variant="outline" onClick={() => navigate("/guide")} className="w-full">
-                    {t('landing.learnTheBasics')}
+                
+                {/* Education Links - Not Buttons */}
+                <div className="space-y-3 pt-2">
+                  <Link to="/guide" className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group/link">
+                    <BookOpen className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div>
+                      <span className="font-medium text-foreground group-hover/link:text-primary transition-colors">Education & Planning Basics</span>
+                      <p className="text-sm text-muted-foreground">Plain-language explanations of funeral planning, terminology, and common decisions.</p>
+                    </div>
+                  </Link>
+                  
+                  <Link to="/faq" className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group/link">
+                    <HelpCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div>
+                      <span className="font-medium text-foreground group-hover/link:text-primary transition-colors">Guides & FAQs</span>
+                      <p className="text-sm text-muted-foreground">Step-by-step articles and answers to common questions.</p>
+                    </div>
+                  </Link>
+                  
+                  <a 
+                    href="https://consumer.ftc.gov/articles/ftc-funeral-rule" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group/link"
+                  >
+                    <FileText className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div>
+                      <span className="font-medium text-foreground group-hover/link:text-primary transition-colors">FTC Funeral Consumer Information</span>
+                      <p className="text-sm text-muted-foreground">Federal law gives you specific rights when arranging funeral services. This information is provided directly from the Federal Trade Commission.</p>
+                    </div>
+                  </a>
+                </div>
+                
+                <div className="pt-4 space-y-2">
+                  <Button onClick={() => navigate("/dashboard")} className="w-full">
+                    View Planning Menu
                   </Button>
+                  <p className="text-xs text-center text-muted-foreground">
+                    Preview your planning steps. Sign in only when you're ready to save or personalize.
+                  </p>
                 </div>
               </CardContent>
             </Card>

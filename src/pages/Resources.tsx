@@ -4,6 +4,7 @@ import { TextSizeToggle } from '@/components/TextSizeToggle';
 import { Home, ExternalLink, FileText, Download } from 'lucide-react';
 import { GlobalHeader } from '@/components/GlobalHeader';
 import { AppFooter } from '@/components/AppFooter';
+import { BackNavigation } from '@/components/BackNavigation';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ResourcesDownloadSection } from '@/components/resources/ResourcesDownloadSection';
 const Resources = () => {
@@ -160,12 +161,7 @@ const Resources = () => {
       <GlobalHeader />
       <div className="flex-1 max-w-5xl mx-auto px-4 py-8 md:py-12 w-full">
         <div className="flex justify-between items-start mb-8">
-          <Link to="/">
-            <Button variant="ghost" size="sm" className="mb-4">
-              <Home className="mr-2 h-4 w-4" />
-              Home
-            </Button>
-          </Link>
+          <BackNavigation />
           <TextSizeToggle />
         </div>
 
