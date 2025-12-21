@@ -29,8 +29,8 @@ export const STRIPE_TO_ROLES_MAP: Record<string, string[]> = {
   'EFABINDER': ['binder'],
   
   // Custom songs
-  'STRIPE_STANDARD_SONG_PRICE_ID': ['song_standard'],
-  'STRIPE_PREMIUM_SONG_PRICE_ID': ['song_premium'],
+  'STANDARDSONG': ['song_standard'],
+  'PREMIUMSONG': ['song_premium'],
 };
 
 /**
