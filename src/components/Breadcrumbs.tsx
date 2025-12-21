@@ -27,7 +27,7 @@ const routeLabels: Record<string, string> = {
   "/products/binder": "Fireproof Binder",
   "/products/custom-song": "Custom Memorial Song",
   "/vip-coach": "VIP Planning Support",
-  "/app": "My Planning Steps",
+  "/preplansteps": "My Planning Steps",
   "/preplandashboard": "Planning Menu",
   "/legal-forms": "Planning Forms",
   "/legal-documents": "Printable Documents",

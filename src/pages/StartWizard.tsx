@@ -33,7 +33,7 @@ export default function StartWizard() {
         .single();
 
       if (settings?.wizard_completed) {
-        navigate('/app');
+        navigate('/preplansteps');
       }
     };
 
@@ -83,7 +83,7 @@ export default function StartWizard() {
       if (error) throw error;
 
       toast.success('Setup complete! Welcome to your planner.');
-      navigate('/app');
+      navigate('/preplansteps');
     } catch (error) {
       console.error('Error completing wizard:', error);
       toast.error('Failed to save. Please try again.');

@@ -242,7 +242,7 @@ export const ChecklistsSection = () => {
                 size="sm" 
                 variant="ghost" 
                 className="w-full gap-1"
-                onClick={() => handleCardClick('pre-planning', 'Continue in Planner', 'internal', () => navigate('/app?section=overview'))}
+                onClick={() => handleCardClick('pre-planning', 'Continue in Planner', 'internal', () => navigate('/preplansteps?section=overview'))}
               >
                 <FolderOpen className="h-3 w-3" />
                 Continue in Planner
@@ -276,7 +276,7 @@ export const ChecklistsSection = () => {
               <Button 
                 size="sm" 
                 className="w-full gap-2"
-                onClick={() => handleCardClick('instructions', isTrustedContact ? 'View Instructions' : 'Write My Instructions', 'internal', () => navigate('/app?section=instructions'))}
+                onClick={() => handleCardClick('instructions', isTrustedContact ? 'View Instructions' : 'Write My Instructions', 'internal', () => navigate('/preplansteps?section=instructions'))}
               >
                 <FileText className="h-3 w-3" />
                 {isTrustedContact ? 'View Instructions' : 'Write My Instructions'}
@@ -286,7 +286,7 @@ export const ChecklistsSection = () => {
                   size="sm" 
                   variant="ghost" 
                   className="w-full gap-1"
-                  onClick={() => handleCardClick('instructions', 'Learn More', 'internal', () => navigate('/app?section=guide'))}
+                  onClick={() => handleCardClick('instructions', 'Learn More', 'internal', () => navigate('/preplansteps?section=guide'))}
                 >
                   <BookOpen className="h-3 w-3" />
                   Learn More
@@ -318,7 +318,7 @@ export const ChecklistsSection = () => {
               <Button 
                 size="sm" 
                 className="w-full gap-2"
-                onClick={() => handleCardClick('documents', 'Organize in Planner', 'internal', () => navigate('/app?section=financial'))}
+                onClick={() => handleCardClick('documents', 'Organize in Planner', 'internal', () => navigate('/preplansteps?section=financial'))}
               >
                 <FolderOpen className="h-3 w-3" />
                 Organize in Planner

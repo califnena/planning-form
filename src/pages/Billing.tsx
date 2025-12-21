@@ -181,7 +181,7 @@ export default function Billing() {
     <div className="container max-w-4xl py-8 space-y-8">
       <Button 
         variant="ghost" 
-        onClick={() => navigate("/app")}
+        onClick={() => navigate("/preplansteps")}
         className="mb-6"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />

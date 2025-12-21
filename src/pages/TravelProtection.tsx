@@ -140,7 +140,7 @@ export default function TravelProtection() {
 
         {/* Back Button */}
         <div className="mt-8 text-center">
-          <Button variant="outline" onClick={() => navigate('/app')}>
+          <Button variant="outline" onClick={() => navigate('/preplansteps')}>
             Back to Planning Menu
           </Button>
         </div>

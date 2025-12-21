@@ -37,7 +37,7 @@ export default function PlanAheadLanding() {
     setIsLoading(true);
     try {
       if (hasPaidAccess) {
-        navigate("/app");
+        navigate("/preplansteps");
       } else {
         navigate("/pricing");
       }

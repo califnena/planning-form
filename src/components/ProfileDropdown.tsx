@@ -124,7 +124,7 @@ export const ProfileDropdown = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate("/app/profile")}>
+        <DropdownMenuItem onClick={() => navigate("/preplansteps/profile")}>
           <User className="mr-2 h-4 w-4" />
           <span>{t("header.account")}</span>
         </DropdownMenuItem>

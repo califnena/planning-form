@@ -37,7 +37,7 @@ export default function AdminPanel() {
           description: t("admin.accessDeniedDescription"),
           variant: "destructive",
         });
-        navigate("/app");
+        navigate("/preplansteps");
         return;
       }
 
@@ -67,7 +67,7 @@ export default function AdminPanel() {
       <div className="container py-8">
         <Button 
           variant="ghost" 
-          onClick={() => navigate("/app/profile")}
+          onClick={() => navigate("/preplansteps/profile")}
           className="mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />

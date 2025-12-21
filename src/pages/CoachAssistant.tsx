@@ -216,7 +216,7 @@ export default function CoachAssistant() {
 
               <div className="space-y-3 pt-4">
                 <Button 
-                  onClick={() => navigate("/app/profile/subscription")}
+                  onClick={() => navigate("/preplansteps/profile/subscription")}
                   size="lg"
                   className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-semibold text-base"
                 >
@@ -245,7 +245,7 @@ export default function CoachAssistant() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate("/app")}
+                onClick={() => navigate("/preplansteps")}
                 className="gap-2"
               >
                 <Home className="h-4 w-4" />

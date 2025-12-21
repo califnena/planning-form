@@ -124,7 +124,7 @@ export default function Dashboard() {
       navigate('/preferences');
       return;
     }
-    navigate('/app');
+    navigate('/preplansteps');
   };
   const handleGeneratePDF = async () => {
     // Check for paid access (subscription required)
