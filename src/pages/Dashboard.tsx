@@ -173,12 +173,59 @@ export default function Dashboard() {
   }, []);
 
   const handleStartDigitalPlanner = () => {
-    if (hasPlannerProgress) {
-      // Continue Planning → go to /plan-ahead with resume flag
-      navigate('/plan-ahead?resume=1');
+    // Start Digital Planner → go to /plan-ahead entry
+    navigate('/plan-ahead');
+  };
+
+  const handleViewSummary = async () => {
+    // Check if user has any plan data before going to summary
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      navigate('/preplan-summary');
+      return;
+    }
+
+    // Check if user has an org and plan
+    const { data: orgMember } = await supabase
+      .from('org_members')
+      .select('org_id')
+      .eq('user_id', user.id)
+      .eq('role', 'owner')
+      .maybeSingle();
+
+    if (!orgMember) {
+      // No org, redirect to planner dashboard with message
+      toast({
+        title: "No planning data yet",
+        description: "Complete at least one section to generate a summary.",
+      });
+      navigate('/preplandashboard');
+      return;
+    }
+
+    // Check if plan has any content
+    const { data: plan } = await supabase
+      .from('plans')
+      .select('instructions_notes, about_me_notes, funeral_wishes_notes, financial_notes')
+      .eq('org_id', orgMember.org_id)
+      .eq('owner_user_id', user.id)
+      .maybeSingle();
+
+    const hasContent = plan && (
+      plan.instructions_notes || 
+      plan.about_me_notes || 
+      plan.funeral_wishes_notes || 
+      plan.financial_notes
+    );
+
+    if (hasContent) {
+      navigate('/preplan-summary');
     } else {
-      // Start Digital Planner → go to /plan-ahead entry
-      navigate('/plan-ahead');
+      toast({
+        title: "No planning data yet",
+        description: "Complete at least one section to generate a summary.",
+      });
+      navigate('/preplandashboard');
     }
   };
 
@@ -563,7 +610,7 @@ export default function Dashboard() {
                 Review, download, or share a summary of your planning information
               </p>
             </div>
-            <Button onClick={() => navigate("/preplan-summary")} variant="outline">
+            <Button onClick={handleViewSummary} variant="outline">
               View Summary
             </Button>
           </div>

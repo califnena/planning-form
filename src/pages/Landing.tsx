@@ -81,8 +81,8 @@ const Landing = () => {
 
   const handlePrimaryCTA = () => {
     if (isLoggedIn && hasPlannerProgress) {
-      // Continue Planning → go to dashboard
-      navigate("/dashboard");
+      // Continue Planning → go to planner dashboard
+      navigate("/preplandashboard");
     } else if (isLoggedIn) {
       // Start Digital Planner → go to plan-ahead entry
       navigate("/plan-ahead");
