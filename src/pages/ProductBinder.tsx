@@ -1,51 +1,24 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, ShoppingCart, Loader2 } from "lucide-react";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { launchCheckout } from "@/lib/checkoutLauncher";
 import binderImage from "@/assets/fireproof-binder.png";
 
 export default function ProductBinder() {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
 
   const handlePurchaseBinder = async () => {
-    setIsLoading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Sign in required",
-          description: "Please sign in to purchase the binder.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
-        body: {
-          lookupKey: 'EFABINDER',
-          successUrl: `${window.location.origin}/purchase-success?product=binder`,
-          cancelUrl: window.location.href,
-        },
-      });
-
-      if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url;
-      }
-    } catch (error) {
-      console.error("Error creating checkout:", error);
-      toast({
-        title: "Error",
-        description: "Could not start checkout. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    await launchCheckout({
+      lookupKey: 'EFABINDER',
+      successUrl: `${window.location.origin}/purchase-success?product=binder`,
+      cancelUrl: window.location.href,
+      navigate,
+      onLoadingChange: setIsLoading,
+    });
   };
 
   return (

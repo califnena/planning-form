@@ -13,7 +13,7 @@ import { AppFooter } from "@/components/AppFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Lock } from "lucide-react";
-import { setPendingCheckout } from "@/lib/pendingCheckout";
+import { launchCheckout } from "@/lib/checkoutLauncher";
 
 export default function DoItForYouIntake() {
   const navigate = useNavigate();
@@ -103,26 +103,13 @@ export default function DoItForYouIntake() {
   };
 
   const handlePurchase = async () => {
-    setIsPurchasing(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
-        body: {
-          lookupKey: 'EFADOFORU',
-          successUrl: `${window.location.origin}/do-it-for-you/confirmation`,
-          cancelUrl: window.location.href
-        }
-      });
-
-      if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url;
-      }
-    } catch (error: any) {
-      console.error('Checkout error:', error);
-      toast.error("Unable to start checkout. Please try again.");
-    } finally {
-      setIsPurchasing(false);
-    }
+    await launchCheckout({
+      lookupKey: 'EFADOFORU',
+      successUrl: `${window.location.origin}/do-it-for-you/confirmation`,
+      cancelUrl: window.location.href,
+      navigate,
+      onLoadingChange: setIsPurchasing,
+    });
   };
 
   const handleHelpTopicChange = (topicId: string, checked: boolean) => {
