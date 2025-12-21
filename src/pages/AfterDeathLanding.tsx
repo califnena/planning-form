@@ -2,42 +2,31 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Download, 
-  ClipboardCheck, 
-  FileText, 
-  Star, 
-  BookOpen, 
-  Music, 
-  Lock, 
-  CheckCircle,
-  Heart,
-  Loader2
-} from "lucide-react";
+import { Download, ClipboardCheck, FileText, Star, BookOpen, Music, Lock, CheckCircle, Heart, Loader2 } from "lucide-react";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/everlasting-logo.png";
-
 export default function AfterDeathLanding() {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [textSize, setTextSize] = useState<number>(100);
-
   const handleTextSizeChange = (direction: "increase" | "decrease") => {
-    const newSize = direction === "increase" 
-      ? Math.min(textSize + 10, 150) 
-      : Math.max(textSize - 10, 80);
+    const newSize = direction === "increase" ? Math.min(textSize + 10, 150) : Math.max(textSize - 10, 80);
     setTextSize(newSize);
     document.documentElement.style.fontSize = `${newSize}%`;
   };
-
   const handlePremiumAccess = async () => {
     setIsLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
       if (!user) {
         // Not logged in - redirect to login
         navigate("/login?redirect=/after-death-planner");
@@ -45,26 +34,24 @@ export default function AfterDeathLanding() {
       }
 
       // Check subscription status
-      const { data: subscription } = await supabase
-        .from('subscriptions')
-        .select('plan_type, status')
-        .eq('user_id', user.id)
-        .single();
-
-      if (subscription?.status === 'active' && 
-          ['premium', 'vip', 'do_it_for_you'].includes(subscription.plan_type)) {
+      const {
+        data: subscription
+      } = await supabase.from('subscriptions').select('plan_type, status').eq('user_id', user.id).single();
+      if (subscription?.status === 'active' && ['premium', 'vip', 'do_it_for_you'].includes(subscription.plan_type)) {
         // Has premium access
         navigate("/after-death-planner");
       } else {
         // Needs to upgrade - create checkout
-        const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
+        const {
+          data,
+          error
+        } = await supabase.functions.invoke('stripe-create-checkout', {
           body: {
             lookupKey: 'EFAPREMIUM',
             successUrl: `${window.location.origin}/after-death-planner`,
-            cancelUrl: window.location.href,
-          },
+            cancelUrl: window.location.href
+          }
         });
-
         if (error) throw error;
         if (data?.url) {
           window.location.href = data.url;
@@ -75,15 +62,13 @@ export default function AfterDeathLanding() {
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
     }
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-stone-50 via-background to-background">
+  return <div className="min-h-screen bg-gradient-to-b from-stone-50 via-background to-background">
       {/* Header */}
       <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -98,27 +83,13 @@ export default function AfterDeathLanding() {
             {/* Text Size Controls */}
             <div className="hidden sm:flex items-center gap-2 border border-border rounded-md px-3 py-1.5">
               <span className="text-sm text-muted-foreground font-medium">Text Size</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleTextSizeChange("decrease")}
-                className="h-7 px-2 font-semibold"
-              >
+              <Button variant="ghost" size="sm" onClick={() => handleTextSizeChange("decrease")} className="h-7 px-2 font-semibold">
                 A-
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 font-semibold pointer-events-none"
-              >
+              <Button variant="ghost" size="sm" className="h-7 px-2 font-semibold pointer-events-none">
                 A
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleTextSizeChange("increase")}
-                className="h-7 px-2 font-semibold"
-              >
+              <Button variant="ghost" size="sm" onClick={() => handleTextSizeChange("increase")} className="h-7 px-2 font-semibold">
                 A+
               </Button>
             </div>
@@ -130,10 +101,10 @@ export default function AfterDeathLanding() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-12 text-sidebar-foreground bg-transparent">
         {/* Hero Section */}
         <div className="max-w-4xl mx-auto text-center space-y-6 mb-16">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium">
+          <div className="inline-flex items-center gap-2 text-primary px-4 py-2 rounded-full text-sm font-medium bg-amber-400">
             <Heart className="h-4 w-4" />
             Compassionate Guidance During Difficult Times
           </div>
@@ -152,22 +123,14 @@ export default function AfterDeathLanding() {
             {/* First 24-48 Hours */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-primary">First 24–48 Hours</CardTitle>
+                <CardTitle className="text-lg text-secondary-foreground">First 24–48 Hours</CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2">
-                  {[
-                    "Locate Everlasting Funeral Advisors app or binder",
-                    'Read "My Instructions"',
-                    "Notify immediate family",
-                    "Secure home, pets, valuables",
-                    "Contact service provider"
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  {["Locate Everlasting Funeral Advisors app or binder", 'Read "My Instructions"', "Notify immediate family", "Secure home, pets, valuables", "Contact service provider"].map((item, i) => <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                       {item}
-                    </li>
-                  ))}
+                    </li>)}
                 </ul>
               </CardContent>
             </Card>
@@ -175,21 +138,14 @@ export default function AfterDeathLanding() {
             {/* First Week */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-primary">First Week</CardTitle>
+                <CardTitle className="text-lg text-secondary-foreground">First Week</CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2">
-                  {[
-                    "Coordinate services",
-                    "Order death certificates",
-                    "Notify employer (if applicable)",
-                    "Begin insurance notifications"
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  {["Coordinate services", "Order death certificates", "Notify employer (if applicable)", "Begin insurance notifications"].map((item, i) => <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                       {item}
-                    </li>
-                  ))}
+                    </li>)}
                 </ul>
               </CardContent>
             </Card>
@@ -197,21 +153,14 @@ export default function AfterDeathLanding() {
             {/* First Month */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-primary">First Month</CardTitle>
+                <CardTitle className="text-lg text-secondary-foreground">First Month</CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2">
-                  {[
-                    "Notify financial institutions",
-                    "Manage urgent bills & utilities",
-                    "Forward mail",
-                    "Meet executor/attorney if needed"
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  {["Notify financial institutions", "Manage urgent bills & utilities", "Forward mail", "Meet executor/attorney if needed"].map((item, i) => <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                       {item}
-                    </li>
-                  ))}
+                    </li>)}
                 </ul>
               </CardContent>
             </Card>
@@ -219,20 +168,14 @@ export default function AfterDeathLanding() {
             {/* 3-12 Months */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-primary">3–12 Months</CardTitle>
+                <CardTitle className="text-lg text-secondary-foreground">3–12 Months</CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2">
-                  {[
-                    "Close or transfer accounts",
-                    "Complete tax & administrative tasks",
-                    "Archive important documents"
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  {["Close or transfer accounts", "Complete tax & administrative tasks", "Archive important documents"].map((item, i) => <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                       {item}
-                    </li>
-                  ))}
+                    </li>)}
                 </ul>
               </CardContent>
             </Card>
@@ -243,11 +186,7 @@ export default function AfterDeathLanding() {
           
           {/* Download Checklist Button */}
           <div className="flex justify-center mt-8">
-            <a 
-              href="/checklists/After-Death-Checklist.png" 
-              download="After-Death-Checklist.png"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
-            >
+            <a href="/checklists/After-Death-Checklist.png" download="After-Death-Checklist.png" className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium">
               <Download className="h-4 w-4" />
               Download Checklist Image
             </a>
@@ -268,13 +207,11 @@ export default function AfterDeathLanding() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="flex justify-center bg-muted/30">
-                <iframe 
-                  src="https://gamma.app/embed/13licam9flg6gcq" 
-                  style={{ width: '700px', maxWidth: '100%', height: '450px' }} 
-                  allow="fullscreen" 
-                  title="EFA After-Death Planner Guide"
-                  className="border-0"
-                />
+                <iframe src="https://gamma.app/embed/13licam9flg6gcq" style={{
+                width: '700px',
+                maxWidth: '100%',
+                height: '450px'
+              }} allow="fullscreen" title="EFA After-Death Planner Guide" className="border-0" />
               </div>
             </CardContent>
           </Card>
@@ -294,22 +231,14 @@ export default function AfterDeathLanding() {
             </CardHeader>
             <CardContent>
               <div className="grid sm:grid-cols-2 gap-4">
-                <a 
-                  href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
-                  download
-                  className="flex items-center gap-3 p-4 border rounded-lg hover:bg-muted transition-colors"
-                >
+                <a href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" download className="flex items-center gap-3 p-4 border rounded-lg hover:bg-muted transition-colors">
                   <FileText className="h-8 w-8 text-primary" />
                   <div>
                     <p className="font-medium">After-Death Planner PDF</p>
                     <p className="text-sm text-muted-foreground">Complete printable guide</p>
                   </div>
                 </a>
-                <a 
-                  href="/checklists/After-Death-Checklist.png" 
-                  download
-                  className="flex items-center gap-3 p-4 border rounded-lg hover:bg-muted transition-colors"
-                >
+                <a href="/checklists/After-Death-Checklist.png" download className="flex items-center gap-3 p-4 border rounded-lg hover:bg-muted transition-colors">
                   <ClipboardCheck className="h-8 w-8 text-primary" />
                   <div>
                     <p className="font-medium">Quick Reference Checklist</p>
@@ -325,7 +254,7 @@ export default function AfterDeathLanding() {
         <div className="max-w-4xl mx-auto mb-16">
           <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
             <CardHeader className="text-center">
-              <div className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-medium mx-auto mb-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium mx-auto mb-2 bg-yellow-500 text-secondary-foreground">
                 <Lock className="h-3 w-3" />
                 Premium Feature
               </div>
@@ -336,32 +265,14 @@ export default function AfterDeathLanding() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-4">
-                {[
-                  "Track progress across 12 organized steps",
-                  "Save and continue anytime",
-                  "Document storage locations",
-                  "Contact management tools",
-                  "Printable summaries",
-                  "Expert guidance at each step"
-                ].map((feature, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm">
+                {["Track progress across 12 organized steps", "Save and continue anytime", "Document storage locations", "Contact management tools", "Printable summaries", "Expert guidance at each step"].map((feature, i) => <div key={i} className="flex items-center gap-2 text-sm">
                     <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
                     {feature}
-                  </div>
-                ))}
+                  </div>)}
               </div>
               <div className="text-center pt-4">
-                <Button 
-                  size="lg" 
-                  onClick={handlePremiumAccess}
-                  disabled={isLoading}
-                  className="gap-2"
-                >
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Lock className="h-4 w-4" />
-                  )}
+                <Button size="lg" onClick={handlePremiumAccess} disabled={isLoading} className="gap-2 bg-blue-600 hover:bg-blue-500">
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
                   {isLoading ? "Loading..." : "Access Step-by-Step Planner"}
                 </Button>
                 <p className="text-xs text-muted-foreground mt-2">
@@ -445,14 +356,10 @@ export default function AfterDeathLanding() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link to="/">
-              <Button variant="outline" size="lg">
-                Back to Home
-              </Button>
+              
             </Link>
             <Link to="/contact">
-              <Button size="lg">
-                Contact Us for Help
-              </Button>
+              
             </Link>
           </div>
         </div>
@@ -471,6 +378,5 @@ export default function AfterDeathLanding() {
           </p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 }
