@@ -203,9 +203,13 @@
   },
   "sidebar": {
     "yourPlanner": "Your Planner",
+    "yourPlanningSteps": "Your Planning Steps",
     "helpSupport": "Help & Support",
+    "helpResources": "Help & Resources",
     "quickActions": "Quick Actions",
     "getStartedMessage": "Get started by selecting sections in Preferences below.",
+    "completeAnyOrder": "You can complete these in any order.",
+    "changeLater": "You can change anything later.",
     "providedBy": "Provided by",
     "followUs": "Follow Us",
     "contactSuggest": "Contact / Suggest",

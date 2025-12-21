@@ -109,9 +109,12 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
       {/* User-selected sections */}
       {userSections.length > 0 && (
         <div className="space-y-1">
-          <h3 className="text-base font-bold text-foreground mb-3 uppercase tracking-wide text-center">
-            {t("sidebar.yourPlanner")}
+          <h3 className="text-base font-bold text-foreground mb-2 uppercase tracking-wide text-center">
+            {t("sidebar.yourPlanningSteps")}
           </h3>
+          <p className="text-xs text-muted-foreground text-center mb-3 px-2">
+            {t("sidebar.completeAnyOrder")}
+          </p>
           {userSections.map(renderNavButton)}
         </div>
       )}
@@ -128,10 +131,10 @@ export const SidebarNav = ({ items, activeSection, onSectionChange }: SidebarNav
       {/* Divider */}
       <hr className="my-4 border-2 border-border mx-4" />
 
-      {/* Help & Support */}
+      {/* Help & Resources */}
       <div className="space-y-1 mt-6">
         <h3 className="text-base font-bold text-foreground mb-3 uppercase tracking-wide text-center">
-          {t("sidebar.helpSupport")}
+          {t("sidebar.helpResources")}
         </h3>
         {alwaysVisibleSections.map((item) => {
           const Icon = getSectionIcon(item.id);
