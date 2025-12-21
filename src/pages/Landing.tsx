@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { BookOpen, CheckCircle, ClipboardList, ShoppingBag, Users, Headphones, Music, HelpCircle, Phone, Download, Heart, Quote, FileText } from "lucide-react";
+import { BookOpen, CheckCircle, ClipboardList, ShoppingBag, Users, Headphones, Music, HelpCircle, Phone, Download, Heart, Quote, FileText, Calendar, Calculator } from "lucide-react";
 import { AppFooter } from "@/components/AppFooter";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -84,20 +84,38 @@ const Landing = () => {
       </header>
 
       <main className="container mx-auto px-4 py-12 md:py-20 bg-secondary">
-        {/* HERO SECTION */}
+        {/* HERO SECTION - Clean hierarchy */}
         <div className="max-w-5xl mx-auto text-center space-y-8">
           {/* Hero Image */}
           <div className="relative mx-auto max-w-2xl">
             <img src={mascotHeroCouple} alt="Planning Ahead is a Gift of Love" className="w-full rounded-2xl shadow-lg" />
           </div>
           
+          {/* H1 - Primary Headline */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-            {t('landing.heroTitle')}
+            Plan ahead. Reduce stress. Protect your family.
           </h1>
           
+          {/* H2 - Supporting Line */}
           <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-            {t('landing.heroSubtitle')}
+            A simple way to organize your wishes, understand the process, and guide your family when it matters most.
           </p>
+
+          {/* Value Bullets */}
+          <ul className="flex flex-col md:flex-row justify-center gap-4 md:gap-8 text-muted-foreground">
+            <li className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-primary" />
+              <span>Create a clear plan before it's needed</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-primary" />
+              <span>Understand funeral and cremation options</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-primary" />
+              <span>Give your family direction and peace of mind</span>
+            </li>
+          </ul>
 
           {/* Returning User Welcome - only shown when authenticated */}
           {userName && <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 max-w-md mx-auto">
@@ -107,17 +125,22 @@ const Landing = () => {
               </Button>
             </div>}
           
-          <div className="flex flex-col items-center gap-4 pt-4">
+          {/* Primary & Secondary CTAs */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Button size="lg" onClick={handleStartPlanner} className="min-h-[48px] text-lg px-8">
-              See How It Works
+              Start Planning
             </Button>
-            <p className="text-sm text-muted-foreground">
-              Preview tools and education first. Upgrade only if and when it makes sense for you.
-            </p>
-            <Link to="/pricing" className="text-sm text-primary hover:underline">
-              View Pricing & Plans
+            <Link to="/resources">
+              <Button size="lg" variant="outline" className="min-h-[48px] text-lg px-8">
+                Explore Resources
+              </Button>
             </Link>
           </div>
+
+          {/* Trust Strip */}
+          <p className="text-sm text-muted-foreground">
+            Educational. Private. No obligation.
+          </p>
         </div>
 
         {/* WHAT WE DO - Single Simple Explanation */}
@@ -200,7 +223,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            {/* CARD 2: Plan Ahead */}
+            {/* CARD 2: Plan Ahead - Typography matched to Understand the Process */}
             <Card className="border-2 hover:border-primary/50 transition-colors group">
               <CardContent className="pt-8 pb-8 space-y-4">
                 <div className="flex justify-center">
@@ -214,24 +237,41 @@ const Landing = () => {
                 <p className="text-muted-foreground leading-relaxed text-center">
                   {t('landing.path2Desc')}
                 </p>
-                <ul className="text-sm text-muted-foreground space-y-2 pl-4">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                    {t('landing.path2Item1')}
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                    {t('landing.path2Item2')}
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                    {t('landing.path2Item3')}
-                  </li>
-                </ul>
-                <div className="pt-4">
+                
+                {/* Education Links - Matching "Understand the Process" card structure */}
+                <div className="space-y-3 pt-2">
+                  <Link to="/plan-ahead" className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group/link">
+                    <ClipboardList className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div>
+                      <span className="font-medium text-foreground group-hover/link:text-primary transition-colors">{t('landing.path2Item1')}</span>
+                      <p className="text-sm text-muted-foreground">Step-by-step guidance for documenting your wishes.</p>
+                    </div>
+                  </Link>
+                  
+                  <Link to="/preplan-summary" className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group/link">
+                    <FileText className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div>
+                      <span className="font-medium text-foreground group-hover/link:text-primary transition-colors">{t('landing.path2Item2')}</span>
+                      <p className="text-sm text-muted-foreground">Download or share your summary with loved ones.</p>
+                    </div>
+                  </Link>
+                  
+                  <Link to="/forms" className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group/link">
+                    <Download className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div>
+                      <span className="font-medium text-foreground group-hover/link:text-primary transition-colors">{t('landing.path2Item3')}</span>
+                      <p className="text-sm text-muted-foreground">Printable worksheets and checklists for offline use.</p>
+                    </div>
+                  </Link>
+                </div>
+                
+                <div className="pt-4 space-y-2">
                   <Button onClick={handleStartPlanner} className="w-full">
                     {t('landing.startPrePlanning')}
                   </Button>
+                  <p className="text-xs text-center text-muted-foreground">
+                    Preview your planning steps. Sign in only when you're ready to save.
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -495,17 +535,40 @@ const Landing = () => {
                 <h3 className="text-xl font-semibold text-foreground">Learn About Funeral Planning</h3>
               </div>
               <div className="space-y-3">
-                <button onClick={() => navigate("/resources")} className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3">
+                <button onClick={() => navigate("/resources?section=planning-guides")} className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3">
                   <BookOpen className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-foreground">Helpful Articles</span>
+                  <div>
+                    <span className="text-foreground block">Guides & FAQs</span>
+                    <span className="text-xs text-muted-foreground">Plain-language planning guides and answers.</span>
+                  </div>
                 </button>
-                <button onClick={() => navigate("/faq")} className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3">
-                  <HelpCircle className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-foreground">Common Questions & Answers</span>
+                <button onClick={() => navigate("/resources?section=forms-worksheets")} className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3">
+                  <Download className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <span className="text-foreground block">Forms & Checklists</span>
+                    <span className="text-xs text-muted-foreground">Printable worksheets and planning tools.</span>
+                  </div>
                 </button>
-                <button onClick={() => navigate("/legal-documents")} className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3">
+                <button onClick={() => navigate("/resources?section=events-workshops")} className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <span className="text-foreground block">Events & Workshops</span>
+                    <span className="text-xs text-muted-foreground">Find local and virtual planning events.</span>
+                  </div>
+                </button>
+                <button onClick={() => navigate("/resources?section=learn-library")} className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3">
                   <FileText className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-foreground">Legal Documents & State Resources</span>
+                  <div>
+                    <span className="text-foreground block">Learn Library</span>
+                    <span className="text-xs text-muted-foreground">Articles, videos, and trusted resources.</span>
+                  </div>
+                </button>
+                <button onClick={() => navigate("/resources?section=tools-calculators")} className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3">
+                  <Calculator className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <span className="text-foreground block">Tools & Calculators</span>
+                    <span className="text-xs text-muted-foreground">Cost estimators and decision helpers.</span>
+                  </div>
                 </button>
               </div>
             </div>
@@ -533,6 +596,22 @@ const Landing = () => {
                 </a>
               </div>
             </div>
+          </div>
+
+          {/* Events Teaser Strip */}
+          <div className="mt-8 bg-card border border-primary/20 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Calendar className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">Events & Workshops</h3>
+                <p className="text-sm text-muted-foreground">Live and virtual sessions on planning, costs, and next steps.</p>
+              </div>
+            </div>
+            <Button onClick={() => navigate("/events")} variant="outline">
+              View Events
+            </Button>
           </div>
         </div>
 
