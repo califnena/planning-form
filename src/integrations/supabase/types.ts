@@ -670,6 +670,99 @@ export type Database = {
           },
         ]
       }
+      efa_do_for_you_intake: {
+        Row: {
+          best_times: string | null
+          created_at: string
+          dob: string | null
+          email: string
+          full_name: string
+          help_topics: string[]
+          id: string
+          involvement_level: string
+          location_preference: string | null
+          non_negotiables: string | null
+          notes: string | null
+          phone: string | null
+          preferred_name: string | null
+          primary_contact_email: string | null
+          primary_contact_name: string
+          primary_contact_phone: string | null
+          primary_contact_relationship: string
+          relationship: string
+          secondary_contact_email: string | null
+          secondary_contact_name: string | null
+          secondary_contact_phone: string | null
+          secondary_contact_relationship: string | null
+          service_preference: string | null
+          service_type: string | null
+          status: string
+          timing: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          best_times?: string | null
+          created_at?: string
+          dob?: string | null
+          email: string
+          full_name: string
+          help_topics?: string[]
+          id?: string
+          involvement_level: string
+          location_preference?: string | null
+          non_negotiables?: string | null
+          notes?: string | null
+          phone?: string | null
+          preferred_name?: string | null
+          primary_contact_email?: string | null
+          primary_contact_name: string
+          primary_contact_phone?: string | null
+          primary_contact_relationship: string
+          relationship: string
+          secondary_contact_email?: string | null
+          secondary_contact_name?: string | null
+          secondary_contact_phone?: string | null
+          secondary_contact_relationship?: string | null
+          service_preference?: string | null
+          service_type?: string | null
+          status?: string
+          timing: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          best_times?: string | null
+          created_at?: string
+          dob?: string | null
+          email?: string
+          full_name?: string
+          help_topics?: string[]
+          id?: string
+          involvement_level?: string
+          location_preference?: string | null
+          non_negotiables?: string | null
+          notes?: string | null
+          phone?: string | null
+          preferred_name?: string | null
+          primary_contact_email?: string | null
+          primary_contact_name?: string
+          primary_contact_phone?: string | null
+          primary_contact_relationship?: string
+          relationship?: string
+          secondary_contact_email?: string | null
+          secondary_contact_name?: string | null
+          secondary_contact_phone?: string | null
+          secondary_contact_relationship?: string | null
+          service_preference?: string | null
+          service_type?: string | null
+          status?: string
+          timing?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       efa_event_contacts: {
         Row: {
           contact_url: string | null
