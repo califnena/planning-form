@@ -103,7 +103,7 @@ export default function PrePlanSummary() {
       // DEBUG: Log user context
       console.log("[PrePlanSummary] Loading data for user:", user.id);
 
-      // Get user's org
+      // Step 1: Get user's org
       const { data: orgMember } = await supabase
         .from("org_members")
         .select("org_id")
@@ -111,194 +111,230 @@ export default function PrePlanSummary() {
         .eq("role", "owner")
         .maybeSingle();
       
-      // DEBUG: Log org lookup
       console.log("[PrePlanSummary] Org member lookup:", { userId: user.id, orgMember });
 
       if (!orgMember) {
-        console.log("[PrePlanSummary] No org found for user");
+        // No org = user hasn't started planning yet
+        console.log("[PrePlanSummary] No org found - redirecting to start planner");
         setLoading(false);
         return;
       }
 
-      // Get plan data
+      // Step 2: Get the LATEST plan by updated_at (not just any plan)
       const { data: plan, error } = await supabase
         .from("plans")
         .select("*")
         .eq("org_id", orgMember.org_id)
         .eq("owner_user_id", user.id)
+        .order("updated_at", { ascending: false })
+        .limit(1)
         .maybeSingle();
 
-      // DEBUG: Log plan data
       console.log("[PrePlanSummary] Plan query result:", { 
         orgId: orgMember.org_id, 
         userId: user.id, 
         planId: plan?.id,
-        hasAboutMe: !!plan?.about_me_notes,
-        hasFuneral: !!plan?.funeral_wishes_notes,
-        hasFinancial: !!plan?.financial_notes,
-        hasProperty: !!plan?.property_notes,
-        hasLegal: !!plan?.legal_notes,
+        planUpdatedAt: plan?.updated_at,
         error 
       });
 
       if (error) throw error;
       
-      if (plan) {
-        setPlanData(plan);
-        setLastUpdated(plan.updated_at);
+      // Step 3: If no plan exists, create one
+      let activePlan = plan;
+      if (!activePlan) {
+        console.log("[PrePlanSummary] No plan found - creating draft plan");
+        const { data: newPlan, error: createError } = await supabase
+          .from("plans")
+          .insert({
+            org_id: orgMember.org_id,
+            owner_user_id: user.id,
+            title: "My Planning Document"
+          })
+          .select()
+          .single();
         
-        // Get personal profile
-        const { data: profileData } = await supabase
-          .from("personal_profiles")
-          .select("*")
-          .eq("plan_id", plan.id)
-          .maybeSingle();
-        setProfile(profileData);
-
-        // Get contacts
-        const { data: contactsData } = await supabase
-          .from("contacts_notify")
-          .select("*")
-          .eq("plan_id", plan.id);
-        setContacts(contactsData || []);
-
-        // Get pets
-        const { data: pets } = await supabase
-          .from("pets")
-          .select("*")
-          .eq("plan_id", plan.id);
-
-        // Get insurance policies
-        const { data: insurance } = await supabase
-          .from("insurance_policies")
-          .select("*")
-          .eq("plan_id", plan.id);
-
-        // Get properties
-        const { data: properties } = await supabase
-          .from("properties")
-          .select("*")
-          .eq("plan_id", plan.id);
-
-        // Get messages
-        const { data: messages } = await supabase
-          .from("messages")
-          .select("*")
-          .eq("plan_id", plan.id);
-
-        // Build sections with content
-        const sectionsList: SectionData[] = [
-          {
-            id: "personal",
-            label: "Personal & Family Details",
-            icon: <User className="h-5 w-5" />,
-            content: profileData ? (
-              <div className="space-y-2 text-sm">
-                {profileData.full_name && <p><strong>Name:</strong> {profileData.full_name}</p>}
-                {profileData.address && <p><strong>Address:</strong> {profileData.address}</p>}
-                {profileData.marital_status && <p><strong>Marital Status:</strong> {profileData.marital_status}</p>}
-                {profileData.partner_name && <p><strong>Spouse/Partner:</strong> {profileData.partner_name}</p>}
-                {profileData.child_names?.length > 0 && (
-                  <p><strong>Children:</strong> {profileData.child_names.filter(Boolean).join(", ")}</p>
-                )}
-              </div>
-            ) : null,
-            hasContent: !!profileData?.full_name,
-            editRoute: "/preplandashboard?section=personal"
-          },
-          {
-            id: "legacy",
-            label: "Life Story & Legacy",
-            icon: <BookHeart className="h-5 w-5" />,
-            content: plan.about_me_notes ? (
-              <p className="text-sm">{plan.about_me_notes}</p>
-            ) : null,
-            hasContent: !!plan.about_me_notes,
-            editRoute: "/preplandashboard?section=legacy"
-          },
-          {
-            id: "funeral",
-            label: "Funeral Wishes",
-            icon: <Heart className="h-5 w-5" />,
-            content: plan.funeral_wishes_notes ? (
-              <p className="text-sm">{plan.funeral_wishes_notes}</p>
-            ) : null,
-            hasContent: !!plan.funeral_wishes_notes,
-            editRoute: "/preplandashboard?section=funeral"
-          },
-          {
-            id: "financial",
-            label: "Financial Life (Summary)",
-            icon: <Wallet className="h-5 w-5" />,
-            content: plan.financial_notes ? (
-              <p className="text-sm">{plan.financial_notes}</p>
-            ) : null,
-            hasContent: !!plan.financial_notes,
-            editRoute: "/preplandashboard?section=financial"
-          },
-          {
-            id: "property",
-            label: "Property & Valuables",
-            icon: <Home className="h-5 w-5" />,
-            content: (properties && properties.length > 0) || plan.property_notes ? (
-              <div className="space-y-2 text-sm">
-                {properties && properties.length > 0 && (
-                  <p><strong>Properties:</strong> {properties.length} listed</p>
-                )}
-                {plan.property_notes && <p>{plan.property_notes}</p>}
-              </div>
-            ) : null,
-            hasContent: (properties && properties.length > 0) || !!plan.property_notes,
-            editRoute: "/preplandashboard?section=property"
-          },
-          {
-            id: "legal",
-            label: "Legal & Planning Notes",
-            icon: <Scale className="h-5 w-5" />,
-            content: plan.legal_notes || contactsData?.some((c: any) => 
-              c.relationship?.toLowerCase().includes('executor') || 
-              c.relationship?.toLowerCase().includes('guardian')
-            ) ? (
-              <div className="space-y-2 text-sm">
-                {contactsData?.filter((c: any) => 
-                  c.relationship?.toLowerCase().includes('executor')
-                ).map((c: any, i: number) => (
-                  <p key={i}><strong>Executor:</strong> {c.name}</p>
-                ))}
-                {contactsData?.filter((c: any) => 
-                  c.relationship?.toLowerCase().includes('guardian')
-                ).map((c: any, i: number) => (
-                  <p key={i}><strong>Guardian:</strong> {c.name}</p>
-                ))}
-                {plan.legal_notes && <p>{plan.legal_notes}</p>}
-              </div>
-            ) : null,
-            hasContent: !!plan.legal_notes || contactsData?.some((c: any) => 
-              c.relationship?.toLowerCase().includes('executor') || 
-              c.relationship?.toLowerCase().includes('guardian')
-            ),
-            editRoute: "/preplandashboard?section=legal"
-          },
-          {
-            id: "messages",
-            label: "Notes for Family & Professionals",
-            icon: <MessageSquare className="h-5 w-5" />,
-            content: (messages && messages.length > 0) || plan.messages_notes || plan.to_loved_ones_message ? (
-              <div className="space-y-2 text-sm">
-                {messages && messages.length > 0 && (
-                  <p><strong>Messages:</strong> {messages.length} written</p>
-                )}
-                {plan.to_loved_ones_message && <p>{plan.to_loved_ones_message}</p>}
-                {plan.messages_notes && <p>{plan.messages_notes}</p>}
-              </div>
-            ) : null,
-            hasContent: (messages && messages.length > 0) || !!plan.messages_notes || !!plan.to_loved_ones_message,
-            editRoute: "/preplandashboard?section=messages"
-          }
-        ];
-
-        setSections(sectionsList);
+        if (createError) {
+          console.error("[PrePlanSummary] Error creating plan:", createError);
+          throw createError;
+        }
+        activePlan = newPlan;
+        console.log("[PrePlanSummary] Created new plan:", activePlan?.id);
       }
+
+      // Step 4: Fetch all related data for this plan
+      const [
+        { data: profileData },
+        { data: contactsData },
+        { data: pets },
+        { data: insurance },
+        { data: properties },
+        { data: messages }
+      ] = await Promise.all([
+        supabase.from("personal_profiles").select("*").eq("plan_id", activePlan.id).maybeSingle(),
+        supabase.from("contacts_notify").select("*").eq("plan_id", activePlan.id),
+        supabase.from("pets").select("*").eq("plan_id", activePlan.id),
+        supabase.from("insurance_policies").select("*").eq("plan_id", activePlan.id),
+        supabase.from("properties").select("*").eq("plan_id", activePlan.id),
+        supabase.from("messages").select("*").eq("plan_id", activePlan.id)
+      ]);
+
+      // DEBUG: Log related data counts
+      console.log("[PrePlanSummary] Related data counts:", {
+        planId: activePlan.id,
+        hasProfile: !!profileData,
+        contactsCount: contactsData?.length || 0,
+        petsCount: pets?.length || 0,
+        insuranceCount: insurance?.length || 0,
+        propertiesCount: properties?.length || 0,
+        messagesCount: messages?.length || 0,
+        planNotes: {
+          about_me: !!activePlan.about_me_notes,
+          funeral: !!activePlan.funeral_wishes_notes,
+          financial: !!activePlan.financial_notes,
+          property: !!activePlan.property_notes,
+          legal: !!activePlan.legal_notes,
+          messages: !!activePlan.messages_notes
+        }
+      });
+
+      // Step 5: Check if ANY data exists (plan notes OR related tables)
+      const hasAnyData = 
+        !!profileData?.full_name ||
+        (contactsData && contactsData.length > 0) ||
+        (pets && pets.length > 0) ||
+        (insurance && insurance.length > 0) ||
+        (properties && properties.length > 0) ||
+        (messages && messages.length > 0) ||
+        !!activePlan.about_me_notes ||
+        !!activePlan.funeral_wishes_notes ||
+        !!activePlan.financial_notes ||
+        !!activePlan.property_notes ||
+        !!activePlan.legal_notes ||
+        !!activePlan.messages_notes ||
+        !!activePlan.to_loved_ones_message ||
+        !!activePlan.instructions_notes;
+
+      console.log("[PrePlanSummary] Has any data:", hasAnyData);
+
+      // Always set the plan data (even if empty) so we can show the summary structure
+      setPlanData(activePlan);
+      setLastUpdated(activePlan.updated_at);
+      setProfile(profileData);
+      setContacts(contactsData || []);
+
+      // Build sections with content
+      const sectionsList: SectionData[] = [
+        {
+          id: "personal",
+          label: "Personal & Family Details",
+          icon: <User className="h-5 w-5" />,
+          content: profileData ? (
+            <div className="space-y-2 text-sm">
+              {profileData.full_name && <p><strong>Name:</strong> {profileData.full_name}</p>}
+              {profileData.address && <p><strong>Address:</strong> {profileData.address}</p>}
+              {profileData.marital_status && <p><strong>Marital Status:</strong> {profileData.marital_status}</p>}
+              {profileData.partner_name && <p><strong>Spouse/Partner:</strong> {profileData.partner_name}</p>}
+              {profileData.child_names?.length > 0 && (
+                <p><strong>Children:</strong> {profileData.child_names.filter(Boolean).join(", ")}</p>
+              )}
+            </div>
+          ) : <p className="text-sm text-muted-foreground italic">No information added yet</p>,
+          hasContent: !!profileData?.full_name,
+          editRoute: "/preplandashboard?section=personal"
+        },
+        {
+          id: "legacy",
+          label: "Life Story & Legacy",
+          icon: <BookHeart className="h-5 w-5" />,
+          content: activePlan.about_me_notes ? (
+            <p className="text-sm">{activePlan.about_me_notes}</p>
+          ) : <p className="text-sm text-muted-foreground italic">No information added yet</p>,
+          hasContent: !!activePlan.about_me_notes,
+          editRoute: "/preplandashboard?section=legacy"
+        },
+        {
+          id: "funeral",
+          label: "Funeral Wishes",
+          icon: <Heart className="h-5 w-5" />,
+          content: activePlan.funeral_wishes_notes ? (
+            <p className="text-sm">{activePlan.funeral_wishes_notes}</p>
+          ) : <p className="text-sm text-muted-foreground italic">No information added yet</p>,
+          hasContent: !!activePlan.funeral_wishes_notes,
+          editRoute: "/preplandashboard?section=funeral"
+        },
+        {
+          id: "financial",
+          label: "Financial Life (Summary)",
+          icon: <Wallet className="h-5 w-5" />,
+          content: activePlan.financial_notes ? (
+            <p className="text-sm">{activePlan.financial_notes}</p>
+          ) : <p className="text-sm text-muted-foreground italic">No information added yet</p>,
+          hasContent: !!activePlan.financial_notes,
+          editRoute: "/preplandashboard?section=financial"
+        },
+        {
+          id: "property",
+          label: "Property & Valuables",
+          icon: <Home className="h-5 w-5" />,
+          content: (properties && properties.length > 0) || activePlan.property_notes ? (
+            <div className="space-y-2 text-sm">
+              {properties && properties.length > 0 && (
+                <p><strong>Properties:</strong> {properties.length} listed</p>
+              )}
+              {activePlan.property_notes && <p>{activePlan.property_notes}</p>}
+            </div>
+          ) : <p className="text-sm text-muted-foreground italic">No information added yet</p>,
+          hasContent: (properties && properties.length > 0) || !!activePlan.property_notes,
+          editRoute: "/preplandashboard?section=property"
+        },
+        {
+          id: "legal",
+          label: "Legal & Planning Notes",
+          icon: <Scale className="h-5 w-5" />,
+          content: activePlan.legal_notes || contactsData?.some((c: any) => 
+            c.relationship?.toLowerCase().includes('executor') || 
+            c.relationship?.toLowerCase().includes('guardian')
+          ) ? (
+            <div className="space-y-2 text-sm">
+              {contactsData?.filter((c: any) => 
+                c.relationship?.toLowerCase().includes('executor')
+              ).map((c: any, i: number) => (
+                <p key={i}><strong>Executor:</strong> {c.name}</p>
+              ))}
+              {contactsData?.filter((c: any) => 
+                c.relationship?.toLowerCase().includes('guardian')
+              ).map((c: any, i: number) => (
+                <p key={i}><strong>Guardian:</strong> {c.name}</p>
+              ))}
+              {activePlan.legal_notes && <p>{activePlan.legal_notes}</p>}
+            </div>
+          ) : <p className="text-sm text-muted-foreground italic">No information added yet</p>,
+          hasContent: !!activePlan.legal_notes || contactsData?.some((c: any) => 
+            c.relationship?.toLowerCase().includes('executor') || 
+            c.relationship?.toLowerCase().includes('guardian')
+          ),
+          editRoute: "/preplandashboard?section=legal"
+        },
+        {
+          id: "messages",
+          label: "Notes for Family & Professionals",
+          icon: <MessageSquare className="h-5 w-5" />,
+          content: (messages && messages.length > 0) || activePlan.messages_notes || activePlan.to_loved_ones_message ? (
+            <div className="space-y-2 text-sm">
+              {messages && messages.length > 0 && (
+                <p><strong>Messages:</strong> {messages.length} written</p>
+              )}
+              {activePlan.to_loved_ones_message && <p>{activePlan.to_loved_ones_message}</p>}
+              {activePlan.messages_notes && <p>{activePlan.messages_notes}</p>}
+            </div>
+          ) : <p className="text-sm text-muted-foreground italic">No information added yet</p>,
+          hasContent: (messages && messages.length > 0) || !!activePlan.messages_notes || !!activePlan.to_loved_ones_message,
+          editRoute: "/preplandashboard?section=messages"
+        }
+      ];
+
+      setSections(sectionsList);
     } catch (error) {
       console.error("Error loading plan data:", error);
       toast({
@@ -413,17 +449,18 @@ export default function PrePlanSummary() {
     );
   }
 
+  // Only show empty state if no org exists (user hasn't started at all)
   if (!planData) {
     return (
       <AuthenticatedLayout>
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <Card className="p-8 text-center">
-            <h2 className="text-xl font-semibold mb-4">No Planning Information Found</h2>
+            <h2 className="text-xl font-semibold mb-4">Your Planning Document</h2>
             <p className="text-muted-foreground mb-6">
-              Complete at least one section in your planner to generate a summary.
+              Your planning document will appear here once you start adding information.
             </p>
             <Button onClick={() => navigate("/preplandashboard")}>
-              Go to Planner
+              Start Planning
             </Button>
           </Card>
         </div>
