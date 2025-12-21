@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
+import { PlannerModeModal } from "@/components/planner/PlannerModeModal";
 import { generatePlanPDF } from "@/lib/pdfGenerator";
 import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator";
 import { generateBlankAfterLifePlanPDF } from "@/lib/blankAfterLifePlanPdfGenerator";
@@ -45,6 +46,7 @@ export default function Dashboard() {
   const [firstName, setFirstName] = useState<string>("");
   const [progress, setProgress] = useState(0);
   const [showPIIDialog, setShowPIIDialog] = useState(false);
+  const [showPlannerModeModal, setShowPlannerModeModal] = useState(false);
   const [pendingPIIData, setPendingPIIData] = useState<any>(null);
   const [isFreePlan, setIsFreePlan] = useState(true);
   const [hasVIPAccess, setHasVIPAccess] = useState(false);
@@ -124,7 +126,7 @@ export default function Dashboard() {
   const checkIsFreePlan = checkIsFreePlanFn;
   const checkVIPAccess = checkVIPAccessFn;
   const checkPrintableAccess = checkPrintableAccessFn;
-  const handleContinuePlanner = async () => {
+  const handleStartDigitalPlanner = async () => {
     const {
       data: {
         user
@@ -138,14 +140,54 @@ export default function Dashboard() {
       navigate('/pricing');
       return;
     }
-    const {
-      data: settings
-    } = await supabase.from("user_settings").select("selected_sections").eq("user_id", user.id).maybeSingle();
-    if (!settings || !settings.selected_sections || settings.selected_sections.length === 0) {
+
+    // Check if user has already selected a planner mode
+    const { data: settings } = await supabase
+      .from("user_settings")
+      .select("selected_sections, planner_mode")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    // If no planner mode selected, show the modal
+    if (!settings?.planner_mode) {
+      setShowPlannerModeModal(true);
+      return;
+    }
+
+    // If no sections selected, go to preferences
+    if (!settings?.selected_sections || settings.selected_sections.length === 0) {
       navigate('/preferences');
       return;
     }
+
+    // Otherwise continue to planner
     navigate('/preplansteps');
+  };
+
+  const handlePlannerModeSelected = async (mode: 'guided' | 'free') => {
+    setShowPlannerModeModal(false);
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Check if user has selected sections
+    const { data: settings } = await supabase
+      .from("user_settings")
+      .select("selected_sections")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (!settings?.selected_sections || settings.selected_sections.length === 0) {
+      navigate('/preferences');
+      return;
+    }
+
+    // Navigate based on mode
+    if (mode === 'guided') {
+      navigate('/wizard/preplanning');
+    } else {
+      navigate('/preplansteps');
+    }
   };
   const handleGeneratePDF = async () => {
     // Check for paid access (subscription required)
@@ -537,7 +579,7 @@ export default function Dashboard() {
           
           <Card className="p-6">
             <div className="space-y-6">
-              {/* Option 1: Digital Planner */}
+              {/* Digital Planner - Simplified to ONE entry point */}
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -545,11 +587,12 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold mb-2">{t('dashboard.option1Digital')}</h3>
+                  <h3 className="font-semibold mb-2">Digital Planner</h3>
                   <p className="text-sm text-muted-foreground mb-4">
                     {t('dashboard.option1DigitalDesc')}
                   </p>
-                  {isFreePlan ? <div className="space-y-4">
+                  {isFreePlan ? (
+                    <div className="space-y-4">
                       <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                         <p className="text-sm text-amber-900 mb-3">
                           <strong>{t('dashboard.upgradeRequired')}</strong> {t('dashboard.upgradeRequiredDesc')}
@@ -558,25 +601,24 @@ export default function Dashboard() {
                           {t('dashboard.subscribeToPremium')}
                         </Button>
                       </div>
-                      <div className="flex flex-col sm:flex-row flex-wrap gap-2">
-                        <Button onClick={handlePurchaseBinder} variant="outline" className="w-full sm:w-auto sm:flex-1 border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 whitespace-normal h-auto py-2">
-                          {t('dashboard.purchasePhysicalBinder')}
-                        </Button>
-                      </div>
-                    </div> : <div className="flex flex-col sm:flex-row flex-wrap gap-2">
-                      <Button onClick={handleContinuePlanner} className="w-full sm:w-auto sm:flex-1 bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] whitespace-normal h-auto py-2">
-                        Begin Planning
+                    </div>
+                  ) : (
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button 
+                        onClick={handleStartDigitalPlanner} 
+                        className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] whitespace-normal h-auto py-3 px-6"
+                      >
+                        Start Digital Planner
                       </Button>
-                      <Button onClick={handleGeneratePDF} variant="outline" className="w-full sm:w-auto sm:flex-1 border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 whitespace-normal h-auto py-2">
-                        {t('dashboard.printableVersion')}
+                      <Button 
+                        onClick={handleGeneratePDF} 
+                        variant="outline" 
+                        className="border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 whitespace-normal h-auto py-3 px-6"
+                      >
+                        Printable Version
                       </Button>
-                      <Button onClick={handleStartWizard} variant="outline" className="w-full sm:w-auto sm:flex-1 border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 whitespace-normal h-auto py-2">
-                        {t('dashboard.stepByStepGuide')}
-                      </Button>
-                      <Button onClick={handlePurchaseBinder} variant="outline" className="w-full sm:w-auto sm:flex-1 border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 whitespace-normal h-auto py-2">
-                        {t('dashboard.purchasePhysicalBinder')}
-                      </Button>
-                    </div>}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -893,5 +935,10 @@ export default function Dashboard() {
       </div>
 
       <PIICollectionDialog open={showPIIDialog} onOpenChange={setShowPIIDialog} onSubmit={handlePIISubmit} />
+      <PlannerModeModal 
+        open={showPlannerModeModal} 
+        onOpenChange={setShowPlannerModeModal} 
+        onContinue={handlePlannerModeSelected} 
+      />
     </AuthenticatedLayout>;
 }
