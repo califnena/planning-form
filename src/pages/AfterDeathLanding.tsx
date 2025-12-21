@@ -287,21 +287,21 @@ export default function AfterDeathLanding() {
         <div className="max-w-5xl mx-auto mb-16">
           <h2 className="text-2xl font-bold text-center mb-8">Additional Support & Products</h2>
           <div className="grid md:grid-cols-3 gap-6">
-            {/* VIP Coach */}
+            {/* Planning Support */}
             <Card className="border-2 hover:border-primary/50 transition-colors">
               <CardHeader>
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center mb-2">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center mb-2">
                   <Star className="h-6 w-6 text-white" />
                 </div>
-                <CardTitle className="text-lg">VIP Coach Assistant</CardTitle>
+                <CardTitle className="text-lg">Compassionate Guidance</CardTitle>
                 <CardDescription>
-                  One-on-one guidance from compassionate funeral planning experts
+                  For those who want reassurance, not just forms. A real person who walks at your pace.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Link to="/vip-coach">
-                  <Button variant="outline" className="w-full">
-                    Get Personal Support
+                  <Button variant="outline" className="w-full min-h-[48px]">
+                    Talk With a Planning Guide
                   </Button>
                 </Link>
               </CardContent>
