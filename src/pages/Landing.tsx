@@ -332,9 +332,7 @@ const Landing = () => {
           <p className="text-lg text-muted-foreground text-center mb-4 max-w-2xl mx-auto">
             {t('landing.optionalSupportDesc')}
           </p>
-          <p className="text-sm text-muted-foreground text-center mb-12 max-w-2xl mx-auto italic">
-            {t('landing.optionalSupportReassurance')}
-          </p>
+          
           
           <div className="grid md:grid-cols-3 gap-8">
             {/* VIP Coach */}
@@ -398,7 +396,7 @@ const Landing = () => {
           <div className="grid md:grid-cols-3 gap-8">
             {/* Testimonial 1 */}
             <Card className="border-2 bg-background/80 backdrop-blur">
-              <CardContent className="pt-8 pb-8 space-y-4">
+              <CardContent className="pt-8 pb-8 space-y-4 bg-yellow-200">
                 <Quote className="h-8 w-8 text-primary/30" />
                 <p className="text-foreground leading-relaxed">
                   "Having everything written down ahead of time gave us such peace of mind. We didn't realize how many small decisions there were until we started, and having clear guidance made all the difference. Our family knows exactly what we want, and that alone is priceless."
@@ -411,7 +409,7 @@ const Landing = () => {
 
             {/* Testimonial 2 */}
             <Card className="border-2 bg-background/80 backdrop-blur">
-              <CardContent className="pt-8 pb-8 space-y-4">
+              <CardContent className="pt-8 pb-8 space-y-4 bg-yellow-200">
                 <Quote className="h-8 w-8 text-primary/30" />
                 <p className="text-foreground leading-relaxed">
                   "I appreciated that nothing felt rushed or sales-driven. The education helped me understand my options, and I was able to move forward at my own pace. Knowing my wishes are organized and accessible gives me a deep sense of relief."
@@ -424,7 +422,7 @@ const Landing = () => {
 
             {/* Testimonial 3 */}
             <Card className="border-2 bg-background/80 backdrop-blur">
-              <CardContent className="pt-8 pb-8 space-y-4">
+              <CardContent className="pt-8 pb-8 space-y-4 bg-yellow-200">
                 <Quote className="h-8 w-8 text-primary/30" />
                 <p className="text-foreground leading-relaxed">
                   "When my wife passed, having a clear plan already in place removed so much stress. The step-by-step guidance helped me focus on honoring her instead of trying to figure everything out during a difficult time."
@@ -570,15 +568,9 @@ const Landing = () => {
 
         {/* FINAL CTA */}
         <div className="mt-24 max-w-3xl mx-auto text-center space-y-6">
-          <p className="text-xl text-muted-foreground">
-            {t('landing.emotionalClose1')}
-          </p>
-          <p className="text-lg text-muted-foreground">
-            {t('landing.emotionalClose2')}
-          </p>
-          <Button size="lg" className="text-lg px-10 py-7 mt-4" onClick={handleStartPlanner}>
-            {t('landing.startWithFreeTools')}
-          </Button>
+          
+          
+          
         </div>
       </main>
     </div>;
