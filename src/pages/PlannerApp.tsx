@@ -600,6 +600,7 @@ const PlannerApp = () => {
             onNext={handleNextSection}
             onGenerateDocument={handleDownloadPDF}
             isLastSection={isLastSection}
+            onSave={handleManualSave}
           />
         )}
       </div>

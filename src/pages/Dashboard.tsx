@@ -13,6 +13,7 @@ import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator"
 import { generateBlankAfterLifePlanPDF } from "@/lib/blankAfterLifePlanPdfGenerator";
 import { checkPaidAccess as checkPaidAccessFn, checkVIPAccess as checkVIPAccessFn, checkPrintableAccess as checkPrintableAccessFn, checkIsFreePlan as checkIsFreePlanFn } from "@/lib/accessChecks";
 import { ChecklistsSection } from "@/components/dashboard/ChecklistsSection";
+import { ResumeCard } from "@/components/dashboard/ResumeCard";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
 export default function Dashboard() {
   const {
@@ -467,6 +468,11 @@ export default function Dashboard() {
   };
   return <AuthenticatedLayout>
       <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Resume Card - Shows if user has previous activity */}
+        <div className="mb-6">
+          <ResumeCard />
+        </div>
+
         {/* Planning Menu Header */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold mb-2">Your Planning Menu</h1>
