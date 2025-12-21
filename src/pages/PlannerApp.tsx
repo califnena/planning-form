@@ -536,6 +536,7 @@ const PlannerApp = () => {
         sectionContent = (
           <SectionOverview
             onNavigateToChecklist={() => setActiveSection("checklist")}
+            onNavigateToSection={(sectionId) => setActiveSection(sectionId)}
           />
         );
         break;
