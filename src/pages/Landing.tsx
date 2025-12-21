@@ -10,16 +10,16 @@ import { useTranslation } from "react-i18next";
 import mascotPlanningAhead from "@/assets/mascot-planning-ahead.png";
 import mascotFamiliesChoose from "@/assets/mascot-families-choose.png";
 import mascotHeroCouple from "@/assets/mascot-hero-couple.png";
-
 const Landing = () => {
-  const { t } = useTranslation();
+  const {
+    t
+  } = useTranslation();
   const navigate = useNavigate();
   const [textSize, setTextSize] = useState<number>(100);
   const [userName, setUserName] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [hasPlannerProgress, setHasPlannerProgress] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
   useEffect(() => {
     const savedSize = localStorage.getItem("landing_text_size");
     if (savedSize) {
@@ -31,29 +31,27 @@ const Landing = () => {
     // Check auth state and planner progress
     const checkUserState = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        
+        const {
+          data: {
+            user
+          }
+        } = await supabase.auth.getUser();
         if (user) {
           setIsLoggedIn(true);
-          
+
           // Get profile name
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('full_name')
-            .eq('id', user.id)
-            .single();
-          
+          const {
+            data: profile
+          } = await supabase.from('profiles').select('full_name').eq('id', user.id).single();
           if (profile?.full_name) {
             setUserName(profile.full_name.split(' ')[0]);
           }
-          
+
           // Check for planner progress in user_settings
-          const { data: settings } = await supabase
-            .from('user_settings')
-            .select('planner_mode, selected_sections')
-            .eq('user_id', user.id)
-            .maybeSingle();
-          
+          const {
+            data: settings
+          } = await supabase.from('user_settings').select('planner_mode, selected_sections').eq('user_id', user.id).maybeSingle();
+
           // User has progress if they have a planner_mode set or selected_sections
           const hasProgress = !!(settings?.planner_mode || settings?.selected_sections);
           setHasPlannerProgress(hasProgress);
@@ -68,17 +66,14 @@ const Landing = () => {
         setIsLoading(false);
       }
     };
-
     checkUserState();
   }, []);
-
   const handleTextSizeChange = (direction: "increase" | "decrease") => {
     const newSize = direction === "increase" ? Math.min(textSize + 10, 150) : Math.max(textSize - 10, 80);
     setTextSize(newSize);
     document.documentElement.style.fontSize = `${newSize}%`;
     localStorage.setItem("landing_text_size", newSize.toString());
   };
-
   const handlePrimaryCTA = () => {
     if (isLoggedIn && hasPlannerProgress) {
       // Continue Planning → go to planner dashboard
@@ -115,18 +110,12 @@ const Landing = () => {
             </div>
             <LanguageSelector />
             {/* Auth-aware header button */}
-            {!isLoading && (
-              isLoggedIn ? (
-                <Button variant="outline" size="lg" onClick={() => navigate("/dashboard")}>
+            {!isLoading && (isLoggedIn ? <Button variant="outline" size="lg" onClick={() => navigate("/dashboard")}>
                   <User className="h-4 w-4 mr-2" />
                   Account
-                </Button>
-              ) : (
-                <Link to="/login">
+                </Button> : <Link to="/login">
                   <Button variant="outline" size="lg">{t('auth.signIn')}</Button>
-                </Link>
-              )
-            )}
+                </Link>)}
           </div>
         </div>
       </header>
@@ -145,33 +134,29 @@ const Landing = () => {
           </h1>
           
           {/* Supporting sentence - single paragraph, clear spacing */}
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mt-5 mb-8">
-            A simple way to organize your wishes, understand the process, and guide your family when it matters most.
-          </p>
+          
 
           {/* Benefits row - horizontal, structured, tight */}
           <div className="flex flex-col md:flex-row justify-center items-center gap-3 md:gap-8 text-muted-foreground text-sm mb-10">
             <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-              <span>Create a clear plan before it's needed</span>
+              <CheckCircle className="h-4 w-4 text-primary flex-shrink-0 bg-accent" />
+              <span className="bg-[sidebar-accent-foreground] bg-slate-300">Create a clear plan before it's needed</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-              <span>Understand funeral and cremation options</span>
+              <span className="bg-slate-300">Understand funeral and cremation options</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-              <span>Give your family direction and peace of mind</span>
+              <span className="bg-slate-300">Give your family direction and peace of mind</span>
             </div>
           </div>
 
           {/* Welcome-back reassurance - separate subtle zone */}
-          {isLoggedIn && hasPlannerProgress && userName && (
-            <div className="text-center mb-6">
-              <p className="text-sm text-muted-foreground/80">Welcome back, {userName}.</p>
+          {isLoggedIn && hasPlannerProgress && userName && <div className="text-center mb-6">
+              <p className="font-normal text-slate-950 text-xl">Welcome back, {userName}.</p>
               <p className="text-sm text-muted-foreground/80">Your plan is saved. Continue anytime.</p>
-            </div>
-          )}
+            </div>}
           
           {/* Primary actions - clean and obvious */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
@@ -186,18 +171,14 @@ const Landing = () => {
           </div>
           
           {/* Sign In link for logged out users */}
-          {!isLoggedIn && !isLoading && (
-            <p className="mb-6">
+          {!isLoggedIn && !isLoading && <p className="mb-6">
               <Link to="/login" className="text-sm text-muted-foreground hover:text-primary underline">
                 Already have an account? Sign In
               </Link>
-            </p>
-          )}
+            </p>}
 
           {/* Footer reassurance - reduced visual weight */}
-          <p className="text-xs text-muted-foreground/70 mt-6">
-            Educational. Private. No obligation.
-          </p>
+          
         </section>
 
         {/* WHAT WE DO - Single Simple Explanation */}
@@ -239,13 +220,7 @@ const Landing = () => {
                 
                 {/* Education Links */}
                 <div className="space-y-2 mt-4">
-                  <Link to="/guide" className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group/link">
-                    <BookOpen className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <div>
-                      <span className="font-medium text-foreground group-hover/link:text-primary transition-colors text-base">Education & Planning Basics</span>
-                      <p className="text-sm text-muted-foreground">Plain-language explanations of funeral planning, terminology, and common decisions.</p>
-                    </div>
-                  </Link>
+                  
                   
                   <Link to="/faq" className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group/link">
                     <HelpCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
@@ -255,12 +230,7 @@ const Landing = () => {
                     </div>
                   </Link>
                   
-                  <a 
-                    href="https://consumer.ftc.gov/articles/ftc-funeral-rule" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group/link"
-                  >
+                  <a href="https://consumer.ftc.gov/articles/ftc-funeral-rule" target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group/link">
                     <FileText className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                     <div>
                       <span className="font-medium text-foreground group-hover/link:text-primary transition-colors text-base">FTC Funeral Consumer Information</span>
