@@ -9,6 +9,7 @@ import { AppFooter } from "@/components/AppFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { usePreviewModeContext } from "@/contexts/PreviewModeContext";
+import { savePendingCheckout, openCheckoutUrl, PendingCheckout } from "@/lib/pendingCheckout";
 
 export default function PlanAheadLanding() {
   const navigate = useNavigate();
@@ -17,14 +18,17 @@ export default function PlanAheadLanding() {
   const [isLoading, setIsLoading] = useState(false);
   const { isLoggedIn, hasPaidAccess, hasPrintableAccess, hasVIPAccess, openLockedModal, saveLastVisitedRoute } = usePreviewModeContext();
 
-  // Helper to require login before action
-  const requireLogin = (action: () => void) => {
+  // Helper to start checkout or save pending and prompt login
+  const startCheckoutOrLogin = async (pending: PendingCheckout, onSuccess: () => void) => {
     if (!isLoggedIn) {
+      // Save what they're trying to buy
+      savePendingCheckout(pending);
       saveLastVisitedRoute(location.pathname);
       openLockedModal("Sign in to continue with your purchase.");
       return;
     }
-    action();
+    // Already logged in - proceed with checkout
+    onSuccess();
   };
 
   const handleStartPlanning = async () => {
@@ -53,33 +57,21 @@ export default function PlanAheadLanding() {
     }
   };
 
-  const openCheckoutUrl = (url: string) => {
-    // In Lovable preview (iframe), Stripe blocks being framed (X-Frame-Options),
-    // so we open Checkout in a new tab. In a normal browser session, we redirect.
-    const isInIframe = (() => {
-      try {
-        return window.self !== window.top;
-      } catch {
-        return true;
-      }
-    })();
-
-    if (isInIframe) {
-      window.open(url, "_blank", "noopener,noreferrer");
-      toast({
-        title: "Checkout opened",
-        description: "Stripe checkout opened in a new tab (preview can't display it inside the frame).",
-      });
-      return;
-    }
-
-    window.location.assign(url);
+  const showCheckoutToast = (title: string, description: string) => {
+    toast({ title, description });
   };
 
   const handlePurchasePrintable = async () => {
-    requireLogin(async () => {
+    const pending: PendingCheckout = {
+      lookupKey: "EFABASIC",
+      mode: "payment",
+      successUrl: `${window.location.origin}/purchase-success?type=printable`,
+      cancelUrl: window.location.href,
+    };
+
+    startCheckoutOrLogin(pending, async () => {
       try {
-        // If user already has printable access, download directly
+        // If user already has printable access, go to dashboard
         if (hasPrintableAccess) {
           navigate("/dashboard");
           toast({
@@ -90,15 +82,10 @@ export default function PlanAheadLanding() {
         }
 
         const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
-          body: {
-            lookupKey: "EFABASIC",
-            mode: "payment",
-            successUrl: `${window.location.origin}/purchase-success?type=printable`,
-            cancelUrl: window.location.href,
-          },
+          body: pending,
         });
         if (error) throw error;
-        if (data?.url) openCheckoutUrl(data.url);
+        if (data?.url) openCheckoutUrl(data.url, showCheckoutToast);
       } catch (error) {
         console.error("Error:", error);
         toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });
@@ -107,18 +94,20 @@ export default function PlanAheadLanding() {
   };
 
   const handlePurchaseBinder = async () => {
-    requireLogin(async () => {
+    const pending: PendingCheckout = {
+      lookupKey: "EFABINDER",
+      mode: "payment",
+      successUrl: `${window.location.origin}/purchase-success?type=binder`,
+      cancelUrl: window.location.href,
+    };
+
+    startCheckoutOrLogin(pending, async () => {
       try {
         const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
-          body: {
-            lookupKey: "EFABINDER",
-            mode: "payment",
-            successUrl: `${window.location.origin}/purchase-success?type=binder`,
-            cancelUrl: window.location.href,
-          },
+          body: pending,
         });
         if (error) throw error;
-        if (data?.url) openCheckoutUrl(data.url);
+        if (data?.url) openCheckoutUrl(data.url, showCheckoutToast);
       } catch (error) {
         console.error("Error:", error);
         toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });
@@ -127,18 +116,20 @@ export default function PlanAheadLanding() {
   };
 
   const handlePurchaseDoItForYou = async () => {
-    requireLogin(async () => {
+    const pending: PendingCheckout = {
+      lookupKey: "EFADOFORU",
+      mode: "payment",
+      successUrl: `${window.location.origin}/purchase-success?type=dfy`,
+      cancelUrl: window.location.href,
+    };
+
+    startCheckoutOrLogin(pending, async () => {
       try {
         const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
-          body: {
-            lookupKey: "EFADOFORU",
-            mode: "payment",
-            successUrl: `${window.location.origin}/purchase-success`,
-            cancelUrl: window.location.href,
-          },
+          body: pending,
         });
         if (error) throw error;
-        if (data?.url) openCheckoutUrl(data.url);
+        if (data?.url) openCheckoutUrl(data.url, showCheckoutToast);
       } catch (error) {
         console.error("Error:", error);
         toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });

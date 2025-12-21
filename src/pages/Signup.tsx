@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { BackToHomeButton } from "@/components/BackToHomeButton";
 import { useTranslation } from "react-i18next";
+import { getPendingCheckout, clearPendingCheckout, openCheckoutUrl, getProductName } from "@/lib/pendingCheckout";
 
 const Signup = () => {
   const { t } = useTranslation();
@@ -67,32 +68,38 @@ const Signup = () => {
       if (data.user) {
         await createOrgForUser(data.user.id, email);
         
-        // Check if a plan was selected from pricing page
-        const selectedPlan = localStorage.getItem("selected_plan");
-        
-        if (selectedPlan) {
-          // Clear the selected plan from localStorage
-          localStorage.removeItem("selected_plan");
-          
-          // For paid plans, you would redirect to checkout here
-          // For now, just show a message
-          if (selectedPlan !== "free") {
+        // Check for pending checkout FIRST
+        const pending = getPendingCheckout();
+        if (pending) {
+          try {
+            clearPendingCheckout();
+            
             toast({
               title: t('auth.accountCreated'),
-              description: t('auth.planSelected', { plan: selectedPlan }),
+              description: `Redirecting to purchase ${getProductName(pending.lookupKey)}...`,
             });
-          } else {
-            toast({
-              title: t('auth.accountCreated'),
-              description: t('auth.welcomeToPlanner'),
+
+            const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke("stripe-create-checkout", {
+              body: pending,
             });
+
+            if (!checkoutError && checkoutData?.url) {
+              openCheckoutUrl(checkoutData.url, (title, desc) => toast({ title, description: desc }));
+              setLoading(false);
+              return; // Stripe redirect handles navigation
+            }
+          } catch (checkoutErr) {
+            console.error("Error processing pending checkout:", checkoutErr);
           }
-        } else {
-          toast({
-            title: t('auth.accountCreated'),
-            description: t('auth.welcomeToPlanner'),
-          });
         }
+
+        // Remove old selected_plan handling
+        localStorage.removeItem("selected_plan");
+        
+        toast({
+          title: t('auth.accountCreated'),
+          description: t('auth.welcomeToPlanner'),
+        });
         
         navigate("/dashboard");
       }
