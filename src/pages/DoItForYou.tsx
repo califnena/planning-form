@@ -3,10 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { AppFooter } from "@/components/AppFooter";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { useState } from "react";
-import { setPendingCheckout } from "@/lib/pendingCheckout";
+import { launchCheckout } from "@/lib/checkoutLauncher";
 import { 
   ClipboardList, 
   MessageSquare, 
@@ -23,38 +21,13 @@ export default function DoItForYou() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePurchase = async () => {
-    setIsLoading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        setPendingCheckout({
-          lookupKey: 'EFADOFORU',
-          successUrl: `${window.location.origin}/do-it-for-you/confirmation`,
-          cancelUrl: window.location.href
-        });
-        navigate('/login');
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
-        body: {
-          lookupKey: 'EFADOFORU',
-          successUrl: `${window.location.origin}/do-it-for-you/confirmation`,
-          cancelUrl: window.location.href
-        }
-      });
-
-      if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url;
-      }
-    } catch (error: any) {
-      console.error('Checkout error:', error);
-      toast.error("Unable to start checkout. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    await launchCheckout({
+      lookupKey: 'EFADOFORU',
+      successUrl: `${window.location.origin}/do-it-for-you/confirmation`,
+      cancelUrl: window.location.href,
+      navigate,
+      onLoadingChange: setIsLoading,
+    });
   };
 
   const steps = [
