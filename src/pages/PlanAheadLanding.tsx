@@ -56,7 +56,8 @@ export default function PlanAheadLanding() {
     }
 
     if (hasPaidAccess) {
-      navigate("/preplansteps");
+      // Route to unified planner start
+      navigate("/planner/start");
       return;
     }
 

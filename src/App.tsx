@@ -68,6 +68,7 @@ import ClaireFAQ from "./pages/ClaireFAQ";
 import PlannerPreview from "./pages/PlannerPreview";
 import PrePlanSummary from "./pages/PrePlanSummary";
 import SharedView from "./pages/SharedView";
+import PlannerStart from "./pages/PlannerStart";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -142,6 +143,7 @@ const App = () => (
                       <Route path="/after-death" element={<AfterDeathLanding />} />
                       <Route path="/plan-ahead" element={<PlanAheadLanding />} />
                       <Route path="/planner-preview" element={<PlannerPreview />} />
+                      <Route path="/planner/start" element={<PlannerStart />} />
                       <Route path="/preplan-summary" element={<PrePlanSummary />} />
                       <Route path="/plan-ahead/guide" element={<PlanAheadGuideViewer />} />
                       <Route path="/preferences" element={<Settings />} />

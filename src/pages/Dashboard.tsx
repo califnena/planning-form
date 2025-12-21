@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
-import { FileText, Star, BookOpen, Scale, Phone, Music, Printer, Users, ListChecks, ShoppingBag, Lightbulb, CalendarDays, Plane, ClipboardList } from "lucide-react";
+import { FileText, Star, BookOpen, Scale, Phone, Music, Printer, Users, ListChecks, ShoppingBag, Lightbulb, CalendarDays, Plane, ClipboardList, Loader2 } from "lucide-react";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,6 +51,7 @@ export default function Dashboard() {
   const [isFreePlan, setIsFreePlan] = useState(true);
   const [hasVIPAccess, setHasVIPAccess] = useState(false);
   const [hasPrintableAccess, setHasPrintableAccess] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   useEffect(() => {
     const loadUserData = async () => {
       const {
@@ -132,62 +133,22 @@ export default function Dashboard() {
         user
       }
     } = await supabase.auth.getUser();
-    if (!user) return;
-
-    // Check for paid access
-    const hasPaidAccess = await checkPaidAccess();
-    if (!hasPaidAccess) {
-      navigate('/pricing');
+    
+    if (!user) {
+      // Save return route and redirect to login
+      localStorage.setItem("efa_last_visited_route", "/planner/start");
+      navigate('/login');
       return;
     }
 
-    // Check if user has already selected a planner mode
-    const { data: settings } = await supabase
-      .from("user_settings")
-      .select("selected_sections, planner_mode")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    // If no planner mode selected, show the modal
-    if (!settings?.planner_mode) {
-      setShowPlannerModeModal(true);
-      return;
-    }
-
-    // If no sections selected, go to preferences
-    if (!settings?.selected_sections || settings.selected_sections.length === 0) {
-      navigate('/preferences');
-      return;
-    }
-
-    // Otherwise continue to planner
-    navigate('/preplansteps');
+    // Route to unified planner start (handles all logic)
+    navigate('/planner/start');
   };
 
   const handlePlannerModeSelected = async (mode: 'guided' | 'free') => {
     setShowPlannerModeModal(false);
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    // Check if user has selected sections
-    const { data: settings } = await supabase
-      .from("user_settings")
-      .select("selected_sections")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (!settings?.selected_sections || settings.selected_sections.length === 0) {
-      navigate('/preferences');
-      return;
-    }
-
-    // Navigate based on mode
-    if (mode === 'guided') {
-      navigate('/wizard/preplanning');
-    } else {
-      navigate('/preplansteps');
-    }
+    // Navigate to planner start which handles everything
+    navigate('/planner/start');
   };
   const handleGeneratePDF = async () => {
     // Check for paid access (subscription required)
@@ -301,28 +262,31 @@ export default function Dashboard() {
     }
   };
   const handleStartWizard = async () => {
-    // Check for paid access
-    const hasPaidAccess = await checkPaidAccess();
-    if (!hasPaidAccess) {
-      navigate('/pricing');
-      return;
-    }
-    navigate('/wizard/preplanning');
+    // Route to unified planner start
+    navigate('/planner/start');
   };
   const handleDownloadBlankPlanner = async () => {
+    setIsGeneratingPDF(true);
+    toast({
+      title: "Preparing your file...",
+      description: "This may take a moment."
+    });
+    
     try {
       await generateManuallyFillablePDF({});
       toast({
-        title: "PDF Downloaded",
-        description: "Your blank planner form has been downloaded successfully."
+        title: "Download started",
+        description: "Your blank planner form has been downloaded."
       });
     } catch (error) {
       console.error("Error generating blank PDF:", error);
       toast({
-        title: "Error",
-        description: "Failed to generate PDF. Please try again.",
+        title: "Download failed",
+        description: "We couldn't generate your printable file. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsGeneratingPDF(false);
     }
   };
   const handleGenerateAfterDeathPDF = async () => {
@@ -637,8 +601,8 @@ export default function Dashboard() {
                     {t('dashboard.option2PrintableDesc')}
                   </p>
                   <div className="flex flex-col sm:flex-row flex-wrap gap-2">
-                    {hasPrintableAccess && <Button onClick={handleDownloadBlankPlanner} variant="outline" className="w-full sm:w-auto sm:flex-1 border-2 border-[hsl(210,100%,35%)] bg-blue-800 hover:bg-blue-700 text-primary-foreground whitespace-normal h-auto py-2">
-                        {t('dashboard.downloadBlankPlannerForm')}
+                    {hasPrintableAccess && <Button onClick={handleDownloadBlankPlanner} disabled={isGeneratingPDF} variant="outline" className="w-full sm:w-auto sm:flex-1 border-2 border-[hsl(210,100%,35%)] bg-blue-800 hover:bg-blue-700 text-primary-foreground whitespace-normal h-auto py-2">
+                        {isGeneratingPDF ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Preparing...</> : t('dashboard.downloadBlankPlannerForm')}
                       </Button>}
                     {!hasPrintableAccess && <Button onClick={handleDownloadWorkbook} className="w-full sm:w-auto sm:flex-1 bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] whitespace-normal h-auto py-2">
                         {t('dashboard.purchase')}

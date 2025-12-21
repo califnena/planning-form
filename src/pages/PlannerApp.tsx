@@ -106,7 +106,9 @@ const PlannerApp = () => {
       } = await supabase.auth.getSession();
 
       if (!session) {
-        navigate("/login");
+        // Save return URL and redirect to login
+        localStorage.setItem("efa_last_visited_route", "/preplansteps");
+        navigate("/login", { replace: true });
         return;
       }
 
@@ -121,9 +123,10 @@ const PlannerApp = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        navigate("/login");
-      } else {
+      // Only handle sign out - don't redirect on SIGNED_IN events
+      if (event === 'SIGNED_OUT' && !session) {
+        navigate("/login", { replace: true });
+      } else if (session) {
         setUser(session.user);
         if (event === "SIGNED_IN") {
           setTimeout(() => {
