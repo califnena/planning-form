@@ -127,21 +127,8 @@ export default function Dashboard() {
   const checkIsFreePlan = checkIsFreePlanFn;
   const checkVIPAccess = checkVIPAccessFn;
   const checkPrintableAccess = checkPrintableAccessFn;
-  const handleStartDigitalPlanner = async () => {
-    const {
-      data: {
-        user
-      }
-    } = await supabase.auth.getUser();
-    
-    if (!user) {
-      // Save return route and redirect to login
-      localStorage.setItem("efa_last_visited_route", "/planner/start");
-      navigate('/login');
-      return;
-    }
-
-    // Route to unified planner start (handles all logic)
+  const handleStartDigitalPlanner = () => {
+    // Single entry route (auth + gating handled inside /planner/start)
     navigate('/planner/start');
   };
 
