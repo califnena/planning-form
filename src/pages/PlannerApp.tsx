@@ -13,6 +13,8 @@ import { EmailPlanDialog } from "@/components/EmailPlanDialog";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { PreviewModeBanner } from "@/components/PreviewModeBanner";
 import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
+import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
+import { SectionOptionsMenu } from "@/components/planner/SectionOptionsMenu";
 import { generatePlanPDF } from "@/lib/pdfGenerator";
 import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator";
 import { useTranslation } from "react-i18next";
@@ -21,7 +23,6 @@ import { OnboardingTour } from "@/components/planner/OnboardingTour";
 import { AppFooter } from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
-
 // Preview Mode Context
 const PreviewModeContext = createContext<{ isPreviewMode: boolean }>({ isPreviewMode: false });
 export const usePreviewMode = () => useContext(PreviewModeContext);
@@ -189,9 +190,86 @@ const PlannerApp = () => {
     }
   };
 
-  const { plan, loading: planLoading, updatePlan } = usePlanData(user?.id || "");
+  const { plan, loading: planLoading, updatePlan, saveState } = usePlanData(user?.id || "");
   const { hasActiveSubscription, isLoading: subscriptionLoading } = useSubscriptionStatus(user?.id);
   const isPreviewMode = !hasActiveSubscription;
+
+  // Handle section archive
+  const handleArchiveSection = async (sectionId: string, note?: string) => {
+    if (!user) return;
+    
+    // Get current section data
+    const sectionData = getSectionData(sectionId);
+    
+    try {
+      await supabase.from("section_archives").insert({
+        user_id: user.id,
+        section_id: sectionId,
+        section_data: sectionData,
+        note: note || null,
+        archived_at: new Date().toISOString()
+      });
+      
+      toast({
+        title: "Section archived",
+        description: "A snapshot has been saved.",
+      });
+    } catch (error) {
+      console.error("Error archiving section:", error);
+      toast({
+        title: "Error",
+        description: "Failed to archive section.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Handle section reset
+  const handleResetSection = (sectionId: string) => {
+    const resetData = getSectionResetData(sectionId);
+    updatePlan(resetData);
+    
+    toast({
+      title: "Section reset",
+      description: "This section has been cleared.",
+    });
+  };
+
+  // Get section data for archiving
+  const getSectionData = (sectionId: string): Record<string, any> => {
+    switch (sectionId) {
+      case "instructions": return { instructions_notes: plan.instructions_notes };
+      case "legacy": return { about_me_notes: plan.about_me_notes };
+      case "funeral": return { funeral_wishes_notes: plan.funeral_wishes_notes };
+      case "financial": return { financial_notes: plan.financial_notes };
+      case "insurance": return { insurance_notes: plan.insurance_notes };
+      case "property": return { property_notes: plan.property_notes };
+      case "pets": return { pets_notes: plan.pets_notes };
+      case "digital": return { digital_notes: plan.digital_notes };
+      case "legal": return { legal_notes: plan.legal_notes };
+      case "messages": return { messages_notes: plan.messages_notes };
+      case "checklist": return { checklist_notes: plan.checklist_notes };
+      default: return {};
+    }
+  };
+
+  // Get reset data for a section
+  const getSectionResetData = (sectionId: string): Partial<typeof plan> => {
+    switch (sectionId) {
+      case "instructions": return { instructions_notes: "" };
+      case "legacy": return { about_me_notes: "" };
+      case "funeral": return { funeral_wishes_notes: "" };
+      case "financial": return { financial_notes: "" };
+      case "insurance": return { insurance_notes: "" };
+      case "property": return { property_notes: "" };
+      case "pets": return { pets_notes: "" };
+      case "digital": return { digital_notes: "" };
+      case "legal": return { legal_notes: "" };
+      case "messages": return { messages_notes: "" };
+      case "checklist": return { checklist_notes: "" };
+      default: return {};
+    }
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -587,8 +665,30 @@ const PlannerApp = () => {
     const readOnlySections = ["resources", "faq", "legalresources", "preferences", "overview"];
     const shouldLock = !readOnlySections.includes(activeSection);
 
+    // Sections that allow archive/reset
+    const editableSections = ["instructions", "legacy", "funeral", "financial", "insurance", "property", "pets", "digital", "legal", "messages", "checklist"];
+    const canEditSection = editableSections.includes(activeSection);
+    const currentSectionLabel = sectionItems.find(s => s.id === activeSection)?.label || activeSection;
+
     return (
       <div>
+        {/* Header with autosave and options */}
+        <div className="flex justify-between items-center mb-4">
+          <AutosaveIndicator 
+            saving={saveState.saving} 
+            lastSaved={saveState.lastSaved}
+            error={saveState.error}
+          />
+          {canEditSection && (
+            <SectionOptionsMenu
+              sectionId={activeSection}
+              sectionLabel={currentSectionLabel}
+              onArchive={(note) => handleArchiveSection(activeSection, note)}
+              onReset={() => handleResetSection(activeSection)}
+            />
+          )}
+        </div>
+        
         {shouldLock ? (
           <PreviewModeWrapper>{sectionContent}</PreviewModeWrapper>
         ) : (
