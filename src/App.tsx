@@ -58,6 +58,7 @@ import LandingAlt from "./pages/LandingAlt";
 import AfterDeathLanding from "./pages/AfterDeathLanding";
 import PlanAheadLanding from "./pages/PlanAheadLanding";
 import DashboardPreview from "./pages/DashboardPreview";
+import Settings from "./pages/Settings";
 
 
 const queryClient = new QueryClient();
@@ -126,6 +127,8 @@ const App = () => (
                       <Route path="/after-death" element={<AfterDeathLanding />} />
                       <Route path="/plan-ahead" element={<PlanAheadLanding />} />
                       <Route path="/plan-ahead/guide" element={<PlanAheadGuideViewer />} />
+                      <Route path="/preferences" element={<Settings />} />
+                      <Route path="/settings" element={<Settings />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
