@@ -292,10 +292,10 @@ export default function PrePlanSummary() {
           <Card className="p-8 text-center">
             <h2 className="text-xl font-semibold mb-4">No Pre-Planning Information Found</h2>
             <p className="text-muted-foreground mb-6">
-              You haven't started your pre-planning yet. Would you like to begin?
+              Complete at least one section in your planner to generate a summary.
             </p>
-            <Button onClick={() => navigate("/preferences")}>
-              Start Planning
+            <Button onClick={() => navigate("/preplandashboard")}>
+              Go to Planner
             </Button>
           </Card>
         </div>

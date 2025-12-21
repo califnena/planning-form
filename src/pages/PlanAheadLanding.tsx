@@ -62,17 +62,8 @@ export default function PlanAheadLanding() {
         completed_sections?: string[];
       } | null;
 
-      // Step 3: Determine where to redirect
-      if (settingsData?.planner_mode === 'guided') {
-        // Guided mode → wizard
-        navigate('/wizard/preplanning');
-      } else if (settingsData?.selected_sections?.length) {
-        // Free mode → preplansteps
-        navigate('/preplansteps');
-      } else {
-        // No progress, fallback to planner preview
-        navigate('/planner-preview');
-      }
+      // Step 3: Determine where to redirect - always go to planner dashboard
+      navigate('/preplandashboard');
     };
 
     if (isLoggedIn !== undefined) {
@@ -118,11 +109,11 @@ export default function PlanAheadLanding() {
 
   const handleStartPlanning = () => {
     if (isLoggedIn && hasPlannerProgress) {
-      // Continue Planning → go to plan-ahead with resume flag
-      navigate("/plan-ahead?resume=1");
+      // Continue Planning → go to planner dashboard
+      navigate("/preplandashboard");
     } else {
-      // Start Digital Planner → go to planner preview
-      navigate("/planner-preview");
+      // Start Digital Planner → go to planner dashboard (it handles onboarding)
+      navigate("/preplandashboard");
     }
   };
 

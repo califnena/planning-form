@@ -80,8 +80,8 @@ export const ResumeCard = () => {
     : 0;
 
   const handleContinue = () => {
-    // Always route to /plan-ahead with resume flag - it handles the redirect
-    navigate('/plan-ahead?resume=1');
+    // Always route to planner dashboard - it handles the resume flow
+    navigate('/preplandashboard');
   };
 
   return (
