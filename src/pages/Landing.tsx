@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { BookOpen, CheckCircle, Shield, Scale, FileText, ClipboardList, ShoppingBag, Users, Headphones, Music, HelpCircle, Phone, Download, Heart, Quote } from "lucide-react";
+import { BookOpen, CheckCircle, ClipboardList, ShoppingBag, Users, Headphones, Music, HelpCircle, Phone, Download, Heart, Quote, FileText } from "lucide-react";
+import { AppFooter } from "@/components/AppFooter";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
@@ -60,7 +61,8 @@ const Landing = () => {
       navigate("/login");
     }
   };
-  return <div className="min-h-screen bg-gradient-to-b from-amber-50/40 via-background to-background">
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-amber-50/40 via-background to-background">
       {/* Header */}
       <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -107,22 +109,19 @@ const Landing = () => {
           </p>
 
           {/* Returning User Welcome - only shown when authenticated */}
-          {userName}
+          {userName && (
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 max-w-md mx-auto">
+              <p className="text-foreground font-medium">Welcome back, {userName}!</p>
+              <Button onClick={() => navigate("/dashboard")} className="mt-2">
+                Continue to Your Dashboard →
+              </Button>
+            </div>
+          )}
           
           <div className="flex flex-col items-center gap-4 pt-4">
-            
-            
-            
-            {/* Trust note */}
-            
-            
-            <div className="flex items-center gap-4 pt-2">
-              
-              <span className="text-muted-foreground">•</span>
-              <Link to="/pricing" className="text-sm text-primary hover:underline font-medium">
-                {t('landing.viewPricing')}
-              </Link>
-            </div>
+            <p className="text-sm text-muted-foreground">
+              Preview tools and education first. Upgrade only if and when it makes sense for you.
+            </p>
           </div>
         </div>
 
@@ -289,43 +288,37 @@ const Landing = () => {
         </div>
 
 
-        {/* TRANSPARENCY & TRUST STRIP */}
-        <div className="mt-16 max-w-4xl mx-auto">
-          <div className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-xl px-8 py-6 border border-primary/20">
-            <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 text-center">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-primary" />
-                <span className="font-medium text-foreground">{t('landing.trustClearPricing')}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-primary" />
-                <span className="font-medium text-foreground">{t('landing.trustNoPressure')}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-primary" />
-                <span className="font-medium text-foreground">{t('landing.trustYouChoose')}</span>
-              </div>
+        {/* CLEAR, TRANSPARENT PRICING SECTION */}
+        <div className="mt-24 max-w-4xl mx-auto">
+          <div className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-sm text-center">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">
+              Clear, Transparent Pricing
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl mx-auto mb-8">
+              You can explore education and preview planning tools before deciding to continue. Some advanced features and services require payment, but you will always see pricing clearly before committing. There are no hidden fees, no pressure, and no obligation to upgrade.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link to="/pricing">
+                <Button size="lg">View Pricing & Plans</Button>
+              </Link>
+              <Link to="/pricing">
+                <Button variant="outline" size="lg">See What's Included</Button>
+              </Link>
             </div>
           </div>
         </div>
 
-        {/* PAYMENT EXPECTATION - Subtle but honest */}
-        <div className="mt-8 max-w-3xl mx-auto text-center">
-          
-        </div>
-
-        {/* OPTIONAL SUPPORT */}
+        {/* COMPASSIONATE SUPPORT (OPTIONAL) */}
         <div className="mt-24 max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
-            {t('landing.optionalSupportTitle')}
+            Compassionate Support (Optional)
           </h2>
-          <p className="text-lg text-muted-foreground text-center mb-4 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
             {t('landing.optionalSupportDesc')}
           </p>
           
-          
           <div className="grid md:grid-cols-3 gap-8">
-            {/* VIP Coach */}
+            {/* Compassionate Support - Renamed from VIP Coach */}
             <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/pricing")}>
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
@@ -334,11 +327,17 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  {t('landing.vipCoach')}
+                  Compassionate Support
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t('landing.vipCoachDesc')}
+                <p className="text-muted-foreground leading-relaxed text-sm">
+                  For individuals and families who want personal guidance, this option provides one-on-one support that goes beyond planning. Includes help navigating difficult decisions, emotional reassurance during stressful moments, and calm guidance before or after a loss.
                 </p>
+                <p className="text-xs text-muted-foreground italic">
+                  This support is always optional and available only if you choose it.
+                </p>
+                <Button variant="outline" className="mt-2">
+                  Learn About Compassionate Support
+                </Button>
               </CardContent>
             </Card>
 
@@ -386,23 +385,23 @@ const Landing = () => {
           <div className="grid md:grid-cols-3 gap-8">
             {/* Testimonial 1 */}
             <Card className="border-2 bg-background/80 backdrop-blur">
-              <CardContent className="pt-8 pb-8 space-y-4 bg-yellow-200">
+              <CardContent className="pt-8 pb-8 space-y-4">
                 <Quote className="h-8 w-8 text-primary/30" />
                 <p className="text-foreground leading-relaxed">
-                  "Having everything written down ahead of time gave us such peace of mind. We didn't realize how many small decisions there were until we started, and having clear guidance made all the difference. Our family knows exactly what we want, and that alone is priceless."
+                  "Having everything written down gave us peace of mind we didn't realize we were missing. The process was calm, respectful, and never pressured. Our family knows exactly what we want, and that clarity means everything."
                 </p>
                 <p className="text-sm font-medium text-muted-foreground">
-                  — Mr. and Mrs. Anne Miller
+                  — Mr. & Mrs. Anne Miller
                 </p>
               </CardContent>
             </Card>
 
             {/* Testimonial 2 */}
-            <Card className="border-2 backdrop-blur bg-amber-200">
-              <CardContent className="pt-8 pb-8 space-y-4 bg-yellow-200">
+            <Card className="border-2 bg-background/80 backdrop-blur">
+              <CardContent className="pt-8 pb-8 space-y-4">
                 <Quote className="h-8 w-8 text-primary/30" />
                 <p className="text-foreground leading-relaxed">
-                  "I appreciated that nothing felt rushed or sales-driven. The education helped me understand my options, and I was able to move forward at my own pace. Knowing my wishes are organized and accessible gives me a deep sense of relief."
+                  "I appreciated being able to move at my own pace. The guidance was clear and compassionate, and I never felt rushed or overwhelmed. It helped me make decisions I had been putting off for years."
                 </p>
                 <p className="text-sm font-medium text-muted-foreground">
                   — Joanne Barrington
@@ -411,11 +410,11 @@ const Landing = () => {
             </Card>
 
             {/* Testimonial 3 */}
-            <Card className="border-2 backdrop-blur bg-amber-200">
-              <CardContent className="pt-8 pb-8 space-y-4 bg-yellow-200">
+            <Card className="border-2 bg-background/80 backdrop-blur">
+              <CardContent className="pt-8 pb-8 space-y-4">
                 <Quote className="h-8 w-8 text-primary/30" />
                 <p className="text-foreground leading-relaxed">
-                  "When my wife passed, having a clear plan already in place removed so much stress. The step-by-step guidance helped me focus on honoring her instead of trying to figure everything out during a difficult time."
+                  "When the time came, having a plan made an incredibly difficult moment manageable. The support was thoughtful, and the tools were easy to follow when it mattered most."
                 </p>
                 <p className="text-sm font-medium text-muted-foreground">
                   — James Blake
@@ -457,83 +456,84 @@ const Landing = () => {
           </div>
         </div>
 
-        {/* Helpful Guides & Resources Section - Now includes free downloads */}
-        <div className="mt-24 max-w-6xl mx-auto bg-indigo-50">
+        {/* GUIDES & RESOURCES - Restructured into Learn / Use */}
+        <div className="mt-24 max-w-6xl mx-auto rounded-2xl p-8 md:p-12 bg-secondary/30">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
-            {t('landing.helpfulGuides')}
+            Guides & Resources
           </h2>
           <p className="text-lg text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
             Free educational resources to help you understand your options and plan with confidence.
           </p>
           
-          {/* Free Downloads Row */}
-          <div className="bg-card border border-border rounded-xl p-6 mb-8">
-            <h3 className="text-lg font-semibold text-foreground mb-4 text-center">Free Downloadable Guides</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <a href="/guides/EFA-Pre-Planning-Checklist.pdf" download className="inline-flex items-center justify-center gap-2 px-5 py-4 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm">
-                <Download className="h-4 w-4" />
-                Pre-Planning Checklist
-              </a>
-              <a href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" download className="inline-flex items-center justify-center gap-2 px-5 py-4 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors font-medium text-sm">
-                <Download className="h-4 w-4" />
-                After-Death Checklist
-              </a>
-              <a href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" download className="inline-flex items-center justify-center gap-2 px-5 py-4 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium text-sm">
-                <Download className="h-4 w-4" />
-                Education Guide
-              </a>
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* LEARN ABOUT FUNERAL PLANNING */}
+            <div className="bg-card border border-border rounded-xl p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <BookOpen className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">Learn About Funeral Planning</h3>
+              </div>
+              <div className="space-y-3">
+                <button 
+                  onClick={() => navigate("/resources")} 
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3"
+                >
+                  <BookOpen className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-foreground">Helpful Articles</span>
+                </button>
+                <button 
+                  onClick={() => navigate("/faq")} 
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3"
+                >
+                  <HelpCircle className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-foreground">Common Questions & Answers</span>
+                </button>
+                <button 
+                  onClick={() => navigate("/legal-documents")} 
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3"
+                >
+                  <FileText className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-foreground">Legal Documents & State Resources</span>
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Resource Cards */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/resources")}>
-              <CardContent className="pt-8 pb-8 text-center space-y-4">
-                <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <BookOpen className="h-8 w-8 text-secondary-foreground" />
-                  </div>
+            {/* USE PLANNING TOOLS */}
+            <div className="bg-card border border-border rounded-xl p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <ClipboardList className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  {t('landing.helpfulArticles')}
-                </h3>
-                
-              </CardContent>
-            </Card>
-
-            
-
-            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/faq")}>
-              <CardContent className="pt-8 pb-8 text-center space-y-4">
-                <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <HelpCircle className="h-8 w-8 text-secondary-foreground" />
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  {t('landing.commonQuestions')}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t('landing.commonQuestionsDesc')}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/vendors")}>
-              <CardContent className="pt-8 pb-8 text-center space-y-4">
-                <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <Phone className="h-8 w-8 text-secondary-foreground" />
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  {t('landing.helpfulContacts')}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {t('landing.helpfulContactsDesc')}
-                </p>
-              </CardContent>
-            </Card>
+                <h3 className="text-xl font-semibold text-foreground">Use Planning Tools</h3>
+              </div>
+              <div className="space-y-3">
+                <a 
+                  href="/guides/EFA-Pre-Planning-Checklist.pdf" 
+                  download 
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3"
+                >
+                  <Download className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-foreground">Pre-Planning Checklist</span>
+                </a>
+                <a 
+                  href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
+                  download 
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3"
+                >
+                  <Download className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-foreground">After-Death Checklist</span>
+                </a>
+                <a 
+                  href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" 
+                  download 
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted transition-colors flex items-center gap-3"
+                >
+                  <Download className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-foreground">Education & Planning Guide</span>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -555,14 +555,11 @@ const Landing = () => {
             </div>
           </div>
         </div>
-
-        {/* FINAL CTA */}
-        <div className="mt-24 max-w-3xl mx-auto text-center space-y-6">
-          
-          
-          
-        </div>
       </main>
-    </div>;
+      
+      <AppFooter />
+    </div>
+  );
 };
+
 export default Landing;
