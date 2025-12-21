@@ -164,24 +164,24 @@ const Landing = () => {
             {t('landing.choosePathDesc')}
           </p>
           
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-8 items-stretch">
             {/* CARD 1: Understand the Process */}
-            <Card className="border-2 hover:border-primary/50 transition-colors group">
-              <CardContent className="pt-8 pb-8 space-y-4">
+            <Card className="border-2 hover:border-primary/50 hover:shadow-lg transition-all duration-200 group cursor-pointer flex flex-col">
+              <CardContent className="pt-8 pb-8 flex flex-col flex-1">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
                     <BookOpen className="h-8 w-8 text-white" />
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-foreground text-center">
+                <h3 className="text-xl font-semibold text-foreground text-center mt-4">
                   Understand the Process
                 </h3>
-                <p className="text-muted-foreground leading-relaxed text-center">
+                <p className="text-muted-foreground leading-relaxed text-center mt-4">
                   Before making any decisions, take time to understand how planning works, what choices matter, and what your rights are.
                 </p>
                 
                 {/* Education Links - Not Buttons */}
-                <div className="space-y-3 pt-2">
+                <div className="space-y-3 pt-2 mt-4">
                   <Link to="/guide" className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group/link">
                     <BookOpen className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                     <div>
@@ -212,7 +212,10 @@ const Landing = () => {
                   </a>
                 </div>
                 
-                <div className="pt-4 space-y-2">
+                {/* Spacer to push button to bottom */}
+                <div className="flex-1" />
+                
+                <div className="pt-4 space-y-2 mt-4">
                   <Button onClick={() => navigate("/dashboard")} className="w-full">
                     View Planning Menu
                   </Button>
@@ -224,22 +227,22 @@ const Landing = () => {
             </Card>
 
             {/* CARD 2: Plan Ahead - Typography matched to Understand the Process */}
-            <Card className="border-2 hover:border-primary/50 transition-colors group">
-              <CardContent className="pt-8 pb-8 space-y-4">
+            <Card className="border-2 hover:border-primary/50 hover:shadow-lg transition-all duration-200 group cursor-pointer flex flex-col">
+              <CardContent className="pt-8 pb-8 flex flex-col flex-1">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
                     <ClipboardList className="h-8 w-8 text-white" />
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-foreground text-center">
+                <h3 className="text-xl font-semibold text-foreground text-center mt-4">
                   {t('landing.path2Title')}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed text-center">
+                <p className="text-muted-foreground leading-relaxed text-center mt-4">
                   {t('landing.path2Desc')}
                 </p>
                 
                 {/* Education Links - Matching "Understand the Process" card structure */}
-                <div className="space-y-3 pt-2">
+                <div className="space-y-3 pt-2 mt-4">
                   <Link to="/plan-ahead" className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group/link">
                     <ClipboardList className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                     <div>
@@ -265,7 +268,10 @@ const Landing = () => {
                   </Link>
                 </div>
                 
-                <div className="pt-4 space-y-2">
+                {/* Spacer to push button to bottom */}
+                <div className="flex-1" />
+                
+                <div className="pt-4 space-y-2 mt-4">
                   <Button onClick={handleStartPlanner} className="w-full">
                     {t('landing.startPrePlanning')}
                   </Button>
@@ -277,26 +283,30 @@ const Landing = () => {
             </Card>
 
             {/* CARD 3: Affordable Products */}
-            <Card className="border-2 hover:border-primary/50 transition-colors group">
-              <CardContent className="pt-8 pb-8 space-y-4">
+            <Card className="border-2 hover:border-primary/50 hover:shadow-lg transition-all duration-200 group cursor-pointer flex flex-col">
+              <CardContent className="pt-8 pb-8 flex flex-col flex-1">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
                     <ShoppingBag className="h-8 w-8 text-white" />
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-foreground text-center">
+                <h3 className="text-xl font-semibold text-foreground text-center mt-4">
                   {t('landing.path3Title')}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed text-center">
+                <p className="text-muted-foreground leading-relaxed text-center mt-4">
                   {t('landing.path3Desc')}
                 </p>
-                <ul className="text-sm text-muted-foreground space-y-2 pl-4">
+                <ul className="text-sm text-muted-foreground space-y-2 pl-4 mt-4">
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
                     {t('landing.path3Item1')}
                   </li>
                 </ul>
-                <div className="pt-4">
+                
+                {/* Spacer to push button to bottom */}
+                <div className="flex-1" />
+                
+                <div className="pt-4 mt-4">
                   <a href="https://everlastingfuneraladvisors.com/shop/" target="_blank" rel="noopener noreferrer" className="w-full">
                     <Button variant="outline" className="w-full">
                       {t('landing.viewProducts')}
@@ -307,20 +317,20 @@ const Landing = () => {
             </Card>
 
             {/* CARD 4: After a Death */}
-            <Card className="border-2 hover:border-primary/50 transition-colors group">
-              <CardContent className="pt-8 pb-8 space-y-4">
+            <Card className="border-2 hover:border-primary/50 hover:shadow-lg transition-all duration-200 group cursor-pointer flex flex-col">
+              <CardContent className="pt-8 pb-8 flex flex-col flex-1">
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
                     <Heart className="h-8 w-8 text-white" />
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-foreground text-center">
+                <h3 className="text-xl font-semibold text-foreground text-center mt-4">
                   {t('landing.path4Title')}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed text-center">
+                <p className="text-muted-foreground leading-relaxed text-center mt-4">
                   {t('landing.path4Desc')}
                 </p>
-                <ul className="text-sm text-muted-foreground space-y-2 pl-4">
+                <ul className="text-sm text-muted-foreground space-y-2 pl-4 mt-4">
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
                     {t('landing.path4Item1')}
@@ -334,7 +344,11 @@ const Landing = () => {
                     {t('landing.path4Item3')}
                   </li>
                 </ul>
-                <div className="pt-4">
+                
+                {/* Spacer to push button to bottom */}
+                <div className="flex-1" />
+                
+                <div className="pt-4 mt-4">
                   <Button onClick={() => navigate("/after-death")} className="w-full">
                     {t('landing.getGuidanceNow')}
                   </Button>
