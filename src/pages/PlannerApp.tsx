@@ -481,8 +481,6 @@ const PlannerApp = () => {
   const enabledSections = allSectionItems.filter(item => visibleIds.has(item.id) && item.id !== "overview");
   const alwaysVisibleSections = [
     { id: "legalresources", label: t("navigation.legalresources"), completed: false },
-    { id: "resources", label: t("navigation.guide"), completed: false },
-    { id: "faq", label: t("navigation.faq"), completed: false },
   ];
   
   const sectionItems = [

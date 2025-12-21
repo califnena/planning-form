@@ -1,23 +1,16 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   Download, 
   Printer, 
-  Share2, 
-  Edit, 
-  Link as LinkIcon, 
   Mail,
-  CheckCircle2,
+  Save,
+  Edit,
   User,
   Users,
   Heart,
@@ -28,26 +21,32 @@ import {
   Dog,
   Laptop,
   Scale,
-  MessageSquare
+  MessageSquare,
+  BookHeart,
+  AlertTriangle,
+  ArrowRight
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { generatePlanPDF } from "@/lib/pdfGenerator";
 import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
 import { ShareSummaryDialog } from "@/components/summary/ShareSummaryDialog";
-import { SharingControls } from "@/components/summary/SharingControls";
+import { WhatsMissingIndicator } from "@/components/summary/WhatsMissingIndicator";
+import { ReminderEmailOptIn } from "@/components/summary/ReminderEmailOptIn";
 
 interface SectionData {
   id: string;
   label: string;
   icon: React.ReactNode;
-  preview: string;
+  content: React.ReactNode;
   hasContent: boolean;
+  editRoute: string;
 }
 
 export default function PrePlanSummary() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   
   const [loading, setLoading] = useState(true);
@@ -56,6 +55,16 @@ export default function PrePlanSummary() {
   const [showPIIDialog, setShowPIIDialog] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [profile, setProfile] = useState<any>(null);
+  const [contacts, setContacts] = useState<any[]>([]);
+
+  // Check for print param
+  useEffect(() => {
+    if (searchParams.get("print") === "1" && planData) {
+      setTimeout(() => window.print(), 500);
+    }
+  }, [searchParams, planData]);
 
   useEffect(() => {
     loadPlanData();
@@ -68,6 +77,7 @@ export default function PrePlanSummary() {
         navigate("/login");
         return;
       }
+      setUserEmail(user.email || "");
 
       // Get user's org
       const { data: orgMember } = await supabase
@@ -97,23 +107,19 @@ export default function PrePlanSummary() {
         setLastUpdated(plan.updated_at);
         
         // Get personal profile
-        const { data: profile } = await supabase
+        const { data: profileData } = await supabase
           .from("personal_profiles")
           .select("*")
           .eq("plan_id", plan.id)
           .maybeSingle();
+        setProfile(profileData);
 
         // Get contacts
-        const { data: contacts } = await supabase
+        const { data: contactsData } = await supabase
           .from("contacts_notify")
           .select("*")
           .eq("plan_id", plan.id);
-
-        // Get professional contacts
-        const { data: professionals } = await supabase
-          .from("contacts_professional")
-          .select("*")
-          .eq("plan_id", plan.id);
+        setContacts(contactsData || []);
 
         // Get pets
         const { data: pets } = await supabase
@@ -139,94 +145,114 @@ export default function PrePlanSummary() {
           .select("*")
           .eq("plan_id", plan.id);
 
-        // Build sections with content previews
+        // Build sections with content
         const sectionsList: SectionData[] = [
           {
             id: "personal",
-            label: "About Me",
+            label: "Personal & Family Details",
             icon: <User className="h-5 w-5" />,
-            preview: profile?.full_name ? `Name: ${profile.full_name}` : "No personal information entered yet.",
-            hasContent: !!profile?.full_name
+            content: profileData ? (
+              <div className="space-y-2 text-sm">
+                {profileData.full_name && <p><strong>Name:</strong> {profileData.full_name}</p>}
+                {profileData.address && <p><strong>Address:</strong> {profileData.address}</p>}
+                {profileData.marital_status && <p><strong>Marital Status:</strong> {profileData.marital_status}</p>}
+                {profileData.partner_name && <p><strong>Spouse/Partner:</strong> {profileData.partner_name}</p>}
+                {profileData.child_names?.length > 0 && (
+                  <p><strong>Children:</strong> {profileData.child_names.filter(Boolean).join(", ")}</p>
+                )}
+              </div>
+            ) : null,
+            hasContent: !!profileData?.full_name,
+            editRoute: "/preplandashboard?section=personal"
           },
           {
-            id: "contacts",
-            label: "Key Contacts",
-            icon: <Users className="h-5 w-5" />,
-            preview: contacts && contacts.length > 0 
-              ? `${contacts.length} contact(s) to notify`
-              : "No contacts added yet.",
-            hasContent: contacts && contacts.length > 0
+            id: "legacy",
+            label: "Life Story & Legacy",
+            icon: <BookHeart className="h-5 w-5" />,
+            content: plan.about_me_notes ? (
+              <p className="text-sm">{plan.about_me_notes}</p>
+            ) : null,
+            hasContent: !!plan.about_me_notes,
+            editRoute: "/preplandashboard?section=legacy"
           },
           {
             id: "funeral",
-            label: "My Wishes",
+            label: "Funeral Wishes",
             icon: <Heart className="h-5 w-5" />,
-            preview: plan.funeral_wishes_notes?.substring(0, 100) || "No wishes recorded yet.",
-            hasContent: !!plan.funeral_wishes_notes
-          },
-          {
-            id: "instructions",
-            label: "Important Information",
-            icon: <FileText className="h-5 w-5" />,
-            preview: plan.instructions_notes?.substring(0, 100) || "No instructions entered yet.",
-            hasContent: !!plan.instructions_notes
+            content: plan.funeral_wishes_notes ? (
+              <p className="text-sm">{plan.funeral_wishes_notes}</p>
+            ) : null,
+            hasContent: !!plan.funeral_wishes_notes,
+            editRoute: "/preplandashboard?section=funeral"
           },
           {
             id: "financial",
-            label: "Financial Information",
+            label: "Financial Life (Summary)",
             icon: <Wallet className="h-5 w-5" />,
-            preview: plan.financial_notes?.substring(0, 100) || "No financial information entered.",
-            hasContent: !!plan.financial_notes
-          },
-          {
-            id: "insurance",
-            label: "Insurance Policies",
-            icon: <Shield className="h-5 w-5" />,
-            preview: insurance && insurance.length > 0 
-              ? `${insurance.length} insurance policy(ies)`
-              : "No insurance policies added.",
-            hasContent: insurance && insurance.length > 0
+            content: plan.financial_notes ? (
+              <p className="text-sm">{plan.financial_notes}</p>
+            ) : null,
+            hasContent: !!plan.financial_notes,
+            editRoute: "/preplandashboard?section=financial"
           },
           {
             id: "property",
-            label: "Property",
+            label: "Property & Valuables",
             icon: <Home className="h-5 w-5" />,
-            preview: properties && properties.length > 0 
-              ? `${properties.length} property(ies) listed`
-              : "No properties listed.",
-            hasContent: properties && properties.length > 0
-          },
-          {
-            id: "pets",
-            label: "Pets",
-            icon: <Dog className="h-5 w-5" />,
-            preview: pets && pets.length > 0 
-              ? `${pets.length} pet(s) with care instructions`
-              : "No pet information added.",
-            hasContent: pets && pets.length > 0
-          },
-          {
-            id: "digital",
-            label: "Digital Accounts",
-            icon: <Laptop className="h-5 w-5" />,
-            preview: plan.digital_notes?.substring(0, 100) || "No digital account information.",
-            hasContent: !!plan.digital_notes
+            content: (properties && properties.length > 0) || plan.property_notes ? (
+              <div className="space-y-2 text-sm">
+                {properties && properties.length > 0 && (
+                  <p><strong>Properties:</strong> {properties.length} listed</p>
+                )}
+                {plan.property_notes && <p>{plan.property_notes}</p>}
+              </div>
+            ) : null,
+            hasContent: (properties && properties.length > 0) || !!plan.property_notes,
+            editRoute: "/preplandashboard?section=property"
           },
           {
             id: "legal",
-            label: "Legal Documents",
+            label: "Legal & Planning Notes",
             icon: <Scale className="h-5 w-5" />,
-            preview: plan.legal_notes?.substring(0, 100) || "No legal document information.",
-            hasContent: !!plan.legal_notes
+            content: plan.legal_notes || contactsData?.some((c: any) => 
+              c.relationship?.toLowerCase().includes('executor') || 
+              c.relationship?.toLowerCase().includes('guardian')
+            ) ? (
+              <div className="space-y-2 text-sm">
+                {contactsData?.filter((c: any) => 
+                  c.relationship?.toLowerCase().includes('executor')
+                ).map((c: any, i: number) => (
+                  <p key={i}><strong>Executor:</strong> {c.name}</p>
+                ))}
+                {contactsData?.filter((c: any) => 
+                  c.relationship?.toLowerCase().includes('guardian')
+                ).map((c: any, i: number) => (
+                  <p key={i}><strong>Guardian:</strong> {c.name}</p>
+                ))}
+                {plan.legal_notes && <p>{plan.legal_notes}</p>}
+              </div>
+            ) : null,
+            hasContent: !!plan.legal_notes || contactsData?.some((c: any) => 
+              c.relationship?.toLowerCase().includes('executor') || 
+              c.relationship?.toLowerCase().includes('guardian')
+            ),
+            editRoute: "/preplandashboard?section=legal"
           },
           {
             id: "messages",
-            label: "Messages & Notes",
+            label: "Notes for Family & Professionals",
             icon: <MessageSquare className="h-5 w-5" />,
-            preview: messages && messages.length > 0 
-              ? `${messages.length} message(s) for loved ones`
-              : plan.to_loved_ones_message?.substring(0, 100) || "No messages written.",
-            hasContent: (messages && messages.length > 0) || !!plan.to_loved_ones_message
+            content: (messages && messages.length > 0) || plan.messages_notes || plan.to_loved_ones_message ? (
+              <div className="space-y-2 text-sm">
+                {messages && messages.length > 0 && (
+                  <p><strong>Messages:</strong> {messages.length} written</p>
+                )}
+                {plan.to_loved_ones_message && <p>{plan.to_loved_ones_message}</p>}
+                {plan.messages_notes && <p>{plan.messages_notes}</p>}
+              </div>
+            ) : null,
+            hasContent: (messages && messages.length > 0) || !!plan.messages_notes || !!plan.to_loved_ones_message,
+            editRoute: "/preplandashboard?section=messages"
           }
         ];
 
@@ -236,7 +262,7 @@ export default function PrePlanSummary() {
       console.error("Error loading plan data:", error);
       toast({
         title: "Error",
-        description: "Failed to load your pre-planning summary.",
+        description: "Failed to load your planning summary.",
         variant: "destructive"
       });
     } finally {
@@ -250,10 +276,11 @@ export default function PrePlanSummary() {
 
   const handlePIISubmit = async (piiData: any) => {
     try {
-      await generatePlanPDF(piiData);
+      const pdf = generatePlanPDF({ ...planData, ...piiData, personal_profile: profile });
+      pdf.save(`Planning-Summary-For-Review-Only_${new Date().toISOString().split('T')[0]}.pdf`);
       toast({
         title: "PDF Downloaded",
-        description: "Your pre-planning summary has been downloaded."
+        description: "Your planning summary has been downloaded."
       });
     } catch (error) {
       console.error("Error generating PDF:", error);
@@ -269,11 +296,71 @@ export default function PrePlanSummary() {
     window.print();
   };
 
-  const handleEditSection = (sectionId: string) => {
-    navigate(`/preplansteps?section=${sectionId}`);
+  const handleSaveConfirmation = () => {
+    toast({
+      title: "Summary saved",
+      description: "Your summary is saved. You can return anytime."
+    });
   };
 
-  const sectionsWithContent = sections.filter(s => s.hasContent).length;
+  const handleNavigateToSection = (sectionId: string) => {
+    navigate(`/preplandashboard?section=${sectionId}`);
+  };
+
+  // Calculate missing sections
+  const getMissingSections = () => {
+    const missing = [];
+    
+    if (!profile?.full_name) {
+      missing.push({
+        id: "personal",
+        name: "Personal & Family Details",
+        status: "No information added yet",
+        actionLabel: "Add now"
+      });
+    }
+    
+    if (!planData?.about_me_notes) {
+      missing.push({
+        id: "legacy",
+        name: "Life Story & Legacy",
+        status: "No information added yet",
+        actionLabel: "Add now"
+      });
+    }
+    
+    if (!planData?.funeral_wishes_notes) {
+      missing.push({
+        id: "funeral",
+        name: "Funeral Wishes",
+        status: "Not recorded",
+        actionLabel: "Add now"
+      });
+    }
+    
+    const hasExecutor = contacts?.some((c: any) => 
+      c.relationship?.toLowerCase().includes('executor')
+    );
+    if (!hasExecutor) {
+      missing.push({
+        id: "contacts",
+        name: "Executor Preferences",
+        status: "Not selected",
+        actionLabel: "Add now"
+      });
+    }
+    
+    if (!planData?.property_notes) {
+      missing.push({
+        id: "property",
+        name: "Property & Valuables",
+        status: "Incomplete",
+        actionLabel: "Review"
+      });
+    }
+    
+    return missing;
+  };
 
   if (loading) {
     return (
@@ -290,7 +377,7 @@ export default function PrePlanSummary() {
       <AuthenticatedLayout>
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <Card className="p-8 text-center">
-            <h2 className="text-xl font-semibold mb-4">No Pre-Planning Information Found</h2>
+            <h2 className="text-xl font-semibold mb-4">No Planning Information Found</h2>
             <p className="text-muted-foreground mb-6">
               Complete at least one section in your planner to generate a summary.
             </p>
@@ -303,128 +390,119 @@ export default function PrePlanSummary() {
     );
   }
 
+  const missingSections = getMissingSections();
+
   return (
     <AuthenticatedLayout>
       <div className="container mx-auto px-4 py-8 max-w-4xl print:p-0">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Your Pre-Planning Summary</h1>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold mb-2">Your Planning Summary</h1>
           <p className="text-muted-foreground">
-            This is a clear summary of the wishes you've entered so far.
-            You can update this anytime.
+            This document reflects the information you've entered.
           </p>
           {lastUpdated && (
-            <p className="text-sm text-muted-foreground mt-2">
-              Last updated: {new Date(lastUpdated).toLocaleDateString()}
+            <p className="text-sm text-muted-foreground mt-1">
+              Last updated: {new Date(lastUpdated).toLocaleDateString()} at {new Date(lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </p>
           )}
         </div>
 
-        {/* Completion Badge */}
-        <div className="mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-950/20 rounded-full">
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
-            <span className="text-sm font-medium text-green-700 dark:text-green-400">
-              Pre-Planning Summary Saved • {sectionsWithContent} sections with information
-            </span>
+        {/* Disclaimer */}
+        <Alert className="mb-6 border-amber-200 bg-amber-50/50 dark:bg-amber-950/20 print:hidden">
+          <AlertTriangle className="h-4 w-4 text-amber-600" />
+          <AlertDescription className="text-amber-800 dark:text-amber-200">
+            <strong>For Review Only</strong> — This summary is not a legal document and does not replace professional advice.
+          </AlertDescription>
+        </Alert>
+
+        {/* What's Missing */}
+        <div className="mb-6 print:hidden">
+          <WhatsMissingIndicator
+            missingSections={missingSections}
+            onNavigateToSection={handleNavigateToSection}
+          />
+        </div>
+
+        {/* Sticky Action Bar */}
+        <div className="sticky top-14 z-40 bg-background/95 backdrop-blur border-b mb-6 -mx-4 px-4 py-3 print:hidden">
+          <div className="flex flex-wrap gap-2 justify-center">
+            <Button onClick={handleDownloadPDF} className="gap-2">
+              <Download className="h-4 w-4" />
+              Download PDF
+            </Button>
+            <Button variant="outline" onClick={handlePrint} className="gap-2">
+              <Printer className="h-4 w-4" />
+              Print
+            </Button>
+            <Button variant="outline" onClick={() => setShowShareDialog(true)} className="gap-2">
+              <Mail className="h-4 w-4" />
+              Email a Copy
+            </Button>
+            <Button variant="outline" onClick={handleSaveConfirmation} className="gap-2">
+              <Save className="h-4 w-4" />
+              Save for Later
+            </Button>
           </div>
         </div>
 
-        {/* Section Accordion */}
-        <Card className="mb-8 print:shadow-none print:border-0">
-          <Accordion type="multiple" className="w-full">
-            {sections.map((section) => (
-              <AccordionItem key={section.id} value={section.id}>
-                <AccordionTrigger className="px-6 hover:no-underline">
-                  <div className="flex items-center gap-3">
+        {/* Content Sections */}
+        <div className="space-y-6 mb-8">
+          {sections.map((section) => (
+            <Card key={section.id} className="print:shadow-none print:border">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg flex items-center gap-2">
                     <div className={`p-2 rounded-lg ${section.hasContent ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
                       {section.icon}
                     </div>
-                    <div className="text-left">
-                      <div className="font-medium">{section.label}</div>
-                      <div className="text-sm text-muted-foreground truncate max-w-md">
-                        {section.preview.length > 60 ? section.preview.substring(0, 60) + '...' : section.preview}
-                      </div>
-                    </div>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="px-6 pb-4">
-                  <div className="pl-12">
-                    <p className="text-muted-foreground mb-4">{section.preview}</p>
-                    <Button 
-                      variant="outline" 
+                    {section.label}
+                  </CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate(section.editRoute)}
+                    className="gap-1 text-muted-foreground hover:text-primary print:hidden"
+                  >
+                    <Edit className="h-3 w-3" />
+                    Edit
+                    <ArrowRight className="h-3 w-3" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {section.hasContent ? (
+                  section.content
+                ) : (
+                  <div className="text-sm text-muted-foreground">
+                    <p>No information added yet</p>
+                    <Button
+                      variant="link"
                       size="sm"
-                      onClick={() => handleEditSection(section.id)}
+                      onClick={() => navigate(section.editRoute)}
+                      className="px-0 text-primary print:hidden"
                     >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit this section
+                      Add information →
                     </Button>
                   </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </Card>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-        {/* Download Section */}
-        <Card className="p-6 mb-8 print:hidden">
-          <h2 className="text-lg font-semibold mb-4">Download your summary</h2>
-          <p className="text-sm text-muted-foreground mb-4">
-            You can download this as many times as you like.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Button onClick={handleDownloadPDF}>
-              <Download className="mr-2 h-4 w-4" />
-              Download PDF
-            </Button>
-            <Button variant="outline" onClick={handlePrint}>
-              <Printer className="mr-2 h-4 w-4" />
-              Print a Copy
-            </Button>
+        {/* Reminder Opt-In */}
+        {missingSections.length > 0 && (
+          <div className="mb-8 print:hidden">
+            <ReminderEmailOptIn userEmail={userEmail} />
           </div>
-        </Card>
+        )}
 
-        {/* Share Section */}
-        <Card className="p-6 mb-8 print:hidden">
-          <h2 className="text-lg font-semibold mb-4">Share with someone you trust</h2>
-          <div className="space-y-4">
-            {/* Create Secure Link */}
-            <div className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg">
-              <LinkIcon className="h-5 w-5 text-primary mt-1" />
-              <div className="flex-1">
-                <h3 className="font-medium mb-1">Create a Secure Link</h3>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Generate a read-only link that anyone can view. You can turn this off anytime.
-                </p>
-                <Button variant="secondary" size="sm" onClick={() => setShowShareDialog(true)}>
-                  Create a Secure Link
-                </Button>
-              </div>
-            </div>
-
-            {/* Email a Copy */}
-            <div className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg">
-              <Mail className="h-5 w-5 text-primary mt-1" />
-              <div className="flex-1">
-                <h3 className="font-medium mb-1">Email a Copy</h3>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Send your summary directly to someone's email.
-                </p>
-                <Button variant="secondary" size="sm" onClick={() => setShowShareDialog(true)}>
-                  Email This Summary
-                </Button>
-              </div>
-            </div>
-
-            {/* Download & Share Yourself */}
-            <p className="text-sm text-muted-foreground">
-              You can also download the PDF and share it however you prefer.
-            </p>
-          </div>
-        </Card>
-
-        {/* Sharing Controls */}
-        <SharingControls />
+        {/* Print Footer */}
+        <div className="hidden print:block mt-8 pt-4 border-t text-center text-sm text-muted-foreground">
+          <p>Planning Summary — For Review Only — Not a Legal Document</p>
+          <p>Generated on {new Date().toLocaleDateString()}</p>
+        </div>
 
         {/* Dialogs */}
         <PIICollectionDialog
