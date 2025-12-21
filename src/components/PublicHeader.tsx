@@ -1,18 +1,37 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, LayoutDashboard, HelpCircle } from "lucide-react";
+import { Home, LayoutDashboard, HelpCircle, User, LogOut } from "lucide-react";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { TextSizeToggle } from "@/components/TextSizeToggle";
+import { usePreviewModeContext } from "@/contexts/PreviewModeContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/everlasting-logo.png";
 
 /**
- * Public header with persistent navigation for Home, Dashboard Preview, and Resources.
- * Used on public pages where user may not be logged in.
+ * Public header with persistent navigation for Home, Dashboard, and Resources.
+ * Shows Sign In when logged out, Account when logged in.
  */
 export const PublicHeader = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { isLoggedIn, isLoading } = usePreviewModeContext();
   
   const isActive = (path: string) => location.pathname === path;
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Signed out",
+        description: "You have been signed out successfully."
+      });
+      navigate("/");
+    } catch (error) {
+      console.error("Sign out error:", error);
+    }
+  };
 
   return (
     <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
@@ -73,9 +92,27 @@ export const PublicHeader = () => {
           
           <LanguageSelector />
           
-          <Link to="/login">
-            <Button variant="outline" size="sm">Sign In</Button>
-          </Link>
+          {/* Conditional: Sign In or Account */}
+          {!isLoading && (
+            isLoggedIn ? (
+              <div className="flex items-center gap-2">
+                <Link to="/profile">
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline">Account</span>
+                  </Button>
+                </Link>
+                <Button variant="outline" size="sm" onClick={handleSignOut} className="gap-2">
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline">Sign Out</span>
+                </Button>
+              </div>
+            ) : (
+              <Link to="/login">
+                <Button variant="outline" size="sm">Sign In</Button>
+              </Link>
+            )
+          )}
         </div>
       </div>
 
