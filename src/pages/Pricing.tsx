@@ -243,7 +243,7 @@ const Pricing = () => {
   const getDisplayedPrice = (lookupKey: string) => priceLabel(stripePrices[lookupKey]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -282,7 +282,7 @@ const Pricing = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-16">
+      <main className="container mx-auto px-4 py-16 flex-1">
         <div className="max-w-6xl mx-auto space-y-12">
           {/* Hero Section */}
           <div className="text-center space-y-4">
@@ -301,19 +301,25 @@ const Pricing = () => {
             </p>
           </div>
 
-          {/* Escape Links */}
+          {/* Navigation Links */}
           <div className="flex justify-center gap-4 flex-wrap">
             <Button 
               variant="outline" 
-              onClick={() => navigate("/plan-ahead")}
+              onClick={() => navigate("/")}
             >
-              Learn About Plan Ahead
+              Return to Home
             </Button>
             <Button 
               variant="outline" 
               onClick={() => navigate("/dashboard")}
             >
-              View Planning Menu
+              Return to Dashboard
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/subscription")}
+            >
+              View Current Subscription
             </Button>
           </div>
 
@@ -392,13 +398,22 @@ const Pricing = () => {
                       )}
 
                       {(plan.lookupKey === "EFAVIPMONTHLY" || plan.lookupKey === "EFAVIPYEAR") && (
-                        <Button 
-                          variant="outline" 
-                          className="w-full"
-                          onClick={() => navigate("/coach-assistant")}
-                        >
-                          What is VIP Support?
-                        </Button>
+                        <>
+                          <Button 
+                            variant="outline" 
+                            className="w-full"
+                            onClick={() => navigate("/coach-assistant")}
+                          >
+                            What is VIP Support?
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            className="w-full text-muted-foreground"
+                            onClick={() => navigate("/subscription")}
+                          >
+                            Manage or Cancel Subscription
+                          </Button>
+                        </>
                       )}
                     </div>
 
@@ -452,6 +467,34 @@ const Pricing = () => {
           </p>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border bg-muted/30">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex flex-wrap justify-center gap-4 text-sm">
+              <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                Home
+              </Link>
+              <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
+                Dashboard
+              </Link>
+              <Link to="/subscription" className="text-muted-foreground hover:text-foreground transition-colors">
+                View Subscription
+              </Link>
+              <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
+                Contact Us
+              </Link>
+              <Link to="/payment-help" className="text-muted-foreground hover:text-foreground transition-colors">
+                Payment Help
+              </Link>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              © {new Date().getFullYear()} Everlasting Funeral Advisors. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
