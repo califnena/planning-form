@@ -12,6 +12,8 @@ import mascotCouple from "@/assets/mascot-couple.png";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { OrientationBanner } from "../OrientationBanner";
+import { GentleOffRamps } from "../GentleOffRamps";
 
 interface SectionPreferencesProps {
   user: User;
@@ -183,20 +185,16 @@ export const SectionPreferences = ({
 
   return (
     <div className="max-w-7xl mx-auto">
+      {/* Orientation Banner */}
+      <OrientationBanner />
+      
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6 px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex-1 min-w-0 flex items-center gap-2">
+          <div className="flex-1 min-w-0">
             <h1 className="text-2xl font-bold text-foreground">{t('preferences.title')}</h1>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <HelpCircle className="h-5 w-5 text-muted-foreground cursor-help" />
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p>{t('preferences.tooltip')}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <p className="text-sm text-muted-foreground mt-1">
+              Step 1: Choose what you want to include
+            </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <Button
@@ -211,7 +209,15 @@ export const SectionPreferences = ({
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-[280px,1fr] gap-6">
+      {/* Two column layout with headers */}
+      <div className="px-4 sm:px-6 mb-4">
+        <div className="grid lg:grid-cols-[280px,1fr] gap-6">
+          <p className="text-sm font-medium text-muted-foreground hidden lg:block">Planning Topics</p>
+          <p className="text-sm font-medium text-muted-foreground hidden lg:block">Your Selections</p>
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-[280px,1fr] gap-6 px-4 sm:px-6">
         <div className="space-y-4">
           <Card className="p-4 border-primary/20 bg-primary/5">
             <div className="flex items-start gap-3 mb-3">
@@ -311,6 +317,33 @@ export const SectionPreferences = ({
         </div>
       </div>
 
+      {/* What happens next section */}
+      <div className="mt-10 p-6 bg-muted/30 rounded-xl">
+        <h3 className="font-semibold text-foreground mb-3">What happens next</h3>
+        <ul className="space-y-2 text-sm text-muted-foreground">
+          <li className="flex items-start gap-2">
+            <span className="text-primary">•</span>
+            You'll answer questions only for the sections you choose
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-primary">•</span>
+            You can save and return later
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-primary">•</span>
+            You can add help from CARE Support anytime
+          </li>
+        </ul>
+        <Button
+          onClick={handleSaveAndContinue}
+          disabled={saving}
+          variant="outline"
+          className="mt-4"
+        >
+          Continue when ready
+        </Button>
+      </div>
+
       <div className="flex flex-col items-center gap-4 mt-8 pt-6 border-t">
         <Button
           onClick={handleSaveAndContinue}
@@ -327,6 +360,9 @@ export const SectionPreferences = ({
           {t('preferences.resetLink')}
         </button>
       </div>
+
+      {/* Gentle off-ramps */}
+      <GentleOffRamps />
     </div>
   );
 };

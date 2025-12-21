@@ -52,6 +52,10 @@ export default function DoItForYouIntake() {
   });
 
   const helpTopicOptions = [
+    { id: "review_started", label: "Help reviewing what I've started" },
+    { id: "finish_planning", label: "Help finishing the planning" },
+    { id: "questions_guidance", label: "I have questions and need guidance" },
+    { id: "not_sure", label: "I'm not sure what I need yet" },
     { id: "plan_ahead", label: "Plan Ahead information and wishes" },
     { id: "after_death", label: "After-death checklist setup for my family" },
     { id: "contacts", label: "Contacts and key people list" },
@@ -268,14 +272,27 @@ export default function DoItForYouIntake() {
       
       <main className="flex-1 py-12 px-4">
         <div className="max-w-2xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Do-It-For-You Intake</h1>
-            <p className="text-muted-foreground">
-              This takes about 10 minutes. Simple answers are enough. If you do not know something, you can leave it blank and we will follow up.
+          {/* Reassuring Header */}
+          <div className="mb-8 text-center">
+            <h1 className="text-3xl font-bold text-foreground mb-3">We'll Help You With This</h1>
+            <p className="text-lg text-muted-foreground mb-4">
+              You don't have to finish this on your own.<br />
+              We'll use what you've already started.
+            </p>
+          </div>
+
+          {/* Progress Reassurance Banner */}
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 mb-8">
+            <p className="text-sm text-foreground leading-relaxed text-center">
+              We've saved your progress. Someone will review what you've entered and guide you through the rest.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Form Reassurance */}
+            <p className="text-sm text-muted-foreground text-center">
+              You can stop anytime. Nothing is final until you choose to save.
+            </p>
             {/* Section 1: Who This Plan Is For */}
             <Card>
               <CardHeader>
@@ -630,25 +647,35 @@ export default function DoItForYouIntake() {
             </Card>
 
             {/* Submit */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                type="submit" 
-                size="lg" 
-                disabled={isSubmitting}
-                className="flex-1"
-              >
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Submit Intake
-              </Button>
-              <Button 
-                type="button"
-                variant="outline"
-                size="lg"
-                onClick={() => navigate('/dashboard')}
-              >
-                Back to Planning Menu
-              </Button>
+            <div className="space-y-4">
+              <p className="text-xs text-muted-foreground text-center">
+                There is no obligation. We'll reach out to explain next steps.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button 
+                  type="submit" 
+                  size="lg" 
+                  disabled={isSubmitting}
+                  className="flex-1"
+                >
+                  {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Request Help
+                </Button>
+                <Button 
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  onClick={() => navigate('/dashboard')}
+                >
+                  Return to Planning Menu
+                </Button>
+              </div>
             </div>
+
+            {/* Footer Disclaimer */}
+            <p className="text-xs text-muted-foreground text-center pt-4">
+              Planning assistance is educational and supportive. It does not replace legal or medical advice.
+            </p>
           </form>
         </div>
       </main>
