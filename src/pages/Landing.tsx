@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { BookOpen, CheckCircle, ClipboardList, ShoppingBag, Users, Headphones, Music, HelpCircle, Phone, Download, Heart, Quote, FileText, Calendar, Calculator } from "lucide-react";
+import { BookOpen, CheckCircle, ClipboardList, ShoppingBag, Users, Headphones, Music, HelpCircle, Phone, Download, Heart, Quote, FileText, Calendar, Calculator, User } from "lucide-react";
 import { AppFooter } from "@/components/AppFooter";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,13 +10,16 @@ import { useTranslation } from "react-i18next";
 import mascotPlanningAhead from "@/assets/mascot-planning-ahead.png";
 import mascotFamiliesChoose from "@/assets/mascot-families-choose.png";
 import mascotHeroCouple from "@/assets/mascot-hero-couple.png";
+
 const Landing = () => {
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [textSize, setTextSize] = useState<number>(100);
   const [userName, setUserName] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [hasPlannerProgress, setHasPlannerProgress] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
   useEffect(() => {
     const savedSize = localStorage.getItem("landing_text_size");
     if (savedSize) {
@@ -25,33 +28,68 @@ const Landing = () => {
       document.documentElement.style.fontSize = `${size}%`;
     }
 
-    // Check if user is logged in for personalized greeting
-    const checkUser = async () => {
-      const {
-        data: {
-          user
+    // Check auth state and planner progress
+    const checkUserState = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          setIsLoggedIn(true);
+          
+          // Get profile name
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', user.id)
+            .single();
+          
+          if (profile?.full_name) {
+            setUserName(profile.full_name.split(' ')[0]);
+          }
+          
+          // Check for planner progress in user_settings
+          const { data: settings } = await supabase
+            .from('user_settings')
+            .select('planner_mode, selected_sections')
+            .eq('user_id', user.id)
+            .maybeSingle();
+          
+          // User has progress if they have a planner_mode set or selected_sections
+          const hasProgress = !!(settings?.planner_mode || settings?.selected_sections);
+          setHasPlannerProgress(hasProgress);
+        } else {
+          setIsLoggedIn(false);
+          setUserName(null);
+          setHasPlannerProgress(false);
         }
-      } = await supabase.auth.getUser();
-      if (user) {
-        const {
-          data: profile
-        } = await supabase.from('profiles').select('full_name').eq('id', user.id).single();
-        if (profile?.full_name) {
-          setUserName(profile.full_name.split(' ')[0]);
-        }
+      } catch (error) {
+        console.error('Error checking user state:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
-    checkUser();
+
+    checkUserState();
   }, []);
+
   const handleTextSizeChange = (direction: "increase" | "decrease") => {
     const newSize = direction === "increase" ? Math.min(textSize + 10, 150) : Math.max(textSize - 10, 80);
     setTextSize(newSize);
     document.documentElement.style.fontSize = `${newSize}%`;
     localStorage.setItem("landing_text_size", newSize.toString());
   };
-  const handleStartPlanner = () => {
-    // Go directly to Plan Ahead landing page (public) - no login required
-    navigate("/plan-ahead");
+
+  const handlePrimaryCTA = () => {
+    if (isLoggedIn && hasPlannerProgress) {
+      // Continue to planner
+      navigate("/planner/start");
+    } else if (isLoggedIn) {
+      // Start fresh planner
+      navigate("/planner/start");
+    } else {
+      // Public path - go to plan-ahead landing
+      navigate("/plan-ahead");
+    }
   };
   return <div className="min-h-screen bg-gradient-to-b from-amber-50/40 via-background to-background">
       {/* Header */}
@@ -76,9 +114,19 @@ const Landing = () => {
               </Button>
             </div>
             <LanguageSelector />
-            <Link to="/login">
-              <Button variant="outline" size="lg">{t('auth.signIn')}</Button>
-            </Link>
+            {/* Auth-aware header button */}
+            {!isLoading && (
+              isLoggedIn ? (
+                <Button variant="outline" size="lg" onClick={() => navigate("/dashboard")}>
+                  <User className="h-4 w-4 mr-2" />
+                  Account
+                </Button>
+              ) : (
+                <Link to="/login">
+                  <Button variant="outline" size="lg">{t('auth.signIn')}</Button>
+                </Link>
+              )
+            )}
           </div>
         </div>
       </header>
@@ -117,24 +165,33 @@ const Landing = () => {
             </li>
           </ul>
 
-          {/* Returning User Welcome - only shown when authenticated */}
-          {userName && <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 max-w-md mx-auto">
-              <p className="text-foreground font-medium">Welcome back, {userName}!</p>
-              <Button onClick={() => navigate("/dashboard")} className="mt-2 min-h-[48px]">
-                Continue to Your Planning Menu →
+          {/* Primary & Secondary CTAs - single action based on user state */}
+          <div className="flex flex-col items-center justify-center gap-4 pt-2">
+            {/* Welcome back message for returning users (Option C - small text, no box) */}
+            {isLoggedIn && hasPlannerProgress && userName && (
+              <div className="text-center space-y-1">
+                <p className="text-sm text-muted-foreground">Welcome back, {userName}.</p>
+                <p className="text-sm text-muted-foreground">Your plan is saved. Continue anytime.</p>
+              </div>
+            )}
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button size="lg" onClick={handlePrimaryCTA} className="min-h-[48px] text-lg px-8">
+                {isLoggedIn && hasPlannerProgress ? "Continue Planning" : "Start Digital Planner"}
               </Button>
-            </div>}
-          
-          {/* Primary & Secondary CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-            <Button size="lg" onClick={handleStartPlanner} className="min-h-[48px] text-lg px-8">
-              Start Planning
-            </Button>
-            <Link to="/resources">
-              <Button size="lg" variant="outline" className="min-h-[48px] text-lg px-8">
-                Explore Resources
-              </Button>
-            </Link>
+              <Link to="/resources">
+                <Button size="lg" variant="outline" className="min-h-[48px] text-lg px-8">
+                  Explore Resources
+                </Button>
+              </Link>
+            </div>
+            
+            {/* Sign In link for logged out users */}
+            {!isLoggedIn && !isLoading && (
+              <Link to="/login" className="text-sm text-muted-foreground hover:text-primary underline">
+                Already have an account? Sign In
+              </Link>
+            )}
           </div>
 
           {/* Trust Strip */}
@@ -270,7 +327,7 @@ const Landing = () => {
                 <div className="flex-1" />
                 
                 <div className="pt-4 space-y-2 mt-4">
-                  <Button onClick={handleStartPlanner} className="w-full min-h-[48px]">
+                  <Button onClick={handlePrimaryCTA} className="w-full min-h-[48px]">
                     {t('landing.startPrePlanning')}
                   </Button>
                   <p className="text-sm text-center text-muted-foreground">
