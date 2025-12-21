@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.admin-user-management]
 verify_jwt = true
+
+[functions.stripe-list-prices]
+verify_jwt = false
