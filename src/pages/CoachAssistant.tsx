@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { AppFooter } from "@/components/AppFooter";
@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Heart, Sparkles, ArrowRight, Mic, Volume2, VolumeX, Home, LogOut } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { setPendingCheckout } from "@/lib/pendingCheckout";
 
 type Message = { role: "user" | "assistant"; content: string };
 type Mode = "planning" | "emotional";
@@ -23,6 +24,7 @@ const TOPICS = [
 
 export default function CoachAssistant() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -32,6 +34,8 @@ export default function CoachAssistant() {
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
   const [isTTSEnabled, setIsTTSEnabled] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
 
   useEffect(() => {
     checkVIPAccess();
@@ -41,9 +45,11 @@ export default function CoachAssistant() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/login");
+        setIsLoggedIn(false);
+        setCheckingAccess(false);
         return;
       }
+      setIsLoggedIn(true);
 
       // Check for VIP access via role-based system
       const { data: hasVIPAccess } = await supabase
@@ -157,6 +163,43 @@ export default function CoachAssistant() {
     navigate("/login");
   };
 
+  const handleUpgradeToVIP = async () => {
+    const successUrl = `${window.location.origin}/purchase-success?type=vip`;
+    const cancelUrl = window.location.href;
+
+    if (!isLoggedIn) {
+      setPendingCheckout({
+        lookupKey: "EFAVIPMONTHLY",
+        successUrl,
+        cancelUrl,
+        postSuccessRedirect: "/vip-coach",
+      });
+      localStorage.setItem("efa_last_visited_route", location.pathname);
+      navigate("/login");
+      return;
+    }
+
+    setIsCheckoutLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
+        body: { lookupKey: "EFAVIPMONTHLY", successUrl, cancelUrl }
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      toast({
+        title: "Error",
+        description: "Unable to start checkout. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCheckoutLoading(false);
+    }
+  };
+
   if (checkingAccess) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -216,12 +259,19 @@ export default function CoachAssistant() {
 
               <div className="space-y-3 pt-4">
                 <Button 
-                  onClick={() => navigate("/preplansteps/profile/subscription")}
+                  onClick={handleUpgradeToVIP}
+                  disabled={isCheckoutLoading}
                   size="lg"
                   className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-semibold text-base"
                 >
-                  Upgrade to VIP Access
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  {isCheckoutLoading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <>
+                      Upgrade to VIP Access
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </>
+                  )}
                 </Button>
                 <p className="text-center text-sm text-muted-foreground">
                   Choose between annual or monthly VIP plans
