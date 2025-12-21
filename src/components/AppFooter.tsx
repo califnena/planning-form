@@ -82,6 +82,13 @@ export const AppFooter = () => {
             </div>
           </div>
 
+          {/* Tagline */}
+          <div className="text-center py-4">
+            <p className="text-sm text-muted-foreground">
+              Serving families nationwide with education, clarity, and compassionate guidance.
+            </p>
+          </div>
+
           {/* Legal & Copyright */}
           <div className="pt-6 border-t border-border">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">

@@ -116,7 +116,15 @@ const Landing = () => {
             </div>}
           
           <div className="flex flex-col items-center gap-4 pt-4">
-            
+            <Button size="lg" onClick={handleStartPlanner} className="min-h-[48px] text-lg px-8">
+              See How It Works
+            </Button>
+            <p className="text-sm text-muted-foreground">
+              Preview tools and education first. Upgrade only if and when it makes sense for you.
+            </p>
+            <Link to="/pricing" className="text-sm text-primary hover:underline">
+              View Pricing & Plans
+            </Link>
           </div>
         </div>
 
@@ -303,17 +311,17 @@ const Landing = () => {
           </div>
         </div>
 
-        {/* COMPASSIONATE SUPPORT (OPTIONAL) */}
+        {/* COMPASSIONATE GUIDANCE & SUPPORT */}
         <div className="mt-24 max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-4">
-            Compassionate Support (Optional)
+            Compassionate Guidance & Support
           </h2>
           <p className="text-lg text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
-            {t('landing.optionalSupportDesc')}
+            For individuals and families who want personal guidance, emotional reassurance, and help navigating difficult conversations. This support goes beyond planning — offering compassionate check-ins, help during moments of distress, and steady guidance before or after a loss. Always optional. Never rushed.
           </p>
           
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Compassionate Support - Renamed from VIP Coach */}
+            {/* Compassionate Guidance */}
             <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/pricing")}>
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
@@ -322,21 +330,18 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Compassionate Support
+                  Compassionate Guidance
                 </h3>
                 <p className="text-muted-foreground leading-relaxed text-sm">
-                  For individuals and families who want personal guidance, this option provides one-on-one support that goes beyond planning. Includes help navigating difficult decisions, emotional reassurance during stressful moments, and calm guidance before or after a loss.
+                  One-on-one support for navigating difficult decisions, emotional reassurance during stressful moments, and calm guidance before or after a loss.
                 </p>
-                <p className="text-xs text-muted-foreground italic">
-                  This support is always optional and available only if you choose it.
-                </p>
-                <Button variant="outline" className="mt-2">
-                  Learn About Compassionate Support
+                <Button variant="outline" className="mt-2 min-h-[48px]">
+                  Learn More
                 </Button>
               </CardContent>
             </Card>
 
-            {/* Do-It-For-You */}
+            {/* Done-For-You Coordination */}
             <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/contact")}>
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
@@ -345,15 +350,18 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  {t('landing.doItForYou')}
+                  Done-For-You Coordination
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed text-sm">
                   {t('landing.doItForYouDesc')}
                 </p>
+                <Button variant="outline" className="mt-2 min-h-[48px]">
+                  Learn More
+                </Button>
               </CardContent>
             </Card>
 
-            {/* Custom Song */}
+            {/* Custom Memorial Song */}
             <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate("/products/custom-song")}>
               <CardContent className="pt-8 pb-8 text-center space-y-4">
                 <div className="flex justify-center">
@@ -362,11 +370,14 @@ const Landing = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  {t('landing.customSong')}
+                  Custom Memorial Song
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed text-sm">
                   {t('landing.customSongDesc')}
                 </p>
+                <Button variant="outline" className="mt-2 min-h-[48px]">
+                  Learn More
+                </Button>
               </CardContent>
             </Card>
           </div>
