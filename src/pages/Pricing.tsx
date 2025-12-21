@@ -103,10 +103,10 @@ const Pricing = () => {
     },
     {
       id: "vip-monthly",
-      title: "VIP Planning Support",
+      title: "CARE Support",
       subtitle: "Monthly subscription",
       bullets: [
-        "One-on-one guidance through your planning process",
+        "Personal planning help from Claire",
         "Help organizing decisions and next steps",
         "Cancel anytime",
       ],
@@ -116,7 +116,7 @@ const Pricing = () => {
     },
     {
       id: "vip-yearly",
-      title: "VIP Planning Support",
+      title: "CARE Support",
       subtitle: "Yearly subscription",
       bullets: [
         "Same support as monthly",
@@ -402,9 +402,9 @@ const Pricing = () => {
                           <Button 
                             variant="outline" 
                             className="w-full"
-                            onClick={() => navigate("/coach-assistant")}
+                            onClick={() => navigate("/care-support")}
                           >
-                            What is VIP Support?
+                            Learn About CARE Support
                           </Button>
                           <Button 
                             variant="ghost" 

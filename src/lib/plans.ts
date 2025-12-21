@@ -31,23 +31,23 @@ export const PLANS = {
   VIP_ANNUAL: {
     key: "vip_annual",
     lookupKey: "EFAVIPYEAR",
-    name: "VIP (Annual)",
+    name: "CARE Support (Annual)",
     price: "$69 / year",
-    description: "Experience complete peace of mind with 24/7 guided planning and emotional support. Includes everything in Premium plus access to a compassionate, AI-powered coach for personalized guidance through end-of-life planning, organization, and coping. Get step-by-step assistance, unlimited updates, and instant help anytime you need support for you or your family.",
+    description: "Personal planning help, coping support, and guidance when you need it. Includes everything in Premium plus access to Claire, your planning assistant, for personalized guidance through end-of-life planning, organization, and coping. Get step-by-step assistance, unlimited updates, and help anytime you need support for you or your family.",
     features: [
       "Everything in Premium",
-      "24/7 guided planning & coping coach (AI-powered)"
+      "Access to Claire for planning guidance and support"
     ],
   },
   VIP_MONTHLY: {
     key: "vip_monthly",
     lookupKey: "EFAVIPMONTHLY",
-    name: "VIP (Monthly)",
+    name: "CARE Support (Monthly)",
     price: "$5.99 / month",
-    description: "Experience complete peace of mind with 24/7 guided planning and emotional support. Includes everything in Premium plus access to a compassionate, AI-powered coach for personalized guidance through end-of-life planning, organization, and coping. Get step-by-step assistance, unlimited updates, and instant help anytime you need support for you or your family.",
+    description: "Personal planning help, coping support, and guidance when you need it. Includes everything in Premium plus access to Claire, your planning assistant, for personalized guidance through end-of-life planning, organization, and coping. Get step-by-step assistance, unlimited updates, and help anytime you need support for you or your family.",
     features: [
       "Everything in Premium (monthly access)",
-      "24/7 guided planning & coping coach (AI-powered)"
+      "Access to Claire for planning guidance and support"
     ],
   },
   BINDER: {

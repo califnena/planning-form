@@ -614,13 +614,13 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* STEP 2 - VIP Planning Support */}
+        {/* STEP 2 - CARE Support */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-full bg-[hsl(210,100%,45%)] text-white flex items-center justify-center font-bold text-lg shadow-md">
               2
             </div>
-            <h2 className="text-2xl font-bold">VIP Planning Support</h2>
+            <h2 className="text-2xl font-bold">CARE Support</h2>
           </div>
           
           <Card className="p-6 bg-amber-50/50 border-amber-200">
@@ -631,9 +631,9 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-semibold mb-2">One-on-one guidance through your planning process</h3>
+                <h3 className="text-xl font-semibold mb-2">Personal planning help from Claire</h3>
                 <p className="text-muted-foreground mb-4">
-                  VIP Planning Support goes beyond planning—offering compassionate check-ins, help during moments of distress, and steady guidance before or after a loss.
+                  CARE Support goes beyond planning—offering compassionate check-ins, help during moments of distress, and steady guidance before or after a loss.
                 </p>
                 <ul className="space-y-2 mb-4 text-muted-foreground">
                   <li className="flex items-start gap-2">
@@ -650,17 +650,17 @@ export default function Dashboard() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-amber-600 mt-1">✓</span>
-                    <span>A real person who walks at your pace</span>
+                    <span>A real assistant who walks at your pace</span>
                   </li>
                 </ul>
-                {hasVIPAccess ? <Button onClick={() => navigate('/vip-coach')} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] min-h-[48px]">
-                    Talk With a Planning Guide
+                {hasVIPAccess ? <Button onClick={() => navigate('/care-support')} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] min-h-[48px]">
+                    Talk to Claire
                   </Button> : <div className="flex flex-wrap gap-3">
                     <Button onClick={handleVIPMonthly} className="bg-[hsl(210,100%,35%)] hover:bg-[hsl(210,100%,30%)] min-h-[48px]">
-                      Add VIP Planning Support
+                      Get CARE Support
                     </Button>
                     <Button onClick={handleVIPYearly} variant="outline" className="border-2 border-[hsl(210,100%,35%)] text-[hsl(210,100%,35%)] bg-white hover:bg-[hsl(210,100%,35%)]/10 min-h-[48px]">
-                      Yearly VIP Support (Save 20%)
+                      Yearly CARE Support (Save 20%)
                     </Button>
                   </div>}
               </div>
