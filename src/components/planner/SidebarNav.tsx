@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Package, Heart, UserCheck } from "lucide-react";
+import { Package, Heart, UserCheck, FileText } from "lucide-react";
 
 interface NavItem {
   id: string;
@@ -142,6 +142,24 @@ export const SidebarNav = ({
           </p>
         </div>
       )}
+
+      {/* My Planning Document - Primary Access */}
+        <>
+          <hr className="my-4 border-2 border-border mx-4" />
+          <div className="px-2">
+            <button
+              onClick={() => navigate("/preplan-summary")}
+              className={cn(
+                "w-full flex items-center gap-3 px-4 py-4 text-base rounded-lg transition-all duration-200 text-left group",
+                "bg-primary/10 hover:bg-primary/20 border-2 border-primary/30",
+                "text-foreground font-medium"
+              )}
+            >
+              <FileText className="h-5 w-5 flex-shrink-0 text-primary" />
+              <span className="flex-1">My Planning Document</span>
+            </button>
+          </div>
+        </>
 
       {/* Support & Services Section */}
       {!hideResources && (
