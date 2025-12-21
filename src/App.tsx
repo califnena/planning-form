@@ -67,7 +67,7 @@ import PaymentHelp from "./pages/PaymentHelp";
 import ClaireFAQ from "./pages/ClaireFAQ";
 import PlannerPreview from "./pages/PlannerPreview";
 import PrePlanSummary from "./pages/PrePlanSummary";
-
+import SharedView from "./pages/SharedView";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -151,6 +151,7 @@ const App = () => (
                       <Route path="/do-it-for-you/intake" element={<DoItForYouIntake />} />
                       <Route path="/do-it-for-you/intake-submitted" element={<DoItForYouIntakeSubmitted />} />
                       <Route path="/payment-help" element={<PaymentHelp />} />
+                      <Route path="/shared/:token" element={<SharedView />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
