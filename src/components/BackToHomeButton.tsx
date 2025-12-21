@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
-import everlastingLogo from "@/assets/everlasting-logo.png";
+import { Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function BackToHomeButton() {
   return (
-    <Link to="/dashboard" className="inline-block hover:opacity-80 transition-opacity">
-      <img 
-        src={everlastingLogo} 
-        alt="Everlasting - Back to Dashboard" 
-        className="h-8 w-auto"
-      />
+    <Link to="/">
+      <Button variant="ghost" size="sm" className="gap-2">
+        <Home className="h-4 w-4" />
+        Home
+      </Button>
     </Link>
   );
 }
