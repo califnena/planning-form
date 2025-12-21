@@ -210,76 +210,91 @@ export default function CoachAssistant() {
 
   if (!hasAccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#f7f5f2] to-[#e8e2dd] p-4 md:p-8">
-        <div className="max-w-3xl mx-auto space-y-6">
-          <Card className="border-none shadow-xl">
-            <CardHeader className="text-center space-y-4 pb-8">
-              <div className="flex items-center justify-center gap-2">
-                <Heart className="h-8 w-8 text-primary" />
-                <CardTitle className="text-4xl font-serif">VIP Coach Assistant</CardTitle>
-              </div>
-              <Badge className="mx-auto bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-                Exclusive VIP Feature
-              </Badge>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="text-center space-y-4">
-                <p className="text-lg font-medium">
-                  Your personal AI companion for planning and emotional support
-                </p>
-                <p className="text-muted-foreground">
-                  Available 24/7 to guide you through every step of your end-of-life planning journey.
-                </p>
-              </div>
-
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 p-6 rounded-lg space-y-4">
-                <h3 className="font-semibold text-lg flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  What You Get:
-                </h3>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">✓</span>
-                    <span><strong>Planning Mode:</strong> Get guided through organizing your funeral wishes, legal documents, and final instructions</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">✓</span>
-                    <span><strong>Emotional Support Mode:</strong> Receive compassionate guidance when dealing with grief, anxiety, or difficult emotions</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">✓</span>
-                    <span><strong>24/7 Availability:</strong> Your coach is always ready to help, anytime you need it</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">✓</span>
-                    <span><strong>Private & Secure:</strong> All conversations are confidential and encrypted</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="space-y-3 pt-4">
-                <Button 
-                  onClick={handleUpgradeToVIP}
-                  disabled={isCheckoutLoading}
-                  size="lg"
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-semibold text-base"
-                >
-                  {isCheckoutLoading ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <>
-                      Upgrade to VIP Access
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </>
-                  )}
+      <div className="min-h-screen flex flex-col">
+        <GlobalHeader />
+        <div className="flex-1 bg-gradient-to-b from-[#f7f5f2] to-[#e8e2dd] p-4 md:p-8">
+          <div className="max-w-3xl mx-auto space-y-6">
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-2">
+                <Home className="h-4 w-4" />
+                Home
+              </Button>
+              {isLoggedIn && (
+                <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="gap-2">
+                  Dashboard
                 </Button>
-                <p className="text-center text-sm text-muted-foreground">
-                  Choose between annual or monthly VIP plans
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+              )}
+            </div>
+            <Card className="border-none shadow-xl">
+              <CardHeader className="text-center space-y-4 pb-8">
+                <div className="flex items-center justify-center gap-2">
+                  <Heart className="h-8 w-8 text-primary" />
+                  <CardTitle className="text-4xl font-serif">VIP Coach Assistant</CardTitle>
+                </div>
+                <Badge className="mx-auto bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                  Exclusive VIP Feature
+                </Badge>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="text-center space-y-4">
+                  <p className="text-lg font-medium">
+                    Your personal AI companion for planning and emotional support
+                  </p>
+                  <p className="text-muted-foreground">
+                    Available 24/7 to guide you through every step of your end-of-life planning journey.
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 p-6 rounded-lg space-y-4">
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    What You Get:
+                  </h3>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-1">✓</span>
+                      <span><strong>Planning Mode:</strong> Get guided through organizing your funeral wishes, legal documents, and final instructions</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-1">✓</span>
+                      <span><strong>Emotional Support Mode:</strong> Receive compassionate guidance when dealing with grief, anxiety, or difficult emotions</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-1">✓</span>
+                      <span><strong>24/7 Availability:</strong> Your coach is always ready to help, anytime you need it</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-1">✓</span>
+                      <span><strong>Private & Secure:</strong> All conversations are confidential and encrypted</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="space-y-3 pt-4">
+                  <Button 
+                    onClick={handleUpgradeToVIP}
+                    disabled={isCheckoutLoading}
+                    size="lg"
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-semibold text-base"
+                  >
+                    {isCheckoutLoading ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <>
+                        Upgrade to VIP Access
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-center text-sm text-muted-foreground">
+                    Choose between annual or monthly VIP plans
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
+        <AppFooter />
       </div>
     );
   }
