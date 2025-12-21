@@ -17,6 +17,7 @@ import {
   Scale,
   BookOpen,
   HelpCircle,
+  FileSignature,
   type LucideIcon,
 } from "lucide-react";
 
@@ -40,6 +41,7 @@ export const SECTION_COLORS: Record<string, string> = {
   legalresources: "from-purple-500 to-purple-600",
   resources: "from-blue-500 to-blue-600",
   faq: "from-green-500 to-green-600",
+  willprep: "from-amber-600 to-amber-700",
 };
 
 export const SECTION_ICONS: Record<string, LucideIcon> = {
@@ -61,6 +63,7 @@ export const SECTION_ICONS: Record<string, LucideIcon> = {
   legalresources: Scale,
   resources: BookOpen,
   faq: HelpCircle,
+  willprep: FileSignature,
 };
 
 export function getSectionIcon(sectionId: string): LucideIcon {
