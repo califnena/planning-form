@@ -127,9 +127,59 @@ export default function Dashboard() {
   const checkIsFreePlan = checkIsFreePlanFn;
   const checkVIPAccess = checkVIPAccessFn;
   const checkPrintableAccess = checkPrintableAccessFn;
+  // Check if user has planner progress
+  const [hasPlannerProgress, setHasPlannerProgress] = useState(false);
+  const [lastStepIndex, setLastStepIndex] = useState(0);
+  const [totalSteps, setTotalSteps] = useState(0);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkPlannerProgress = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: settings } = await supabase
+        .from('user_settings')
+        .select('planner_mode, selected_sections, last_step_index, last_planner_activity')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const settingsData = settings as {
+        planner_mode?: string;
+        selected_sections?: string[];
+        last_step_index?: number;
+        last_planner_activity?: string;
+      } | null;
+
+      const hasProgress = !!(settingsData?.planner_mode || settingsData?.selected_sections?.length);
+      setHasPlannerProgress(hasProgress);
+      setLastStepIndex((settingsData?.last_step_index ?? 0) + 1);
+      setTotalSteps(settingsData?.selected_sections?.length ?? 0);
+      
+      if (settingsData?.last_planner_activity) {
+        const date = new Date(settingsData.last_planner_activity);
+        const now = new Date();
+        const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+        if (diffDays === 0) {
+          setLastUpdated('Today');
+        } else if (diffDays === 1) {
+          setLastUpdated('Yesterday');
+        } else {
+          setLastUpdated(`${diffDays} days ago`);
+        }
+      }
+    };
+    checkPlannerProgress();
+  }, []);
+
   const handleStartDigitalPlanner = () => {
-    // Start Digital Planner → go to /plan-ahead entry
-    navigate('/plan-ahead');
+    if (hasPlannerProgress) {
+      // Continue Planning → go to /plan-ahead with resume flag
+      navigate('/plan-ahead?resume=1');
+    } else {
+      // Start Digital Planner → go to /plan-ahead entry
+      navigate('/plan-ahead');
+    }
   };
 
   const handlePlannerModeSelected = async (mode: 'guided' | 'free') => {

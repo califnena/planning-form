@@ -1,7 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Home, LayoutDashboard, HelpCircle, User, LogOut } from "lucide-react";
-import { LanguageSelector } from "@/components/LanguageSelector";
 import { TextSizeToggle } from "@/components/TextSizeToggle";
 import { usePreviewModeContext } from "@/contexts/PreviewModeContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -89,8 +88,6 @@ export const PublicHeader = () => {
           <div className="flex sm:hidden">
             <TextSizeToggle compact />
           </div>
-          
-          <LanguageSelector />
           
           {/* Conditional: Sign In or Account */}
           {!isLoading && (
