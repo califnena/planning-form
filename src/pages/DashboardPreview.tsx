@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FileText, Star, BookOpen, Music, Printer, Users, ListChecks, ShoppingBag, Plane, Lock, Eye } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { PublicHeader } from "@/components/PublicHeader";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PreviewModeBanner } from "@/components/dashboard/PreviewModeBanner";
 import { AppFooter } from "@/components/AppFooter";
+import { usePreviewModeContext } from "@/contexts/PreviewModeContext";
 
 /**
  * Public Dashboard Preview - viewable without login.
@@ -13,9 +14,16 @@ import { AppFooter } from "@/components/AppFooter";
  */
 export default function DashboardPreview() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { openLockedModal, saveLastVisitedRoute, isLoggedIn } = usePreviewModeContext();
 
   const handleLoginRequired = (redirect: string) => {
-    navigate(`/login?redirect=${encodeURIComponent(redirect)}`);
+    if (isLoggedIn) {
+      navigate(redirect);
+    } else {
+      saveLastVisitedRoute(location.pathname);
+      openLockedModal("Sign in to save your progress and personalize your plan.");
+    }
   };
 
   return (

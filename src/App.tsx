@@ -7,9 +7,11 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n/config";
 import { TextSizeProvider } from "./contexts/TextSizeContext";
 import { AccessibilityProvider } from "./contexts/AccessibilityContext";
+import { PreviewModeProvider } from "./contexts/PreviewModeContext";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { BackToTopButton } from "./components/BackToTopButton";
 import { VisitorTracker } from "./components/VisitorTracker";
+import { LockedFeatureModal } from "./components/LockedFeatureModal";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -68,63 +70,66 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <ScrollToTop />
-              <BackToTopButton />
-              <VisitorTracker />
-              <div className="flex flex-col min-h-screen">
-                <div className="flex-1">
-                  <Routes>
-                    <Route path="/" element={<Landing />} />
-                    <Route path="/unsubscribe" element={<Unsubscribe />} />
-                    <Route path="/pricing" element={<Pricing />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/dashboard-preview" element={<DashboardPreview />} />
-                    <Route path="/about-us" element={<AboutUs />} />
-                    <Route path="/legal-forms" element={<LegalForms />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
-                    <Route path="/reset-password" element={<ResetPassword />} />
-                    <Route path="/app" element={<PlannerApp />} />
-                    <Route path="/preplandashboard" element={<PlannerApp />} />
-                    <Route path="/app/profile" element={<Profile />} />
-                    <Route path="/app/profile/subscription" element={<Subscription />} />
-                    <Route path="/plans" element={<Plans />} />
-                    <Route path="/products" element={<Products />} />
-                    <Route path="/products/binder" element={<ProductBinder />} />
-                    <Route path="/products/custom-song" element={<CustomSong />} />
-                    <Route path="/song-info" element={<SongInfo />} />
-                    <Route path="/song-confirmation" element={<SongConfirmation />} />
-                    <Route path="/purchase-success" element={<PurchaseSuccess />} />
-                    <Route path="/admin" element={<AdminPanel />} />
-                    <Route path="/admin/events" element={<AdminEvents />} />
-                    <Route path="/events" element={<Events />} />
-                    <Route path="/billing" element={<Billing />} />
-                    <Route path="/vip-coach" element={<CoachAssistant />} />
-                    <Route path="/after-death-planner" element={<NextSteps />} />
-                    <Route path="/next-steps" element={<NextSteps />} />
-                    <Route path="/next-steps/case/:caseId" element={<CaseDetail />} />
-                    <Route path="/wizard/preplanning" element={<PrePlanningWizard />} />
-                    <Route path="/wizard/afterdeath" element={<AfterDeathWizard />} />
-                    <Route path="/vendors" element={<Vendors />} />
-                    <Route path="/guide" element={<PrePlanningGuide />} />
-                    <Route path="/forms" element={<Forms />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/resources" element={<Resources />} />
-                    <Route path="/faq" element={<FAQ />} />
-                    <Route path="/legal-documents" element={<LegalDocuments />} />
-                    <Route path="/preview/preplanning" element={<PreviewPrePlanning />} />
-                    <Route path="/preview/afterdeath" element={<PreviewAfterDeath />} />
-                    <Route path="/preview/legal" element={<PreviewLegal />} />
-                    <Route path="/preview/pdf" element={<PreviewPDF />} />
-                    <Route path="/travel-protection" element={<TravelProtection />} />
-                    <Route path="/preview-landing" element={<LandingAlt />} />
-                    <Route path="/after-death" element={<AfterDeathLanding />} />
-                    <Route path="/plan-ahead" element={<PlanAheadLanding />} />
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
+              <PreviewModeProvider>
+                <ScrollToTop />
+                <BackToTopButton />
+                <VisitorTracker />
+                <LockedFeatureModal />
+                <div className="flex flex-col min-h-screen">
+                  <div className="flex-1">
+                    <Routes>
+                      <Route path="/" element={<Landing />} />
+                      <Route path="/unsubscribe" element={<Unsubscribe />} />
+                      <Route path="/pricing" element={<Pricing />} />
+                      <Route path="/dashboard" element={<Dashboard />} />
+                      <Route path="/dashboard-preview" element={<DashboardPreview />} />
+                      <Route path="/about-us" element={<AboutUs />} />
+                      <Route path="/legal-forms" element={<LegalForms />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/signup" element={<Signup />} />
+                      <Route path="/reset-password" element={<ResetPassword />} />
+                      <Route path="/app" element={<PlannerApp />} />
+                      <Route path="/preplandashboard" element={<PlannerApp />} />
+                      <Route path="/app/profile" element={<Profile />} />
+                      <Route path="/app/profile/subscription" element={<Subscription />} />
+                      <Route path="/plans" element={<Plans />} />
+                      <Route path="/products" element={<Products />} />
+                      <Route path="/products/binder" element={<ProductBinder />} />
+                      <Route path="/products/custom-song" element={<CustomSong />} />
+                      <Route path="/song-info" element={<SongInfo />} />
+                      <Route path="/song-confirmation" element={<SongConfirmation />} />
+                      <Route path="/purchase-success" element={<PurchaseSuccess />} />
+                      <Route path="/admin" element={<AdminPanel />} />
+                      <Route path="/admin/events" element={<AdminEvents />} />
+                      <Route path="/events" element={<Events />} />
+                      <Route path="/billing" element={<Billing />} />
+                      <Route path="/vip-coach" element={<CoachAssistant />} />
+                      <Route path="/after-death-planner" element={<NextSteps />} />
+                      <Route path="/next-steps" element={<NextSteps />} />
+                      <Route path="/next-steps/case/:caseId" element={<CaseDetail />} />
+                      <Route path="/wizard/preplanning" element={<PrePlanningWizard />} />
+                      <Route path="/wizard/afterdeath" element={<AfterDeathWizard />} />
+                      <Route path="/vendors" element={<Vendors />} />
+                      <Route path="/guide" element={<PrePlanningGuide />} />
+                      <Route path="/forms" element={<Forms />} />
+                      <Route path="/contact" element={<Contact />} />
+                      <Route path="/resources" element={<Resources />} />
+                      <Route path="/faq" element={<FAQ />} />
+                      <Route path="/legal-documents" element={<LegalDocuments />} />
+                      <Route path="/preview/preplanning" element={<PreviewPrePlanning />} />
+                      <Route path="/preview/afterdeath" element={<PreviewAfterDeath />} />
+                      <Route path="/preview/legal" element={<PreviewLegal />} />
+                      <Route path="/preview/pdf" element={<PreviewPDF />} />
+                      <Route path="/travel-protection" element={<TravelProtection />} />
+                      <Route path="/preview-landing" element={<LandingAlt />} />
+                      <Route path="/after-death" element={<AfterDeathLanding />} />
+                      <Route path="/plan-ahead" element={<PlanAheadLanding />} />
+                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </div>
                 </div>
-              </div>
+              </PreviewModeProvider>
             </BrowserRouter>
           </TooltipProvider>
         </AccessibilityProvider>

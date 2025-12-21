@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,16 +9,33 @@ import { useToast } from "@/hooks/use-toast";
 import { BackToHomeButton } from "@/components/BackToHomeButton";
 import { useTranslation } from "react-i18next";
 
+const LAST_VISITED_KEY = "efa_last_visited_route";
+
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-
-  // Removed auto-redirect to allow users to manually enter credentials
+  // Get redirect from URL params or localStorage
+  const getRedirectUrl = () => {
+    // First check URL params (e.g., /login?redirect=/app)
+    const urlRedirect = searchParams.get("redirect");
+    if (urlRedirect) return urlRedirect;
+    
+    // Then check localStorage for last visited route
+    const lastVisited = localStorage.getItem(LAST_VISITED_KEY);
+    if (lastVisited) {
+      localStorage.removeItem(LAST_VISITED_KEY); // Clear after use
+      return lastVisited;
+    }
+    
+    // Default to dashboard
+    return "/dashboard";
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,11 +54,8 @@ const Login = () => {
         const selectedPlan = localStorage.getItem("selected_plan");
         
         if (selectedPlan) {
-          // Clear the selected plan from localStorage
           localStorage.removeItem("selected_plan");
           
-          // For paid plans, you would redirect to checkout here
-          // For now, just show a message and redirect to dashboard
           if (selectedPlan !== "free") {
             toast({
               title: t('auth.welcome'),
@@ -55,7 +69,9 @@ const Login = () => {
           });
         }
         
-        navigate("/dashboard");
+        // Redirect to saved route or dashboard
+        const redirectUrl = getRedirectUrl();
+        navigate(redirectUrl);
       }
     } catch (error: any) {
       toast({
@@ -80,7 +96,6 @@ const Login = () => {
       });
 
       if (error) {
-        // If test account doesn't exist, create it
         const { error: signUpError } = await supabase.auth.signUp({
           email: testEmail,
           password: testPassword,
@@ -88,7 +103,6 @@ const Login = () => {
 
         if (signUpError) throw signUpError;
 
-        // Try logging in again
         const { error: loginError } = await supabase.auth.signInWithPassword({
           email: testEmail,
           password: testPassword,
@@ -101,7 +115,9 @@ const Login = () => {
         title: t('auth.testLoginSuccess'),
         description: t('auth.testLoginDesc'),
       });
-      navigate("/dashboard");
+      
+      const redirectUrl = getRedirectUrl();
+      navigate(redirectUrl);
     } catch (error: any) {
       toast({
         title: t('auth.testLoginFailed'),
