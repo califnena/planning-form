@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { BackToHomeButton } from "@/components/BackToHomeButton";
 import { useTranslation } from "react-i18next";
-import { getPendingCheckout, clearPendingCheckout, openCheckoutUrl, getProductName } from "@/lib/pendingCheckout";
+import { getPendingCheckout, clearPendingCheckout, getProductName } from "@/lib/pendingCheckout";
 
 const LAST_VISITED_KEY = "efa_last_visited_route";
 
@@ -58,7 +58,7 @@ const Login = () => {
       if (error) throw error;
 
       if (data?.url) {
-        openCheckoutUrl(data.url, (title, desc) => toast({ title, description: desc }));
+        window.location.href = data.url;
         return true; // Indicate we're handling redirect
       }
     } catch (error) {

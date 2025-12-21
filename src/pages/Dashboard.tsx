@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { FileText, Star, BookOpen, Scale, Phone, Music, Printer, Users, ListChecks, ShoppingBag, Lightbulb, CalendarDays, Plane } from "lucide-react";
@@ -13,14 +13,33 @@ import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator"
 import { generateBlankAfterLifePlanPDF } from "@/lib/blankAfterLifePlanPdfGenerator";
 import { checkPaidAccess as checkPaidAccessFn, checkVIPAccess as checkVIPAccessFn, checkPrintableAccess as checkPrintableAccessFn, checkIsFreePlan as checkIsFreePlanFn } from "@/lib/accessChecks";
 import { ChecklistsSection } from "@/components/dashboard/ChecklistsSection";
+import { setPendingCheckout } from "@/lib/pendingCheckout";
 export default function Dashboard() {
   const {
     t
   } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     toast
   } = useToast();
+
+  // Helper to queue checkout and redirect to login if not authenticated
+  const queueCheckoutAndGoLogin = async (lookupKey: string, successUrl: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setPendingCheckout({
+        lookupKey,
+        successUrl,
+        cancelUrl: window.location.href,
+        postSuccessRedirect: "/dashboard",
+      });
+      localStorage.setItem("efa_last_visited_route", location.pathname);
+      navigate("/login");
+      return true; // Indicate we need to stop and redirect
+    }
+    return false; // User is authenticated, proceed with checkout
+  };
   const [firstName, setFirstName] = useState<string>("");
   const [progress, setProgress] = useState(0);
   const [showPIIDialog, setShowPIIDialog] = useState(false);
@@ -152,18 +171,18 @@ export default function Dashboard() {
     }
   };
   const handleDownloadWorkbook = async () => {
+    const successUrl = `${window.location.origin}/purchase-success?type=printable`;
+    
+    // Check if user is logged in, queue checkout if not
+    const needsLogin = await queueCheckoutAndGoLogin("EFABASIC", successUrl);
+    if (needsLogin) return;
+
     try {
-      const successUrl = `${window.location.origin}/purchase-success?type=printable`;
-      const cancelUrl = `${window.location.origin}/dashboard`;
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke('stripe-create-checkout', {
+      const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
         body: {
           lookupKey: 'EFABASIC',
-          mode: 'payment',
           successUrl,
-          cancelUrl,
+          cancelUrl: `${window.location.origin}/dashboard`,
           allowPromotionCodes: true
         }
       });
@@ -195,18 +214,18 @@ export default function Dashboard() {
     }
   };
   const handlePurchaseBinder = async () => {
+    const successUrl = `${window.location.origin}/purchase-success?type=binder`;
+    
+    // Check if user is logged in, queue checkout if not
+    const needsLogin = await queueCheckoutAndGoLogin("EFABINDER", successUrl);
+    if (needsLogin) return;
+
     try {
-      const successUrl = `${window.location.origin}/purchase-success?type=binder`;
-      const cancelUrl = `${window.location.origin}/dashboard`;
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke('stripe-create-checkout', {
+      const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
         body: {
           lookupKey: 'EFABINDER',
-          mode: 'payment',
           successUrl,
-          cancelUrl,
+          cancelUrl: `${window.location.origin}/dashboard`,
           allowPromotionCodes: true
         }
       });
@@ -279,18 +298,17 @@ export default function Dashboard() {
     }
   };
   const handleVIPMonthly = async () => {
+    const successUrl = `${window.location.origin}/purchase-success?type=vip`;
+    
+    const needsLogin = await queueCheckoutAndGoLogin("EFAVIPMONTHLY", successUrl);
+    if (needsLogin) return;
+
     try {
-      const successUrl = `${window.location.origin}/purchase-success?type=vip-monthly`;
-      const cancelUrl = `${window.location.origin}/dashboard`;
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke("stripe-create-checkout", {
+      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
         body: {
           lookupKey: "EFAVIPMONTHLY",
-          mode: "subscription",
           successUrl,
-          cancelUrl,
+          cancelUrl: `${window.location.origin}/dashboard`,
           allowPromotionCodes: true
         }
       });
@@ -304,10 +322,8 @@ export default function Dashboard() {
         return;
       }
       if (data?.url) {
-        console.log("Redirecting to Stripe checkout:", data.url);
         window.location.href = data.url;
       } else {
-        console.error("No checkout URL in response:", data);
         toast({
           title: "Error",
           description: "No checkout URL received. Please try again.",
@@ -324,18 +340,17 @@ export default function Dashboard() {
     }
   };
   const handleVIPYearly = async () => {
+    const successUrl = `${window.location.origin}/purchase-success?type=vip`;
+    
+    const needsLogin = await queueCheckoutAndGoLogin("EFAVIPYEAR", successUrl);
+    if (needsLogin) return;
+
     try {
-      const successUrl = `${window.location.origin}/purchase-success?type=vip-yearly`;
-      const cancelUrl = `${window.location.origin}/dashboard`;
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke("stripe-create-checkout", {
+      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
         body: {
           lookupKey: "EFAVIPYEAR",
-          mode: "subscription",
           successUrl,
-          cancelUrl,
+          cancelUrl: `${window.location.origin}/dashboard`,
           allowPromotionCodes: true
         }
       });
@@ -349,10 +364,8 @@ export default function Dashboard() {
         return;
       }
       if (data?.url) {
-        console.log("Redirecting to Stripe checkout:", data.url);
         window.location.href = data.url;
       } else {
-        console.error("No checkout URL in response:", data);
         toast({
           title: "Error",
           description: "No checkout URL received. Please try again.",
@@ -369,18 +382,17 @@ export default function Dashboard() {
     }
   };
   const handlePremiumSubscription = async () => {
+    const successUrl = `${window.location.origin}/purchase-success?type=premium`;
+    
+    const needsLogin = await queueCheckoutAndGoLogin("EFAPREMIUM", successUrl);
+    if (needsLogin) return;
+
     try {
-      const successUrl = `${window.location.origin}/purchase-success?type=premium`;
-      const cancelUrl = `${window.location.origin}/dashboard`;
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke("stripe-create-checkout", {
+      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
         body: {
           lookupKey: "EFAPREMIUM",
-          mode: "subscription",
           successUrl,
-          cancelUrl,
+          cancelUrl: `${window.location.origin}/dashboard`,
           allowPromotionCodes: true
         }
       });
@@ -394,10 +406,8 @@ export default function Dashboard() {
         return;
       }
       if (data?.url) {
-        console.log("Redirecting to Stripe checkout:", data.url);
         window.location.href = data.url;
       } else {
-        console.error("No checkout URL in response:", data);
         toast({
           title: "Error",
           description: "No checkout URL received. Please try again.",
@@ -414,18 +424,17 @@ export default function Dashboard() {
     }
   };
   const handleBookDoItForYou = async () => {
+    const successUrl = `${window.location.origin}/purchase-success?type=done_for_you`;
+    
+    const needsLogin = await queueCheckoutAndGoLogin("EFADOFORU", successUrl);
+    if (needsLogin) return;
+
     try {
-      const successUrl = `${window.location.origin}/purchase-success`;
-      const cancelUrl = `${window.location.origin}/dashboard`;
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke("stripe-create-checkout", {
+      const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
         body: {
           lookupKey: "EFADOFORU",
-          mode: "payment",
           successUrl,
-          cancelUrl,
+          cancelUrl: `${window.location.origin}/dashboard`,
           allowPromotionCodes: true
         }
       });

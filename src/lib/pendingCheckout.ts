@@ -8,20 +8,21 @@
  * 4. After purchase, send them to the correct destination page
  */
 
-const PENDING_CHECKOUT_KEY = "efa_pending_checkout";
+export const PENDING_CHECKOUT_KEY = "efa_pending_checkout";
 
-export interface PendingCheckout {
-  lookupKey: string;          // EFABASIC, EFAPREMIUM, EFABINDER, EFAVIPMONTHLY, EFADOFORU, STANDARDSONG
-  mode: "payment" | "subscription";
+export type PendingCheckout = {
+  lookupKey: string; // EFABASIC, EFAPREMIUM, EFABINDER, EFAVIPMONTHLY, EFAVIPYEAR, EFADOFORU, STANDARDSONG
+  mode?: "payment" | "subscription"; // optional, Stripe function will decide based on price type
   successUrl: string;
   cancelUrl: string;
-}
+  postSuccessRedirect?: string; // optional: where to land after success
+};
 
 /**
  * Save pending checkout details to localStorage
  */
-export function savePendingCheckout(checkout: PendingCheckout): void {
-  localStorage.setItem(PENDING_CHECKOUT_KEY, JSON.stringify(checkout));
+export function setPendingCheckout(pending: PendingCheckout): void {
+  localStorage.setItem(PENDING_CHECKOUT_KEY, JSON.stringify(pending));
 }
 
 /**
@@ -50,34 +51,6 @@ export function clearPendingCheckout(): void {
  */
 export function hasPendingCheckout(): boolean {
   return localStorage.getItem(PENDING_CHECKOUT_KEY) !== null;
-}
-
-/**
- * Helper to open checkout URL (handles iframe detection for Lovable preview)
- */
-export function openCheckoutUrl(url: string, showToast?: (title: string, description: string) => void): void {
-  // In Lovable preview (iframe), Stripe blocks being framed (X-Frame-Options),
-  // so we open Checkout in a new tab. In a normal browser session, we redirect.
-  const isInIframe = (() => {
-    try {
-      return window.self !== window.top;
-    } catch {
-      return true;
-    }
-  })();
-
-  if (isInIframe) {
-    window.open(url, "_blank", "noopener,noreferrer");
-    if (showToast) {
-      showToast(
-        "Checkout opened",
-        "Stripe checkout opened in a new tab (preview can't display it inside the frame)."
-      );
-    }
-    return;
-  }
-
-  window.location.assign(url);
 }
 
 /**
