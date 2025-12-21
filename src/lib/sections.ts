@@ -19,6 +19,7 @@ export const ALL_SECTIONS: Section[] = [
   { id: "digital", title: "Online Accounts", description: "Passwords, devices, and important digital information." },
   { id: "legal", title: "Legal Document Storage", description: "Keep track of where your will, trust, and legal documents are stored." },
   { id: "messages", title: "Letters & Personal Messages", description: "Messages you want to leave for loved ones." },
+  { id: "willprep", title: "Prepare Information for a Will", description: "Organize your wishes and create a draft to review with an attorney." },
 ];
 
 export const REQUIRED_SECTIONS: Section[] = [
