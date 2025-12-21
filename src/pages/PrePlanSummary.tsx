@@ -398,8 +398,8 @@ export default function PrePlanSummary() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">Your Planning Summary</h1>
-          <p className="text-muted-foreground">
-            This document reflects the information you've entered.
+          <p className="text-muted-foreground font-medium">
+            This is your complete planning document.
           </p>
           {lastUpdated && (
             <p className="text-sm text-muted-foreground mt-1">
