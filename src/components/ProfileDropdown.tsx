@@ -134,7 +134,7 @@ export const ProfileDropdown = () => {
             <span>{t("header.adminPanel")}</span>
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem onClick={() => navigate("/plans")}>
+        <DropdownMenuItem onClick={() => navigate("/pricing")}>
           <Receipt className="mr-2 h-4 w-4" />
           <span>{t("header.subscriptionBilling")}</span>
         </DropdownMenuItem>
