@@ -132,70 +132,70 @@ const Landing = () => {
       </header>
 
       <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-10 md:py-16 bg-secondary">
-        {/* HERO SECTION - Clean hierarchy */}
-        <section className="max-w-5xl mx-auto text-center space-y-6">
+        {/* HERO SECTION - Clean hierarchy with proper spacing */}
+        <section className="max-w-4xl mx-auto text-center">
           {/* Hero Image */}
-          <div className="relative mx-auto max-w-2xl">
+          <div className="relative mx-auto max-w-2xl mb-8">
             <img src={mascotHeroCouple} alt="Planning Ahead is a Gift of Love" className="w-full rounded-xl shadow-lg" />
           </div>
           
-          {/* H1 - Primary Headline */}
-          <h1 className="text-3xl md:text-[42px] font-bold text-foreground leading-tight">
+          {/* H1 - Primary Headline - stands alone with breathing room */}
+          <h1 className="text-3xl md:text-[42px] font-bold text-foreground leading-tight max-w-3xl mx-auto">
             Plan ahead. Reduce stress. Protect your family.
           </h1>
           
-          {/* H2 - Supporting Line */}
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
+          {/* Supporting sentence - single paragraph, clear spacing */}
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mt-5 mb-8">
             A simple way to organize your wishes, understand the process, and guide your family when it matters most.
           </p>
 
-          {/* Value Bullets */}
-          <ul className="flex flex-col md:flex-row justify-center gap-4 md:gap-6 text-muted-foreground text-base">
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+          {/* Benefits row - horizontal, structured, tight */}
+          <div className="flex flex-col md:flex-row justify-center items-center gap-3 md:gap-8 text-muted-foreground text-sm mb-10">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
               <span>Create a clear plan before it's needed</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-              <span>Understand funeral and cremation options</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-              <span>Give your family direction and peace of mind</span>
-            </li>
-          </ul>
-
-          {/* Primary & Secondary CTAs - single action based on user state */}
-          <div className="flex flex-col items-center justify-center gap-4 pt-2">
-            {/* Welcome back message for returning users (Option C - small text, no box) */}
-            {isLoggedIn && hasPlannerProgress && userName && (
-              <div className="text-center space-y-1">
-                <p className="text-sm text-muted-foreground">Welcome back, {userName}.</p>
-                <p className="text-sm text-muted-foreground">Your plan is saved. Continue anytime.</p>
-              </div>
-            )}
-            
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" onClick={handlePrimaryCTA} className="min-h-[48px] text-lg px-8">
-                {isLoggedIn && hasPlannerProgress ? "Continue Planning" : "Start Digital Planner"}
-              </Button>
-              <Link to="/resources">
-                <Button size="lg" variant="outline" className="min-h-[48px] text-lg px-8">
-                  Explore Resources
-                </Button>
-              </Link>
             </div>
-            
-            {/* Sign In link for logged out users */}
-            {!isLoggedIn && !isLoading && (
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+              <span>Understand funeral and cremation options</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+              <span>Give your family direction and peace of mind</span>
+            </div>
+          </div>
+
+          {/* Welcome-back reassurance - separate subtle zone */}
+          {isLoggedIn && hasPlannerProgress && userName && (
+            <div className="text-center mb-6">
+              <p className="text-sm text-muted-foreground/80">Welcome back, {userName}.</p>
+              <p className="text-sm text-muted-foreground/80">Your plan is saved. Continue anytime.</p>
+            </div>
+          )}
+          
+          {/* Primary actions - clean and obvious */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
+            <Button size="lg" onClick={handlePrimaryCTA} className="min-h-[48px] text-lg px-8">
+              {isLoggedIn && hasPlannerProgress ? "Continue Planning" : "Start Digital Planner"}
+            </Button>
+            <Link to="/resources">
+              <Button size="lg" variant="outline" className="min-h-[48px] text-lg px-8">
+                Explore Resources
+              </Button>
+            </Link>
+          </div>
+          
+          {/* Sign In link for logged out users */}
+          {!isLoggedIn && !isLoading && (
+            <p className="mb-6">
               <Link to="/login" className="text-sm text-muted-foreground hover:text-primary underline">
                 Already have an account? Sign In
               </Link>
-            )}
-          </div>
+            </p>
+          )}
 
-          {/* Trust Strip */}
-          <p className="text-sm text-muted-foreground">
+          {/* Footer reassurance - reduced visual weight */}
+          <p className="text-xs text-muted-foreground/70 mt-6">
             Educational. Private. No obligation.
           </p>
         </section>
