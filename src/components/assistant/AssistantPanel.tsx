@@ -1,22 +1,21 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { 
-  Calendar, 
   HelpCircle, 
-  BookOpen, 
   Send, 
   Trash2, 
   Loader2,
-  ThumbsUp,
-  ThumbsDown,
   MessageCircle,
-  X
+  X,
+  Heart,
+  FileText,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BookingModal } from "./BookingModal";
@@ -33,19 +32,45 @@ interface AssistantPanelProps {
   onClose: () => void;
 }
 
+// Quick action buttons for seniors
+const QUICK_ACTIONS = [
+  { 
+    label: "Help me understand my options", 
+    prompt: "Can you help me understand my planning options? I'm not sure where to start.",
+    icon: HelpCircle 
+  },
+  { 
+    label: "Help me continue my plan", 
+    prompt: "I want to continue working on my plan. What should I focus on next?",
+    icon: FileText 
+  },
+  { 
+    label: "I have a question", 
+    prompt: "I have a question about planning.",
+    icon: MessageCircle 
+  },
+  { 
+    label: "I need more support", 
+    prompt: "I'm feeling a bit overwhelmed and could use some extra support.",
+    icon: Heart 
+  },
+];
+
 export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [showBooking, setShowBooking] = useState(false);
+  const [hasCAREAccess, setHasCAREAccess] = useState<boolean | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen) {
-      loadOrCreateConversation();
+      checkAccessAndLoad();
     }
   }, [isOpen]);
 
@@ -66,6 +91,43 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, onClose]);
+
+  const checkAccessAndLoad = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setHasCAREAccess(false);
+        return;
+      }
+
+      // Check for CARE Support access
+      const { data: hasVIPAccess } = await supabase
+        .rpc('has_vip_access', { _user_id: user.id });
+      
+      if (hasVIPAccess) {
+        setHasCAREAccess(true);
+        loadOrCreateConversation();
+        return;
+      }
+
+      const { data: subscription } = await supabase
+        .from("subscriptions")
+        .select("plan_type")
+        .eq("user_id", user.id)
+        .eq("status", "active")
+        .single();
+
+      if (subscription?.plan_type === "vip_annual" || subscription?.plan_type === "vip_monthly") {
+        setHasCAREAccess(true);
+        loadOrCreateConversation();
+      } else {
+        setHasCAREAccess(false);
+      }
+    } catch (error) {
+      console.error("Error checking access:", error);
+      setHasCAREAccess(false);
+    }
+  };
 
   const loadOrCreateConversation = async () => {
     try {
@@ -113,11 +175,11 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
     }
   };
 
-  const handleSend = async () => {
-    if (!input.trim() || !conversationId) return;
+  const handleSend = async (customMessage?: string) => {
+    const messageToSend = customMessage || input.trim();
+    if (!messageToSend || !conversationId) return;
 
-    const userMessage = input.trim();
-    setInput("");
+    if (!customMessage) setInput("");
     setIsLoading(true);
 
     try {
@@ -127,7 +189,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
         .insert({
           conversation_id: conversationId,
           role: 'user',
-          content: userMessage
+          content: messageToSend
         })
         .select()
         .single();
@@ -136,31 +198,9 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
         setMessages(prev => [...prev, userMsg as Message]);
       }
 
-      // Check for intents
-      if (/book|appointment|schedule|meet/i.test(userMessage)) {
-        setShowBooking(true);
-        const responseMsg = "I can help you book an appointment! I've opened the booking interface for you. Would you like a 15-minute consultation or something longer?";
-        
-        const { data: assistantMsg } = await supabase
-          .from('assistant_messages')
-          .insert({
-            conversation_id: conversationId,
-            role: 'assistant',
-            content: responseMsg
-          })
-          .select()
-          .single();
-
-        if (assistantMsg) {
-          setMessages(prev => [...prev, assistantMsg as Message]);
-        }
-        setIsLoading(false);
-        return;
-      }
-
       // Search KB
       const searchResponse = await supabase.functions.invoke('kb-search', {
-        body: { query: userMessage }
+        body: { query: messageToSend }
       });
 
       let context = "";
@@ -187,7 +227,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
         body: JSON.stringify({
           messages: [
             ...messages.map(m => ({ role: m.role, content: m.content })),
-            { role: 'user', content: userMessage + context }
+            { role: 'user', content: messageToSend + context }
           ],
           conversationId
         }),
@@ -303,16 +343,22 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
     }
   };
 
+  const handleGetCARESupport = () => {
+    onClose();
+    navigate("/care-support");
+  };
+
   if (!isOpen) return null;
 
-  return (
-    <>
-      <Card ref={panelRef} className="fixed bottom-24 right-6 w-[380px] h-[600px] shadow-2xl z-40 flex flex-col md:bottom-8 md:right-24">
+  // No CARE access - show upsell
+  if (hasCAREAccess === false) {
+    return (
+      <Card ref={panelRef} className="fixed bottom-24 right-6 w-[380px] shadow-2xl z-40 flex flex-col md:bottom-8 md:right-24">
         <CardHeader className="pb-3 space-y-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2">
-              <MessageCircle className="h-5 w-5 text-primary" />
-              Ask Claire
+              <Heart className="h-5 w-5 text-primary" />
+              Talk to Claire
             </CardTitle>
             <Button
               variant="ghost"
@@ -323,24 +369,65 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
               <X className="h-4 w-4" />
             </Button>
           </div>
-          
-          <div className="flex gap-2 flex-wrap">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="text-xs"
-              onClick={() => setShowBooking(true)}
+        </CardHeader>
+        <CardContent className="space-y-4 pb-6">
+          <div className="text-center space-y-3">
+            <p className="text-lg font-medium">
+              Hi, I'm Claire.
+            </p>
+            <p className="text-muted-foreground text-sm">
+              I'm here to help you with planning, one step at a time.
+            </p>
+          </div>
+
+          <div className="bg-muted/50 p-4 rounded-lg text-center">
+            <p className="text-sm text-muted-foreground">
+              Claire is available with CARE Support.
+            </p>
+          </div>
+
+          <Button 
+            onClick={handleGetCARESupport}
+            size="lg"
+            className="w-full min-h-[48px]"
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Get CARE Support
+          </Button>
+
+          <p className="text-xs text-center text-muted-foreground">
+            You can close this anytime.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Loading state
+  if (hasCAREAccess === null) {
+    return (
+      <Card ref={panelRef} className="fixed bottom-24 right-6 w-[380px] h-[400px] shadow-2xl z-40 flex items-center justify-center md:bottom-8 md:right-24">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </Card>
+    );
+  }
+
+  return (
+    <>
+      <Card ref={panelRef} className="fixed bottom-24 right-6 w-[380px] h-[600px] shadow-2xl z-40 flex flex-col md:bottom-8 md:right-24">
+        <CardHeader className="pb-3 space-y-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Heart className="h-5 w-5 text-primary" />
+              Talk to Claire
+            </CardTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-8 w-8"
             >
-              <Calendar className="h-3 w-3 mr-1" />
-              Book Appointment
-            </Button>
-            <Button variant="outline" size="sm" className="text-xs">
-              <HelpCircle className="h-3 w-3 mr-1" />
-              How do I...?
-            </Button>
-            <Button variant="outline" size="sm" className="text-xs">
-              <BookOpen className="h-3 w-3 mr-1" />
-              Browse FAQs
+              <X className="h-4 w-4" />
             </Button>
           </div>
         </CardHeader>
@@ -349,9 +436,27 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
           <ScrollArea className="flex-1 pr-4" ref={scrollRef}>
             <div className="space-y-4">
               {messages.length === 0 && (
-                <div className="text-center text-muted-foreground text-sm py-8">
-                  <p>👋 Hi, it's Claire!</p>
-                  <p className="mt-2">What would you like help with today?</p>
+                <div className="space-y-4">
+                  <div className="text-center text-muted-foreground text-sm py-4">
+                    <p className="text-base font-medium text-foreground">Hi, I'm Claire.</p>
+                    <p className="mt-2">How can I help today?</p>
+                  </div>
+                  
+                  {/* Quick action buttons for seniors */}
+                  <div className="space-y-2">
+                    {QUICK_ACTIONS.map((action) => (
+                      <Button
+                        key={action.label}
+                        variant="outline"
+                        className="w-full justify-start text-left h-auto py-3 px-4"
+                        onClick={() => handleSend(action.prompt)}
+                        disabled={isLoading}
+                      >
+                        <action.icon className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+                        <span className="text-sm">{action.label}</span>
+                      </Button>
+                    ))}
+                  </div>
                 </div>
               )}
               
@@ -378,7 +483,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
               {isLoading && (
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm">Thinking...</span>
+                  <span className="text-sm">Claire is thinking...</span>
                 </div>
               )}
             </div>
@@ -400,7 +505,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                 rows={2}
               />
               <Button 
-                onClick={handleSend} 
+                onClick={() => handleSend()} 
                 disabled={isLoading || !input.trim()}
                 size="icon"
               >
@@ -408,7 +513,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
               </Button>
             </div>
 
-            <div className="flex justify-start items-center">
+            <div className="flex justify-between items-center">
               <Button
                 variant="ghost"
                 size="sm"
@@ -418,12 +523,11 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                 <Trash2 className="h-3 w-3 mr-1" />
                 Clear history
               </Button>
+              <span className="text-xs text-muted-foreground">
+                You can close this anytime.
+              </span>
             </div>
           </div>
-
-          <p className="text-xs text-muted-foreground text-center">
-            Your conversation is private and secure.
-          </p>
         </CardContent>
       </Card>
 

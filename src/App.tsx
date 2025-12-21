@@ -64,6 +64,7 @@ import DoItForYouConfirmation from "./pages/DoItForYouConfirmation";
 import DoItForYouIntake from "./pages/DoItForYouIntake";
 import DoItForYouIntakeSubmitted from "./pages/DoItForYouIntakeSubmitted";
 import PaymentHelp from "./pages/PaymentHelp";
+import ClaireFAQ from "./pages/ClaireFAQ";
 
 const queryClient = new QueryClient();
 
@@ -110,6 +111,7 @@ const App = () => (
                       <Route path="/events" element={<Events />} />
                       <Route path="/billing" element={<Billing />} />
                       <Route path="/care-support" element={<CareSupport />} />
+                      <Route path="/claire-faq" element={<ClaireFAQ />} />
                       {/* Redirects from old routes */}
                       <Route path="/vip-coach" element={<CareSupport />} />
                       <Route path="/vip" element={<CareSupport />} />
