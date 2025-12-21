@@ -53,6 +53,29 @@ export default function PlanAheadLanding() {
     }
   };
 
+  const openCheckoutUrl = (url: string) => {
+    // In Lovable preview (iframe), Stripe blocks being framed (X-Frame-Options),
+    // so we open Checkout in a new tab. In a normal browser session, we redirect.
+    const isInIframe = (() => {
+      try {
+        return window.self !== window.top;
+      } catch {
+        return true;
+      }
+    })();
+
+    if (isInIframe) {
+      window.open(url, "_blank", "noopener,noreferrer");
+      toast({
+        title: "Checkout opened",
+        description: "Stripe checkout opened in a new tab (preview can't display it inside the frame).",
+      });
+      return;
+    }
+
+    window.location.assign(url);
+  };
+
   const handlePurchasePrintable = async () => {
     requireLogin(async () => {
       try {
@@ -61,21 +84,21 @@ export default function PlanAheadLanding() {
           navigate("/dashboard");
           toast({
             title: "Access Granted",
-            description: "You already have printable access. Visit your dashboard to download."
+            description: "You already have printable access. Visit your dashboard to download.",
           });
           return;
         }
-        
-        const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
+
+        const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
           body: {
-            lookupKey: 'EFABASIC',
-            mode: 'payment',
+            lookupKey: "EFABASIC",
+            mode: "payment",
             successUrl: `${window.location.origin}/purchase-success?type=printable`,
-            cancelUrl: window.location.href
-          }
+            cancelUrl: window.location.href,
+          },
         });
         if (error) throw error;
-        if (data?.url) window.location.href = data.url;
+        if (data?.url) openCheckoutUrl(data.url);
       } catch (error) {
         console.error("Error:", error);
         toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });
@@ -86,16 +109,16 @@ export default function PlanAheadLanding() {
   const handlePurchaseBinder = async () => {
     requireLogin(async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
+        const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
           body: {
-            lookupKey: 'EFABINDER',
-            mode: 'payment',
+            lookupKey: "EFABINDER",
+            mode: "payment",
             successUrl: `${window.location.origin}/purchase-success?type=binder`,
-            cancelUrl: window.location.href
-          }
+            cancelUrl: window.location.href,
+          },
         });
         if (error) throw error;
-        if (data?.url) window.location.href = data.url;
+        if (data?.url) openCheckoutUrl(data.url);
       } catch (error) {
         console.error("Error:", error);
         toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });
@@ -106,16 +129,16 @@ export default function PlanAheadLanding() {
   const handlePurchaseDoItForYou = async () => {
     requireLogin(async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
+        const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
           body: {
-            lookupKey: 'EFADOFORU',
-            mode: 'payment',
+            lookupKey: "EFADOFORU",
+            mode: "payment",
             successUrl: `${window.location.origin}/purchase-success`,
-            cancelUrl: window.location.href
-          }
+            cancelUrl: window.location.href,
+          },
         });
         if (error) throw error;
-        if (data?.url) window.location.href = data.url;
+        if (data?.url) openCheckoutUrl(data.url);
       } catch (error) {
         console.error("Error:", error);
         toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });
