@@ -56,3 +56,6 @@ verify_jwt = false
 
 [functions.stripe-verify-checkout]
 verify_jwt = false
+
+[functions.stripe-validate-prices]
+verify_jwt = false
