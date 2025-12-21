@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, CreditCard, Download, ArrowLeft, ExternalLink, Mail, Check, AlertCircle } from "lucide-react";
+import { Loader2, Download, ArrowLeft, ExternalLink, Mail, Check, AlertCircle, Package } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getPlanDisplayName, getPlanFeatures } from "@/lib/billingPlans";
+import { getPlanDisplayName } from "@/lib/billingPlans";
 
 interface Subscription {
   id: string;
@@ -34,6 +34,17 @@ interface Purchase {
   amount: number;
   purchased_at: string;
 }
+
+const PRODUCT_NAMES: Record<string, string> = {
+  EFABINDER: "Fireproof Planning Binder",
+  EFADOFORU: "Do-It-For-You Planning",
+  STANDARDSONG: "Custom Memorial Song",
+  PREMIUMSONG: "Premium Memorial Song",
+  EFAPRINTABLE: "Printable Access",
+  EFAGUIDED: "Guided Access",
+  EFAVIPMONTHLY: "VIP Planning Support (Monthly)",
+  EFAVIPYEARLY: "VIP Planning Support (Yearly)",
+};
 
 export default function Billing() {
   const navigate = useNavigate();
@@ -54,7 +65,6 @@ export default function Billing() {
         return;
       }
 
-      // Check for admin role
       const { data: adminRole } = await supabase
         .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
       
@@ -62,7 +72,6 @@ export default function Billing() {
         setIsMasterAccount(true);
       }
 
-      // Fetch subscription
       const { data: subscriptionData } = await supabase
         .from("subscriptions")
         .select("*")
@@ -73,7 +82,6 @@ export default function Billing() {
         setSubscription(subscriptionData);
       }
 
-      // Fetch purchases
       const { data: purchaseData } = await supabase
         .from("purchases")
         .select("*")
@@ -84,7 +92,6 @@ export default function Billing() {
         setPurchases(purchaseData);
       }
 
-      // Fetch invoices
       const { data: invoiceData } = await supabase
         .from("invoices")
         .select("*")
@@ -104,8 +111,8 @@ export default function Billing() {
   const handleManageBilling = async () => {
     if (!subscription?.stripe_customer_id) {
       toast({
-        title: t("billing.noAccount"),
-        description: t("billing.contactSupport"),
+        title: "No billing account",
+        description: "Please contact support for assistance.",
       });
       return;
     }
@@ -120,18 +127,17 @@ export default function Billing() {
 
       if (data?.url) {
         window.location.href = data.url;
-      } else if (data?.error) {
-        // Portal not available, show contact option
+      } else {
         toast({
-          title: t("billing.portalUnavailable"),
-          description: t("billing.contactSupportDescription"),
+          title: "Portal unavailable",
+          description: "Please contact support for billing changes.",
         });
       }
     } catch (err) {
       console.error("Portal error:", err);
       toast({
-        title: t("billing.error"),
-        description: t("billing.contactSupportDescription"),
+        title: "Error",
+        description: "Could not open billing portal. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -155,16 +161,13 @@ export default function Billing() {
     return new Date(dateString).toLocaleDateString();
   };
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-      active: "default",
-      trialing: "secondary",
-      past_due: "destructive",
-      canceled: "outline",
-      incomplete: "destructive",
-    };
-    return <Badge variant={variants[status] || "secondary"}>{status}</Badge>;
+  const getProductName = (lookupKey: string) => {
+    return PRODUCT_NAMES[lookupKey] || getPlanDisplayName(lookupKey.replace('EFA', '').toLowerCase()) || lookupKey;
   };
+
+  const isSubscriptionCancellable = subscription && 
+    ["active", "trialing", "past_due"].includes(subscription.status) &&
+    !subscription.cancel_at_period_end;
 
   if (loading) {
     return (
@@ -174,23 +177,22 @@ export default function Billing() {
     );
   }
 
-  const isActiveSubscription = subscription?.status === "active" || subscription?.status === "trialing";
-  const planFeatures = subscription?.plan_type ? getPlanFeatures(subscription.plan_type) : [];
+  const hasActiveSubscription = subscription && ["active", "trialing", "past_due"].includes(subscription.status);
 
   return (
     <div className="container max-w-4xl py-8 space-y-8">
       <Button 
         variant="ghost" 
-        onClick={() => navigate("/preplansteps")}
+        onClick={() => navigate("/dashboard")}
         className="mb-6"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        {t("billing.returnHome")}
+        Back to Planning Menu
       </Button>
       
       <div>
-        <h1 className="text-3xl font-bold">{t("billing.title")}</h1>
-        <p className="text-muted-foreground">{t("billing.description")}</p>
+        <h1 className="text-3xl font-bold">Billing</h1>
+        <p className="text-muted-foreground">Manage your subscriptions and view your purchases.</p>
       </div>
 
       {/* Master Account Notice */}
@@ -199,75 +201,75 @@ export default function Billing() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Check className="h-5 w-5 text-primary" />
-              {t("billing.masterAccount")}
+              Master Account
             </CardTitle>
             <CardDescription>
-              {t("billing.masterAccountDescription")}
+              You have full access to all features as an administrator.
             </CardDescription>
           </CardHeader>
         </Card>
       )}
 
-      {/* Current Plan */}
+      {/* Active Subscriptions */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("billing.currentPlan")}</CardTitle>
-          <CardDescription>{t("billing.currentPlanDescription")}</CardDescription>
+          <CardTitle>Subscriptions</CardTitle>
+          <CardDescription>
+            Subscriptions renew automatically. You can cancel anytime. If you cancel, access remains available through the end of your current billing period.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          {subscription && subscription.plan_type !== "free" ? (
+          {hasActiveSubscription ? (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-semibold">
-                    {getPlanDisplayName(subscription.plan_type)}
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="space-y-1">
+                  <h3 className="font-semibold">
+                    {getProductName(subscription.plan_type.toUpperCase())}
                   </h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    {getStatusBadge(subscription.status)}
+                  <div className="flex items-center gap-2">
+                    <Badge variant={subscription.status === "active" ? "default" : subscription.status === "past_due" ? "destructive" : "secondary"}>
+                      {subscription.status === "active" ? "Active" : 
+                       subscription.status === "trialing" ? "Trial" : 
+                       subscription.status === "past_due" ? "Past Due" : subscription.status}
+                    </Badge>
                     {subscription.cancel_at_period_end && (
                       <Badge variant="outline" className="text-amber-600 border-amber-600">
                         <AlertCircle className="h-3 w-3 mr-1" />
-                        {t("billing.cancelsAtPeriodEnd")}
+                        Cancels {formatDate(subscription.current_period_end)}
                       </Badge>
                     )}
                   </div>
-                </div>
-              </div>
-
-              {isActiveSubscription && (
-                <>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="text-muted-foreground">{t("billing.currentPeriodStart")}</p>
-                      <p className="font-medium">{formatDate(subscription.current_period_start)}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">{t("billing.renewalDate")}</p>
-                      <p className="font-medium">{formatDate(subscription.current_period_end)}</p>
-                    </div>
-                  </div>
-
-                  {planFeatures.length > 0 && (
-                    <div>
-                      <p className="text-sm font-medium mb-2">{t("billing.planIncludes")}</p>
-                      <ul className="text-sm text-muted-foreground space-y-1">
-                        {planFeatures.slice(0, 4).map((feature, i) => (
-                          <li key={i} className="flex items-center gap-2">
-                            <Check className="h-3 w-3 text-primary" />
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                  {subscription.current_period_end && !subscription.cancel_at_period_end && (
+                    <p className="text-sm text-muted-foreground">
+                      Renews {formatDate(subscription.current_period_end)}
+                    </p>
                   )}
-                </>
-              )}
+                </div>
+                {isSubscriptionCancellable && (
+                  <Button 
+                    variant="outline" 
+                    onClick={handleManageBilling}
+                    disabled={portalLoading}
+                  >
+                    {portalLoading ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                    )}
+                    Manage Subscription
+                  </Button>
+                )}
+              </div>
             </div>
           ) : (
-            <div className="text-center py-4">
-              <p className="text-muted-foreground mb-4">{t("billing.noActivePlan")}</p>
-              <Button onClick={() => navigate("/subscription")}>
-                {t("billing.viewPlans")}
+            <div className="text-center py-6 text-muted-foreground">
+              <p>No active subscriptions.</p>
+              <Button 
+                variant="link" 
+                onClick={() => navigate("/pricing")}
+                className="mt-2"
+              >
+                View available plans
               </Button>
             </div>
           )}
@@ -275,131 +277,73 @@ export default function Billing() {
       </Card>
 
       {/* One-Time Purchases */}
-      {purchases.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("billing.oneTimePurchases")}</CardTitle>
-            <CardDescription>{t("billing.oneTimePurchasesDescription")}</CardDescription>
-          </CardHeader>
-          <CardContent>
+      <Card>
+        <CardHeader>
+          <CardTitle>One-Time Purchases</CardTitle>
+          <CardDescription>
+            One-time purchases do not renew and do not require cancellation.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {purchases.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t("billing.product")}</TableHead>
-                  <TableHead>{t("billing.dateColumn")}</TableHead>
-                  <TableHead>{t("billing.statusColumn")}</TableHead>
+                  <TableHead>Product</TableHead>
+                  <TableHead>Purchased</TableHead>
+                  <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {purchases.map((purchase) => (
                   <TableRow key={purchase.id}>
-                    <TableCell className="font-medium">
-                      {getPlanDisplayName(purchase.product_lookup_key.replace('EFA', '').toLowerCase())}
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Package className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">{getProductName(purchase.product_lookup_key)}</span>
+                      </div>
                     </TableCell>
                     <TableCell>{formatDate(purchase.purchased_at)}</TableCell>
-                    <TableCell>{getStatusBadge(purchase.status)}</TableCell>
+                    <TableCell>
+                      <Badge variant="default" className="bg-green-600">
+                        <Check className="h-3 w-3 mr-1" />
+                        Owned
+                      </Badge>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Manage Billing */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("billing.manageBilling")}</CardTitle>
-          <CardDescription>{t("billing.manageBillingDescription")}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {subscription?.stripe_customer_id ? (
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button onClick={handleManageBilling} disabled={portalLoading}>
-                {portalLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                )}
-                {t("billing.manageSubscription")}
-              </Button>
-              <Button variant="outline" onClick={handleContactSupport}>
-                <Mail className="mr-2 h-4 w-4" />
-                {t("billing.contactSupport")}
-              </Button>
-            </div>
           ) : (
-            <div className="bg-muted/50 rounded-lg p-4">
-              <p className="text-sm text-muted-foreground mb-3">
-                {t("billing.noStripeAccount")}
-              </p>
-              <Button variant="outline" onClick={handleContactSupport}>
-                <Mail className="mr-2 h-4 w-4" />
-                {t("billing.contactSupport")}
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Payment Method */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("billing.paymentMethod")}</CardTitle>
-          <CardDescription>{t("billing.paymentMethodDescription")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {subscription?.stripe_customer_id ? (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <CreditCard className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="font-medium">{t("billing.cardOnFile")}</p>
-                  <p className="text-sm text-muted-foreground">{t("billing.paymentConnected")}</p>
-                </div>
-              </div>
-              <Button variant="outline" onClick={handleManageBilling} disabled={portalLoading}>
-                {t("billing.update")}
-              </Button>
-            </div>
-          ) : (
-            <div className="text-center py-4">
-              <p className="text-muted-foreground mb-4">{t("billing.noPaymentMethod")}</p>
-              <Button onClick={() => navigate("/subscription")}>
-                <CreditCard className="mr-2 h-4 w-4" />
-                {t("billing.addPaymentMethod")}
-              </Button>
+            <div className="text-center py-6 text-muted-foreground">
+              No one-time purchases yet.
             </div>
           )}
         </CardContent>
       </Card>
 
       {/* Billing History */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("billing.billingHistory")}</CardTitle>
-          <CardDescription>{t("billing.billingHistoryDescription")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {invoices.length > 0 ? (
+      {invoices.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Payment History</CardTitle>
+            <CardDescription>Your receipts and invoices.</CardDescription>
+          </CardHeader>
+          <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t("billing.dateColumn")}</TableHead>
-                  <TableHead>{t("billing.amountColumn")}</TableHead>
-                  <TableHead>{t("billing.statusColumn")}</TableHead>
-                  <TableHead className="text-right">{t("billing.invoiceColumn")}</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Receipt</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {invoices.map((invoice) => (
                   <TableRow key={invoice.id}>
-                    <TableCell>
-                      {new Date(invoice.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      {formatCurrency(invoice.amount, invoice.currency)}
-                    </TableCell>
+                    <TableCell>{formatDate(invoice.created_at)}</TableCell>
+                    <TableCell>{formatCurrency(invoice.amount, invoice.currency)}</TableCell>
                     <TableCell>
                       <Badge variant={invoice.status === "paid" ? "default" : "secondary"}>
                         {invoice.status}
@@ -407,11 +351,7 @@ export default function Billing() {
                     </TableCell>
                     <TableCell className="text-right">
                       {invoice.invoice_pdf && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          asChild
-                        >
+                        <Button variant="ghost" size="sm" asChild>
                           <a href={invoice.invoice_pdf} target="_blank" rel="noopener noreferrer">
                             <Download className="h-4 w-4" />
                           </a>
@@ -422,11 +362,20 @@ export default function Billing() {
                 ))}
               </TableBody>
             </Table>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              {t("billing.noInvoices")}
-            </div>
-          )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Support */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Need Help?</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button variant="outline" onClick={handleContactSupport}>
+            <Mail className="mr-2 h-4 w-4" />
+            Contact Support
+          </Button>
         </CardContent>
       </Card>
     </div>
