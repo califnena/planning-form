@@ -384,6 +384,7 @@ export default function PrePlanSummary() {
   };
 
   const [generatingPdf, setGeneratingPdf] = useState(false);
+  const [isDraftMode, setIsDraftMode] = useState(false);
 
   const handleDownloadPDF = () => {
     // Check validation first
@@ -391,7 +392,28 @@ export default function PrePlanSummary() {
       setShowReadinessModal(true);
       return;
     }
+    setIsDraftMode(false);
     setShowPIIDialog(true);
+  };
+
+  const handleDownloadDraft = () => {
+    setIsDraftMode(true);
+    setShowPIIDialog(true);
+  };
+
+  const handlePrintDraft = () => {
+    setIsDraftMode(true);
+    // For now, trigger the same flow - the PDF will be marked as draft
+    setShowPIIDialog(true);
+  };
+
+  const handleEmailDraft = () => {
+    setIsDraftMode(true);
+    // For now, we'll use the share dialog for email functionality
+    toast({
+      title: "Coming soon",
+      description: "Email draft functionality will be available soon. Please use Download or Print for now.",
+    });
   };
 
   const handlePIISubmit = async (piiData: any) => {
@@ -407,7 +429,8 @@ export default function PrePlanSummary() {
           planData: { ...planData, personal_profile: profile, contacts },
           selectedSections,
           piiData,
-          docType: 'full'
+          docType: 'full',
+          isDraft: isDraftMode, // Pass draft flag to mark PDF appropriately
         }
       });
 
@@ -428,15 +451,23 @@ export default function PrePlanSummary() {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = pdfData.filename || 'My-Final-Wishes.pdf';
+        const filename = isDraftMode 
+          ? `DRAFT-My-Final-Wishes-${new Date().toISOString().split('T')[0]}.pdf`
+          : pdfData.filename || 'My-Final-Wishes.pdf';
+        link.download = filename;
         link.click();
         URL.revokeObjectURL(url);
       }
 
       toast({
-        title: "PDF Generated",
-        description: "Your planning document has been generated successfully."
+        title: isDraftMode ? "Draft PDF Generated" : "PDF Generated",
+        description: isDraftMode 
+          ? "Your draft document has been generated. Some fields may be blank."
+          : "Your planning document has been generated successfully."
       });
+      
+      // Reset draft mode after successful generation
+      setIsDraftMode(false);
     } catch (error) {
       console.error("Error generating PDF:", error);
       toast({
@@ -741,7 +772,12 @@ export default function PrePlanSummary() {
           open={showReadinessModal}
           onOpenChange={setShowReadinessModal}
           missing={validationResult.missing}
+          hasHardRequired={validationResult.hasHardRequired}
+          canBypass={validationResult.canBypass}
           onFixItems={() => {}}
+          onDownloadDraft={handleDownloadDraft}
+          onPrintDraft={handlePrintDraft}
+          onEmailDraft={handleEmailDraft}
         />
       </div>
     </AuthenticatedLayout>

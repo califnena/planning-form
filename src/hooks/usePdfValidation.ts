@@ -7,12 +7,15 @@ export interface MissingField {
   fieldLabel: string;
   message: string;
   fixRoute: string;
+  severity: "hard" | "recommended"; // hard = cannot bypass, recommended = can bypass
 }
 
 export interface ValidationResult {
   isValid: boolean;
   missing: MissingField[];
   missingSectionCount: number;
+  hasHardRequired: boolean; // true if any hard-required fields are missing
+  canBypass: boolean; // true if only recommended fields are missing
 }
 
 interface PlanData {
@@ -54,6 +57,7 @@ interface PlanData {
   digital_notes?: string;
   messages_notes?: string;
   to_loved_ones_message?: string;
+  prepared_for?: string;
 }
 
 // Section route mapping for "Go to section" navigation
@@ -98,7 +102,8 @@ export function validatePdfReady(
     sectionKey: string,
     fieldKey: string,
     fieldLabel: string,
-    message: string
+    message: string,
+    severity: "hard" | "recommended"
   ) => {
     missing.push({
       sectionKey,
@@ -107,26 +112,28 @@ export function validatePdfReady(
       fieldLabel,
       message,
       fixRoute: SECTION_ROUTES[sectionKey] || "/preplandashboard",
+      severity,
     });
   };
 
   // Only validate sections the user selected
   
-  // A) Personal & Family Details
+  // A) Personal & Family Details - HARD REQUIRED: full_name OR prepared_for
   if (selectedSet.has("personal")) {
     const profile = planData?.personal_profile;
+    const hasName = profile?.full_name?.trim() || planData?.prepared_for?.trim();
     
-    if (!profile?.full_name?.trim()) {
-      addMissing("personal", "full_name", "Full Legal Name", "Add your full legal name");
+    if (!hasName) {
+      addMissing("personal", "full_name", "Full Legal Name", "Add your full legal name", "hard");
     }
     
-    // Address is recommended but allow partial
+    // Address is HARD REQUIRED (street + city + state minimum)
     if (!profile?.address?.trim()) {
-      addMissing("personal", "address", "Current Address", "Add your current address");
+      addMissing("personal", "address", "Current Address", "Add your current address", "hard");
     }
   }
 
-  // B) Contacts to Notify
+  // B) Contacts to Notify - RECOMMENDED
   if (selectedSet.has("contacts")) {
     const contacts = planData?.contacts || [];
     const validContacts = contacts.filter(c => 
@@ -136,45 +143,46 @@ export function validatePdfReady(
     );
     
     if (validContacts.length === 0) {
-      addMissing("contacts", "contact_entry", "Emergency Contact", "Add at least one person to notify with name, relationship, and contact info");
+      addMissing("contacts", "contact_entry", "Emergency Contact", "Add at least one person to notify", "recommended");
     }
   }
 
-  // C) Funeral Wishes
+  // C) Funeral Wishes - RECOMMENDED
   if (selectedSet.has("funeral")) {
     const funeral = planData?.funeral;
     const funeralNotes = planData?.funeral_wishes_notes;
     
-    // Check if any funeral preference is recorded
     const hasDisposition = funeral?.disposition?.trim() || funeral?.funeral_preference?.trim();
-    const hasServicePref = funeral?.service_preference?.trim();
     const hasNotes = funeralNotes?.trim();
     
     if (!hasDisposition && !hasNotes) {
-      addMissing("funeral", "disposition", "Burial or Cremation", "Choose burial, cremation, or 'Unsure'");
+      addMissing("funeral", "disposition", "Burial or Cremation", "Choose burial, cremation, or 'Unsure'", "recommended");
     }
   }
 
-  // D) Legal Documents (if selected)
+  // D) Legal Documents - RECOMMENDED
   if (selectedSet.has("legal")) {
     const legal = planData?.legal;
     const legalNotes = planData?.legal_notes;
     
-    // Will status is important
     const hasWillInfo = legal?.will_status?.trim() || legalNotes?.trim();
     
     if (!hasWillInfo) {
-      addMissing("legal", "will_status", "Will Status", "Note whether you have a will (Yes/No/Working on it)");
+      addMissing("legal", "will_status", "Will Status", "Note whether you have a will", "recommended");
     }
   }
 
   // Count unique sections with missing fields
   const missingSectionKeys = new Set(missing.map(m => m.sectionKey));
+  const hasHardRequired = missing.some(m => m.severity === "hard");
+  const canBypass = missing.length > 0 && !hasHardRequired;
 
   return {
     isValid: missing.length === 0,
     missing,
     missingSectionCount: missingSectionKeys.size,
+    hasHardRequired,
+    canBypass,
   };
 }
 
