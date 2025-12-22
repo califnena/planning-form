@@ -1,27 +1,30 @@
 /**
  * Section Routes - Single source of truth for section navigation
  * Used by PrePlanSummary, PdfReadinessModal, and any other deep-linking needs
+ * 
+ * TRUE ROUTES: Each section has its own URL path
  */
 
 // Section route mapping for deep-linking from summary/modals to specific planner sections
 export const SECTION_ROUTES: Record<string, string> = {
-  personal: "/preplandashboard?section=personal",
-  contacts: "/preplandashboard?section=contacts",
-  funeral: "/preplandashboard?section=funeral",
-  legacy: "/preplandashboard?section=legacy",
-  legal: "/preplandashboard?section=legal",
-  financial: "/preplandashboard?section=financial",
-  insurance: "/preplandashboard?section=insurance",
-  property: "/preplandashboard?section=property",
-  pets: "/preplandashboard?section=pets",
-  digital: "/preplandashboard?section=digital",
-  messages: "/preplandashboard?section=messages",
-  preferences: "/preplandashboard?section=preferences",
-  overview: "/preplandashboard?section=overview",
-  checklist: "/preplandashboard?section=checklist",
-  legalresources: "/preplandashboard?section=legalresources",
-  willprep: "/preplandashboard?section=willprep",
-  providers: "/preplandashboard?section=providers",
+  personal: "/preplandashboard/personal-family",
+  contacts: "/preplandashboard/contacts",
+  funeral: "/preplandashboard/funeral-wishes",
+  legacy: "/preplandashboard/life-story",
+  legal: "/preplandashboard/legal-docs",
+  financial: "/preplandashboard/financial-life",
+  insurance: "/preplandashboard/insurance",
+  property: "/preplandashboard/property-valuables",
+  pets: "/preplandashboard/pets",
+  digital: "/preplandashboard/digital",
+  messages: "/preplandashboard/messages",
+  preferences: "/preplandashboard/preferences",
+  overview: "/preplandashboard/overview",
+  checklist: "/preplandashboard/checklist",
+  legalresources: "/preplandashboard/legalresources",
+  willprep: "/preplandashboard/willprep",
+  providers: "/preplandashboard/providers",
+  instructions: "/preplandashboard/instructions",
 };
 
 // Section labels for display
@@ -43,17 +46,18 @@ export const SECTION_LABELS: Record<string, string> = {
   legalresources: "Legal Resources",
   willprep: "Will Preparation",
   providers: "Service Providers",
+  instructions: "Instructions",
 };
 
 /**
  * Get the route for a specific section
- * Falls back to /preplandashboard if section not found
+ * Falls back to /preplandashboard/preferences if section not found
  */
 export function getSectionRoute(sectionId: string, focusField?: string): string {
-  const baseRoute = SECTION_ROUTES[sectionId] || "/preplandashboard";
+  const baseRoute = SECTION_ROUTES[sectionId] || "/preplandashboard/preferences";
   
   if (focusField) {
-    return `${baseRoute}&focus=${focusField}`;
+    return `${baseRoute}?focus=${focusField}`;
   }
   
   return baseRoute;
