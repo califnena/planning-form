@@ -84,6 +84,8 @@ export default function PrePlanSummary() {
   const [investments, setInvestments] = useState<any[]>([]);
   const [professionalContacts, setProfessionalContacts] = useState<any[]>([]);
   const [funeralFunding, setFuneralFunding] = useState<any[]>([]);
+  const [debts, setDebts] = useState<any[]>([]);
+  const [businesses, setBusinesses] = useState<any[]>([]);
   const [showFirstTimeHelper, setShowFirstTimeHelper] = useState(false);
   const [selectedSections, setSelectedSections] = useState<string[]>(SETTINGS_DEFAULT);
   
@@ -193,6 +195,8 @@ export default function PrePlanSummary() {
       const dbInvestments = data.investments || [];
       const dbProfessionalContacts = data.professionalContacts || [];
       const dbFuneralFunding = data.funeralFunding || [];
+      const dbDebts = data.debts || [];
+      const dbBusinesses = data.businesses || [];
       
       // Prefer localStorage arrays if they exist and have data, otherwise use DB
       const localContacts = localPlan?.contacts_notify || localPlan?.contacts || [];
@@ -204,6 +208,8 @@ export default function PrePlanSummary() {
       const localInvestments = localPlan?.investments || [];
       const localProfessionalContacts = localPlan?.contacts_professional || [];
       const localFuneralFunding = localPlan?.funeral_funding || [];
+      const localDebts = localPlan?.debts || [];
+      const localBusinesses = localPlan?.businesses || [];
       
       // Use DB if it has data, otherwise fall back to localStorage
       const mergedContacts = dbContacts.length > 0 ? dbContacts : localContacts;
@@ -215,6 +221,8 @@ export default function PrePlanSummary() {
       const mergedInvestments = dbInvestments.length > 0 ? dbInvestments : localInvestments;
       const mergedProfessionalContacts = dbProfessionalContacts.length > 0 ? dbProfessionalContacts : localProfessionalContacts;
       const mergedFuneralFunding = dbFuneralFunding.length > 0 ? dbFuneralFunding : localFuneralFunding;
+      const mergedDebts = dbDebts.length > 0 ? dbDebts : localDebts;
+      const mergedBusinesses = dbBusinesses.length > 0 ? dbBusinesses : localBusinesses;
 
       // Use merged profile that includes localStorage data
       setProfile(Object.keys(mergedProfile).length > 0 ? mergedProfile : null);
@@ -227,6 +235,8 @@ export default function PrePlanSummary() {
       setInvestments(mergedInvestments);
       setProfessionalContacts(mergedProfessionalContacts);
       setFuneralFunding(mergedFuneralFunding);
+      setDebts(mergedDebts);
+      setBusinesses(mergedBusinesses);
       
       // Debug log for validation troubleshooting
       console.log("[PrePlanSummary] Data resolution:", {
@@ -556,6 +566,8 @@ export default function PrePlanSummary() {
         investments: investments,
         contacts_professional: professionalContacts,
         funeral_funding: funeralFunding,
+        debts: debts,
+        businesses: businesses,
 
         // Section visibility
         _visibleSections: selectedSections,
@@ -570,9 +582,12 @@ export default function PrePlanSummary() {
           : (pdfPlanData.insurance_policies as any)?.policies?.length,
         properties: pdfPlanData.properties?.length,
         bank_accounts: pdfPlanData.bank_accounts?.length,
-        digital_assets: (pdfPlanData as any).digital_assets?.length,
+        investments: pdfPlanData.investments?.length,
+        debts: pdfPlanData.debts?.length,
+        businesses: pdfPlanData.businesses?.length,
+        contacts_professional: pdfPlanData.contacts_professional?.length,
+        funeral_funding: pdfPlanData.funeral_funding?.length,
         messages: pdfPlanData.messages?.length,
-        legal_keys: (pdfPlanData as any).legal ? Object.keys((pdfPlanData as any).legal) : [],
         selectedSections,
       });
 
