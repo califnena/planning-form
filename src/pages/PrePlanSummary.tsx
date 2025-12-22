@@ -463,6 +463,7 @@ export default function PrePlanSummary() {
 
   const [generatingPdf, setGeneratingPdf] = useState(false);
   const [isDraftMode, setIsDraftMode] = useState(false);
+  const [pdfExportKind, setPdfExportKind] = useState<'planner' | 'report'>('planner');
 
   const handleDownloadPDF = () => {
     // Check validation first
@@ -470,22 +471,33 @@ export default function PrePlanSummary() {
       setShowReadinessModal(true);
       return;
     }
+    setPdfExportKind('planner');
+    setIsDraftMode(false);
+    setShowPIIDialog(true);
+  };
+
+  const handleDownloadSummaryReport = () => {
+    // Summary report is always allowed (it’s informational)
+    setPdfExportKind('report');
     setIsDraftMode(false);
     setShowPIIDialog(true);
   };
 
   const handleDownloadDraft = () => {
+    setPdfExportKind('planner');
     setIsDraftMode(true);
     setShowPIIDialog(true);
   };
 
   const handlePrintDraft = () => {
+    setPdfExportKind('planner');
     setIsDraftMode(true);
     // For now, trigger the same flow - the PDF will be marked as draft
     setShowPIIDialog(true);
   };
 
   const handleEmailDraft = () => {
+    setPdfExportKind('planner');
     setIsDraftMode(true);
     // For now, we'll use the share dialog for email functionality
     toast({
@@ -549,6 +561,21 @@ export default function PrePlanSummary() {
         _visibleSections: selectedSections,
       };
 
+      // Prove what we are sending + what the UI selected
+      console.log("PDF payload section counts", {
+        contacts_notify: pdfPlanData.contacts_notify?.length,
+        pets: pdfPlanData.pets?.length,
+        insurance_policies: Array.isArray(pdfPlanData.insurance_policies)
+          ? pdfPlanData.insurance_policies.length
+          : (pdfPlanData.insurance_policies as any)?.policies?.length,
+        properties: pdfPlanData.properties?.length,
+        bank_accounts: pdfPlanData.bank_accounts?.length,
+        digital_assets: (pdfPlanData as any).digital_assets?.length,
+        messages: pdfPlanData.messages?.length,
+        legal_keys: (pdfPlanData as any).legal ? Object.keys((pdfPlanData as any).legal) : [],
+        selectedSections,
+      });
+
       // CRITICAL DEBUG LOG - shows exactly what is sent to PDF
       console.log("[PrePlanSummary] PDF planData payload:", {
         planId: pdfPlanData.id,
@@ -557,7 +584,9 @@ export default function PrePlanSummary() {
         profile_address: pdfPlanData.personal_profile?.address,
         contacts_notify_count: pdfPlanData.contacts_notify?.length,
         pets_count: pdfPlanData.pets?.length,
-        insurance_policies_count: pdfPlanData.insurance_policies?.length,
+        insurance_policies_count: Array.isArray(pdfPlanData.insurance_policies)
+          ? pdfPlanData.insurance_policies.length
+          : (pdfPlanData.insurance_policies as any)?.policies?.length,
         properties_count: pdfPlanData.properties?.length,
         messages_count: pdfPlanData.messages?.length,
         bank_accounts_count: pdfPlanData.bank_accounts?.length,
@@ -566,16 +595,19 @@ export default function PrePlanSummary() {
       });
       console.log("[PrePlanSummary] Full PDF payload:", pdfPlanData);
 
-      // Call edge function to generate PDF with COMPLETE data
-      const { data: pdfData, error: pdfError } = await supabase.functions.invoke('generate-pdf', {
+      const functionName = pdfExportKind === 'planner' ? 'generate-planner-pdf' : 'generate-pdf';
+      const reportSelectedSections = ['overview', 'personal', 'legacy'];
+
+      const { data: pdfData, error: pdfError } = await supabase.functions.invoke(functionName, {
         body: {
           planData: pdfPlanData,
-          selectedSections,
+          // Planner PDF should output everything (ignore filtering). Report keeps its fixed 3 sections.
+          selectedSections: pdfExportKind === 'planner' ? selectedSections : reportSelectedSections,
           piiData,
-          docType: 'full',
+          docType: pdfExportKind === 'planner' ? 'planner' : 'report',
           isDraft: isDraftMode,
-          outputAllPages: true, // Always output all 23 pages
-        }
+          outputAllPages: pdfExportKind === 'planner',
+        },
       });
 
       if (pdfError) throw pdfError;
@@ -800,8 +832,19 @@ export default function PrePlanSummary() {
                     Print or Save My Plan
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Creates a printable document you can save and share</TooltipContent>
+                <TooltipContent>Creates the full multi-page planner document</TooltipContent>
               </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" onClick={handleDownloadSummaryReport} className="gap-2">
+                    <FileText className="h-4 w-4" />
+                    Download Summary Report
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Downloads the short 3-page summary report</TooltipContent>
+              </Tooltip>
+
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="outline" onClick={handlePrint} className="gap-2">
