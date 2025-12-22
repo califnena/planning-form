@@ -8,6 +8,42 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Section key normalizer to handle UI vs PDF key mismatches
+const SECTION_KEY_MAP: Record<string, string> = {
+  personal: "personal_information",
+  personal_information: "personal_information",
+  contacts: "contacts_notify",
+  notify: "contacts_notify",
+  contacts_notify: "contacts_notify",
+  professional_contacts: "professional_contacts",
+  pros: "professional_contacts",
+  service_providers: "service_providers",
+  vendors: "service_providers",
+  funeral: "funeral_wishes",
+  funeral_wishes: "funeral_wishes",
+  financial: "financial",
+  financial_life: "financial",
+  insurance: "insurance",
+  insurance_policies: "insurance",
+  property: "property",
+  properties: "property",
+  valuables: "property",
+  pets: "pets",
+  digital: "digital",
+  digital_accounts: "digital",
+  digital_assets: "digital",
+  legal: "legal",
+  legal_documents: "legal",
+  messages: "messages",
+  notes: "notes",
+};
+
+function normalizeSelectedSections(selected: any): Set<string> {
+  const list = Array.isArray(selected) ? selected : [];
+  const normalized = list.map((k: string) => SECTION_KEY_MAP[k] || k);
+  return new Set(normalized);
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -38,12 +74,37 @@ serve(async (req) => {
     }
 
     const {
-      planData,
+      planData: rawPlanData,
       selectedSections = [],
       piiData,
       docType = "planner",
       isDraft = false,
     } = await req.json();
+
+    // Ensure all expected planData keys exist with defaults
+    const planData = rawPlanData || {};
+    planData.contacts_notify = planData.contacts_notify || [];
+    planData.pets = planData.pets || [];
+    planData.insurance_policies = planData.insurance_policies || [];
+    planData.properties = planData.properties || [];
+    planData.bank_accounts = planData.bank_accounts || [];
+    planData.digital_assets = planData.digital_assets || [];
+    planData.messages = planData.messages || [];
+    planData.legal = planData.legal || {};
+    planData.contacts_professional = planData.contacts_professional || [];
+    planData.service_providers = planData.service_providers || [];
+    planData.investments = planData.investments || [];
+    planData.debts = planData.debts || [];
+    planData.businesses = planData.businesses || [];
+    planData.funeral_funding = planData.funeral_funding || [];
+    planData.pallbearers = planData.pallbearers || [];
+    planData.honorary_pallbearers = planData.honorary_pallbearers || [];
+    planData.valuables = planData.valuables || [];
+    planData.phones = planData.phones || [];
+
+    // Normalize selectedSections for consistent matching
+    const selectedSet = normalizeSelectedSections(selectedSections);
+    const hasFilter = selectedSet.size > 0;
 
     console.log("[generate-planner-pdf] Generating planner PDF", {
       userId: user.id,
@@ -59,6 +120,9 @@ serve(async (req) => {
       properties: planData?.properties?.length || 0,
       bank_accounts: planData?.bank_accounts?.length || 0,
       messages: planData?.messages?.length || 0,
+      investments: planData?.investments?.length || 0,
+      debts: planData?.debts?.length || 0,
+      legal_keys: Object.keys(planData?.legal || {}),
     });
 
     // IMPORTANT: The planner export should always be the full multi-page binder.
