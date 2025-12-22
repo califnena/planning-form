@@ -252,23 +252,26 @@ async function generateSimplePdf(
     return y - 30;
   };
 
-  const addField = (page: any, label: string, value: string, y: number): number => {
-    page.drawText(`${label}:`, {
+  const addField = (page: any, label: string, value: any, y: number): number => {
+    const v = sanitizeForPdf((value ?? "").toString().trim());
+
+    page.drawText(`${sanitizeForPdf(label)}:`, {
       x: margin,
       y,
       size: 10,
       font: helveticaBold,
       color: textColor,
     });
-    if (value) {
-      page.drawText(sanitizeForPdf(value), {
-        x: margin + 120,
-        y,
-        size: 10,
-        font: helvetica,
-        color: textColor,
-      });
-    }
+
+    // Always draw something so the field never “disappears” in the PDF
+    page.drawText(v || "", {
+      x: margin + 120,
+      y,
+      size: 10,
+      font: helvetica,
+      color: textColor,
+    });
+
     return y - lineHeight;
   };
 
@@ -280,30 +283,34 @@ async function generateSimplePdf(
     maxItems: number = 6,
   ): number => {
     let currentY = y;
-    const displayItems = (items || []).slice(0, maxItems);
+    const displayItems = Array.isArray(items) ? items.slice(0, maxItems) : [];
 
-    for (const item of displayItems) {
-      const text = sanitizeForPdf(formatter(item));
-      if (text && currentY > 80) {
-        page.drawText(`• ${text}`, {
-          x: margin,
-          y: currentY,
-          size: 10,
-          font: helvetica,
-          color: textColor,
-        });
-        currentY -= lineHeight;
-      }
-    }
-
-    if ((items || []).length > maxItems) {
-      page.drawText(`... and ${(items || []).length - maxItems} more`, {
+    if (displayItems.length === 0) {
+      page.drawText(`• `, {
         x: margin,
         y: currentY,
-        size: 9,
+        size: 10,
         font: helvetica,
-        color: rgb(0.4, 0.4, 0.4),
+        color: textColor,
       });
+      return currentY - lineHeight;
+    }
+
+    for (const item of displayItems) {
+      if (currentY <= 80) break;
+
+      const raw = formatter(item);
+      const text = sanitizeForPdf((raw ?? "").toString().trim());
+
+      // Always draw a bullet so the section doesn’t look missing
+      page.drawText(`• ${text}`, {
+        x: margin,
+        y: currentY,
+        size: 10,
+        font: helvetica,
+        color: textColor,
+      });
+
       currentY -= lineHeight;
     }
 
@@ -599,25 +606,40 @@ async function generateSimplePdf(
   addFooter(funeral2, pageNum++);
 
   // PAGE 13: Financial
+  console.log("PDF Financial keys", {
+    bank_accounts_len: (planData?.bank_accounts || []).length,
+    bank_accounts_keys: Object.keys((planData?.bank_accounts || [])[0] || {}),
+    financial_notes_len: (planData?.financial_notes || "").length,
+  });
+
   const financialPage = pdfDoc.addPage([pageWidth, pageHeight]);
   let finY = addSectionHeader(financialPage, "Financial Life", pageHeight - 80);
-  
+
   const bankList = planData?.bank_accounts || [];
+  const formatBank = (b: any) =>
+    [
+      b.bank_name || b.institution || b.bank || b.name,
+      b.account_type || b.type,
+      b.last4
+        ? `Last4: ${b.last4}`
+        : (b.account_last4 ? `Last4: ${b.account_last4}` : ""),
+      b.beneficiary
+        ? `Ben/POD: ${b.beneficiary}`
+        : (b.pod ? `Ben/POD: ${b.pod}` : ""),
+    ]
+      .filter(Boolean)
+      .join(" | ");
+
   if (bankList.length > 0) {
-    financialPage.drawText("Bank Accounts:", { x: margin, y: finY, size: 10, font: helveticaBold, color: textColor });
+    financialPage.drawText("Bank Accounts:", {
+      x: margin,
+      y: finY,
+      size: 10,
+      font: helveticaBold,
+      color: textColor,
+    });
     finY -= lineHeight;
-    finY = addArrayItems(
-      financialPage,
-      bankList,
-      (b) => [
-        b.bank_name,
-        b.account_type,
-        b.account_number ? `#${b.account_number}` : "",
-        b.pod ? `POD: ${b.pod}` : "",
-      ].filter(Boolean).join(" - "),
-      finY,
-      6,
-    );
+    finY = addArrayItems(financialPage, bankList, formatBank, finY, 6);
     finY -= 10;
   }
   
@@ -812,25 +834,39 @@ async function generateSimplePdf(
   addFooter(digitalPage, pageNum++);
 
   // PAGE 18: Legal
+  console.log("PDF Legal keys", {
+    legal_keys: Object.keys(planData?.legal || {}),
+    executor_name: planData?.legal?.executor_name,
+    legal_notes_len: (planData?.legal_notes || "").length,
+  });
+
   const legalPage = pdfDoc.addPage([pageWidth, pageHeight]);
   let legY = addSectionHeader(legalPage, "Legal Documents", pageHeight - 80);
-  
-  // Render legal document details
+
+  // Render legal document details (support common key variants)
   const legal = planData?.legal || {};
-  if (legal.executor_name) legY = addField(legalPage, "Executor", legal.executor_name, legY);
-  if (legal.executor_phone) legY = addField(legalPage, "Executor Phone", legal.executor_phone, legY);
-  if (legal.executor_email) legY = addField(legalPage, "Executor Email", legal.executor_email, legY);
+  const executorName = legal.executor_name || legal.executor || legal.executorName;
+  const executorPhone = legal.executor_phone || legal.executorPhone;
+  const executorEmail = legal.executor_email || legal.executorEmail;
+  const poaName = legal.poa_name || legal.power_of_attorney || legal.poa || legal.poaName;
+  const poaPhone = legal.poa_phone || legal.poaPhone;
+  const willLoc = legal.will_location || legal.willLocation;
+  const trustLoc = legal.trust_location || legal.trustLocation;
+
+  if (executorName) legY = addField(legalPage, "Executor", executorName, legY);
+  if (executorPhone) legY = addField(legalPage, "Executor Phone", executorPhone, legY);
+  if (executorEmail) legY = addField(legalPage, "Executor Email", executorEmail, legY);
   if (legal.alternate_executor) legY = addField(legalPage, "Alternate Executor", legal.alternate_executor, legY);
   legY -= 10;
-  
-  if (legal.poa_name) legY = addField(legalPage, "Power of Attorney", legal.poa_name, legY);
-  if (legal.poa_phone) legY = addField(legalPage, "POA Phone", legal.poa_phone, legY);
+
+  if (poaName) legY = addField(legalPage, "Power of Attorney", poaName, legY);
+  if (poaPhone) legY = addField(legalPage, "POA Phone", poaPhone, legY);
   if (legal.healthcare_proxy) legY = addField(legalPage, "Healthcare Proxy", legal.healthcare_proxy, legY);
   if (legal.healthcare_proxy_phone) legY = addField(legalPage, "Proxy Phone", legal.healthcare_proxy_phone, legY);
   legY -= 10;
-  
-  if (legal.will_location) legY = addField(legalPage, "Will Location", legal.will_location, legY);
-  if (legal.trust_location) legY = addField(legalPage, "Trust Location", legal.trust_location, legY);
+
+  if (willLoc) legY = addField(legalPage, "Will Location", willLoc, legY);
+  if (trustLoc) legY = addField(legalPage, "Trust Location", trustLoc, legY);
   if (legal.poa_document_location) legY = addField(legalPage, "POA Document Location", legal.poa_document_location, legY);
   if (legal.living_will_location) legY = addField(legalPage, "Living Will Location", legal.living_will_location, legY);
   if (legal.safe_deposit_location) legY = addField(legalPage, "Safe Deposit Box", legal.safe_deposit_location, legY);
