@@ -1243,6 +1243,36 @@ export type Database = {
           },
         ]
       }
+      generated_documents: {
+        Row: {
+          created_at: string
+          doc_type: string
+          id: string
+          plan_id: string
+          storage_bucket: string
+          storage_path: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          doc_type: string
+          id?: string
+          plan_id: string
+          storage_bucket: string
+          storage_path: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          doc_type?: string
+          id?: string
+          plan_id?: string
+          storage_bucket?: string
+          storage_path?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       insurance_policies: {
         Row: {
           company: string
@@ -1821,6 +1851,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      plan_section_selections: {
+        Row: {
+          created_at: string
+          id: string
+          is_selected: boolean
+          plan_id: string
+          section_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_selected?: boolean
+          plan_id: string
+          section_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_selected?: boolean
+          plan_id?: string
+          section_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       plans: {
         Row: {
