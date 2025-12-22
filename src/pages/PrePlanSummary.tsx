@@ -44,6 +44,7 @@ import { ReminderEmailOptIn } from "@/components/summary/ReminderEmailOptIn";
 import { PdfReadinessModal, PdfReadinessBadge } from "@/components/summary/PdfReadinessModal";
 import { usePdfValidation } from "@/hooks/usePdfValidation";
 import { SETTINGS_DEFAULT } from "@/lib/sections";
+import { useActivePlan, fetchPlanData } from "@/hooks/useActivePlan";
 
 interface SectionData {
   id: string;
@@ -60,7 +61,10 @@ export default function PrePlanSummary() {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   
-  const [loading, setLoading] = useState(true);
+  // Use the unified active plan hook - SINGLE SOURCE OF TRUTH
+  const { loading: planLoading, planId, orgId, plan: activePlan, error: planError } = useActivePlan();
+  
+  const [dataLoading, setDataLoading] = useState(true);
   const [planData, setPlanData] = useState<any>(null);
   const [sections, setSections] = useState<SectionData[]>([]);
   const [showPIIDialog, setShowPIIDialog] = useState(false);
@@ -72,6 +76,9 @@ export default function PrePlanSummary() {
   const [contacts, setContacts] = useState<any[]>([]);
   const [showFirstTimeHelper, setShowFirstTimeHelper] = useState(false);
   const [selectedSections, setSelectedSections] = useState<string[]>(SETTINGS_DEFAULT);
+  
+  // Combined loading state
+  const loading = planLoading || dataLoading;
   
   // PDF Validation
   const validationResult = usePdfValidation(
@@ -99,13 +106,18 @@ export default function PrePlanSummary() {
     }
   }, [searchParams, planData]);
 
+  // Load data when planId is available
   useEffect(() => {
-    loadPlanData();
-  }, []);
+    if (!planLoading && planId) {
+      loadPlanData(planId);
+    } else if (!planLoading && !planId) {
+      setDataLoading(false);
+    }
+  }, [planLoading, planId]);
 
-  const loadPlanData = async () => {
+  const loadPlanData = async (activePlanId: string) => {
     try {
-      setLoading(true);
+      setDataLoading(true);
 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -126,7 +138,10 @@ export default function PrePlanSummary() {
         setSelectedSections(settings.selected_sections);
       }
 
-      // 0) Load locally-saved planner data (the planner auto-saves here)
+      // Fetch all plan data using the unified function - SINGLE SOURCE OF TRUTH
+      const data = await fetchPlanData(activePlanId);
+      
+      // Also load localStorage for any unsaved local changes
       let localPlan: any | null = null;
       try {
         const raw = localStorage.getItem(`plan_${user.id}`);
@@ -135,80 +150,27 @@ export default function PrePlanSummary() {
         console.warn("[PrePlanSummary] Failed to parse local plan", e);
       }
 
-      // 1) Try to resolve active plan from the backend (best-effort)
-      const { data: orgMember, error: orgError } = await supabase
-        .from("org_members")
-        .select("org_id")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      let orgId = orgMember?.org_id || null;
-      let activePlan: any | null = null;
-
-      if (orgId) {
-        const { data: plan } = await supabase
-          .from("plans")
-          .select("*")
-          .eq("org_id", orgId)
-          .eq("owner_user_id", user.id)
-          .order("updated_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        activePlan = plan || null;
-      }
-
-      if (!activePlan) {
-        const { data: fallbackPlan } = await supabase
-          .from("plans")
-          .select("*")
-          .eq("owner_user_id", user.id)
-          .order("updated_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        if (fallbackPlan) {
-          activePlan = fallbackPlan;
-          orgId = fallbackPlan.org_id || orgId;
-        }
-      }
-
-      // 2) Merge: local data holds most section fields; DB plan holds note fields + metadata
+      // Merge: DB is source of truth for structured data, localStorage for notes
       const mergedPlan: any = {
         ...(localPlan || {}),
-        ...(activePlan || {}),
-        // Ensure we don't lose identifiers if only one side has them
-        id: activePlan?.id || localPlan?.id,
-        org_id: activePlan?.org_id || localPlan?.org_id,
+        ...(data.plan || {}),
+        id: activePlanId,
+        org_id: orgId,
       };
-
-      // 3) If we have neither local data nor a resolved plan, we truly have nothing to show
-      const hasLocal = !!localPlan;
-      const hasResolvedPlan = !!mergedPlan?.id;
-
-      if (!hasLocal && !hasResolvedPlan) {
-        // Keep structure consistent with existing empty-state behavior
-        setPlanData(null);
-        setSections([]);
-        setProfile(null);
-        setContacts([]);
-        setLastUpdated(null);
-        return;
-      }
 
       setPlanData(mergedPlan);
       setLastUpdated(mergedPlan.updated_at || null);
 
-      // Planner sections are stored in the local plan shape
-      const mergedProfile = mergedPlan.personal_profile || null;
-      const mergedContacts = Array.isArray(mergedPlan.contacts) ? mergedPlan.contacts : [];
-      const mergedMessages = Array.isArray(mergedPlan.messages) ? mergedPlan.messages : [];
-      const mergedPropertyItems = Array.isArray(mergedPlan.property?.items) ? mergedPlan.property.items : [];
+      // Use data from Supabase tables (source of truth)
+      const dbProfile = data.personalProfile;
+      const dbContacts = data.contacts || [];
+      const dbMessages = data.messages || [];
+      const dbProperties = data.properties || [];
+      const dbPets = data.pets || [];
+      const dbInsurance = data.insurance || [];
 
-      setProfile(mergedProfile);
-      setContacts(mergedContacts);
+      setProfile(dbProfile);
+      setContacts(dbContacts);
 
       // Get the user's selected sections from settings
       const userSelectedSections = settings?.selected_sections?.length 
@@ -216,67 +178,67 @@ export default function PrePlanSummary() {
         : SETTINGS_DEFAULT;
       const selectedSet = new Set(userSelectedSections);
 
-      // Build ALL possible sections with content
+      // Build ALL possible sections with content from DB
       const allPossibleSections: SectionData[] = [
         {
           id: "personal",
           label: "Personal & Family Details",
           icon: <User className="h-5 w-5" />,
-          content: mergedProfile ? (
+          content: dbProfile ? (
             <div className="space-y-2 text-sm">
-              {mergedProfile.full_name && (
+              {dbProfile.full_name && (
                 <p>
-                  <strong>Name:</strong> {mergedProfile.full_name}
+                  <strong>Name:</strong> {dbProfile.full_name}
                 </p>
               )}
-              {mergedProfile.address && (
+              {dbProfile.address && (
                 <p>
-                  <strong>Address:</strong> {mergedProfile.address}
+                  <strong>Address:</strong> {dbProfile.address}
                 </p>
               )}
-              {mergedProfile.marital_status && (
+              {dbProfile.marital_status && (
                 <p>
-                  <strong>Marital Status:</strong> {mergedProfile.marital_status}
+                  <strong>Marital Status:</strong> {dbProfile.marital_status}
                 </p>
               )}
-              {mergedProfile.partner_name && (
+              {dbProfile.partner_name && (
                 <p>
-                  <strong>Spouse/Partner:</strong> {mergedProfile.partner_name}
+                  <strong>Spouse/Partner:</strong> {dbProfile.partner_name}
                 </p>
               )}
-              {Array.isArray(mergedProfile.child_names) && mergedProfile.child_names.filter(Boolean).length > 0 && (
+              {Array.isArray(dbProfile.child_names) && dbProfile.child_names.filter(Boolean).length > 0 && (
                 <p>
-                  <strong>Children:</strong> {mergedProfile.child_names.filter(Boolean).join(", ")}
+                  <strong>Children:</strong> {dbProfile.child_names.filter(Boolean).join(", ")}
                 </p>
               )}
             </div>
           ) : null,
-          hasContent: !!mergedProfile?.full_name,
+          hasContent: !!dbProfile?.full_name,
           editRoute: "/preplandashboard?section=personal",
         },
         {
           id: "contacts",
           label: "Key Contacts to Notify",
           icon: <Users className="h-5 w-5" />,
-          content: mergedContacts.length > 0 ? (
+          content: dbContacts.length > 0 ? (
             <div className="space-y-2 text-sm">
               <p>
-                <strong>Contacts:</strong> {mergedContacts.length} saved
+                <strong>Contacts:</strong> {dbContacts.length} saved
               </p>
               <div className="space-y-1">
-                {mergedContacts.slice(0, 5).map((c: any, idx: number) => (
+                {dbContacts.slice(0, 5).map((c: any, idx: number) => (
                   <p key={idx} className="text-muted-foreground">
                     {c?.name || "(Unnamed)"}
                     {c?.relationship ? ` — ${c.relationship}` : ""}
                   </p>
                 ))}
-                {mergedContacts.length > 5 && (
-                  <p className="text-muted-foreground">…and {mergedContacts.length - 5} more</p>
+                {dbContacts.length > 5 && (
+                  <p className="text-muted-foreground">…and {dbContacts.length - 5} more</p>
                 )}
               </div>
             </div>
           ) : null,
-          hasContent: mergedContacts.length > 0,
+          hasContent: dbContacts.length > 0,
           editRoute: "/preplandashboard?section=contacts",
         },
         {
@@ -313,31 +275,31 @@ export default function PrePlanSummary() {
           id: "insurance",
           label: "Insurance (Summary)",
           icon: <Shield className="h-5 w-5" />,
-          content: mergedPlan.insurance?.policies?.length ? (
+          content: dbInsurance.length > 0 ? (
             <p className="text-sm">
-              <strong>Policies:</strong> {mergedPlan.insurance.policies.length} saved
+              <strong>Policies:</strong> {dbInsurance.length} saved
             </p>
           ) : mergedPlan.insurance_notes ? (
             <p className="text-sm">{mergedPlan.insurance_notes}</p>
           ) : null,
-          hasContent: !!mergedPlan.insurance_notes || !!mergedPlan.insurance?.policies?.length,
+          hasContent: !!mergedPlan.insurance_notes || dbInsurance.length > 0,
           editRoute: "/preplandashboard?section=insurance",
         },
         {
           id: "property",
           label: "Property & Valuables",
           icon: <Home className="h-5 w-5" />,
-          content: mergedPropertyItems.length > 0 || mergedPlan.property_notes ? (
+          content: dbProperties.length > 0 || mergedPlan.property_notes ? (
             <div className="space-y-2 text-sm">
-              {mergedPropertyItems.length > 0 && (
+              {dbProperties.length > 0 && (
                 <p>
-                  <strong>Items:</strong> {mergedPropertyItems.length} listed
+                  <strong>Items:</strong> {dbProperties.length} listed
                 </p>
               )}
               {mergedPlan.property_notes && <p>{mergedPlan.property_notes}</p>}
             </div>
           ) : null,
-          hasContent: mergedPropertyItems.length > 0 || !!mergedPlan.property_notes,
+          hasContent: dbProperties.length > 0 || !!mergedPlan.property_notes,
           editRoute: "/preplandashboard?section=property",
         },
         {
@@ -354,10 +316,15 @@ export default function PrePlanSummary() {
           id: "pets",
           label: "Pet Care",
           icon: <Dog className="h-5 w-5" />,
-          content: mergedPlan.pets_notes ? (
-            <p className="text-sm">{mergedPlan.pets_notes}</p>
+          content: dbPets.length > 0 || mergedPlan.pets_notes ? (
+            <div className="space-y-2 text-sm">
+              {dbPets.length > 0 && (
+                <p><strong>Pets:</strong> {dbPets.length} listed</p>
+              )}
+              {mergedPlan.pets_notes && <p>{mergedPlan.pets_notes}</p>}
+            </div>
           ) : null,
-          hasContent: !!mergedPlan.pets_notes,
+          hasContent: dbPets.length > 0 || !!mergedPlan.pets_notes,
           editRoute: "/preplandashboard?section=pets",
         },
         {
@@ -374,18 +341,18 @@ export default function PrePlanSummary() {
           id: "messages",
           label: "Messages to Loved Ones",
           icon: <MessageSquare className="h-5 w-5" />,
-          content: mergedMessages.length > 0 || mergedPlan.to_loved_ones_message || mergedPlan.messages_notes ? (
+          content: dbMessages.length > 0 || mergedPlan.to_loved_ones_message || mergedPlan.messages_notes ? (
             <div className="space-y-2 text-sm">
-              {mergedMessages.length > 0 && (
+              {dbMessages.length > 0 && (
                 <p>
-                  <strong>Messages:</strong> {mergedMessages.length} written
+                  <strong>Messages:</strong> {dbMessages.length} written
                 </p>
               )}
               {mergedPlan.to_loved_ones_message && <p>{mergedPlan.to_loved_ones_message}</p>}
               {mergedPlan.messages_notes && <p>{mergedPlan.messages_notes}</p>}
             </div>
           ) : null,
-          hasContent: mergedMessages.length > 0 || !!mergedPlan.messages_notes || !!mergedPlan.to_loved_ones_message,
+          hasContent: dbMessages.length > 0 || !!mergedPlan.messages_notes || !!mergedPlan.to_loved_ones_message,
           editRoute: "/preplandashboard?section=messages",
         },
       ];
@@ -396,15 +363,13 @@ export default function PrePlanSummary() {
 
       setSections(filteredSections);
 
-      // Helpful console diagnostics (admin debug panel already exists)
-      if (orgError?.message) {
-        console.log("[PrePlanSummary] org_members lookup error:", orgError.message);
-      }
       console.log("[PrePlanSummary] Plan resolution:", {
         userId: user.id,
-        hasLocalPlan: !!localPlan,
-        resolvedOrgId: orgId,
-        resolvedPlanId: mergedPlan?.id || null,
+        planId: activePlanId,
+        orgId,
+        sectionsCount: filteredSections.length,
+        dbContactsCount: dbContacts.length,
+        dbPropertiesCount: dbProperties.length,
       });
     } catch (error) {
       console.error("Error loading plan data:", error);
@@ -414,7 +379,7 @@ export default function PrePlanSummary() {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setDataLoading(false);
     }
   };
 

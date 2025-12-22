@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useActivePlan, fetchPlanData } from "@/hooks/useActivePlan";
 
 interface PlanDataStatus {
   loading: boolean;
@@ -21,9 +22,11 @@ interface PlanDataStatus {
 
 /**
  * Shared hook for checking if user has any planning data.
- * Uses auth-safe loading and fallback resolution for org/plan.
+ * Uses the unified useActivePlan hook as the single source of truth for plan_id.
  */
 export function usePlanDataStatus() {
+  const { loading: planLoading, planId, orgId, plan, error: planError } = useActivePlan();
+  
   const [status, setStatus] = useState<PlanDataStatus>({
     loading: true,
     userId: null,
@@ -44,8 +47,10 @@ export function usePlanDataStatus() {
 
   useEffect(() => {
     const checkData = async () => {
+      // Wait for plan resolution to complete
+      if (planLoading) return;
+
       try {
-        // Step 1: Wait for auth to load
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
           console.log("[usePlanDataStatus] No authenticated user");
@@ -53,71 +58,7 @@ export function usePlanDataStatus() {
           return;
         }
 
-        console.log("[usePlanDataStatus] User ID:", user.id);
-        let orgId: string | null = null;
-        let planId: string | null = null;
-        let debugInfo = "";
-
-        // Step 2A: Primary - Try to get org from org_members
-        const { data: orgMember, error: orgError } = await supabase
-          .from("org_members")
-          .select("org_id")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        if (orgError) {
-          console.log("[usePlanDataStatus] org_members query error:", orgError.message);
-          debugInfo = `org_members error: ${orgError.message}`;
-        }
-
-        if (orgMember?.org_id) {
-          orgId = orgMember.org_id;
-          debugInfo = "Resolved org from org_members";
-          console.log("[usePlanDataStatus] Found org from org_members:", orgId);
-
-          // Get latest plan for this org
-          const { data: plan } = await supabase
-            .from("plans")
-            .select("*")
-            .eq("org_id", orgId)
-            .eq("owner_user_id", user.id)
-            .order("updated_at", { ascending: false })
-            .limit(1)
-            .maybeSingle();
-
-          if (plan) {
-            planId = plan.id;
-            debugInfo += "; found plan by org";
-          }
-        }
-
-        // Step 2B: Fallback - If no org or no plan, try to get plan directly by owner_user_id
-        if (!planId) {
-          console.log("[usePlanDataStatus] Trying fallback: plans by owner_user_id");
-          const { data: fallbackPlan, error: fallbackError } = await supabase
-            .from("plans")
-            .select("*")
-            .eq("owner_user_id", user.id)
-            .order("updated_at", { ascending: false })
-            .limit(1)
-            .maybeSingle();
-
-          if (fallbackError) {
-            console.log("[usePlanDataStatus] Fallback plan query error:", fallbackError.message);
-            debugInfo += `; fallback error: ${fallbackError.message}`;
-          }
-
-          if (fallbackPlan) {
-            planId = fallbackPlan.id;
-            orgId = fallbackPlan.org_id || orgId;
-            debugInfo = "Resolved plan via fallback (owner_user_id)";
-            console.log("[usePlanDataStatus] Fallback found plan:", planId, "org:", orgId);
-          }
-        }
-
-        // If still no plan, set status and return
+        // If no plan found, return early
         if (!planId) {
           console.log("[usePlanDataStatus] No plan found for user");
           setStatus(prev => ({
@@ -126,29 +67,15 @@ export function usePlanDataStatus() {
             userId: user.id,
             orgId,
             planId: null,
-            debugInfo: debugInfo || "No plan found for user",
+            debugInfo: planError || "No plan found for user",
           }));
           return;
         }
 
-        // Step 3: Check related tables for data
-        const [
-          { data: profile },
-          { data: contacts },
-          { data: pets },
-          { data: insurance },
-          { data: properties },
-          { data: messages },
-          { data: plan }
-        ] = await Promise.all([
-          supabase.from("personal_profiles").select("full_name").eq("plan_id", planId).maybeSingle(),
-          supabase.from("contacts_notify").select("id").eq("plan_id", planId),
-          supabase.from("pets").select("id").eq("plan_id", planId),
-          supabase.from("insurance_policies").select("id").eq("plan_id", planId),
-          supabase.from("properties").select("id").eq("plan_id", planId),
-          supabase.from("messages").select("id").eq("plan_id", planId),
-          supabase.from("plans").select("*").eq("id", planId).maybeSingle()
-        ]);
+        console.log("[usePlanDataStatus] Using planId from useActivePlan:", planId);
+
+        // Fetch plan data using the unified function
+        const data = await fetchPlanData(planId);
 
         // Count plan notes that have content
         const noteFields = [
@@ -157,17 +84,17 @@ export function usePlanDataStatus() {
           'property_notes', 'pets_notes', 'digital_notes', 'legal_notes',
           'messages_notes', 'to_loved_ones_message'
         ];
-        const planNotesCount = plan ? noteFields.filter(
-          field => plan[field] && String(plan[field]).trim().length > 0
+        const planNotesCount = data.plan ? noteFields.filter(
+          field => data.plan[field] && String(data.plan[field]).trim().length > 0
         ).length : 0;
 
         const counts = {
-          personalProfile: !!profile?.full_name,
-          contacts: contacts?.length || 0,
-          pets: pets?.length || 0,
-          insurance: insurance?.length || 0,
-          properties: properties?.length || 0,
-          messages: messages?.length || 0,
+          personalProfile: !!data.personalProfile?.full_name,
+          contacts: data.contacts?.length || 0,
+          pets: data.pets?.length || 0,
+          insurance: data.insurance?.length || 0,
+          properties: data.properties?.length || 0,
+          messages: data.messages?.length || 0,
           planNotes: planNotesCount,
         };
 
@@ -189,7 +116,7 @@ export function usePlanDataStatus() {
           orgId,
           planId,
           hasAnyData,
-          debugInfo,
+          debugInfo: "Resolved via useActivePlan",
           counts,
         });
       } catch (error) {
@@ -199,7 +126,7 @@ export function usePlanDataStatus() {
     };
 
     checkData();
-  }, []);
+  }, [planLoading, planId, orgId, planError, plan]);
 
   return status;
 }
