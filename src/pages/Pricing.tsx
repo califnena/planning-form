@@ -6,7 +6,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Plus, Minus } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import mascotCouple from "@/assets/mascot-couple.png";
 import { launchCheckout } from "@/lib/checkoutLauncher";
 import { supabase } from "@/integrations/supabase/client";
@@ -103,14 +102,13 @@ const Pricing = () => {
   const navigate = useNavigate();
   const planCardsRef = useRef<HTMLDivElement>(null);
   const [textSize, setTextSize] = useState<number>(100);
-  const [loadingCheckout, setLoadingCheckout] = useState(false);
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [loadingPrices, setLoadingPrices] = useState(true);
   const [stripePrices, setStripePrices] = useState<StripePricesMap>({});
   const [recommendedPlan, setRecommendedPlan] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [currentPlanId, setCurrentPlanId] = useState<string | null>(null);
   const [currentPlanName, setCurrentPlanName] = useState<string | null>(null);
-  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState<boolean>(true);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
@@ -260,24 +258,17 @@ const Pricing = () => {
     localStorage.setItem("landing_text_size", newSize.toString());
   };
 
-  const handleSelectPlan = (planId: string) => {
-    setSelectedPlanId(planId);
-  };
-
-  const handleContinueToCheckout = async () => {
-    const plan = plans.find(p => p.id === selectedPlanId);
-    if (!plan) return;
-    
+  const handleChoosePlan = async (plan: typeof plans[0]) => {
     const successUrl = `${window.location.origin}${plan.successPath}`;
     const cancelUrl = window.location.href;
-    setLoadingCheckout(true);
+    setLoadingPlan(plan.id);
     await launchCheckout({
       lookupKey: plan.lookupKey,
       successUrl,
       cancelUrl,
       navigate,
       onLoadingChange: (loading) => {
-        if (!loading) setLoadingCheckout(false);
+        if (!loading) setLoadingPlan(null);
       },
     });
   };
@@ -407,26 +398,15 @@ const Pricing = () => {
                   <Loader2 className="h-4 w-4 animate-spin" />
                 </span>
               ) : getDisplayedPrice(plan.lookupKey);
+              const isBuying = loadingPlan === plan.id;
               const isRecommended = recommendedPlan === plan.id;
               const isCurrentPlan = currentPlanId === plan.id;
-              const isSelected = selectedPlanId === plan.id;
 
               return (
                 <Card 
                   key={plan.id} 
-                  onClick={() => handleSelectPlan(plan.id)}
-                  className={`relative flex flex-col cursor-pointer transition-all ${
-                    isSelected ? "border-primary border-2 ring-2 ring-primary/30" : ""
-                  } ${plan.featured && !isSelected ? "border-primary/50 border-2" : ""} ${
-                    isCurrentPlan && !isSelected ? "ring-2 ring-primary/20" : ""
-                  } hover:border-primary/70`}
+                  className={`relative flex flex-col ${plan.featured ? "border-primary border-2" : ""} ${isCurrentPlan ? "ring-2 ring-primary/20" : ""}`}
                 >
-                  {/* Selected Indicator */}
-                  {isSelected && (
-                    <div className="absolute top-3 right-3">
-                      <CheckCircle className="h-6 w-6 text-primary fill-primary/20" />
-                    </div>
-                  )}
                   {/* Current Plan Badge */}
                   {isCurrentPlan && (
                     <Badge 
@@ -465,29 +445,27 @@ const Pricing = () => {
                         </li>
                       ))}
                     </ul>
+                    
+                    <Button 
+                      className="w-full" 
+                      size="lg"
+                      variant={plan.featured ? "default" : "outline"}
+                      onClick={() => handleChoosePlan(plan)}
+                      disabled={isBuying || loadingPrices}
+                    >
+                      {isBuying ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        plan.buttonLabel
+                      )}
+                    </Button>
                   </CardContent>
                 </Card>
               );
             })}
-          </div>
-
-          {/* Continue to Checkout Button */}
-          <div className="flex justify-center pt-4">
-            <Button 
-              size="lg"
-              className="text-lg px-8 py-6"
-              onClick={handleContinueToCheckout}
-              disabled={!selectedPlanId || loadingCheckout || loadingPrices}
-            >
-              {loadingCheckout ? (
-                <>
-                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  Loading...
-                </>
-              ) : (
-                "👉 Continue to Secure Checkout"
-              )}
-            </Button>
           </div>
 
           {/* Comparison Table */}
