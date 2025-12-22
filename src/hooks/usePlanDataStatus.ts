@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useActivePlan, fetchPlanData } from "@/hooks/useActivePlan";
 
 interface PlanDataStatus {
   loading: boolean;
@@ -22,11 +21,9 @@ interface PlanDataStatus {
 
 /**
  * Shared hook for checking if user has any planning data.
- * Uses the unified useActivePlan hook as the single source of truth for plan_id.
+ * Self-contained to avoid hook ordering issues.
  */
 export function usePlanDataStatus() {
-  const { loading: planLoading, planId, orgId, plan, error: planError } = useActivePlan();
-  
   const [status, setStatus] = useState<PlanDataStatus>({
     loading: true,
     userId: null,
@@ -47,58 +44,103 @@ export function usePlanDataStatus() {
 
   useEffect(() => {
     const checkData = async () => {
-      // Wait for plan resolution to complete
-      if (planLoading) return;
-
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-          console.log("[usePlanDataStatus] No authenticated user");
           setStatus(prev => ({ ...prev, loading: false, debugInfo: "No authenticated user" }));
           return;
         }
 
-        // If no plan found, return early
+        let orgId: string | null = null;
+        let planId: string | null = null;
+
+        // Get org membership
+        const { data: orgMember } = await supabase
+          .from("org_members")
+          .select("org_id")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (orgMember?.org_id) {
+          orgId = orgMember.org_id;
+          const { data: plan } = await supabase
+            .from("plans")
+            .select("*")
+            .eq("org_id", orgId)
+            .eq("owner_user_id", user.id)
+            .order("updated_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (plan) planId = plan.id;
+        }
+
+        // Fallback
         if (!planId) {
-          console.log("[usePlanDataStatus] No plan found for user");
+          const { data: fallbackPlan } = await supabase
+            .from("plans")
+            .select("*")
+            .eq("owner_user_id", user.id)
+            .order("updated_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (fallbackPlan) {
+            planId = fallbackPlan.id;
+            orgId = fallbackPlan.org_id || orgId;
+          }
+        }
+
+        if (!planId) {
           setStatus(prev => ({
             ...prev,
             loading: false,
             userId: user.id,
             orgId,
-            planId: null,
-            debugInfo: planError || "No plan found for user",
+            debugInfo: "No plan found",
           }));
           return;
         }
 
-        console.log("[usePlanDataStatus] Using planId from useActivePlan:", planId);
+        // Fetch counts
+        const [
+          { data: profile },
+          { data: contacts },
+          { data: pets },
+          { data: insurance },
+          { data: properties },
+          { data: messages },
+          { data: plan }
+        ] = await Promise.all([
+          supabase.from("personal_profiles").select("full_name").eq("plan_id", planId).maybeSingle(),
+          supabase.from("contacts_notify").select("id").eq("plan_id", planId),
+          supabase.from("pets").select("id").eq("plan_id", planId),
+          supabase.from("insurance_policies").select("id").eq("plan_id", planId),
+          supabase.from("properties").select("id").eq("plan_id", planId),
+          supabase.from("messages").select("id").eq("plan_id", planId),
+          supabase.from("plans").select("*").eq("id", planId).maybeSingle()
+        ]);
 
-        // Fetch plan data using the unified function
-        const data = await fetchPlanData(planId);
-
-        // Count plan notes that have content
         const noteFields = [
           'instructions_notes', 'about_me_notes', 'checklist_notes',
           'funeral_wishes_notes', 'financial_notes', 'insurance_notes',
           'property_notes', 'pets_notes', 'digital_notes', 'legal_notes',
           'messages_notes', 'to_loved_ones_message'
         ];
-        const planNotesCount = data.plan ? noteFields.filter(
-          field => data.plan[field] && String(data.plan[field]).trim().length > 0
+        const planNotesCount = plan ? noteFields.filter(
+          field => plan[field] && String(plan[field]).trim().length > 0
         ).length : 0;
 
         const counts = {
-          personalProfile: !!data.personalProfile?.full_name,
-          contacts: data.contacts?.length || 0,
-          pets: data.pets?.length || 0,
-          insurance: data.insurance?.length || 0,
-          properties: data.properties?.length || 0,
-          messages: data.messages?.length || 0,
+          personalProfile: !!profile?.full_name,
+          contacts: contacts?.length || 0,
+          pets: pets?.length || 0,
+          insurance: insurance?.length || 0,
+          properties: properties?.length || 0,
+          messages: messages?.length || 0,
           planNotes: planNotesCount,
         };
 
-        // Has data if ANY of these are true
         const hasAnyData =
           counts.personalProfile ||
           counts.contacts > 0 ||
@@ -108,15 +150,13 @@ export function usePlanDataStatus() {
           counts.messages > 0 ||
           counts.planNotes > 0;
 
-        console.log("[usePlanDataStatus] Counts:", counts, "hasAnyData:", hasAnyData);
-
         setStatus({
           loading: false,
           userId: user.id,
           orgId,
           planId,
           hasAnyData,
-          debugInfo: "Resolved via useActivePlan",
+          debugInfo: "Resolved",
           counts,
         });
       } catch (error) {
@@ -126,7 +166,7 @@ export function usePlanDataStatus() {
     };
 
     checkData();
-  }, [planLoading, planId, orgId, planError, plan]);
+  }, []);
 
   return status;
 }
