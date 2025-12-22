@@ -152,9 +152,9 @@ serve(async (req) => {
     const templateResponse = await fetch(templateUrl);
     
     if (!templateResponse.ok) {
-      console.log('Template not found in storage (status:', templateResponse.status, '), will generate from scratch');
-      // Fall back to generating a simple PDF without template
-      return await generateSimplePdf(planData, selectedSections, piiData, user.id, supabase, corsHeaders);
+      console.log('Template not found in storage (status:', templateResponse.status, '), generating full 23-page fallback PDF');
+      // Generate comprehensive 23-page PDF matching blank form structure
+      return await generateSimplePdf(planData, selectedSections, piiData, user.id, supabase, corsHeaders, isDraft);
     }
 
     const templateBytes = await templateResponse.arrayBuffer();
@@ -496,14 +496,15 @@ serve(async (req) => {
   }
 });
 
-// Fallback function to generate a simple PDF without template
+// Fallback function to generate a FULL 23-page PDF matching blank form layout
 async function generateSimplePdf(
   planData: any, 
   selectedSections: string[], 
   piiData: any,
   userId: string,
   supabase: any,
-  corsHeaders: Record<string, string>
+  corsHeaders: Record<string, string>,
+  isDraft: boolean = false
 ) {
   const pdfDoc = await PDFDocument.create();
   const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -512,204 +513,452 @@ async function generateSimplePdf(
   const pageWidth = 612;
   const pageHeight = 792;
   const margin = 50;
+  const lineHeight = 16;
   
-  // Add cover page
-  let page = pdfDoc.addPage([pageWidth, pageHeight]);
-  let y = pageHeight - 100;
-  
-  // Title
-  page.drawText('My Life & Legacy Planner', {
-    x: margin,
-    y,
-    size: 28,
-    font: helveticaBold,
-    color: rgb(0.1, 0.18, 0.27),
-  });
-  
-  y -= 40;
-  page.drawText('End-of-Life Planning Guide', {
-    x: margin,
-    y,
-    size: 14,
-    font: helvetica,
-    color: rgb(0.27, 0.27, 0.27),
-  });
-  
-  y -= 60;
   const profile = { ...(planData.personal_profile || {}), ...(piiData || {}) };
-  if (profile.full_name) {
-    page.drawText(`Prepared for: ${profile.full_name}`, {
-      x: margin,
-      y,
-      size: 16,
-      font: helveticaBold,
-      color: rgb(0.1, 0.1, 0.1),
-    });
-  }
+  const textColor = rgb(0.15, 0.15, 0.15);
+  const headerColor = rgb(0.05, 0.35, 0.35);
   
-  y -= 30;
-  page.drawText(`Generated: ${new Date().toLocaleDateString()}`, {
-    x: margin,
-    y,
-    size: 12,
-    font: helvetica,
-    color: rgb(0.4, 0.4, 0.4),
-  });
-  
-  // Footer
-  page.drawText('For planning purposes only. Not a legal document.', {
-    x: margin,
-    y: 50,
-    size: 9,
-    font: helvetica,
-    color: rgb(0.5, 0.5, 0.5),
-  });
-  
-  page.drawText('Provided by Everlasting Funeral Advisors', {
-    x: margin,
-    y: 35,
-    size: 9,
-    font: helvetica,
-    color: rgb(0.5, 0.5, 0.5),
-  });
-
-  // Helper to sanitize text for PDF (remove special chars that WinAnsi can't encode)
+  // Helper to sanitize text for PDF
   const sanitizeForPdf = (text: string): string => {
     if (!text) return '';
-    return text
-      .replace(/[\r\n]+/g, ' ') // Replace newlines with spaces
-      .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
-      .replace(/[\u2018\u2019]/g, "'") // Smart quotes
+    return String(text)
+      .replace(/[\r\n]+/g, ' ')
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+      .replace(/[\u2018\u2019]/g, "'")
       .replace(/[\u201C\u201D]/g, '"')
-      .replace(/\u2013|\u2014/g, '-') // Em/en dashes
-      .replace(/\u2026/g, '...') // Ellipsis
-      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '') // Emojis
-      .replace(/[\u{2600}-\u{26FF}]/gu, '') // Misc symbols
-      .replace(/[\u{2700}-\u{27BF}]/gu, '') // Dingbats
+      .replace(/\u2013|\u2014/g, '-')
+      .replace(/\u2026/g, '...')
+      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+      .replace(/[\u{2600}-\u{26FF}]/gu, '')
+      .replace(/[\u{2700}-\u{27BF}]/gu, '')
       .trim();
   };
 
-  // Helper to add content page
-  const addContentPage = (title: string, content: string | null) => {
-    if (!content) return;
-    
-    const newPage = pdfDoc.addPage([pageWidth, pageHeight]);
-    let currentY = pageHeight - 60;
-    
-    // Title
-    newPage.drawText(sanitizeForPdf(title), {
-      x: margin,
-      y: currentY,
-      size: 18,
-      font: helveticaBold,
-      color: rgb(0.05, 0.46, 0.46),
-    });
-    
-    currentY -= 30;
-    
-    // Content - sanitize and split by spaces
-    const sanitizedContent = sanitizeForPdf(content);
-    const words = sanitizedContent.split(' ').filter(w => w.length > 0);
-    let line = '';
-    const maxWidth = pageWidth - (margin * 2);
+  // Helper to wrap text
+  const wrapText = (text: string, maxWidth: number, fontSize: number): string[] => {
+    const sanitized = sanitizeForPdf(text);
+    const words = sanitized.split(' ').filter(w => w.length > 0);
+    const lines: string[] = [];
+    let currentLine = '';
     
     for (const word of words) {
-      const sanitizedWord = sanitizeForPdf(word);
-      if (!sanitizedWord) continue;
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      const testWidth = helvetica.widthOfTextAtSize(testLine, fontSize);
       
-      const testLine = line ? `${line} ${sanitizedWord}` : sanitizedWord;
-      const width = helvetica.widthOfTextAtSize(testLine, 11);
-      
-      if (width > maxWidth && line) {
-        newPage.drawText(line, {
-          x: margin,
-          y: currentY,
-          size: 11,
-          font: helvetica,
-          color: rgb(0.2, 0.2, 0.2),
-        });
-        currentY -= 15;
-        line = sanitizedWord;
-        
-        if (currentY < 80) break;
+      if (testWidth > maxWidth && currentLine) {
+        lines.push(currentLine);
+        currentLine = word;
       } else {
-        line = testLine;
+        currentLine = testLine;
       }
     }
-    
-    if (line && currentY >= 80) {
-      newPage.drawText(line, {
-        x: margin,
-        y: currentY,
-        size: 11,
-        font: helvetica,
-        color: rgb(0.2, 0.2, 0.2),
+    if (currentLine) lines.push(currentLine);
+    return lines;
+  };
+
+  // Helper to add draft watermark
+  const addDraftWatermark = (page: any) => {
+    if (isDraft) {
+      page.drawText('DRAFT', {
+        x: 200,
+        y: 400,
+        size: 72,
+        font: helveticaBold,
+        color: rgb(0.92, 0.92, 0.92),
+        opacity: 0.5,
       });
     }
-    
-    // Footer
-    newPage.drawText('For planning purposes only. Not a legal document.', {
-      x: margin,
-      y: 50,
-      size: 9,
-      font: helvetica,
-      color: rgb(0.5, 0.5, 0.5),
+  };
+
+  // Helper to add page footer
+  const addFooter = (page: any, pageNum: number) => {
+    page.drawText('For planning purposes only. Not a legal document.', {
+      x: margin, y: 40, size: 9, font: helvetica, color: rgb(0.5, 0.5, 0.5),
+    });
+    page.drawText(`Page ${pageNum}`, {
+      x: pageWidth - margin - 40, y: 40, size: 9, font: helvetica, color: rgb(0.5, 0.5, 0.5),
     });
   };
 
-  // Add sections based on selection
-  if (selectedSections.includes('personal') && profile.full_name) {
-    const personalContent = [
-      profile.full_name && `Name: ${profile.full_name}`,
-      profile.address && `Address: ${profile.address}`,
-      profile.phone && `Phone: ${profile.phone}`,
-      profile.email && `Email: ${profile.email}`,
-      profile.dob && `Date of Birth: ${profile.dob}`,
-      profile.birthplace && `Place of Birth: ${profile.birthplace}`,
-      profile.marital_status && `Marital Status: ${profile.marital_status}`,
-      profile.partner_name && `Spouse/Partner: ${profile.partner_name}`,
-    ].filter(Boolean).join(' | '); // Use pipe separator instead of newlines
-    
-    if (personalContent) {
-      addContentPage('My Personal Information', personalContent);
+  // Helper to add section header
+  const addSectionHeader = (page: any, title: string, y: number): number => {
+    page.drawText(sanitizeForPdf(title), {
+      x: margin, y, size: 16, font: helveticaBold, color: headerColor,
+    });
+    return y - 30;
+  };
+
+  // Helper to add labeled field
+  const addField = (page: any, label: string, value: string, y: number): number => {
+    page.drawText(`${label}:`, {
+      x: margin, y, size: 10, font: helveticaBold, color: textColor,
+    });
+    if (value) {
+      page.drawText(sanitizeForPdf(value), {
+        x: margin + 120, y, size: 10, font: helvetica, color: textColor,
+      });
     }
+    return y - lineHeight;
+  };
+
+  // Helper to add array items
+  const addArrayItems = (page: any, items: any[], formatter: (item: any) => string, y: number, maxItems: number = 6): number => {
+    let currentY = y;
+    const displayItems = items.slice(0, maxItems);
+    
+    for (const item of displayItems) {
+      const text = sanitizeForPdf(formatter(item));
+      if (text && currentY > 80) {
+        page.drawText(`• ${text}`, {
+          x: margin, y: currentY, size: 10, font: helvetica, color: textColor,
+        });
+        currentY -= lineHeight;
+      }
+    }
+    
+    if (items.length > maxItems) {
+      page.drawText(`... and ${items.length - maxItems} more`, {
+        x: margin, y: currentY, size: 9, font: helvetica, color: rgb(0.4, 0.4, 0.4),
+      });
+      currentY -= lineHeight;
+    }
+    
+    return currentY;
+  };
+
+  // Helper to add notes box
+  const addNotesBox = (page: any, label: string, notes: string, y: number): number => {
+    let currentY = y;
+    if (!notes) return currentY;
+    
+    page.drawText(`${label}:`, {
+      x: margin, y: currentY, size: 10, font: helveticaBold, color: textColor,
+    });
+    currentY -= lineHeight;
+    
+    const lines = wrapText(notes, pageWidth - margin * 2, 10);
+    for (const line of lines.slice(0, 8)) {
+      if (currentY > 80) {
+        page.drawText(line, {
+          x: margin, y: currentY, size: 10, font: helvetica, color: textColor,
+        });
+        currentY -= 14;
+      }
+    }
+    
+    return currentY - 10;
+  };
+
+  let pageNum = 1;
+
+  // PAGE 1: Cover
+  const coverPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  coverPage.drawText('My Life & Legacy Planner', {
+    x: margin, y: pageHeight - 120, size: 32, font: helveticaBold, color: headerColor,
+  });
+  coverPage.drawText('A Complete Guide for End-of-Life Planning', {
+    x: margin, y: pageHeight - 160, size: 14, font: helvetica, color: textColor,
+  });
+  if (profile.full_name) {
+    coverPage.drawText(`Prepared for: ${sanitizeForPdf(profile.full_name)}`, {
+      x: margin, y: pageHeight - 220, size: 16, font: helveticaBold, color: textColor,
+    });
+  }
+  coverPage.drawText(`Generated: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, {
+    x: margin, y: pageHeight - 250, size: 12, font: helvetica, color: rgb(0.4, 0.4, 0.4),
+  });
+  addDraftWatermark(coverPage);
+  addFooter(coverPage, pageNum++);
+
+  // PAGE 2: Table of Contents
+  const tocPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  let tocY = addSectionHeader(tocPage, 'Table of Contents', pageHeight - 80);
+  const sections = [
+    'Checklist', 'Instructions', 'Personal Information', 'Life Story & Legacy',
+    'Contacts to Notify', 'Service Providers', 'Funeral & Memorial Wishes',
+    'Financial Life', 'Insurance Policies', 'Property & Valuables', 'Pets',
+    'Digital Accounts', 'Legal Documents', 'Messages to Loved Ones', 'Revisions'
+  ];
+  for (let i = 0; i < sections.length; i++) {
+    tocPage.drawText(`${i + 3}. ${sections[i]}`, {
+      x: margin, y: tocY, size: 11, font: helvetica, color: textColor,
+    });
+    tocY -= 20;
+  }
+  addDraftWatermark(tocPage);
+  addFooter(tocPage, pageNum++);
+
+  // PAGE 3: Checklist
+  const checklistPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  let checkY = addSectionHeader(checklistPage, 'Planning Checklist', pageHeight - 80);
+  const checkItems = [
+    'Complete personal information', 'List contacts to notify',
+    'Document funeral wishes', 'Record financial accounts',
+    'List insurance policies', 'Document property and valuables',
+    'Arrange pet care', 'List digital accounts',
+    'Gather legal documents', 'Write messages to loved ones'
+  ];
+  for (const item of checkItems) {
+    checklistPage.drawText(`☐ ${item}`, {
+      x: margin, y: checkY, size: 11, font: helvetica, color: textColor,
+    });
+    checkY -= 22;
+  }
+  addDraftWatermark(checklistPage);
+  addFooter(checklistPage, pageNum++);
+
+  // PAGE 4: Instructions
+  const instructionsPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  let instrY = addSectionHeader(instructionsPage, 'How to Use This Document', pageHeight - 80);
+  instrY = addNotesBox(instructionsPage, 'Instructions', planData.instructions_notes || 
+    'This document contains important information about your wishes and affairs. Store it in a safe place and inform your loved ones of its location.', instrY);
+  addDraftWatermark(instructionsPage);
+  addFooter(instructionsPage, pageNum++);
+
+  // PAGE 5-6: Personal Information
+  const personal1 = pdfDoc.addPage([pageWidth, pageHeight]);
+  let pY = addSectionHeader(personal1, 'Personal Information', pageHeight - 80);
+  pY = addField(personal1, 'Full Legal Name', profile.full_name || '', pY);
+  pY = addField(personal1, 'Nicknames', profile.nicknames || '', pY);
+  pY = addField(personal1, 'Maiden Name', profile.maiden_name || '', pY);
+  pY = addField(personal1, 'Date of Birth', profile.dob || profile.date_of_birth || '', pY);
+  pY = addField(personal1, 'Place of Birth', profile.birthplace || profile.place_of_birth || '', pY);
+  if (piiData?.ssn) pY = addField(personal1, 'SSN', piiData.ssn, pY);
+  pY = addField(personal1, 'Citizenship', profile.citizenship || '', pY);
+  pY -= 10;
+  pY = addField(personal1, 'Address', profile.address || '', pY);
+  pY = addField(personal1, 'Phone', profile.phone || '', pY);
+  pY = addField(personal1, 'Email', profile.email || '', pY);
+  pY -= 10;
+  pY = addField(personal1, 'Marital Status', profile.marital_status || '', pY);
+  pY = addField(personal1, 'Spouse/Partner', profile.partner_name || '', pY);
+  pY = addField(personal1, 'Religion', profile.religion || '', pY);
+  addDraftWatermark(personal1);
+  addFooter(personal1, pageNum++);
+
+  const personal2 = pdfDoc.addPage([pageWidth, pageHeight]);
+  pY = addSectionHeader(personal2, 'Family Information', pageHeight - 80);
+  pY = addField(personal2, 'Father', profile.father_name || '', pY);
+  pY = addField(personal2, 'Mother', profile.mother_name || '', pY);
+  pY = addField(personal2, 'Ex-Spouse', profile.ex_spouse_name || '', pY);
+  if (profile.child_names?.length) {
+    pY = addField(personal2, 'Children', profile.child_names.join(', '), pY);
+  }
+  addDraftWatermark(personal2);
+  addFooter(personal2, pageNum++);
+
+  // PAGE 7: Life Story & Legacy
+  const legacyPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  let legacyY = addSectionHeader(legacyPage, 'My Life Story & Legacy', pageHeight - 80);
+  legacyY = addNotesBox(legacyPage, 'About Me', planData.about_me_notes || '', legacyY);
+  addDraftWatermark(legacyPage);
+  addFooter(legacyPage, pageNum++);
+
+  // PAGE 8-9: Contacts to Notify
+  const contacts1 = pdfDoc.addPage([pageWidth, pageHeight]);
+  let cY = addSectionHeader(contacts1, 'People to Notify', pageHeight - 80);
+  const contactsList = planData.contacts_notify || [];
+  cY = addArrayItems(contacts1, contactsList, (c) => 
+    [c.name, c.relationship ? `(${c.relationship})` : '', c.contact || c.phone || c.email].filter(Boolean).join(' - '),
+    cY, 12
+  );
+  addDraftWatermark(contacts1);
+  addFooter(contacts1, pageNum++);
+
+  const contacts2 = pdfDoc.addPage([pageWidth, pageHeight]);
+  cY = addSectionHeader(contacts2, 'Professional Contacts', pageHeight - 80);
+  const professionalList = planData.contacts_professional || [];
+  cY = addArrayItems(contacts2, professionalList, (c) => 
+    [c.role, c.name, c.company, c.contact].filter(Boolean).join(' - '),
+    cY, 12
+  );
+  addDraftWatermark(contacts2);
+  addFooter(contacts2, pageNum++);
+
+  // PAGE 10: Service Providers (Vendors)
+  const vendorsPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  let vY = addSectionHeader(vendorsPage, 'Service Providers', pageHeight - 80);
+  vY = addNotesBox(vendorsPage, 'Notes', 'Record any service providers, funeral homes, or other vendors here.', vY);
+  addDraftWatermark(vendorsPage);
+  addFooter(vendorsPage, pageNum++);
+
+  // PAGE 11-12: Funeral & Memorial Wishes
+  const funeral1 = pdfDoc.addPage([pageWidth, pageHeight]);
+  let fY = addSectionHeader(funeral1, 'Funeral & Memorial Wishes', pageHeight - 80);
+  fY = addNotesBox(funeral1, 'My Wishes', planData.funeral_wishes_notes || '', fY);
+  const funding = planData.funeral_funding || [];
+  if (funding.length > 0) {
+    fY -= 20;
+    funeral1.drawText('Funding Sources:', { x: margin, y: fY, size: 10, font: helveticaBold, color: textColor });
+    fY -= lineHeight;
+    fY = addArrayItems(funeral1, funding, (f) => [f.source, f.account].filter(Boolean).join(' - '), fY, 4);
+  }
+  addDraftWatermark(funeral1);
+  addFooter(funeral1, pageNum++);
+
+  const funeral2 = pdfDoc.addPage([pageWidth, pageHeight]);
+  fY = addSectionHeader(funeral2, 'Service Details (continued)', pageHeight - 80);
+  addDraftWatermark(funeral2);
+  addFooter(funeral2, pageNum++);
+
+  // PAGE 13: Financial Life
+  const financialPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  let finY = addSectionHeader(financialPage, 'Financial Life', pageHeight - 80);
+  finY = addNotesBox(financialPage, 'Financial Notes', planData.financial_notes || '', finY);
+  const bankList = planData.bank_accounts || [];
+  if (bankList.length > 0) {
+    finY -= 10;
+    financialPage.drawText('Bank Accounts:', { x: margin, y: finY, size: 10, font: helveticaBold, color: textColor });
+    finY -= lineHeight;
+    finY = addArrayItems(financialPage, bankList, (b) => 
+      [b.bank_name, b.account_type, b.pod ? `POD: ${b.pod}` : ''].filter(Boolean).join(' - '),
+      finY, 6
+    );
+  }
+  const investList = planData.investments || [];
+  if (investList.length > 0) {
+    finY -= 10;
+    financialPage.drawText('Investments:', { x: margin, y: finY, size: 10, font: helveticaBold, color: textColor });
+    finY -= lineHeight;
+    finY = addArrayItems(financialPage, investList, (i) => 
+      [i.brokerage, i.account_type].filter(Boolean).join(' - '),
+      finY, 4
+    );
+  }
+  addDraftWatermark(financialPage);
+  addFooter(financialPage, pageNum++);
+
+  // PAGE 14: Insurance Policies
+  const insurancePage = pdfDoc.addPage([pageWidth, pageHeight]);
+  let insY = addSectionHeader(insurancePage, 'Insurance Policies', pageHeight - 80);
+  insY = addNotesBox(insurancePage, 'Notes', planData.insurance_notes || '', insY);
+  const insuranceList = planData.insurance_policies || [];
+  if (insuranceList.length > 0) {
+    insY -= 10;
+    insY = addArrayItems(insurancePage, insuranceList, (p) => 
+      [p.company, p.type, p.policy_number ? `#${p.policy_number}` : '', p.contact_person].filter(Boolean).join(' - '),
+      insY, 10
+    );
+  }
+  addDraftWatermark(insurancePage);
+  addFooter(insurancePage, pageNum++);
+
+  // PAGE 15: Property & Valuables
+  const propertyPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  let propY = addSectionHeader(propertyPage, 'Property & Valuables', pageHeight - 80);
+  propY = addNotesBox(propertyPage, 'Notes', planData.property_notes || '', propY);
+  const propList = planData.properties || [];
+  if (propList.length > 0) {
+    propY -= 10;
+    propY = addArrayItems(propertyPage, propList, (p) => 
+      [p.address, p.kind, p.mortgage_bank ? `Lender: ${p.mortgage_bank}` : ''].filter(Boolean).join(' - '),
+      propY, 8
+    );
+  }
+  addDraftWatermark(propertyPage);
+  addFooter(propertyPage, pageNum++);
+
+  // PAGE 16: Pets
+  const petsPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  let petY = addSectionHeader(petsPage, 'Pets', pageHeight - 80);
+  petY = addNotesBox(petsPage, 'Notes', planData.pets_notes || '', petY);
+  const petsList = planData.pets || [];
+  if (petsList.length > 0) {
+    petY -= 10;
+    petY = addArrayItems(petsPage, petsList, (p) => 
+      [p.name, p.breed, p.caregiver ? `Caregiver: ${p.caregiver}` : '', p.vet_contact ? `Vet: ${p.vet_contact}` : ''].filter(Boolean).join(' - '),
+      petY, 8
+    );
+  }
+  addDraftWatermark(petsPage);
+  addFooter(petsPage, pageNum++);
+
+  // PAGE 17: Digital Accounts
+  const digitalPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  let digY = addSectionHeader(digitalPage, 'Digital Accounts', pageHeight - 80);
+  digY = addNotesBox(digitalPage, 'Notes', planData.digital_notes || '', digY);
+  addDraftWatermark(digitalPage);
+  addFooter(digitalPage, pageNum++);
+
+  // PAGE 18: Legal Documents
+  const legalPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  let legY = addSectionHeader(legalPage, 'Legal Documents', pageHeight - 80);
+  legY = addNotesBox(legalPage, 'Notes', planData.legal_notes || '', legY);
+  addDraftWatermark(legalPage);
+  addFooter(legalPage, pageNum++);
+
+  // PAGES 19-22: Messages to Loved Ones
+  const messagesPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  let msgY = addSectionHeader(messagesPage, 'Messages to Loved Ones', pageHeight - 80);
+  msgY = addNotesBox(messagesPage, 'General Message', planData.to_loved_ones_message || planData.messages_notes || '', msgY);
+  const messagesList = planData.messages || [];
+  if (messagesList.length > 0) {
+    msgY -= 10;
+    msgY = addArrayItems(messagesPage, messagesList, (m) => 
+      [m.audience || m.to_name, m.title].filter(Boolean).join(': '),
+      msgY, 6
+    );
+  }
+  addDraftWatermark(messagesPage);
+  addFooter(messagesPage, pageNum++);
+
+  // Add 3 more message pages for continuity
+  for (let i = 0; i < 3; i++) {
+    const msgContPage = pdfDoc.addPage([pageWidth, pageHeight]);
+    addSectionHeader(msgContPage, `Messages (continued - page ${i + 2})`, pageHeight - 80);
+    addDraftWatermark(msgContPage);
+    addFooter(msgContPage, pageNum++);
   }
 
-  if (selectedSections.includes('legacy') && planData.about_me_notes) {
-    addContentPage('About Me - My Story & Legacy', planData.about_me_notes);
+  // PAGES 23-24: Revisions
+  const revPage1 = pdfDoc.addPage([pageWidth, pageHeight]);
+  let revY = addSectionHeader(revPage1, 'Revisions & Updates', pageHeight - 80);
+  revPage1.drawText('Use this section to record any changes or updates to your plan.', {
+    x: margin, y: revY, size: 11, font: helvetica, color: textColor,
+  });
+  revY -= 40;
+  revPage1.drawText('Date                    Change Made                    Initials', {
+    x: margin, y: revY, size: 10, font: helveticaBold, color: textColor,
+  });
+  revY -= 20;
+  for (let i = 0; i < 10; i++) {
+    revPage1.drawText('________    ________________________________    ______', {
+      x: margin, y: revY, size: 10, font: helvetica, color: rgb(0.7, 0.7, 0.7),
+    });
+    revY -= 24;
   }
+  addDraftWatermark(revPage1);
+  addFooter(revPage1, pageNum++);
 
-  if (selectedSections.includes('funeral') && planData.funeral_wishes_notes) {
-    addContentPage('My Funeral & Memorial Wishes', planData.funeral_wishes_notes);
+  const revPage2 = pdfDoc.addPage([pageWidth, pageHeight]);
+  revY = addSectionHeader(revPage2, 'Revisions (continued)', pageHeight - 80);
+  revY -= 20;
+  for (let i = 0; i < 12; i++) {
+    revPage2.drawText('________    ________________________________    ______', {
+      x: margin, y: revY, size: 10, font: helvetica, color: rgb(0.7, 0.7, 0.7),
+    });
+    revY -= 24;
   }
+  addDraftWatermark(revPage2);
+  addFooter(revPage2, pageNum++);
 
-  if (selectedSections.includes('financial') && planData.financial_notes) {
-    addContentPage('Financial Life', planData.financial_notes);
-  }
-
-  if (selectedSections.includes('insurance') && planData.insurance_notes) {
-    addContentPage('Insurance', planData.insurance_notes);
-  }
-
-  if (selectedSections.includes('property') && planData.property_notes) {
-    addContentPage('My Property', planData.property_notes);
-  }
-
-  if (selectedSections.includes('legal') && planData.legal_notes) {
-    addContentPage('Legal', planData.legal_notes);
-  }
-
-  if (selectedSections.includes('messages') && planData.messages_notes) {
-    addContentPage('Messages to Loved Ones', planData.messages_notes);
-  }
+  // Final page count should be 23-24
+  console.log(`Generated fallback PDF with ${pageNum - 1} pages`);
 
   const pdfBytes = await pdfDoc.save();
   const base64Pdf = btoa(String.fromCharCode(...new Uint8Array(pdfBytes)));
   
+  const lastName = (profile.full_name || '').split(' ').pop() || 'Unknown';
+  const dateStr = new Date().toISOString().split('T')[0];
+  const filename = isDraft 
+    ? `DRAFT-My-Life-and-Legacy-Planner_${lastName}_${dateStr}.pdf`
+    : `My-Life-and-Legacy-Planner_${lastName}_${dateStr}.pdf`;
+  
   return new Response(JSON.stringify({ 
     success: true, 
     pdfBase64: base64Pdf,
-    filename: `My-Final-Wishes-${new Date().toISOString().split('T')[0]}.pdf`
+    filename
   }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
