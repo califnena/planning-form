@@ -572,6 +572,35 @@ async function generateSimplePdf(
   // PAGE 17: Digital
   const digitalPage = pdfDoc.addPage([pageWidth, pageHeight]);
   let digY = addSectionHeader(digitalPage, "Digital Accounts", pageHeight - 80);
+  
+  // Render digital accounts array if present
+  const digitalList = planData?.digital_assets || planData?.digital_accounts || [];
+  if (digitalList.length > 0) {
+    digY = addArrayItems(
+      digitalPage,
+      digitalList,
+      (d) => [d.provider || d.service, d.type || d.account_type, d.access_person ? `Access: ${d.access_person}` : ""].filter(Boolean).join(" - "),
+      digY,
+      10,
+    );
+    digY -= 10;
+  }
+  
+  // Render phones if present
+  const phonesList = planData?.phones || [];
+  if (phonesList.length > 0) {
+    digitalPage.drawText("Phone Accounts:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
+    digY -= lineHeight;
+    digY = addArrayItems(
+      digitalPage,
+      phonesList,
+      (p) => [p.phone_number, p.carrier, p.access_info].filter(Boolean).join(" - "),
+      digY,
+      6,
+    );
+    digY -= 10;
+  }
+  
   digY = addNotesBox(digitalPage, "Notes", planData?.digital_notes || "", digY);
   addDraftWatermark(digitalPage);
   addFooter(digitalPage, pageNum++);
@@ -579,6 +608,32 @@ async function generateSimplePdf(
   // PAGE 18: Legal
   const legalPage = pdfDoc.addPage([pageWidth, pageHeight]);
   let legY = addSectionHeader(legalPage, "Legal Documents", pageHeight - 80);
+  
+  // Render legal document details
+  const legal = planData?.legal || {};
+  if (legal.executor_name) legY = addField(legalPage, "Executor", legal.executor_name, legY);
+  if (legal.executor_phone) legY = addField(legalPage, "Executor Phone", legal.executor_phone, legY);
+  if (legal.executor_email) legY = addField(legalPage, "Executor Email", legal.executor_email, legY);
+  if (legal.alternate_executor) legY = addField(legalPage, "Alternate Executor", legal.alternate_executor, legY);
+  legY -= 10;
+  
+  if (legal.poa_name) legY = addField(legalPage, "Power of Attorney", legal.poa_name, legY);
+  if (legal.poa_phone) legY = addField(legalPage, "POA Phone", legal.poa_phone, legY);
+  if (legal.healthcare_proxy) legY = addField(legalPage, "Healthcare Proxy", legal.healthcare_proxy, legY);
+  if (legal.healthcare_proxy_phone) legY = addField(legalPage, "Proxy Phone", legal.healthcare_proxy_phone, legY);
+  legY -= 10;
+  
+  if (legal.will_location) legY = addField(legalPage, "Will Location", legal.will_location, legY);
+  if (legal.trust_location) legY = addField(legalPage, "Trust Location", legal.trust_location, legY);
+  if (legal.poa_document_location) legY = addField(legalPage, "POA Document Location", legal.poa_document_location, legY);
+  if (legal.living_will_location) legY = addField(legalPage, "Living Will Location", legal.living_will_location, legY);
+  if (legal.safe_deposit_location) legY = addField(legalPage, "Safe Deposit Box", legal.safe_deposit_location, legY);
+  legY -= 10;
+  
+  if (legal.attorney_name) legY = addField(legalPage, "Attorney", legal.attorney_name, legY);
+  if (legal.attorney_phone) legY = addField(legalPage, "Attorney Phone", legal.attorney_phone, legY);
+  if (legal.attorney_firm) legY = addField(legalPage, "Law Firm", legal.attorney_firm, legY);
+  
   legY = addNotesBox(legalPage, "Notes", planData?.legal_notes || "", legY);
   addDraftWatermark(legalPage);
   addFooter(legalPage, pageNum++);
