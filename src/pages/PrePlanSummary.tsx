@@ -210,8 +210,14 @@ export default function PrePlanSummary() {
       setProfile(mergedProfile);
       setContacts(mergedContacts);
 
-      // Build sections with content (no "selected/completed" gating)
-      const sectionsList: SectionData[] = [
+      // Get the user's selected sections from settings
+      const userSelectedSections = settings?.selected_sections?.length 
+        ? settings.selected_sections 
+        : SETTINGS_DEFAULT;
+      const selectedSet = new Set(userSelectedSections);
+
+      // Build ALL possible sections with content
+      const allPossibleSections: SectionData[] = [
         {
           id: "personal",
           label: "Personal & Family Details",
@@ -244,9 +250,7 @@ export default function PrePlanSummary() {
                 </p>
               )}
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground italic">No information added yet</p>
-          ),
+          ) : null,
           hasContent: !!mergedProfile?.full_name,
           editRoute: "/preplandashboard?section=personal",
         },
@@ -271,9 +275,7 @@ export default function PrePlanSummary() {
                 )}
               </div>
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground italic">No information added yet</p>
-          ),
+          ) : null,
           hasContent: mergedContacts.length > 0,
           editRoute: "/preplandashboard?section=contacts",
         },
@@ -283,9 +285,7 @@ export default function PrePlanSummary() {
           icon: <BookHeart className="h-5 w-5" />,
           content: mergedPlan.about_me_notes ? (
             <p className="text-sm">{mergedPlan.about_me_notes}</p>
-          ) : (
-            <p className="text-sm text-muted-foreground italic">No information added yet</p>
-          ),
+          ) : null,
           hasContent: !!mergedPlan.about_me_notes,
           editRoute: "/preplandashboard?section=legacy",
         },
@@ -295,9 +295,7 @@ export default function PrePlanSummary() {
           icon: <Heart className="h-5 w-5" />,
           content: mergedPlan.funeral_wishes_notes ? (
             <p className="text-sm">{mergedPlan.funeral_wishes_notes}</p>
-          ) : (
-            <p className="text-sm text-muted-foreground italic">No information added yet</p>
-          ),
+          ) : null,
           hasContent: !!mergedPlan.funeral_wishes_notes,
           editRoute: "/preplandashboard?section=funeral",
         },
@@ -307,9 +305,7 @@ export default function PrePlanSummary() {
           icon: <Wallet className="h-5 w-5" />,
           content: mergedPlan.financial_notes ? (
             <p className="text-sm">{mergedPlan.financial_notes}</p>
-          ) : (
-            <p className="text-sm text-muted-foreground italic">No information added yet</p>
-          ),
+          ) : null,
           hasContent: !!mergedPlan.financial_notes,
           editRoute: "/preplandashboard?section=financial",
         },
@@ -323,9 +319,7 @@ export default function PrePlanSummary() {
             </p>
           ) : mergedPlan.insurance_notes ? (
             <p className="text-sm">{mergedPlan.insurance_notes}</p>
-          ) : (
-            <p className="text-sm text-muted-foreground italic">No information added yet</p>
-          ),
+          ) : null,
           hasContent: !!mergedPlan.insurance_notes || !!mergedPlan.insurance?.policies?.length,
           editRoute: "/preplandashboard?section=insurance",
         },
@@ -342,9 +336,7 @@ export default function PrePlanSummary() {
               )}
               {mergedPlan.property_notes && <p>{mergedPlan.property_notes}</p>}
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground italic">No information added yet</p>
-          ),
+          ) : null,
           hasContent: mergedPropertyItems.length > 0 || !!mergedPlan.property_notes,
           editRoute: "/preplandashboard?section=property",
         },
@@ -354,11 +346,29 @@ export default function PrePlanSummary() {
           icon: <Scale className="h-5 w-5" />,
           content: mergedPlan.legal_notes ? (
             <p className="text-sm">{mergedPlan.legal_notes}</p>
-          ) : (
-            <p className="text-sm text-muted-foreground italic">No information added yet</p>
-          ),
+          ) : null,
           hasContent: !!mergedPlan.legal_notes,
           editRoute: "/preplandashboard?section=legal",
+        },
+        {
+          id: "pets",
+          label: "Pet Care",
+          icon: <Dog className="h-5 w-5" />,
+          content: mergedPlan.pets_notes ? (
+            <p className="text-sm">{mergedPlan.pets_notes}</p>
+          ) : null,
+          hasContent: !!mergedPlan.pets_notes,
+          editRoute: "/preplandashboard?section=pets",
+        },
+        {
+          id: "digital",
+          label: "Online Accounts",
+          icon: <Laptop className="h-5 w-5" />,
+          content: mergedPlan.digital_notes ? (
+            <p className="text-sm">{mergedPlan.digital_notes}</p>
+          ) : null,
+          hasContent: !!mergedPlan.digital_notes,
+          editRoute: "/preplandashboard?section=digital",
         },
         {
           id: "messages",
@@ -374,15 +384,17 @@ export default function PrePlanSummary() {
               {mergedPlan.to_loved_ones_message && <p>{mergedPlan.to_loved_ones_message}</p>}
               {mergedPlan.messages_notes && <p>{mergedPlan.messages_notes}</p>}
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground italic">No information added yet</p>
-          ),
+          ) : null,
           hasContent: mergedMessages.length > 0 || !!mergedPlan.messages_notes || !!mergedPlan.to_loved_ones_message,
           editRoute: "/preplandashboard?section=messages",
         },
       ];
 
-      setSections(sectionsList);
+      // CRITICAL: Only include sections that user selected in Preferences
+      // This is the single source of truth - section exists if selected, not if data exists
+      const filteredSections = allPossibleSections.filter(s => selectedSet.has(s.id));
+
+      setSections(filteredSections);
 
       // Helpful console diagnostics (admin debug panel already exists)
       if (orgError?.message) {
@@ -488,53 +500,55 @@ export default function PrePlanSummary() {
     navigate(`/preplandashboard?section=${sectionId}`);
   };
 
-  // Calculate missing sections
+  // Calculate missing sections - ONLY check sections user has selected in Preferences
   const getMissingSections = () => {
-    const missing = [];
+    const missing: Array<{id: string; name: string; status: string; actionLabel: string}> = [];
+    const selectedSet = new Set(selectedSections);
     
-    if (!profile?.full_name) {
+    // Only flag missing data for SELECTED sections
+    if (selectedSet.has("personal") && !profile?.full_name) {
       missing.push({
         id: "personal",
         name: "Personal & Family Details",
-        status: "No information added yet",
+        status: "Incomplete",
         actionLabel: "Add now"
       });
     }
     
-    if (!planData?.about_me_notes) {
+    if (selectedSet.has("legacy") && !planData?.about_me_notes) {
       missing.push({
         id: "legacy",
         name: "Life Story & Legacy",
-        status: "No information added yet",
+        status: "Incomplete",
         actionLabel: "Add now"
       });
     }
     
-    if (!planData?.funeral_wishes_notes) {
+    if (selectedSet.has("funeral") && !planData?.funeral_wishes_notes) {
       missing.push({
         id: "funeral",
         name: "Funeral Wishes",
-        status: "Not recorded",
+        status: "Incomplete",
         actionLabel: "Add now"
       });
     }
     
-    const hasExecutor = contacts?.some((c: any) => 
-      c.relationship?.toLowerCase().includes('executor')
-    );
-    if (!hasExecutor) {
-      missing.push({
-        id: "contacts",
-        name: "Executor Preferences",
-        status: "Not selected",
-        actionLabel: "Add now"
-      });
+    if (selectedSet.has("contacts")) {
+      const hasContacts = contacts?.length > 0;
+      if (!hasContacts) {
+        missing.push({
+          id: "contacts",
+          name: "Key Contacts to Notify",
+          status: "Incomplete",
+          actionLabel: "Add now"
+        });
+      }
     }
     
-    if (!planData?.property_notes) {
+    if (selectedSet.has("legal") && !planData?.legal_notes) {
       missing.push({
-        id: "property",
-        name: "Property & Valuables",
+        id: "legal",
+        name: "Legal & Planning Notes",
         status: "Incomplete",
         actionLabel: "Review"
       });
@@ -553,22 +567,20 @@ export default function PrePlanSummary() {
     );
   }
 
-  // Only show empty state if:
-  // 1. No plan exists AND
-  // 2. Shared hook confirms no data exists (checks all related tables)
-  const showEmptyState = !planData;
+  // Show empty state only if NO sections are selected (user hasn't set preferences)
+  const noSectionsSelected = selectedSections.length === 0;
   
-  if (showEmptyState) {
+  if (noSectionsSelected) {
     return (
       <AuthenticatedLayout>
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <Card className="p-8 text-center">
             <h2 className="text-xl font-semibold mb-4">Your Planning Document</h2>
             <p className="text-muted-foreground mb-6">
-              Your planning document will appear here once you start adding information.
+              You haven't chosen any sections yet. Start by selecting what you'd like to include in your plan.
             </p>
-            <Button onClick={() => navigate("/preplandashboard")}>
-              Start Planning
+            <Button onClick={() => navigate("/preplandashboard?section=preferences")}>
+              Choose Your Sections
             </Button>
           </Card>
         </div>
@@ -585,7 +597,13 @@ export default function PrePlanSummary() {
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">Your Planning Summary</h1>
           <p className="text-muted-foreground font-medium">
-            This is your complete planning document.
+            {missingSections.length > 0 
+              ? "Some sections are still incomplete. You can finish them anytime."
+              : "This is your complete planning document."
+            }
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Showing {sections.length} section{sections.length !== 1 ? 's' : ''} based on your preferences
           </p>
           {lastUpdated && (
             <p className="text-sm text-muted-foreground mt-1">
@@ -709,18 +727,18 @@ export default function PrePlanSummary() {
                 </div>
               </CardHeader>
               <CardContent>
-                {section.hasContent ? (
+                {section.hasContent && section.content ? (
                   section.content
                 ) : (
-                  <div className="text-sm text-muted-foreground">
-                    <p>No information added yet</p>
+                  <div className="text-sm text-muted-foreground bg-muted/30 rounded-lg p-4">
+                    <p className="mb-2">This section is incomplete. Add your information to include it in your final document.</p>
                     <Button
-                      variant="link"
+                      variant="outline"
                       size="sm"
                       onClick={() => navigate(section.editRoute)}
-                      className="px-0 text-primary print:hidden"
+                      className="text-primary print:hidden"
                     >
-                      Add information →
+                      Complete this section →
                     </Button>
                   </div>
                 )}
