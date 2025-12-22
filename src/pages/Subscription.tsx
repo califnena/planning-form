@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Check, ArrowLeft } from "lucide-react";
 import binderImage from "@/assets/fireproof-binder.png";
 import { PLANS } from "@/lib/plans";
+import { CheckoutFallback } from "@/components/CheckoutFallback";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +29,8 @@ export default function Subscription() {
   const [currentSubscription, setCurrentSubscription] = useState<any>(null);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [isMasterAccount, setIsMasterAccount] = useState(false);
+  const [checkoutStarted, setCheckoutStarted] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const loadSubscription = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -72,6 +75,9 @@ export default function Subscription() {
   };
 
   const handleCheckout = async (planKey: string) => {
+    setCheckoutLoading(true);
+    setCheckoutStarted(true);
+    
     try {
       const successUrl = `${window.location.origin}/subscription?status=success`;
       const cancelUrl = `${window.location.origin}/subscription?status=cancel`;
@@ -82,6 +88,8 @@ export default function Subscription() {
           description: "Unknown plan.", 
           variant: "destructive" 
         });
+        setCheckoutLoading(false);
+        setCheckoutStarted(false);
         return;
       }
       const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
@@ -96,12 +104,16 @@ export default function Subscription() {
       });
       if (error) throw error;
       if (data?.url) {
+        // Store URL for recovery
+        localStorage.setItem("efa_last_checkout_url", data.url);
+        localStorage.setItem("efa_checkout_return_url", window.location.pathname);
         window.location.href = data.url as string;
       } else {
         throw new Error("Invalid checkout response");
       }
     } catch (err) {
       console.error(err);
+      setCheckoutLoading(false);
       toast({ 
         title: "Checkout error", 
         description: "We're having trouble loading this price. Please try again later or contact support.", 
@@ -141,10 +153,37 @@ export default function Subscription() {
   const hasActiveSubscription = currentSubscription && currentSubscription.status === "active";
   const currentPlanKey = currentSubscription?.plan_type;
 
+  const handleResetCheckout = () => {
+    setCheckoutStarted(false);
+    setCheckoutLoading(false);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  // Show checkout fallback if checkout started and might be stuck
+  if (checkoutStarted) {
+    return (
+      <div className="container mx-auto py-10">
+        <Button 
+          variant="ghost" 
+          onClick={handleResetCheckout}
+          className="mb-6"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Plans
+        </Button>
+        <CheckoutFallback
+          isLoading={checkoutLoading}
+          checkoutStarted={checkoutStarted}
+          timeoutMs={8000}
+          onReload={() => window.location.reload()}
+        />
       </div>
     );
   }
