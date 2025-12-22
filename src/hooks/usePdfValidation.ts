@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { SECTION_ROUTES, SECTION_LABELS } from "@/lib/sectionRoutes";
 
 export interface MissingField {
   sectionKey: string;
@@ -61,36 +62,6 @@ interface PlanData {
   prepared_for?: string;
   // Also check the plans table prepared_for field as fallback for name
 }
-
-// Section route mapping for "Go to section" navigation
-const SECTION_ROUTES: Record<string, string> = {
-  personal: "/preplandashboard?section=personal",
-  contacts: "/preplandashboard?section=contacts",
-  funeral: "/preplandashboard?section=funeral",
-  legacy: "/preplandashboard?section=legacy",
-  legal: "/preplandashboard?section=legal",
-  financial: "/preplandashboard?section=financial",
-  insurance: "/preplandashboard?section=insurance",
-  property: "/preplandashboard?section=property",
-  pets: "/preplandashboard?section=pets",
-  digital: "/preplandashboard?section=digital",
-  messages: "/preplandashboard?section=messages",
-};
-
-// Section labels for display
-const SECTION_LABELS: Record<string, string> = {
-  personal: "Personal & Family Details",
-  contacts: "Key Contacts to Notify",
-  funeral: "Funeral Wishes",
-  legacy: "Life Story & Legacy",
-  legal: "Legal Documents",
-  financial: "Financial Life",
-  insurance: "Insurance",
-  property: "Property & Valuables",
-  pets: "Pet Care",
-  digital: "Digital Accounts",
-  messages: "Messages to Loved Ones",
-};
 
 export function validatePdfReady(
   planData: PlanData | null,
