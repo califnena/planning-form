@@ -182,31 +182,68 @@ export default function PrePlanSummary() {
         ...(localProfile || {}),
       };
       
+      // CRITICAL: Merge DB arrays with localStorage arrays
+      // The planner forms may save to localStorage, not the Supabase tables
       const dbContacts = data.contacts || [];
       const dbMessages = data.messages || [];
       const dbProperties = data.properties || [];
       const dbPets = data.pets || [];
       const dbInsurance = data.insurance || [];
+      const dbBankAccounts = data.bankAccounts || [];
+      const dbInvestments = data.investments || [];
+      const dbProfessionalContacts = data.professionalContacts || [];
+      const dbFuneralFunding = data.funeralFunding || [];
+      
+      // Prefer localStorage arrays if they exist and have data, otherwise use DB
+      const localContacts = localPlan?.contacts_notify || localPlan?.contacts || [];
+      const localPets = localPlan?.pets || [];
+      const localInsurance = localPlan?.insurance_policies || localPlan?.insurance || [];
+      const localProperties = localPlan?.properties || [];
+      const localMessages = localPlan?.messages || [];
+      const localBankAccounts = localPlan?.bank_accounts || [];
+      const localInvestments = localPlan?.investments || [];
+      const localProfessionalContacts = localPlan?.contacts_professional || [];
+      const localFuneralFunding = localPlan?.funeral_funding || [];
+      
+      // Use DB if it has data, otherwise fall back to localStorage
+      const mergedContacts = dbContacts.length > 0 ? dbContacts : localContacts;
+      const mergedPets = dbPets.length > 0 ? dbPets : localPets;
+      const mergedInsurance = dbInsurance.length > 0 ? dbInsurance : localInsurance;
+      const mergedProperties = dbProperties.length > 0 ? dbProperties : localProperties;
+      const mergedMessages = dbMessages.length > 0 ? dbMessages : localMessages;
+      const mergedBankAccounts = dbBankAccounts.length > 0 ? dbBankAccounts : localBankAccounts;
+      const mergedInvestments = dbInvestments.length > 0 ? dbInvestments : localInvestments;
+      const mergedProfessionalContacts = dbProfessionalContacts.length > 0 ? dbProfessionalContacts : localProfessionalContacts;
+      const mergedFuneralFunding = dbFuneralFunding.length > 0 ? dbFuneralFunding : localFuneralFunding;
 
       // Use merged profile that includes localStorage data
       setProfile(Object.keys(mergedProfile).length > 0 ? mergedProfile : null);
-      setContacts(dbContacts);
-      setPets(dbPets);
-      setInsurance(dbInsurance);
-      setProperties(dbProperties);
-      setMessages(dbMessages);
-      setBankAccounts(data.bankAccounts || []);
-      setInvestments(data.investments || []);
-      setProfessionalContacts(data.professionalContacts || []);
-      setFuneralFunding(data.funeralFunding || []);
+      setContacts(mergedContacts);
+      setPets(mergedPets);
+      setInsurance(mergedInsurance);
+      setProperties(mergedProperties);
+      setMessages(mergedMessages);
+      setBankAccounts(mergedBankAccounts);
+      setInvestments(mergedInvestments);
+      setProfessionalContacts(mergedProfessionalContacts);
+      setFuneralFunding(mergedFuneralFunding);
       
       // Debug log for validation troubleshooting
-      console.log("[PrePlanSummary] Profile resolution:", {
+      console.log("[PrePlanSummary] Data resolution:", {
         dbProfile: !!dbProfile,
         localProfile: !!localProfile,
         mergedFullName: mergedProfile?.full_name,
         mergedAddress: mergedProfile?.address,
         preparedFor: mergedPlan?.prepared_for,
+        dbContactsCount: dbContacts.length,
+        localContactsCount: localContacts.length,
+        mergedContactsCount: mergedContacts.length,
+        dbPetsCount: dbPets.length,
+        localPetsCount: localPets.length,
+        mergedPetsCount: mergedPets.length,
+        dbInsuranceCount: dbInsurance.length,
+        localInsuranceCount: localInsurance.length,
+        mergedInsuranceCount: mergedInsurance.length,
       });
 
       // Get the user's selected sections from settings
@@ -259,25 +296,25 @@ export default function PrePlanSummary() {
           id: "contacts",
           label: "Key Contacts to Notify",
           icon: <Users className="h-5 w-5" />,
-          content: dbContacts.length > 0 ? (
+          content: mergedContacts.length > 0 ? (
             <div className="space-y-2 text-sm">
               <p>
-                <strong>Contacts:</strong> {dbContacts.length} saved
+                <strong>Contacts:</strong> {mergedContacts.length} saved
               </p>
               <div className="space-y-1">
-                {dbContacts.slice(0, 5).map((c: any, idx: number) => (
+                {mergedContacts.slice(0, 5).map((c: any, idx: number) => (
                   <p key={idx} className="text-muted-foreground">
                     {c?.name || "(Unnamed)"}
                     {c?.relationship ? ` — ${c.relationship}` : ""}
                   </p>
                 ))}
-                {dbContacts.length > 5 && (
-                  <p className="text-muted-foreground">…and {dbContacts.length - 5} more</p>
+                {mergedContacts.length > 5 && (
+                  <p className="text-muted-foreground">…and {mergedContacts.length - 5} more</p>
                 )}
               </div>
             </div>
           ) : null,
-          hasContent: dbContacts.length > 0,
+          hasContent: mergedContacts.length > 0,
           editRoute: SECTION_ROUTES.contacts,
         },
         {
@@ -314,31 +351,31 @@ export default function PrePlanSummary() {
           id: "insurance",
           label: "Insurance (Summary)",
           icon: <Shield className="h-5 w-5" />,
-          content: dbInsurance.length > 0 ? (
+          content: mergedInsurance.length > 0 ? (
             <p className="text-sm">
-              <strong>Policies:</strong> {dbInsurance.length} saved
+              <strong>Policies:</strong> {mergedInsurance.length} saved
             </p>
           ) : mergedPlan.insurance_notes ? (
             <p className="text-sm">{mergedPlan.insurance_notes}</p>
           ) : null,
-          hasContent: !!mergedPlan.insurance_notes || dbInsurance.length > 0,
+          hasContent: !!mergedPlan.insurance_notes || mergedInsurance.length > 0,
           editRoute: SECTION_ROUTES.insurance,
         },
         {
           id: "property",
           label: "Property & Valuables",
           icon: <Home className="h-5 w-5" />,
-          content: dbProperties.length > 0 || mergedPlan.property_notes ? (
+          content: mergedProperties.length > 0 || mergedPlan.property_notes ? (
             <div className="space-y-2 text-sm">
-              {dbProperties.length > 0 && (
+              {mergedProperties.length > 0 && (
                 <p>
-                  <strong>Items:</strong> {dbProperties.length} listed
+                  <strong>Items:</strong> {mergedProperties.length} listed
                 </p>
               )}
               {mergedPlan.property_notes && <p>{mergedPlan.property_notes}</p>}
             </div>
           ) : null,
-          hasContent: dbProperties.length > 0 || !!mergedPlan.property_notes,
+          hasContent: mergedProperties.length > 0 || !!mergedPlan.property_notes,
           editRoute: SECTION_ROUTES.property,
         },
         {
@@ -355,15 +392,15 @@ export default function PrePlanSummary() {
           id: "pets",
           label: "Pet Care",
           icon: <Dog className="h-5 w-5" />,
-          content: dbPets.length > 0 || mergedPlan.pets_notes ? (
+          content: mergedPets.length > 0 || mergedPlan.pets_notes ? (
             <div className="space-y-2 text-sm">
-              {dbPets.length > 0 && (
-                <p><strong>Pets:</strong> {dbPets.length} listed</p>
+              {mergedPets.length > 0 && (
+                <p><strong>Pets:</strong> {mergedPets.length} listed</p>
               )}
               {mergedPlan.pets_notes && <p>{mergedPlan.pets_notes}</p>}
             </div>
           ) : null,
-          hasContent: dbPets.length > 0 || !!mergedPlan.pets_notes,
+          hasContent: mergedPets.length > 0 || !!mergedPlan.pets_notes,
           editRoute: SECTION_ROUTES.pets,
         },
         {
@@ -380,18 +417,18 @@ export default function PrePlanSummary() {
           id: "messages",
           label: "Messages to Loved Ones",
           icon: <MessageSquare className="h-5 w-5" />,
-          content: dbMessages.length > 0 || mergedPlan.to_loved_ones_message || mergedPlan.messages_notes ? (
+          content: mergedMessages.length > 0 || mergedPlan.to_loved_ones_message || mergedPlan.messages_notes ? (
             <div className="space-y-2 text-sm">
-              {dbMessages.length > 0 && (
+              {mergedMessages.length > 0 && (
                 <p>
-                  <strong>Messages:</strong> {dbMessages.length} written
+                  <strong>Messages:</strong> {mergedMessages.length} written
                 </p>
               )}
               {mergedPlan.to_loved_ones_message && <p>{mergedPlan.to_loved_ones_message}</p>}
               {mergedPlan.messages_notes && <p>{mergedPlan.messages_notes}</p>}
             </div>
           ) : null,
-          hasContent: dbMessages.length > 0 || !!mergedPlan.messages_notes || !!mergedPlan.to_loved_ones_message,
+          hasContent: mergedMessages.length > 0 || !!mergedPlan.messages_notes || !!mergedPlan.to_loved_ones_message,
           editRoute: SECTION_ROUTES.messages,
         },
       ];
@@ -407,8 +444,10 @@ export default function PrePlanSummary() {
         planId: activePlanId,
         orgId,
         sectionsCount: filteredSections.length,
-        dbContactsCount: dbContacts.length,
-        dbPropertiesCount: dbProperties.length,
+        mergedContactsCount: mergedContacts.length,
+        mergedPropertiesCount: mergedProperties.length,
+        mergedPetsCount: mergedPets.length,
+        mergedInsuranceCount: mergedInsurance.length,
       });
     } catch (error) {
       console.error("Error loading plan data:", error);
