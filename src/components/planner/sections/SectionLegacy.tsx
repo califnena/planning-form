@@ -8,6 +8,7 @@ import { usePreviewMode } from "@/pages/PlannerApp";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
+import { WritingHelperButton } from "@/components/planner/WritingHelperButton";
 
 interface SectionLegacyProps {
   value?: string;
@@ -52,7 +53,16 @@ export const SectionLegacy = ({ value, onChange }: SectionLegacyProps) => {
 
       <PreviewModeWrapper>
         <div className="space-y-2">
-          <Label htmlFor="legacy">Your Life Story</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="legacy">Your Life Story</Label>
+            <WritingHelperButton
+              fieldLabel="Your Life Story"
+              fieldContext="life_story"
+              currentText={value || ""}
+              onInsert={onChange}
+              disabled={isPreviewMode}
+            />
+          </div>
           <p className="text-xs text-muted-foreground">
             Write about your life journey, what made you proud, and how you want to be remembered
           </p>
