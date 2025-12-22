@@ -97,17 +97,26 @@ export default function PrePlanSummary() {
 
   const loadPlanData = async () => {
     try {
+      setLoading(true);
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         navigate("/login");
         return;
       }
-      setUserEmail(user.email || "");
-      
-      // DEBUG: Log user context
-      console.log("[PrePlanSummary] Loading data for user:", user.id);
 
-      // Step 1: Get user's org (try org_members first)
+      setUserEmail(user.email || "");
+
+      // 0) Load locally-saved planner data (the planner auto-saves here)
+      let localPlan: any | null = null;
+      try {
+        const raw = localStorage.getItem(`plan_${user.id}`);
+        if (raw) localPlan = JSON.parse(raw);
+      } catch (e) {
+        console.warn("[PrePlanSummary] Failed to parse local plan", e);
+      }
+
+      // 1) Try to resolve active plan from the backend (best-effort)
       const { data: orgMember, error: orgError } = await supabase
         .from("org_members")
         .select("org_id")
@@ -115,15 +124,12 @@ export default function PrePlanSummary() {
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
-      
-      console.log("[PrePlanSummary] Org member lookup:", { userId: user.id, orgMember, orgError: orgError?.message });
 
       let orgId = orgMember?.org_id || null;
-      let activePlan: any = null;
+      let activePlan: any | null = null;
 
-      // If we have an org, try to get plan from org
       if (orgId) {
-        const { data: plan, error } = await supabase
+        const { data: plan } = await supabase
           .from("plans")
           .select("*")
           .eq("org_id", orgId)
@@ -131,15 +137,12 @@ export default function PrePlanSummary() {
           .order("updated_at", { ascending: false })
           .limit(1)
           .maybeSingle();
-        
-        console.log("[PrePlanSummary] Plan query by org:", { orgId, planId: plan?.id, error: error?.message });
-        activePlan = plan;
+
+        activePlan = plan || null;
       }
 
-      // FALLBACK: If no plan found via org, try direct lookup by owner_user_id
       if (!activePlan) {
-        console.log("[PrePlanSummary] Trying fallback: plans by owner_user_id");
-        const { data: fallbackPlan, error: fallbackError } = await supabase
+        const { data: fallbackPlan } = await supabase
           .from("plans")
           .select("*")
           .eq("owner_user_id", user.id)
@@ -147,223 +150,237 @@ export default function PrePlanSummary() {
           .limit(1)
           .maybeSingle();
 
-        console.log("[PrePlanSummary] Fallback plan lookup:", { planId: fallbackPlan?.id, orgId: fallbackPlan?.org_id, error: fallbackError?.message });
-        
         if (fallbackPlan) {
           activePlan = fallbackPlan;
           orgId = fallbackPlan.org_id || orgId;
         }
       }
 
-      // If still no plan, create one (only if we have an orgId)
-      if (!activePlan && orgId) {
-        console.log("[PrePlanSummary] No plan found - creating draft plan");
-        const { data: newPlan, error: createError } = await supabase
-          .from("plans")
-          .insert({
-            org_id: orgId,
-            owner_user_id: user.id,
-            title: "My Planning Document"
-          })
-          .select()
-          .single();
-        
-        if (createError) {
-          console.error("[PrePlanSummary] Error creating plan:", createError);
-          throw createError;
-        }
-        activePlan = newPlan;
-        console.log("[PrePlanSummary] Created new plan:", activePlan?.id);
-      }
+      // 2) Merge: local data holds most section fields; DB plan holds note fields + metadata
+      const mergedPlan: any = {
+        ...(localPlan || {}),
+        ...(activePlan || {}),
+        // Ensure we don't lose identifiers if only one side has them
+        id: activePlan?.id || localPlan?.id,
+        org_id: activePlan?.org_id || localPlan?.org_id,
+      };
 
-      // If no plan and no org, show empty state
-      if (!activePlan) {
-        console.log("[PrePlanSummary] No plan and no org - showing empty state");
-        setLoading(false);
+      // 3) If we have neither local data nor a resolved plan, we truly have nothing to show
+      const hasLocal = !!localPlan;
+      const hasResolvedPlan = !!mergedPlan?.id;
+
+      if (!hasLocal && !hasResolvedPlan) {
+        // Keep structure consistent with existing empty-state behavior
+        setPlanData(null);
+        setSections([]);
+        setProfile(null);
+        setContacts([]);
+        setLastUpdated(null);
         return;
       }
 
-      console.log("[PrePlanSummary] Using plan:", { planId: activePlan.id, updatedAt: activePlan.updated_at });
+      setPlanData(mergedPlan);
+      setLastUpdated(mergedPlan.updated_at || null);
 
-      // Step 4: Fetch all related data for this plan
-      const [
-        { data: profileData },
-        { data: contactsData },
-        { data: pets },
-        { data: insurance },
-        { data: properties },
-        { data: messages }
-      ] = await Promise.all([
-        supabase.from("personal_profiles").select("*").eq("plan_id", activePlan.id).maybeSingle(),
-        supabase.from("contacts_notify").select("*").eq("plan_id", activePlan.id),
-        supabase.from("pets").select("*").eq("plan_id", activePlan.id),
-        supabase.from("insurance_policies").select("*").eq("plan_id", activePlan.id),
-        supabase.from("properties").select("*").eq("plan_id", activePlan.id),
-        supabase.from("messages").select("*").eq("plan_id", activePlan.id)
-      ]);
+      // Planner sections are stored in the local plan shape
+      const mergedProfile = mergedPlan.personal_profile || null;
+      const mergedContacts = Array.isArray(mergedPlan.contacts) ? mergedPlan.contacts : [];
+      const mergedMessages = Array.isArray(mergedPlan.messages) ? mergedPlan.messages : [];
+      const mergedPropertyItems = Array.isArray(mergedPlan.property?.items) ? mergedPlan.property.items : [];
 
-      // DEBUG: Log related data counts
-      console.log("[PrePlanSummary] Related data counts:", {
-        planId: activePlan.id,
-        hasProfile: !!profileData,
-        contactsCount: contactsData?.length || 0,
-        petsCount: pets?.length || 0,
-        insuranceCount: insurance?.length || 0,
-        propertiesCount: properties?.length || 0,
-        messagesCount: messages?.length || 0,
-        planNotes: {
-          about_me: !!activePlan.about_me_notes,
-          funeral: !!activePlan.funeral_wishes_notes,
-          financial: !!activePlan.financial_notes,
-          property: !!activePlan.property_notes,
-          legal: !!activePlan.legal_notes,
-          messages: !!activePlan.messages_notes
-        }
-      });
+      setProfile(mergedProfile);
+      setContacts(mergedContacts);
 
-      // Step 5: Check if ANY data exists (plan notes OR related tables)
-      const hasAnyData = 
-        !!profileData?.full_name ||
-        (contactsData && contactsData.length > 0) ||
-        (pets && pets.length > 0) ||
-        (insurance && insurance.length > 0) ||
-        (properties && properties.length > 0) ||
-        (messages && messages.length > 0) ||
-        !!activePlan.about_me_notes ||
-        !!activePlan.funeral_wishes_notes ||
-        !!activePlan.financial_notes ||
-        !!activePlan.property_notes ||
-        !!activePlan.legal_notes ||
-        !!activePlan.messages_notes ||
-        !!activePlan.to_loved_ones_message ||
-        !!activePlan.instructions_notes;
-
-      console.log("[PrePlanSummary] Has any data:", hasAnyData);
-
-      // Always set the plan data (even if empty) so we can show the summary structure
-      setPlanData(activePlan);
-      setLastUpdated(activePlan.updated_at);
-      setProfile(profileData);
-      setContacts(contactsData || []);
-
-      // Build sections with content
+      // Build sections with content (no "selected/completed" gating)
       const sectionsList: SectionData[] = [
         {
           id: "personal",
           label: "Personal & Family Details",
           icon: <User className="h-5 w-5" />,
-          content: profileData ? (
+          content: mergedProfile ? (
             <div className="space-y-2 text-sm">
-              {profileData.full_name && <p><strong>Name:</strong> {profileData.full_name}</p>}
-              {profileData.address && <p><strong>Address:</strong> {profileData.address}</p>}
-              {profileData.marital_status && <p><strong>Marital Status:</strong> {profileData.marital_status}</p>}
-              {profileData.partner_name && <p><strong>Spouse/Partner:</strong> {profileData.partner_name}</p>}
-              {profileData.child_names?.length > 0 && (
-                <p><strong>Children:</strong> {profileData.child_names.filter(Boolean).join(", ")}</p>
+              {mergedProfile.full_name && (
+                <p>
+                  <strong>Name:</strong> {mergedProfile.full_name}
+                </p>
+              )}
+              {mergedProfile.address && (
+                <p>
+                  <strong>Address:</strong> {mergedProfile.address}
+                </p>
+              )}
+              {mergedProfile.marital_status && (
+                <p>
+                  <strong>Marital Status:</strong> {mergedProfile.marital_status}
+                </p>
+              )}
+              {mergedProfile.partner_name && (
+                <p>
+                  <strong>Spouse/Partner:</strong> {mergedProfile.partner_name}
+                </p>
+              )}
+              {Array.isArray(mergedProfile.child_names) && mergedProfile.child_names.filter(Boolean).length > 0 && (
+                <p>
+                  <strong>Children:</strong> {mergedProfile.child_names.filter(Boolean).join(", ")}
+                </p>
               )}
             </div>
-          ) : <p className="text-sm text-muted-foreground italic">No information added yet</p>,
-          hasContent: !!profileData?.full_name,
-          editRoute: "/preplandashboard?section=personal"
+          ) : (
+            <p className="text-sm text-muted-foreground italic">No information added yet</p>
+          ),
+          hasContent: !!mergedProfile?.full_name,
+          editRoute: "/preplandashboard?section=personal",
+        },
+        {
+          id: "contacts",
+          label: "Key Contacts to Notify",
+          icon: <Users className="h-5 w-5" />,
+          content: mergedContacts.length > 0 ? (
+            <div className="space-y-2 text-sm">
+              <p>
+                <strong>Contacts:</strong> {mergedContacts.length} saved
+              </p>
+              <div className="space-y-1">
+                {mergedContacts.slice(0, 5).map((c: any, idx: number) => (
+                  <p key={idx} className="text-muted-foreground">
+                    {c?.name || "(Unnamed)"}
+                    {c?.relationship ? ` — ${c.relationship}` : ""}
+                  </p>
+                ))}
+                {mergedContacts.length > 5 && (
+                  <p className="text-muted-foreground">…and {mergedContacts.length - 5} more</p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">No information added yet</p>
+          ),
+          hasContent: mergedContacts.length > 0,
+          editRoute: "/preplandashboard?section=contacts",
         },
         {
           id: "legacy",
           label: "Life Story & Legacy",
           icon: <BookHeart className="h-5 w-5" />,
-          content: activePlan.about_me_notes ? (
-            <p className="text-sm">{activePlan.about_me_notes}</p>
-          ) : <p className="text-sm text-muted-foreground italic">No information added yet</p>,
-          hasContent: !!activePlan.about_me_notes,
-          editRoute: "/preplandashboard?section=legacy"
+          content: mergedPlan.about_me_notes ? (
+            <p className="text-sm">{mergedPlan.about_me_notes}</p>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">No information added yet</p>
+          ),
+          hasContent: !!mergedPlan.about_me_notes,
+          editRoute: "/preplandashboard?section=legacy",
         },
         {
           id: "funeral",
           label: "Funeral Wishes",
           icon: <Heart className="h-5 w-5" />,
-          content: activePlan.funeral_wishes_notes ? (
-            <p className="text-sm">{activePlan.funeral_wishes_notes}</p>
-          ) : <p className="text-sm text-muted-foreground italic">No information added yet</p>,
-          hasContent: !!activePlan.funeral_wishes_notes,
-          editRoute: "/preplandashboard?section=funeral"
+          content: mergedPlan.funeral_wishes_notes ? (
+            <p className="text-sm">{mergedPlan.funeral_wishes_notes}</p>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">No information added yet</p>
+          ),
+          hasContent: !!mergedPlan.funeral_wishes_notes,
+          editRoute: "/preplandashboard?section=funeral",
         },
         {
           id: "financial",
           label: "Financial Life (Summary)",
           icon: <Wallet className="h-5 w-5" />,
-          content: activePlan.financial_notes ? (
-            <p className="text-sm">{activePlan.financial_notes}</p>
-          ) : <p className="text-sm text-muted-foreground italic">No information added yet</p>,
-          hasContent: !!activePlan.financial_notes,
-          editRoute: "/preplandashboard?section=financial"
+          content: mergedPlan.financial_notes ? (
+            <p className="text-sm">{mergedPlan.financial_notes}</p>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">No information added yet</p>
+          ),
+          hasContent: !!mergedPlan.financial_notes,
+          editRoute: "/preplandashboard?section=financial",
+        },
+        {
+          id: "insurance",
+          label: "Insurance (Summary)",
+          icon: <Shield className="h-5 w-5" />,
+          content: mergedPlan.insurance?.policies?.length ? (
+            <p className="text-sm">
+              <strong>Policies:</strong> {mergedPlan.insurance.policies.length} saved
+            </p>
+          ) : mergedPlan.insurance_notes ? (
+            <p className="text-sm">{mergedPlan.insurance_notes}</p>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">No information added yet</p>
+          ),
+          hasContent: !!mergedPlan.insurance_notes || !!mergedPlan.insurance?.policies?.length,
+          editRoute: "/preplandashboard?section=insurance",
         },
         {
           id: "property",
           label: "Property & Valuables",
           icon: <Home className="h-5 w-5" />,
-          content: (properties && properties.length > 0) || activePlan.property_notes ? (
+          content: mergedPropertyItems.length > 0 || mergedPlan.property_notes ? (
             <div className="space-y-2 text-sm">
-              {properties && properties.length > 0 && (
-                <p><strong>Properties:</strong> {properties.length} listed</p>
+              {mergedPropertyItems.length > 0 && (
+                <p>
+                  <strong>Items:</strong> {mergedPropertyItems.length} listed
+                </p>
               )}
-              {activePlan.property_notes && <p>{activePlan.property_notes}</p>}
+              {mergedPlan.property_notes && <p>{mergedPlan.property_notes}</p>}
             </div>
-          ) : <p className="text-sm text-muted-foreground italic">No information added yet</p>,
-          hasContent: (properties && properties.length > 0) || !!activePlan.property_notes,
-          editRoute: "/preplandashboard?section=property"
+          ) : (
+            <p className="text-sm text-muted-foreground italic">No information added yet</p>
+          ),
+          hasContent: mergedPropertyItems.length > 0 || !!mergedPlan.property_notes,
+          editRoute: "/preplandashboard?section=property",
         },
         {
           id: "legal",
           label: "Legal & Planning Notes",
           icon: <Scale className="h-5 w-5" />,
-          content: activePlan.legal_notes || contactsData?.some((c: any) => 
-            c.relationship?.toLowerCase().includes('executor') || 
-            c.relationship?.toLowerCase().includes('guardian')
-          ) ? (
-            <div className="space-y-2 text-sm">
-              {contactsData?.filter((c: any) => 
-                c.relationship?.toLowerCase().includes('executor')
-              ).map((c: any, i: number) => (
-                <p key={i}><strong>Executor:</strong> {c.name}</p>
-              ))}
-              {contactsData?.filter((c: any) => 
-                c.relationship?.toLowerCase().includes('guardian')
-              ).map((c: any, i: number) => (
-                <p key={i}><strong>Guardian:</strong> {c.name}</p>
-              ))}
-              {activePlan.legal_notes && <p>{activePlan.legal_notes}</p>}
-            </div>
-          ) : <p className="text-sm text-muted-foreground italic">No information added yet</p>,
-          hasContent: !!activePlan.legal_notes || contactsData?.some((c: any) => 
-            c.relationship?.toLowerCase().includes('executor') || 
-            c.relationship?.toLowerCase().includes('guardian')
+          content: mergedPlan.legal_notes ? (
+            <p className="text-sm">{mergedPlan.legal_notes}</p>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">No information added yet</p>
           ),
-          editRoute: "/preplandashboard?section=legal"
+          hasContent: !!mergedPlan.legal_notes,
+          editRoute: "/preplandashboard?section=legal",
         },
         {
           id: "messages",
-          label: "Notes for Family & Professionals",
+          label: "Messages to Loved Ones",
           icon: <MessageSquare className="h-5 w-5" />,
-          content: (messages && messages.length > 0) || activePlan.messages_notes || activePlan.to_loved_ones_message ? (
+          content: mergedMessages.length > 0 || mergedPlan.to_loved_ones_message || mergedPlan.messages_notes ? (
             <div className="space-y-2 text-sm">
-              {messages && messages.length > 0 && (
-                <p><strong>Messages:</strong> {messages.length} written</p>
+              {mergedMessages.length > 0 && (
+                <p>
+                  <strong>Messages:</strong> {mergedMessages.length} written
+                </p>
               )}
-              {activePlan.to_loved_ones_message && <p>{activePlan.to_loved_ones_message}</p>}
-              {activePlan.messages_notes && <p>{activePlan.messages_notes}</p>}
+              {mergedPlan.to_loved_ones_message && <p>{mergedPlan.to_loved_ones_message}</p>}
+              {mergedPlan.messages_notes && <p>{mergedPlan.messages_notes}</p>}
             </div>
-          ) : <p className="text-sm text-muted-foreground italic">No information added yet</p>,
-          hasContent: (messages && messages.length > 0) || !!activePlan.messages_notes || !!activePlan.to_loved_ones_message,
-          editRoute: "/preplandashboard?section=messages"
-        }
+          ) : (
+            <p className="text-sm text-muted-foreground italic">No information added yet</p>
+          ),
+          hasContent: mergedMessages.length > 0 || !!mergedPlan.messages_notes || !!mergedPlan.to_loved_ones_message,
+          editRoute: "/preplandashboard?section=messages",
+        },
       ];
 
       setSections(sectionsList);
+
+      // Helpful console diagnostics (admin debug panel already exists)
+      if (orgError?.message) {
+        console.log("[PrePlanSummary] org_members lookup error:", orgError.message);
+      }
+      console.log("[PrePlanSummary] Plan resolution:", {
+        userId: user.id,
+        hasLocalPlan: !!localPlan,
+        resolvedOrgId: orgId,
+        resolvedPlanId: mergedPlan?.id || null,
+      });
     } catch (error) {
       console.error("Error loading plan data:", error);
       toast({
         title: "Error",
         description: "Failed to load your planning summary.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
