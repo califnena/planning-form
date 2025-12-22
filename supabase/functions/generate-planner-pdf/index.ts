@@ -285,15 +285,9 @@ async function generateSimplePdf(
     let currentY = y;
     const displayItems = Array.isArray(items) ? items.slice(0, maxItems) : [];
 
+    // Don't draw anything if no items - caller should use drawEmpty instead
     if (displayItems.length === 0) {
-      page.drawText(`• `, {
-        x: margin,
-        y: currentY,
-        size: 10,
-        font: helvetica,
-        color: textColor,
-      });
-      return currentY - lineHeight;
+      return currentY;
     }
 
     for (const item of displayItems) {
@@ -301,8 +295,8 @@ async function generateSimplePdf(
 
       const raw = formatter(item);
       const text = sanitizeForPdf((raw ?? "").toString().trim());
+      if (!text) continue;
 
-      // Always draw a bullet so the section doesn’t look missing
       page.drawText(`• ${text}`, {
         x: margin,
         y: currentY,
