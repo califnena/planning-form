@@ -700,7 +700,7 @@ async function generateSimplePdf(
     'Gather legal documents', 'Write messages to loved ones'
   ];
   for (const item of checkItems) {
-    checklistPage.drawText(`☐ ${item}`, {
+    checklistPage.drawText(`[ ] ${item}`, {
       x: margin, y: checkY, size: 11, font: helvetica, color: textColor,
     });
     checkY -= 22;
