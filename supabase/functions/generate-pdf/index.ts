@@ -453,6 +453,22 @@ async function generateSimplePdf(
     color: rgb(0.5, 0.5, 0.5),
   });
 
+  // Helper to sanitize text for PDF (remove special chars that WinAnsi can't encode)
+  const sanitizeForPdf = (text: string): string => {
+    if (!text) return '';
+    return text
+      .replace(/[\r\n]+/g, ' ') // Replace newlines with spaces
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+      .replace(/[\u2018\u2019]/g, "'") // Smart quotes
+      .replace(/[\u201C\u201D]/g, '"')
+      .replace(/\u2013|\u2014/g, '-') // Em/en dashes
+      .replace(/\u2026/g, '...') // Ellipsis
+      .replace(/[\u{1F300}-\u{1F9FF}]/gu, '') // Emojis
+      .replace(/[\u{2600}-\u{26FF}]/gu, '') // Misc symbols
+      .replace(/[\u{2700}-\u{27BF}]/gu, '') // Dingbats
+      .trim();
+  };
+
   // Helper to add content page
   const addContentPage = (title: string, content: string | null) => {
     if (!content) return;
@@ -461,7 +477,7 @@ async function generateSimplePdf(
     let currentY = pageHeight - 60;
     
     // Title
-    newPage.drawText(title, {
+    newPage.drawText(sanitizeForPdf(title), {
       x: margin,
       y: currentY,
       size: 18,
@@ -471,16 +487,20 @@ async function generateSimplePdf(
     
     currentY -= 30;
     
-    // Content - simple wrapping
-    const words = content.split(' ');
+    // Content - sanitize and split by spaces
+    const sanitizedContent = sanitizeForPdf(content);
+    const words = sanitizedContent.split(' ').filter(w => w.length > 0);
     let line = '';
     const maxWidth = pageWidth - (margin * 2);
     
     for (const word of words) {
-      const testLine = line ? `${line} ${word}` : word;
+      const sanitizedWord = sanitizeForPdf(word);
+      if (!sanitizedWord) continue;
+      
+      const testLine = line ? `${line} ${sanitizedWord}` : sanitizedWord;
       const width = helvetica.widthOfTextAtSize(testLine, 11);
       
-      if (width > maxWidth) {
+      if (width > maxWidth && line) {
         newPage.drawText(line, {
           x: margin,
           y: currentY,
@@ -489,7 +509,7 @@ async function generateSimplePdf(
           color: rgb(0.2, 0.2, 0.2),
         });
         currentY -= 15;
-        line = word;
+        line = sanitizedWord;
         
         if (currentY < 80) break;
       } else {
@@ -528,7 +548,7 @@ async function generateSimplePdf(
       profile.birthplace && `Place of Birth: ${profile.birthplace}`,
       profile.marital_status && `Marital Status: ${profile.marital_status}`,
       profile.partner_name && `Spouse/Partner: ${profile.partner_name}`,
-    ].filter(Boolean).join('\n\n');
+    ].filter(Boolean).join(' | '); // Use pipe separator instead of newlines
     
     if (personalContent) {
       addContentPage('My Personal Information', personalContent);
