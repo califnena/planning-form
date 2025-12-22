@@ -191,28 +191,26 @@ serve(async (req) => {
     const profile = { ...(planData.personal_profile || {}), ...(piiData || {}) };
     const textColor = rgb(0.1, 0.1, 0.1);
 
-    // Helper to draw text with wrapping
-    const drawText = (page: any, text: string, pos: TextPosition) => {
-      if (!text) return;
-      const fontSize = pos.fontSize || 11;
-      const lines = wrapText(text, pos.maxWidth, fontSize, helvetica);
-      let currentY = pos.y;
-      
-      for (const line of lines.slice(0, 5)) { // Max 5 lines
-        page.drawText(line, {
-          x: pos.x,
-          y: currentY,
-          size: fontSize,
-          font: helvetica,
-          color: textColor,
-        });
-        currentY -= fontSize + 2;
-      }
+    // Helper to sanitize text for PDF (remove special chars that WinAnsi can't encode)
+    const sanitizeForPdf = (text: string): string => {
+      if (!text) return '';
+      return String(text)
+        .replace(/[\r\n]+/g, ' ') // Replace newlines with spaces
+        .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+        .replace(/[\u2018\u2019]/g, "'") // Smart quotes
+        .replace(/[\u201C\u201D]/g, '"')
+        .replace(/\u2013|\u2014/g, '-') // Em/en dashes
+        .replace(/\u2026/g, '...') // Ellipsis
+        .replace(/[\u{1F300}-\u{1F9FF}]/gu, '') // Emojis
+        .replace(/[\u{2600}-\u{26FF}]/gu, '') // Misc symbols
+        .replace(/[\u{2700}-\u{27BF}]/gu, '') // Dingbats
+        .trim();
     };
 
-    // Simple text wrapping function
+    // Simple text wrapping function with sanitization
     function wrapText(text: string, maxWidth: number, fontSize: number, font: any): string[] {
-      const words = text.split(' ');
+      const sanitized = sanitizeForPdf(text);
+      const words = sanitized.split(' ').filter(w => w.length > 0);
       const lines: string[] = [];
       let currentLine = '';
       
@@ -234,6 +232,25 @@ serve(async (req) => {
       
       return lines;
     }
+
+    // Helper to draw text with wrapping
+    const drawText = (page: any, text: string, pos: TextPosition) => {
+      if (!text) return;
+      const fontSize = pos.fontSize || 11;
+      const lines = wrapText(text, pos.maxWidth, fontSize, helvetica);
+      let currentY = pos.y;
+      
+      for (const line of lines.slice(0, 5)) { // Max 5 lines
+        page.drawText(line, {
+          x: pos.x,
+          y: currentY,
+          size: fontSize,
+          font: helvetica,
+          color: textColor,
+        });
+        currentY -= fontSize + 2;
+      }
+    };
 
     // Find the cover page in our new PDF and add prepared_for
     if (pages.length > 0) {
