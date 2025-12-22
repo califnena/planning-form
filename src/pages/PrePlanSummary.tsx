@@ -107,51 +107,61 @@ export default function PrePlanSummary() {
       // DEBUG: Log user context
       console.log("[PrePlanSummary] Loading data for user:", user.id);
 
-      // Step 1: Get user's org
-      const { data: orgMember } = await supabase
+      // Step 1: Get user's org (try org_members first)
+      const { data: orgMember, error: orgError } = await supabase
         .from("org_members")
         .select("org_id")
         .eq("user_id", user.id)
-        .eq("role", "owner")
-        .maybeSingle();
-      
-      console.log("[PrePlanSummary] Org member lookup:", { userId: user.id, orgMember });
-
-      if (!orgMember) {
-        // No org = user hasn't started planning yet
-        console.log("[PrePlanSummary] No org found - redirecting to start planner");
-        setLoading(false);
-        return;
-      }
-
-      // Step 2: Get the LATEST plan by updated_at (not just any plan)
-      const { data: plan, error } = await supabase
-        .from("plans")
-        .select("*")
-        .eq("org_id", orgMember.org_id)
-        .eq("owner_user_id", user.id)
-        .order("updated_at", { ascending: false })
+        .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
-
-      console.log("[PrePlanSummary] Plan query result:", { 
-        orgId: orgMember.org_id, 
-        userId: user.id, 
-        planId: plan?.id,
-        planUpdatedAt: plan?.updated_at,
-        error 
-      });
-
-      if (error) throw error;
       
-      // Step 3: If no plan exists, create one
-      let activePlan = plan;
+      console.log("[PrePlanSummary] Org member lookup:", { userId: user.id, orgMember, orgError: orgError?.message });
+
+      let orgId = orgMember?.org_id || null;
+      let activePlan: any = null;
+
+      // If we have an org, try to get plan from org
+      if (orgId) {
+        const { data: plan, error } = await supabase
+          .from("plans")
+          .select("*")
+          .eq("org_id", orgId)
+          .eq("owner_user_id", user.id)
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        console.log("[PrePlanSummary] Plan query by org:", { orgId, planId: plan?.id, error: error?.message });
+        activePlan = plan;
+      }
+
+      // FALLBACK: If no plan found via org, try direct lookup by owner_user_id
       if (!activePlan) {
+        console.log("[PrePlanSummary] Trying fallback: plans by owner_user_id");
+        const { data: fallbackPlan, error: fallbackError } = await supabase
+          .from("plans")
+          .select("*")
+          .eq("owner_user_id", user.id)
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        console.log("[PrePlanSummary] Fallback plan lookup:", { planId: fallbackPlan?.id, orgId: fallbackPlan?.org_id, error: fallbackError?.message });
+        
+        if (fallbackPlan) {
+          activePlan = fallbackPlan;
+          orgId = fallbackPlan.org_id || orgId;
+        }
+      }
+
+      // If still no plan, create one (only if we have an orgId)
+      if (!activePlan && orgId) {
         console.log("[PrePlanSummary] No plan found - creating draft plan");
         const { data: newPlan, error: createError } = await supabase
           .from("plans")
           .insert({
-            org_id: orgMember.org_id,
+            org_id: orgId,
             owner_user_id: user.id,
             title: "My Planning Document"
           })
@@ -165,6 +175,15 @@ export default function PrePlanSummary() {
         activePlan = newPlan;
         console.log("[PrePlanSummary] Created new plan:", activePlan?.id);
       }
+
+      // If no plan and no org, show empty state
+      if (!activePlan) {
+        console.log("[PrePlanSummary] No plan and no org - showing empty state");
+        setLoading(false);
+        return;
+      }
+
+      console.log("[PrePlanSummary] Using plan:", { planId: activePlan.id, updatedAt: activePlan.updated_at });
 
       // Step 4: Fetch all related data for this plan
       const [
@@ -464,8 +483,10 @@ export default function PrePlanSummary() {
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Admin Debug Panel */}
           <PlanDebugPanel 
+            userId={planDataStatus.userId}
             orgId={planDataStatus.orgId} 
-            planId={planDataStatus.planId} 
+            planId={planDataStatus.planId}
+            debugInfo={planDataStatus.debugInfo}
             counts={planDataStatus.counts} 
           />
           <Card className="p-8 text-center">
@@ -489,8 +510,10 @@ export default function PrePlanSummary() {
       <div className="container mx-auto px-4 py-8 max-w-4xl print:p-0">
         {/* Admin Debug Panel */}
         <PlanDebugPanel 
+          userId={planDataStatus.userId}
           orgId={planDataStatus.orgId} 
-          planId={planDataStatus.planId} 
+          planId={planDataStatus.planId}
+          debugInfo={planDataStatus.debugInfo}
           counts={planDataStatus.counts} 
         />
         

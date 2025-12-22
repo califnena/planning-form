@@ -35,6 +35,7 @@ import Vendors from "./pages/Vendors";
 import Forms from "./pages/Forms";
 import Contact from "./pages/Contact";
 import Resources from "./pages/Resources";
+import CostEstimator from "./pages/CostEstimator";
 import FAQ from "./pages/FAQ";
 import LegalDocuments from "./pages/LegalDocuments";
 import PreviewPrePlanning from "./pages/PreviewPrePlanning";
@@ -132,6 +133,7 @@ const App = () => (
                       <Route path="/forms" element={<Forms />} />
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/resources" element={<Resources />} />
+                      <Route path="/resources/cost-estimator" element={<CostEstimator />} />
                       <Route path="/faq" element={<FAQ />} />
                       <Route path="/legal-documents" element={<LegalDocuments />} />
                       <Route path="/preview/preplanning" element={<PreviewPrePlanning />} />

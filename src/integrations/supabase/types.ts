@@ -505,6 +505,66 @@ export type Database = {
           },
         ]
       }
+      cost_estimates: {
+        Row: {
+          addons: string[] | null
+          casket_level: string
+          created_at: string
+          disposition: string
+          high_estimate: number
+          id: string
+          low_estimate: number
+          plan_id: string | null
+          service_level: string
+          state: string
+          typical_estimate: number
+          user_id: string
+        }
+        Insert: {
+          addons?: string[] | null
+          casket_level: string
+          created_at?: string
+          disposition: string
+          high_estimate: number
+          id?: string
+          low_estimate: number
+          plan_id?: string | null
+          service_level: string
+          state: string
+          typical_estimate: number
+          user_id: string
+        }
+        Update: {
+          addons?: string[] | null
+          casket_level?: string
+          created_at?: string
+          disposition?: string
+          high_estimate?: number
+          id?: string
+          low_estimate?: number
+          plan_id?: string | null
+          service_level?: string
+          state?: string
+          typical_estimate?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cost_estimates_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "admin_plans_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cost_estimates_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       death_cert_requests: {
         Row: {
           case_id: string
