@@ -507,15 +507,15 @@ const Resources = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="bg-card border border-border rounded-xl p-6">
+        <Link to="/resources/cost-estimator" className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-colors block">
           <h3 className="font-semibold mb-2 flex items-center gap-2">
             <span>💰</span> Cost Estimator
           </h3>
           <p className="text-sm text-muted-foreground mb-4">
             Get a general idea of funeral costs based on your choices.
           </p>
-          <Button variant="outline" size="sm" disabled>Coming Soon</Button>
-        </div>
+          <Button variant="outline" size="sm">Open Calculator</Button>
+        </Link>
         
         <div className="bg-card border border-border rounded-xl p-6">
           <h3 className="font-semibold mb-2 flex items-center gap-2">

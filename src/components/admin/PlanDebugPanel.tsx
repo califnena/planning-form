@@ -3,8 +3,10 @@ import { Bug } from "lucide-react";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
 
 interface PlanDebugPanelProps {
+  userId?: string | null;
   orgId: string | null;
   planId: string | null;
+  debugInfo?: string | null;
   counts: {
     personalProfile: boolean;
     contacts: number;
@@ -20,7 +22,7 @@ interface PlanDebugPanelProps {
  * Admin-only debug panel showing plan resolution and data counts.
  * Only visible when user has admin role.
  */
-export function PlanDebugPanel({ orgId, planId, counts }: PlanDebugPanelProps) {
+export function PlanDebugPanel({ userId, orgId, planId, debugInfo, counts }: PlanDebugPanelProps) {
   const { isAdmin, isLoading } = useAdminStatus();
 
   if (isLoading || !isAdmin) {
@@ -33,11 +35,25 @@ export function PlanDebugPanel({ orgId, planId, counts }: PlanDebugPanelProps) {
       <AlertTitle className="text-amber-800">Admin Debug: Plan Data Status</AlertTitle>
       <AlertDescription className="text-amber-700 mt-2">
         <div className="grid grid-cols-2 gap-2 text-sm font-mono">
+          {userId !== undefined && (
+            <>
+              <div>user_id:</div>
+              <div className="truncate">{userId || "null"}</div>
+            </>
+          )}
+          
           <div>org_id:</div>
           <div className="truncate">{orgId || "null"}</div>
           
           <div>plan_id:</div>
           <div className="truncate">{planId || "null"}</div>
+          
+          {debugInfo && (
+            <>
+              <div>debug:</div>
+              <div className="truncate">{debugInfo}</div>
+            </>
+          )}
           
           <div className="col-span-2 border-t border-amber-300 pt-2 mt-2 font-semibold">
             Data Counts:
