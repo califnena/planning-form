@@ -14,6 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { WritingHelperButton } from "@/components/planner/WritingHelperButton";
 
 interface SectionFuneralProps {
   data: any;
@@ -213,7 +214,15 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
 
       <div className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="funeral_preference">{t("funeral.funeralPreference")}</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="funeral_preference">{t("funeral.funeralPreference")}</Label>
+            <WritingHelperButton
+              fieldLabel="Funeral Preference"
+              fieldContext="funeral_wishes"
+              currentText={funeral.funeral_preference || ""}
+              onInsert={(text) => updateFuneral("funeral_preference", text)}
+            />
+          </div>
           <p className="text-xs text-muted-foreground">{t("funeral.funeralPreferenceHelp")}</p>
           <Textarea
             id="funeral_preference"
@@ -861,7 +870,15 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="readings_content">Preferred Readings</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="readings_content">Preferred Readings</Label>
+                <WritingHelperButton
+                  fieldLabel="Preferred Readings"
+                  fieldContext="funeral_wishes"
+                  currentText={funeral.readings_content || ""}
+                  onInsert={(text) => updateFuneral("readings_content", text)}
+                />
+              </div>
               <Textarea
                 id="readings_content"
                 value={funeral.readings_content || ""}
@@ -921,7 +938,15 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="funeral_general_notes">Additional Details & Special Requests</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="funeral_general_notes">Additional Details & Special Requests</Label>
+            <WritingHelperButton
+              fieldLabel="Additional Details & Special Requests"
+              fieldContext="funeral_wishes"
+              currentText={funeral.general_notes || ""}
+              onInsert={(text) => updateFuneral("general_notes", text)}
+            />
+          </div>
           <p className="text-xs text-muted-foreground">Preferred funeral home, music, readings, speakers, traditions, dress code, budget, pre-paid plan details, and any other pertinent information</p>
           <Textarea
             id="funeral_general_notes"
