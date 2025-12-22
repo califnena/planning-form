@@ -161,16 +161,35 @@ export default function PrePlanSummary() {
       setPlanData(mergedPlan);
       setLastUpdated(mergedPlan.updated_at || null);
 
-      // Use data from Supabase tables (source of truth)
+      // CRITICAL: Merge localStorage personal_profile with DB data
+      // The form saves to localStorage, not the personal_profiles table
       const dbProfile = data.personalProfile;
+      const localProfile = localPlan?.personal_profile;
+      
+      // Merge: prefer localStorage (where form saves) over DB
+      const mergedProfile = {
+        ...(dbProfile || {}),
+        ...(localProfile || {}),
+      };
+      
       const dbContacts = data.contacts || [];
       const dbMessages = data.messages || [];
       const dbProperties = data.properties || [];
       const dbPets = data.pets || [];
       const dbInsurance = data.insurance || [];
 
-      setProfile(dbProfile);
+      // Use merged profile that includes localStorage data
+      setProfile(Object.keys(mergedProfile).length > 0 ? mergedProfile : null);
       setContacts(dbContacts);
+      
+      // Debug log for validation troubleshooting
+      console.log("[PrePlanSummary] Profile resolution:", {
+        dbProfile: !!dbProfile,
+        localProfile: !!localProfile,
+        mergedFullName: mergedProfile?.full_name,
+        mergedAddress: mergedProfile?.address,
+        preparedFor: mergedPlan?.prepared_for,
+      });
 
       // Get the user's selected sections from settings
       const userSelectedSections = settings?.selected_sections?.length 
@@ -178,42 +197,44 @@ export default function PrePlanSummary() {
         : SETTINGS_DEFAULT;
       const selectedSet = new Set(userSelectedSections);
 
-      // Build ALL possible sections with content from DB
+      // Build ALL possible sections with content from merged data
+      const displayProfile = Object.keys(mergedProfile).length > 0 ? mergedProfile : null;
+      
       const allPossibleSections: SectionData[] = [
         {
           id: "personal",
           label: "Personal & Family Details",
           icon: <User className="h-5 w-5" />,
-          content: dbProfile ? (
+          content: displayProfile ? (
             <div className="space-y-2 text-sm">
-              {dbProfile.full_name && (
+              {displayProfile.full_name && (
                 <p>
-                  <strong>Name:</strong> {dbProfile.full_name}
+                  <strong>Name:</strong> {displayProfile.full_name}
                 </p>
               )}
-              {dbProfile.address && (
+              {displayProfile.address && (
                 <p>
-                  <strong>Address:</strong> {dbProfile.address}
+                  <strong>Address:</strong> {displayProfile.address}
                 </p>
               )}
-              {dbProfile.marital_status && (
+              {displayProfile.marital_status && (
                 <p>
-                  <strong>Marital Status:</strong> {dbProfile.marital_status}
+                  <strong>Marital Status:</strong> {displayProfile.marital_status}
                 </p>
               )}
-              {dbProfile.partner_name && (
+              {displayProfile.partner_name && (
                 <p>
-                  <strong>Spouse/Partner:</strong> {dbProfile.partner_name}
+                  <strong>Spouse/Partner:</strong> {displayProfile.partner_name}
                 </p>
               )}
-              {Array.isArray(dbProfile.child_names) && dbProfile.child_names.filter(Boolean).length > 0 && (
+              {Array.isArray(displayProfile.child_names) && displayProfile.child_names.filter(Boolean).length > 0 && (
                 <p>
-                  <strong>Children:</strong> {dbProfile.child_names.filter(Boolean).join(", ")}
+                  <strong>Children:</strong> {displayProfile.child_names.filter(Boolean).join(", ")}
                 </p>
               )}
             </div>
           ) : null,
-          hasContent: !!dbProfile?.full_name,
+          hasContent: !!(displayProfile?.full_name || mergedPlan?.prepared_for),
           editRoute: "/preplandashboard?section=personal",
         },
         {
@@ -460,7 +481,7 @@ export default function PrePlanSummary() {
       }
 
       toast({
-        title: isDraftMode ? "Draft PDF Generated" : "PDF Generated",
+        title: isDraftMode ? "Draft Document Created" : "Document Created",
         description: isDraftMode 
           ? "Your draft document has been generated. Some fields may be blank."
           : "Your planning document has been generated successfully."
@@ -469,10 +490,10 @@ export default function PrePlanSummary() {
       // Reset draft mode after successful generation
       setIsDraftMode(false);
     } catch (error) {
-      console.error("Error generating PDF:", error);
+      console.error("Error generating document:", error);
       toast({
         title: "Error",
-        description: "Failed to generate PDF. Please try again.",
+        description: "Failed to create your document. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -653,7 +674,7 @@ export default function PrePlanSummary() {
                 <TooltipTrigger asChild>
                   <Button onClick={handleDownloadPDF} className="gap-2">
                     <Download className="h-4 w-4" />
-                    Download PDF
+                    Download My Document
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Downloads your complete planning document</TooltipContent>
@@ -662,19 +683,19 @@ export default function PrePlanSummary() {
                 <TooltipTrigger asChild>
                   <Button variant="outline" onClick={handlePrint} className="gap-2">
                     <Printer className="h-4 w-4" />
-                    Print
+                    Print My Document
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Prints the full planning summary</TooltipContent>
+                <TooltipContent>Prints your planning document</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="outline" onClick={() => setShowShareDialog(true)} className="gap-2">
                     <Mail className="h-4 w-4" />
-                    Email a Copy
+                    Email My Document
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Sends the full planning summary</TooltipContent>
+                <TooltipContent>Sends your planning document by email</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -683,7 +704,7 @@ export default function PrePlanSummary() {
                     Save for Later
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Your summary is automatically saved</TooltipContent>
+                <TooltipContent>Your document is automatically saved</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>

@@ -19,6 +19,7 @@ export interface ValidationResult {
 }
 
 interface PlanData {
+  // Personal profile can come from personal_profiles table OR localStorage
   personal_profile?: {
     full_name?: string;
     birthplace?: string;
@@ -58,6 +59,7 @@ interface PlanData {
   messages_notes?: string;
   to_loved_ones_message?: string;
   prepared_for?: string;
+  // Also check the plans table prepared_for field as fallback for name
 }
 
 // Section route mapping for "Go to section" navigation
@@ -121,14 +123,21 @@ export function validatePdfReady(
   // A) Personal & Family Details - HARD REQUIRED: full_name OR prepared_for
   if (selectedSet.has("personal")) {
     const profile = planData?.personal_profile;
-    const hasName = profile?.full_name?.trim() || planData?.prepared_for?.trim();
+    
+    // Check for name in multiple possible locations (DB profile, localStorage, or plans.prepared_for)
+    const hasName = !!(
+      (profile?.full_name && profile.full_name.trim().length >= 2) ||
+      (planData?.prepared_for && planData.prepared_for.trim().length >= 2)
+    );
     
     if (!hasName) {
       addMissing("personal", "full_name", "Full Legal Name", "Add your full legal name", "hard");
     }
     
-    // Address is HARD REQUIRED (street + city + state minimum)
-    if (!profile?.address?.trim()) {
+    // Address check - minimum 5 characters for valid address
+    const hasAddress = !!(profile?.address && profile.address.trim().length >= 5);
+    
+    if (!hasAddress) {
       addMissing("personal", "address", "Current Address", "Add your current address", "hard");
     }
   }

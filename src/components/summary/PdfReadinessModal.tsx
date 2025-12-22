@@ -101,11 +101,11 @@ export function PdfReadinessModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <FileText className="h-5 w-5 text-primary" />
-            Before We Create Your PDF
+            Before We Create Your Document
           </DialogTitle>
           <DialogDescription className="text-base pt-2">
             {hasHardRequired 
-              ? "Some required information is missing. Please add it before creating your PDF."
+              ? "Some required information is missing. Please add it before creating your document."
               : "A few items are missing. You can add them now, or create a draft with blank spaces."}
           </DialogDescription>
         </DialogHeader>
@@ -228,7 +228,7 @@ export function PdfReadinessModal({
                   className="gap-2"
                 >
                   <Download className="h-4 w-4" />
-                  Download Draft PDF
+                  Download Draft
                 </Button>
                 <Button
                   variant="secondary"
@@ -248,9 +248,12 @@ export function PdfReadinessModal({
                   className="gap-2"
                 >
                   <Mail className="h-4 w-4" />
-                  Email Draft Copy
+                  Email Draft
                 </Button>
               </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                This creates a printable document you can save and share.
+              </p>
             </div>
           </div>
         )}
@@ -296,7 +299,7 @@ export function PdfReadinessBadge({
       <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
         <CheckCircle2 className="h-4 w-4 text-green-600" />
         <span className="text-sm font-medium text-green-700 dark:text-green-400">
-          PDF Ready
+          Document Ready
         </span>
       </div>
     );

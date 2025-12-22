@@ -67,18 +67,18 @@ export const PIICollectionDialog = ({ open, onOpenChange, onSubmit }: PIICollect
         <DialogHeader>
           <div className="flex items-center gap-2">
             <Shield className="h-6 w-6 text-primary" />
-            <DialogTitle className="text-xl">Add Sensitive Information for PDF</DialogTitle>
+            <DialogTitle className="text-xl">Add Sensitive Information for Your Document</DialogTitle>
           </div>
           <DialogDescription className="space-y-3 pt-2">
             <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
               <AlertTriangle className="h-4 w-4 text-amber-600" />
               <AlertDescription className="text-amber-900 dark:text-amber-100 text-sm">
-                <strong>This information will NOT be saved.</strong> It's only used to generate your PDF document. 
-                You'll need to re-enter it next time you generate a PDF.
+                <strong>This information will NOT be saved.</strong> It's only used to create your document. 
+                You'll need to re-enter it next time.
               </AlertDescription>
             </Alert>
             <p className="text-sm">
-              Enter any sensitive details you want included in your PDF. All fields are optional - 
+              Enter any sensitive details you want included in your document. All fields are optional - 
               leave blank any information you don't want to include.
             </p>
           </DialogDescription>
@@ -227,7 +227,7 @@ export const PIICollectionDialog = ({ open, onOpenChange, onSubmit }: PIICollect
             Skip - Generate Without Sensitive Info
           </Button>
           <Button onClick={handleSubmit} className="w-full sm:w-auto">
-            Generate PDF with This Information
+            Create My Document
           </Button>
         </DialogFooter>
       </DialogContent>

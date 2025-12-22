@@ -271,14 +271,14 @@ export default function Dashboard() {
     try {
       await generatePlanPDF(piiData);
       toast({
-        title: "PDF Generated",
+        title: "Document Created",
         description: "Your Pre-Planning document has been generated successfully."
       });
     } catch (error) {
-      console.error("Error generating PDF:", error);
+      console.error("Error generating document:", error);
       toast({
         title: "Error",
-        description: "Failed to generate PDF. Please try again.",
+        description: "Failed to create your document. Please try again.",
         variant: "destructive"
       });
     }
@@ -401,14 +401,14 @@ export default function Dashboard() {
     try {
       await generateBlankAfterLifePlanPDF();
       toast({
-        title: "PDF Generated",
+        title: "Document Created",
         description: "Your After-Death Planner document has been generated successfully."
       });
     } catch (error) {
-      console.error("Error generating After-Death PDF:", error);
+      console.error("Error generating After-Death document:", error);
       toast({
         title: "Error",
-        description: "Failed to generate PDF. Please try again.",
+        description: "Failed to create your document. Please try again.",
         variant: "destructive"
       });
     }

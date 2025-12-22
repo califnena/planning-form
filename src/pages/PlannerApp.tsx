@@ -397,13 +397,13 @@ const PlannerApp = () => {
         window.open(pdfUrl, '_blank');
         toast({
           title: "Preview opened",
-          description: "PDF opened in new tab (PII data not saved)",
+          description: "Document opened in new tab (PII data not saved)",
         });
       } catch (error) {
-        console.error("Error generating PDF:", error);
+        console.error("Error generating document:", error);
         toast({
           title: "Error",
-          description: "Failed to generate PDF preview. Please try again.",
+          description: "Failed to create document preview. Please try again.",
           variant: "destructive",
         });
       }
@@ -439,10 +439,10 @@ const PlannerApp = () => {
           description: "Your plan has been updated and downloaded successfully. (PII data not saved)",
         });
       } catch (error) {
-        console.error("Error generating PDF:", error);
+        console.error("Error generating document:", error);
         toast({
           title: "Error",
-          description: "Failed to generate PDF. Please try again.",
+          description: "Failed to create your document. Please try again.",
           variant: "destructive",
         });
       }
