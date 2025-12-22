@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { GlobalHeader } from "@/components/GlobalHeader";
@@ -54,11 +54,15 @@ import { mergeVisibleSections } from "@/lib/sections";
 
 const PlannerApp = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState("preferences");
+  
+  // Read section from query param, default to "preferences"
+  const sectionFromUrl = searchParams.get("section");
+  const [activeSection, setActiveSection] = useState(sectionFromUrl || "preferences");
   const [showRevisionDialog, setShowRevisionDialog] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showPIIDialog, setShowPIIDialog] = useState(false);
@@ -67,6 +71,15 @@ const PlannerApp = () => {
   const [userSettings, setUserSettings] = useState<string[] | null>(null);
   const [settingsLoading, setSettingsLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Update activeSection when URL section param changes (for deep-linking from /preplan-summary)
+  useEffect(() => {
+    if (sectionFromUrl && sectionFromUrl !== activeSection) {
+      setActiveSection(sectionFromUrl);
+      // Scroll to top when navigating to a section
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [sectionFromUrl]);
 
   const loadUserSettings = async (userId: string) => {
     try {

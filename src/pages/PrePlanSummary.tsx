@@ -45,6 +45,7 @@ import { PdfReadinessModal, PdfReadinessBadge } from "@/components/summary/PdfRe
 import { usePdfValidation } from "@/hooks/usePdfValidation";
 import { SETTINGS_DEFAULT } from "@/lib/sections";
 import { useActivePlan, fetchPlanData } from "@/hooks/useActivePlan";
+import { SECTION_ROUTES } from "@/lib/sectionRoutes";
 
 interface SectionData {
   id: string;
@@ -235,7 +236,7 @@ export default function PrePlanSummary() {
             </div>
           ) : null,
           hasContent: !!(displayProfile?.full_name || mergedPlan?.prepared_for),
-          editRoute: "/preplandashboard?section=personal",
+          editRoute: SECTION_ROUTES.personal,
         },
         {
           id: "contacts",
@@ -260,7 +261,7 @@ export default function PrePlanSummary() {
             </div>
           ) : null,
           hasContent: dbContacts.length > 0,
-          editRoute: "/preplandashboard?section=contacts",
+          editRoute: SECTION_ROUTES.contacts,
         },
         {
           id: "legacy",
@@ -270,7 +271,7 @@ export default function PrePlanSummary() {
             <p className="text-sm">{mergedPlan.about_me_notes}</p>
           ) : null,
           hasContent: !!mergedPlan.about_me_notes,
-          editRoute: "/preplandashboard?section=legacy",
+          editRoute: SECTION_ROUTES.legacy,
         },
         {
           id: "funeral",
@@ -280,7 +281,7 @@ export default function PrePlanSummary() {
             <p className="text-sm">{mergedPlan.funeral_wishes_notes}</p>
           ) : null,
           hasContent: !!mergedPlan.funeral_wishes_notes,
-          editRoute: "/preplandashboard?section=funeral",
+          editRoute: SECTION_ROUTES.funeral,
         },
         {
           id: "financial",
@@ -290,7 +291,7 @@ export default function PrePlanSummary() {
             <p className="text-sm">{mergedPlan.financial_notes}</p>
           ) : null,
           hasContent: !!mergedPlan.financial_notes,
-          editRoute: "/preplandashboard?section=financial",
+          editRoute: SECTION_ROUTES.financial,
         },
         {
           id: "insurance",
@@ -304,7 +305,7 @@ export default function PrePlanSummary() {
             <p className="text-sm">{mergedPlan.insurance_notes}</p>
           ) : null,
           hasContent: !!mergedPlan.insurance_notes || dbInsurance.length > 0,
-          editRoute: "/preplandashboard?section=insurance",
+          editRoute: SECTION_ROUTES.insurance,
         },
         {
           id: "property",
@@ -321,7 +322,7 @@ export default function PrePlanSummary() {
             </div>
           ) : null,
           hasContent: dbProperties.length > 0 || !!mergedPlan.property_notes,
-          editRoute: "/preplandashboard?section=property",
+          editRoute: SECTION_ROUTES.property,
         },
         {
           id: "legal",
@@ -331,7 +332,7 @@ export default function PrePlanSummary() {
             <p className="text-sm">{mergedPlan.legal_notes}</p>
           ) : null,
           hasContent: !!mergedPlan.legal_notes,
-          editRoute: "/preplandashboard?section=legal",
+          editRoute: SECTION_ROUTES.legal,
         },
         {
           id: "pets",
@@ -346,7 +347,7 @@ export default function PrePlanSummary() {
             </div>
           ) : null,
           hasContent: dbPets.length > 0 || !!mergedPlan.pets_notes,
-          editRoute: "/preplandashboard?section=pets",
+          editRoute: SECTION_ROUTES.pets,
         },
         {
           id: "digital",
@@ -356,7 +357,7 @@ export default function PrePlanSummary() {
             <p className="text-sm">{mergedPlan.digital_notes}</p>
           ) : null,
           hasContent: !!mergedPlan.digital_notes,
-          editRoute: "/preplandashboard?section=digital",
+          editRoute: SECTION_ROUTES.digital,
         },
         {
           id: "messages",
@@ -374,7 +375,7 @@ export default function PrePlanSummary() {
             </div>
           ) : null,
           hasContent: dbMessages.length > 0 || !!mergedPlan.messages_notes || !!mergedPlan.to_loved_ones_message,
-          editRoute: "/preplandashboard?section=messages",
+          editRoute: SECTION_ROUTES.messages,
         },
       ];
 
@@ -596,7 +597,7 @@ export default function PrePlanSummary() {
             <p className="text-muted-foreground mb-6">
               You haven't chosen any sections yet. Start by selecting what you'd like to include in your plan.
             </p>
-            <Button onClick={() => navigate("/preplandashboard?section=preferences")}>
+            <Button onClick={() => navigate(SECTION_ROUTES.preferences)}>
               Choose Your Sections
             </Button>
           </Card>
