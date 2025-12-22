@@ -684,7 +684,8 @@ export default function PrePlanSummary() {
   };
 
   const handleNavigateToSection = (sectionId: string) => {
-    navigate(`/preplandashboard?section=${sectionId}`);
+    const route = SECTION_ROUTES[sectionId] || "/preplandashboard/preferences";
+    navigate(route);
   };
 
   // Calculate missing sections - ONLY check sections user has selected in Preferences

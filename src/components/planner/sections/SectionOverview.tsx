@@ -26,9 +26,9 @@ export const SectionOverview = ({ onNavigateToSection }: SectionOverviewProps) =
 
   const { plan, loading, saveState } = usePlanData(userId || "");
 
-  // Calculate progress from plan data
+  // Calculate progress from plan data - IDs must match sectionIdToRoute in OverviewPage
   const sections = [
-    { id: "about", label: "About Me", field: "about_me_notes" },
+    { id: "legacy", label: "About Me", field: "about_me_notes" },
     { id: "funeral", label: "Funeral Wishes", field: "funeral_wishes_notes" },
     { id: "legal", label: "Legal", field: "legal_notes" },
     { id: "financial", label: "Financial", field: "financial_notes" },
@@ -59,8 +59,11 @@ export const SectionOverview = ({ onNavigateToSection }: SectionOverviewProps) =
   const handleContinuePlanning = () => {
     if (firstIncompleteSection && onNavigateToSection) {
       onNavigateToSection(firstIncompleteSection.id);
+    } else if (onNavigateToSection) {
+      // If all sections complete, go to the first one
+      onNavigateToSection("legacy");
     } else {
-      navigate('/plan-ahead?resume=1');
+      navigate('/preplandashboard/life-story');
     }
   };
 
@@ -72,7 +75,7 @@ export const SectionOverview = ({ onNavigateToSection }: SectionOverviewProps) =
         title: "No planning data yet",
         description: "Complete at least one section to generate your summary.",
       });
-      navigate('/plan-ahead');
+      navigate('/preplandashboard/life-story');
     }
   };
 
