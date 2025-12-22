@@ -46,6 +46,7 @@ import { usePdfValidation } from "@/hooks/usePdfValidation";
 import { SETTINGS_DEFAULT } from "@/lib/sections";
 import { useActivePlan, fetchPlanData } from "@/hooks/useActivePlan";
 import { SECTION_ROUTES } from "@/lib/sectionRoutes";
+import { buildPlanDataForPdf, normalizePlanDataForPdf } from "@/lib/buildPlanDataForPdf";
 
 interface SectionData {
   id: string;
@@ -445,14 +446,38 @@ export default function PrePlanSummary() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Call edge function to generate PDF
+      // Build complete plan data from Supabase (not just modal data)
+      // This is the fix: use buildPlanDataForPdf as the source of truth
+      const rawPlanData = await buildPlanDataForPdf(user.id);
+      const completePlanData = normalizePlanDataForPdf(rawPlanData);
+      
+      // Merge PII data into the personal profile
+      completePlanData.personal_profile = {
+        ...completePlanData.personal_profile,
+        full_name: piiData.full_name || completePlanData.personal_profile?.full_name,
+        address: piiData.address || completePlanData.personal_profile?.address,
+        ssn: piiData.ssn, // SSN is only from PII modal, never stored
+      };
+      completePlanData.prepared_by = piiData.prepared_by || completePlanData.prepared_by;
+      completePlanData.prepared_for = piiData.full_name || completePlanData.prepared_for;
+
+      console.log("[PrePlanSummary] Generating PDF with complete plan data:", {
+        planId: completePlanData.id,
+        hasProfile: !!completePlanData.personal_profile?.full_name,
+        contactsCount: completePlanData.contacts_notify?.length,
+        petsCount: completePlanData.pets?.length,
+        insuranceCount: completePlanData.insurance_policies?.length,
+      });
+
+      // Call edge function to generate PDF with COMPLETE data
       const { data: pdfData, error: pdfError } = await supabase.functions.invoke('generate-pdf', {
         body: {
-          planData: { ...planData, personal_profile: profile, contacts },
+          planData: completePlanData,
           selectedSections,
           piiData,
           docType: 'full',
-          isDraft: isDraftMode, // Pass draft flag to mark PDF appropriately
+          isDraft: isDraftMode,
+          outputAllPages: true, // Always output all 23 pages
         }
       });
 
@@ -474,8 +499,8 @@ export default function PrePlanSummary() {
         const link = document.createElement('a');
         link.href = url;
         const filename = isDraftMode 
-          ? `DRAFT-My-Final-Wishes-${new Date().toISOString().split('T')[0]}.pdf`
-          : pdfData.filename || 'My-Final-Wishes.pdf';
+          ? `DRAFT-My-Life-and-Legacy-Planner-${new Date().toISOString().split('T')[0]}.pdf`
+          : pdfData.filename || `My-Life-and-Legacy-Planner-${new Date().toISOString().split('T')[0]}.pdf`;
         link.download = filename;
         link.click();
         URL.revokeObjectURL(url);
@@ -675,16 +700,16 @@ export default function PrePlanSummary() {
                 <TooltipTrigger asChild>
                   <Button onClick={handleDownloadPDF} className="gap-2">
                     <Download className="h-4 w-4" />
-                    Download My Document
+                    Print or Save My Plan
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Downloads your complete planning document</TooltipContent>
+                <TooltipContent>Creates a printable document you can save and share</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="outline" onClick={handlePrint} className="gap-2">
                     <Printer className="h-4 w-4" />
-                    Print My Document
+                    Print Paper Copy
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Prints your planning document</TooltipContent>
@@ -693,7 +718,7 @@ export default function PrePlanSummary() {
                 <TooltipTrigger asChild>
                   <Button variant="outline" onClick={() => setShowShareDialog(true)} className="gap-2">
                     <Mail className="h-4 w-4" />
-                    Email My Document
+                    Email to Family
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Sends your planning document by email</TooltipContent>
@@ -709,12 +734,12 @@ export default function PrePlanSummary() {
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="secondary" onClick={() => toast({ title: "Coming soon", description: "For My Family view is being prepared." })} className="gap-2">
+                  <Button variant="secondary" onClick={() => toast({ title: "Coming soon", description: "Family Notice view is being prepared." })} className="gap-2">
                     <Heart className="h-4 w-4" />
-                    For My Family
+                    Share One-Page Family Notice
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Shares a simplified version for loved ones</TooltipContent>
+                <TooltipContent>Shares a simplified one-page summary for loved ones</TooltipContent>
               </Tooltip>
             </div>
           </TooltipProvider>

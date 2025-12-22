@@ -138,50 +138,40 @@ serve(async (req) => {
       });
     }
 
-    const { planData, selectedSections, piiData, docType = 'full' } = await req.json();
-    console.log('Generating PDF for user:', user.id, 'docType:', docType);
+    const { planData, selectedSections, piiData, docType = 'full', isDraft = false, outputAllPages = true } = await req.json();
+    console.log('Generating PDF for user:', user.id, 'docType:', docType, 'isDraft:', isDraft, 'outputAllPages:', outputAllPages);
     console.log('Selected sections:', selectedSections);
+    console.log('Plan data keys:', Object.keys(planData || {}));
+    console.log('Contacts count:', planData?.contacts_notify?.length || 0);
+    console.log('Insurance count:', planData?.insurance_policies?.length || 0);
 
-    // Fetch the blank PDF template from public URL
-    const templateUrl = `${supabaseUrl.replace('/auth/v1', '')}/storage/v1/object/public/pdf-templates/My-Final-Wishes-Blank-Form-2025-11-17.pdf`;
+    // Fetch the blank PDF template from storage
+    const templateUrl = `${supabaseUrl}/storage/v1/object/public/pdf-templates/My-Final-Wishes-Blank-Form-2025-11-17.pdf`;
     
-    // Fallback: try direct URL construction
-    const baseUrl = supabaseUrl.replace('/auth/v1', '').replace('supabase.co', 'supabase.co');
+    console.log('Fetching template from:', templateUrl);
     const templateResponse = await fetch(templateUrl);
     
     if (!templateResponse.ok) {
-      console.log('Template not found in storage, will generate from scratch');
+      console.log('Template not found in storage (status:', templateResponse.status, '), will generate from scratch');
       // Fall back to generating a simple PDF without template
       return await generateSimplePdf(planData, selectedSections, piiData, user.id, supabase, corsHeaders);
     }
 
     const templateBytes = await templateResponse.arrayBuffer();
+    console.log('Template loaded, size:', templateBytes.byteLength);
+    
     const templatePdf = await PDFDocument.load(templateBytes);
     const helvetica = await templatePdf.embedFont(StandardFonts.Helvetica);
     const helveticaBold = await templatePdf.embedFont(StandardFonts.HelveticaBold);
 
-    // Create new PDF with only selected sections
+    // Create new PDF - ALWAYS copy ALL pages from template (outputAllPages = true)
     const newPdf = await PDFDocument.create();
+    const totalPages = templatePdf.getPageCount();
+    console.log('Template has', totalPages, 'pages - copying ALL pages');
     
-    // Always include cover and TOC
-    const pagesToInclude: number[] = [...SECTION_PAGES.cover, ...SECTION_PAGES.toc];
-    
-    // Add pages for selected sections
-    for (const sectionId of selectedSections) {
-      const templateSection = SECTION_ID_MAP[sectionId];
-      if (templateSection && SECTION_PAGES[templateSection]) {
-        pagesToInclude.push(...SECTION_PAGES[templateSection]);
-      }
-    }
-    
-    // Always include revisions at the end
-    pagesToInclude.push(...SECTION_PAGES.revisions);
-    
-    // Sort and dedupe
-    const uniquePages = [...new Set(pagesToInclude)].sort((a, b) => a - b);
-    
-    // Copy only selected pages
-    const copiedPages = await newPdf.copyPages(templatePdf, uniquePages);
+    // Copy ALL pages from template (full 23-page binder)
+    const allPageIndices = Array.from({ length: totalPages }, (_, i) => i);
+    const copiedPages = await newPdf.copyPages(templatePdf, allPageIndices);
     copiedPages.forEach(page => newPdf.addPage(page));
 
     // Get pages for overlaying text
@@ -268,10 +258,10 @@ serve(async (req) => {
       }), coverPositions.date);
     }
 
-    // Find personal info page and overlay data
-    const personalPageIndex = uniquePages.indexOf(4);
-    if (personalPageIndex !== -1 && pages[personalPageIndex]) {
-      const personalPage = pages[personalPageIndex];
+    // Find personal info page and overlay data (page 4 in 0-indexed = personal info)
+    // Since we copy ALL pages, page index matches the original template
+    const personalPage = pages[4]; // Personal info is page 5 (0-indexed = 4)
+    if (personalPage) {
       const positions = FIELD_POSITIONS.personal;
       
       if (profile.full_name) drawText(personalPage, profile.full_name, positions.full_name);
@@ -286,19 +276,15 @@ serve(async (req) => {
       if (profile.email) drawText(personalPage, profile.email, positions.email);
     }
 
-    // Find legacy (About Me) page
-    const legacyPageIndex = uniquePages.indexOf(6);
-    if (legacyPageIndex !== -1 && pages[legacyPageIndex]) {
-      const legacyPage = pages[legacyPageIndex];
-      if (planData.about_me_notes) {
-        drawText(legacyPage, planData.about_me_notes, FIELD_POSITIONS.legacy.story);
-      }
+    // Find legacy (About Me) page - page 6 (0-indexed)
+    const legacyPage = pages[6];
+    if (legacyPage && planData.about_me_notes) {
+      drawText(legacyPage, planData.about_me_notes, FIELD_POSITIONS.legacy.story);
     }
 
-    // Find funeral page
-    const funeralPageIndex = uniquePages.indexOf(10);
-    if (funeralPageIndex !== -1 && pages[funeralPageIndex]) {
-      const funeralPage = pages[funeralPageIndex];
+    // Find funeral page - page 10 (0-indexed)
+    const funeralPage = pages[10];
+    if (funeralPage) {
       const funeral = planData.funeral || {};
       
       if (funeral.funeral_preference) {
@@ -309,6 +295,123 @@ serve(async (req) => {
       }
       if (funeral.burial_notes || funeral.cremation_notes) {
         drawText(funeralPage, funeral.burial_notes || funeral.cremation_notes, FIELD_POSITIONS.funeral.disposition_notes);
+      }
+    }
+
+    // Overlay contacts on page 7 (0-indexed)
+    const contactsPage = pages[7];
+    if (contactsPage && Array.isArray(planData.contacts_notify)) {
+      let contactY = 620;
+      const contactFontSize = 10;
+      for (let i = 0; i < Math.min(planData.contacts_notify.length, 5); i++) {
+        const contact = planData.contacts_notify[i];
+        if (contact?.name) {
+          const contactLine = [
+            contact.name,
+            contact.relationship ? `(${contact.relationship})` : '',
+            contact.contact || contact.phone || contact.email || ''
+          ].filter(Boolean).join(' - ');
+          
+          contactsPage.drawText(sanitizeForPdf(contactLine), {
+            x: 70,
+            y: contactY,
+            size: contactFontSize,
+            font: helvetica,
+            color: textColor,
+          });
+          contactY -= 30;
+        }
+      }
+    }
+
+    // Overlay insurance on page 13 (0-indexed)
+    const insurancePage = pages[13];
+    if (insurancePage && Array.isArray(planData.insurance_policies)) {
+      let insuranceY = 620;
+      const insuranceFontSize = 10;
+      for (let i = 0; i < Math.min(planData.insurance_policies.length, 5); i++) {
+        const policy = planData.insurance_policies[i];
+        if (policy?.company) {
+          const policyLine = [
+            policy.company,
+            policy.type || '',
+            policy.policy_number ? `#${policy.policy_number}` : ''
+          ].filter(Boolean).join(' - ');
+          
+          insurancePage.drawText(sanitizeForPdf(policyLine), {
+            x: 70,
+            y: insuranceY,
+            size: insuranceFontSize,
+            font: helvetica,
+            color: textColor,
+          });
+          insuranceY -= 25;
+        }
+      }
+    }
+
+    // Overlay pets on page 15 (0-indexed)
+    const petsPage = pages[15];
+    if (petsPage && Array.isArray(planData.pets)) {
+      let petY = 620;
+      const petFontSize = 10;
+      for (let i = 0; i < Math.min(planData.pets.length, 5); i++) {
+        const pet = planData.pets[i];
+        if (pet?.name) {
+          const petLine = [
+            pet.name,
+            pet.breed || '',
+            pet.caregiver ? `Care: ${pet.caregiver}` : ''
+          ].filter(Boolean).join(' - ');
+          
+          petsPage.drawText(sanitizeForPdf(petLine), {
+            x: 70,
+            y: petY,
+            size: petFontSize,
+            font: helvetica,
+            color: textColor,
+          });
+          petY -= 25;
+        }
+      }
+    }
+
+    // Overlay properties on page 14 (0-indexed)
+    const propertyPage = pages[14];
+    if (propertyPage && Array.isArray(planData.properties)) {
+      let propY = 620;
+      const propFontSize = 10;
+      for (let i = 0; i < Math.min(planData.properties.length, 5); i++) {
+        const prop = planData.properties[i];
+        if (prop?.address) {
+          const propLine = [
+            prop.address,
+            prop.mortgage_bank ? `Lender: ${prop.mortgage_bank}` : ''
+          ].filter(Boolean).join(' - ');
+          
+          propertyPage.drawText(sanitizeForPdf(propLine), {
+            x: 70,
+            y: propY,
+            size: propFontSize,
+            font: helvetica,
+            color: textColor,
+          });
+          propY -= 25;
+        }
+      }
+    }
+
+    // Add DRAFT watermark if isDraft
+    if (isDraft) {
+      for (const page of pages) {
+        page.drawText('DRAFT', {
+          x: 200,
+          y: 400,
+          size: 72,
+          font: helveticaBold,
+          color: rgb(0.9, 0.9, 0.9),
+          rotate: { type: 'degrees', angle: 45 } as any,
+        });
       }
     }
 
