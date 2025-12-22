@@ -76,6 +76,14 @@ export default function PrePlanSummary() {
   const [userEmail, setUserEmail] = useState<string>("");
   const [profile, setProfile] = useState<any>(null);
   const [contacts, setContacts] = useState<any[]>([]);
+  const [pets, setPets] = useState<any[]>([]);
+  const [insurance, setInsurance] = useState<any[]>([]);
+  const [properties, setProperties] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
+  const [investments, setInvestments] = useState<any[]>([]);
+  const [professionalContacts, setProfessionalContacts] = useState<any[]>([]);
+  const [funeralFunding, setFuneralFunding] = useState<any[]>([]);
   const [showFirstTimeHelper, setShowFirstTimeHelper] = useState(false);
   const [selectedSections, setSelectedSections] = useState<string[]>(SETTINGS_DEFAULT);
   
@@ -183,6 +191,14 @@ export default function PrePlanSummary() {
       // Use merged profile that includes localStorage data
       setProfile(Object.keys(mergedProfile).length > 0 ? mergedProfile : null);
       setContacts(dbContacts);
+      setPets(dbPets);
+      setInsurance(dbInsurance);
+      setProperties(dbProperties);
+      setMessages(dbMessages);
+      setBankAccounts(data.bankAccounts || []);
+      setInvestments(data.investments || []);
+      setProfessionalContacts(data.professionalContacts || []);
+      setFuneralFunding(data.funeralFunding || []);
       
       // Debug log for validation troubleshooting
       console.log("[PrePlanSummary] Profile resolution:", {
@@ -446,33 +462,75 @@ export default function PrePlanSummary() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Build complete plan data from Supabase (not just modal data)
-      // This is the fix: use buildPlanDataForPdf as the source of truth
-      const rawPlanData = await buildPlanDataForPdf(user.id);
-      const completePlanData = normalizePlanDataForPdf(rawPlanData);
-      
-      // Merge PII data into the personal profile
-      completePlanData.personal_profile = {
-        ...completePlanData.personal_profile,
-        full_name: piiData.full_name || completePlanData.personal_profile?.full_name,
-        address: piiData.address || completePlanData.personal_profile?.address,
-        ssn: piiData.ssn, // SSN is only from PII modal, never stored
-      };
-      completePlanData.prepared_by = piiData.prepared_by || completePlanData.prepared_by;
-      completePlanData.prepared_for = piiData.full_name || completePlanData.prepared_for;
+      // Build PDF payload using ALREADY LOADED state data
+      // This ensures the PDF gets the exact same data shown on the summary page
+      const pdfPlanData = {
+        // Plan metadata
+        id: planId,
+        org_id: orgId,
+        prepared_by: piiData.prepared_by || profile?.full_name || planData?.preparer_name,
+        prepared_for: piiData.full_name || profile?.full_name || planData?.prepared_for,
+        title: planData?.title,
+        updated_at: planData?.updated_at,
 
-      console.log("[PrePlanSummary] Generating PDF with complete plan data:", {
-        planId: completePlanData.id,
-        hasProfile: !!completePlanData.personal_profile?.full_name,
-        contactsCount: completePlanData.contacts_notify?.length,
-        petsCount: completePlanData.pets?.length,
-        insuranceCount: completePlanData.insurance_policies?.length,
+        // Personal profile (merged from state + PII modal)
+        personal_profile: {
+          ...(profile || {}),
+          full_name: piiData.full_name || profile?.full_name,
+          address: piiData.address || profile?.address,
+          ssn: piiData.ssn, // SSN only from PII modal, never stored
+        },
+
+        // Notes from planData state
+        instructions_notes: planData?.instructions_notes || "",
+        about_me_notes: planData?.about_me_notes || "",
+        checklist_notes: planData?.checklist_notes || "",
+        funeral_wishes_notes: planData?.funeral_wishes_notes || "",
+        financial_notes: planData?.financial_notes || "",
+        insurance_notes: planData?.insurance_notes || "",
+        property_notes: planData?.property_notes || "",
+        pets_notes: planData?.pets_notes || "",
+        digital_notes: planData?.digital_notes || "",
+        legal_notes: planData?.legal_notes || "",
+        messages_notes: planData?.messages_notes || "",
+        to_loved_ones_message: planData?.to_loved_ones_message || "",
+
+        // Arrays from state (loaded from Supabase in loadPlanData)
+        contacts_notify: contacts,
+        pets: pets,
+        insurance_policies: insurance,
+        properties: properties,
+        messages: messages,
+        bank_accounts: bankAccounts,
+        investments: investments,
+        contacts_professional: professionalContacts,
+        funeral_funding: funeralFunding,
+
+        // Section visibility
+        _visibleSections: selectedSections,
+      };
+
+      // CRITICAL DEBUG LOG - shows exactly what is sent to PDF
+      console.log("[PrePlanSummary] PDF planData payload:", {
+        planId: pdfPlanData.id,
+        prepared_for: pdfPlanData.prepared_for,
+        profile_full_name: pdfPlanData.personal_profile?.full_name,
+        profile_address: pdfPlanData.personal_profile?.address,
+        contacts_notify_count: pdfPlanData.contacts_notify?.length,
+        pets_count: pdfPlanData.pets?.length,
+        insurance_policies_count: pdfPlanData.insurance_policies?.length,
+        properties_count: pdfPlanData.properties?.length,
+        messages_count: pdfPlanData.messages?.length,
+        bank_accounts_count: pdfPlanData.bank_accounts?.length,
+        has_about_me: !!pdfPlanData.about_me_notes,
+        has_funeral_notes: !!pdfPlanData.funeral_wishes_notes,
       });
+      console.log("[PrePlanSummary] Full PDF payload:", pdfPlanData);
 
       // Call edge function to generate PDF with COMPLETE data
       const { data: pdfData, error: pdfError } = await supabase.functions.invoke('generate-pdf', {
         body: {
-          planData: completePlanData,
+          planData: pdfPlanData,
           selectedSections,
           piiData,
           docType: 'full',
