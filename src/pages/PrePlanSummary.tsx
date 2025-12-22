@@ -41,6 +41,9 @@ import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
 import { ShareSummaryDialog } from "@/components/summary/ShareSummaryDialog";
 import { WhatsMissingIndicator } from "@/components/summary/WhatsMissingIndicator";
 import { ReminderEmailOptIn } from "@/components/summary/ReminderEmailOptIn";
+import { PdfReadinessModal, PdfReadinessBadge } from "@/components/summary/PdfReadinessModal";
+import { usePdfValidation } from "@/hooks/usePdfValidation";
+import { SETTINGS_DEFAULT } from "@/lib/sections";
 
 interface SectionData {
   id: string;
@@ -62,11 +65,19 @@ export default function PrePlanSummary() {
   const [sections, setSections] = useState<SectionData[]>([]);
   const [showPIIDialog, setShowPIIDialog] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
+  const [showReadinessModal, setShowReadinessModal] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string>("");
   const [profile, setProfile] = useState<any>(null);
   const [contacts, setContacts] = useState<any[]>([]);
   const [showFirstTimeHelper, setShowFirstTimeHelper] = useState(false);
+  const [selectedSections, setSelectedSections] = useState<string[]>(SETTINGS_DEFAULT);
+  
+  // PDF Validation
+  const validationResult = usePdfValidation(
+    { ...planData, personal_profile: profile, contacts },
+    selectedSections
+  );
   
   // Check if first-time visitor to summary page
   useEffect(() => {
@@ -103,6 +114,17 @@ export default function PrePlanSummary() {
       }
 
       setUserEmail(user.email || "");
+      
+      // Load selected sections from user settings
+      const { data: settings } = await supabase
+        .from("user_settings")
+        .select("selected_sections")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      
+      if (settings?.selected_sections?.length) {
+        setSelectedSections(settings.selected_sections);
+      }
 
       // 0) Load locally-saved planner data (the planner auto-saves here)
       let localPlan: any | null = null;
@@ -387,6 +409,11 @@ export default function PrePlanSummary() {
   const [generatingPdf, setGeneratingPdf] = useState(false);
 
   const handleDownloadPDF = () => {
+    // Check validation first
+    if (!validationResult.isValid) {
+      setShowReadinessModal(true);
+      return;
+    }
     setShowPIIDialog(true);
   };
 
@@ -394,38 +421,27 @@ export default function PrePlanSummary() {
     try {
       setGeneratingPdf(true);
       
-      // Get selected sections from user settings
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      
-      const { data: settings } = await supabase
-        .from("user_settings")
-        .select("selected_sections")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      
-      const selectedSections = settings?.selected_sections || [
-        "overview", "funeral", "personal", "legacy", "contacts", "financial"
-      ];
 
       // Call edge function to generate PDF
-      const { data, error } = await supabase.functions.invoke('generate-pdf', {
+      const { data: pdfData, error: pdfError } = await supabase.functions.invoke('generate-pdf', {
         body: {
-          planData: { ...planData, personal_profile: profile },
+          planData: { ...planData, personal_profile: profile, contacts },
           selectedSections,
           piiData,
           docType: 'full'
         }
       });
 
-      if (error) throw error;
+      if (pdfError) throw pdfError;
 
-      if (data.url) {
+      if (pdfData.url) {
         // Open PDF in new tab for download
-        window.open(data.url, '_blank');
-      } else if (data.pdfBase64) {
+        window.open(pdfData.url, '_blank');
+      } else if (pdfData.pdfBase64) {
         // Fallback: download base64 PDF
-        const byteCharacters = atob(data.pdfBase64);
+        const byteCharacters = atob(pdfData.pdfBase64);
         const byteNumbers = new Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) {
           byteNumbers[i] = byteCharacters.charCodeAt(i);
@@ -435,7 +451,7 @@ export default function PrePlanSummary() {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = data.filename || 'My-Final-Wishes.pdf';
+        link.download = pdfData.filename || 'My-Final-Wishes.pdf';
         link.click();
         URL.revokeObjectURL(url);
       }
@@ -598,6 +614,15 @@ export default function PrePlanSummary() {
           </AlertDescription>
         </Alert>
 
+        {/* PDF Readiness Badge */}
+        <div className="mb-6 print:hidden">
+          <PdfReadinessBadge
+            isReady={validationResult.isValid}
+            missingSectionCount={validationResult.missingSectionCount}
+            onFixClick={() => setShowReadinessModal(true)}
+          />
+        </div>
+
         {/* What's Missing */}
         <div className="mb-6 print:hidden">
           <WhatsMissingIndicator
@@ -727,6 +752,13 @@ export default function PrePlanSummary() {
         <ShareSummaryDialog
           open={showShareDialog}
           onOpenChange={setShowShareDialog}
+        />
+
+        <PdfReadinessModal
+          open={showReadinessModal}
+          onOpenChange={setShowReadinessModal}
+          missing={validationResult.missing}
+          onFixItems={() => {}}
         />
       </div>
     </AuthenticatedLayout>
