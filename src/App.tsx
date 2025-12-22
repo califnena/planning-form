@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n/config";
 import { TextSizeProvider } from "./contexts/TextSizeContext";
@@ -70,6 +70,30 @@ import PlannerPreview from "./pages/PlannerPreview";
 import PrePlanSummary from "./pages/PrePlanSummary";
 import SharedView from "./pages/SharedView";
 import PlannerStart from "./pages/PlannerStart";
+
+// Import planner layout and pages
+import {
+  PlannerLayout,
+  PreferencesPage,
+  OverviewPage,
+  PersonalFamilyPage,
+  LifeStoryPage,
+  FuneralWishesPage,
+  FinancialLifePage,
+  PropertyValuablesPage,
+  LegalDocsPage,
+  InsurancePage,
+  PetsPage,
+  DigitalPage,
+  MessagesPage,
+  ContactsPage,
+  ProvidersPage,
+  ChecklistPage,
+  InstructionsPage,
+  LegalResourcesPage,
+  WillPrepPage,
+} from "./pages/planner";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -99,8 +123,33 @@ const App = () => (
                       <Route path="/login" element={<Login />} />
                       <Route path="/signup" element={<Signup />} />
                       <Route path="/reset-password" element={<ResetPassword />} />
-                      <Route path="/preplansteps" element={<PlannerApp />} />
-                      <Route path="/preplandashboard" element={<PlannerApp />} />
+                      
+                      {/* Legacy route - redirect to new structure */}
+                      <Route path="/preplansteps" element={<Navigate to="/preplandashboard" replace />} />
+                      
+                      {/* New nested planner routes */}
+                      <Route path="/preplandashboard" element={<PlannerLayout />}>
+                        <Route index element={<Navigate to="/preplandashboard/preferences" replace />} />
+                        <Route path="preferences" element={<PreferencesPage />} />
+                        <Route path="overview" element={<OverviewPage />} />
+                        <Route path="personal-family" element={<PersonalFamilyPage />} />
+                        <Route path="life-story" element={<LifeStoryPage />} />
+                        <Route path="funeral-wishes" element={<FuneralWishesPage />} />
+                        <Route path="financial-life" element={<FinancialLifePage />} />
+                        <Route path="property-valuables" element={<PropertyValuablesPage />} />
+                        <Route path="legal-docs" element={<LegalDocsPage />} />
+                        <Route path="insurance" element={<InsurancePage />} />
+                        <Route path="pets" element={<PetsPage />} />
+                        <Route path="digital" element={<DigitalPage />} />
+                        <Route path="messages" element={<MessagesPage />} />
+                        <Route path="contacts" element={<ContactsPage />} />
+                        <Route path="providers" element={<ProvidersPage />} />
+                        <Route path="checklist" element={<ChecklistPage />} />
+                        <Route path="instructions" element={<InstructionsPage />} />
+                        <Route path="legalresources" element={<LegalResourcesPage />} />
+                        <Route path="willprep" element={<WillPrepPage />} />
+                      </Route>
+                      
                       <Route path="/preplansteps/profile" element={<Profile />} />
                       <Route path="/preplansteps/profile/subscription" element={<Subscription />} />
                       <Route path="/plans" element={<Plans />} />
