@@ -317,6 +317,22 @@ async function generateSimplePdf(
     return currentY;
   };
 
+  // Helper: check if text value has content
+  const hasText = (v: any): boolean => {
+    return (v ?? "").toString().trim().length > 0;
+  };
+
+  // Helper: check if array has items
+  const hasAny = (items: any[]): boolean => {
+    return Array.isArray(items) && items.length > 0;
+  };
+
+  // Helper: draw "No information entered" placeholder
+  const drawEmpty = (page: any, y: number, msg = "No information entered."): number => {
+    page.drawText(msg, { x: margin, y, size: 10, font: helvetica, color: rgb(0.5, 0.5, 0.5) });
+    return y - lineHeight;
+  };
+
   const addNotesBox = (page: any, label: string, notes: string, y: number): number => {
     let currentY = y;
     if (!notes) return currentY;
@@ -517,13 +533,17 @@ async function generateSimplePdf(
   const contacts2 = pdfDoc.addPage([pageWidth, pageHeight]);
   cY = addSectionHeader(contacts2, "Professional Contacts", pageHeight - 80);
   const professionalList = planData?.contacts_professional || [];
-  cY = addArrayItems(
-    contacts2,
-    professionalList,
-    (c) => [c.role, c.name, c.company, c.contact].filter(Boolean).join(" - "),
-    cY,
-    12,
-  );
+  if (hasAny(professionalList)) {
+    cY = addArrayItems(
+      contacts2,
+      professionalList,
+      (c) => [c.role, c.name, c.company, c.contact].filter(Boolean).join(" - "),
+      cY,
+      12,
+    );
+  } else {
+    cY = drawEmpty(contacts2, cY);
+  }
   addDraftWatermark(contacts2);
   addFooter(contacts2, pageNum++);
 
@@ -533,18 +553,24 @@ async function generateSimplePdf(
   
   // Render service providers array
   const providersList = planData?.service_providers || planData?.providers || [];
-  if (providersList.length > 0) {
-    vY = addArrayItems(
-      vendorsPage,
-      providersList,
-      (p) => [p.name, p.type ? `(${p.type})` : "", p.phone, p.website, p.address].filter(Boolean).join(" - "),
-      vY,
-      10,
-    );
-    vY -= 10;
-  }
+  const serviceProviderNotes = planData?.service_providers_notes || "";
+  const hasServiceProviders = hasAny(providersList) || hasText(serviceProviderNotes);
   
-  vY = addNotesBox(vendorsPage, "Notes", planData?.service_providers_notes || "", vY);
+  if (!hasServiceProviders) {
+    vY = drawEmpty(vendorsPage, vY);
+  } else {
+    if (providersList.length > 0) {
+      vY = addArrayItems(
+        vendorsPage,
+        providersList,
+        (p) => [p.name, p.type ? `(${p.type})` : "", p.phone, p.website, p.address].filter(Boolean).join(" - "),
+        vY,
+        10,
+      );
+      vY -= 10;
+    }
+    vY = addNotesBox(vendorsPage, "Notes", serviceProviderNotes, vY);
+  }
   addDraftWatermark(vendorsPage);
   addFooter(vendorsPage, pageNum++);
 
@@ -557,28 +583,36 @@ async function generateSimplePdf(
   const svc = planData?.service_preferences || {};
   const fh = planData?.funeral_home || {};
   const cem = planData?.cemetery || {};
-  
-  if (disp.preference || disp.type) fY = addField(funeral1, "Disposition", disp.preference || disp.type || "", fY);
-  if (fh.name) fY = addField(funeral1, "Funeral Home", [fh.name, fh.phone].filter(Boolean).join(" - "), fY);
-  if (fh.address) fY = addField(funeral1, "Funeral Home Address", fh.address, fY);
-  if (cem.name || cem.location) fY = addField(funeral1, "Cemetery", [cem.name, cem.location].filter(Boolean).join(" - "), fY);
-  if (svc.service_type) fY = addField(funeral1, "Service Type", svc.service_type, fY);
-  if (svc.location) fY = addField(funeral1, "Service Location", svc.location, fY);
-  if (svc.officiant) fY = addField(funeral1, "Officiant", svc.officiant, fY);
-  if (svc.music) fY = addField(funeral1, "Music", svc.music, fY);
-  if (svc.readings) fY = addField(funeral1, "Readings", svc.readings, fY);
-  if (svc.flowers_or_donations) fY = addField(funeral1, "Flowers/Donations", svc.flowers_or_donations, fY);
-  if (svc.clothing) fY = addField(funeral1, "Clothing", svc.clothing, fY);
-  fY -= 10;
-  
-  fY = addNotesBox(funeral1, "My Wishes", planData?.funeral_wishes_notes || "", fY);
-  
+  const funeralNotes = planData?.funeral_wishes_notes || "";
   const funding = planData?.funeral_funding || [];
-  if (funding.length > 0) {
+  
+  const hasFuneral = hasText(disp.preference) || hasText(disp.type) || hasText(fh.name) || hasText(cem.name) || 
+    hasText(svc.service_type) || hasText(funeralNotes) || hasAny(funding);
+  
+  if (!hasFuneral) {
+    fY = drawEmpty(funeral1, fY);
+  } else {
+    if (disp.preference || disp.type) fY = addField(funeral1, "Disposition", disp.preference || disp.type || "", fY);
+    if (fh.name) fY = addField(funeral1, "Funeral Home", [fh.name, fh.phone].filter(Boolean).join(" - "), fY);
+    if (fh.address) fY = addField(funeral1, "Funeral Home Address", fh.address, fY);
+    if (cem.name || cem.location) fY = addField(funeral1, "Cemetery", [cem.name, cem.location].filter(Boolean).join(" - "), fY);
+    if (svc.service_type) fY = addField(funeral1, "Service Type", svc.service_type, fY);
+    if (svc.location) fY = addField(funeral1, "Service Location", svc.location, fY);
+    if (svc.officiant) fY = addField(funeral1, "Officiant", svc.officiant, fY);
+    if (svc.music) fY = addField(funeral1, "Music", svc.music, fY);
+    if (svc.readings) fY = addField(funeral1, "Readings", svc.readings, fY);
+    if (svc.flowers_or_donations) fY = addField(funeral1, "Flowers/Donations", svc.flowers_or_donations, fY);
+    if (svc.clothing) fY = addField(funeral1, "Clothing", svc.clothing, fY);
     fY -= 10;
-    funeral1.drawText("Funding Sources:", { x: margin, y: fY, size: 10, font: helveticaBold, color: textColor });
-    fY -= lineHeight;
-    fY = addArrayItems(funeral1, funding, (f) => [f.source, f.account].filter(Boolean).join(" - "), fY, 4);
+    
+    fY = addNotesBox(funeral1, "My Wishes", funeralNotes, fY);
+    
+    if (funding.length > 0) {
+      fY -= 10;
+      funeral1.drawText("Funding Sources:", { x: margin, y: fY, size: 10, font: helveticaBold, color: textColor });
+      fY -= lineHeight;
+      fY = addArrayItems(funeral1, funding, (f) => [f.source, f.account].filter(Boolean).join(" - "), fY, 4);
+    }
   }
   addDraftWatermark(funeral1);
   addFooter(funeral1, pageNum++);
@@ -606,16 +640,23 @@ async function generateSimplePdf(
   addFooter(funeral2, pageNum++);
 
   // PAGE 13: Financial
-  console.log("PDF Financial keys", {
-    bank_accounts_len: (planData?.bank_accounts || []).length,
-    bank_accounts_keys: Object.keys((planData?.bank_accounts || [])[0] || {}),
-    financial_notes_len: (planData?.financial_notes || "").length,
+  const bankList = planData?.bank_accounts || [];
+  const investList = planData?.investments || [];
+  const debtsList = planData?.debts || [];
+  const businessList = planData?.businesses || [];
+  const financialNotes = planData?.financial_notes || "";
+  
+  console.log("SECTION CHECK financial", {
+    bank: bankList.length,
+    inv: investList.length,
+    debts: debtsList.length,
+    biz: businessList.length,
+    notes: financialNotes.length
   });
 
   const financialPage = pdfDoc.addPage([pageWidth, pageHeight]);
   let finY = addSectionHeader(financialPage, "Financial Life", pageHeight - 80);
 
-  const bankList = planData?.bank_accounts || [];
   const formatBank = (b: any) =>
     [
       b.bank_name || b.institution || b.bank || b.name,
@@ -630,72 +671,73 @@ async function generateSimplePdf(
       .filter(Boolean)
       .join(" | ");
 
-  if (bankList.length > 0) {
-    financialPage.drawText("Bank Accounts:", {
-      x: margin,
-      y: finY,
-      size: 10,
-      font: helveticaBold,
-      color: textColor,
-    });
-    finY -= lineHeight;
-    finY = addArrayItems(financialPage, bankList, formatBank, finY, 6);
-    finY -= 10;
+  const hasFinancial = hasAny(bankList) || hasAny(investList) || hasAny(debtsList) || hasAny(businessList) || hasText(financialNotes);
+
+  if (!hasFinancial) {
+    finY = drawEmpty(financialPage, finY);
+  } else {
+    if (bankList.length > 0) {
+      financialPage.drawText("Bank Accounts:", {
+        x: margin,
+        y: finY,
+        size: 10,
+        font: helveticaBold,
+        color: textColor,
+      });
+      finY -= lineHeight;
+      finY = addArrayItems(financialPage, bankList, formatBank, finY, 6);
+      finY -= 10;
+    }
+    
+    if (investList.length > 0) {
+      financialPage.drawText("Investments:", { x: margin, y: finY, size: 10, font: helveticaBold, color: textColor });
+      finY -= lineHeight;
+      finY = addArrayItems(
+        financialPage,
+        investList,
+        (i) => [
+          i.brokerage,
+          i.account_type,
+          i.account_number ? `#${i.account_number}` : "",
+        ].filter(Boolean).join(" - "),
+        finY,
+        4,
+      );
+      finY -= 10;
+    }
+    
+    if (debtsList.length > 0) {
+      financialPage.drawText("Debts & Liabilities:", { x: margin, y: finY, size: 10, font: helveticaBold, color: textColor });
+      finY -= lineHeight;
+      finY = addArrayItems(
+        financialPage,
+        debtsList,
+        (d) => [
+          d.creditor,
+          d.debt_type,
+          d.account_number ? `#${d.account_number}` : "",
+        ].filter(Boolean).join(" - "),
+        finY,
+        4,
+      );
+      finY -= 10;
+    }
+    
+    if (businessList.length > 0) {
+      financialPage.drawText("Business Interests:", { x: margin, y: finY, size: 10, font: helveticaBold, color: textColor });
+      finY -= lineHeight;
+      finY = addArrayItems(
+        financialPage,
+        businessList,
+        (b) => [b.name, b.address, b.partnership_info].filter(Boolean).join(" - "),
+        finY,
+        4,
+      );
+      finY -= 10;
+    }
+    
+    finY = addNotesBox(financialPage, "Financial Notes", financialNotes, finY);
   }
-  
-  const investList = planData?.investments || [];
-  if (investList.length > 0) {
-    financialPage.drawText("Investments:", { x: margin, y: finY, size: 10, font: helveticaBold, color: textColor });
-    finY -= lineHeight;
-    finY = addArrayItems(
-      financialPage,
-      investList,
-      (i) => [
-        i.brokerage,
-        i.account_type,
-        i.account_number ? `#${i.account_number}` : "",
-      ].filter(Boolean).join(" - "),
-      finY,
-      4,
-    );
-    finY -= 10;
-  }
-  
-  // Debts
-  const debtsList = planData?.debts || [];
-  if (debtsList.length > 0) {
-    financialPage.drawText("Debts & Liabilities:", { x: margin, y: finY, size: 10, font: helveticaBold, color: textColor });
-    finY -= lineHeight;
-    finY = addArrayItems(
-      financialPage,
-      debtsList,
-      (d) => [
-        d.creditor,
-        d.debt_type,
-        d.account_number ? `#${d.account_number}` : "",
-      ].filter(Boolean).join(" - "),
-      finY,
-      4,
-    );
-    finY -= 10;
-  }
-  
-  // Businesses
-  const businessList = planData?.businesses || [];
-  if (businessList.length > 0) {
-    financialPage.drawText("Business Interests:", { x: margin, y: finY, size: 10, font: helveticaBold, color: textColor });
-    finY -= lineHeight;
-    finY = addArrayItems(
-      financialPage,
-      businessList,
-      (b) => [b.name, b.address, b.partnership_info].filter(Boolean).join(" - "),
-      finY,
-      4,
-    );
-    finY -= 10;
-  }
-  
-  finY = addNotesBox(financialPage, "Financial Notes", planData?.financial_notes || "", finY);
   addDraftWatermark(financialPage);
   addFooter(financialPage, pageNum++);
 
@@ -734,47 +776,60 @@ async function generateSimplePdf(
   let propY = addSectionHeader(propertyPage, "Property & Valuables", pageHeight - 80);
   
   const propList = planData?.properties || [];
-  if (propList.length > 0) {
-    propertyPage.drawText("Real Estate:", { x: margin, y: propY, size: 10, font: helveticaBold, color: textColor });
-    propY -= lineHeight;
-    propY = addArrayItems(
-      propertyPage,
-      propList,
-      (p) => [
-        p.address,
-        p.kind,
-        p.mortgage_bank ? `Lender: ${p.mortgage_bank}` : "",
-        p.manager ? `Manager: ${p.manager}` : "",
-      ].filter(Boolean).join(" - "),
-      propY,
-      6,
-    );
-    propY -= 10;
-  }
-  
-  // Valuables
   const valuablesList = planData?.valuables || [];
-  if (valuablesList.length > 0) {
-    propertyPage.drawText("Valuables:", { x: margin, y: propY, size: 10, font: helveticaBold, color: textColor });
-    propY -= lineHeight;
-    propY = addArrayItems(
-      propertyPage,
-      valuablesList,
-      (v) => [v.item, v.location, v.notes].filter(Boolean).join(" - "),
-      propY,
-      6,
-    );
-    propY -= 10;
-  }
-  
-  // Safe deposit
   const safeDeposit = planData?.safe_deposit || {};
-  if (safeDeposit.location || safeDeposit.bank) {
-    propY = addField(propertyPage, "Safe Deposit Box", [safeDeposit.bank, safeDeposit.location, safeDeposit.key_location].filter(Boolean).join(" - "), propY);
-    propY -= 10;
-  }
+  const propertyNotes = planData?.property_notes || "";
   
-  propY = addNotesBox(propertyPage, "Notes", planData?.property_notes || "", propY);
+  console.log("SECTION CHECK property", {
+    properties: propList.length,
+    valuables: valuablesList.length,
+    safeDeposit: Object.keys(safeDeposit).length,
+    notes: propertyNotes.length
+  });
+  
+  const hasProperty = hasAny(propList) || hasAny(valuablesList) || hasText(safeDeposit.location) || hasText(safeDeposit.bank) || hasText(propertyNotes);
+  
+  if (!hasProperty) {
+    propY = drawEmpty(propertyPage, propY);
+  } else {
+    if (propList.length > 0) {
+      propertyPage.drawText("Real Estate:", { x: margin, y: propY, size: 10, font: helveticaBold, color: textColor });
+      propY -= lineHeight;
+      propY = addArrayItems(
+        propertyPage,
+        propList,
+        (p) => [
+          p.address,
+          p.kind,
+          p.mortgage_bank ? `Lender: ${p.mortgage_bank}` : "",
+          p.manager ? `Manager: ${p.manager}` : "",
+        ].filter(Boolean).join(" - "),
+        propY,
+        6,
+      );
+      propY -= 10;
+    }
+    
+    if (valuablesList.length > 0) {
+      propertyPage.drawText("Valuables:", { x: margin, y: propY, size: 10, font: helveticaBold, color: textColor });
+      propY -= lineHeight;
+      propY = addArrayItems(
+        propertyPage,
+        valuablesList,
+        (v) => [v.item, v.location, v.notes].filter(Boolean).join(" - "),
+        propY,
+        6,
+      );
+      propY -= 10;
+    }
+    
+    if (safeDeposit.location || safeDeposit.bank) {
+      propY = addField(propertyPage, "Safe Deposit Box", [safeDeposit.bank, safeDeposit.location, safeDeposit.key_location].filter(Boolean).join(" - "), propY);
+      propY -= 10;
+    }
+    
+    propY = addNotesBox(propertyPage, "Notes", propertyNotes, propY);
+  }
   addDraftWatermark(propertyPage);
   addFooter(propertyPage, pageNum++);
 
@@ -801,50 +856,54 @@ async function generateSimplePdf(
   const digitalPage = pdfDoc.addPage([pageWidth, pageHeight]);
   let digY = addSectionHeader(digitalPage, "Digital Accounts", pageHeight - 80);
   
-  // Render digital accounts array if present
   const digitalList = planData?.digital_assets || planData?.digital_accounts || [];
-  if (digitalList.length > 0) {
-    digY = addArrayItems(
-      digitalPage,
-      digitalList,
-      (d) => [d.provider || d.service, d.type || d.account_type, d.access_person ? `Access: ${d.access_person}` : ""].filter(Boolean).join(" - "),
-      digY,
-      10,
-    );
-    digY -= 10;
-  }
-  
-  // Render phones if present
   const phonesList = planData?.phones || [];
-  if (phonesList.length > 0) {
-    digitalPage.drawText("Phone Accounts:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
-    digY -= lineHeight;
-    digY = addArrayItems(
-      digitalPage,
-      phonesList,
-      (p) => [p.phone_number, p.carrier, p.access_info].filter(Boolean).join(" - "),
-      digY,
-      6,
-    );
-    digY -= 10;
-  }
+  const digitalNotes = planData?.digital_notes || "";
   
-  digY = addNotesBox(digitalPage, "Notes", planData?.digital_notes || "", digY);
+  console.log("SECTION CHECK digital", {
+    digital: digitalList.length,
+    phones: phonesList.length,
+    notes: digitalNotes.length
+  });
+  
+  const hasDigital = hasAny(digitalList) || hasAny(phonesList) || hasText(digitalNotes);
+  
+  if (!hasDigital) {
+    digY = drawEmpty(digitalPage, digY);
+  } else {
+    if (digitalList.length > 0) {
+      digY = addArrayItems(
+        digitalPage,
+        digitalList,
+        (d) => [d.provider || d.service, d.type || d.account_type, d.access_person ? `Access: ${d.access_person}` : ""].filter(Boolean).join(" - "),
+        digY,
+        10,
+      );
+      digY -= 10;
+    }
+    
+    if (phonesList.length > 0) {
+      digitalPage.drawText("Phone Accounts:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
+      digY -= lineHeight;
+      digY = addArrayItems(
+        digitalPage,
+        phonesList,
+        (p) => [p.phone_number, p.carrier, p.access_info].filter(Boolean).join(" - "),
+        digY,
+        6,
+      );
+      digY -= 10;
+    }
+    
+    digY = addNotesBox(digitalPage, "Notes", digitalNotes, digY);
+  }
   addDraftWatermark(digitalPage);
   addFooter(digitalPage, pageNum++);
 
   // PAGE 18: Legal
-  console.log("PDF Legal keys", {
-    legal_keys: Object.keys(planData?.legal || {}),
-    executor_name: planData?.legal?.executor_name,
-    legal_notes_len: (planData?.legal_notes || "").length,
-  });
-
-  const legalPage = pdfDoc.addPage([pageWidth, pageHeight]);
-  let legY = addSectionHeader(legalPage, "Legal Documents", pageHeight - 80);
-
-  // Render legal document details (support common key variants)
   const legal = planData?.legal || {};
+  const legalNotes = planData?.legal_notes || "";
+  
   const executorName = legal.executor_name || legal.executor || legal.executorName;
   const executorPhone = legal.executor_phone || legal.executorPhone;
   const executorEmail = legal.executor_email || legal.executorEmail;
@@ -852,31 +911,49 @@ async function generateSimplePdf(
   const poaPhone = legal.poa_phone || legal.poaPhone;
   const willLoc = legal.will_location || legal.willLocation;
   const trustLoc = legal.trust_location || legal.trustLocation;
-
-  if (executorName) legY = addField(legalPage, "Executor", executorName, legY);
-  if (executorPhone) legY = addField(legalPage, "Executor Phone", executorPhone, legY);
-  if (executorEmail) legY = addField(legalPage, "Executor Email", executorEmail, legY);
-  if (legal.alternate_executor) legY = addField(legalPage, "Alternate Executor", legal.alternate_executor, legY);
-  legY -= 10;
-
-  if (poaName) legY = addField(legalPage, "Power of Attorney", poaName, legY);
-  if (poaPhone) legY = addField(legalPage, "POA Phone", poaPhone, legY);
-  if (legal.healthcare_proxy) legY = addField(legalPage, "Healthcare Proxy", legal.healthcare_proxy, legY);
-  if (legal.healthcare_proxy_phone) legY = addField(legalPage, "Proxy Phone", legal.healthcare_proxy_phone, legY);
-  legY -= 10;
-
-  if (willLoc) legY = addField(legalPage, "Will Location", willLoc, legY);
-  if (trustLoc) legY = addField(legalPage, "Trust Location", trustLoc, legY);
-  if (legal.poa_document_location) legY = addField(legalPage, "POA Document Location", legal.poa_document_location, legY);
-  if (legal.living_will_location) legY = addField(legalPage, "Living Will Location", legal.living_will_location, legY);
-  if (legal.safe_deposit_location) legY = addField(legalPage, "Safe Deposit Box", legal.safe_deposit_location, legY);
-  legY -= 10;
   
-  if (legal.attorney_name) legY = addField(legalPage, "Attorney", legal.attorney_name, legY);
-  if (legal.attorney_phone) legY = addField(legalPage, "Attorney Phone", legal.attorney_phone, legY);
-  if (legal.attorney_firm) legY = addField(legalPage, "Law Firm", legal.attorney_firm, legY);
+  console.log("SECTION CHECK legal", {
+    executor: executorName,
+    poa: poaName,
+    will: willLoc,
+    trust: trustLoc,
+    notes: legalNotes.length
+  });
   
-  legY = addNotesBox(legalPage, "Notes", planData?.legal_notes || "", legY);
+  const hasLegal = hasText(executorName) || hasText(poaName) || hasText(willLoc) || hasText(trustLoc) || 
+    hasText(legal.healthcare_proxy) || hasText(legal.attorney_name) || hasText(legalNotes);
+
+  const legalPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  let legY = addSectionHeader(legalPage, "Legal Documents", pageHeight - 80);
+
+  if (!hasLegal) {
+    legY = drawEmpty(legalPage, legY);
+  } else {
+    if (executorName) legY = addField(legalPage, "Executor", executorName, legY);
+    if (executorPhone) legY = addField(legalPage, "Executor Phone", executorPhone, legY);
+    if (executorEmail) legY = addField(legalPage, "Executor Email", executorEmail, legY);
+    if (legal.alternate_executor) legY = addField(legalPage, "Alternate Executor", legal.alternate_executor, legY);
+    legY -= 10;
+
+    if (poaName) legY = addField(legalPage, "Power of Attorney", poaName, legY);
+    if (poaPhone) legY = addField(legalPage, "POA Phone", poaPhone, legY);
+    if (legal.healthcare_proxy) legY = addField(legalPage, "Healthcare Proxy", legal.healthcare_proxy, legY);
+    if (legal.healthcare_proxy_phone) legY = addField(legalPage, "Proxy Phone", legal.healthcare_proxy_phone, legY);
+    legY -= 10;
+
+    if (willLoc) legY = addField(legalPage, "Will Location", willLoc, legY);
+    if (trustLoc) legY = addField(legalPage, "Trust Location", trustLoc, legY);
+    if (legal.poa_document_location) legY = addField(legalPage, "POA Document Location", legal.poa_document_location, legY);
+    if (legal.living_will_location) legY = addField(legalPage, "Living Will Location", legal.living_will_location, legY);
+    if (legal.safe_deposit_location) legY = addField(legalPage, "Safe Deposit Box", legal.safe_deposit_location, legY);
+    legY -= 10;
+    
+    if (legal.attorney_name) legY = addField(legalPage, "Attorney", legal.attorney_name, legY);
+    if (legal.attorney_phone) legY = addField(legalPage, "Attorney Phone", legal.attorney_phone, legY);
+    if (legal.attorney_firm) legY = addField(legalPage, "Law Firm", legal.attorney_firm, legY);
+    
+    legY = addNotesBox(legalPage, "Notes", legalNotes, legY);
+  }
   addDraftWatermark(legalPage);
   addFooter(legalPage, pageNum++);
 
@@ -971,7 +1048,7 @@ async function generateSimplePdf(
     return new Response(JSON.stringify({
       success: true,
       pdfBase64: base64Pdf,
-      filename: `My-Life-and-Legacy-Planner-${new Date().toISOString().split("T")[0]}.pdf`,
+      filename: `My-Last-Wishes.pdf`,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -988,7 +1065,7 @@ async function generateSimplePdf(
     return new Response(JSON.stringify({
       success: true,
       pdfBase64: base64Pdf,
-      filename: `My-Life-and-Legacy-Planner-${new Date().toISOString().split("T")[0]}.pdf`,
+      filename: `My-Last-Wishes.pdf`,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -1005,7 +1082,7 @@ async function generateSimplePdf(
   return new Response(JSON.stringify({
     success: true,
     url: signedUrl.signedUrl,
-    filename: `My-Life-and-Legacy-Planner-${new Date().toISOString().split("T")[0]}.pdf`,
+    filename: `My-Last-Wishes.pdf`,
   }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
