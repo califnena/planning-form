@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ArrowRight, Clock, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { format, isValid, parseISO, formatDistanceToNow } from "date-fns";
+import { isValid, parseISO, formatDistanceToNow } from "date-fns";
 
 interface PlannerProgress {
   lastActivity: string | null;
@@ -16,7 +14,6 @@ interface PlannerProgress {
 }
 
 export const ResumeCard = () => {
-  const navigate = useNavigate();
   const [progress, setProgress] = useState<PlannerProgress | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -79,41 +76,27 @@ export const ResumeCard = () => {
     ? Math.round((progress.completedSections.length / progress.totalSteps) * 100) 
     : 0;
 
-  const handleContinue = () => {
-    // Always route to planner dashboard - it handles the resume flow
-    navigate('/preplandashboard');
-  };
-
   return (
     <Card className="bg-primary/5 border-primary/20">
       <CardContent className="p-5">
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div className="flex items-start gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <FileText className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground">
-                  Continue where you left off
-                </h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Step {progress.currentStep} of {progress.totalSteps}
-                  {progress.lastActivity && (
-                    <span className="ml-2 text-muted-foreground/70">
-                      · Last updated {progress.lastActivity}
-                    </span>
-                  )}
-                </p>
-              </div>
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <FileText className="h-5 w-5 text-primary" />
             </div>
-            <Button 
-              onClick={handleContinue}
-              className="flex-shrink-0"
-            >
-              Continue Planning
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
+            <div>
+              <h3 className="font-semibold text-foreground">
+                Your Planning Progress
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Step {progress.currentStep} of {progress.totalSteps}
+                {progress.lastActivity && (
+                  <span className="ml-2 text-muted-foreground/70">
+                    · Last updated {progress.lastActivity}
+                  </span>
+                )}
+              </p>
+            </div>
           </div>
           
           {/* Progress bar */}
