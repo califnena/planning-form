@@ -62,3 +62,6 @@ verify_jwt = false
 
 [functions.writing-helper]
 verify_jwt = true
+
+[functions.generate-pdf]
+verify_jwt = true

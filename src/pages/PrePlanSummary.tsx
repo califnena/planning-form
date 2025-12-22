@@ -25,7 +25,9 @@ import {
   BookHeart,
   AlertTriangle,
   ArrowRight,
-  X
+  X,
+  Loader2,
+  ExternalLink
 } from "lucide-react";
 import {
   Tooltip,
@@ -35,7 +37,6 @@ import {
 } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { generatePlanPDF } from "@/lib/pdfGenerator";
 import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
 import { ShareSummaryDialog } from "@/components/summary/ShareSummaryDialog";
 import { WhatsMissingIndicator } from "@/components/summary/WhatsMissingIndicator";
@@ -383,17 +384,65 @@ export default function PrePlanSummary() {
     }
   };
 
+  const [generatingPdf, setGeneratingPdf] = useState(false);
+
   const handleDownloadPDF = () => {
     setShowPIIDialog(true);
   };
 
   const handlePIISubmit = async (piiData: any) => {
     try {
-      const pdf = generatePlanPDF({ ...planData, ...piiData, personal_profile: profile });
-      pdf.save(`Planning-Summary-For-Review-Only_${new Date().toISOString().split('T')[0]}.pdf`);
+      setGeneratingPdf(true);
+      
+      // Get selected sections from user settings
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      const { data: settings } = await supabase
+        .from("user_settings")
+        .select("selected_sections")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      
+      const selectedSections = settings?.selected_sections || [
+        "overview", "funeral", "personal", "legacy", "contacts", "financial"
+      ];
+
+      // Call edge function to generate PDF
+      const { data, error } = await supabase.functions.invoke('generate-pdf', {
+        body: {
+          planData: { ...planData, personal_profile: profile },
+          selectedSections,
+          piiData,
+          docType: 'full'
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.url) {
+        // Open PDF in new tab for download
+        window.open(data.url, '_blank');
+      } else if (data.pdfBase64) {
+        // Fallback: download base64 PDF
+        const byteCharacters = atob(data.pdfBase64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = data.filename || 'My-Final-Wishes.pdf';
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+
       toast({
-        title: "PDF Downloaded",
-        description: "Your planning summary has been downloaded."
+        title: "PDF Generated",
+        description: "Your planning document has been generated successfully."
       });
     } catch (error) {
       console.error("Error generating PDF:", error);
@@ -402,11 +451,14 @@ export default function PrePlanSummary() {
         description: "Failed to generate PDF. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setGeneratingPdf(false);
     }
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = async () => {
+    // Generate PDF and open in new tab for printing
+    handleDownloadPDF();
   };
 
   const handleSaveConfirmation = () => {

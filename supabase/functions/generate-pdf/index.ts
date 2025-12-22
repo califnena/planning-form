@@ -1,0 +1,576 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { PDFDocument, rgb, StandardFonts } from "https://esm.sh/pdf-lib@1.17.1";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+// Section to page mapping in the template PDF (0-indexed)
+const SECTION_PAGES: Record<string, number[]> = {
+  cover: [0],
+  toc: [1],
+  checklist: [2],
+  instructions: [3],
+  personal: [4, 5],
+  legacy: [6],
+  contacts: [7, 8],
+  vendors: [9],
+  funeral: [10, 11],
+  financial: [12],
+  insurance: [13],
+  property: [14],
+  pets: [15],
+  digital: [16],
+  legal: [17],
+  messages: [18, 19, 20, 21],
+  revisions: [22, 23],
+};
+
+// Map section IDs from user settings to template sections
+const SECTION_ID_MAP: Record<string, string> = {
+  overview: 'cover',
+  instructions: 'instructions',
+  personal: 'personal',
+  legacy: 'legacy',
+  contacts: 'contacts',
+  providers: 'vendors',
+  funeral: 'funeral',
+  financial: 'financial',
+  insurance: 'insurance',
+  property: 'property',
+  pets: 'pets',
+  digital: 'digital',
+  legal: 'legal',
+  messages: 'messages',
+};
+
+interface TextPosition {
+  x: number;
+  y: number;
+  maxWidth: number;
+  fontSize?: number;
+}
+
+// Text coordinates for overlaying data (y is from bottom of page)
+const FIELD_POSITIONS: Record<string, Record<string, TextPosition>> = {
+  cover: {
+    prepared_for: { x: 105, y: 620, maxWidth: 300, fontSize: 14 },
+    date: { x: 105, y: 602, maxWidth: 150, fontSize: 12 },
+  },
+  personal: {
+    full_name: { x: 170, y: 665, maxWidth: 350, fontSize: 11 },
+    nicknames: { x: 170, y: 644, maxWidth: 350, fontSize: 11 },
+    maiden_name: { x: 170, y: 622, maxWidth: 350, fontSize: 11 },
+    dob: { x: 170, y: 600, maxWidth: 200, fontSize: 11 },
+    birthplace: { x: 170, y: 578, maxWidth: 350, fontSize: 11 },
+    ssn: { x: 170, y: 556, maxWidth: 200, fontSize: 11 },
+    citizenship: { x: 170, y: 534, maxWidth: 200, fontSize: 11 },
+    address: { x: 170, y: 490, maxWidth: 350, fontSize: 11 },
+    phone: { x: 170, y: 445, maxWidth: 200, fontSize: 11 },
+    email: { x: 170, y: 423, maxWidth: 300, fontSize: 11 },
+  },
+  personal_family: {
+    marital_status: { x: 170, y: 690, maxWidth: 200, fontSize: 11 },
+    partner_name: { x: 170, y: 660, maxWidth: 300, fontSize: 11 },
+    partner_phone: { x: 170, y: 640, maxWidth: 200, fontSize: 11 },
+    partner_email: { x: 170, y: 620, maxWidth: 300, fontSize: 11 },
+    ex_spouse_name: { x: 170, y: 598, maxWidth: 300, fontSize: 11 },
+    religion: { x: 170, y: 576, maxWidth: 200, fontSize: 11 },
+    father_name: { x: 170, y: 530, maxWidth: 300, fontSize: 11 },
+    father_phone: { x: 170, y: 510, maxWidth: 200, fontSize: 11 },
+    father_email: { x: 170, y: 490, maxWidth: 300, fontSize: 11 },
+    mother_name: { x: 170, y: 448, maxWidth: 300, fontSize: 11 },
+    mother_phone: { x: 170, y: 428, maxWidth: 200, fontSize: 11 },
+    mother_email: { x: 170, y: 408, maxWidth: 300, fontSize: 11 },
+    children: { x: 70, y: 360, maxWidth: 450, fontSize: 10 },
+  },
+  legacy: {
+    story: { x: 70, y: 600, maxWidth: 450, fontSize: 10 },
+  },
+  funeral: {
+    preference: { x: 70, y: 640, maxWidth: 450, fontSize: 10 },
+    disposition: { x: 70, y: 520, maxWidth: 450, fontSize: 10 },
+    cemetery: { x: 70, y: 440, maxWidth: 450, fontSize: 10 },
+    disposition_notes: { x: 70, y: 380, maxWidth: 450, fontSize: 10 },
+  },
+  funeral_cont: {
+    flower_preferences: { x: 70, y: 510, maxWidth: 450, fontSize: 10 },
+    charity_donations: { x: 70, y: 450, maxWidth: 450, fontSize: 10 },
+    location: { x: 70, y: 390, maxWidth: 450, fontSize: 10 },
+    music: { x: 70, y: 330, maxWidth: 450, fontSize: 10 },
+    readings: { x: 70, y: 270, maxWidth: 450, fontSize: 10 },
+    speakers: { x: 70, y: 210, maxWidth: 450, fontSize: 10 },
+  },
+};
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Get auth header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Get user from auth token
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+    
+    if (userError || !user) {
+      console.error('Auth error:', userError);
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { planData, selectedSections, piiData, docType = 'full' } = await req.json();
+    console.log('Generating PDF for user:', user.id, 'docType:', docType);
+    console.log('Selected sections:', selectedSections);
+
+    // Fetch the blank PDF template from public URL
+    const templateUrl = `${supabaseUrl.replace('/auth/v1', '')}/storage/v1/object/public/pdf-templates/My-Final-Wishes-Blank-Form-2025-11-17.pdf`;
+    
+    // Fallback: try direct URL construction
+    const baseUrl = supabaseUrl.replace('/auth/v1', '').replace('supabase.co', 'supabase.co');
+    const templateResponse = await fetch(templateUrl);
+    
+    if (!templateResponse.ok) {
+      console.log('Template not found in storage, will generate from scratch');
+      // Fall back to generating a simple PDF without template
+      return await generateSimplePdf(planData, selectedSections, piiData, user.id, supabase, corsHeaders);
+    }
+
+    const templateBytes = await templateResponse.arrayBuffer();
+    const templatePdf = await PDFDocument.load(templateBytes);
+    const helvetica = await templatePdf.embedFont(StandardFonts.Helvetica);
+    const helveticaBold = await templatePdf.embedFont(StandardFonts.HelveticaBold);
+
+    // Create new PDF with only selected sections
+    const newPdf = await PDFDocument.create();
+    
+    // Always include cover and TOC
+    const pagesToInclude: number[] = [...SECTION_PAGES.cover, ...SECTION_PAGES.toc];
+    
+    // Add pages for selected sections
+    for (const sectionId of selectedSections) {
+      const templateSection = SECTION_ID_MAP[sectionId];
+      if (templateSection && SECTION_PAGES[templateSection]) {
+        pagesToInclude.push(...SECTION_PAGES[templateSection]);
+      }
+    }
+    
+    // Always include revisions at the end
+    pagesToInclude.push(...SECTION_PAGES.revisions);
+    
+    // Sort and dedupe
+    const uniquePages = [...new Set(pagesToInclude)].sort((a, b) => a - b);
+    
+    // Copy only selected pages
+    const copiedPages = await newPdf.copyPages(templatePdf, uniquePages);
+    copiedPages.forEach(page => newPdf.addPage(page));
+
+    // Get pages for overlaying text
+    const pages = newPdf.getPages();
+    
+    // Overlay user data onto the PDF
+    const profile = { ...(planData.personal_profile || {}), ...(piiData || {}) };
+    const textColor = rgb(0.1, 0.1, 0.1);
+
+    // Helper to draw text with wrapping
+    const drawText = (page: any, text: string, pos: TextPosition) => {
+      if (!text) return;
+      const fontSize = pos.fontSize || 11;
+      const lines = wrapText(text, pos.maxWidth, fontSize, helvetica);
+      let currentY = pos.y;
+      
+      for (const line of lines.slice(0, 5)) { // Max 5 lines
+        page.drawText(line, {
+          x: pos.x,
+          y: currentY,
+          size: fontSize,
+          font: helvetica,
+          color: textColor,
+        });
+        currentY -= fontSize + 2;
+      }
+    };
+
+    // Simple text wrapping function
+    function wrapText(text: string, maxWidth: number, fontSize: number, font: any): string[] {
+      const words = text.split(' ');
+      const lines: string[] = [];
+      let currentLine = '';
+      
+      for (const word of words) {
+        const testLine = currentLine ? `${currentLine} ${word}` : word;
+        const testWidth = font.widthOfTextAtSize(testLine, fontSize);
+        
+        if (testWidth > maxWidth && currentLine) {
+          lines.push(currentLine);
+          currentLine = word;
+        } else {
+          currentLine = testLine;
+        }
+      }
+      
+      if (currentLine) {
+        lines.push(currentLine);
+      }
+      
+      return lines;
+    }
+
+    // Find the cover page in our new PDF and add prepared_for
+    if (pages.length > 0) {
+      const coverPage = pages[0];
+      const coverPositions = FIELD_POSITIONS.cover;
+      
+      if (profile.full_name) {
+        drawText(coverPage, profile.full_name, coverPositions.prepared_for);
+      }
+      
+      drawText(coverPage, new Date().toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      }), coverPositions.date);
+    }
+
+    // Find personal info page and overlay data
+    const personalPageIndex = uniquePages.indexOf(4);
+    if (personalPageIndex !== -1 && pages[personalPageIndex]) {
+      const personalPage = pages[personalPageIndex];
+      const positions = FIELD_POSITIONS.personal;
+      
+      if (profile.full_name) drawText(personalPage, profile.full_name, positions.full_name);
+      if (profile.nicknames) drawText(personalPage, profile.nicknames, positions.nicknames);
+      if (profile.maiden_name) drawText(personalPage, profile.maiden_name, positions.maiden_name);
+      if (profile.dob) drawText(personalPage, profile.dob, positions.dob);
+      if (profile.birthplace) drawText(personalPage, profile.birthplace, positions.birthplace);
+      if (piiData?.ssn) drawText(personalPage, piiData.ssn, positions.ssn);
+      if (profile.citizenship) drawText(personalPage, profile.citizenship, positions.citizenship);
+      if (profile.address) drawText(personalPage, profile.address, positions.address);
+      if (profile.phone) drawText(personalPage, profile.phone, positions.phone);
+      if (profile.email) drawText(personalPage, profile.email, positions.email);
+    }
+
+    // Find legacy (About Me) page
+    const legacyPageIndex = uniquePages.indexOf(6);
+    if (legacyPageIndex !== -1 && pages[legacyPageIndex]) {
+      const legacyPage = pages[legacyPageIndex];
+      if (planData.about_me_notes) {
+        drawText(legacyPage, planData.about_me_notes, FIELD_POSITIONS.legacy.story);
+      }
+    }
+
+    // Find funeral page
+    const funeralPageIndex = uniquePages.indexOf(10);
+    if (funeralPageIndex !== -1 && pages[funeralPageIndex]) {
+      const funeralPage = pages[funeralPageIndex];
+      const funeral = planData.funeral || {};
+      
+      if (funeral.funeral_preference) {
+        drawText(funeralPage, funeral.funeral_preference, FIELD_POSITIONS.funeral.preference);
+      }
+      if (funeral.cemetery_plot) {
+        drawText(funeralPage, funeral.cemetery_plot, FIELD_POSITIONS.funeral.cemetery);
+      }
+      if (funeral.burial_notes || funeral.cremation_notes) {
+        drawText(funeralPage, funeral.burial_notes || funeral.cremation_notes, FIELD_POSITIONS.funeral.disposition_notes);
+      }
+    }
+
+    // Serialize the PDF
+    const pdfBytes = await newPdf.save();
+    
+    // Create a unique filename
+    const timestamp = Date.now();
+    const filename = `${user.id}/${docType}_${timestamp}.pdf`;
+    
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase
+      .storage
+      .from('generated-pdfs')
+      .upload(filename, pdfBytes, {
+        contentType: 'application/pdf',
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      // Return the PDF directly as base64 if storage upload fails
+      const base64Pdf = btoa(String.fromCharCode(...new Uint8Array(pdfBytes)));
+      return new Response(JSON.stringify({ 
+        success: true, 
+        pdfBase64: base64Pdf,
+        filename: `My-Final-Wishes-${new Date().toISOString().split('T')[0]}.pdf`
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Generate signed URL
+    const { data: signedUrl, error: signedError } = await supabase
+      .storage
+      .from('generated-pdfs')
+      .createSignedUrl(filename, 3600); // 1 hour expiry
+
+    if (signedError) {
+      console.error('Signed URL error:', signedError);
+      const base64Pdf = btoa(String.fromCharCode(...new Uint8Array(pdfBytes)));
+      return new Response(JSON.stringify({ 
+        success: true, 
+        pdfBase64: base64Pdf,
+        filename: `My-Final-Wishes-${new Date().toISOString().split('T')[0]}.pdf`
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Store reference in generated_documents table
+    await supabase
+      .from('generated_documents')
+      .insert({
+        user_id: user.id,
+        plan_id: planData.id || null,
+        doc_type: docType,
+        storage_bucket: 'generated-pdfs',
+        storage_path: filename,
+      });
+
+    console.log('PDF generated successfully:', signedUrl.signedUrl);
+
+    return new Response(JSON.stringify({ 
+      success: true, 
+      url: signedUrl.signedUrl,
+      filename: `My-Final-Wishes-${new Date().toISOString().split('T')[0]}.pdf`
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
+  } catch (error: unknown) {
+    console.error('Error generating PDF:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return new Response(JSON.stringify({ 
+      error: 'Failed to generate PDF',
+      details: errorMessage 
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+});
+
+// Fallback function to generate a simple PDF without template
+async function generateSimplePdf(
+  planData: any, 
+  selectedSections: string[], 
+  piiData: any,
+  userId: string,
+  supabase: any,
+  corsHeaders: Record<string, string>
+) {
+  const pdfDoc = await PDFDocument.create();
+  const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  
+  const pageWidth = 612;
+  const pageHeight = 792;
+  const margin = 50;
+  
+  // Add cover page
+  let page = pdfDoc.addPage([pageWidth, pageHeight]);
+  let y = pageHeight - 100;
+  
+  // Title
+  page.drawText('My Life & Legacy Planner', {
+    x: margin,
+    y,
+    size: 28,
+    font: helveticaBold,
+    color: rgb(0.1, 0.18, 0.27),
+  });
+  
+  y -= 40;
+  page.drawText('End-of-Life Planning Guide', {
+    x: margin,
+    y,
+    size: 14,
+    font: helvetica,
+    color: rgb(0.27, 0.27, 0.27),
+  });
+  
+  y -= 60;
+  const profile = { ...(planData.personal_profile || {}), ...(piiData || {}) };
+  if (profile.full_name) {
+    page.drawText(`Prepared for: ${profile.full_name}`, {
+      x: margin,
+      y,
+      size: 16,
+      font: helveticaBold,
+      color: rgb(0.1, 0.1, 0.1),
+    });
+  }
+  
+  y -= 30;
+  page.drawText(`Generated: ${new Date().toLocaleDateString()}`, {
+    x: margin,
+    y,
+    size: 12,
+    font: helvetica,
+    color: rgb(0.4, 0.4, 0.4),
+  });
+  
+  // Footer
+  page.drawText('For planning purposes only. Not a legal document.', {
+    x: margin,
+    y: 50,
+    size: 9,
+    font: helvetica,
+    color: rgb(0.5, 0.5, 0.5),
+  });
+  
+  page.drawText('Provided by Everlasting Funeral Advisors', {
+    x: margin,
+    y: 35,
+    size: 9,
+    font: helvetica,
+    color: rgb(0.5, 0.5, 0.5),
+  });
+
+  // Helper to add content page
+  const addContentPage = (title: string, content: string | null) => {
+    if (!content) return;
+    
+    const newPage = pdfDoc.addPage([pageWidth, pageHeight]);
+    let currentY = pageHeight - 60;
+    
+    // Title
+    newPage.drawText(title, {
+      x: margin,
+      y: currentY,
+      size: 18,
+      font: helveticaBold,
+      color: rgb(0.05, 0.46, 0.46),
+    });
+    
+    currentY -= 30;
+    
+    // Content - simple wrapping
+    const words = content.split(' ');
+    let line = '';
+    const maxWidth = pageWidth - (margin * 2);
+    
+    for (const word of words) {
+      const testLine = line ? `${line} ${word}` : word;
+      const width = helvetica.widthOfTextAtSize(testLine, 11);
+      
+      if (width > maxWidth) {
+        newPage.drawText(line, {
+          x: margin,
+          y: currentY,
+          size: 11,
+          font: helvetica,
+          color: rgb(0.2, 0.2, 0.2),
+        });
+        currentY -= 15;
+        line = word;
+        
+        if (currentY < 80) break;
+      } else {
+        line = testLine;
+      }
+    }
+    
+    if (line && currentY >= 80) {
+      newPage.drawText(line, {
+        x: margin,
+        y: currentY,
+        size: 11,
+        font: helvetica,
+        color: rgb(0.2, 0.2, 0.2),
+      });
+    }
+    
+    // Footer
+    newPage.drawText('For planning purposes only. Not a legal document.', {
+      x: margin,
+      y: 50,
+      size: 9,
+      font: helvetica,
+      color: rgb(0.5, 0.5, 0.5),
+    });
+  };
+
+  // Add sections based on selection
+  if (selectedSections.includes('personal') && profile.full_name) {
+    const personalContent = [
+      profile.full_name && `Name: ${profile.full_name}`,
+      profile.address && `Address: ${profile.address}`,
+      profile.phone && `Phone: ${profile.phone}`,
+      profile.email && `Email: ${profile.email}`,
+      profile.dob && `Date of Birth: ${profile.dob}`,
+      profile.birthplace && `Place of Birth: ${profile.birthplace}`,
+      profile.marital_status && `Marital Status: ${profile.marital_status}`,
+      profile.partner_name && `Spouse/Partner: ${profile.partner_name}`,
+    ].filter(Boolean).join('\n\n');
+    
+    if (personalContent) {
+      addContentPage('My Personal Information', personalContent);
+    }
+  }
+
+  if (selectedSections.includes('legacy') && planData.about_me_notes) {
+    addContentPage('About Me - My Story & Legacy', planData.about_me_notes);
+  }
+
+  if (selectedSections.includes('funeral') && planData.funeral_wishes_notes) {
+    addContentPage('My Funeral & Memorial Wishes', planData.funeral_wishes_notes);
+  }
+
+  if (selectedSections.includes('financial') && planData.financial_notes) {
+    addContentPage('Financial Life', planData.financial_notes);
+  }
+
+  if (selectedSections.includes('insurance') && planData.insurance_notes) {
+    addContentPage('Insurance', planData.insurance_notes);
+  }
+
+  if (selectedSections.includes('property') && planData.property_notes) {
+    addContentPage('My Property', planData.property_notes);
+  }
+
+  if (selectedSections.includes('legal') && planData.legal_notes) {
+    addContentPage('Legal', planData.legal_notes);
+  }
+
+  if (selectedSections.includes('messages') && planData.messages_notes) {
+    addContentPage('Messages to Loved Ones', planData.messages_notes);
+  }
+
+  const pdfBytes = await pdfDoc.save();
+  const base64Pdf = btoa(String.fromCharCode(...new Uint8Array(pdfBytes)));
+  
+  return new Response(JSON.stringify({ 
+    success: true, 
+    pdfBase64: base64Pdf,
+    filename: `My-Final-Wishes-${new Date().toISOString().split('T')[0]}.pdf`
+  }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
