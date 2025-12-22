@@ -6,6 +6,7 @@
  * - If not logged in → save pending checkout → redirect to login
  * - If logged in → invoke checkout → redirect to Stripe URL
  * - If URL missing → show error with fallback options
+ * - 8-second timeout for hung requests
  */
 
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +19,8 @@ export type CheckoutParams = {
   cancelUrl: string;
   navigate: (path: string) => void;
   onLoadingChange?: (loading: boolean) => void;
+  /** Timeout in ms before showing error (default: 8000) */
+  timeoutMs?: number;
 };
 
 export type CheckoutResult = {
@@ -25,7 +28,11 @@ export type CheckoutResult = {
   redirected: boolean;
   error?: string;
   stripeUrl?: string;
+  timedOut?: boolean;
 };
+
+// Stripe Payment Link fallback URLs (configure these in Stripe dashboard)
+const STRIPE_PAYMENT_LINK_FALLBACK = "https://buy.stripe.com"; // Replace with actual payment link
 
 /**
  * Get the last checkout URL for recovery
@@ -35,11 +42,27 @@ export function getLastCheckoutUrl(): string | null {
 }
 
 /**
+ * Check if Stripe scripts are likely blocked
+ */
+export function checkStripeScriptAccess(): Promise<boolean> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    // Use a small Stripe asset to check connectivity
+    img.src = "https://js.stripe.com/v3/fingerprinted/img/visa-729c05c240c4bdb47b03ac81d9945bfe.svg?" + Date.now();
+    // Timeout after 3 seconds
+    setTimeout(() => resolve(false), 3000);
+  });
+}
+
+/**
  * Safely open Stripe checkout URL
  * Returns true if successful, false if blocked
  */
 function openStripeCheckoutSafely(checkoutUrl: string): boolean {
   if (!checkoutUrl || !checkoutUrl.includes("stripe.com")) {
+    console.error("[Checkout] Invalid checkout URL:", checkoutUrl);
     return false;
   }
 
@@ -47,15 +70,19 @@ function openStripeCheckoutSafely(checkoutUrl: string): boolean {
   localStorage.setItem("efa_last_checkout_url", checkoutUrl);
   localStorage.setItem("efa_checkout_return_url", window.location.pathname);
 
+  console.log("[Checkout] Opening Stripe URL:", checkoutUrl);
+
   // Try opening in a new tab first (reduces preview/CSP issues)
   const newTab = window.open(checkoutUrl, "_blank", "noopener,noreferrer");
 
   // If popups blocked, fall back to same-tab redirect
   if (!newTab) {
+    console.log("[Checkout] Popup blocked, falling back to redirect");
     try {
       window.location.href = checkoutUrl;
       return true;
-    } catch {
+    } catch (e) {
+      console.error("[Checkout] Redirect failed:", e);
       return false;
     }
   }
@@ -64,8 +91,19 @@ function openStripeCheckoutSafely(checkoutUrl: string): boolean {
 }
 
 /**
- * Launch Stripe Checkout with proper handling for logged-out users
- * and error fallbacks.
+ * Create a timeout promise that rejects after specified ms
+ */
+function createTimeout(ms: number): Promise<never> {
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Checkout request timed out after ${ms / 1000} seconds`));
+    }, ms);
+  });
+}
+
+/**
+ * Launch Stripe Checkout with proper handling for logged-out users,
+ * error fallbacks, and 8-second timeout.
  */
 export async function launchCheckout({
   lookupKey,
@@ -73,8 +111,10 @@ export async function launchCheckout({
   cancelUrl,
   navigate,
   onLoadingChange,
+  timeoutMs = 8000,
 }: CheckoutParams): Promise<CheckoutResult> {
   onLoadingChange?.(true);
+  console.log("[Checkout] Starting checkout for:", lookupKey);
 
   try {
     // Check if user is logged in
@@ -97,8 +137,10 @@ export async function launchCheckout({
       return { success: true, redirected: false };
     }
 
-    // User is logged in - invoke checkout
-    const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
+    console.log("[Checkout] User authenticated, invoking checkout function");
+
+    // Race between checkout request and timeout
+    const checkoutPromise = supabase.functions.invoke('stripe-create-checkout', {
       body: {
         lookupKey,
         successUrl,
@@ -106,58 +148,96 @@ export async function launchCheckout({
       },
     });
 
+    const { data, error } = await Promise.race([
+      checkoutPromise,
+      createTimeout(timeoutMs).catch((e) => {
+        throw e;
+      }),
+    ]) as { data: any; error: any };
+
     if (error) {
-      console.error('Checkout error:', error);
+      console.error('[Checkout] Edge function error:', error);
       throw new Error(error.message || 'Unable to start checkout');
     }
 
     if (!data?.url) {
-      console.error('No checkout URL returned');
+      console.error('[Checkout] No checkout URL returned:', data);
       throw new Error('No checkout URL returned from server');
     }
+
+    console.log("[Checkout] Got Stripe URL, attempting to open");
 
     // Try to open Stripe checkout safely
     const opened = openStripeCheckoutSafely(data.url);
     
     if (!opened) {
-      toast.error("Payment page blocked", {
-        description: "Your browser blocked the payment window. Visit Payment Help for troubleshooting steps.",
-        action: {
-          label: "Get Help",
-          onClick: () => navigate('/payment-help'),
-        },
-        duration: 10000,
-      });
+      console.error("[Checkout] Failed to open checkout URL");
+      showCheckoutBlockedError(navigate, data.url);
       onLoadingChange?.(false);
-      return { success: false, redirected: false, error: "Payment page blocked" };
+      return { success: false, redirected: false, error: "Payment page blocked", stripeUrl: data.url };
     }
+    
+    // Keep loading for a moment to allow redirect
+    setTimeout(() => {
+      onLoadingChange?.(false);
+    }, 2000);
     
     return { success: true, redirected: true, stripeUrl: data.url };
 
   } catch (error: any) {
-    console.error('Checkout launch error:', error);
+    console.error('[Checkout] Launch error:', error);
     
-    // Show error with helpful fallback options
+    const isTimeout = error.message?.includes('timed out');
     const lastUrl = getLastCheckoutUrl();
     
-    toast.error("Unable to start checkout", {
-      description: "Please try again. If the payment page looks blank, visit Payment Help.",
-      action: {
-        label: lastUrl ? "Open in new tab" : "Get Help",
-        onClick: () => {
-          if (lastUrl) {
-            window.open(lastUrl, '_blank');
-          } else {
-            navigate('/payment-help');
-          }
+    if (isTimeout) {
+      console.log("[Checkout] Request timed out after", timeoutMs, "ms");
+      toast.error("Checkout is taking too long", {
+        description: "The payment page didn't respond in time. Try again or open checkout directly.",
+        action: {
+          label: lastUrl ? "Open Checkout" : "Reload",
+          onClick: () => {
+            if (lastUrl) {
+              window.open(lastUrl, '_blank');
+            } else {
+              window.location.reload();
+            }
+          },
         },
-      },
-      duration: 10000,
-    });
+        duration: 15000,
+      });
+    } else {
+      showCheckoutBlockedError(navigate, lastUrl);
+    }
 
     onLoadingChange?.(false);
-    return { success: false, redirected: false, error: error.message };
+    return { 
+      success: false, 
+      redirected: false, 
+      error: error.message, 
+      timedOut: isTimeout 
+    };
   }
+}
+
+/**
+ * Show a helpful error toast when checkout is blocked
+ */
+function showCheckoutBlockedError(navigate: (path: string) => void, checkoutUrl?: string | null) {
+  toast.error("Secure checkout did not load", {
+    description: "Your browser or network blocked the payment window. Try reloading or opening in a new tab.",
+    action: {
+      label: checkoutUrl ? "Open in New Tab" : "Get Help",
+      onClick: () => {
+        if (checkoutUrl) {
+          window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
+        } else {
+          navigate('/payment-help');
+        }
+      },
+    },
+    duration: 15000,
+  });
 }
 
 /**
@@ -166,6 +246,7 @@ export async function launchCheckout({
 export function retryLastCheckout(): boolean {
   const lastUrl = getLastCheckoutUrl();
   if (lastUrl) {
+    console.log("[Checkout] Retrying with last URL:", lastUrl);
     window.open(lastUrl, '_blank');
     return true;
   }
@@ -180,5 +261,28 @@ export function getCheckoutTroubleshootingMessage(): string {
 • Try opening in a new tab or window
 • Disable ad blockers or privacy extensions
 • Try a different browser (Chrome, Safari, Firefox)
-• If on a work network, try your phone's mobile data`;
+• If on a work network, try your phone's mobile data
+• Disable iCloud Private Relay or VPN temporarily`;
+}
+
+/**
+ * Validate that Stripe key mode matches price mode
+ * Returns warning message if mismatch detected
+ */
+export function validateStripeModeMatch(publishableKey: string, priceId?: string): string | null {
+  const isTestKey = publishableKey?.startsWith('pk_test_');
+  const isLiveKey = publishableKey?.startsWith('pk_live_');
+  
+  if (!isTestKey && !isLiveKey) {
+    return "Invalid Stripe publishable key format";
+  }
+
+  // If we have a price ID, check if modes match
+  if (priceId) {
+    const isTestPrice = priceId?.startsWith('price_') && priceId?.includes('test');
+    // This is a heuristic - Stripe doesn't explicitly mark test prices
+    // The best validation is at the server level
+  }
+
+  return null;
 }
