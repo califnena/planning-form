@@ -396,7 +396,7 @@ const Landing = () => {
                 <Button size="lg" className="min-h-[48px]">View Pricing & Plans</Button>
               </Link>
               <Link to="/pricing">
-                <Button variant="outline" size="lg" className="min-h-[48px]">See What's Included</Button>
+                
               </Link>
             </div>
           </div>
@@ -482,7 +482,7 @@ const Landing = () => {
           <div className="grid md:grid-cols-3 gap-6">
             {/* Testimonial 1 */}
             <Card className="border-2 rounded-xl bg-background/80 backdrop-blur flex flex-col">
-              <CardContent className="p-6 flex flex-col flex-1">
+              <CardContent className="p-6 flex flex-col flex-1 bg-amber-100">
                 <Quote className="h-7 w-7 text-primary/30" />
                 <p className="text-foreground leading-relaxed text-base mt-3 flex-1">
                   "Having everything written down gave us peace of mind we didn't realize we were missing. The process was calm, respectful, and never pressured."
@@ -495,7 +495,7 @@ const Landing = () => {
 
             {/* Testimonial 2 */}
             <Card className="border-2 rounded-xl bg-background/80 backdrop-blur flex flex-col">
-              <CardContent className="p-6 flex flex-col flex-1">
+              <CardContent className="p-6 flex flex-col flex-1 bg-amber-100">
                 <Quote className="h-7 w-7 text-primary/30" />
                 <p className="text-foreground leading-relaxed text-base mt-3 flex-1">
                   "I appreciated being able to move at my own pace. The guidance was clear and compassionate, and I never felt rushed or overwhelmed."
@@ -508,7 +508,7 @@ const Landing = () => {
 
             {/* Testimonial 3 */}
             <Card className="border-2 rounded-xl bg-background/80 backdrop-blur flex flex-col">
-              <CardContent className="p-6 flex flex-col flex-1">
+              <CardContent className="p-6 flex flex-col flex-1 bg-amber-100">
                 <Quote className="h-7 w-7 text-primary/30" />
                 <p className="text-foreground leading-relaxed text-base mt-3 flex-1">
                   "When the time came, having a plan made an incredibly difficult moment manageable. The support was thoughtful, and the tools were easy to follow."
