@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Loader2, Check, X, ChevronDown, User } from "lucide-react";
+import { CheckCircle, Loader2, Check, X, ChevronDown, User, ExternalLink, RefreshCw, AlertTriangle } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Plus, Minus } from "lucide-react";
@@ -38,6 +38,21 @@ const LOOKUP_KEY_TO_PLAN_ID: Record<string, string> = {
   "EFABASIC": "printable",
   "EFABINDER": "binder"
 };
+
+// Stripe Payment Link fallbacks (external URLs that always work)
+const STRIPE_PAYMENT_LINKS: Record<string, { url: string; label: string }> = {
+  "EFAPREMIUM": { url: "https://buy.stripe.com/14A5kD6Nn3Gjg1NdYi7bW02", label: "Premium Plan" },
+  "EFABASIC": { url: "https://buy.stripe.com/6oU28r2x75OrbLxg6q7bW00", label: "Basic Plan" },
+  "EFABINDER": { url: "https://buy.stripe.com/eVqcN5dbLfp1aHt8DY7bW01", label: "Physical Binder" },
+  "EFAVIPMONTHLY": { url: "https://buy.stripe.com/28E8wP4Ff5OrbLx5rM7bW05", label: "VIP Monthly" },
+  "EFAVIPYEAR": { url: "https://buy.stripe.com/5kQ9ATfjT0u78zl1bw7bW04", label: "VIP Yearly" },
+  "EFADOFORU": { url: "https://buy.stripe.com/4gM6oHgnXfp18zl2fA7bW03", label: "Do-It-For-You" },
+};
+
+// Fallback timeout in milliseconds
+const STRIPE_FALLBACK_TIMEOUT_MS = 8000;
+
+type FallbackReason = "timeout" | "stripe_script_missing" | "init_error" | "price_load_error" | null;
 
 function formatMoney(unitAmount: number | null | undefined, currency?: string) {
   if (unitAmount == null) return "";
@@ -111,6 +126,11 @@ const Pricing = () => {
   const [currentPlanName, setCurrentPlanName] = useState<string | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState<boolean>(true);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  
+  // Fallback mode state
+  const [fallbackMode, setFallbackMode] = useState<boolean>(false);
+  const [fallbackReason, setFallbackReason] = useState<FallbackReason>(null);
+  const pageLoadTime = useRef<number>(Date.now());
 
   // Core plans - simplified to 3
   const plans = [
@@ -225,7 +245,7 @@ const Pricing = () => {
     checkAuthAndPlan();
   }, []);
 
-  // Load Stripe prices
+  // Load Stripe prices with fallback detection
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -241,6 +261,13 @@ const Pricing = () => {
         console.error("Failed to load Stripe prices:", err);
         if (!mounted) return;
         setStripePrices({});
+        // If prices fail to load after timeout, trigger fallback
+        const elapsed = Date.now() - pageLoadTime.current;
+        if (elapsed >= STRIPE_FALLBACK_TIMEOUT_MS) {
+          console.warn("[Pricing Fallback] Price load error after timeout");
+          setFallbackReason("price_load_error");
+          setFallbackMode(true);
+        }
       } finally {
         if (!mounted) return;
         setLoadingPrices(false);
@@ -248,6 +275,41 @@ const Pricing = () => {
     })();
     return () => { mounted = false; };
   }, []);
+
+  // 8-second timeout to detect Stripe loading issues
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      // Check if Stripe script is available
+      if (typeof (window as any).Stripe === 'undefined') {
+        console.warn("[Pricing Fallback] Stripe script not loaded after 8s - window.Stripe is undefined");
+        setFallbackReason("stripe_script_missing");
+        setFallbackMode(true);
+        return;
+      }
+      
+      // Check if prices are still loading after timeout
+      if (loadingPrices) {
+        console.warn("[Pricing Fallback] Prices still loading after 8s timeout");
+        setFallbackReason("timeout");
+        setFallbackMode(true);
+      }
+    }, STRIPE_FALLBACK_TIMEOUT_MS);
+
+    return () => clearTimeout(timeoutId);
+  }, [loadingPrices]);
+
+  // Handler for opening Stripe Payment Links
+  const handleOpenPaymentLink = (lookupKey: string) => {
+    const link = STRIPE_PAYMENT_LINKS[lookupKey];
+    if (link) {
+      window.open(link.url, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const handleReloadPage = () => {
+    window.location.reload();
+  };
+
 
   const handleTextSizeChange = (direction: "increase" | "decrease") => {
     const newSize = direction === "increase" 
@@ -389,6 +451,97 @@ const Pricing = () => {
             lookupKeys={PRICING_PAGE_LOOKUP_KEYS} 
             isAdmin={isAdmin} 
           />
+
+          {/* Fallback Mode UI - shown when Stripe fails to load */}
+          {fallbackMode && (
+            <Card className="border-amber-300 bg-amber-50/50 dark:bg-amber-950/20 max-w-2xl mx-auto">
+              <CardHeader className="text-center">
+                <div className="mx-auto mb-2">
+                  <AlertTriangle className="h-10 w-10 text-amber-600" />
+                </div>
+                <CardTitle className="text-amber-800 dark:text-amber-200">
+                  Secure checkout did not load
+                </CardTitle>
+                <p className="text-amber-700 dark:text-amber-300 text-sm mt-2">
+                  Your browser or network blocked the secure checkout screen. Use the buttons below to continue.
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-3">
+                  {/* Core plans first */}
+                  <Button 
+                    onClick={() => handleOpenPaymentLink("EFAPREMIUM")} 
+                    className="w-full justify-between"
+                    variant="default"
+                  >
+                    <span>Digital Planner (Premium)</span>
+                    <ExternalLink className="h-4 w-4 ml-2" />
+                  </Button>
+                  <Button 
+                    onClick={() => handleOpenPaymentLink("EFABASIC")} 
+                    className="w-full justify-between"
+                    variant="outline"
+                  >
+                    <span>Printable Planner (Basic)</span>
+                    <ExternalLink className="h-4 w-4 ml-2" />
+                  </Button>
+                  <Button 
+                    onClick={() => handleOpenPaymentLink("EFABINDER")} 
+                    className="w-full justify-between"
+                    variant="outline"
+                  >
+                    <span>Physical Binder</span>
+                    <ExternalLink className="h-4 w-4 ml-2" />
+                  </Button>
+                  
+                  {/* Additional plans */}
+                  <div className="border-t border-amber-200 dark:border-amber-800 pt-3 mt-2">
+                    <p className="text-xs text-amber-600 dark:text-amber-400 mb-2">Additional options:</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button 
+                        onClick={() => handleOpenPaymentLink("EFAVIPMONTHLY")} 
+                        variant="ghost"
+                        size="sm"
+                        className="justify-between text-xs"
+                      >
+                        <span>VIP Monthly</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </Button>
+                      <Button 
+                        onClick={() => handleOpenPaymentLink("EFAVIPYEAR")} 
+                        variant="ghost"
+                        size="sm"
+                        className="justify-between text-xs"
+                      >
+                        <span>VIP Yearly</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </Button>
+                      <Button 
+                        onClick={() => handleOpenPaymentLink("EFADOFORU")} 
+                        variant="ghost"
+                        size="sm"
+                        className="justify-between text-xs col-span-2"
+                      >
+                        <span>Do-It-For-You Service</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-center pt-2">
+                  <Button onClick={handleReloadPage} variant="outline" size="sm">
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Reload Page
+                  </Button>
+                </div>
+
+                <p className="text-xs text-center text-muted-foreground">
+                  Try disabling ad blockers, VPN, or iCloud Private Relay. Or open in Chrome if using Safari.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Plans Grid - 3 Cards */}
           <div ref={planCardsRef} className="grid md:grid-cols-3 gap-6 scroll-mt-8">
