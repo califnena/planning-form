@@ -525,6 +525,16 @@ export default function PrePlanSummary() {
 
       // Build PDF payload using ALREADY LOADED state data
       // This ensures the PDF gets the exact same data shown on the summary page
+      
+      // Get localStorage plan data for detailed section objects (funeral, etc.)
+      let localPlanForPdf: any = null;
+      try {
+        const raw = localStorage.getItem(`plan_${user.id}`);
+        if (raw) localPlanForPdf = JSON.parse(raw);
+      } catch (e) {
+        console.warn("[PrePlanSummary] Failed to parse local plan for PDF:", e);
+      }
+      
       const pdfPlanData = {
         // Plan metadata
         id: planId,
@@ -555,6 +565,37 @@ export default function PrePlanSummary() {
         legal_notes: planData?.legal_notes || "",
         messages_notes: planData?.messages_notes || "",
         to_loved_ones_message: planData?.to_loved_ones_message || "",
+        
+        // CRITICAL: Include detailed funeral object from localStorage
+        // This contains the checkboxes, disposition preferences, service details, etc.
+        funeral: localPlanForPdf?.funeral || planData?.funeral || {},
+        
+        // Additional section detail objects that may be in localStorage
+        funeral_disposition: localPlanForPdf?.funeral?.burial 
+          ? { preference: "burial", type: "burial" }
+          : localPlanForPdf?.funeral?.cremation 
+            ? { preference: "cremation", type: "cremation" }
+            : localPlanForPdf?.funeral?.natural_burial
+              ? { preference: "natural_burial", type: "natural_burial" }
+              : {},
+        service_preferences: {
+          service_type: localPlanForPdf?.funeral?.service_type || "",
+          location: localPlanForPdf?.funeral?.service_location || "",
+          officiant: localPlanForPdf?.funeral?.officiant || "",
+          music: localPlanForPdf?.funeral?.music_preferences || "",
+          readings: localPlanForPdf?.funeral?.readings || "",
+          flowers_or_donations: localPlanForPdf?.funeral?.flowers_or_donations || "",
+          clothing: localPlanForPdf?.funeral?.clothing || "",
+        },
+        funeral_home: {
+          name: localPlanForPdf?.funeral?.funeral_home_name || "",
+          phone: localPlanForPdf?.funeral?.funeral_home_phone || "",
+          address: localPlanForPdf?.funeral?.funeral_home_address || "",
+        },
+        cemetery: {
+          name: localPlanForPdf?.funeral?.cemetery_name || "",
+          location: localPlanForPdf?.funeral?.cemetery_location || "",
+        },
 
         // Arrays from state (loaded from Supabase in loadPlanData)
         contacts_notify: contacts,
@@ -568,13 +609,30 @@ export default function PrePlanSummary() {
         funeral_funding: funeralFunding,
         debts: debts,
         businesses: businesses,
+        
+        // Pallbearers from funeral data
+        pallbearers: localPlanForPdf?.funeral?.pallbearers || [],
+        honorary_pallbearers: localPlanForPdf?.funeral?.honorary_pallbearers || [],
 
         // Section visibility
         _visibleSections: selectedSections,
       };
 
+      // CRITICAL DEBUG LOG - shows exactly what is sent to PDF for funeral section
+      console.log("[PrePlanSummary] PDF payload funeral data:", {
+        funeral_wishes_notes_len: pdfPlanData.funeral_wishes_notes?.length || 0,
+        funeral_object_keys: Object.keys(pdfPlanData.funeral || {}),
+        funeral_disposition: pdfPlanData.funeral_disposition,
+        service_preferences_keys: Object.keys(pdfPlanData.service_preferences || {}),
+        funeral_home: pdfPlanData.funeral_home,
+        cemetery: pdfPlanData.cemetery,
+        funeral_funding_len: pdfPlanData.funeral_funding?.length || 0,
+        has_burial: pdfPlanData.funeral?.burial,
+        has_cremation: pdfPlanData.funeral?.cremation,
+      });
+
       // Prove what we are sending + what the UI selected
-      console.log("PDF payload section counts", {
+      console.log("[PrePlanSummary] PDF payload section counts:", {
         contacts_notify: pdfPlanData.contacts_notify?.length,
         pets: pdfPlanData.pets?.length,
         insurance_policies: Array.isArray(pdfPlanData.insurance_policies)
@@ -589,24 +647,6 @@ export default function PrePlanSummary() {
         funeral_funding: pdfPlanData.funeral_funding?.length,
         messages: pdfPlanData.messages?.length,
         selectedSections,
-      });
-
-      // CRITICAL DEBUG LOG - shows exactly what is sent to PDF
-      console.log("[PrePlanSummary] PDF planData payload:", {
-        planId: pdfPlanData.id,
-        prepared_for: pdfPlanData.prepared_for,
-        profile_full_name: pdfPlanData.personal_profile?.full_name,
-        profile_address: pdfPlanData.personal_profile?.address,
-        contacts_notify_count: pdfPlanData.contacts_notify?.length,
-        pets_count: pdfPlanData.pets?.length,
-        insurance_policies_count: Array.isArray(pdfPlanData.insurance_policies)
-          ? pdfPlanData.insurance_policies.length
-          : (pdfPlanData.insurance_policies as any)?.policies?.length,
-        properties_count: pdfPlanData.properties?.length,
-        messages_count: pdfPlanData.messages?.length,
-        bank_accounts_count: pdfPlanData.bank_accounts?.length,
-        has_about_me: !!pdfPlanData.about_me_notes,
-        has_funeral_notes: !!pdfPlanData.funeral_wishes_notes,
       });
       console.log("[PrePlanSummary] Full PDF payload:", pdfPlanData);
 
@@ -631,7 +671,7 @@ export default function PrePlanSummary() {
         // Open PDF in new tab for download
         window.open(pdfData.url, '_blank');
       } else if (pdfData.pdfBase64) {
-        // Fallback: download base64 PDF
+        // Fallback: download base64 PDF with correct filename
         const byteCharacters = atob(pdfData.pdfBase64);
         const byteNumbers = new Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) {
@@ -642,9 +682,10 @@ export default function PrePlanSummary() {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        const filename = isDraftMode 
+        // Use filename from server response (includes "Planner for {Name}.pdf")
+        const filename = pdfData.filename || (isDraftMode 
           ? `DRAFT-My-Life-and-Legacy-Planner-${new Date().toISOString().split('T')[0]}.pdf`
-          : pdfData.filename || `My-Life-and-Legacy-Planner-${new Date().toISOString().split('T')[0]}.pdf`;
+          : `My-Life-and-Legacy-Planner-${new Date().toISOString().split('T')[0]}.pdf`);
         link.download = filename;
         link.click();
         URL.revokeObjectURL(url);
