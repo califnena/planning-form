@@ -1,5 +1,6 @@
 import { Shield } from "lucide-react";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
+import { Badge } from "@/components/ui/badge";
 
 export const AdminBanner = () => {
   const { isAdmin, isLoading } = useAdminStatus();
@@ -9,11 +10,13 @@ export const AdminBanner = () => {
     return null;
   }
 
+  // Subtle admin badge instead of prominent banner
   return (
-    <div className="bg-yellow-400 text-black py-2 px-4 text-center font-bold flex items-center justify-center gap-2 z-50">
-      <Shield className="h-5 w-5" />
-      <span>ADMIN</span>
-      <Shield className="h-5 w-5" />
+    <div className="fixed top-2 right-2 z-50">
+      <Badge variant="outline" className="bg-muted/80 text-muted-foreground border-muted-foreground/30 text-xs font-medium gap-1 px-2 py-1">
+        <Shield className="h-3 w-3" />
+        Admin
+      </Badge>
     </div>
   );
 };

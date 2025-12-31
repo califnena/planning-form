@@ -18,6 +18,7 @@ import { ResumeCard } from "@/components/dashboard/ResumeCard";
 import { MyPlanningDocumentCard } from "@/components/dashboard/MyPlanningDocumentCard";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
 import { usePlanDataStatus } from "@/hooks/usePlanDataStatus";
+import { useAdminStatus } from "@/hooks/useAdminStatus";
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -51,6 +52,9 @@ export default function Dashboard() {
   const [hasVIPAccess, setHasVIPAccess] = useState(false);
   const [hasPrintableAccess, setHasPrintableAccess] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  
+  // Admin/test users bypass all subscription checks
+  const { isAdmin, isLoading: isAdminLoading } = useAdminStatus();
   
   const planDataStatus = usePlanDataStatus();
 
@@ -586,17 +590,37 @@ export default function Dashboard() {
             <div className="space-y-6">
               {/* Primary Action - Unified Start/Continue */}
               <div className="text-center">
-                {isFreePlan ? (
+                {/* CRITICAL: Admin/test users ALWAYS bypass subscription checks - checked FIRST */}
+                {isAdmin ? (
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button 
+                      onClick={handleStartDigitalPlanner} 
+                      size="lg"
+                      className="min-h-[56px] px-8 text-lg"
+                    >
+                      {planDataStatus.hasAnyData ? "Continue My Wishes" : "Start My Wishes"}
+                    </Button>
+                    <Button 
+                      onClick={handleViewSummary} 
+                      variant="outline" 
+                      size="lg"
+                      className="min-h-[56px] px-8 text-lg border-2"
+                    >
+                      <Printer className="h-5 w-5 mr-2" />
+                      Print or Save My Wishes
+                    </Button>
+                  </div>
+                ) : isFreePlan ? (
                   <div className="space-y-4">
                     <p className="text-muted-foreground mb-4">
-                      To start writing down your wishes, you'll need a subscription.
+                      To continue, choose how you'd like to get started.
                     </p>
                     <Button 
                       onClick={handlePremiumSubscription} 
                       size="lg"
                       className="min-h-[56px] px-8 text-lg"
                     >
-                      Get Started
+                      Continue to My Wishes
                     </Button>
                   </div>
                 ) : (
@@ -645,7 +669,8 @@ export default function Dashboard() {
                   <p className="text-muted-foreground mb-4 leading-relaxed">
                     Personal planning help from Claire — a real person who walks at your pace.
                   </p>
-                  {hasVIPAccess ? (
+                  {/* Admin users bypass Stripe - always show access */}
+                  {isAdmin || hasVIPAccess ? (
                     <Button 
                       onClick={() => navigate('/care-support')} 
                       className="min-h-[48px]"
