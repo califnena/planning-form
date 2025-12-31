@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +10,20 @@ import { Switch } from "@/components/ui/switch";
 import { CheckCircle2, ChevronRight, Edit2, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+
+// Map section IDs to their planner routes
+const SECTION_ROUTES: Record<string, string> = {
+  personal: "/preplandashboard/personal-family",
+  funeral: "/preplandashboard/funeral-wishes",
+  financial: "/preplandashboard/financial-life",
+  property: "/preplandashboard/property-valuables",
+  legal: "/preplandashboard/legal-docs",
+  messages: "/preplandashboard/messages",
+  contacts: "/preplandashboard/contacts",
+  insurance: "/preplandashboard/insurance",
+  digital: "/preplandashboard/digital",
+  pets: "/preplandashboard/pets",
+};
 
 interface SectionPreferencesProps {
   user: User;
@@ -82,6 +97,7 @@ export const SectionPreferences = ({
 }: SectionPreferencesProps) => {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [selectedSections, setSelectedSections] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -169,6 +185,22 @@ export const SectionPreferences = ({
     if (onContinue) onContinue();
   };
 
+  // New handler that navigates to first selected section
+  const handleContinueToPlanner = async () => {
+    await saveSettings();
+    
+    // Find the first user-selected section (not always-included)
+    const userSections = selectedSections.filter(s => !ALWAYS_INCLUDED.includes(s));
+    const firstSection = userSections[0];
+    
+    if (firstSection && SECTION_ROUTES[firstSection]) {
+      navigate(SECTION_ROUTES[firstSection]);
+    } else {
+      // Fallback to overview if no sections selected
+      navigate("/preplandashboard");
+    }
+  };
+
   // Get sections that have data (placeholder - would check real data)
   const getSectionStatus = (sectionId: string) => {
     // This would check real data in production
@@ -252,15 +284,15 @@ export const SectionPreferences = ({
             </div>
           </Card>
 
-          {/* Primary Continue Button */}
+          {/* Primary Continue Button - Routes to first selected section */}
           <div className="pt-6 space-y-4">
             <Button
-              onClick={handleSaveAndContinue}
+              onClick={handleContinueToPlanner}
               disabled={saving}
               size="lg"
               className="w-full py-6 text-lg font-medium"
             >
-              {saving ? "Saving..." : "Continue"}
+              {saving ? "Saving..." : "Continue to My Wishes"}
               <ChevronRight className="ml-2 h-5 w-5" />
             </Button>
 

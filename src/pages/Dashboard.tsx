@@ -548,26 +548,43 @@ export default function Dashboard() {
           <ResumeCard />
         </div>
 
-        {/* Page Title and Purpose */}
+        {/* Page Title and Purpose - Unified "My Wishes" */}
         <div className="mb-10 text-center">
-          <h1 className="text-3xl font-bold mb-3">My Planning Document</h1>
+          <h1 className="text-3xl font-bold mb-3">My Wishes</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            This page helps you write down your wishes and keep them in one place.
+            This is where your wishes are written and kept in one place.
           </p>
         </div>
 
-        {/* My Planning Document Card */}
-        <div className="mb-10">
-          <MyPlanningDocumentCard hasData={planDataStatus.hasAnyData} />
+        {/* Reassurance - Trust Copy */}
+        <div className="mb-8 bg-accent/30 border border-accent/50 rounded-lg p-5 max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-center leading-relaxed">
+            You can skip anything, come back later, or change your answers at any time.<br />
+            Nothing is shared unless you choose to print or save it.
+          </p>
         </div>
 
-        {/* ==================== SECTION A: PRIMARY ==================== */}
+        {/* Progress Indicator - De-emphasized */}
+        {progress > 0 && (
+          <div className="mb-8 max-w-md mx-auto">
+            <p className="text-sm text-muted-foreground text-center mb-2">Your progress</p>
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-primary/60 rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              You can take this one step at a time.
+            </p>
+          </div>
+        )}
+
+        {/* ==================== SECTION A: PRIMARY - MY WISHES ==================== */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-primary">Write Down Your Wishes</h2>
-          
           <Card className="p-8">
             <div className="space-y-6">
-              {/* Primary Action - Start or Continue Planning */}
+              {/* Primary Action - Unified Start/Continue */}
               <div className="text-center">
                 {isFreePlan ? (
                   <div className="space-y-4">
@@ -589,7 +606,7 @@ export default function Dashboard() {
                       size="lg"
                       className="min-h-[56px] px-8 text-lg"
                     >
-                      {planDataStatus.hasAnyData ? "Continue Planning" : "Start Planning"}
+                      {planDataStatus.hasAnyData ? "Continue My Wishes" : "Start My Wishes"}
                     </Button>
                     <Button 
                       onClick={handleViewSummary} 
@@ -675,9 +692,10 @@ export default function Dashboard() {
 
         {/* ==================== SECTION C: OTHER OPTIONS ==================== */}
         <section className="mb-12">
-          <h2 className="text-xl font-semibold mb-6 text-muted-foreground">Other Options</h2>
+          <h2 className="text-xl font-semibold mb-2 text-muted-foreground">Other Options</h2>
+          <p className="text-sm text-muted-foreground mb-6">You can explore these later if you wish.</p>
           
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 opacity-90">
             {/* Shop */}
             <Card 
               className="p-5 hover:shadow-md transition-shadow cursor-pointer"
