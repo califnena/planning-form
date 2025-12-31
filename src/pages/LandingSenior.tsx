@@ -137,13 +137,7 @@ const LandingSenior = () => {
             Safe, private, and simple. Go at your own pace.
           </p>
 
-          {/* Welcome back message for returning users */}
-          {isLoggedIn && hasPlannerProgress && userName && (
-            <div className="mb-6 p-4 bg-muted/50 rounded-lg inline-block">
-              <p className="font-medium text-foreground">Welcome back, {userName}.</p>
-              <p className="text-sm text-muted-foreground">Your plan is saved. Continue where you left off.</p>
-            </div>
-          )}
+
           
           <div className="flex flex-col items-center gap-3">
             <Button 
