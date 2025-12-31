@@ -79,6 +79,13 @@ export const SectionInstructions = ({ value, onChange }: SectionInstructionsProp
           </Button>
         )}
       </div>
+      {/* Instructions for PDF */}
+      <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+        <h3 className="font-semibold mb-2 text-amber-900 dark:text-amber-100">📄 Instructions for the PDF:</h3>
+        <p className="text-sm text-amber-800 dark:text-amber-200">
+          Enter any sensitive details about you or the person you are filling out this plan for that you want included in the document generated in PDF format. All fields are optional - leave blank any information you don't want to include. Download the PDF after filling out.
+        </p>
+      </div>
 
       <div className="p-4 bg-muted/50 rounded-lg">
         <h3 className="font-semibold mb-2">💡 Important Tip:</h3>
