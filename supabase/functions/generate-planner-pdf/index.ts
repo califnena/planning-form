@@ -747,10 +747,10 @@ async function generateSimplePdf(
       .filter(Boolean)
       .join(" | ");
 
-  // Also check for checkbox selections in financialObj
+  // Also check for checkbox selections in financialObj (matching SectionFinancial.tsx field names)
   const hasFinancialCheckboxes = financialObj.has_checking || financialObj.has_savings || 
     financialObj.has_retirement || financialObj.has_investment || financialObj.has_crypto ||
-    financialObj.has_business || financialObj.has_trust || financialObj.has_annuity;
+    financialObj.has_safe_deposit || financialObj.has_business || financialObj.has_debts;
     
   const hasFinancial = hasAny(bankList) || hasAny(investList) || hasAny(debtsList) || 
     hasAny(businessList) || hasText(financialNotes) || hasFinancialCheckboxes;
@@ -758,7 +758,7 @@ async function generateSimplePdf(
   if (!hasFinancial) {
     finY = drawEmpty(financialPage, finY);
   } else {
-    // Show account types if checkboxes were checked
+    // Show account types if checkboxes were checked (matching SectionFinancial.tsx)
     if (hasFinancialCheckboxes) {
       const accountTypes: string[] = [];
       if (financialObj.has_checking) accountTypes.push("Checking");
@@ -766,9 +766,9 @@ async function generateSimplePdf(
       if (financialObj.has_retirement) accountTypes.push("Retirement (401k/IRA)");
       if (financialObj.has_investment) accountTypes.push("Investment/Brokerage");
       if (financialObj.has_crypto) accountTypes.push("Cryptocurrency");
-      if (financialObj.has_business) accountTypes.push("Business Accounts");
-      if (financialObj.has_trust) accountTypes.push("Trust Accounts");
-      if (financialObj.has_annuity) accountTypes.push("Annuities");
+      if (financialObj.has_safe_deposit) accountTypes.push("Safe Deposit Box");
+      if (financialObj.has_business) accountTypes.push("Business Interests");
+      if (financialObj.has_debts) accountTypes.push("Outstanding Debts/Loans");
       
       if (accountTypes.length > 0) {
         finY = addField(financialPage, "Account Types", accountTypes.join(", "), finY);
@@ -833,6 +833,24 @@ async function generateSimplePdf(
         finY,
         4,
       );
+      finY -= 10;
+    }
+    
+    // Add additional text fields from localStorage (SectionFinancial.tsx)
+    if (financialObj.safe_deposit_details) {
+      finY = addNotesBox(financialPage, "Safe Deposit Box Details", financialObj.safe_deposit_details, finY);
+      finY -= 10;
+    }
+    if (financialObj.crypto_details) {
+      finY = addNotesBox(financialPage, "Cryptocurrency Details", financialObj.crypto_details, finY);
+      finY -= 10;
+    }
+    if (financialObj.business_details) {
+      finY = addNotesBox(financialPage, "Business Interests Details", financialObj.business_details, finY);
+      finY -= 10;
+    }
+    if (financialObj.debts_details) {
+      finY = addNotesBox(financialPage, "Outstanding Debts Details", financialObj.debts_details, finY);
       finY -= 10;
     }
     
@@ -904,10 +922,10 @@ async function generateSimplePdf(
   };
   const propertyNotes = planData?.property_notes || "";
   
-  // Check for property type checkboxes
-  const hasPropertyCheckboxes = propertyObj.has_home || propertyObj.has_vehicle || 
-    propertyObj.has_jewelry || propertyObj.has_collectibles || propertyObj.has_firearms ||
-    propertyObj.has_art || propertyObj.has_other;
+  // Check for property type checkboxes (matching SectionProperty.tsx field names)
+  const hasPropertyCheckboxes = propertyObj.has_house || propertyObj.has_car || 
+    propertyObj.has_business || propertyObj.has_artwork || propertyObj.has_jewelry || 
+    propertyObj.has_money_cash || propertyObj.has_other;
   
   console.log("[generate-planner-pdf] Property section data:", {
     property_obj_keys: Object.keys(propertyObj),
@@ -924,16 +942,16 @@ async function generateSimplePdf(
   if (!hasProperty) {
     propY = drawEmpty(propertyPage, propY);
   } else {
-    // Show property types if checkboxes were checked
+    // Show property types if checkboxes were checked (matching SectionProperty.tsx field names)
     if (hasPropertyCheckboxes) {
       const propTypes: string[] = [];
-      if (propertyObj.has_home) propTypes.push("Real Estate/Home");
-      if (propertyObj.has_vehicle) propTypes.push("Vehicles");
+      if (propertyObj.has_house) propTypes.push("House");
+      if (propertyObj.has_car) propTypes.push("Car");
+      if (propertyObj.has_business) propTypes.push("Business");
+      if (propertyObj.has_artwork) propTypes.push("Artwork");
       if (propertyObj.has_jewelry) propTypes.push("Jewelry");
-      if (propertyObj.has_collectibles) propTypes.push("Collectibles");
-      if (propertyObj.has_firearms) propTypes.push("Firearms");
-      if (propertyObj.has_art) propTypes.push("Art");
-      if (propertyObj.has_other) propTypes.push("Other");
+      if (propertyObj.has_money_cash) propTypes.push("Money/Cash");
+      if (propertyObj.has_other) propTypes.push(propertyObj.other_type || "Other");
       
       if (propTypes.length > 0) {
         propY = addField(propertyPage, "Property Types", propTypes.join(", "), propY);
