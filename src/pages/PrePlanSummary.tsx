@@ -848,30 +848,49 @@ export default function PrePlanSummary() {
   return (
     <AuthenticatedLayout>
       <div className="container mx-auto px-4 py-8 max-w-4xl print:p-0">
-        {/* Header */}
+        {/* Senior-Friendly Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Your Planning Summary</h1>
-          <p className="text-muted-foreground font-medium">
-            {missingSections.length > 0 
-              ? "Some sections are still incomplete. You can finish them anytime."
-              : "This is your complete planning document."
-            }
-          </p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Showing {sections.length} section{sections.length !== 1 ? 's' : ''} based on your preferences
-          </p>
+          <h1 className="text-3xl font-bold mb-3 text-foreground">Your Planning Summary</h1>
+          <div className="space-y-1 text-muted-foreground">
+            <p className="text-lg">This page shows everything you have written so far.</p>
+            <p>You do not need to finish every section.</p>
+            <p>You can review, print, or come back to your plan at any time.</p>
+          </div>
           {lastUpdated && (
-            <p className="text-sm text-muted-foreground mt-1">
-              Last updated: {new Date(lastUpdated).toLocaleDateString()} at {new Date(lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            <p className="text-sm text-muted-foreground mt-3">
+              Last saved: {new Date(lastUpdated).toLocaleDateString()} at {new Date(lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </p>
           )}
         </div>
 
-        {/* First-time helper */}
+        {/* What Can You Do Here - Helper Box */}
+        <div className="bg-senior-sage/20 border border-senior-sage/40 rounded-xl p-5 mb-6 print:hidden">
+          <h2 className="font-semibold text-foreground mb-3">What can you do on this page?</h2>
+          <ul className="space-y-2 text-muted-foreground">
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Review what you have already filled out</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>See which sections are still optional or empty</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Print or save a summary for your records</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Return to your planner to make changes anytime</span>
+            </li>
+          </ul>
+        </div>
+
+        {/* First-time helper - keep but simplify */}
         {showFirstTimeHelper && (
           <Alert className="mb-6 border-primary/30 bg-primary/5 print:hidden">
             <AlertDescription className="flex items-center justify-between">
-              <span>This page is where you can view, print, or share everything you've entered.</span>
+              <span>This is your personal summary. Take your time reviewing it.</span>
               <Button variant="ghost" size="sm" onClick={dismissFirstTimeHelper} className="h-6 w-6 p-0">
                 <X className="h-4 w-4" />
               </Button>
@@ -879,11 +898,11 @@ export default function PrePlanSummary() {
           </Alert>
         )}
 
-        {/* Disclaimer */}
+        {/* Disclaimer - softer language */}
         <Alert className="mb-6 border-amber-200 bg-amber-50/50 dark:bg-amber-950/20 print:hidden">
           <AlertTriangle className="h-4 w-4 text-amber-600" />
           <AlertDescription className="text-amber-800 dark:text-amber-200">
-            <strong>For Review Only</strong> — This summary is not a legal document and does not replace professional advice.
+            <strong>For Your Records Only</strong> — This summary helps you organize your wishes. It is not a legal document.
           </AlertDescription>
         </Alert>
 
@@ -896,70 +915,96 @@ export default function PrePlanSummary() {
           />
         </div>
 
-        {/* What's Missing */}
-        <div className="mb-6 print:hidden">
-          <WhatsMissingIndicator
-            missingSections={missingSections}
-            onNavigateToSection={handleNavigateToSection}
-          />
+        {/* What's Missing - only show if there are missing sections */}
+        {missingSections.length > 0 && (
+          <div className="mb-6 print:hidden">
+            <WhatsMissingIndicator
+              missingSections={missingSections}
+              onNavigateToSection={handleNavigateToSection}
+            />
+          </div>
+        )}
+
+        {/* Primary Action Bar - Senior-Friendly */}
+        <div className="bg-white dark:bg-card border rounded-xl p-5 mb-6 print:hidden shadow-sm">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-4">
+            <Button 
+              onClick={() => navigate("/preplandashboard")} 
+              variant="outline"
+              size="lg"
+              className="gap-2 min-w-[200px]"
+            >
+              <ArrowRight className="h-4 w-4 rotate-180" />
+              Return to My Planner
+            </Button>
+            <Button 
+              onClick={handleDownloadPDF} 
+              size="lg"
+              className="gap-2 min-w-[200px]"
+            >
+              <Download className="h-4 w-4" />
+              View or Print My Plan
+            </Button>
+          </div>
+          
+          {/* Secondary actions */}
+          <div className="flex flex-wrap gap-2 justify-center border-t pt-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/preplandashboard/preferences")} className="gap-1 text-muted-foreground">
+              Continue filling sections
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleSaveConfirmation} className="gap-1 text-muted-foreground">
+              <Save className="h-3 w-3" />
+              Save and come back later
+            </Button>
+          </div>
+          
+          {/* Reassurance text */}
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            You can always return to your planner or home page.<br />
+            Nothing is final unless you choose to print or share it.
+          </p>
         </div>
 
-        {/* Sticky Action Bar */}
-        <div className="sticky top-14 z-40 bg-background/95 backdrop-blur border-b mb-6 -mx-4 px-4 py-3 print:hidden">
+        {/* More Actions - Collapsed */}
+        <div className="bg-muted/30 border rounded-xl p-4 mb-6 print:hidden">
+          <p className="text-sm font-medium text-muted-foreground mb-3 text-center">More options</p>
           <TooltipProvider>
             <div className="flex flex-wrap gap-2 justify-center">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button onClick={handleDownloadPDF} className="gap-2">
-                    <Download className="h-4 w-4" />
-                    Print or Save My Plan
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Creates the full multi-page planner document</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" onClick={handleDownloadSummaryReport} className="gap-2">
+                  <Button variant="outline" size="sm" onClick={handleDownloadSummaryReport} className="gap-2">
                     <FileText className="h-4 w-4" />
-                    Download Summary Report
+                    Short Summary
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Downloads the short 3-page summary report</TooltipContent>
+                <TooltipContent>Downloads a shorter 3-page summary</TooltipContent>
               </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" onClick={handlePrint} className="gap-2">
+                  <Button variant="outline" size="sm" onClick={handlePrint} className="gap-2">
                     <Printer className="h-4 w-4" />
                     Print Paper Copy
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Prints your planning document</TooltipContent>
               </Tooltip>
+              
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" onClick={() => setShowShareDialog(true)} className="gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setShowShareDialog(true)} className="gap-2">
                     <Mail className="h-4 w-4" />
                     Email to Family
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Sends your planning document by email</TooltipContent>
               </Tooltip>
+              
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" onClick={handleSaveConfirmation} className="gap-2">
-                    <Save className="h-4 w-4" />
-                    Save for Later
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Your document is automatically saved</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="secondary" onClick={() => toast({ title: "Coming soon", description: "Family Notice view is being prepared." })} className="gap-2">
+                  <Button variant="outline" size="sm" onClick={() => toast({ title: "Coming soon", description: "Family Notice view is being prepared." })} className="gap-2">
                     <Heart className="h-4 w-4" />
-                    Share One-Page Family Notice
+                    One-Page Family Notice
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Shares a simplified one-page summary for loved ones</TooltipContent>
@@ -968,8 +1013,13 @@ export default function PrePlanSummary() {
           </TooltipProvider>
         </div>
 
-        {/* Content Sections */}
-        <div className="space-y-6 mb-8">
+        {/* Content Sections - Senior-Friendly Language */}
+        <div className="space-y-4 mb-8">
+          <h2 className="text-xl font-semibold text-foreground">Your Sections</h2>
+          <p className="text-muted-foreground mb-4">
+            Below are the sections you have chosen to include. You can edit any section at any time.
+          </p>
+          
           {sections.map((section) => (
             <Card key={section.id} className="print:shadow-none print:border">
               <CardHeader className="pb-3">
@@ -994,17 +1044,22 @@ export default function PrePlanSummary() {
               </CardHeader>
               <CardContent>
                 {section.hasContent && section.content ? (
-                  section.content
+                  <div>
+                    <p className="text-xs text-green-600 dark:text-green-400 mb-2 font-medium">
+                      ✓ You have added information to this section.
+                    </p>
+                    {section.content}
+                  </div>
                 ) : (
                   <div className="text-sm text-muted-foreground bg-muted/30 rounded-lg p-4">
-                    <p className="mb-2">This section is incomplete. Add your information to include it in your final document.</p>
+                    <p className="mb-2">You have not added anything here yet. This is optional.</p>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => navigate(section.editRoute)}
                       className="text-primary print:hidden"
                     >
-                      Complete this section →
+                      Add information →
                     </Button>
                   </div>
                 )}
@@ -1020,9 +1075,67 @@ export default function PrePlanSummary() {
           </div>
         )}
 
+        {/* Optional Add-Ons Section */}
+        <div className="border-t pt-8 mb-8 print:hidden">
+          <h2 className="text-xl font-semibold text-foreground mb-2">Optional Add-Ons</h2>
+          <p className="text-muted-foreground mb-4">Only if you want them — these do not affect your plan.</p>
+          
+          <div className="grid gap-4 sm:grid-cols-2">
+            {/* Printed Binder */}
+            <Card className="border-senior-sage/30 hover:border-senior-sage/50 transition-colors">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-senior-sage/20 text-primary">
+                    <FileText className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-medium text-foreground mb-1">Purchase a Printed Binder</h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      A physical copy for your home or family.
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => navigate("/product-binder")}
+                      className="w-full"
+                    >
+                      Learn More
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Memorial Song */}
+            <Card className="border-senior-sage/30 hover:border-senior-sage/50 transition-colors">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-senior-sage/20 text-primary">
+                    <Heart className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-medium text-foreground mb-1">Create a Memorial Song</h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      A personalized song to remember a loved one.
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => navigate("/custom-song")}
+                      className="w-full"
+                    >
+                      Learn More
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
         {/* Print Footer */}
         <div className="hidden print:block mt-8 pt-4 border-t text-center text-sm text-muted-foreground">
-          <p>Planning Summary — For Review Only — Not a Legal Document</p>
+          <p>Planning Summary — For Your Records — Not a Legal Document</p>
           <p>Generated on {new Date().toLocaleDateString()}</p>
         </div>
 
