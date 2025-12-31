@@ -144,21 +144,26 @@ export const SectionPreferences = ({
     );
   };
 
-  const saveSettings = async () => {
+  const saveSettings = async (options?: { invokeOnSave?: boolean }) => {
+    const invokeOnSave = options?.invokeOnSave ?? true;
+
     try {
       setSaving(true);
       // Always include required sections
       const sectionsToSave = [...new Set([...ALWAYS_INCLUDED, ...selectedSections])];
-      
+
       const { error } = await supabase
         .from("user_settings")
-        .upsert({
-          user_id: user.id,
-          selected_sections: sectionsToSave,
-          updated_at: new Date().toISOString(),
-        }, {
-          onConflict: "user_id"
-        });
+        .upsert(
+          {
+            user_id: user.id,
+            selected_sections: sectionsToSave,
+            updated_at: new Date().toISOString(),
+          },
+          {
+            onConflict: "user_id",
+          }
+        );
 
       if (error) throw error;
 
@@ -167,7 +172,9 @@ export const SectionPreferences = ({
         description: t('preferences.preferencesSaved'),
       });
 
-      if (onSave) onSave();
+      // IMPORTANT: only invoke external onSave callbacks when explicitly desired.
+      // (PreferencesPage currently reloads the window onSave; that would cancel navigation.)
+      if (invokeOnSave && onSave) onSave();
     } catch (error) {
       console.error("Error saving settings:", error);
       toast({
@@ -187,20 +194,31 @@ export const SectionPreferences = ({
 
   // Navigate to first selected section in DISPLAY ORDER (not selection order)
   const handleContinueToPlanner = async () => {
-    await saveSettings();
-    
+    console.info("[SectionPreferences] Continue clicked", {
+      selectedSections,
+      userSelectedCount,
+    });
+
+    // Save selections but DO NOT trigger external onSave callbacks (they may reload the page)
+    await saveSettings({ invokeOnSave: false });
+
     // Find the first section in DISPLAY ORDER that the user has selected
     // This ensures consistent navigation regardless of selection order
-    const firstSelectedSection = FRIENDLY_SECTIONS.find(
-      section => selectedSections.includes(section.id)
+    const firstSelectedSection = FRIENDLY_SECTIONS.find((section) =>
+      selectedSections.includes(section.id)
     );
-    
-    if (firstSelectedSection && SECTION_ROUTES[firstSelectedSection.id]) {
-      // Explicit navigation to the first selected section
-      navigate(SECTION_ROUTES[firstSelectedSection.id]);
-    } else {
-      // Fallback to overview if no sections selected
-      navigate("/preplandashboard/overview");
+
+    const nextRoute = firstSelectedSection
+      ? SECTION_ROUTES[firstSelectedSection.id]
+      : "/preplandashboard/overview";
+
+    console.info("[SectionPreferences] Navigating to", {
+      firstSelectedSection: firstSelectedSection?.id,
+      nextRoute,
+    });
+
+    if (nextRoute) {
+      navigate(nextRoute);
     }
   };
 
