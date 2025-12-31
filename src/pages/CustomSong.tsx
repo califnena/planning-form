@@ -8,6 +8,12 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+// Stripe Payment Link fallbacks
+const SONG_PAYMENT_LINKS = {
+  standard: 'https://buy.stripe.com/test_standard', // TODO: Add standard song payment link
+  premium: 'https://buy.stripe.com/4gM28rgnXa4H16T6vQ7bW07',
+};
+
 export default function CustomSong() {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -34,7 +40,11 @@ export default function CustomSong() {
 
       if (error) {
         console.error('Stripe function error:', error);
-        throw error;
+        // Fall back to payment link
+        console.log(`Falling back to payment link for ${packageType}`);
+        window.open(SONG_PAYMENT_LINKS[packageType], '_blank');
+        setLoading(null);
+        return;
       }
       
       if (data?.url) {
@@ -45,25 +55,29 @@ export default function CustomSong() {
           setLoading(null);
           toast({
             title: "Pop-up blocked",
-            description: "Please allow pop-ups and try again, or use the link below.",
-            variant: "destructive",
+            description: "Opening checkout in this tab...",
           });
           setTimeout(() => {
             window.location.href = data.url;
-          }, 1000);
+          }, 500);
         } else {
           setLoading(null);
         }
       } else {
-        throw new Error('No checkout URL received');
+        // Fall back to payment link
+        console.log(`No URL received, falling back to payment link for ${packageType}`);
+        window.open(SONG_PAYMENT_LINKS[packageType], '_blank');
+        setLoading(null);
       }
     } catch (error: any) {
       console.error('Checkout error:', error);
       setLoading(null);
+      // Fall back to payment link on any error
+      console.log(`Error occurred, falling back to payment link for ${packageType}`);
+      window.open(SONG_PAYMENT_LINKS[packageType], '_blank');
       toast({
-        title: "Checkout failed",
-        description: error.message || "Unable to start checkout. Please try again.",
-        variant: "destructive",
+        title: "Opening secure checkout",
+        description: "Redirecting to payment page...",
       });
     }
   };
