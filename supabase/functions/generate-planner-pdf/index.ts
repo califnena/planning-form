@@ -572,34 +572,107 @@ async function generateSimplePdf(
   const funeral1 = pdfDoc.addPage([pageWidth, pageHeight]);
   let fY = addSectionHeader(funeral1, "Funeral & Memorial Wishes", pageHeight - 80);
   
-  // Render funeral preferences
+  // CRITICAL: Also read from planData.funeral object (localStorage data)
+  const funeralObj = planData?.funeral || {};
+  
+  // Render funeral preferences - check multiple data sources
   const disp = planData?.funeral_disposition || planData?.disposition || {};
   const svc = planData?.service_preferences || {};
   const fh = planData?.funeral_home || {};
   const cem = planData?.cemetery || {};
-  const funeralNotes = planData?.funeral_wishes_notes || "";
+  const funeralNotes = planData?.funeral_wishes_notes || funeralObj.funeral_preference || "";
   const funding = planData?.funeral_funding || [];
   
+  // Extract disposition from funeral object checkboxes
+  const dispositionFromCheckboxes = (() => {
+    if (funeralObj.burial) return "Burial";
+    if (funeralObj.cremation) return "Cremation";
+    if (funeralObj.natural_burial) return "Natural Burial";
+    if (funeralObj.mausoleum_private) return "Private Mausoleum";
+    if (funeralObj.mausoleum_community) return "Community Mausoleum";
+    if (funeralObj.lawn_crypt) return "Lawn Crypt";
+    if (funeralObj.body_donation) return "Body Donation";
+    return "";
+  })();
+  
+  // Debug log for funeral data
+  console.log("[generate-planner-pdf] Funeral section data:", {
+    funeral_obj_keys: Object.keys(funeralObj),
+    disp_preference: disp.preference,
+    disposition_from_checkboxes: dispositionFromCheckboxes,
+    funeral_notes_len: funeralNotes.length,
+    funding_len: funding.length,
+    has_burial: funeralObj.burial,
+    has_cremation: funeralObj.cremation,
+    service_type: svc.service_type || funeralObj.service_type,
+    funeral_home_name: fh.name || funeralObj.funeral_home_name,
+  });
+  
+  // Check if we have ANY funeral data
   const hasFuneral = hasText(disp.preference) || hasText(disp.type) || hasText(fh.name) || hasText(cem.name) || 
-    hasText(svc.service_type) || hasText(funeralNotes) || hasAny(funding);
+    hasText(svc.service_type) || hasText(funeralNotes) || hasAny(funding) ||
+    hasText(dispositionFromCheckboxes) || hasText(funeralObj.funeral_home_name) ||
+    hasText(funeralObj.service_type) || hasText(funeralObj.music_preferences) ||
+    hasText(funeralObj.burial_notes) || hasText(funeralObj.cremation_notes);
   
   if (!hasFuneral) {
     fY = drawEmpty(funeral1, fY);
   } else {
-    if (disp.preference || disp.type) fY = addField(funeral1, "Disposition", disp.preference || disp.type || "", fY);
-    if (fh.name) fY = addField(funeral1, "Funeral Home", [fh.name, fh.phone].filter(Boolean).join(" - "), fY);
-    if (fh.address) fY = addField(funeral1, "Funeral Home Address", fh.address, fY);
-    if (cem.name || cem.location) fY = addField(funeral1, "Cemetery", [cem.name, cem.location].filter(Boolean).join(" - "), fY);
-    if (svc.service_type) fY = addField(funeral1, "Service Type", svc.service_type, fY);
-    if (svc.location) fY = addField(funeral1, "Service Location", svc.location, fY);
-    if (svc.officiant) fY = addField(funeral1, "Officiant", svc.officiant, fY);
-    if (svc.music) fY = addField(funeral1, "Music", svc.music, fY);
-    if (svc.readings) fY = addField(funeral1, "Readings", svc.readings, fY);
-    if (svc.flowers_or_donations) fY = addField(funeral1, "Flowers/Donations", svc.flowers_or_donations, fY);
-    if (svc.clothing) fY = addField(funeral1, "Clothing", svc.clothing, fY);
+    // Show disposition from either source
+    const finalDisposition = disp.preference || disp.type || dispositionFromCheckboxes;
+    if (finalDisposition) fY = addField(funeral1, "Disposition", finalDisposition, fY);
+    
+    // Show disposition notes if available
+    if (funeralObj.burial && funeralObj.burial_notes) {
+      fY = addField(funeral1, "Burial Notes", funeralObj.burial_notes, fY);
+    }
+    if (funeralObj.cremation && funeralObj.cremation_notes) {
+      fY = addField(funeral1, "Cremation Notes", funeralObj.cremation_notes, fY);
+    }
+    if (funeralObj.natural_burial && funeralObj.natural_burial_notes) {
+      fY = addField(funeral1, "Natural Burial Notes", funeralObj.natural_burial_notes, fY);
+    }
+    
+    // Funeral home from either source
+    const fhName = fh.name || funeralObj.funeral_home_name;
+    const fhPhone = fh.phone || funeralObj.funeral_home_phone;
+    if (fhName) fY = addField(funeral1, "Funeral Home", [fhName, fhPhone].filter(Boolean).join(" - "), fY);
+    
+    const fhAddr = fh.address || funeralObj.funeral_home_address;
+    if (fhAddr) fY = addField(funeral1, "Funeral Home Address", fhAddr, fY);
+    
+    // Cemetery from either source
+    const cemName = cem.name || funeralObj.cemetery_name;
+    const cemLoc = cem.location || funeralObj.cemetery_location;
+    if (cemName || cemLoc) fY = addField(funeral1, "Cemetery", [cemName, cemLoc].filter(Boolean).join(" - "), fY);
+    
+    // Service preferences from either source
+    const serviceType = svc.service_type || funeralObj.service_type;
+    if (serviceType) fY = addField(funeral1, "Service Type", serviceType, fY);
+    
+    const serviceLoc = svc.location || funeralObj.service_location;
+    if (serviceLoc) fY = addField(funeral1, "Service Location", serviceLoc, fY);
+    
+    const officiant = svc.officiant || funeralObj.officiant;
+    if (officiant) fY = addField(funeral1, "Officiant", officiant, fY);
+    
+    const music = svc.music || funeralObj.music_preferences;
+    if (music) fY = addField(funeral1, "Music", music, fY);
+    
+    const readings = svc.readings || funeralObj.readings;
+    if (readings) fY = addField(funeral1, "Readings", readings, fY);
+    
+    const flowers = svc.flowers_or_donations || funeralObj.flowers_or_donations;
+    if (flowers) fY = addField(funeral1, "Flowers/Donations", flowers, fY);
+    
+    const clothing = svc.clothing || funeralObj.clothing;
+    if (clothing) fY = addField(funeral1, "Clothing", clothing, fY);
+    
     fY -= 10;
     
-    fY = addNotesBox(funeral1, "My Wishes", funeralNotes, fY);
+    // Use funeral preference text or generic notes
+    const wishesText = funeralNotes || funeralObj.other_wishes || "";
+    if (wishesText) fY = addNotesBox(funeral1, "My Wishes", wishesText, fY);
     
     if (funding.length > 0) {
       fY -= 10;
@@ -1028,13 +1101,39 @@ async function generateSimplePdf(
 
   const pdfBytes = await pdfDoc.save();
 
+  // Build user-friendly filename from prepared_for name
+  const sanitizeFilename = (name: string): string => {
+    if (!name) return "";
+    return name
+      .replace(/[<>:"/\\|?*]/g, "") // Remove illegal filename chars
+      .replace(/\s+/g, " ")          // Normalize whitespace
+      .trim()
+      .substring(0, 100);            // Limit length
+  };
+  
+  const preparedForName = sanitizeFilename(
+    planData?.prepared_for || 
+    profile?.full_name || 
+    piiData?.full_name || 
+    ""
+  );
+  
+  const userFriendlyFilename = preparedForName
+    ? `Planner for ${preparedForName}.pdf`
+    : "My-Life-and-Legacy-Planner.pdf";
+  
+  const draftPrefix = isDraft ? "DRAFT-" : "";
+  const finalUserFilename = `${draftPrefix}${userFriendlyFilename}`;
+  
+  console.log(`[generate-planner-pdf] User filename: ${finalUserFilename}`);
+
   const timestamp = Date.now();
-  const filename = `${userId}/${docType}_${timestamp}.pdf`;
+  const storagePath = `${userId}/${docType}_${timestamp}.pdf`;
 
   const { error: uploadError } = await supabase
     .storage
     .from("generated-pdfs")
-    .upload(filename, pdfBytes, { contentType: "application/pdf", upsert: true });
+    .upload(storagePath, pdfBytes, { contentType: "application/pdf", upsert: true });
 
   if (uploadError) {
     console.error("[generate-planner-pdf] Upload error:", uploadError);
@@ -1042,7 +1141,7 @@ async function generateSimplePdf(
     return new Response(JSON.stringify({
       success: true,
       pdfBase64: base64Pdf,
-      filename: `My-Last-Wishes.pdf`,
+      filename: finalUserFilename,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -1051,7 +1150,7 @@ async function generateSimplePdf(
   const { data: signedUrl, error: signedError } = await supabase
     .storage
     .from("generated-pdfs")
-    .createSignedUrl(filename, 3600);
+    .createSignedUrl(storagePath, 3600);
 
   if (signedError) {
     console.error("[generate-planner-pdf] Signed URL error:", signedError);
@@ -1059,7 +1158,7 @@ async function generateSimplePdf(
     return new Response(JSON.stringify({
       success: true,
       pdfBase64: base64Pdf,
-      filename: `My-Last-Wishes.pdf`,
+      filename: finalUserFilename,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -1070,13 +1169,13 @@ async function generateSimplePdf(
     plan_id: planData?.id || null,
     doc_type: docType,
     storage_bucket: "generated-pdfs",
-    storage_path: filename,
+    storage_path: storagePath,
   });
 
   return new Response(JSON.stringify({
     success: true,
     url: signedUrl.signedUrl,
-    filename: `My-Last-Wishes.pdf`,
+    filename: finalUserFilename,
   }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
