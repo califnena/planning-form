@@ -1,4 +1,4 @@
-import { User, LogOut, Sparkles, Receipt, Shield } from "lucide-react";
+import { User, LogOut, Sparkles, Receipt, Shield, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -126,7 +126,15 @@ export const ProfileDropdown = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate("/preplansteps/profile")}>
           <User className="mr-2 h-4 w-4" />
-          <span>{t("header.account")}</span>
+          <span>Account</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate("/settings")}>
+          <Settings className="mr-2 h-4 w-4" />
+          <span>Preferences</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate("/pricing")}>
+          <Receipt className="mr-2 h-4 w-4" />
+          <span>Subscription & Billing</span>
         </DropdownMenuItem>
         {isAdmin && (
           <DropdownMenuItem onClick={() => navigate("/admin")}>
@@ -134,10 +142,6 @@ export const ProfileDropdown = () => {
             <span>{t("header.adminPanel")}</span>
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem onClick={() => navigate("/pricing")}>
-          <Receipt className="mr-2 h-4 w-4" />
-          <span>{t("header.subscriptionBilling")}</span>
-        </DropdownMenuItem>
         {isVIP && (
           <>
             <DropdownMenuSeparator />
