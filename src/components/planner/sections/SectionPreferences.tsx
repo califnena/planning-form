@@ -6,14 +6,9 @@ import { useToast } from "@/hooks/use-toast";
 import { ALL_SECTIONS } from "@/lib/sections";
 import { User } from "@supabase/supabase-js";
 import { Switch } from "@/components/ui/switch";
-import { CheckCircle2, ClipboardList, FileText, User as UserIcon, BookHeart, Users, Building, Church, DollarSign, Shield, Home, PawPrint, Globe, FolderLock, Heart, HelpCircle } from "lucide-react";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import mascotCouple from "@/assets/mascot-couple.png";
+import { CheckCircle2, ChevronRight, Edit2, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { OrientationBanner } from "../OrientationBanner";
-import { GentleOffRamps } from "../GentleOffRamps";
 
 interface SectionPreferencesProps {
   user: User;
@@ -22,52 +17,62 @@ interface SectionPreferencesProps {
   showWelcome?: boolean;
 }
 
-// Section groups with icons
-const SECTION_GROUPS = [
+// Simplified section list with friendly labels
+const FRIENDLY_SECTIONS = [
   {
-    id: "essentials",
-    icon: ClipboardList,
-    sections: ["overview", "instructions", "personal"]
+    id: "personal",
+    label: "Personal & Family Details",
+    description: "Who you are and who matters to you"
   },
   {
-    id: "farewell",
-    icon: Church,
-    sections: ["legacy", "funeral", "providers"]
+    id: "funeral",
+    label: "Funeral Wishes",
+    description: "How you would like to be remembered"
   },
   {
-    id: "finances",
-    icon: DollarSign,
-    sections: ["financial", "insurance", "legal"]
+    id: "financial",
+    label: "Financial Life",
+    description: "Important money and account information"
   },
   {
-    id: "digital-home",
-    icon: Home,
-    sections: ["digital", "property", "pets"]
+    id: "property",
+    label: "Property & Valuables",
+    description: "Homes, land, and meaningful items"
+  },
+  {
+    id: "legal",
+    label: "Legal Documents & Resources",
+    description: "Wills, powers of attorney, and important papers"
   },
   {
     id: "messages",
-    icon: Heart,
-    sections: ["messages", "contacts"]
+    label: "Letters & Messages",
+    description: "Notes or messages for loved ones"
+  },
+  {
+    id: "contacts",
+    label: "Important Contacts",
+    description: "People to notify and who can help"
+  },
+  {
+    id: "insurance",
+    label: "Insurance Information",
+    description: "Life insurance and other policies"
+  },
+  {
+    id: "digital",
+    label: "Online Accounts",
+    description: "Email, social media, and digital services"
+  },
+  {
+    id: "pets",
+    label: "Pet Care",
+    description: "Plans for your animal companions"
   }
 ];
 
-// Section icons mapping
-const SECTION_ICONS: Record<string, any> = {
-  overview: ClipboardList,
-  instructions: FileText,
-  personal: UserIcon,
-  legacy: BookHeart,
-  contacts: Users,
-  providers: Building,
-  funeral: Church,
-  financial: DollarSign,
-  insurance: Shield,
-  property: Home,
-  pets: PawPrint,
-  digital: Globe,
-  legal: FolderLock,
-  messages: Heart
-};
+// Always include these in the background
+const ALWAYS_INCLUDED = ["overview", "instructions"];
 
 export const SectionPreferences = ({ 
   user, 
@@ -80,7 +85,7 @@ export const SectionPreferences = ({
   const [selectedSections, setSelectedSections] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeGroup, setActiveGroup] = useState("essentials");
+  const [showAllSections, setShowAllSections] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -100,7 +105,8 @@ export const SectionPreferences = ({
       if (data?.selected_sections) {
         setSelectedSections(data.selected_sections);
       } else {
-        setSelectedSections(["overview", "funeral", "personal", "legacy", "contacts", "financial"]);
+        // Default recommended sections
+        setSelectedSections([...ALWAYS_INCLUDED, "personal", "funeral", "financial", "legal", "contacts"]);
       }
     } catch (error) {
       console.error("Error loading settings:", error);
@@ -125,11 +131,14 @@ export const SectionPreferences = ({
   const saveSettings = async () => {
     try {
       setSaving(true);
+      // Always include required sections
+      const sectionsToSave = [...new Set([...ALWAYS_INCLUDED, ...selectedSections])];
+      
       const { error } = await supabase
         .from("user_settings")
         .upsert({
           user_id: user.id,
-          selected_sections: selectedSections,
+          selected_sections: sectionsToSave,
           updated_at: new Date().toISOString(),
         }, {
           onConflict: "user_id"
@@ -160,209 +169,164 @@ export const SectionPreferences = ({
     if (onContinue) onContinue();
   };
 
-  const handleReset = async () => {
-    const recommended = ["overview", "funeral", "personal", "legacy", "contacts", "financial"];
-    setSelectedSections(recommended);
-    await saveSettings();
+  // Get sections that have data (placeholder - would check real data)
+  const getSectionStatus = (sectionId: string) => {
+    // This would check real data in production
+    return selectedSections.includes(sectionId) ? "selected" : "not-selected";
   };
 
-  const getGroupCount = (groupSections: string[]) => {
-    return groupSections.filter(s => selectedSections.includes(s)).length;
-  };
-
-  const activeGroupSections = SECTION_GROUPS.find(g => g.id === activeGroup)?.sections || [];
+  const userSelectedCount = selectedSections.filter(s => !ALWAYS_INCLUDED.includes(s)).length;
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="flex items-center justify-center py-16">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-sm text-muted-foreground">{t('preferences.loadingPreferences')}</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+          <p className="text-muted-foreground">Loading your preferences...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* Orientation Banner */}
-      <OrientationBanner />
-      
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6 px-4 sm:px-6 py-4">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold text-foreground">{t('preferences.title')}</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Step 1: Choose what you want to include
-            </p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button
-              onClick={handleSaveAndContinue}
-              disabled={saving}
-              size="lg"
-              className="bg-primary hidden sm:inline-flex"
-            >
-              {saving ? t('common.saving') : t('preferences.saveAndContinue')}
-            </Button>
-          </div>
-        </div>
+    <div className="max-w-4xl mx-auto px-4 py-6">
+      {/* Header - Simple and Clear */}
+      <div className="mb-8">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-foreground mb-3">
+          Choose What You'd Like to Include
+        </h1>
+        <p className="text-lg text-muted-foreground leading-relaxed">
+          These are the areas you may want to include in your plan.<br />
+          You can take this one step at a time. Nothing is required.
+        </p>
       </div>
 
-      {/* Two column layout with headers */}
-      <div className="px-4 sm:px-6 mb-4">
-        <div className="grid lg:grid-cols-[280px,1fr] gap-6">
-          <p className="text-sm font-medium text-muted-foreground hidden lg:block">Planning Topics</p>
-          <p className="text-sm font-medium text-muted-foreground hidden lg:block">Your Selections</p>
-        </div>
-      </div>
-
-      <div className="grid lg:grid-cols-[280px,1fr] gap-6 px-4 sm:px-6">
+      {/* Main Content Area */}
+      <div className="grid lg:grid-cols-[1fr,320px] gap-8">
+        {/* Left Column - Topic Selection */}
         <div className="space-y-4">
-          <Card className="p-4 border-primary/20 bg-primary/5">
-            <div className="flex items-start gap-3 mb-3">
-              <Avatar className="h-10 w-10 border-2 border-primary/20">
-                <AvatarImage src={mascotCouple} alt="Mr. Everlasting" />
-                <AvatarFallback>ME</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <p className="text-sm text-muted-foreground">{t('preferences.infoCard')}</p>
-              </div>
-            </div>
-            <div className="text-lg font-semibold text-primary">
-              {t('preferences.totalSelected', { count: selectedSections.length })}
-            </div>
-          </Card>
-
-          <div className="space-y-2">
-            {SECTION_GROUPS.map((group) => {
-              const Icon = group.icon;
-              const count = getGroupCount(group.sections);
-              const isActive = activeGroup === group.id;
-              
-              return (
-                <button
-                  key={group.id}
-                  onClick={() => setActiveGroup(group.id)}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-left",
-                    isActive
-                      ? "bg-primary/10 border-2 border-primary text-primary font-medium"
-                      : "bg-card border-2 border-transparent hover:border-muted hover:bg-muted/50"
-                  )}
-                >
-                  <Icon className="h-5 w-5 flex-shrink-0" />
-                  <span className="flex-1 text-sm">{t(`preferences.groups.${group.id}`)}</span>
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-background">
-                    {count}/{group.sections.length}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          {activeGroupSections.map((sectionId) => {
-            const section = ALL_SECTIONS.find(s => s.id === sectionId);
-            if (!section) return null;
-
-            const Icon = SECTION_ICONS[sectionId] || ClipboardList;
-            const isSelected = selectedSections.includes(sectionId);
-
+          {FRIENDLY_SECTIONS.map((section) => {
+            const isSelected = selectedSections.includes(section.id);
+            
             return (
               <Card
-                key={sectionId}
+                key={section.id}
                 className={cn(
-                  "p-4 cursor-pointer transition-all hover:shadow-md",
+                  "p-5 cursor-pointer transition-all border-2",
                   isSelected
-                    ? "border-2 border-primary bg-primary/5"
-                    : "border-2 border-border hover:border-primary/50"
+                    ? "border-primary bg-primary/5 shadow-sm"
+                    : "border-border hover:border-primary/40 hover:bg-muted/30"
                 )}
-                onClick={() => toggle(sectionId)}
+                onClick={() => toggle(section.id)}
               >
-                <div className="flex items-start gap-4">
-                  <div className={cn(
-                    "p-2 rounded-lg flex-shrink-0",
-                    isSelected ? "bg-primary/20" : "bg-muted"
-                  )}>
-                    <Icon className={cn("h-5 w-5", isSelected ? "text-primary" : "text-muted-foreground")} />
-                  </div>
+                <div className="flex items-center gap-4">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-foreground">
-                        {t(`preferences.sections.${sectionId}.label`, section.title)}
-                      </h3>
-                      {isSelected && <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0" />}
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {t(`preferences.sections.${sectionId}.description`, section.description)}
+                    <h3 className="text-lg font-medium text-foreground mb-1">
+                      {section.label}
+                    </h3>
+                    <p className="text-muted-foreground">
+                      {section.description}
                     </p>
-                    {!isSelected && (
-                      <p className="text-xs text-muted-foreground/80 mt-2 italic">
-                        {t('preferences.hiddenFromSidebar')}
-                      </p>
-                    )}
                   </div>
                   <Switch
                     checked={isSelected}
-                    onCheckedChange={() => toggle(sectionId)}
+                    onCheckedChange={() => toggle(section.id)}
                     onClick={(e) => e.stopPropagation()}
-                    className="flex-shrink-0"
+                    className="flex-shrink-0 scale-110"
                   />
                 </div>
               </Card>
             );
           })}
+
+          {/* Reassurance Box */}
+          <Card className="p-5 bg-accent/30 border-accent/50 mt-6">
+            <div className="flex items-start gap-3">
+              <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-medium text-foreground mb-1">You're in control</h4>
+                <p className="text-muted-foreground">
+                  You can skip anything, come back later, or change your answers at any time.
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Primary Continue Button */}
+          <div className="pt-6 space-y-4">
+            <Button
+              onClick={handleSaveAndContinue}
+              disabled={saving}
+              size="lg"
+              className="w-full py-6 text-lg font-medium"
+            >
+              {saving ? "Saving..." : "Continue"}
+              <ChevronRight className="ml-2 h-5 w-5" />
+            </Button>
+
+            {/* Secondary Link */}
+            <p className="text-center text-sm text-muted-foreground">
+              Prefer to browse all sections instead?{" "}
+              <button
+                onClick={() => setShowAllSections(!showAllSections)}
+                className="text-primary hover:underline font-medium"
+              >
+                View all planning sections
+              </button>
+            </p>
+          </div>
+        </div>
+
+        {/* Right Column - Your Plan So Far (Preview Panel) */}
+        <div className="lg:sticky lg:top-6 h-fit">
+          <Card className="p-5 border-2 border-muted">
+            <h3 className="font-semibold text-foreground mb-4 text-lg">
+              Your Plan So Far
+            </h3>
+            
+            <div className="space-y-3 mb-6">
+              {FRIENDLY_SECTIONS.filter(s => selectedSections.includes(s.id)).map((section) => (
+                <div key={section.id} className="flex items-center justify-between py-2 border-b border-muted last:border-0">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0" />
+                    <span className="text-sm text-foreground">{section.label}</span>
+                  </div>
+                  <button className="text-xs text-primary hover:underline flex items-center gap-1">
+                    <Edit2 className="h-3 w-3" />
+                    Edit
+                  </button>
+                </div>
+              ))}
+              
+              {userSelectedCount === 0 && (
+                <p className="text-sm text-muted-foreground italic py-2">
+                  Select topics above to add them to your plan
+                </p>
+              )}
+            </div>
+
+            {/* Always-visible actions */}
+            <div className="space-y-3 pt-4 border-t border-muted">
+              <Button
+                variant="outline"
+                className="w-full justify-center py-5"
+                onClick={handleSaveAndContinue}
+                disabled={saving}
+              >
+                Review My Plan
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-center py-5"
+                onClick={handleSaveAndContinue}
+                disabled={saving}
+              >
+                Print or Save My Wishes
+              </Button>
+            </div>
+          </Card>
         </div>
       </div>
-
-      {/* What happens next section */}
-      <div className="mt-10 p-6 bg-muted/30 rounded-xl">
-        <h3 className="font-semibold text-foreground mb-3">What happens next</h3>
-        <ul className="space-y-2 text-sm text-muted-foreground">
-          <li className="flex items-start gap-2">
-            <span className="text-primary">•</span>
-            You'll answer questions only for the sections you choose
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-primary">•</span>
-            You can save and return later
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-primary">•</span>
-            You can add help from CARE Support anytime
-          </li>
-        </ul>
-        <Button
-          onClick={handleSaveAndContinue}
-          disabled={saving}
-          variant="outline"
-          className="mt-4"
-        >
-          Continue when ready
-        </Button>
-      </div>
-
-      <div className="flex flex-col items-center gap-4 mt-8 pt-6 border-t">
-        <Button
-          onClick={handleSaveAndContinue}
-          disabled={saving}
-          size="lg"
-          className="bg-primary w-full sm:hidden"
-        >
-          {saving ? t('common.saving') : t('preferences.saveAndContinue')}
-        </Button>
-        <button 
-          onClick={handleReset}
-          className="text-sm text-muted-foreground hover:text-foreground underline transition-colors"
-        >
-          {t('preferences.resetLink')}
-        </button>
-      </div>
-
-      {/* Gentle off-ramps */}
-      <GentleOffRamps />
     </div>
   );
 };
