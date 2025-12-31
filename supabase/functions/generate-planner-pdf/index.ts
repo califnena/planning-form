@@ -169,11 +169,12 @@ async function generateSimplePdf(
   const pageWidth = 612;
   const pageHeight = 792;
   const margin = 50;
-  const lineHeight = 16;
+  const lineHeight = 18; // Increased for senior readability
 
   const profile = { ...(planData?.personal_profile || {}), ...(piiData || {}) };
   const textColor = rgb(0.15, 0.15, 0.15);
   const headerColor = rgb(0.05, 0.35, 0.35);
+  const brandColor = rgb(0.2, 0.4, 0.4); // EFA teal
 
   const sanitizeForPdf = (text: string): string => {
     if (!text) return "";
@@ -221,6 +222,24 @@ async function generateSimplePdf(
       font: helveticaBold,
       color: rgb(0.92, 0.92, 0.92),
       opacity: 0.5,
+    });
+  };
+
+  // Add page header with EFA branding (subtle, professional)
+  const addPageHeader = (page: any) => {
+    page.drawText("Everlasting Funeral Advisors", {
+      x: pageWidth - margin - 160,
+      y: pageHeight - 25,
+      size: 8,
+      font: helvetica,
+      color: brandColor,
+    });
+    // Subtle line under header
+    page.drawLine({
+      start: { x: margin, y: pageHeight - 35 },
+      end: { x: pageWidth - margin, y: pageHeight - 35 },
+      thickness: 0.5,
+      color: rgb(0.85, 0.85, 0.85),
     });
   };
 
@@ -359,18 +378,43 @@ async function generateSimplePdf(
 
   let pageNum = 1;
 
-  // PAGE 1: Cover
+  // PAGE 1: Cover with EFA branding
   const coverPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  
+  // EFA Logo/Branding at top
+  coverPage.drawText("Everlasting Funeral Advisors", {
+    x: margin,
+    y: pageHeight - 60,
+    size: 14,
+    font: helveticaBold,
+    color: brandColor,
+  });
+  coverPage.drawText("Helping Families Plan with Peace and Clarity", {
+    x: margin,
+    y: pageHeight - 78,
+    size: 10,
+    font: helvetica,
+    color: rgb(0.5, 0.5, 0.5),
+  });
+  
+  // Decorative line
+  coverPage.drawLine({
+    start: { x: margin, y: pageHeight - 95 },
+    end: { x: pageWidth - margin, y: pageHeight - 95 },
+    thickness: 1,
+    color: brandColor,
+  });
+  
   coverPage.drawText("My Life & Legacy Planner", {
     x: margin,
-    y: pageHeight - 120,
+    y: pageHeight - 150,
     size: 32,
     font: helveticaBold,
     color: headerColor,
   });
   coverPage.drawText("A Complete Guide for End-of-Life Planning", {
     x: margin,
-    y: pageHeight - 160,
+    y: pageHeight - 190,
     size: 14,
     font: helvetica,
     color: textColor,
@@ -378,8 +422,8 @@ async function generateSimplePdf(
   if (profile.full_name) {
     coverPage.drawText(`Prepared for: ${sanitizeForPdf(profile.full_name)}`, {
       x: margin,
-      y: pageHeight - 220,
-      size: 16,
+      y: pageHeight - 250,
+      size: 18,
       font: helveticaBold,
       color: textColor,
     });
@@ -388,18 +432,29 @@ async function generateSimplePdf(
     `Generated: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`,
     {
       x: margin,
-      y: pageHeight - 250,
+      y: pageHeight - 285,
       size: 12,
       font: helvetica,
       color: rgb(0.4, 0.4, 0.4),
     },
   );
+  
+  // Note at bottom of cover
+  coverPage.drawText("Store this document in a safe place and inform your loved ones of its location.", {
+    x: margin,
+    y: 120,
+    size: 11,
+    font: helvetica,
+    color: textColor,
+  });
+  
   addDraftWatermark(coverPage);
   addFooter(coverPage, pageNum++);
 
   // PAGE 2: Table of Contents
   const tocPage = pdfDoc.addPage([pageWidth, pageHeight]);
-  let tocY = addSectionHeader(tocPage, "Table of Contents", pageHeight - 80);
+  addPageHeader(tocPage);
+  let tocY = addSectionHeader(tocPage, "Table of Contents", pageHeight - 100);
   const tocSections = [
     "Checklist",
     "Instructions",
@@ -415,24 +470,25 @@ async function generateSimplePdf(
     "Digital Accounts",
     "Legal Documents",
     "Messages to Loved Ones",
-    "Revisions",
+    "Plan Review & Signature",
   ];
   for (let i = 0; i < tocSections.length; i++) {
     tocPage.drawText(`${i + 3}. ${tocSections[i]}`, {
       x: margin,
       y: tocY,
-      size: 11,
+      size: 12,
       font: helvetica,
       color: textColor,
     });
-    tocY -= 20;
+    tocY -= 24;
   }
   addDraftWatermark(tocPage);
   addFooter(tocPage, pageNum++);
 
   // PAGE 3: Checklist (use ASCII checkbox to avoid WinAnsi issues)
   const checklistPage = pdfDoc.addPage([pageWidth, pageHeight]);
-  let checkY = addSectionHeader(checklistPage, "Planning Checklist", pageHeight - 80);
+  addPageHeader(checklistPage);
+  let checkY = addSectionHeader(checklistPage, "Planning Checklist", pageHeight - 100);
   const checkItems = [
     "Complete personal information",
     "List contacts to notify",
@@ -460,7 +516,8 @@ async function generateSimplePdf(
 
   // PAGE 4: Instructions
   const instructionsPage = pdfDoc.addPage([pageWidth, pageHeight]);
-  let instrY = addSectionHeader(instructionsPage, "How to Use This Document", pageHeight - 80);
+  addPageHeader(instructionsPage);
+  let instrY = addSectionHeader(instructionsPage, "How to Use This Document", pageHeight - 100);
   instrY = addNotesBox(
     instructionsPage,
     "Instructions",
@@ -473,7 +530,8 @@ async function generateSimplePdf(
 
   // PAGE 5-6: Personal Information
   const personal1 = pdfDoc.addPage([pageWidth, pageHeight]);
-  let pY = addSectionHeader(personal1, "Personal Information", pageHeight - 80);
+  addPageHeader(personal1);
+  let pY = addSectionHeader(personal1, "Personal Information", pageHeight - 100);
   pY = addField(personal1, "Full Legal Name", profile.full_name || "", pY);
   pY = addField(personal1, "Nicknames", profile.nicknames || "", pY);
   pY = addField(personal1, "Maiden Name", profile.maiden_name || "", pY);
@@ -503,10 +561,50 @@ async function generateSimplePdf(
   addDraftWatermark(personal2);
   addFooter(personal2, pageNum++);
 
-  // PAGE 7: Life Story & Legacy
+  // PAGE 7: Life Story & Legacy - FULL CONTENT
   const legacyPage = pdfDoc.addPage([pageWidth, pageHeight]);
-  let legacyY = addSectionHeader(legacyPage, "My Life Story & Legacy", pageHeight - 80);
-  legacyY = addNotesBox(legacyPage, "About Me", planData?.about_me_notes || "", legacyY);
+  addPageHeader(legacyPage);
+  let legacyY = addSectionHeader(legacyPage, "My Life Story & Legacy", pageHeight - 100);
+  
+  // Get life story data from multiple sources
+  const lifeStoryNotes = planData?.about_me_notes || planData?.life_story || "";
+  const profileHobbies = profile?.hobbies || "";
+  const profileAccomplishments = profile?.accomplishments || "";
+  const profileRemembered = profile?.remembered || "";
+  
+  const hasLifeStory = hasText(lifeStoryNotes) || hasText(profileHobbies) || 
+    hasText(profileAccomplishments) || hasText(profileRemembered);
+  
+  if (!hasLifeStory) {
+    legacyY = drawEmpty(legacyPage, legacyY);
+  } else {
+    // Print all life story content - do not truncate
+    if (lifeStoryNotes) {
+      legacyPage.drawText("My Story:", { x: margin, y: legacyY, size: 11, font: helveticaBold, color: textColor });
+      legacyY -= lineHeight;
+      const storyLines = wrapText(lifeStoryNotes, pageWidth - margin * 2, 11);
+      for (const line of storyLines.slice(0, 20)) {
+        if (legacyY <= 100) break;
+        legacyPage.drawText(line, { x: margin, y: legacyY, size: 11, font: helvetica, color: textColor });
+        legacyY -= lineHeight;
+      }
+      legacyY -= 10;
+    }
+    
+    if (profileHobbies) {
+      legacyY = addNotesBox(legacyPage, "Hobbies & Interests", profileHobbies, legacyY);
+      legacyY -= 10;
+    }
+    
+    if (profileAccomplishments) {
+      legacyY = addNotesBox(legacyPage, "Accomplishments", profileAccomplishments, legacyY);
+      legacyY -= 10;
+    }
+    
+    if (profileRemembered) {
+      legacyY = addNotesBox(legacyPage, "How I Want to Be Remembered", profileRemembered, legacyY);
+    }
+  }
   addDraftWatermark(legacyPage);
   addFooter(legacyPage, pageNum++);
 
@@ -1366,9 +1464,10 @@ async function generateSimplePdf(
     addFooter(msgContPage, pageNum++);
   }
 
-  // PAGES 23-24: Revisions
+  // PAGES 23-24: Revisions & Updates
   const revPage1 = pdfDoc.addPage([pageWidth, pageHeight]);
-  let revY = addSectionHeader(revPage1, "Revisions & Updates", pageHeight - 80);
+  addPageHeader(revPage1);
+  let revY = addSectionHeader(revPage1, "Revisions & Updates", pageHeight - 100);
   revPage1.drawText("Use this section to record any changes or updates to your plan.", {
     x: margin,
     y: revY,
@@ -1377,42 +1476,129 @@ async function generateSimplePdf(
     color: textColor,
   });
   revY -= 40;
-  revPage1.drawText("Date                    Change Made                    Initials", {
+  revPage1.drawText("Date                    Change Made                                    Initials", {
     x: margin,
     y: revY,
     size: 10,
     font: helveticaBold,
     color: textColor,
   });
-  revY -= 20;
-  for (let i = 0; i < 10; i++) {
-    revPage1.drawText("________    ________________________________    ______", {
+  revY -= 24;
+  for (let i = 0; i < 8; i++) {
+    revPage1.drawText("________    ________________________________________    ______", {
       x: margin,
       y: revY,
       size: 10,
       font: helvetica,
       color: rgb(0.7, 0.7, 0.7),
     });
-    revY -= 24;
+    revY -= 26;
   }
   addDraftWatermark(revPage1);
   addFooter(revPage1, pageNum++);
 
-  const revPage2 = pdfDoc.addPage([pageWidth, pageHeight]);
-  revY = addSectionHeader(revPage2, "Revisions (continued)", pageHeight - 80);
-  revY -= 20;
-  for (let i = 0; i < 12; i++) {
-    revPage2.drawText("________    ________________________________    ______", {
-      x: margin,
-      y: revY,
+  // PAGE 25: Plan Review & Signature
+  const signaturePage = pdfDoc.addPage([pageWidth, pageHeight]);
+  addPageHeader(signaturePage);
+  let sigY = addSectionHeader(signaturePage, "Plan Review & Signature", pageHeight - 100);
+  
+  // Purpose text
+  signaturePage.drawText("This section is for your personal records and family reference.", {
+    x: margin,
+    y: sigY,
+    size: 11,
+    font: helvetica,
+    color: textColor,
+  });
+  sigY -= 20;
+  signaturePage.drawText("Signing below indicates you have reviewed this document.", {
+    x: margin,
+    y: sigY,
+    size: 11,
+    font: helvetica,
+    color: textColor,
+  });
+  sigY -= 50;
+  
+  // Printed Name field
+  signaturePage.drawText("Printed Name:", {
+    x: margin,
+    y: sigY,
+    size: 12,
+    font: helveticaBold,
+    color: textColor,
+  });
+  sigY -= 8;
+  signaturePage.drawLine({
+    start: { x: margin + 100, y: sigY },
+    end: { x: pageWidth - margin, y: sigY },
+    thickness: 1,
+    color: rgb(0.6, 0.6, 0.6),
+  });
+  sigY -= 40;
+  
+  // Signature field
+  signaturePage.drawText("Signature:", {
+    x: margin,
+    y: sigY,
+    size: 12,
+    font: helveticaBold,
+    color: textColor,
+  });
+  sigY -= 8;
+  signaturePage.drawLine({
+    start: { x: margin + 100, y: sigY },
+    end: { x: pageWidth - margin, y: sigY },
+    thickness: 1,
+    color: rgb(0.6, 0.6, 0.6),
+  });
+  sigY -= 40;
+  
+  // Date field
+  signaturePage.drawText("Date:", {
+    x: margin,
+    y: sigY,
+    size: 12,
+    font: helveticaBold,
+    color: textColor,
+  });
+  sigY -= 8;
+  signaturePage.drawLine({
+    start: { x: margin + 100, y: sigY },
+    end: { x: margin + 250, y: sigY },
+    thickness: 1,
+    color: rgb(0.6, 0.6, 0.6),
+  });
+  sigY -= 60;
+  
+  // Additional notes
+  signaturePage.drawText("Important Reminders:", {
+    x: margin,
+    y: sigY,
+    size: 11,
+    font: helveticaBold,
+    color: textColor,
+  });
+  sigY -= lineHeight + 4;
+  const reminders = [
+    "Keep this document in a safe, accessible location.",
+    "Inform your loved ones and executor where to find it.",
+    "Review and update regularly, especially after major life events.",
+    "This is for planning purposes only and is not a legal document.",
+  ];
+  for (const reminder of reminders) {
+    signaturePage.drawText(`- ${reminder}`, {
+      x: margin + 10,
+      y: sigY,
       size: 10,
       font: helvetica,
-      color: rgb(0.7, 0.7, 0.7),
+      color: textColor,
     });
-    revY -= 24;
+    sigY -= lineHeight + 2;
   }
-  addDraftWatermark(revPage2);
-  addFooter(revPage2, pageNum++);
+  
+  addDraftWatermark(signaturePage);
+  addFooter(signaturePage, pageNum++);
 
   console.log(`[generate-planner-pdf] Generated planner PDF with ${pageNum - 1} pages`);
 
@@ -1436,15 +1622,15 @@ async function generateSimplePdf(
     ""
   );
   
-  // Build filename: "Planner - LastName, FirstName.pdf"
+  // Build filename: "Planner - LastName, FirstName.pdf" (using en-dash for senior-friendly)
   const buildSeniorFilename = (fullName: string): string => {
-    if (!fullName) return "My-Life-and-Legacy-Planner.pdf";
+    if (!fullName) return "Planner - My Wishes.pdf";
     
     const parts = fullName.trim().split(/\s+/);
-    if (parts.length === 0) return "My-Life-and-Legacy-Planner.pdf";
+    if (parts.length === 0) return "Planner - My Wishes.pdf";
     
     if (parts.length === 1) {
-      // Only first name available
+      // Only first name available - use fallback format
       return `Planner - ${parts[0]}.pdf`;
     }
     
@@ -1452,7 +1638,7 @@ async function generateSimplePdf(
     const firstName = parts[0];
     const lastName = parts[parts.length - 1];
     
-    // Format: "Planner - LastName, FirstName.pdf"
+    // Format: "Planner - LastName, FirstName.pdf" (en-dash character)
     return `Planner - ${lastName}, ${firstName}.pdf`;
   };
   
