@@ -2,11 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { CheckCircle, Shield, Clock, HelpCircle, FileText, Heart, Users, ShoppingBag, BookOpen, MessageCircle, ChevronDown, ChevronUp, Quote } from "lucide-react";
+import { CheckCircle, Shield, Clock, HelpCircle, FileText, Heart, Users, ShoppingBag, BookOpen, MessageCircle, ChevronDown, ChevronUp, Quote, Bot, LogIn, LogOut, User } from "lucide-react";
 import { AppFooter } from "@/components/AppFooter";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import mascotHeroCouple from "@/assets/mascot-hero-couple.png";
+import mascotFamiliesChoose from "@/assets/mascot-families-choose.png";
 
 /**
  * LandingSenior (Version B)
@@ -114,6 +115,35 @@ const LandingSenior = () => {
               </Button>
             </div>
             <LanguageSelector />
+            
+            {/* Account Button - clearly visible */}
+            {isLoggedIn ? (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  setIsLoggedIn(false);
+                  setUserName(null);
+                }}
+                className="h-9 px-4 gap-2 bg-white border-primary/30 text-[hsl(var(--senior-text))] hover:bg-primary/5 font-medium"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </Button>
+            ) : (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                asChild
+                className="h-9 px-4 gap-2 bg-white border-primary/30 text-[hsl(var(--senior-text))] hover:bg-primary/5 font-medium"
+              >
+                <Link to="/login">
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline">Account</span>
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </header>
@@ -224,51 +254,51 @@ const LandingSenior = () => {
           </div>
         </section>
 
-        {/* 4) TESTIMONIALS - Warm, elevated, important */}
-        <section className="bg-[hsl(var(--senior-testimonial))] rounded-3xl p-8 md:p-12 mb-16">
+        {/* 4) TESTIMONIALS - Warm, elevated, important with higher contrast */}
+        <section className="bg-[hsl(40,35%,88%)] rounded-3xl p-8 md:p-12 mb-16 border-2 border-primary/20">
           <h2 className="text-xl md:text-2xl font-semibold text-[hsl(var(--senior-text))] mb-10 text-center">
             What Families Are Saying
           </h2>
           
           <div className="space-y-8 max-w-2xl mx-auto">
             {/* Testimonial 1 */}
-            <div className="bg-white rounded-2xl shadow-sm p-8 relative">
-              <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/20" />
+            <div className="bg-white rounded-2xl shadow-md border border-primary/15 p-8 relative">
+              <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/30" />
               <div className="pl-8">
                 <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed mb-5 italic">
                   "I finally feel at peace knowing my children won't have to guess what I wanted. This was so much easier than I expected."
                 </p>
-                <p className="text-primary font-semibold text-base">— Margaret, 72</p>
+                <p className="text-primary font-bold text-base">— Margaret, 72</p>
               </div>
             </div>
             
             {/* Testimonial 2 */}
-            <div className="bg-white rounded-2xl shadow-sm p-8 relative">
-              <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/20" />
+            <div className="bg-white rounded-2xl shadow-md border border-primary/15 p-8 relative">
+              <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/30" />
               <div className="pl-8">
                 <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed mb-5 italic">
                   "My husband and I filled this out together one evening. It brought us closer and gave us both comfort."
                 </p>
-                <p className="text-primary font-semibold text-base">— Robert & Helen, 68</p>
+                <p className="text-primary font-bold text-base">— Robert & Helen, 68</p>
               </div>
             </div>
 
             {/* Additional testimonial (collapsible) */}
             {showMoreTestimonials && (
-              <div className="bg-white rounded-2xl shadow-sm p-8 relative">
-                <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/20" />
+              <div className="bg-white rounded-2xl shadow-md border border-primary/15 p-8 relative">
+                <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/30" />
                 <div className="pl-8">
                   <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed mb-5 italic">
                     "When my mother passed, we had no idea what she wanted. I don't want my family to go through that. This tool helped me put everything in one place."
                   </p>
-                  <p className="text-primary font-semibold text-base">— David, 58</p>
+                  <p className="text-primary font-bold text-base">— David, 58</p>
                 </div>
               </div>
             )}
 
             <button 
               onClick={() => setShowMoreTestimonials(!showMoreTestimonials)}
-              className="flex items-center gap-2 mx-auto text-sm text-[hsl(var(--senior-text-soft))] hover:text-primary transition-colors py-2"
+              className="flex items-center gap-2 mx-auto text-sm text-[hsl(var(--senior-text))] font-medium hover:text-primary transition-colors py-2"
             >
               {showMoreTestimonials ? (
                 <>
@@ -285,18 +315,29 @@ const LandingSenior = () => {
           </div>
         </section>
 
-        {/* 5) OUR MISSION - Calm letter/note style */}
+        {/* 5) OUR MISSION - Calm letter/note style with trust image */}
         <section className="mb-16">
-          <div className="bg-[hsl(var(--senior-mission))] rounded-3xl border-2 border-primary/15 p-8 md:p-12 text-center">
-            <h2 className="text-xl font-semibold text-[hsl(var(--senior-text))] mb-6">
-              Our Mission
-            </h2>
-            <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed max-w-2xl mx-auto mb-4">
-              Our mission is to help families plan ahead with clarity, compassion, and confidence—so no one is left guessing during a difficult time.
-            </p>
-            <p className="text-[hsl(var(--senior-text-soft))] text-base">
-              We believe planning ahead is a gift of love, not a burden.
-            </p>
+          <div className="bg-[hsl(var(--senior-mission))] rounded-3xl border-2 border-primary/15 p-8 md:p-12">
+            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+              <div className="text-center md:text-left flex-1">
+                <h2 className="text-xl font-semibold text-[hsl(var(--senior-text))] mb-6">
+                  Our Mission
+                </h2>
+                <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed mb-4">
+                  Our mission is to help families plan ahead with clarity, compassion, and confidence—so no one is left guessing during a difficult time.
+                </p>
+                <p className="text-[hsl(var(--senior-text-soft))] text-base">
+                  We believe planning ahead is a gift of love, not a burden.
+                </p>
+              </div>
+              <div className="flex-shrink-0 w-full md:w-64">
+                <img 
+                  src={mascotFamiliesChoose} 
+                  alt="Why Families Choose Everlasting" 
+                  className="w-full rounded-2xl shadow-md"
+                />
+              </div>
+            </div>
           </div>
         </section>
 
@@ -318,15 +359,15 @@ const LandingSenior = () => {
               <span className="text-[hsl(var(--senior-text))] font-medium text-lg">Planning tools</span>
             </Link>
             
-            <Link 
-              to="/products" 
-              className="flex items-center gap-5 p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors"
+            <a 
+              href="https://everlastingfuneraladvisors.com/shop/"
+              className="flex items-center gap-5 p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors cursor-pointer"
             >
               <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
                 <ShoppingBag className="h-7 w-7 text-primary" />
               </div>
               <span className="text-[hsl(var(--senior-text))] font-medium text-lg">Affordable funeral products</span>
-            </Link>
+            </a>
             
             <Link 
               to="/after-death" 
@@ -343,9 +384,12 @@ const LandingSenior = () => {
               className="flex items-center gap-5 p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors"
             >
               <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
-                <Users className="h-7 w-7 text-primary" />
+                <Bot className="h-7 w-7 text-primary" />
               </div>
-              <span className="text-[hsl(var(--senior-text))] font-medium text-lg">Optional help from a real person</span>
+              <div>
+                <span className="text-[hsl(var(--senior-text))] font-medium text-lg block">24/7 Automated Support</span>
+                <span className="text-[hsl(var(--senior-text-soft))] text-sm">(Planning & Emotional Guidance)</span>
+              </div>
             </Link>
           </div>
         </section>
@@ -401,15 +445,16 @@ const LandingSenior = () => {
             Need Help Along the Way?
           </h2>
           
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-3 gap-5 mb-6">
             <Link 
               to="/care-support" 
               className="flex flex-col items-center text-center p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors"
             >
               <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center mb-4">
-                <MessageCircle className="h-7 w-7 text-primary" />
+                <Bot className="h-7 w-7 text-primary" />
               </div>
-              <span className="font-medium text-[hsl(var(--senior-text))]">Talk to CARE Support</span>
+              <span className="font-medium text-[hsl(var(--senior-text))]">24/7 Automated Support</span>
+              <span className="text-sm text-[hsl(var(--senior-text-soft))] mt-1">(Planning & Emotional Guidance)</span>
             </Link>
             
             <Link 
@@ -432,6 +477,12 @@ const LandingSenior = () => {
               <span className="font-medium text-[hsl(var(--senior-text))]">View common questions</span>
             </Link>
           </div>
+          
+          {/* Compliance disclaimer */}
+          <p className="text-center text-sm text-[hsl(var(--senior-text-soft))] max-w-lg mx-auto">
+            Always available guidance to help you think through your wishes.<br />
+            This support is automated, not a live person.
+          </p>
         </section>
 
         {/* 8) FINAL CTA - Calming container with reassurance */}
