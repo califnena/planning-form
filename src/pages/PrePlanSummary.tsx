@@ -566,11 +566,11 @@ export default function PrePlanSummary() {
         messages_notes: planData?.messages_notes || "",
         to_loved_ones_message: planData?.to_loved_ones_message || "",
         
-        // CRITICAL: Include detailed funeral object from localStorage
-        // This contains the checkboxes, disposition preferences, service details, etc.
-        funeral: localPlanForPdf?.funeral || planData?.funeral || {},
+        // CRITICAL: Include detailed section objects from localStorage
+        // These contain checkboxes, item arrays, and detailed preferences
         
-        // Additional section detail objects that may be in localStorage
+        // Funeral section
+        funeral: localPlanForPdf?.funeral || planData?.funeral || {},
         funeral_disposition: localPlanForPdf?.funeral?.burial 
           ? { preference: "burial", type: "burial" }
           : localPlanForPdf?.funeral?.cremation 
@@ -596,14 +596,40 @@ export default function PrePlanSummary() {
           name: localPlanForPdf?.funeral?.cemetery_name || "",
           location: localPlanForPdf?.funeral?.cemetery_location || "",
         },
+        
+        // Financial section - includes checkboxes and accounts array
+        financial: localPlanForPdf?.financial || planData?.financial || {},
+        financial_accounts: localPlanForPdf?.financial?.accounts || [],
+        
+        // Property section - includes checkboxes and items array
+        property: localPlanForPdf?.property || planData?.property || {},
+        property_items: localPlanForPdf?.property?.items || [],
+        safe_deposit: {
+          location: localPlanForPdf?.property?.safe_deposit_location || "",
+          bank: localPlanForPdf?.property?.safe_deposit_bank || "",
+          key_location: localPlanForPdf?.property?.safe_deposit_key_location || "",
+        },
+        valuables: localPlanForPdf?.property?.items || [],
+        
+        // Digital section - includes accounts and phones arrays
+        digital: localPlanForPdf?.digital || planData?.digital || {},
+        digital_assets: localPlanForPdf?.digital?.accounts || [],
+        phones: localPlanForPdf?.digital?.phones || [],
+        
+        // Legal section - includes document checkboxes and locations
+        legal: localPlanForPdf?.legal || planData?.legal || {},
+        
+        // Insurance section - includes policies array
+        insurance: localPlanForPdf?.insurance || planData?.insurance || {},
 
         // Arrays from state (loaded from Supabase in loadPlanData)
+        // These may override localStorage if DB has data
         contacts_notify: contacts,
         pets: pets,
-        insurance_policies: insurance,
-        properties: properties,
+        insurance_policies: insurance.length > 0 ? insurance : (localPlanForPdf?.insurance?.policies || []),
+        properties: properties.length > 0 ? properties : (localPlanForPdf?.property?.items || []),
         messages: messages,
-        bank_accounts: bankAccounts,
+        bank_accounts: bankAccounts.length > 0 ? bankAccounts : (localPlanForPdf?.financial?.accounts || []),
         investments: investments,
         contacts_professional: professionalContacts,
         funeral_funding: funeralFunding,
@@ -618,17 +644,17 @@ export default function PrePlanSummary() {
         _visibleSections: selectedSections,
       };
 
-      // CRITICAL DEBUG LOG - shows exactly what is sent to PDF for funeral section
-      console.log("[PrePlanSummary] PDF payload funeral data:", {
-        funeral_wishes_notes_len: pdfPlanData.funeral_wishes_notes?.length || 0,
-        funeral_object_keys: Object.keys(pdfPlanData.funeral || {}),
-        funeral_disposition: pdfPlanData.funeral_disposition,
-        service_preferences_keys: Object.keys(pdfPlanData.service_preferences || {}),
-        funeral_home: pdfPlanData.funeral_home,
-        cemetery: pdfPlanData.cemetery,
-        funeral_funding_len: pdfPlanData.funeral_funding?.length || 0,
-        has_burial: pdfPlanData.funeral?.burial,
-        has_cremation: pdfPlanData.funeral?.cremation,
+      // CRITICAL DEBUG LOG - shows exactly what is sent to PDF for all sections
+      console.log("[PrePlanSummary] PDF payload section objects:", {
+        funeral_keys: Object.keys(pdfPlanData.funeral || {}),
+        financial_keys: Object.keys(pdfPlanData.financial || {}),
+        financial_accounts_len: pdfPlanData.financial_accounts?.length || 0,
+        property_keys: Object.keys(pdfPlanData.property || {}),
+        property_items_len: pdfPlanData.property_items?.length || 0,
+        digital_keys: Object.keys(pdfPlanData.digital || {}),
+        digital_assets_len: pdfPlanData.digital_assets?.length || 0,
+        legal_keys: Object.keys(pdfPlanData.legal || {}),
+        insurance_keys: Object.keys(pdfPlanData.insurance || {}),
       });
 
       // Prove what we are sending + what the UI selected
