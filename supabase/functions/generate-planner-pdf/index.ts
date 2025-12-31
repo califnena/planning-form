@@ -707,18 +707,26 @@ async function generateSimplePdf(
   addFooter(funeral2, pageNum++);
 
   // PAGE 13: Financial
-  const bankList = planData?.bank_accounts || [];
+  // CRITICAL: Read from multiple data sources - DB arrays OR localStorage object
+  const financialObj = planData?.financial || {};
+  const financialAccounts = planData?.financial_accounts || financialObj.accounts || [];
+  const bankList = planData?.bank_accounts?.length > 0 ? planData.bank_accounts : financialAccounts;
   const investList = planData?.investments || [];
   const debtsList = planData?.debts || [];
   const businessList = planData?.businesses || [];
   const financialNotes = planData?.financial_notes || "";
   
-  console.log("SECTION CHECK financial", {
-    bank: bankList.length,
+  console.log("[generate-planner-pdf] Financial section data:", {
+    financialObj_keys: Object.keys(financialObj),
+    financial_accounts_len: financialAccounts.length,
+    bank_accounts_len: planData?.bank_accounts?.length || 0,
+    bank_list_final: bankList.length,
     inv: investList.length,
     debts: debtsList.length,
     biz: businessList.length,
-    notes: financialNotes.length
+    notes_len: financialNotes.length,
+    has_checking: financialObj.has_checking,
+    has_savings: financialObj.has_savings,
   });
 
   const financialPage = pdfDoc.addPage([pageWidth, pageHeight]);
@@ -734,17 +742,42 @@ async function generateSimplePdf(
       b.beneficiary
         ? `Ben/POD: ${b.beneficiary}`
         : (b.pod ? `Ben/POD: ${b.pod}` : ""),
+      b.details || "",
     ]
       .filter(Boolean)
       .join(" | ");
 
-  const hasFinancial = hasAny(bankList) || hasAny(investList) || hasAny(debtsList) || hasAny(businessList) || hasText(financialNotes);
+  // Also check for checkbox selections in financialObj
+  const hasFinancialCheckboxes = financialObj.has_checking || financialObj.has_savings || 
+    financialObj.has_retirement || financialObj.has_investment || financialObj.has_crypto ||
+    financialObj.has_business || financialObj.has_trust || financialObj.has_annuity;
+    
+  const hasFinancial = hasAny(bankList) || hasAny(investList) || hasAny(debtsList) || 
+    hasAny(businessList) || hasText(financialNotes) || hasFinancialCheckboxes;
 
   if (!hasFinancial) {
     finY = drawEmpty(financialPage, finY);
   } else {
+    // Show account types if checkboxes were checked
+    if (hasFinancialCheckboxes) {
+      const accountTypes: string[] = [];
+      if (financialObj.has_checking) accountTypes.push("Checking");
+      if (financialObj.has_savings) accountTypes.push("Savings");
+      if (financialObj.has_retirement) accountTypes.push("Retirement (401k/IRA)");
+      if (financialObj.has_investment) accountTypes.push("Investment/Brokerage");
+      if (financialObj.has_crypto) accountTypes.push("Cryptocurrency");
+      if (financialObj.has_business) accountTypes.push("Business Accounts");
+      if (financialObj.has_trust) accountTypes.push("Trust Accounts");
+      if (financialObj.has_annuity) accountTypes.push("Annuities");
+      
+      if (accountTypes.length > 0) {
+        finY = addField(financialPage, "Account Types", accountTypes.join(", "), finY);
+        finY -= 10;
+      }
+    }
+    
     if (bankList.length > 0) {
-      financialPage.drawText("Bank Accounts:", {
+      financialPage.drawText("Bank/Financial Accounts:", {
         x: margin,
         y: finY,
         size: 10,
@@ -812,29 +845,45 @@ async function generateSimplePdf(
   const insurancePage = pdfDoc.addPage([pageWidth, pageHeight]);
   let insY = addSectionHeader(insurancePage, "Insurance Policies", pageHeight - 80);
 
-  // Support both array shape and { policies: [...] } shape
-  const insuranceList = Array.isArray(planData?.insurance_policies)
-    ? planData.insurance_policies
-    : planData?.insurance_policies?.policies || [];
-
-  if (insuranceList.length > 0) {
-    insY = addArrayItems(
-      insurancePage,
-      insuranceList,
-      (p) => [
-        p.company,
-        p.type,
-        p.policy_number ? `Policy: ${p.policy_number}` : "",
-        p.contact_person ? `Agent: ${p.contact_person}` : "",
-        p.phone_or_url,
-      ].filter(Boolean).join(" - "),
-      insY,
-      10,
-    );
-    insY -= 10;
-  }
+  // CRITICAL: Read from multiple data sources
+  const insuranceObj = planData?.insurance || {};
+  const localInsurancePolicies = insuranceObj.policies || [];
   
-  insY = addNotesBox(insurancePage, "Notes", planData?.insurance_notes || "", insY);
+  // Support both array shape and { policies: [...] } shape
+  const insuranceList = Array.isArray(planData?.insurance_policies) && planData.insurance_policies.length > 0
+    ? planData.insurance_policies
+    : localInsurancePolicies;
+    
+  console.log("[generate-planner-pdf] Insurance section data:", {
+    insurance_obj_keys: Object.keys(insuranceObj),
+    local_policies_len: localInsurancePolicies.length,
+    final_list_len: insuranceList.length,
+  });
+
+  const hasInsurance = insuranceList.length > 0 || hasText(planData?.insurance_notes);
+
+  if (!hasInsurance) {
+    insY = drawEmpty(insurancePage, insY);
+  } else {
+    if (insuranceList.length > 0) {
+      insY = addArrayItems(
+        insurancePage,
+        insuranceList,
+        (p) => [
+          p.company,
+          p.type,
+          p.policy_number ? `Policy: ${p.policy_number}` : "",
+          p.contact_person ? `Agent: ${p.contact_person}` : "",
+          p.phone_or_url,
+        ].filter(Boolean).join(" - "),
+        insY,
+        10,
+      );
+      insY -= 10;
+    }
+    
+    insY = addNotesBox(insurancePage, "Notes", planData?.insurance_notes || "", insY);
+  }
   addDraftWatermark(insurancePage);
   addFooter(insurancePage, pageNum++);
 
@@ -842,48 +891,69 @@ async function generateSimplePdf(
   const propertyPage = pdfDoc.addPage([pageWidth, pageHeight]);
   let propY = addSectionHeader(propertyPage, "Property & Valuables", pageHeight - 80);
   
-  const propList = planData?.properties || [];
-  const valuablesList = planData?.valuables || [];
-  const safeDeposit = planData?.safe_deposit || {};
+  // CRITICAL: Read from multiple data sources
+  const propertyObj = planData?.property || {};
+  const localPropertyItems = planData?.property_items || propertyObj.items || [];
+  
+  const propList = planData?.properties?.length > 0 ? planData.properties : localPropertyItems;
+  const valuablesList = planData?.valuables || localPropertyItems;
+  const safeDeposit = planData?.safe_deposit || {
+    location: propertyObj.safe_deposit_location || "",
+    bank: propertyObj.safe_deposit_bank || "",
+    key_location: propertyObj.safe_deposit_key_location || "",
+  };
   const propertyNotes = planData?.property_notes || "";
   
-  console.log("SECTION CHECK property", {
-    properties: propList.length,
-    valuables: valuablesList.length,
-    safeDeposit: Object.keys(safeDeposit).length,
-    notes: propertyNotes.length
+  // Check for property type checkboxes
+  const hasPropertyCheckboxes = propertyObj.has_home || propertyObj.has_vehicle || 
+    propertyObj.has_jewelry || propertyObj.has_collectibles || propertyObj.has_firearms ||
+    propertyObj.has_art || propertyObj.has_other;
+  
+  console.log("[generate-planner-pdf] Property section data:", {
+    property_obj_keys: Object.keys(propertyObj),
+    local_items_len: localPropertyItems.length,
+    prop_list_final: propList.length,
+    valuables_len: valuablesList.length,
+    safe_deposit: safeDeposit,
+    has_checkboxes: hasPropertyCheckboxes,
   });
   
-  const hasProperty = hasAny(propList) || hasAny(valuablesList) || hasText(safeDeposit.location) || hasText(safeDeposit.bank) || hasText(propertyNotes);
+  const hasProperty = hasAny(propList) || hasAny(valuablesList) || hasText(safeDeposit.location) || 
+    hasText(safeDeposit.bank) || hasText(propertyNotes) || hasPropertyCheckboxes;
   
   if (!hasProperty) {
     propY = drawEmpty(propertyPage, propY);
   } else {
+    // Show property types if checkboxes were checked
+    if (hasPropertyCheckboxes) {
+      const propTypes: string[] = [];
+      if (propertyObj.has_home) propTypes.push("Real Estate/Home");
+      if (propertyObj.has_vehicle) propTypes.push("Vehicles");
+      if (propertyObj.has_jewelry) propTypes.push("Jewelry");
+      if (propertyObj.has_collectibles) propTypes.push("Collectibles");
+      if (propertyObj.has_firearms) propTypes.push("Firearms");
+      if (propertyObj.has_art) propTypes.push("Art");
+      if (propertyObj.has_other) propTypes.push("Other");
+      
+      if (propTypes.length > 0) {
+        propY = addField(propertyPage, "Property Types", propTypes.join(", "), propY);
+        propY -= 10;
+      }
+    }
+    
     if (propList.length > 0) {
-      propertyPage.drawText("Real Estate:", { x: margin, y: propY, size: 10, font: helveticaBold, color: textColor });
+      propertyPage.drawText("Property Items:", { x: margin, y: propY, size: 10, font: helveticaBold, color: textColor });
       propY -= lineHeight;
       propY = addArrayItems(
         propertyPage,
         propList,
         (p) => [
-          p.address,
-          p.kind,
+          p.address || p.description || p.type,
+          p.kind || p.type,
           p.mortgage_bank ? `Lender: ${p.mortgage_bank}` : "",
           p.manager ? `Manager: ${p.manager}` : "",
+          p.location || "",
         ].filter(Boolean).join(" - "),
-        propY,
-        6,
-      );
-      propY -= 10;
-    }
-    
-    if (valuablesList.length > 0) {
-      propertyPage.drawText("Valuables:", { x: margin, y: propY, size: 10, font: helveticaBold, color: textColor });
-      propY -= lineHeight;
-      propY = addArrayItems(
-        propertyPage,
-        valuablesList,
-        (v) => [v.item, v.location, v.notes].filter(Boolean).join(" - "),
         propY,
         6,
       );
@@ -923,14 +993,23 @@ async function generateSimplePdf(
   const digitalPage = pdfDoc.addPage([pageWidth, pageHeight]);
   let digY = addSectionHeader(digitalPage, "Digital Accounts", pageHeight - 80);
   
-  const digitalList = planData?.digital_assets || planData?.digital_accounts || [];
-  const phonesList = planData?.phones || [];
+  // CRITICAL: Read from multiple data sources
+  const digitalObj = planData?.digital || {};
+  const localDigitalAccounts = digitalObj.accounts || [];
+  const localPhones = digitalObj.phones || [];
+  
+  const digitalList = planData?.digital_assets?.length > 0 
+    ? planData.digital_assets 
+    : (planData?.digital_accounts?.length > 0 ? planData.digital_accounts : localDigitalAccounts);
+  const phonesList = planData?.phones?.length > 0 ? planData.phones : localPhones;
   const digitalNotes = planData?.digital_notes || "";
   
-  console.log("SECTION CHECK digital", {
-    digital: digitalList.length,
-    phones: phonesList.length,
-    notes: digitalNotes.length
+  console.log("[generate-planner-pdf] Digital section data:", {
+    digital_obj_keys: Object.keys(digitalObj),
+    local_accounts_len: localDigitalAccounts.length,
+    local_phones_len: localPhones.length,
+    digital_list_final: digitalList.length,
+    phones_list_final: phonesList.length,
   });
   
   const hasDigital = hasAny(digitalList) || hasAny(phonesList) || hasText(digitalNotes);
@@ -939,10 +1018,18 @@ async function generateSimplePdf(
     digY = drawEmpty(digitalPage, digY);
   } else {
     if (digitalList.length > 0) {
+      digitalPage.drawText("Online Accounts:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
+      digY -= lineHeight;
       digY = addArrayItems(
         digitalPage,
         digitalList,
-        (d) => [d.provider || d.service, d.type || d.account_type, d.access_person ? `Access: ${d.access_person}` : ""].filter(Boolean).join(" - "),
+        (d) => [
+          d.provider || d.service || d.name,
+          d.type || d.account_type,
+          d.username ? `User: ${d.username}` : "",
+          d.access_person ? `Access: ${d.access_person}` : "",
+          d.notes || "",
+        ].filter(Boolean).join(" - "),
         digY,
         10,
       );
@@ -971,6 +1058,10 @@ async function generateSimplePdf(
   const legal = planData?.legal || {};
   const legalNotes = planData?.legal_notes || "";
   
+  // Check for document checkboxes
+  const hasLegalDocCheckboxes = legal.has_will || legal.has_trust || legal.has_poa ||
+    legal.has_healthcare_directive || legal.has_living_will || legal.has_beneficiary_designations;
+  
   const executorName = legal.executor_name || legal.executor || legal.executorName;
   const executorPhone = legal.executor_phone || legal.executorPhone;
   const executorEmail = legal.executor_email || legal.executorEmail;
@@ -979,16 +1070,17 @@ async function generateSimplePdf(
   const willLoc = legal.will_location || legal.willLocation;
   const trustLoc = legal.trust_location || legal.trustLocation;
   
-  console.log("SECTION CHECK legal", {
+  console.log("[generate-planner-pdf] Legal section data:", {
+    legal_keys: Object.keys(legal),
+    has_doc_checkboxes: hasLegalDocCheckboxes,
     executor: executorName,
     poa: poaName,
     will: willLoc,
     trust: trustLoc,
-    notes: legalNotes.length
   });
   
   const hasLegal = hasText(executorName) || hasText(poaName) || hasText(willLoc) || hasText(trustLoc) || 
-    hasText(legal.healthcare_proxy) || hasText(legal.attorney_name) || hasText(legalNotes);
+    hasText(legal.healthcare_proxy) || hasText(legal.attorney_name) || hasText(legalNotes) || hasLegalDocCheckboxes;
 
   const legalPage = pdfDoc.addPage([pageWidth, pageHeight]);
   let legY = addSectionHeader(legalPage, "Legal Documents", pageHeight - 80);
@@ -996,6 +1088,22 @@ async function generateSimplePdf(
   if (!hasLegal) {
     legY = drawEmpty(legalPage, legY);
   } else {
+    // Show document types if checkboxes were checked
+    if (hasLegalDocCheckboxes) {
+      const docTypes: string[] = [];
+      if (legal.has_will) docTypes.push("Will");
+      if (legal.has_trust) docTypes.push("Trust");
+      if (legal.has_poa) docTypes.push("Power of Attorney");
+      if (legal.has_healthcare_directive) docTypes.push("Healthcare Directive");
+      if (legal.has_living_will) docTypes.push("Living Will");
+      if (legal.has_beneficiary_designations) docTypes.push("Beneficiary Designations");
+      
+      if (docTypes.length > 0) {
+        legY = addField(legalPage, "Documents I Have", docTypes.join(", "), legY);
+        legY -= 10;
+      }
+    }
+    
     if (executorName) legY = addField(legalPage, "Executor", executorName, legY);
     if (executorPhone) legY = addField(legalPage, "Executor Phone", executorPhone, legY);
     if (executorEmail) legY = addField(legalPage, "Executor Email", executorEmail, legY);
