@@ -670,6 +670,16 @@ const Landing = () => {
             </div>
           </div>
         </section>
+
+        {/* Cross-link to Version B (Senior-friendly) */}
+        <section className="text-center py-6 border-t border-border mt-8">
+          <Link 
+            to="/home-senior" 
+            className="text-sm text-muted-foreground hover:text-primary underline"
+          >
+            Try the simpler home page
+          </Link>
+        </section>
       </main>
       
       <AppFooter />
