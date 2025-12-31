@@ -1,6 +1,6 @@
 import { ProgressDot } from "./ProgressDot";
 import { cn } from "@/lib/utils";
-import { getSectionIcon, getSectionColor } from "@/lib/sectionIcons";
+import { getSectionIcon } from "@/lib/sectionIcons";
 import {
   Tooltip,
   TooltipContent,
@@ -17,11 +17,18 @@ interface NavItem {
   completed: boolean;
 }
 
+interface SectionGroup {
+  label: string;
+  sections: string[];
+}
+
 interface SidebarNavProps {
   items: NavItem[];
   activeSection: string;
   onSectionChange: (section: string) => void;
-  hideResources?: boolean; // Hide Help & Resources section for focused flow
+  hideResources?: boolean;
+  browseMode?: boolean;
+  sectionGroups?: SectionGroup[];
 }
 
 // Support & Services items that route to external pages
@@ -35,10 +42,13 @@ export const SidebarNav = ({
   items, 
   activeSection, 
   onSectionChange,
-  hideResources = false
+  hideResources = false,
+  browseMode = false,
+  sectionGroups = []
 }: SidebarNavProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
   // Define which sections have tooltips
   const tooltips: Record<string, string> = {
     overview: "A simple checklist of the most important items",
@@ -67,12 +77,45 @@ export const SidebarNav = ({
     item.id !== "preferences"
   );
 
-  // All items are now user sections (no more always-visible "resources" sections)
+  // All items are now user sections
   const userSections = items;
 
-  const renderNavButton = (item: NavItem) => {
+  // Collapsed/Guided mode - icon only
+  const renderCollapsedButton = (item: NavItem) => {
     const Icon = getSectionIcon(item.id);
-    const colorGradient = getSectionColor(item.id);
+    
+    return (
+      <TooltipProvider key={item.id} delayDuration={100}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={() => onSectionChange(item.id)}
+              className={cn(
+                "w-full flex items-center justify-center p-3 rounded-lg transition-all duration-200",
+                "hover:bg-accent/50",
+                activeSection === item.id
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Icon className="h-5 w-5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent 
+            side="right" 
+            className="bg-popover text-popover-foreground border px-3 py-2"
+            sideOffset={8}
+          >
+            <p className="font-medium">{item.label}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  };
+
+  // Full/Browse mode button
+  const renderNavButton = (item: NavItem, showDot: boolean = true) => {
+    const Icon = getSectionIcon(item.id);
     
     const button = (
       <button
@@ -85,14 +128,12 @@ export const SidebarNav = ({
             : "text-foreground hover:text-foreground"
         )}
       >
-        <div className={cn(
-          "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gradient-to-br",
-          colorGradient
-        )}>
-          <Icon className="h-4 w-4 text-white" />
-        </div>
+        <Icon className={cn(
+          "h-5 w-5 flex-shrink-0",
+          activeSection === item.id ? "text-primary" : "text-muted-foreground"
+        )} />
         <span className="flex-1">{item.label}</span>
-        <ProgressDot completed={item.completed} />
+        {showDot && <ProgressDot completed={item.completed} />}
       </button>
     );
 
@@ -119,18 +160,84 @@ export const SidebarNav = ({
     return <div key={item.id}>{button}</div>;
   };
 
+  // Group sections for browse mode
+  const getGroupedSections = () => {
+    if (!browseMode || sectionGroups.length === 0) return null;
+    
+    return sectionGroups.map((group) => {
+      const groupItems = userSections.filter(item => group.sections.includes(item.id));
+      if (groupItems.length === 0) return null;
+      
+      return (
+        <div key={group.label} className="mb-6">
+          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-4">
+            {group.label}
+          </h4>
+          <div className="space-y-1">
+            {groupItems.map(item => renderNavButton(item, false))}
+          </div>
+        </div>
+      );
+    });
+  };
+
+  // Get ungrouped sections (ones not in any group)
+  const getUngroupedSections = () => {
+    if (!browseMode || sectionGroups.length === 0) return userSections;
+    
+    const groupedIds = sectionGroups.flatMap(g => g.sections);
+    return userSections.filter(item => !groupedIds.includes(item.id));
+  };
+
+  // GUIDED MODE (collapsed)
+  if (!browseMode) {
+    return (
+      <nav className="space-y-2">
+        {userSections.map(renderCollapsedButton)}
+        
+        {/* My Planning Document - Collapsed */}
+        <hr className="my-3 border-border" />
+        <TooltipProvider delayDuration={100}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => navigate("/preplan-summary")}
+                className="w-full flex items-center justify-center p-3 rounded-lg transition-all bg-primary/10 hover:bg-primary/20 text-primary"
+              >
+                <FileText className="h-5 w-5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right" sideOffset={8}>
+              <p className="font-medium">My Planning Document</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </nav>
+    );
+  }
+
+  // BROWSE MODE (full navigation)
   return (
-    <nav className="space-y-6">
-      {/* User-selected sections */}
-      {userSections.length > 0 && (
+    <nav className="space-y-4">
+      {/* Grouped Sections */}
+      {getGroupedSections()}
+      
+      {/* Ungrouped Sections (if any) */}
+      {getUngroupedSections().length > 0 && sectionGroups.length > 0 && (
+        <div className="mb-6">
+          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-4">
+            Other Sections
+          </h4>
+          <div className="space-y-1">
+            {getUngroupedSections().map(item => renderNavButton(item, false))}
+          </div>
+        </div>
+      )}
+
+      {/* Fallback: If no groups, show flat list */}
+      {sectionGroups.length === 0 && (
         <div className="space-y-1">
-          <h3 className="text-base font-bold text-foreground mb-2 uppercase tracking-wide text-center">
-            {t("sidebar.yourPlanningSteps")}
-          </h3>
-          <p className="text-xs text-muted-foreground text-center mb-3 px-2">
-            {t("sidebar.completeAnyOrder")}
-          </p>
-          {userSections.map(renderNavButton)}
+          {userSections.map(item => renderNavButton(item))}
         </div>
       )}
 
@@ -144,33 +251,32 @@ export const SidebarNav = ({
       )}
 
       {/* My Planning Document - Primary Access */}
-        <>
-          <hr className="my-4 border-2 border-border mx-4" />
-          <div className="px-2">
-            <button
-              onClick={() => navigate("/preplan-summary")}
-              className={cn(
-                "w-full flex items-center gap-3 px-4 py-4 text-base rounded-lg transition-all duration-200 text-left group",
-                "bg-primary/10 hover:bg-primary/20 border-2 border-primary/30",
-                "text-foreground font-medium"
-              )}
-            >
-              <FileText className="h-5 w-5 flex-shrink-0 text-primary" />
-              <span className="flex-1">My Planning Document</span>
-            </button>
-          </div>
-        </>
+      <>
+        <hr className="my-4 border-2 border-border mx-4" />
+        <div className="px-2">
+          <button
+            onClick={() => navigate("/preplan-summary")}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-4 text-base rounded-lg transition-all duration-200 text-left group",
+              "bg-primary/10 hover:bg-primary/20 border-2 border-primary/30",
+              "text-foreground font-medium"
+            )}
+          >
+            <FileText className="h-5 w-5 flex-shrink-0 text-primary" />
+            <span className="flex-1">My Planning Document</span>
+          </button>
+        </div>
+      </>
 
       {/* Support & Services Section */}
       {!hideResources && (
         <>
-          {/* Divider */}
           <hr className="my-4 border-2 border-border mx-4" />
 
           <div className="space-y-1 mt-6">
-            <h3 className="text-base font-bold text-foreground mb-3 uppercase tracking-wide text-center">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-4">
               Support & Services
-            </h3>
+            </h4>
             {supportServicesItems.map((item) => {
               const Icon = item.icon;
               
