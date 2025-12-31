@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { CheckCircle, Phone, HelpCircle, FileText, Heart, Shield, Clock, Users } from "lucide-react";
+import { CheckCircle, Phone, HelpCircle, FileText, Heart, Shield, Clock, Users, ShoppingBag, BookOpen, MessageCircle } from "lucide-react";
 import { AppFooter } from "@/components/AppFooter";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -185,6 +185,173 @@ const LandingSenior = () => {
           </Card>
         </section>
 
+        {/* SECTION: Why Families Choose Everlasting */}
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-foreground mb-6 text-center">
+            Why Families Choose Everlasting
+          </h2>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            <Card className="border border-border">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h3 className="font-medium text-foreground mb-1">Clear and Simple</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Plain language. No confusing terms. Just straightforward guidance.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border border-border">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h3 className="font-medium text-foreground mb-1">A Gift to Your Family</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Spare your loved ones from guessing. Give them peace of mind.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border border-border">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h3 className="font-medium text-foreground mb-1">Update Anytime</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Your wishes may change. Come back and update whenever you need.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border border-border">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h3 className="font-medium text-foreground mb-1">Help When You Need It</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Reach a real person if you get stuck or want guidance.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* SECTION: What Families Are Saying (Testimonials) */}
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-foreground mb-6 text-center">
+            What Families Are Saying
+          </h2>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="border-2 border-muted bg-muted/20">
+              <CardContent className="p-6">
+                <p className="text-foreground text-lg leading-relaxed mb-4">
+                  "I finally feel at peace knowing my children won't have to guess what I wanted. This was so much easier than I expected."
+                </p>
+                <p className="text-muted-foreground font-medium">— Margaret, 72</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-2 border-muted bg-muted/20">
+              <CardContent className="p-6">
+                <p className="text-foreground text-lg leading-relaxed mb-4">
+                  "My husband and I filled this out together one evening. It brought us closer and gave us both comfort."
+                </p>
+                <p className="text-muted-foreground font-medium">— Robert & Helen, 68</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-2 border-muted bg-muted/20 md:col-span-2">
+              <CardContent className="p-6">
+                <p className="text-foreground text-lg leading-relaxed mb-4">
+                  "When my mother passed, we had no idea what she wanted. I don't want my family to go through that. This tool helped me put everything in one place."
+                </p>
+                <p className="text-muted-foreground font-medium">— David, 58</p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* SECTION: Our Mission */}
+        <section className="mb-12">
+          <Card className="border border-primary/30 bg-primary/5">
+            <CardContent className="p-6 md:p-8 text-center">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                Our Mission
+              </h2>
+              <p className="text-foreground text-lg leading-relaxed max-w-2xl mx-auto mb-3">
+                Our mission is to help families plan ahead with clarity, compassion, and confidence—so no one is left guessing during a difficult time.
+              </p>
+              <p className="text-muted-foreground">
+                We believe planning ahead is a gift of love, not a burden.
+              </p>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* SECTION: How We Can Help You (Services Overview) */}
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-foreground mb-6 text-center">
+            How We Can Help You
+          </h2>
+          
+          <div className="space-y-3">
+            <Link 
+              to="/plan-ahead" 
+              className="flex items-center gap-4 p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors"
+            >
+              <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+              <span className="text-foreground">Write down your wishes step by step</span>
+            </Link>
+            
+            <Link 
+              to="/preplan-summary" 
+              className="flex items-center gap-4 p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors"
+            >
+              <FileText className="h-5 w-5 text-primary flex-shrink-0" />
+              <span className="text-foreground">Save or print your plan anytime</span>
+            </Link>
+            
+            <Link 
+              to="/products" 
+              className="flex items-center gap-4 p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors"
+            >
+              <ShoppingBag className="h-5 w-5 text-primary flex-shrink-0" />
+              <span className="text-foreground">Affordable caskets, urns, and flowers</span>
+            </Link>
+            
+            <Link 
+              to="/after-death" 
+              className="flex items-center gap-4 p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors"
+            >
+              <BookOpen className="h-5 w-5 text-primary flex-shrink-0" />
+              <span className="text-foreground">After-death guidance for your family</span>
+            </Link>
+            
+            <Link 
+              to="/care-support" 
+              className="flex items-center gap-4 p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors"
+            >
+              <Users className="h-5 w-5 text-primary flex-shrink-0" />
+              <span className="text-foreground">Optional help from a real person</span>
+            </Link>
+          </div>
+        </section>
+
         {/* SECTION 3: What do I do first? */}
         <section className="mb-12 text-center">
           <h2 className="text-xl font-semibold text-foreground mb-4">
@@ -221,10 +388,10 @@ const LandingSenior = () => {
           </div>
         </section>
 
-        {/* SECTION 4: What happens after? */}
+        {/* SECTION: What Happens After I Start? (Process Clarity) */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-foreground mb-6 text-center">
-            What happens next?
+            What Happens After I Start?
           </h2>
           
           <div className="space-y-4 max-w-2xl mx-auto">
@@ -233,9 +400,9 @@ const LandingSenior = () => {
                 1
               </div>
               <div>
-                <h3 className="font-medium text-foreground">Answer questions about your preferences</h3>
+                <h3 className="font-medium text-foreground">Choose what you want to include</h3>
                 <p className="text-sm text-muted-foreground">
-                  Topics include funeral wishes, important contacts, and messages for loved ones.
+                  Pick the topics that matter to you. Skip what doesn't apply.
                 </p>
               </div>
             </div>
@@ -245,9 +412,9 @@ const LandingSenior = () => {
                 2
               </div>
               <div>
-                <h3 className="font-medium text-foreground">Save your plan</h3>
+                <h3 className="font-medium text-foreground">Answer questions at your own pace</h3>
                 <p className="text-sm text-muted-foreground">
-                  Create an account to save your progress. You can come back anytime to update it.
+                  Take as much time as you need. Your progress is saved automatically.
                 </p>
               </div>
             </div>
@@ -257,68 +424,101 @@ const LandingSenior = () => {
                 3
               </div>
               <div>
-                <h3 className="font-medium text-foreground">Share with your family</h3>
+                <h3 className="font-medium text-foreground">Review or change anything anytime</h3>
                 <p className="text-sm text-muted-foreground">
-                  Print it, email it, or give a trusted person a secure link to view it.
+                  Come back whenever you want to update your wishes.
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-4 p-4 bg-muted/30 rounded-lg">
+              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0">
+                4
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground">Print or save when you're ready</h3>
+                <p className="text-sm text-muted-foreground">
+                  Get a printable document to share with your family.
                 </p>
               </div>
             </div>
           </div>
+          
+          <p className="text-center text-muted-foreground mt-6 max-w-lg mx-auto">
+            You never have to finish everything at once.
+          </p>
         </section>
 
-        {/* SECTION 5: Where can I get help? */}
+        {/* SECTION: Need Help Along the Way? */}
         <section className="mb-12">
           <Card className="border border-border">
             <CardContent className="p-6 md:p-8">
               <h2 className="text-xl font-semibold text-foreground mb-6 text-center">
-                Need help along the way?
+                Need Help Along the Way?
               </h2>
               
-              <div className="grid md:grid-cols-2 gap-4">
-                <Link 
-                  to="/faq" 
-                  className="flex items-start gap-3 p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors"
-                >
-                  <HelpCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <div>
-                    <span className="font-medium text-foreground">Common Questions</span>
-                    <p className="text-sm text-muted-foreground">Answers to frequently asked questions.</p>
-                  </div>
-                </Link>
-                
-                <Link 
-                  to="/resources" 
-                  className="flex items-start gap-3 p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors"
-                >
-                  <FileText className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <div>
-                    <span className="font-medium text-foreground">Free Guides & Checklists</span>
-                    <p className="text-sm text-muted-foreground">Downloadable resources to help you plan.</p>
-                  </div>
-                </Link>
-                
+              <div className="grid md:grid-cols-3 gap-4">
                 <Link 
                   to="/care-support" 
-                  className="flex items-start gap-3 p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors"
+                  className="flex flex-col items-center text-center p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors"
                 >
-                  <Users className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <div>
-                    <span className="font-medium text-foreground">Talk to Someone</span>
-                    <p className="text-sm text-muted-foreground">Get guidance from a real person.</p>
-                  </div>
+                  <MessageCircle className="h-8 w-8 text-primary mb-3" />
+                  <span className="font-medium text-foreground">Talk to CARE Support</span>
+                  <p className="text-sm text-muted-foreground mt-1">Get guidance from a real person</p>
                 </Link>
                 
                 <Link 
-                  to="/contact" 
-                  className="flex items-start gap-3 p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors"
+                  to="/do-it-for-you" 
+                  className="flex flex-col items-center text-center p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors"
                 >
-                  <Phone className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <div>
-                    <span className="font-medium text-foreground">Contact Us</span>
-                    <p className="text-sm text-muted-foreground">Send us a message or request a call.</p>
-                  </div>
+                  <Users className="h-8 w-8 text-primary mb-3" />
+                  <span className="font-medium text-foreground">Request Help Filling Out Your Plan</span>
+                  <p className="text-sm text-muted-foreground mt-1">We can do it together</p>
+                </Link>
+                
+                <Link 
+                  to="/faq" 
+                  className="flex flex-col items-center text-center p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors"
+                >
+                  <HelpCircle className="h-8 w-8 text-primary mb-3" />
+                  <span className="font-medium text-foreground">View Common Questions</span>
+                  <p className="text-sm text-muted-foreground mt-1">Find quick answers</p>
                 </Link>
               </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* FINAL CALL TO ACTION */}
+        <section className="mb-12 text-center">
+          <Card className="border-2 border-primary/30 bg-primary/5">
+            <CardContent className="p-8 md:p-10">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                Ready to give your family peace of mind?
+              </h2>
+              
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
+                <Button 
+                  size="lg" 
+                  onClick={handlePrimaryCTA} 
+                  className="min-h-[56px] text-lg px-10"
+                >
+                  Start My Plan
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  asChild
+                  className="min-h-[56px] text-lg px-10"
+                >
+                  <Link to="/resources">Learn More First</Link>
+                </Button>
+              </div>
+              
+              <p className="text-muted-foreground text-sm">
+                You can stop anytime. Nothing is shared unless you choose.
+              </p>
             </CardContent>
           </Card>
         </section>
