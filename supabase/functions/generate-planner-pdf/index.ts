@@ -514,13 +514,18 @@ async function generateSimplePdf(
   const contacts1 = pdfDoc.addPage([pageWidth, pageHeight]);
   let cY = addSectionHeader(contacts1, "People to Notify", pageHeight - 80);
   const contactsList = planData?.contacts_notify || [];
-  cY = addArrayItems(
-    contacts1,
-    contactsList,
-    (c) => [c.name, c.relationship ? `(${c.relationship})` : "", c.contact || c.phone || c.email].filter(Boolean).join(" - "),
-    cY,
-    12,
-  );
+  
+  if (hasAny(contactsList)) {
+    cY = addArrayItems(
+      contacts1,
+      contactsList,
+      (c) => [c.name, c.relationship ? `(${c.relationship})` : "", c.contact || c.phone || c.email].filter(Boolean).join(" - "),
+      cY,
+      12,
+    );
+  } else {
+    cY = drawEmpty(contacts1, cY);
+  }
   addDraftWatermark(contacts1);
   addFooter(contacts1, pageNum++);
 
@@ -991,18 +996,98 @@ async function generateSimplePdf(
   // PAGE 16: Pets
   const petsPage = pdfDoc.addPage([pageWidth, pageHeight]);
   let petY = addSectionHeader(petsPage, "Pets", pageHeight - 80);
-  petY = addNotesBox(petsPage, "Notes", planData?.pets_notes || "", petY);
+  
   const petsList = planData?.pets || [];
-  if (petsList.length > 0) {
-    petY -= 10;
-    petY = addArrayItems(
-      petsPage,
-      petsList,
-      (p) => [p.name, p.breed, p.caregiver ? `Caregiver: ${p.caregiver}` : "", p.vet_contact ? `Vet: ${p.vet_contact}` : ""].filter(Boolean)
-        .join(" - "),
-      petY,
-      8,
-    );
+  const petsNotes = planData?.pets_notes || "";
+  const hasPets = hasAny(petsList) || hasText(petsNotes);
+  
+  console.log("[generate-planner-pdf] Pets section data:", {
+    pets_count: petsList.length,
+    pets_notes_len: petsNotes.length,
+    has_pets: hasPets,
+  });
+  
+  if (!hasPets) {
+    petY = drawEmpty(petsPage, petY);
+  } else {
+    if (petsList.length > 0) {
+      petsPage.drawText("My Pets:", { x: margin, y: petY, size: 10, font: helveticaBold, color: textColor });
+      petY -= lineHeight + 4;
+      
+      // Print each pet with full details
+      for (const pet of petsList.slice(0, 8)) {
+        if (petY <= 100) break;
+        
+        const petName = pet.name || pet.type || "(Unnamed pet)";
+        const petType = pet.type || pet.breed || "";
+        
+        // Pet name and type on first line
+        petsPage.drawText(`• ${sanitizeForPdf(petName)}${petType ? ` (${sanitizeForPdf(petType)})` : ""}`, {
+          x: margin,
+          y: petY,
+          size: 10,
+          font: helveticaBold,
+          color: textColor,
+        });
+        petY -= lineHeight;
+        
+        // Caregiver info
+        if (pet.caregiver) {
+          petsPage.drawText(`  Caregiver: ${sanitizeForPdf(pet.caregiver)}`, {
+            x: margin + 10,
+            y: petY,
+            size: 10,
+            font: helvetica,
+            color: textColor,
+          });
+          petY -= lineHeight;
+        }
+        
+        // Vet info
+        if (pet.vet_contact) {
+          petsPage.drawText(`  Veterinarian: ${sanitizeForPdf(pet.vet_contact)}`, {
+            x: margin + 10,
+            y: petY,
+            size: 10,
+            font: helvetica,
+            color: textColor,
+          });
+          petY -= lineHeight;
+        }
+        
+        // Care instructions
+        if (pet.care_instructions || pet.instructions) {
+          const careText = pet.care_instructions || pet.instructions;
+          const careLines = wrapText(careText, pageWidth - margin * 2 - 20, 10);
+          petsPage.drawText(`  Care Notes:`, {
+            x: margin + 10,
+            y: petY,
+            size: 10,
+            font: helvetica,
+            color: textColor,
+          });
+          petY -= lineHeight;
+          for (const line of careLines.slice(0, 3)) {
+            if (petY <= 100) break;
+            petsPage.drawText(`    ${line}`, {
+              x: margin + 10,
+              y: petY,
+              size: 10,
+              font: helvetica,
+              color: textColor,
+            });
+            petY -= lineHeight;
+          }
+        }
+        
+        petY -= 8; // Extra spacing between pets
+      }
+    }
+    
+    if (petsNotes) {
+      petY -= 10;
+      petY = addNotesBox(petsPage, "Additional Pet Notes", petsNotes, petY);
+    }
   }
   addDraftWatermark(petsPage);
   addFooter(petsPage, pageNum++);
@@ -1153,24 +1238,130 @@ async function generateSimplePdf(
   // PAGES 19-22: Messages
   const messagesPage = pdfDoc.addPage([pageWidth, pageHeight]);
   let msgY = addSectionHeader(messagesPage, "Messages to Loved Ones", pageHeight - 80);
-  msgY = addNotesBox(messagesPage, "General Message", planData?.to_loved_ones_message || planData?.messages_notes || "", msgY);
+  
   const messagesList = planData?.messages || [];
-  if (messagesList.length > 0) {
-    msgY -= 10;
-    msgY = addArrayItems(
-      messagesPage,
-      messagesList,
-      (m) => [m.audience || m.to_name || m.recipients, m.title].filter(Boolean).join(": "),
-      msgY,
-      6,
-    );
+  const generalMessage = planData?.to_loved_ones_message || planData?.messages_notes || "";
+  const hasMessages = hasAny(messagesList) || hasText(generalMessage);
+  
+  console.log("[generate-planner-pdf] Messages section data:", {
+    messages_count: messagesList.length,
+    general_message_len: generalMessage.length,
+    has_messages: hasMessages,
+  });
+  
+  if (!hasMessages) {
+    msgY = drawEmpty(messagesPage, msgY);
+  } else {
+    // Print general message first
+    if (generalMessage) {
+      msgY = addNotesBox(messagesPage, "General Message to My Family", generalMessage, msgY);
+      msgY -= 10;
+    }
+    
+    // Print each individual message with full body
+    if (messagesList.length > 0) {
+      messagesPage.drawText("Individual Messages:", { x: margin, y: msgY, size: 10, font: helveticaBold, color: textColor });
+      msgY -= lineHeight + 4;
+      
+      for (const msg of messagesList) {
+        if (msgY <= 120) break;
+        
+        const recipient = msg.audience || msg.to_name || msg.recipients || "(Unspecified recipient)";
+        const title = msg.title || "";
+        const body = msg.body || msg.message || msg.content || "";
+        
+        // Recipient line
+        messagesPage.drawText(`To: ${sanitizeForPdf(recipient)}${title ? ` - ${sanitizeForPdf(title)}` : ""}`, {
+          x: margin,
+          y: msgY,
+          size: 10,
+          font: helveticaBold,
+          color: textColor,
+        });
+        msgY -= lineHeight;
+        
+        // Message body - wrap text and print
+        if (body) {
+          const bodyLines = wrapText(body, pageWidth - margin * 2 - 10, 10);
+          for (const line of bodyLines.slice(0, 6)) {
+            if (msgY <= 100) break;
+            messagesPage.drawText(`  ${line}`, {
+              x: margin + 10,
+              y: msgY,
+              size: 10,
+              font: helvetica,
+              color: textColor,
+            });
+            msgY -= 14;
+          }
+          if (bodyLines.length > 6) {
+            messagesPage.drawText("  (continued on next page...)", {
+              x: margin + 10,
+              y: msgY,
+              size: 9,
+              font: helvetica,
+              color: rgb(0.5, 0.5, 0.5),
+            });
+            msgY -= lineHeight;
+          }
+        }
+        
+        msgY -= 10; // Extra spacing between messages
+      }
+    }
   }
   addDraftWatermark(messagesPage);
   addFooter(messagesPage, pageNum++);
 
-  for (let i = 0; i < 3; i++) {
+  // Additional message continuation pages - only add if we have many messages
+  const needsContinuation = messagesList.length > 3;
+  const continuationPages = needsContinuation ? 2 : 0;
+  
+  for (let i = 0; i < continuationPages; i++) {
     const msgContPage = pdfDoc.addPage([pageWidth, pageHeight]);
-    addSectionHeader(msgContPage, `Messages (continued - page ${i + 2})`, pageHeight - 80);
+    let contY = addSectionHeader(msgContPage, `Messages (continued - page ${i + 2})`, pageHeight - 80);
+    
+    // Get messages that didn't fit on first page
+    const remainingMessages = messagesList.slice(3 + (i * 4), 3 + ((i + 1) * 4));
+    
+    if (remainingMessages.length === 0) {
+      contY = drawEmpty(msgContPage, contY, "No additional messages.");
+    } else {
+      for (const msg of remainingMessages) {
+        if (contY <= 120) break;
+        
+        const recipient = msg.audience || msg.to_name || msg.recipients || "(Unspecified recipient)";
+        const title = msg.title || "";
+        const body = msg.body || msg.message || msg.content || "";
+        
+        msgContPage.drawText(`To: ${sanitizeForPdf(recipient)}${title ? ` - ${sanitizeForPdf(title)}` : ""}`, {
+          x: margin,
+          y: contY,
+          size: 10,
+          font: helveticaBold,
+          color: textColor,
+        });
+        contY -= lineHeight;
+        
+        if (body) {
+          const bodyLines = wrapText(body, pageWidth - margin * 2 - 10, 10);
+          for (const line of bodyLines.slice(0, 8)) {
+            if (contY <= 100) break;
+            msgContPage.drawText(`  ${line}`, {
+              x: margin + 10,
+              y: contY,
+              size: 10,
+              font: helvetica,
+              color: textColor,
+            });
+            contY -= 14;
+          }
+        }
+        
+        contY -= 10;
+      }
+    }
+    
     addDraftWatermark(msgContPage);
     addFooter(msgContPage, pageNum++);
   }
@@ -1227,7 +1418,7 @@ async function generateSimplePdf(
 
   const pdfBytes = await pdfDoc.save();
 
-  // Build user-friendly filename from prepared_for name
+  // Build user-friendly filename: "Planner - LastName, FirstName.pdf"
   const sanitizeFilename = (name: string): string => {
     if (!name) return "";
     return name
@@ -1237,17 +1428,35 @@ async function generateSimplePdf(
       .substring(0, 100);            // Limit length
   };
   
-  const preparedForName = sanitizeFilename(
-    planData?.prepared_for || 
-    profile?.full_name || 
+  // Parse full name into first/last for senior-friendly format
+  const rawFullName = sanitizeFilename(
     piiData?.full_name || 
+    profile?.full_name || 
+    planData?.prepared_for || 
     ""
   );
   
-  const userFriendlyFilename = preparedForName
-    ? `Planner for ${preparedForName}.pdf`
-    : "My-Life-and-Legacy-Planner.pdf";
+  // Build filename: "Planner - LastName, FirstName.pdf"
+  const buildSeniorFilename = (fullName: string): string => {
+    if (!fullName) return "My-Life-and-Legacy-Planner.pdf";
+    
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length === 0) return "My-Life-and-Legacy-Planner.pdf";
+    
+    if (parts.length === 1) {
+      // Only first name available
+      return `Planner - ${parts[0]}.pdf`;
+    }
+    
+    // Extract first and last name
+    const firstName = parts[0];
+    const lastName = parts[parts.length - 1];
+    
+    // Format: "Planner - LastName, FirstName.pdf"
+    return `Planner - ${lastName}, ${firstName}.pdf`;
+  };
   
+  const userFriendlyFilename = buildSeniorFilename(rawFullName);
   const draftPrefix = isDraft ? "DRAFT-" : "";
   const finalUserFilename = `${draftPrefix}${userFriendlyFilename}`;
   
