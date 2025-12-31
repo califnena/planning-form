@@ -3,6 +3,7 @@ import { SectionProperty } from "@/components/planner/sections/SectionProperty";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
+import { ViewDocumentButton } from "@/components/planner/ViewDocumentButton";
 import { useNavigate } from "react-router-dom";
 
 export default function PropertyValuablesPage() {
@@ -22,6 +23,7 @@ export default function PropertyValuablesPage() {
           error={saveState.error}
         />
       </div>
+      <ViewDocumentButton />
       <PreviewModeWrapper>
         <SectionProperty data={plan} onChange={(data) => updatePlan(data)} />
       </PreviewModeWrapper>
