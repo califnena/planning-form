@@ -185,19 +185,22 @@ export const SectionPreferences = ({
     if (onContinue) onContinue();
   };
 
-  // New handler that navigates to first selected section
+  // Navigate to first selected section in DISPLAY ORDER (not selection order)
   const handleContinueToPlanner = async () => {
     await saveSettings();
     
-    // Find the first user-selected section (not always-included)
-    const userSections = selectedSections.filter(s => !ALWAYS_INCLUDED.includes(s));
-    const firstSection = userSections[0];
+    // Find the first section in DISPLAY ORDER that the user has selected
+    // This ensures consistent navigation regardless of selection order
+    const firstSelectedSection = FRIENDLY_SECTIONS.find(
+      section => selectedSections.includes(section.id)
+    );
     
-    if (firstSection && SECTION_ROUTES[firstSection]) {
-      navigate(SECTION_ROUTES[firstSection]);
+    if (firstSelectedSection && SECTION_ROUTES[firstSelectedSection.id]) {
+      // Explicit navigation to the first selected section
+      navigate(SECTION_ROUTES[firstSelectedSection.id]);
     } else {
       // Fallback to overview if no sections selected
-      navigate("/preplandashboard");
+      navigate("/preplandashboard/overview");
     }
   };
 
@@ -286,15 +289,27 @@ export const SectionPreferences = ({
 
           {/* Primary Continue Button - Routes to first selected section */}
           <div className="pt-6 space-y-4">
+            {/* Helper text to set expectation */}
+            {userSelectedCount > 0 && (
+              <p className="text-center text-sm text-muted-foreground">
+                We'll take you to the first section you chose.
+              </p>
+            )}
             <Button
               onClick={handleContinueToPlanner}
-              disabled={saving}
+              disabled={saving || userSelectedCount === 0}
               size="lg"
               className="w-full py-6 text-lg font-medium"
             >
-              {saving ? "Saving..." : "Continue to My Wishes"}
+              {saving ? "Saving..." : "Continue"}
               <ChevronRight className="ml-2 h-5 w-5" />
             </Button>
+
+            {userSelectedCount === 0 && (
+              <p className="text-center text-sm text-muted-foreground">
+                Select at least one topic above to continue.
+              </p>
+            )}
 
             {/* Secondary Link */}
             <p className="text-center text-sm text-muted-foreground">
