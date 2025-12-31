@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 // Stripe Payment Link fallbacks
 const SONG_PAYMENT_LINKS = {
-  standard: 'https://buy.stripe.com/test_standard', // TODO: Add standard song payment link
+  standard: 'https://buy.stripe.com/7sYbJ13Bb6SvcPBf2m7bW08',
   premium: 'https://buy.stripe.com/4gM28rgnXa4H16T6vQ7bW07',
 };
 
