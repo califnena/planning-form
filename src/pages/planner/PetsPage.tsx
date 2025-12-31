@@ -3,6 +3,7 @@ import { SectionPets } from "@/components/planner/sections/SectionPets";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
+import { ViewDocumentButton } from "@/components/planner/ViewDocumentButton";
 import { useNavigate } from "react-router-dom";
 
 export default function PetsPage() {
@@ -22,6 +23,7 @@ export default function PetsPage() {
           error={saveState.error}
         />
       </div>
+      <ViewDocumentButton />
       <PreviewModeWrapper>
         <SectionPets data={plan} onChange={updatePlan} />
       </PreviewModeWrapper>
