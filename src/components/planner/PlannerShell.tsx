@@ -1,7 +1,8 @@
 import { useState, ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 import { SidebarNav } from "./SidebarNav";
 import { Button } from "@/components/ui/button";
-import { Menu, Eye, EyeOff } from "lucide-react";
+import { Menu, Eye, FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -53,6 +54,7 @@ export const PlannerShell = ({
   onAfterLifePlan,
 }: PlannerShellProps) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [browseMode, setBrowseMode] = useState(false);
 
@@ -154,6 +156,20 @@ export const PlannerShell = ({
             >
               <Menu className="h-5 w-5 mr-2" />
               Menu
+            </Button>
+          </div>
+          
+          {/* Persistent View Document Button - always accessible */}
+          <div className="fixed bottom-4 right-4 z-50">
+            <Button
+              size="lg"
+              variant="default"
+              className="rounded-full shadow-lg gap-2"
+              onClick={() => navigate("/preplan-summary")}
+            >
+              <FileText className="h-5 w-5" />
+              <span className="hidden sm:inline">View My Document</span>
+              <span className="sm:hidden">Document</span>
             </Button>
           </div>
           
