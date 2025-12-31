@@ -57,6 +57,17 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Senior-friendly warm palette
+        senior: {
+          cream: "hsl(var(--senior-cream))",
+          sage: "hsl(var(--senior-sage))",
+          "sage-deep": "hsl(var(--senior-sage-deep))",
+          "warm-gray": "hsl(var(--senior-warm-gray))",
+          testimonial: "hsl(var(--senior-testimonial))",
+          mission: "hsl(var(--senior-mission))",
+          text: "hsl(var(--senior-text))",
+          "text-soft": "hsl(var(--senior-text-soft))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
