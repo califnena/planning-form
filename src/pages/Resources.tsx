@@ -362,73 +362,191 @@ const Resources = () => {
     </div>
   );
 
-  // Forms & Worksheets Section
-  const renderFormsWorksheets = () => (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Forms & Worksheets</h1>
-        <p className="text-lg text-muted-foreground">
-          Printable forms and downloadable resources to help you plan.
-        </p>
-      </div>
-
-      <ResourcesDownloadSection />
-
-      {/* Additional Forms */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Additional Downloads
-          </CardTitle>
+  // Forms & Worksheets Section - Senior-friendly card layout
+  const renderFormsWorksheets = () => {
+    // Document card component for consistent styling
+    const DocumentCard = ({ 
+      title, 
+      description, 
+      tags, 
+      href, 
+      isComingSoon = false 
+    }: { 
+      title: string; 
+      description: string; 
+      tags: string[]; 
+      href: string;
+      isComingSoon?: boolean;
+    }) => (
+      <Card className={cn("h-full", isComingSoon && "border-dashed opacity-75")}>
+        <CardHeader className="pb-3">
+          <div className="flex flex-wrap gap-2 mb-3">
+            {tags.map((tag, idx) => (
+              <span 
+                key={idx}
+                className={cn(
+                  "inline-block px-3 py-1 text-xs font-semibold rounded-full",
+                  tag === 'Fillable' && "bg-blue-500/10 text-blue-700",
+                  tag === 'Printable' && "bg-green-500/10 text-green-700",
+                  tag === 'Before Death' && "bg-primary/10 text-primary",
+                  tag === 'After Death' && "bg-amber-500/10 text-amber-700",
+                  tag === 'Reference' && "bg-purple-500/10 text-purple-700"
+                )}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+          <CardTitle className="text-lg">{title}</CardTitle>
+          <CardDescription className="text-base">{description}</CardDescription>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-4">
-            <li>
-              <Link to="/forms" className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
-                <FileText className="h-5 w-5 text-primary shrink-0" />
-                <div>
-                  <p className="font-medium text-foreground">Blank Fillable Forms</p>
-                  <p className="text-sm text-muted-foreground">Pre-Planning & After-Death Planner forms you can fill out</p>
-                </div>
-                <ChevronRight className="h-5 w-5 text-muted-foreground ml-auto" />
-              </Link>
-            </li>
-            <li>
-              <a href="/guides/Know-Your-Rights-When-Arranging-a-Funeral.pdf" download className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
-                <Download className="h-5 w-5 text-primary shrink-0" />
-                <div>
-                  <p className="font-medium text-foreground">Know Your Rights (Print or Save as PDF)</p>
-                  <p className="text-sm text-muted-foreground">FTC Funeral Rule consumer rights guide</p>
-                </div>
-                <ChevronRight className="h-5 w-5 text-muted-foreground ml-auto" />
+          {isComingSoon ? (
+            <Button variant="outline" className="w-full min-h-[48px]" disabled>
+              Coming Soon
+            </Button>
+          ) : (
+            <>
+              <a 
+                href={href} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Button className="w-full min-h-[48px] gap-2">
+                  <ExternalLink className="h-4 w-4" />
+                  Open or Download
+                </Button>
               </a>
-            </li>
-            <li>
-              <a href="/guides/Discussing-Death-Guide.pdf" download className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
-                <Download className="h-5 w-5 text-primary shrink-0" />
-                <div>
-                  <p className="font-medium text-foreground">Discussing Death Guide (Print or Save as PDF)</p>
-                  <p className="text-sm text-muted-foreground">Tips for having the conversation with loved ones</p>
-                </div>
-                <ChevronRight className="h-5 w-5 text-muted-foreground ml-auto" />
-              </a>
-            </li>
-            <li>
-              <a href="/guides/My-End-of-Life-Decisions-Guide.pdf" download className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors">
-                <Download className="h-5 w-5 text-primary shrink-0" />
-                <div>
-                  <p className="font-medium text-foreground">My End-of-Life Decisions Guide (Print or Save as PDF)</p>
-                  <p className="text-sm text-muted-foreground">Comprehensive planning decisions worksheet</p>
-                </div>
-                <ChevronRight className="h-5 w-5 text-muted-foreground ml-auto" />
-              </a>
-            </li>
-          </ul>
+              <p className="text-sm text-muted-foreground text-center mt-2">
+                You can print or save this document.
+              </p>
+            </>
+          )}
         </CardContent>
       </Card>
-    </div>
-  );
+    );
+
+    return (
+      <div className="space-y-10">
+        {/* Page Header */}
+        <div className="bg-muted/30 rounded-xl p-6 border border-border">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Forms & Worksheets</h1>
+          <p className="text-xl text-muted-foreground mb-3">
+            Printable and fillable documents you can save, print, or share.
+          </p>
+          <p className="text-base text-muted-foreground">
+            These forms help you write things down and keep them organized. You can fill them out online or print them and complete them by hand.
+          </p>
+        </div>
+
+        {/* Essential Planning Forms */}
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <FileText className="h-5 w-5 text-primary" />
+            Essential Planning Forms
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            These are the main documents most people need.
+          </p>
+          
+          <div className="grid gap-6 md:grid-cols-2">
+            <DocumentCard
+              title="My Final Wishes Form"
+              description="Record your preferences for funeral arrangements and personal wishes."
+              tags={['Fillable', 'Printable', 'Before Death']}
+              href="/templates/My-Final-Wishes-Blank-Form-2025-11-17.pdf"
+            />
+            <DocumentCard
+              title="Pre-Planning Worksheet"
+              description="Organize all your important information in one place."
+              tags={['Fillable', 'Printable', 'Before Death']}
+              href="/guides/EFA-Pre-Planning-Checklist.pdf"
+            />
+            <DocumentCard
+              title="My End-of-Life Decisions Guide"
+              description="A comprehensive guide to help you think through important decisions."
+              tags={['Reference', 'Before Death']}
+              href="/guides/My-End-of-Life-Decisions-Guide.pdf"
+            />
+            <DocumentCard
+              title="Personal Information Summary"
+              description="Keep all your vital information together for your loved ones."
+              tags={['Fillable', 'Printable', 'Before Death']}
+              isComingSoon={true}
+              href=""
+            />
+            <DocumentCard
+              title="Emergency Contacts Sheet"
+              description="A simple form to list important contacts in one place."
+              tags={['Printable', 'Before Death']}
+              isComingSoon={true}
+              href=""
+            />
+          </div>
+        </div>
+
+        {/* Additional Worksheets */}
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-primary" />
+            Additional Worksheets
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            Helpful extras and optional planning tools.
+          </p>
+          
+          <div className="grid gap-6 md:grid-cols-2">
+            <DocumentCard
+              title="Discussing Death Guide"
+              description="Tips and conversation starters for talking with loved ones."
+              tags={['Reference', 'Before Death']}
+              href="/guides/Discussing-Death-Guide.pdf"
+            />
+            <DocumentCard
+              title="Know Your Rights (FTC Funeral Rule)"
+              description="Learn about consumer protections when arranging a funeral."
+              tags={['Reference', 'Before Death', 'After Death']}
+              href="/guides/Know-Your-Rights-When-Arranging-a-Funeral.pdf"
+            />
+            <DocumentCard
+              title="Complying with the Funeral Rule"
+              description="Detailed information about FTC regulations for funeral services."
+              tags={['Reference']}
+              href="/guides/Complying-with-the-Funeral-Rule.pdf"
+            />
+            <DocumentCard
+              title="After-Death Planner & Checklist"
+              description="A step-by-step checklist for families after a loss."
+              tags={['Printable', 'After Death']}
+              href="/guides/EFA-After-Death-Planner-and-Checklist.pdf"
+            />
+          </div>
+        </div>
+
+        {/* Quick link to fillable forms page */}
+        <Card className="border-2 border-primary/20">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row md:items-center gap-4">
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-foreground mb-1">Looking for More Forms?</h3>
+                <p className="text-muted-foreground">
+                  Visit our dedicated forms page for additional blank and guided walkthrough forms.
+                </p>
+              </div>
+              <Link to="/forms">
+                <Button variant="outline" className="min-h-[48px] gap-2">
+                  <FileText className="h-4 w-4" />
+                  View All Forms
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
 
   // FAQs Section with Travel Protection
   const renderFAQs = () => (
