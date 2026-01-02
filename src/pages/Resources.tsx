@@ -209,25 +209,70 @@ const Resources = () => {
         </p>
       </div>
 
-      {/* Featured Guide */}
+      {/* Pre-Planning Guide */}
       <div className="bg-card border-2 border-primary/20 rounded-lg p-6 shadow-lg">
         <div className="mb-4">
           <span className="inline-block px-3 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full mb-2">
-            📖 Featured Guide
+            📋 Pre-Planning
           </span>
           <h2 className="text-xl font-bold text-foreground">
-            Planning Your Funeral: A Gift of Peace & Clarity
+            Pre-Planning Guide
           </h2>
+          <p className="text-muted-foreground mt-2">
+            A comprehensive guide to help you plan ahead and give your family peace of mind.
+          </p>
         </div>
-        <div className="flex justify-center">
+        <div className="flex justify-center mb-4">
           <iframe 
-            src="https://gamma.app/embed/rwk4xlwaixs6gbj" 
+            src="https://gamma.app/embed/om4wcs6irh1s18e" 
             style={{ width: '700px', maxWidth: '100%', height: '450px' }}
             allow="fullscreen" 
-            title="Planning Your Funeral: A Gift of Peace & Clarity" 
+            title="Pre-Planning Guide" 
             className="rounded-lg border border-border" 
           />
         </div>
+        <a 
+          href="https://gamma.app/docs/om4wcs6irh1s18e" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
+        >
+          <ExternalLink className="h-4 w-4" />
+          Open Full Guide
+        </a>
+      </div>
+
+      {/* When Death Happens Guide */}
+      <div className="bg-card border-2 border-amber-500/20 rounded-lg p-6 shadow-lg">
+        <div className="mb-4">
+          <span className="inline-block px-3 py-1 text-xs font-semibold bg-amber-500/10 text-amber-700 rounded-full mb-2">
+            🕊️ After a Loss
+          </span>
+          <h2 className="text-xl font-bold text-foreground">
+            When Death Happens: After-Death Planner Guide
+          </h2>
+          <p className="text-muted-foreground mt-2">
+            Step-by-step guidance for families navigating the first days and weeks after losing a loved one.
+          </p>
+        </div>
+        <div className="flex justify-center mb-4">
+          <iframe 
+            src="https://gamma.app/embed/13licam9flg6gcq" 
+            style={{ width: '700px', maxWidth: '100%', height: '450px' }}
+            allow="fullscreen" 
+            title="After-Death Planner Guide" 
+            className="rounded-lg border border-border" 
+          />
+        </div>
+        <a 
+          href="https://gamma.app/docs/13licam9flg6gcq" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
+        >
+          <ExternalLink className="h-4 w-4" />
+          Open Full Guide
+        </a>
       </div>
 
       {legacyResourceSections.map((section, idx) => (
