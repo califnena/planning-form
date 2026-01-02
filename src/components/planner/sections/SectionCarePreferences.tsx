@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Info } from "lucide-react";
+import { Info, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface CarePreferencesData {
@@ -13,17 +13,17 @@ interface SectionCarePreferencesProps {
   onChange?: (data: CarePreferencesData) => void;
 }
 
-// Exact checkbox questions from requirements - one per line
+// EXACT checkbox questions from requirements - one per line, large square checkboxes
 const PREFERENCE_OPTIONS = [
-  { id: "comfort_priority", label: "Comfort and pain relief are a priority" },
-  { id: "avoid_aggressive", label: "Avoid aggressive treatment if recovery is unlikely" },
-  { id: "healthcare_proxy", label: "Healthcare proxy should be involved" },
-  { id: "prefer_home", label: "Prefer care at home if possible" },
-  { id: "open_hospice", label: "Open to hospice care" },
-  { id: "loved_ones_present", label: "Want loved ones present" },
-  { id: "clear_explanations", label: "Want clear explanations" },
-  { id: "spiritual_support", label: "Want spiritual or religious support" },
-  { id: "additional_wishes", label: "Additional wishes matter" },
+  { id: "comfort_priority", label: "I prefer comfort-focused care if recovery is unlikely." },
+  { id: "family_contact", label: "I want my family contacted before major decisions are made (when possible)." },
+  { id: "avoid_machines", label: "I prefer to avoid being kept alive by machines if there is no meaningful recovery." },
+  { id: "pain_relief", label: "I prefer pain relief even if it may cause sleepiness." },
+  { id: "stay_home", label: "I prefer to stay at home as long as it is safe and possible." },
+  { id: "hospice_care", label: "If I cannot stay at home, I prefer hospice care when appropriate." },
+  { id: "spiritual_support", label: "I want a faith leader or spiritual support contacted if I am very ill." },
+  { id: "communication_needs", label: "I have communication needs (hearing, vision, language) I want caregivers to know." },
+  { id: "mobility_needs", label: "I have mobility or assistance needs I want caregivers to know." },
 ];
 
 export const SectionCarePreferences = ({ data = {}, onChange }: SectionCarePreferencesProps) => {
@@ -55,25 +55,25 @@ export const SectionCarePreferences = ({ data = {}, onChange }: SectionCarePrefe
           <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-foreground text-base">
+              This is not medical advice. This is a simple summary for your family.
               Everything here is optional. Check what applies to you and skip anything that doesn't.
-              This does not replace medical or legal documents.
             </p>
           </div>
         </div>
       </Card>
 
-      {/* Preference Checkboxes - One per line, large square checkboxes (min 44px) */}
+      {/* Preference Checkboxes - One per line, large square checkboxes (44px min) */}
       <Card className="p-5 mb-6">
         <div className="space-y-4">
           {PREFERENCE_OPTIONS.map((option) => (
             <label
               key={option.id}
-              className="flex items-center gap-4 cursor-pointer py-2"
+              className="flex items-start gap-4 cursor-pointer py-2"
             >
               <button
                 type="button"
                 className={cn(
-                  "h-11 w-11 rounded border-2 flex items-center justify-center transition-all flex-shrink-0",
+                  "h-11 w-11 rounded-md border-2 flex items-center justify-center transition-all flex-shrink-0 mt-0.5",
                   isChecked(option.id)
                     ? "bg-primary border-primary"
                     : "border-muted-foreground hover:border-primary"
@@ -82,15 +82,7 @@ export const SectionCarePreferences = ({ data = {}, onChange }: SectionCarePrefe
                 aria-label={option.label}
               >
                 {isChecked(option.id) && (
-                  <svg
-                    className="h-6 w-6 text-primary-foreground"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={3}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check className="h-6 w-6 text-primary-foreground" strokeWidth={3} />
                 )}
               </button>
               <input
@@ -99,7 +91,7 @@ export const SectionCarePreferences = ({ data = {}, onChange }: SectionCarePrefe
                 checked={isChecked(option.id)}
                 onChange={() => togglePreference(option.id)}
               />
-              <span className="text-foreground text-base leading-relaxed">{option.label}</span>
+              <span className="text-foreground text-base leading-relaxed pt-2">{option.label}</span>
             </label>
           ))}
         </div>
@@ -107,7 +99,7 @@ export const SectionCarePreferences = ({ data = {}, onChange }: SectionCarePrefe
 
       {/* Optional Notes Field */}
       <Card className="p-5">
-        <h3 className="text-lg font-medium text-foreground mb-3">Other preferences (optional)</h3>
+        <h3 className="text-lg font-medium text-foreground mb-3">Other care notes (optional)</h3>
         <Textarea
           value={data.additionalNotes || ""}
           onChange={(e) => onChange?.({ ...data, additionalNotes: e.target.value })}

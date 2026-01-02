@@ -1,9 +1,23 @@
 import { ProgressDot } from "./ProgressDot";
 import { cn } from "@/lib/utils";
-import { getSectionIcon } from "@/lib/sectionIcons";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { FileText, ClipboardList, User, Heart, Home as HomeIcon, Shield, Users, Dog, MessageSquare, BookOpen, HelpCircle } from "lucide-react";
+import { 
+  FileText, 
+  ClipboardList, 
+  User, 
+  Heart, 
+  Home as HomeIcon, 
+  Shield, 
+  Users, 
+  Dog, 
+  MessageSquare, 
+  BookOpen, 
+  HelpCircle,
+  Stethoscope,
+  Plane,
+  Printer
+} from "lucide-react";
 
 interface NavItem {
   id: string;
@@ -17,20 +31,32 @@ interface SidebarNavProps {
   onSectionChange: (section: string) => void;
 }
 
-// FINAL navigation order as specified - NO BROWSE MODE
-const NAV_SECTIONS = [
+// Navigation structure per spec
+const TOP_SECTIONS = [
+  { id: "home", label: "Home", icon: HomeIcon, route: "/dashboard" },
+  { id: "plansummary", label: "Your Plan Summary", icon: FileText, route: "/preplan-summary" },
+];
+
+const PREPLANNING_SECTIONS = [
   { id: "preplanning", label: "Pre-Planning Checklist", icon: ClipboardList },
-  { id: "personal", label: "About You", icon: User },
-  { id: "healthcare", label: "Medical & Care Preferences", icon: Heart },
+  { id: "healthcare", label: "Medical & Care Preferences", icon: Stethoscope },
+  { id: "advancedirective", label: "Advance Directive & DNR Status", icon: Heart },
+  { id: "travel", label: "Travel & Away-From-Home Plan", icon: Plane },
+];
+
+const WISHES_SECTIONS = [
   { id: "funeral", label: "Funeral Wishes", icon: Heart },
-  { id: "insurance", label: "Insurance", icon: Shield },
-  { id: "contacts", label: "Important Contacts", icon: Users },
-  { id: "property", label: "Property & Valuables", icon: HomeIcon },
-  { id: "pets", label: "Pets", icon: Dog },
   { id: "messages", label: "Messages to Loved Ones", icon: MessageSquare },
 ];
 
-const RESOURCE_SECTIONS = [
+const RECORDS_SECTIONS = [
+  { id: "contacts", label: "Important Contacts", icon: Users },
+  { id: "insurance", label: "Insurance", icon: Shield },
+  { id: "property", label: "Property & Valuables", icon: HomeIcon },
+  { id: "digital", label: "Online Accounts", icon: BookOpen },
+];
+
+const HELP_SECTIONS = [
   { id: "resources", label: "Resources", icon: BookOpen, route: "/resources" },
   { id: "faq", label: "FAQs", icon: HelpCircle, route: "/faq" },
 ];
@@ -43,20 +69,30 @@ export const SidebarNav = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  // Get completion status from items
   const getCompletionStatus = (sectionId: string) => {
     const item = items.find(i => i.id === sectionId);
     return item?.completed || false;
   };
 
-  const renderNavButton = (section: { id: string; label: string; icon: any }, showDot: boolean = true) => {
+  const renderNavButton = (
+    section: { id: string; label: string; icon: any; route?: string }, 
+    showDot: boolean = true
+  ) => {
     const Icon = section.icon;
     const completed = getCompletionStatus(section.id);
+    
+    const handleClick = () => {
+      if (section.route) {
+        navigate(section.route);
+      } else {
+        onSectionChange(section.id);
+      }
+    };
     
     return (
       <button
         key={section.id}
-        onClick={() => onSectionChange(section.id)}
+        onClick={handleClick}
         className={cn(
           "w-full flex items-center gap-3 px-4 py-3.5 text-base rounded-lg transition-all duration-200 text-left group",
           "hover:bg-accent/50",
@@ -70,44 +106,44 @@ export const SidebarNav = ({
           activeSection === section.id ? "text-primary" : "text-muted-foreground"
         )} />
         <span className="flex-1">{section.label}</span>
-        {showDot && <ProgressDot completed={completed} />}
+        {showDot && !section.route && <ProgressDot completed={completed} />}
       </button>
     );
   };
 
-  const renderResourceButton = (section: { id: string; label: string; icon: any; route: string }) => {
-    const Icon = section.icon;
-    
-    return (
-      <button
-        key={section.id}
-        onClick={() => navigate(section.route)}
-        className={cn(
-          "w-full flex items-center gap-3 px-4 py-3.5 text-base rounded-lg transition-all duration-200 text-left group",
-          "hover:bg-accent/50 text-foreground hover:text-foreground"
-        )}
-      >
-        <Icon className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
-        <span className="flex-1">{section.label}</span>
-      </button>
-    );
-  };
+  const renderSectionGroup = (
+    title: string, 
+    sections: { id: string; label: string; icon: any; route?: string }[],
+    showDots: boolean = true
+  ) => (
+    <div className="space-y-1">
+      <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-4">
+        {title}
+      </h4>
+      {sections.map(section => renderNavButton(section, showDots))}
+    </div>
+  );
 
   return (
     <nav className="space-y-1">
-      {/* Main Sections */}
-      {NAV_SECTIONS.map(section => renderNavButton(section))}
+      {/* Top Navigation */}
+      {TOP_SECTIONS.map(section => renderNavButton(section, false))}
 
-      {/* Divider */}
+      {/* Pre-Planning Area */}
       <hr className="my-4 border-border mx-4" />
+      {renderSectionGroup("Pre-Planning Area", PREPLANNING_SECTIONS)}
 
-      {/* Resources Section */}
-      <div className="space-y-1">
-        <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-4">
-          Help & Resources
-        </h4>
-        {RESOURCE_SECTIONS.map(section => renderResourceButton(section))}
-      </div>
+      {/* Your Wishes */}
+      <hr className="my-4 border-border mx-4" />
+      {renderSectionGroup("Your Wishes", WISHES_SECTIONS)}
+
+      {/* Important Records */}
+      <hr className="my-4 border-border mx-4" />
+      {renderSectionGroup("Important Records", RECORDS_SECTIONS)}
+
+      {/* Help & Education */}
+      <hr className="my-4 border-border mx-4" />
+      {renderSectionGroup("Help & Education", HELP_SECTIONS, false)}
 
       {/* Printable Copy - Primary Access */}
       <hr className="my-4 border-2 border-border mx-4" />
@@ -120,7 +156,7 @@ export const SidebarNav = ({
             "text-foreground font-medium"
           )}
         >
-          <FileText className="h-5 w-5 flex-shrink-0 text-primary" />
+          <Printer className="h-5 w-5 flex-shrink-0 text-primary" />
           <span className="flex-1">Printable Copy</span>
         </button>
         <p className="text-sm text-muted-foreground mt-2 px-4">
