@@ -214,38 +214,54 @@ const Resources = () => {
         </CardContent>
       </Card>
 
-      {/* After-Death Checklist */}
+      {/* After-Death Checklist - PDF-based for reliability */}
       <Card className="border-2 border-amber-500/20">
         <CardHeader>
           <div className="flex items-center gap-2 mb-2">
-            <span className="inline-block px-3 py-1 text-xs font-semibold bg-amber-500/10 text-amber-700 rounded-full">
+            <span className="inline-block px-3 py-1 text-sm font-semibold bg-amber-500/10 text-amber-700 rounded-full">
               📝 After a Loss
             </span>
           </div>
-          <CardTitle className="text-xl">After-Death Checklist</CardTitle>
-          <CardDescription className="text-base">
-            Essential steps and tasks for families after the loss of a loved one.
+          <CardTitle className="text-xl">After-Death Planner & Checklist</CardTitle>
+          <CardDescription className="text-base leading-relaxed">
+            This checklist guides loved ones step by step after a death. You can read it online, download it, or print it.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex justify-center mb-4">
+        <CardContent className="space-y-6">
+          {/* PDF Preview */}
+          <div className="w-full rounded-lg border border-border overflow-hidden bg-muted/30">
             <iframe 
-              src="https://gamma.app/embed/h13wkygxlos50w9" 
-              style={{ width: '700px', maxWidth: '100%', height: '450px' }}
-              allow="fullscreen" 
-              title="After-Death Checklist" 
-              className="rounded-lg border border-border" 
+              src="/guides/EFA-After-Death-Planner-and-Checklist.pdf"
+              style={{ width: '100%', height: '500px' }}
+              title="After-Death Planner & Checklist" 
+              className="w-full"
             />
           </div>
-          <a 
-            href="https://gamma.app/docs/After-Death-Planner-Checklist-h13wkygxlos50w9" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-primary hover:underline text-base font-medium"
-          >
-            <ExternalLink className="h-4 w-4" />
-            Open Full Checklist in New Tab
-          </a>
+          
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <a 
+              href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex-1"
+            >
+              <Button className="w-full min-h-[52px] text-base gap-2">
+                <Eye className="h-5 w-5" />
+                View or Print Checklist
+              </Button>
+            </a>
+            <a 
+              href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
+              download="After-Death-Planner-and-Checklist.pdf"
+              className="flex-1"
+            >
+              <Button variant="outline" className="w-full min-h-[52px] text-base gap-2">
+                <Download className="h-5 w-5" />
+                Download Printable Copy
+              </Button>
+            </a>
+          </div>
         </CardContent>
       </Card>
     </div>
