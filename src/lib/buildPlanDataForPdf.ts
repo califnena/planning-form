@@ -8,7 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
  * ensuring the PDF generator has everything it needs.
  */
 export async function buildPlanDataForPdf(userId: string): Promise<any> {
-  // Step 1: Get the user's active plan
+  // Step 1: Get the user's org membership or create one
+  let orgId: string | null = null;
+  
   const { data: orgMember } = await supabase
     .from("org_members")
     .select("org_id")
@@ -17,14 +19,19 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     .limit(1)
     .maybeSingle();
 
+  if (orgMember?.org_id) {
+    orgId = orgMember.org_id;
+  }
+
   let planId: string | null = null;
   let plan: any = null;
 
-  if (orgMember?.org_id) {
+  // Try to find existing plan
+  if (orgId) {
     const { data: existingPlan } = await supabase
       .from("plans")
       .select("*")
-      .eq("org_id", orgMember.org_id)
+      .eq("org_id", orgId)
       .eq("owner_user_id", userId)
       .order("updated_at", { ascending: false })
       .limit(1)
@@ -49,12 +56,56 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     if (fallbackPlan) {
       planId = fallbackPlan.id;
       plan = fallbackPlan;
+      orgId = fallbackPlan.org_id || orgId;
     }
   }
 
+  // CRITICAL: If no plan exists, CREATE one so PDF generation can proceed
   if (!planId || !plan) {
-    console.warn("[buildPlanDataForPdf] No plan found for user:", userId);
-    return createEmptyPlanData(userId);
+    console.log("[buildPlanDataForPdf] No plan found - creating default plan for user:", userId);
+    
+    // Create org if needed
+    if (!orgId) {
+      const { data: newOrg, error: orgError } = await supabase
+        .from("orgs")
+        .insert({ name: "Personal" })
+        .select("id")
+        .single();
+      
+      if (orgError) {
+        console.error("[buildPlanDataForPdf] Failed to create org:", orgError);
+        return createEmptyPlanData(userId);
+      }
+      orgId = newOrg.id;
+      
+      // Add user to org
+      await supabase.from("org_members").insert({
+        org_id: orgId,
+        user_id: userId,
+        role: "owner"
+      });
+    }
+    
+    // Create the plan
+    const { data: newPlan, error: planError } = await supabase
+      .from("plans")
+      .insert({
+        org_id: orgId,
+        owner_user_id: userId,
+        title: "My Final Wishes Plan",
+        plan_payload: {}
+      })
+      .select("*")
+      .single();
+    
+    if (planError) {
+      console.error("[buildPlanDataForPdf] Failed to create plan:", planError);
+      return createEmptyPlanData(userId);
+    }
+    
+    planId = newPlan.id;
+    plan = newPlan;
+    console.log("[buildPlanDataForPdf] Created new plan:", planId);
   }
 
   // Step 2: Fetch all related data in parallel
