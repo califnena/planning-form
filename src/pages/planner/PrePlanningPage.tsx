@@ -3,13 +3,12 @@ import { SectionPrePlanning } from "@/components/planner/sections/SectionPrePlan
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
 import { ViewDocumentButton } from "@/components/planner/ViewDocumentButton";
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 export default function PrePlanningPage() {
   const { user, saveState } = usePlanContext();
   const { toast } = useToast();
-  const [statuses, setStatuses] = useState<Record<string, "completed" | "not_started">>({});
+  const [statuses, setStatuses] = useState<Record<string, boolean>>({});
 
   // Load statuses from localStorage (persisted per user)
   useEffect(() => {
@@ -25,8 +24,8 @@ export default function PrePlanningPage() {
     }
   }, [user?.id]);
 
-  const handleStatusChange = (id: string, status: "completed" | "not_started") => {
-    const newStatuses = { ...statuses, [id]: status };
+  const handleStatusChange = (id: string, checked: boolean) => {
+    const newStatuses = { ...statuses, [id]: checked };
     setStatuses(newStatuses);
     
     // Persist to localStorage

@@ -30,19 +30,26 @@ export const SECTION_ROUTES: Record<string, string> = {
   preplanning: "/preplandashboard/pre-planning",
 };
 
-// Section labels for display
+// Section labels for display - FINAL senior-friendly naming
 export const SECTION_LABELS: Record<string, string> = {
-  personal: "Personal & Family Details",
-  contacts: "Important Contacts",
+  preplanning: "Pre-Planning Checklist",
+  personal: "About You",
+  healthcare: "Medical & Care Preferences",
+  carepreferences: "Care Preferences",
   funeral: "Funeral Wishes",
+  insurance: "Insurance",
+  contacts: "Important Contacts",
+  property: "Property & Valuables",
+  pets: "Pets",
+  messages: "Messages to Loved Ones",
+  resources: "Resources",
+  faq: "FAQs",
+  printableplan: "My Printable Plan",
+  // Legacy section IDs for backwards compatibility
   legacy: "Life Story & Legacy",
   legal: "Legal Documents",
   financial: "Financial Life",
-  insurance: "Insurance Overview",
-  property: "Property & Valuables",
-  pets: "Pet Care",
   digital: "Digital Accounts",
-  messages: "Messages to Loved Ones",
   preferences: "Preferences",
   overview: "Overview",
   checklist: "Checklist",
@@ -50,9 +57,6 @@ export const SECTION_LABELS: Record<string, string> = {
   willprep: "Will Preparation",
   providers: "Service Providers",
   instructions: "Instructions",
-  healthcare: "Medical Information",
-  carepreferences: "Care Preferences",
-  preplanning: "Pre-Planning Checklist",
 };
 
 /**
