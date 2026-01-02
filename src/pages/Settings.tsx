@@ -5,13 +5,15 @@ import { TextSizeToggle } from '@/components/TextSizeToggle';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Globe } from 'lucide-react';
+import { ArrowLeft, Globe, Volume2, Mic } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { ShareLinksManager } from '@/components/sharing/ShareLinksManager';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useTextSize, TextSizePreset } from '@/contexts/TextSizeContext';
+import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Switch } from '@/components/ui/switch';
 
 // Text size preset selector component
 const TextSizePresetSelector = () => {
@@ -40,6 +42,19 @@ const TextSizePresetSelector = () => {
         ))}
       </div>
     </RadioGroup>
+  );
+};
+
+// Voice-Friendly Mode Toggle Component
+const VoiceFriendlyToggle = () => {
+  const { voiceFriendlyMode, toggleVoiceFriendlyMode } = useAccessibility();
+  
+  return (
+    <Switch
+      checked={voiceFriendlyMode}
+      onCheckedChange={toggleVoiceFriendlyMode}
+      className="data-[state=checked]:bg-primary"
+    />
   );
 };
 
@@ -162,6 +177,27 @@ const Settings = () => {
 
           <TabsContent value="accessibility" className="space-y-4">
             <div className="bg-card border rounded-lg p-6 space-y-6">
+              {/* Voice-Friendly Mode - PROMINENT */}
+              <div className="border-2 border-primary/20 rounded-lg p-4 bg-primary/5">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Volume2 className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <Label className="text-base font-semibold cursor-pointer">
+                        Voice-friendly mode
+                      </Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Read instructions aloud and speak instead of typing. 
+                        Reduces eye strain and makes planning easier.
+                      </p>
+                    </div>
+                  </div>
+                  <VoiceFriendlyToggle />
+                </div>
+              </div>
+
               {/* Language Section */}
               <div>
                 <div className="flex items-center gap-2 mb-2">

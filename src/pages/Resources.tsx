@@ -12,6 +12,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { ResourcesDownloadSection } from '@/components/resources/ResourcesDownloadSection';
 import { ResourcesSidebar } from '@/components/resources/ResourcesSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ErrorPanel } from '@/components/ui/ErrorPanel';
 import { cn } from '@/lib/utils';
 
 const Resources = () => {
@@ -87,7 +88,7 @@ const Resources = () => {
     }
   };
 
-  // Planning Guides Section
+  // Planning Guides Section - Using PDF with fallback instead of Gamma embeds
   const renderPlanningGuides = () => (
     <div className="space-y-8">
       <div>
@@ -97,73 +98,106 @@ const Resources = () => {
         </p>
       </div>
 
-      {/* Pre-Planning Guide */}
+      {/* Pre-Planning Guide - PDF-based for reliability */}
       <Card className="border-2 border-primary/20">
         <CardHeader>
           <div className="flex items-center gap-2 mb-2">
-            <span className="inline-block px-3 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full">
+            <span className="inline-block px-3 py-1 text-sm font-semibold bg-primary/10 text-primary rounded-full">
               📋 Pre-Planning
             </span>
           </div>
           <CardTitle className="text-xl">Pre-Planning Guide</CardTitle>
-          <CardDescription className="text-base">
-            A comprehensive guide to help you plan ahead and give your family peace of mind.
+          <CardDescription className="text-base leading-relaxed">
+            A comprehensive guide to help you plan ahead and give your family peace of mind. 
+            You can read it online, download it, or print it.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex justify-center mb-4">
+        <CardContent className="space-y-6">
+          {/* PDF Preview */}
+          <div className="w-full rounded-lg border border-border overflow-hidden bg-muted/30">
             <iframe 
-              src="https://gamma.app/embed/om4wcs6irh1s18e" 
-              style={{ width: '700px', maxWidth: '100%', height: '450px' }}
-              allow="fullscreen" 
+              src="/guides/Pre-Planning-Guide.pdf"
+              style={{ width: '100%', height: '500px' }}
               title="Pre-Planning Guide" 
-              className="rounded-lg border border-border" 
+              className="w-full"
             />
           </div>
-          <a 
-            href="https://gamma.app/docs/om4wcs6irh1s18e" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-primary hover:underline text-base font-medium"
-          >
-            <ExternalLink className="h-4 w-4" />
-            Open Full Guide in New Tab
-          </a>
+          
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <a 
+              href="/guides/Pre-Planning-Guide.pdf" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex-1"
+            >
+              <Button className="w-full min-h-[52px] text-base gap-2">
+                <Eye className="h-5 w-5" />
+                View or Print Guide
+              </Button>
+            </a>
+            <a 
+              href="/guides/Pre-Planning-Guide.pdf" 
+              download="Pre-Planning-Guide.pdf"
+              className="flex-1"
+            >
+              <Button variant="outline" className="w-full min-h-[52px] text-base gap-2">
+                <Download className="h-5 w-5" />
+                Download Printable Copy
+              </Button>
+            </a>
+          </div>
         </CardContent>
       </Card>
 
-      {/* When Death Happens Guide */}
+      {/* When Death Happens Guide - PDF-based for reliability */}
       <Card className="border-2 border-amber-500/20">
         <CardHeader>
           <div className="flex items-center gap-2 mb-2">
-            <span className="inline-block px-3 py-1 text-xs font-semibold bg-amber-500/10 text-amber-700 rounded-full">
+            <span className="inline-block px-3 py-1 text-sm font-semibold bg-amber-500/10 text-amber-700 rounded-full">
               🕊️ After a Loss
             </span>
           </div>
           <CardTitle className="text-xl">When Death Happens: After-Death Planner Guide</CardTitle>
-          <CardDescription className="text-base">
+          <CardDescription className="text-base leading-relaxed">
             Step-by-step guidance for families navigating the first days and weeks after losing a loved one.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex justify-center mb-4">
+        <CardContent className="space-y-6">
+          {/* PDF Preview */}
+          <div className="w-full rounded-lg border border-border overflow-hidden bg-muted/30">
             <iframe 
-              src="https://gamma.app/embed/13licam9flg6gcq" 
-              style={{ width: '700px', maxWidth: '100%', height: '450px' }}
-              allow="fullscreen" 
+              src="/guides/Everlasting-Funeral-Advisors-Guide.pdf"
+              style={{ width: '100%', height: '500px' }}
               title="After-Death Planner Guide" 
-              className="rounded-lg border border-border" 
+              className="w-full"
             />
           </div>
-          <a 
-            href="https://gamma.app/docs/13licam9flg6gcq" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-primary hover:underline text-base font-medium"
-          >
-            <ExternalLink className="h-4 w-4" />
-            Open Full Guide in New Tab
-          </a>
+          
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <a 
+              href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex-1"
+            >
+              <Button className="w-full min-h-[52px] text-base gap-2">
+                <Eye className="h-5 w-5" />
+                View or Print Guide
+              </Button>
+            </a>
+            <a 
+              href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" 
+              download="After-Death-Planner-Guide.pdf"
+              className="flex-1"
+            >
+              <Button variant="outline" className="w-full min-h-[52px] text-base gap-2">
+                <Download className="h-5 w-5" />
+                Download Printable Copy
+              </Button>
+            </a>
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -179,38 +213,55 @@ const Resources = () => {
         </p>
       </div>
 
-      {/* Pre-Planning Checklist */}
+      {/* Pre-Planning Checklist - PDF-based for reliability */}
       <Card className="border-2 border-primary/20">
         <CardHeader>
           <div className="flex items-center gap-2 mb-2">
-            <span className="inline-block px-3 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full">
+            <span className="inline-block px-3 py-1 text-sm font-semibold bg-primary/10 text-primary rounded-full">
               ✅ Pre-Planning
             </span>
           </div>
           <CardTitle className="text-xl">Pre-Planning Checklist</CardTitle>
-          <CardDescription className="text-base">
-            Everything you need to prepare ahead of time for peace of mind.
+          <CardDescription className="text-base leading-relaxed">
+            Everything you need to prepare ahead of time for peace of mind. 
+            You can read it online, download it, or print it.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex justify-center mb-4">
+        <CardContent className="space-y-6">
+          {/* PDF Preview */}
+          <div className="w-full rounded-lg border border-border overflow-hidden bg-muted/30">
             <iframe 
-              src="https://gamma.app/embed/plsn9a9j7cvzdh5" 
-              style={{ width: '700px', maxWidth: '100%', height: '450px' }}
-              allow="fullscreen" 
+              src="/guides/EFA-Pre-Planning-Checklist.pdf"
+              style={{ width: '100%', height: '500px' }}
               title="Pre-Planning Checklist" 
-              className="rounded-lg border border-border" 
+              className="w-full"
             />
           </div>
-          <a 
-            href="https://gamma.app/docs/plsn9a9j7cvzdh5" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-primary hover:underline text-base font-medium"
-          >
-            <ExternalLink className="h-4 w-4" />
-            Open Full Checklist in New Tab
-          </a>
+          
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <a 
+              href="/guides/EFA-Pre-Planning-Checklist.pdf" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex-1"
+            >
+              <Button className="w-full min-h-[52px] text-base gap-2">
+                <Eye className="h-5 w-5" />
+                View or Print Checklist
+              </Button>
+            </a>
+            <a 
+              href="/guides/EFA-Pre-Planning-Checklist.pdf" 
+              download="Pre-Planning-Checklist.pdf"
+              className="flex-1"
+            >
+              <Button variant="outline" className="w-full min-h-[52px] text-base gap-2">
+                <Download className="h-5 w-5" />
+                Download Printable Copy
+              </Button>
+            </a>
+          </div>
         </CardContent>
       </Card>
 

@@ -7,6 +7,8 @@ interface AccessibilityContextType {
   toggleHighContrastMode: () => void;
   reducedMotion: boolean;
   toggleReducedMotion: () => void;
+  voiceFriendlyMode: boolean;
+  toggleVoiceFriendlyMode: () => void;
 }
 
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
@@ -24,6 +26,11 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const [reducedMotion, setReducedMotion] = useState<boolean>(() => {
     const stored = localStorage.getItem('efa-reduced-motion');
+    return stored === 'true';
+  });
+
+  const [voiceFriendlyMode, setVoiceFriendlyMode] = useState<boolean>(() => {
+    const stored = localStorage.getItem('efa-voice-friendly');
     return stored === 'true';
   });
 
@@ -53,6 +60,12 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.setItem('efa-reduced-motion', newValue.toString());
   };
 
+  const toggleVoiceFriendlyMode = () => {
+    const newValue = !voiceFriendlyMode;
+    setVoiceFriendlyMode(newValue);
+    localStorage.setItem('efa-voice-friendly', newValue.toString());
+  };
+
   useEffect(() => {
     // Apply super-senior mode class to html element
     if (superSeniorMode) {
@@ -80,6 +93,15 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [reducedMotion]);
 
+  useEffect(() => {
+    // Apply voice-friendly class to html element
+    if (voiceFriendlyMode) {
+      document.documentElement.classList.add('voice-friendly-mode');
+    } else {
+      document.documentElement.classList.remove('voice-friendly-mode');
+    }
+  }, [voiceFriendlyMode]);
+
   return (
     <AccessibilityContext.Provider
       value={{
@@ -89,6 +111,8 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
         toggleHighContrastMode,
         reducedMotion,
         toggleReducedMotion,
+        voiceFriendlyMode,
+        toggleVoiceFriendlyMode,
       }}
     >
       {children}
