@@ -113,7 +113,7 @@ export const SidebarNav = ({
       <hr className="my-4 border-2 border-border mx-4" />
       <div className="px-2">
         <button
-          onClick={() => navigate("/plan-summary")}
+          onClick={() => navigate("/preplan-summary")}
           className={cn(
             "w-full flex items-center gap-3 px-4 py-4 text-base rounded-lg transition-all duration-200 text-left group",
             "bg-primary/10 hover:bg-primary/20 border-2 border-primary/30",
