@@ -82,6 +82,10 @@ export default function PrePlanSummary() {
   const [personalNotes, setPersonalNotes] = useState("");
   const [notesSaving, setNotesSaving] = useState(false);
   
+  // State for PDF fallback handling
+  const [lastPdfUrl, setLastPdfUrl] = useState<string | null>(null);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+  
   const loading = planLoading || dataLoading;
 
   // Load personal notes from localStorage
@@ -283,6 +287,12 @@ export default function PrePlanSummary() {
 
   const handleDownloadPDF = async () => {
     setGeneratingPdf(true);
+    setPdfError(null);
+
+    // Dev logging
+    if (import.meta.env.DEV) {
+      console.log("[PrePlanSummary] Starting printable copy generation...");
+    }
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -309,10 +319,19 @@ export default function PrePlanSummary() {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        if (import.meta.env.DEV) {
+          console.error("[PrePlanSummary] Edge function error:", error);
+        }
+        throw error;
+      }
 
       if (!pdfData?.pdfBase64) {
-        throw new Error("PDF generation returned no data");
+        throw new Error("Printable copy generation returned no data");
+      }
+
+      if (import.meta.env.DEV) {
+        console.log("[PrePlanSummary] Successfully received PDF data");
       }
 
       const byteCharacters = atob(pdfData.pdfBase64);
@@ -324,22 +343,54 @@ export default function PrePlanSummary() {
       const blob = new Blob([byteArray], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
 
-      // Open PDF in new tab for immediate viewing/printing
-      window.open(url, "_blank", "noopener,noreferrer");
+      // Store URL for fallback access
+      setLastPdfUrl(url);
 
-      toast({
-        title: "Document Ready",
-        description: "Your planning document opened in a new tab. You can save or print from there.",
-      });
+      // Try to open in new tab
+      const newWindow = window.open(url, "_blank", "noopener,noreferrer");
+
+      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+        // Pop-up was blocked - show fallback UI
+        setPdfError("popup_blocked");
+        toast({
+          title: "Your printable copy is ready",
+          description: "Use the buttons below to open or download your document.",
+        });
+      } else {
+        toast({
+          title: "Your printable copy is ready",
+          description: "It opened in a new tab. You can save or print from there.",
+        });
+      }
     } catch (error) {
       console.error("Error generating document:", error);
+      setPdfError("generation_failed");
       toast({
         title: "Something didn't work",
-        description: "Something didn't work. Please try again. Or call us for help.",
+        description: "Please try again. If the problem continues, call us for help.",
         variant: "destructive",
       });
     } finally {
       setGeneratingPdf(false);
+    }
+  };
+
+  // Download PDF directly
+  const handleDownloadDirectly = () => {
+    if (lastPdfUrl) {
+      const link = document.createElement('a');
+      link.href = lastPdfUrl;
+      link.download = 'My-Planning-Document.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  // Open PDF in new tab (for retry)
+  const handleOpenPdf = () => {
+    if (lastPdfUrl) {
+      window.open(lastPdfUrl, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -413,15 +464,77 @@ export default function PrePlanSummary() {
             {generatingPdf ? (
               <>
                 <Loader2 className="h-5 w-5 animate-spin" />
-                Creating Document...
+                Creating Your Printable Copy...
               </>
             ) : (
               <>
                 <Download className="h-5 w-5" />
-                View or Print My Planning Document
+                Printable Copy
               </>
             )}
           </Button>
+          <p className="text-sm text-muted-foreground text-center">
+            You can print or save your plan anytime.
+          </p>
+          
+          {/* Fallback buttons when popup blocked or PDF ready */}
+          {pdfError === "popup_blocked" && lastPdfUrl && (
+            <Card className="p-4 bg-amber-50 border-amber-200">
+              <p className="text-foreground font-medium mb-3">
+                Your printable copy is ready.
+              </p>
+              <p className="text-sm text-muted-foreground mb-4">
+                We could not open it automatically. Use the buttons below.
+              </p>
+              <div className="space-y-2">
+                <Button 
+                  onClick={handleOpenPdf}
+                  className="w-full h-12"
+                >
+                  Open Printable Copy
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={handleDownloadDirectly}
+                  className="w-full h-12"
+                >
+                  Download Printable Copy
+                </Button>
+              </div>
+            </Card>
+          )}
+
+          {/* Error state with call for help */}
+          {pdfError === "generation_failed" && (
+            <Card className="p-4 bg-destructive/10 border-destructive/30">
+              <p className="text-foreground font-medium mb-2">
+                Something didn't work. Please try again.
+              </p>
+              <p className="text-sm text-muted-foreground mb-4">
+                If the problem continues, we're here to help.
+              </p>
+              <Button 
+                variant="outline"
+                onClick={() => window.location.href = "tel:+18005551234"}
+                className="w-full h-12"
+              >
+                Call Us for Help
+              </Button>
+            </Card>
+          )}
+
+          {/* Most Recent Printable Copy link */}
+          {lastPdfUrl && !pdfError && (
+            <div className="text-center">
+              <Button 
+                variant="link" 
+                onClick={handleOpenPdf}
+                className="text-primary underline"
+              >
+                Open Most Recent Printable Copy
+              </Button>
+            </div>
+          )}
           
           {/* Share with Family - secondary action, visually grouped */}
           <Button 

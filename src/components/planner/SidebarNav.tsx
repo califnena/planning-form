@@ -109,7 +109,7 @@ export const SidebarNav = ({
         {RESOURCE_SECTIONS.map(section => renderResourceButton(section))}
       </div>
 
-      {/* My Printable Plan - Primary Access */}
+      {/* Printable Copy - Primary Access */}
       <hr className="my-4 border-2 border-border mx-4" />
       <div className="px-2">
         <button
@@ -121,8 +121,11 @@ export const SidebarNav = ({
           )}
         >
           <FileText className="h-5 w-5 flex-shrink-0 text-primary" />
-          <span className="flex-1">My Printable Plan</span>
+          <span className="flex-1">Printable Copy</span>
         </button>
+        <p className="text-sm text-muted-foreground mt-2 px-4">
+          You can print or save your plan anytime.
+        </p>
       </div>
     </nav>
   );
