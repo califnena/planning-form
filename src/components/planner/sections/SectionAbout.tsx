@@ -20,8 +20,8 @@ export const SectionAbout = ({ value, onChange }: SectionAboutProps) => {
   const handleSave = () => {
     if (isPreviewMode) {
       toast({
-        title: "Preview Mode",
-        description: "Editing is locked. Start a trial to unlock.",
+        title: "Read-Only Mode",
+        description: "Subscribe to edit and save your plan.",
         variant: "destructive",
       });
       return;

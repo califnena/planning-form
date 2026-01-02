@@ -36,8 +36,8 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
   const handleSave = () => {
     if (isPreviewMode) {
       toast({
-        title: "Preview Mode",
-        description: "Editing is locked. Start a trial to unlock.",
+        title: "Read-Only Mode",
+        description: "Subscribe to edit and save your plan.",
         variant: "destructive",
       });
       return;
@@ -53,8 +53,8 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold mb-2">{t("personal.title")}</h2>
-          <p className="text-muted-foreground">{t("personal.description")}</p>
-          <p className="text-xs text-primary mt-1">✓ Auto-saves as you type</p>
+          <p className="text-muted-foreground leading-relaxed">{t("personal.description")}</p>
+          <p className="text-sm text-primary mt-1">✓ Auto-saves as you type</p>
         </div>
         <TooltipProvider>
           <Tooltip>
@@ -73,20 +73,21 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
       <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-950/20 mb-4">
         <Shield className="h-5 w-5 text-blue-600" />
-        <AlertTitle className="text-blue-900 dark:text-blue-100 font-semibold text-sm">
-          Privacy Protected: Sensitive Information Not Saved
+        <AlertTitle className="text-blue-900 dark:text-blue-100 font-semibold text-base">
+          Privacy Protected
         </AlertTitle>
-        <AlertDescription className="text-blue-800 dark:text-blue-200 text-xs mt-1">
-          For your security, <strong>we do NOT save</strong> sensitive details like SSN, DOB, addresses, or phone numbers. 
-          You'll re-enter this information only when generating your PDF. It's only used for printing and never stored.
+        <AlertDescription className="text-blue-800 dark:text-blue-200 text-sm mt-1 leading-relaxed">
+          For your privacy, we do not save Social Security numbers, date of birth, or full address. 
+          If you want them included on your printable copy, you can type them when you create your document. 
+          You can also skip and handwrite them later.
         </AlertDescription>
       </Alert>
 
       <PreviewModeWrapper>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="full_name">{t("personal.fullName")}</Label>
-          <p className="text-xs text-muted-foreground">{t("personal.fullNameHelp")}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{t("personal.fullNameHelp")}</p>
           <Input
             id="full_name"
             value={profile.full_name || ""}
@@ -97,7 +98,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
         <div className="space-y-2">
           <Label htmlFor="nicknames">{t("personal.nicknames")}</Label>
-          <p className="text-xs text-muted-foreground">{t("personal.nicknamesHelp")}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{t("personal.nicknamesHelp")}</p>
           <Input
             id="nicknames"
             value={profile.nicknames || ""}
@@ -108,7 +109,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
         <div className="space-y-2">
           <Label htmlFor="maiden_name">{t("personal.maidenName")}</Label>
-          <p className="text-xs text-muted-foreground">{t("personal.maidenNameHelp")}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{t("personal.maidenNameHelp")}</p>
           <Input
             id="maiden_name"
             value={profile.maiden_name || ""}
@@ -117,20 +118,8 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="dob">{t("personal.dob")}</Label>
-          <p className="text-xs text-muted-foreground">{t("personal.dobHelp")}</p>
-          <Input
-            id="dob"
-            type="date"
-            value={profile.dob || ""}
-            onChange={(e) => updateProfile("dob", e.target.value)}
-            max={new Date().toISOString().split('T')[0]}
-          />
-        </div>
-
-        <div className="space-y-2">
           <Label htmlFor="birthplace">{t("personal.birthplace")}</Label>
-          <p className="text-xs text-muted-foreground">{t("personal.birthplaceHelp")}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{t("personal.birthplaceHelp")}</p>
           <Input
             id="birthplace"
             value={profile.birthplace || ""}
@@ -140,19 +129,8 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="ssn">{t("personal.ssn")}</Label>
-          <p className="text-xs text-muted-foreground">{t("personal.ssnHelp")}</p>
-          <Input
-            id="ssn"
-            value={profile.ssn || ""}
-            onChange={(e) => updateProfile("ssn", e.target.value)}
-            placeholder={t("personal.ssnPlaceholder")}
-          />
-        </div>
-
-        <div className="space-y-2">
           <Label htmlFor="citizenship">{t("personal.citizenship")}</Label>
-          <p className="text-xs text-muted-foreground">{t("personal.citizenshipHelp")}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{t("personal.citizenshipHelp")}</p>
           <Input
             id="citizenship"
             value={profile.citizenship || ""}
@@ -161,19 +139,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="address">{t("personal.address")}</Label>
-        <p className="text-xs text-muted-foreground">{t("personal.addressHelp")}</p>
-        <Textarea
-          id="address"
-          value={profile.address || ""}
-          onChange={(e) => updateProfile("address", e.target.value)}
-          placeholder={t("personal.addressPlaceholder")}
-          rows={3}
-        />
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="marital_status">{t("personal.maritalStatus")}</Label>
           <Input
@@ -204,7 +170,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
       <div className="border-t pt-6">
         <h3 className="text-lg font-semibold mb-4">Spouse/Partner Information</h3>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="partner_name">{t("personal.partnerName")}</Label>
             <Input
@@ -239,7 +205,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
       <div className="border-t pt-6">
         <h3 className="text-lg font-semibold mb-4">Father's Information</h3>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="father_name">{t("personal.fatherName")}</Label>
             <Input
@@ -274,7 +240,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
       <div className="border-t pt-6">
         <h3 className="text-lg font-semibold mb-4">Mother's Information</h3>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="mother_name">{t("personal.motherName")}</Label>
             <Input
@@ -377,7 +343,7 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
       <div className="border-t pt-6">
         <h3 className="text-lg font-semibold mb-4">{t("personal.militaryService")}</h3>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="vet_branch">{t("personal.vetBranch")}</Label>
             <Input

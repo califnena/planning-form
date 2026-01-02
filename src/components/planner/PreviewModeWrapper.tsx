@@ -6,7 +6,7 @@ interface PreviewModeWrapperProps {
 }
 
 /**
- * Wraps section content and automatically disables all inputs when in preview mode
+ * Wraps section content and automatically disables all inputs when in read-only mode
  */
 export function PreviewModeWrapper({ children }: PreviewModeWrapperProps) {
   const { isPreviewMode } = usePreviewMode();
@@ -15,13 +15,13 @@ export function PreviewModeWrapper({ children }: PreviewModeWrapperProps) {
     return <>{children}</>;
   }
 
-  // When in preview mode, wrap in a div that intercepts pointer events
+  // When in read-only mode, wrap in a div that intercepts pointer events
   return (
     <div className="relative">
       <div className="pointer-events-none opacity-60">
         {children}
       </div>
-      <div className="absolute inset-0 cursor-not-allowed" title="Available with subscription. You're in Preview Mode." />
+      <div className="absolute inset-0 cursor-not-allowed" title="Read-only until you subscribe." />
     </div>
   );
 }

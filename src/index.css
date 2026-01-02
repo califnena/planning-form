@@ -129,7 +129,51 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground text-base leading-relaxed;
+  }
+
+  /* Senior-friendly typography defaults */
+  p, li, span {
+    @apply leading-relaxed;
+  }
+
+  /* Minimum readable text - avoid text-xs for body content */
+  .text-xs {
+    font-size: 0.875rem; /* Override text-xs to be at least text-sm (14px) */
+    line-height: 1.5;
+  }
+
+  /* Ensure labels are readable */
+  label {
+    @apply text-base font-medium;
+  }
+
+  /* Helper text minimum size */
+  .text-muted-foreground {
+    @apply text-sm leading-relaxed;
+  }
+
+  /* Section headings */
+  h1 {
+    @apply text-2xl font-bold;
+  }
+
+  h2 {
+    @apply text-xl font-semibold;
+  }
+
+  h3 {
+    @apply text-lg font-semibold;
+  }
+
+  /* Touch-friendly minimum button/link sizes */
+  button, a {
+    min-height: 44px;
+  }
+  
+  /* Exception for inline links */
+  p a, li a, span a {
+    min-height: auto;
   }
 
   /* Global text size classes */

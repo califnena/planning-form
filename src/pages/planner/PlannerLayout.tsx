@@ -261,8 +261,8 @@ export default function PlannerLayout() {
   const handlePreviewPDF = () => {
     if (isPreviewMode) {
       toast({
-        title: "Preview Mode",
-        description: "PDF export is locked. Start a trial to unlock.",
+        title: "Read-Only Mode",
+        description: "Subscribe to create your printable copy.",
         variant: "destructive",
       });
       return;
@@ -274,8 +274,8 @@ export default function PlannerLayout() {
   const handleDownloadPDF = () => {
     if (isPreviewMode) {
       toast({
-        title: "Preview Mode",
-        description: "PDF export is locked. Start a trial to unlock.",
+        title: "Read-Only Mode",
+        description: "Subscribe to create your printable copy.",
         variant: "destructive",
       });
       return;
@@ -287,8 +287,8 @@ export default function PlannerLayout() {
   const handleDownloadManualForm = () => {
     if (isPreviewMode) {
       toast({
-        title: "Preview Mode",
-        description: "PDF export is locked. Start a trial to unlock.",
+        title: "Read-Only Mode",
+        description: "Subscribe to create your printable copy.",
         variant: "destructive",
       });
       return;
@@ -297,14 +297,14 @@ export default function PlannerLayout() {
       const pdf = generateManuallyFillablePDF(plan);
       pdf.save(`My-Final-Wishes-Blank-Form-${new Date().toISOString().split('T')[0]}.pdf`);
       toast({
-        title: "Blank Form Downloaded",
-        description: "Printable blank form ready for handwriting.",
+        title: "Printable Form Downloaded",
+        description: "Blank form ready for handwriting.",
       });
     } catch (error) {
       console.error("Error generating manual form:", error);
       toast({
         title: "Error",
-        description: "Failed to generate manual form. Please try again.",
+        description: "Failed to create printable form. Please try again.",
         variant: "destructive",
       });
     }
@@ -313,8 +313,8 @@ export default function PlannerLayout() {
   const handleEmailPlan = () => {
     if (isPreviewMode) {
       toast({
-        title: "Preview Mode",
-        description: "Email export is locked. Start a trial to unlock.",
+        title: "Read-Only Mode",
+        description: "Subscribe to email your plan.",
         variant: "destructive",
       });
       return;

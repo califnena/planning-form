@@ -67,19 +67,20 @@ export const PIICollectionDialog = ({ open, onOpenChange, onSubmit }: PIICollect
         <DialogHeader>
           <div className="flex items-center gap-2">
             <Shield className="h-6 w-6 text-primary" />
-            <DialogTitle className="text-xl">Add Sensitive Information for Your Document</DialogTitle>
+            <DialogTitle className="text-xl">Add Information for Your Printable Copy</DialogTitle>
           </div>
           <DialogDescription className="space-y-3 pt-2">
             <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
               <AlertTriangle className="h-4 w-4 text-amber-600" />
-              <AlertDescription className="text-amber-900 dark:text-amber-100 text-sm">
-                <strong>This information will NOT be saved.</strong> It's only used to create your document. 
-                You'll need to re-enter it next time.
+              <AlertDescription className="text-amber-900 dark:text-amber-100 text-sm leading-relaxed">
+                <strong>For your privacy, we do not save</strong> Social Security numbers, date of birth, or full address. 
+                If you want them included on your printable copy, you can type them here. 
+                You can also skip and handwrite them later.
               </AlertDescription>
             </Alert>
-            <p className="text-sm">
-              Enter any sensitive details you want included in your document. All fields are optional - 
-              leave blank any information you don't want to include.
+            <p className="text-sm leading-relaxed">
+              Enter any details you want included in your printable copy. All fields are optional - 
+              skip any you don't want to include.
             </p>
           </DialogDescription>
         </DialogHeader>
@@ -222,12 +223,12 @@ export const PIICollectionDialog = ({ open, onOpenChange, onSubmit }: PIICollect
           </div>
         </ScrollArea>
 
-        <DialogFooter className="flex-col sm:flex-row gap-2">
-          <Button variant="outline" onClick={handleSkip} className="w-full sm:w-auto">
-            Skip - Generate Without Sensitive Info
+        <DialogFooter className="flex-col sm:flex-row gap-3 pt-4">
+          <Button variant="outline" onClick={handleSkip} className="w-full sm:w-auto min-h-[48px]">
+            Skip - I'll handwrite these later
           </Button>
-          <Button onClick={handleSubmit} className="w-full sm:w-auto">
-            Create My Document
+          <Button onClick={handleSubmit} className="w-full sm:w-auto min-h-[48px]">
+            Create My Printable Copy
           </Button>
         </DialogFooter>
       </DialogContent>
