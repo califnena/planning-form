@@ -97,6 +97,8 @@ import {
   PrePlanningPage,
   HealthCarePage,
   CarePreferencesPage,
+  AdvanceDirectivePage,
+  TravelPlanningPage,
 } from "./pages/planner";
 
 const queryClient = new QueryClient();
@@ -135,26 +137,28 @@ const App = () => (
                       {/* New nested planner routes */}
                       <Route path="/preplandashboard" element={<PlannerLayout />}>
                         <Route index element={<Navigate to="/preplandashboard/preferences" replace />} />
-                        <Route path="preferences" element={<PreferencesPage />} />
-                        <Route path="overview" element={<OverviewPage />} />
-                        <Route path="pre-planning" element={<PrePlanningPage />} />
-                        <Route path="health-care" element={<HealthCarePage />} />
-                        <Route path="care-preferences" element={<CarePreferencesPage />} />
-                        <Route path="personal-family" element={<PersonalFamilyPage />} />
-                        <Route path="life-story" element={<LifeStoryPage />} />
-                        <Route path="funeral-wishes" element={<FuneralWishesPage />} />
-                        <Route path="financial-life" element={<FinancialLifePage />} />
-                        <Route path="property-valuables" element={<PropertyValuablesPage />} />
-                        <Route path="legal-docs" element={<LegalDocsPage />} />
-                        <Route path="insurance" element={<InsurancePage />} />
-                        <Route path="pets" element={<PetsPage />} />
-                        <Route path="digital" element={<DigitalPage />} />
-                        <Route path="messages" element={<MessagesPage />} />
-                        <Route path="contacts" element={<ContactsPage />} />
-                        <Route path="providers" element={<ProvidersPage />} />
-                        <Route path="checklist" element={<ChecklistPage />} />
-                        <Route path="instructions" element={<InstructionsPage />} />
-                        <Route path="legalresources" element={<LegalResourcesPage />} />
+                      <Route path="preferences" element={<PreferencesPage />} />
+                      <Route path="overview" element={<OverviewPage />} />
+                      <Route path="pre-planning" element={<PrePlanningPage />} />
+                      <Route path="health-care" element={<HealthCarePage />} />
+                      <Route path="care-preferences" element={<CarePreferencesPage />} />
+                      <Route path="advance-directive" element={<AdvanceDirectivePage />} />
+                      <Route path="travel-planning" element={<TravelPlanningPage />} />
+                      <Route path="personal-family" element={<PersonalFamilyPage />} />
+                      <Route path="life-story" element={<LifeStoryPage />} />
+                      <Route path="funeral-wishes" element={<FuneralWishesPage />} />
+                      <Route path="financial-life" element={<FinancialLifePage />} />
+                      <Route path="property-valuables" element={<PropertyValuablesPage />} />
+                      <Route path="legal-docs" element={<LegalDocsPage />} />
+                      <Route path="insurance" element={<InsurancePage />} />
+                      <Route path="pets" element={<PetsPage />} />
+                      <Route path="digital" element={<DigitalPage />} />
+                      <Route path="messages" element={<MessagesPage />} />
+                      <Route path="contacts" element={<ContactsPage />} />
+                      <Route path="providers" element={<ProvidersPage />} />
+                      <Route path="checklist" element={<ChecklistPage />} />
+                      <Route path="instructions" element={<InstructionsPage />} />
+                      <Route path="legalresources" element={<LegalResourcesPage />} />
                         <Route path="willprep" element={<WillPrepPage />} />
                       </Route>
                       

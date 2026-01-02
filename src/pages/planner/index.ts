@@ -21,3 +21,5 @@ export { default as WillPrepPage } from "./WillPrepPage";
 export { default as PrePlanningPage } from "./PrePlanningPage";
 export { default as HealthCarePage } from "./HealthCarePage";
 export { default as CarePreferencesPage } from "./CarePreferencesPage";
+export { default as AdvanceDirectivePage } from "./AdvanceDirectivePage";
+export { default as TravelPlanningPage } from "./TravelPlanningPage";
