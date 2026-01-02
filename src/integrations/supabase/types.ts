@@ -1901,6 +1901,7 @@ export type Database = {
           owner_user_id: string
           percent_complete: number | null
           pets_notes: string | null
+          plan_payload: Json
           prepared_for: string | null
           preparer_name: string | null
           property_notes: string | null
@@ -1926,6 +1927,7 @@ export type Database = {
           owner_user_id: string
           percent_complete?: number | null
           pets_notes?: string | null
+          plan_payload?: Json
           prepared_for?: string | null
           preparer_name?: string | null
           property_notes?: string | null
@@ -1951,6 +1953,7 @@ export type Database = {
           owner_user_id?: string
           percent_complete?: number | null
           pets_notes?: string | null
+          plan_payload?: Json
           prepared_for?: string | null
           preparer_name?: string | null
           property_notes?: string | null

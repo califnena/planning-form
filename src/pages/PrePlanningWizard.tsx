@@ -281,7 +281,7 @@ export default function PrePlanningWizard() {
         />
       </div>
       
-      <SectionComponent data={plan} onChange={updatePlan} />
+      <SectionComponent data={plan} onChange={(data: any) => updatePlan(data)} />
       
       {/* Section complete button */}
       <div className="mt-8 pt-6 border-t flex justify-end">

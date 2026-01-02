@@ -27,6 +27,8 @@ export interface PlanData {
     signature_png: string;
     prepared_by: string;
   }>;
+  // Allow nested objects and additional properties
+  [key: string]: any;
 }
 
 export interface SaveState {
