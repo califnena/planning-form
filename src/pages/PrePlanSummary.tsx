@@ -445,6 +445,24 @@ export default function PrePlanSummary() {
   return (
     <AuthenticatedLayout>
       <div className="container mx-auto px-4 py-6 max-w-lg print:p-0">
+        {/* Top Navigation */}
+        <div className="mb-6 space-y-2">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate("/home-senior")}
+            className="text-muted-foreground h-12 px-4 text-base"
+          >
+            ← Back to Home
+          </Button>
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate("/preplandashboard")}
+            className="text-muted-foreground h-12 px-4 text-base"
+          >
+            ← Back to My Planner
+          </Button>
+        </div>
+
         {/* Page Title */}
         <div className="mb-6 text-center">
           <h1 className="text-2xl sm:text-3xl font-bold mb-3 text-foreground">Your Plan Summary</h1>
@@ -555,11 +573,16 @@ export default function PrePlanSummary() {
               <button className="w-full p-5 flex items-center justify-between text-left hover:bg-muted/50 transition-colors rounded-t-lg">
                 <div>
                   <p className="font-medium text-foreground text-lg">
-                    View what you've already filled in
+                    Your completed sections
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    You can update any section at any time.
+                    This shows what you have already filled in. You can view or edit any section at any time.
                   </p>
+                  {sectionsExpanded && (
+                    <p className="text-sm text-primary mt-2">
+                      Tap a section to open it.
+                    </p>
+                  )}
                 </div>
                 {sectionsExpanded ? (
                   <ChevronUp className="h-6 w-6 text-muted-foreground flex-shrink-0" />
@@ -680,16 +703,6 @@ export default function PrePlanSummary() {
           </div>
         </div>
 
-        {/* Return to Planner */}
-        <div className="text-center">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate("/preplandashboard")}
-            className="text-muted-foreground"
-          >
-            ← Return to My Planner
-          </Button>
-        </div>
 
         {/* Dialogs - PII dialog removed */}
         <ShareSummaryDialog
