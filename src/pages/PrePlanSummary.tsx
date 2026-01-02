@@ -30,7 +30,7 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
+// PIICollectionDialog removed - PDF generates immediately without PII collection
 import { ShareSummaryDialog } from "@/components/summary/ShareSummaryDialog";
 import { SETTINGS_DEFAULT } from "@/lib/sections";
 import { useActivePlan, fetchPlanData } from "@/hooks/useActivePlan";
@@ -56,7 +56,7 @@ export default function PrePlanSummary() {
   const [dataLoading, setDataLoading] = useState(true);
   const [planData, setPlanData] = useState<any>(null);
   const [sections, setSections] = useState<SectionData[]>([]);
-  const [showPIIDialog, setShowPIIDialog] = useState(false);
+  // PII dialog removed - PDF generates immediately
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
@@ -74,7 +74,7 @@ export default function PrePlanSummary() {
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [selectedSections, setSelectedSections] = useState<string[]>(SETTINGS_DEFAULT);
   const [generatingPdf, setGeneratingPdf] = useState(false);
-  const [exportKind, setExportKind] = useState<"download" | "print" | "email">("download");
+  // exportKind removed - always opens in new tab
   
   // New state for simplified UI
   const [sectionsExpanded, setSectionsExpanded] = useState(false);
@@ -356,12 +356,6 @@ export default function PrePlanSummary() {
   };
 
   const handleDownloadPDF = async () => {
-    setExportKind("download");
-    setShowPIIDialog(true);
-  };
-
-  const handlePIISubmit = async (piiData: any) => {
-    setShowPIIDialog(false);
     setGeneratingPdf(true);
 
     try {
@@ -372,10 +366,11 @@ export default function PrePlanSummary() {
           description: "You need to be signed in to generate your document.",
           variant: "destructive"
         });
+        setGeneratingPdf(false);
         return;
       }
 
-      // Build the PDF payload using the already-loaded data
+      // Build the PDF payload using the already-loaded data - NO PII COLLECTION
       const pdfPayload = {
         id: planId,
         org_id: orgId,
@@ -408,7 +403,7 @@ export default function PrePlanSummary() {
 
       const payload = {
         ...normalizedPayload,
-        pii: piiData,
+        pii: {}, // No PII collected - blank lines for handwriting
         userId: userId,
         planId: planId,
         orgId: orgId,
@@ -430,23 +425,20 @@ export default function PrePlanSummary() {
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        const filename = pdfData.filename || `My-Planning-Document-${new Date().toISOString().split('T')[0]}.pdf`;
-        link.download = filename;
-        link.click();
-        URL.revokeObjectURL(url);
+        
+        // Open PDF in new tab for immediate viewing/printing
+        window.open(url, '_blank');
+        
+        toast({
+          title: "Document Ready",
+          description: "Your planning document opened in a new tab. You can save or print from there."
+        });
       }
-
-      toast({
-        title: "Document Created",
-        description: "Your planning document has been generated successfully."
-      });
     } catch (error) {
       console.error("Error generating document:", error);
       toast({
-        title: "Error",
-        description: "Failed to create your document. Please try again.",
+        title: "Something didn't work",
+        description: "Please try again or call us for help at (XXX) XXX-XXXX.",
         variant: "destructive"
       });
     } finally {
@@ -689,13 +681,7 @@ export default function PrePlanSummary() {
           </Button>
         </div>
 
-        {/* Dialogs */}
-        <PIICollectionDialog
-          open={showPIIDialog}
-          onOpenChange={setShowPIIDialog}
-          onSubmit={handlePIISubmit}
-        />
-
+        {/* Dialogs - PII dialog removed */}
         <ShareSummaryDialog
           open={showShareDialog}
           onOpenChange={setShowShareDialog}
