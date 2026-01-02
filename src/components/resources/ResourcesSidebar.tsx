@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { 
-  Compass, BookOpen, FileText, HelpCircle, Library, 
-  Calendar, Calculator, Headphones, ChevronDown, ChevronRight,
-  Menu, X
+  BookOpen, FileText, HelpCircle, 
+  Calculator, Headphones, ChevronDown, ChevronRight,
+  Menu, CheckSquare, Link2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -20,26 +19,31 @@ export interface ResourceSection {
 
 export const resourceSections: ResourceSection[] = [
   {
-    id: 'getting-started',
-    label: 'Getting Started',
-    icon: Compass,
-    subItems: [
-      { id: 'overview', label: 'Overview' },
-      { id: 'how-it-works', label: 'How This App Works' },
-      { id: 'what-to-do-first', label: 'What To Do First' },
-      { id: 'common-mistakes', label: 'Common Mistakes to Avoid' },
-    ],
-  },
-  {
     id: 'planning-guides',
     label: 'Planning Guides',
     icon: BookOpen,
     subItems: [
-      { id: 'pre-planning-basics', label: 'Pre-Planning Basics' },
-      { id: 'when-death-happens', label: 'When Death Happens' },
-      { id: 'funeral-vs-cremation', label: 'Funeral vs Cremation' },
-      { id: 'burial-options', label: 'Burial Options' },
-      { id: 'costs-explained', label: 'Costs Explained' },
+      { id: 'pre-planning-guide', label: 'Pre-Planning Guide' },
+      { id: 'when-death-happens', label: 'When Death Happens Guide' },
+    ],
+  },
+  {
+    id: 'checklists',
+    label: 'Checklists',
+    icon: CheckSquare,
+    subItems: [
+      { id: 'pre-planning-checklist', label: 'Pre-Planning Checklist' },
+      { id: 'after-death-checklist', label: 'After-Death Checklist' },
+    ],
+  },
+  {
+    id: 'tools-calculators',
+    label: 'Tools & Calculators',
+    icon: Calculator,
+    subItems: [
+      { id: 'cost-estimator', label: 'Cost Estimator' },
+      { id: 'progress-tracker', label: 'Planning Progress' },
+      { id: 'document-checklist', label: 'Document Checklist' },
     ],
   },
   {
@@ -48,8 +52,6 @@ export const resourceSections: ResourceSection[] = [
     icon: FileText,
     subItems: [
       { id: 'printable-forms', label: 'Printable Blank Forms' },
-      { id: 'guided-forms', label: 'Guided Walkthrough Forms' },
-      { id: 'checklists', label: 'Checklists' },
       { id: 'download-center', label: 'Download Center' },
     ],
   },
@@ -60,41 +62,18 @@ export const resourceSections: ResourceSection[] = [
     subItems: [
       { id: 'general', label: 'General Questions' },
       { id: 'legal-financial', label: 'Legal & Financial' },
+      { id: 'travel-protection', label: 'Travel Protection' },
       { id: 'funeral-process', label: 'Funeral Process' },
       { id: 'app-account', label: 'App & Account' },
     ],
   },
   {
-    id: 'learn-library',
-    label: 'Learn Library',
-    icon: Library,
+    id: 'trusted-resources',
+    label: 'Trusted Resources',
+    icon: Link2,
     subItems: [
-      { id: 'articles', label: 'Short Articles' },
-      { id: 'videos', label: 'Videos' },
-      { id: 'external-resources', label: 'Trusted Resources' },
-      { id: 'glossary', label: 'Glossary' },
-    ],
-  },
-  {
-    id: 'events-workshops',
-    label: 'Events & Workshops',
-    icon: Calendar,
-    subItems: [
-      { id: 'upcoming', label: 'Upcoming Events' },
-      { id: 'recordings', label: 'Past Recordings' },
-      { id: 'local-seminars', label: 'Local Seminars' },
-      { id: 'virtual-workshops', label: 'Virtual Workshops' },
-    ],
-  },
-  {
-    id: 'tools-calculators',
-    label: 'Tools & Calculators',
-    icon: Calculator,
-    subItems: [
-      { id: 'cost-estimator', label: 'Cost Estimator' },
-      { id: 'progress-tracker', label: 'Planning Progress' },
-      { id: 'decision-helper', label: 'Decision Helper' },
-      { id: 'document-checklist', label: 'Document Checklist' },
+      { id: 'government', label: 'Government Resources' },
+      { id: 'consumer-protection', label: 'Consumer Protection' },
     ],
   },
   {
@@ -104,8 +83,6 @@ export const resourceSections: ResourceSection[] = [
     subItems: [
       { id: 'contact', label: 'Contact Support' },
       { id: 'how-to-get-help', label: 'How to Get Help' },
-      { id: 'report-issue', label: 'Report an Issue' },
-      { id: 'feedback', label: 'Feedback' },
     ],
   },
 ];
@@ -140,9 +117,9 @@ function SidebarContent({
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b border-border">
-        <h2 className="font-semibold text-foreground">Resources</h2>
-        <p className="text-xs text-muted-foreground mt-1">
-          Help, guides, and tools
+        <h2 className="font-semibold text-foreground text-lg">Resources</h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Guides, checklists, and tools
         </p>
       </div>
       
@@ -163,14 +140,14 @@ function SidebarContent({
                     }
                   }}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    "w-full flex items-center justify-between px-3 py-3 rounded-lg text-sm font-medium transition-colors",
                     isActive 
                       ? "bg-primary/10 text-primary" 
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
                   <span className="flex items-center gap-2">
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-5 w-5" />
                     {section.label}
                   </span>
                   {section.subItems && section.subItems.length > 0 && (
@@ -187,7 +164,7 @@ function SidebarContent({
                         key={subItem.id}
                         onClick={() => handleItemClick(section.id, subItem.id)}
                         className={cn(
-                          "w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors",
+                          "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
                           activeSection === section.id && activeSubItem === subItem.id
                             ? "bg-primary/10 text-primary font-medium"
                             : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -217,10 +194,10 @@ export function ResourcesSidebar({ activeSection, activeSubItem, onSectionChange
         <SheetTrigger asChild>
           <Button 
             variant="outline" 
-            size="sm" 
-            className="fixed bottom-4 left-4 z-50 shadow-lg"
+            size="lg" 
+            className="fixed bottom-4 left-4 z-50 shadow-lg min-h-[48px]"
           >
-            <Menu className="h-4 w-4 mr-2" />
+            <Menu className="h-5 w-5 mr-2" />
             Resources Menu
           </Button>
         </SheetTrigger>
@@ -237,7 +214,7 @@ export function ResourcesSidebar({ activeSection, activeSubItem, onSectionChange
   }
 
   return (
-    <aside className="w-60 shrink-0 sticky top-20 h-[calc(100vh-5rem)] border-r border-border bg-card">
+    <aside className="w-64 shrink-0 sticky top-20 h-[calc(100vh-5rem)] border-r border-border bg-card">
       <SidebarContent 
         activeSection={activeSection}
         activeSubItem={activeSubItem}
