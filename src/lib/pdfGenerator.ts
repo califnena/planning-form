@@ -1,3 +1,15 @@
+/**
+ * PDF GENERATOR - LOCKED TEMPLATE SYSTEM v1.0
+ * 
+ * This module provides PDF generation using the locked template system.
+ * The main export `generatePlanPDF` uses the locked generator for consistency.
+ * 
+ * ARCHITECTURE:
+ * - Uses locked template configuration (pdfTemplateConfig.ts)
+ * - Single PDF generator (lockedPdfGenerator.ts)
+ * - No alternative generators or fallback formatting
+ */
+
 import jsPDF from "jspdf";
 import everlastingLogo from "@/assets/everlasting-logo.png";
 import {
@@ -10,6 +22,10 @@ import {
   hasMessagesData
 } from "./pdf_helpers";
 import { pdfLabels } from "./pdfTranslations";
+import { generateLockedPlanPDF, downloadLockedPlanPDF, getLockedPlanPDFBlob } from "./lockedPdfGenerator";
+
+// Re-export the locked PDF generator as the primary generator
+export { generateLockedPlanPDF, downloadLockedPlanPDF, getLockedPlanPDFBlob };
 
 interface PlanData {
   prepared_by?: string;
@@ -28,7 +44,22 @@ interface PlanData {
   [key: string]: any;
 }
 
-export const generatePlanPDF = (planData: PlanData) => {
+/**
+ * Primary PDF generator using locked template system
+ * This function maintains backward compatibility while using the new locked generator
+ */
+export const generatePlanPDF = (planData: PlanData): jsPDF => {
+  // Use the locked template generator
+  return generateLockedPlanPDF(planData, {
+    selectedSections: planData._visibleSections,
+  });
+};
+
+/**
+ * Legacy PDF generator (deprecated - kept for backward compatibility)
+ * @deprecated Use generatePlanPDF or generateLockedPlanPDF instead
+ */
+export const generateLegacyPlanPDF = (planData: PlanData) => {
   const pdf = new jsPDF();
   let yPosition = 20;
   const pageHeight = pdf.internal.pageSize.height;
