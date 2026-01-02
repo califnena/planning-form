@@ -2,14 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   Download, 
-  Printer, 
-  Mail,
-  Save,
+  ChevronDown,
+  ChevronUp,
   Edit,
   User,
   Users,
@@ -23,26 +22,16 @@ import {
   Scale,
   MessageSquare,
   BookHeart,
-  AlertTriangle,
-  ArrowRight,
-  X,
+  Check,
+  Circle,
   Loader2,
-  ExternalLink
+  Play
 } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
 import { ShareSummaryDialog } from "@/components/summary/ShareSummaryDialog";
-import { WhatsMissingIndicator } from "@/components/summary/WhatsMissingIndicator";
-import { ReminderEmailOptIn } from "@/components/summary/ReminderEmailOptIn";
-import { PdfReadinessModal, PdfReadinessBadge } from "@/components/summary/PdfReadinessModal";
-import { usePdfValidation } from "@/hooks/usePdfValidation";
 import { SETTINGS_DEFAULT } from "@/lib/sections";
 import { useActivePlan, fetchPlanData } from "@/hooks/useActivePlan";
 import { SECTION_ROUTES } from "@/lib/sectionRoutes";
@@ -52,8 +41,7 @@ interface SectionData {
   id: string;
   label: string;
   icon: React.ReactNode;
-  content: React.ReactNode;
-  hasContent: boolean;
+  status: "completed" | "started" | "not_started";
   editRoute: string;
 }
 
@@ -63,7 +51,6 @@ export default function PrePlanSummary() {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   
-  // Use the unified active plan hook - SINGLE SOURCE OF TRUTH
   const { loading: planLoading, planId, orgId, plan: activePlan, error: planError } = useActivePlan();
   
   const [dataLoading, setDataLoading] = useState(true);
@@ -71,9 +58,8 @@ export default function PrePlanSummary() {
   const [sections, setSections] = useState<SectionData[]>([]);
   const [showPIIDialog, setShowPIIDialog] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
-  const [showReadinessModal, setShowReadinessModal] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string>("");
+  const [userId, setUserId] = useState<string>("");
   const [profile, setProfile] = useState<any>(null);
   const [contacts, setContacts] = useState<any[]>([]);
   const [pets, setPets] = useState<any[]>([]);
@@ -86,30 +72,34 @@ export default function PrePlanSummary() {
   const [funeralFunding, setFuneralFunding] = useState<any[]>([]);
   const [debts, setDebts] = useState<any[]>([]);
   const [businesses, setBusinesses] = useState<any[]>([]);
-  const [showFirstTimeHelper, setShowFirstTimeHelper] = useState(false);
   const [selectedSections, setSelectedSections] = useState<string[]>(SETTINGS_DEFAULT);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
+  const [exportKind, setExportKind] = useState<"download" | "print" | "email">("download");
   
-  // Combined loading state
+  // New state for simplified UI
+  const [sectionsExpanded, setSectionsExpanded] = useState(false);
+  const [personalNotes, setPersonalNotes] = useState("");
+  const [notesSaving, setNotesSaving] = useState(false);
+  
   const loading = planLoading || dataLoading;
-  
-  // PDF Validation
-  const validationResult = usePdfValidation(
-    { ...planData, personal_profile: profile, contacts },
-    selectedSections
-  );
-  
-  // Check if first-time visitor to summary page
+
+  // Load personal notes from localStorage
   useEffect(() => {
-    const hasSeenHelper = localStorage.getItem("preplan_summary_helper_seen");
-    if (!hasSeenHelper) {
-      setShowFirstTimeHelper(true);
+    const savedNotes = localStorage.getItem("plan_personal_notes");
+    if (savedNotes) {
+      setPersonalNotes(savedNotes);
     }
   }, []);
 
-  const dismissFirstTimeHelper = () => {
-    localStorage.setItem("preplan_summary_helper_seen", "true");
-    setShowFirstTimeHelper(false);
-  };
+  // Auto-save personal notes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (personalNotes) {
+        localStorage.setItem("plan_personal_notes", personalNotes);
+      }
+    }, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [personalNotes]);
 
   // Check for print param
   useEffect(() => {
@@ -138,8 +128,8 @@ export default function PrePlanSummary() {
       }
 
       setUserEmail(user.email || "");
+      setUserId(user.id);
       
-      // Load selected sections from user settings
       const { data: settings } = await supabase
         .from("user_settings")
         .select("selected_sections")
@@ -150,10 +140,8 @@ export default function PrePlanSummary() {
         setSelectedSections(settings.selected_sections);
       }
 
-      // Fetch all plan data using the unified function - SINGLE SOURCE OF TRUTH
       const data = await fetchPlanData(activePlanId);
       
-      // Also load localStorage for any unsaved local changes
       let localPlan: any | null = null;
       try {
         const raw = localStorage.getItem(`plan_${user.id}`);
@@ -162,7 +150,6 @@ export default function PrePlanSummary() {
         console.warn("[PrePlanSummary] Failed to parse local plan", e);
       }
 
-      // Merge: DB is source of truth for structured data, localStorage for notes
       const mergedPlan: any = {
         ...(localPlan || {}),
         ...(data.plan || {}),
@@ -171,21 +158,14 @@ export default function PrePlanSummary() {
       };
 
       setPlanData(mergedPlan);
-      setLastUpdated(mergedPlan.updated_at || null);
 
-      // CRITICAL: Merge localStorage personal_profile with DB data
-      // The form saves to localStorage, not the personal_profiles table
       const dbProfile = data.personalProfile;
       const localProfile = localPlan?.personal_profile;
-      
-      // Merge: prefer localStorage (where form saves) over DB
       const mergedProfile = {
         ...(dbProfile || {}),
         ...(localProfile || {}),
       };
       
-      // CRITICAL: Merge DB arrays with localStorage arrays
-      // The planner forms may save to localStorage, not the Supabase tables
       const dbContacts = data.contacts || [];
       const dbMessages = data.messages || [];
       const dbProperties = data.properties || [];
@@ -198,7 +178,6 @@ export default function PrePlanSummary() {
       const dbDebts = data.debts || [];
       const dbBusinesses = data.businesses || [];
       
-      // Prefer localStorage arrays if they exist and have data, otherwise use DB
       const localContacts = localPlan?.contacts_notify || localPlan?.contacts || [];
       const localPets = localPlan?.pets || [];
       const localInsurance = localPlan?.insurance_policies || localPlan?.insurance || [];
@@ -211,7 +190,6 @@ export default function PrePlanSummary() {
       const localDebts = localPlan?.debts || [];
       const localBusinesses = localPlan?.businesses || [];
       
-      // Use DB if it has data, otherwise fall back to localStorage
       const mergedContacts = dbContacts.length > 0 ? dbContacts : localContacts;
       const mergedPets = dbPets.length > 0 ? dbPets : localPets;
       const mergedInsurance = dbInsurance.length > 0 ? dbInsurance : localInsurance;
@@ -224,7 +202,6 @@ export default function PrePlanSummary() {
       const mergedDebts = dbDebts.length > 0 ? dbDebts : localDebts;
       const mergedBusinesses = dbBusinesses.length > 0 ? dbBusinesses : localBusinesses;
 
-      // Use merged profile that includes localStorage data
       setProfile(Object.keys(mergedProfile).length > 0 ? mergedProfile : null);
       setContacts(mergedContacts);
       setPets(mergedPets);
@@ -237,32 +214,19 @@ export default function PrePlanSummary() {
       setFuneralFunding(mergedFuneralFunding);
       setDebts(mergedDebts);
       setBusinesses(mergedBusinesses);
-      
-      // Debug log for validation troubleshooting
-      console.log("[PrePlanSummary] Data resolution:", {
-        dbProfile: !!dbProfile,
-        localProfile: !!localProfile,
-        mergedFullName: mergedProfile?.full_name,
-        mergedAddress: mergedProfile?.address,
-        preparedFor: mergedPlan?.prepared_for,
-        dbContactsCount: dbContacts.length,
-        localContactsCount: localContacts.length,
-        mergedContactsCount: mergedContacts.length,
-        dbPetsCount: dbPets.length,
-        localPetsCount: localPets.length,
-        mergedPetsCount: mergedPets.length,
-        dbInsuranceCount: dbInsurance.length,
-        localInsuranceCount: localInsurance.length,
-        mergedInsuranceCount: mergedInsurance.length,
-      });
 
-      // Get the user's selected sections from settings
       const userSelectedSections = settings?.selected_sections?.length 
         ? settings.selected_sections 
         : SETTINGS_DEFAULT;
       const selectedSet = new Set(userSelectedSections);
 
-      // Build ALL possible sections with content from merged data
+      // Determine status for each section
+      const getSectionStatus = (hasContent: boolean, hasPartialContent: boolean): "completed" | "started" | "not_started" => {
+        if (hasContent) return "completed";
+        if (hasPartialContent) return "started";
+        return "not_started";
+      };
+
       const displayProfile = Object.keys(mergedProfile).length > 0 ? mergedProfile : null;
       
       const allPossibleSections: SectionData[] = [
@@ -270,292 +234,148 @@ export default function PrePlanSummary() {
           id: "personal",
           label: "Personal & Family Details",
           icon: <User className="h-5 w-5" />,
-          content: displayProfile ? (
-            <div className="space-y-2 text-sm">
-              {displayProfile.full_name && (
-                <p>
-                  <strong>Name:</strong> {displayProfile.full_name}
-                </p>
-              )}
-              {displayProfile.address && (
-                <p>
-                  <strong>Address:</strong> {displayProfile.address}
-                </p>
-              )}
-              {displayProfile.marital_status && (
-                <p>
-                  <strong>Marital Status:</strong> {displayProfile.marital_status}
-                </p>
-              )}
-              {displayProfile.partner_name && (
-                <p>
-                  <strong>Spouse/Partner:</strong> {displayProfile.partner_name}
-                </p>
-              )}
-              {Array.isArray(displayProfile.child_names) && displayProfile.child_names.filter(Boolean).length > 0 && (
-                <p>
-                  <strong>Children:</strong> {displayProfile.child_names.filter(Boolean).join(", ")}
-                </p>
-              )}
-            </div>
-          ) : null,
-          hasContent: !!(displayProfile?.full_name || mergedPlan?.prepared_for),
+          status: getSectionStatus(
+            !!(displayProfile?.full_name && displayProfile?.address),
+            !!(displayProfile?.full_name || displayProfile?.address || mergedPlan?.prepared_for)
+          ),
           editRoute: SECTION_ROUTES.personal,
         },
         {
           id: "contacts",
           label: "Key Contacts to Notify",
           icon: <Users className="h-5 w-5" />,
-          content: mergedContacts.length > 0 ? (
-            <div className="space-y-2 text-sm">
-              <p>
-                <strong>Contacts:</strong> {mergedContacts.length} saved
-              </p>
-              <div className="space-y-1">
-                {mergedContacts.slice(0, 5).map((c: any, idx: number) => (
-                  <p key={idx} className="text-muted-foreground">
-                    {c?.name || "(Unnamed)"}
-                    {c?.relationship ? ` — ${c.relationship}` : ""}
-                  </p>
-                ))}
-                {mergedContacts.length > 5 && (
-                  <p className="text-muted-foreground">…and {mergedContacts.length - 5} more</p>
-                )}
-              </div>
-            </div>
-          ) : null,
-          hasContent: mergedContacts.length > 0,
+          status: getSectionStatus(mergedContacts.length >= 2, mergedContacts.length > 0),
           editRoute: SECTION_ROUTES.contacts,
         },
         {
           id: "legacy",
           label: "Life Story & Legacy",
           icon: <BookHeart className="h-5 w-5" />,
-          content: mergedPlan.about_me_notes ? (
-            <p className="text-sm">{mergedPlan.about_me_notes}</p>
-          ) : null,
-          hasContent: !!mergedPlan.about_me_notes,
+          status: getSectionStatus(!!mergedPlan.about_me_notes, false),
           editRoute: SECTION_ROUTES.legacy,
         },
         {
           id: "funeral",
           label: "Funeral Wishes",
           icon: <Heart className="h-5 w-5" />,
-          content: mergedPlan.funeral_wishes_notes ? (
-            <p className="text-sm">{mergedPlan.funeral_wishes_notes}</p>
-          ) : null,
-          hasContent: !!mergedPlan.funeral_wishes_notes,
+          status: getSectionStatus(!!mergedPlan.funeral_wishes_notes, false),
           editRoute: SECTION_ROUTES.funeral,
         },
         {
           id: "financial",
-          label: "Financial Life (Summary)",
+          label: "Financial Life",
           icon: <Wallet className="h-5 w-5" />,
-          content: mergedPlan.financial_notes ? (
-            <p className="text-sm">{mergedPlan.financial_notes}</p>
-          ) : null,
-          hasContent: !!mergedPlan.financial_notes,
+          status: getSectionStatus(!!mergedPlan.financial_notes, false),
           editRoute: SECTION_ROUTES.financial,
         },
         {
           id: "insurance",
-          label: "Insurance (Summary)",
+          label: "Insurance",
           icon: <Shield className="h-5 w-5" />,
-          content: mergedInsurance.length > 0 ? (
-            <p className="text-sm">
-              <strong>Policies:</strong> {mergedInsurance.length} saved
-            </p>
-          ) : mergedPlan.insurance_notes ? (
-            <p className="text-sm">{mergedPlan.insurance_notes}</p>
-          ) : null,
-          hasContent: !!mergedPlan.insurance_notes || mergedInsurance.length > 0,
+          status: getSectionStatus(
+            mergedInsurance.length > 0 || !!mergedPlan.insurance_notes,
+            false
+          ),
           editRoute: SECTION_ROUTES.insurance,
         },
         {
           id: "property",
           label: "Property & Valuables",
           icon: <Home className="h-5 w-5" />,
-          content: mergedProperties.length > 0 || mergedPlan.property_notes ? (
-            <div className="space-y-2 text-sm">
-              {mergedProperties.length > 0 && (
-                <p>
-                  <strong>Items:</strong> {mergedProperties.length} listed
-                </p>
-              )}
-              {mergedPlan.property_notes && <p>{mergedPlan.property_notes}</p>}
-            </div>
-          ) : null,
-          hasContent: mergedProperties.length > 0 || !!mergedPlan.property_notes,
+          status: getSectionStatus(
+            mergedProperties.length > 0 || !!mergedPlan.property_notes,
+            false
+          ),
           editRoute: SECTION_ROUTES.property,
         },
         {
           id: "legal",
           label: "Legal & Planning Notes",
           icon: <Scale className="h-5 w-5" />,
-          content: mergedPlan.legal_notes ? (
-            <p className="text-sm">{mergedPlan.legal_notes}</p>
-          ) : null,
-          hasContent: !!mergedPlan.legal_notes,
+          status: getSectionStatus(!!mergedPlan.legal_notes, false),
           editRoute: SECTION_ROUTES.legal,
         },
         {
           id: "pets",
           label: "Pet Care",
           icon: <Dog className="h-5 w-5" />,
-          content: mergedPets.length > 0 || mergedPlan.pets_notes ? (
-            <div className="space-y-2 text-sm">
-              {mergedPets.length > 0 && (
-                <p><strong>Pets:</strong> {mergedPets.length} listed</p>
-              )}
-              {mergedPlan.pets_notes && <p>{mergedPlan.pets_notes}</p>}
-            </div>
-          ) : null,
-          hasContent: mergedPets.length > 0 || !!mergedPlan.pets_notes,
+          status: getSectionStatus(
+            mergedPets.length > 0 || !!mergedPlan.pets_notes,
+            false
+          ),
           editRoute: SECTION_ROUTES.pets,
         },
         {
           id: "digital",
           label: "Online Accounts",
           icon: <Laptop className="h-5 w-5" />,
-          content: mergedPlan.digital_notes ? (
-            <p className="text-sm">{mergedPlan.digital_notes}</p>
-          ) : null,
-          hasContent: !!mergedPlan.digital_notes,
+          status: getSectionStatus(!!mergedPlan.digital_notes, false),
           editRoute: SECTION_ROUTES.digital,
         },
         {
           id: "messages",
           label: "Messages to Loved Ones",
           icon: <MessageSquare className="h-5 w-5" />,
-          content: mergedMessages.length > 0 || mergedPlan.to_loved_ones_message || mergedPlan.messages_notes ? (
-            <div className="space-y-2 text-sm">
-              {mergedMessages.length > 0 && (
-                <p>
-                  <strong>Messages:</strong> {mergedMessages.length} written
-                </p>
-              )}
-              {mergedPlan.to_loved_ones_message && <p>{mergedPlan.to_loved_ones_message}</p>}
-              {mergedPlan.messages_notes && <p>{mergedPlan.messages_notes}</p>}
-            </div>
-          ) : null,
-          hasContent: mergedMessages.length > 0 || !!mergedPlan.messages_notes || !!mergedPlan.to_loved_ones_message,
+          status: getSectionStatus(
+            mergedMessages.length > 0 || !!mergedPlan.messages_notes || !!mergedPlan.to_loved_ones_message,
+            false
+          ),
           editRoute: SECTION_ROUTES.messages,
         },
       ];
 
-      // CRITICAL: Only include sections that user selected in Preferences
-      // This is the single source of truth - section exists if selected, not if data exists
-      const filteredSections = allPossibleSections.filter(s => selectedSet.has(s.id));
-
-      setSections(filteredSections);
-
-      console.log("[PrePlanSummary] Plan resolution:", {
-        userId: user.id,
-        planId: activePlanId,
-        orgId,
-        sectionsCount: filteredSections.length,
-        mergedContactsCount: mergedContacts.length,
-        mergedPropertiesCount: mergedProperties.length,
-        mergedPetsCount: mergedPets.length,
-        mergedInsuranceCount: mergedInsurance.length,
-      });
+      const filtered = allPossibleSections.filter(s => selectedSet.has(s.id));
+      setSections(filtered);
     } catch (error) {
       console.error("Error loading plan data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load your planning summary.",
-        variant: "destructive",
+        title: "Error loading data",
+        description: "Please try again or call us for help.",
+        variant: "destructive"
       });
     } finally {
       setDataLoading(false);
     }
   };
 
-  const [generatingPdf, setGeneratingPdf] = useState(false);
-  const [isDraftMode, setIsDraftMode] = useState(false);
-  const [pdfExportKind, setPdfExportKind] = useState<'planner' | 'report'>('planner');
-
-  const handleDownloadPDF = () => {
-    // Check validation first
-    if (!validationResult.isValid) {
-      setShowReadinessModal(true);
-      return;
-    }
-    setPdfExportKind('planner');
-    setIsDraftMode(false);
+  const handleDownloadPDF = async () => {
+    setExportKind("download");
     setShowPIIDialog(true);
-  };
-
-  const handleDownloadSummaryReport = () => {
-    // Summary report is always allowed (it’s informational)
-    setPdfExportKind('report');
-    setIsDraftMode(false);
-    setShowPIIDialog(true);
-  };
-
-  const handleDownloadDraft = () => {
-    setPdfExportKind('planner');
-    setIsDraftMode(true);
-    setShowPIIDialog(true);
-  };
-
-  const handlePrintDraft = () => {
-    setPdfExportKind('planner');
-    setIsDraftMode(true);
-    // For now, trigger the same flow - the PDF will be marked as draft
-    setShowPIIDialog(true);
-  };
-
-  const handleEmailDraft = () => {
-    setPdfExportKind('planner');
-    setIsDraftMode(true);
-    // For now, we'll use the share dialog for email functionality
-    toast({
-      title: "Coming soon",
-      description: "Email draft functionality will be available soon. Please use Download or Print for now.",
-    });
   };
 
   const handlePIISubmit = async (piiData: any) => {
-    try {
-      setGeneratingPdf(true);
-      
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+    setShowPIIDialog(false);
+    setGeneratingPdf(true);
 
-      // Build PDF payload using ALREADY LOADED state data
-      // This ensures the PDF gets the exact same data shown on the summary page
-      
-      // Get localStorage plan data for detailed section objects (funeral, etc.)
-      let localPlanForPdf: any = null;
-      try {
-        const raw = localStorage.getItem(`plan_${user.id}`);
-        if (raw) localPlanForPdf = JSON.parse(raw);
-      } catch (e) {
-        console.warn("[PrePlanSummary] Failed to parse local plan for PDF:", e);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Please sign in",
+          description: "You need to be signed in to generate your document.",
+          variant: "destructive"
+        });
+        return;
       }
-      
-      const pdfPlanData = {
-        // Plan metadata
+
+      // Build the PDF payload using the already-loaded data
+      const pdfPayload = {
         id: planId,
         org_id: orgId,
-        prepared_by: piiData.prepared_by || profile?.full_name || planData?.preparer_name,
-        prepared_for: piiData.full_name || profile?.full_name || planData?.prepared_for,
-        title: planData?.title,
-        updated_at: planData?.updated_at,
-
-        // Personal profile (merged from state + PII modal)
-        personal_profile: {
-          ...(profile || {}),
-          full_name: piiData.full_name || profile?.full_name,
-          address: piiData.address || profile?.address,
-          ssn: piiData.ssn, // SSN only from PII modal, never stored
-        },
-
-        // Notes from planData state
-        instructions_notes: planData?.instructions_notes || "",
+        prepared_for: profile?.full_name || planData?.prepared_for || "",
+        personal_profile: profile || {},
+        contacts_notify: contacts || [],
+        pets: pets || [],
+        insurance_policies: insurance || [],
+        properties: properties || [],
+        messages: messages || [],
+        investments: investments || [],
+        debts: debts || [],
+        bank_accounts: bankAccounts || [],
+        businesses: businesses || [],
+        funeral_funding: funeralFunding || [],
+        contacts_professional: professionalContacts || [],
         about_me_notes: planData?.about_me_notes || "",
-        checklist_notes: planData?.checklist_notes || "",
         funeral_wishes_notes: planData?.funeral_wishes_notes || "",
         financial_notes: planData?.financial_notes || "",
         insurance_notes: planData?.insurance_notes || "",
@@ -565,139 +385,26 @@ export default function PrePlanSummary() {
         legal_notes: planData?.legal_notes || "",
         messages_notes: planData?.messages_notes || "",
         to_loved_ones_message: planData?.to_loved_ones_message || "",
-        
-        // CRITICAL: Include detailed section objects from localStorage
-        // These contain checkboxes, item arrays, and detailed preferences
-        
-        // Funeral section
-        funeral: localPlanForPdf?.funeral || planData?.funeral || {},
-        funeral_disposition: localPlanForPdf?.funeral?.burial 
-          ? { preference: "burial", type: "burial" }
-          : localPlanForPdf?.funeral?.cremation 
-            ? { preference: "cremation", type: "cremation" }
-            : localPlanForPdf?.funeral?.natural_burial
-              ? { preference: "natural_burial", type: "natural_burial" }
-              : {},
-        service_preferences: {
-          service_type: localPlanForPdf?.funeral?.service_type || "",
-          location: localPlanForPdf?.funeral?.service_location || "",
-          officiant: localPlanForPdf?.funeral?.officiant || "",
-          music: localPlanForPdf?.funeral?.music_preferences || "",
-          readings: localPlanForPdf?.funeral?.readings || "",
-          flowers_or_donations: localPlanForPdf?.funeral?.flowers_or_donations || "",
-          clothing: localPlanForPdf?.funeral?.clothing || "",
-        },
-        funeral_home: {
-          name: localPlanForPdf?.funeral?.funeral_home_name || "",
-          phone: localPlanForPdf?.funeral?.funeral_home_phone || "",
-          address: localPlanForPdf?.funeral?.funeral_home_address || "",
-        },
-        cemetery: {
-          name: localPlanForPdf?.funeral?.cemetery_name || "",
-          location: localPlanForPdf?.funeral?.cemetery_location || "",
-        },
-        
-        // Financial section - includes checkboxes and accounts array
-        financial: localPlanForPdf?.financial || planData?.financial || {},
-        financial_accounts: localPlanForPdf?.financial?.accounts || [],
-        
-        // Property section - includes checkboxes and items array
-        property: localPlanForPdf?.property || planData?.property || {},
-        property_items: localPlanForPdf?.property?.items || [],
-        safe_deposit: {
-          location: localPlanForPdf?.property?.safe_deposit_location || "",
-          bank: localPlanForPdf?.property?.safe_deposit_bank || "",
-          key_location: localPlanForPdf?.property?.safe_deposit_key_location || "",
-        },
-        valuables: localPlanForPdf?.property?.items || [],
-        
-        // Digital section - includes accounts and phones arrays
-        digital: localPlanForPdf?.digital || planData?.digital || {},
-        digital_assets: localPlanForPdf?.digital?.accounts || [],
-        phones: localPlanForPdf?.digital?.phones || [],
-        
-        // Legal section - includes document checkboxes and locations
-        legal: localPlanForPdf?.legal || planData?.legal || {},
-        
-        // Insurance section - includes policies array
-        insurance: localPlanForPdf?.insurance || planData?.insurance || {},
-
-        // Arrays from state (loaded from Supabase in loadPlanData)
-        // These may override localStorage if DB has data
-        contacts_notify: contacts,
-        pets: pets,
-        insurance_policies: insurance.length > 0 ? insurance : (localPlanForPdf?.insurance?.policies || []),
-        properties: properties.length > 0 ? properties : (localPlanForPdf?.property?.items || []),
-        messages: messages,
-        bank_accounts: bankAccounts.length > 0 ? bankAccounts : (localPlanForPdf?.financial?.accounts || []),
-        investments: investments,
-        contacts_professional: professionalContacts,
-        funeral_funding: funeralFunding,
-        debts: debts,
-        businesses: businesses,
-        
-        // Pallbearers from funeral data
-        pallbearers: localPlanForPdf?.funeral?.pallbearers || [],
-        honorary_pallbearers: localPlanForPdf?.funeral?.honorary_pallbearers || [],
-
-        // Section visibility
-        _visibleSections: selectedSections,
       };
 
-      // CRITICAL DEBUG LOG - shows exactly what is sent to PDF for all sections
-      console.log("[PrePlanSummary] PDF payload section objects:", {
-        funeral_keys: Object.keys(pdfPlanData.funeral || {}),
-        financial_keys: Object.keys(pdfPlanData.financial || {}),
-        financial_accounts_len: pdfPlanData.financial_accounts?.length || 0,
-        property_keys: Object.keys(pdfPlanData.property || {}),
-        property_items_len: pdfPlanData.property_items?.length || 0,
-        digital_keys: Object.keys(pdfPlanData.digital || {}),
-        digital_assets_len: pdfPlanData.digital_assets?.length || 0,
-        legal_keys: Object.keys(pdfPlanData.legal || {}),
-        insurance_keys: Object.keys(pdfPlanData.insurance || {}),
-      });
+      const normalizedPayload = normalizePlanDataForPdf(pdfPayload);
 
-      // Prove what we are sending + what the UI selected
-      console.log("[PrePlanSummary] PDF payload section counts:", {
-        contacts_notify: pdfPlanData.contacts_notify?.length,
-        pets: pdfPlanData.pets?.length,
-        insurance_policies: Array.isArray(pdfPlanData.insurance_policies)
-          ? pdfPlanData.insurance_policies.length
-          : (pdfPlanData.insurance_policies as any)?.policies?.length,
-        properties: pdfPlanData.properties?.length,
-        bank_accounts: pdfPlanData.bank_accounts?.length,
-        investments: pdfPlanData.investments?.length,
-        debts: pdfPlanData.debts?.length,
-        businesses: pdfPlanData.businesses?.length,
-        contacts_professional: pdfPlanData.contacts_professional?.length,
-        funeral_funding: pdfPlanData.funeral_funding?.length,
-        messages: pdfPlanData.messages?.length,
+      const payload = {
+        ...normalizedPayload,
+        pii: piiData,
+        userId: userId,
+        planId: planId,
+        orgId: orgId,
         selectedSections,
-      });
-      console.log("[PrePlanSummary] Full PDF payload:", pdfPlanData);
+      };
 
-      const functionName = pdfExportKind === 'planner' ? 'generate-planner-pdf' : 'generate-pdf';
-      const reportSelectedSections = ['overview', 'personal', 'legacy'];
-
-      const { data: pdfData, error: pdfError } = await supabase.functions.invoke(functionName, {
-        body: {
-          planData: pdfPlanData,
-          // Planner PDF should output everything (ignore filtering). Report keeps its fixed 3 sections.
-          selectedSections: pdfExportKind === 'planner' ? selectedSections : reportSelectedSections,
-          piiData,
-          docType: pdfExportKind === 'planner' ? 'planner' : 'report',
-          isDraft: isDraftMode,
-          outputAllPages: pdfExportKind === 'planner',
-        },
+      const { data: pdfData, error } = await supabase.functions.invoke("generate-planner-pdf", {
+        body: payload,
       });
 
-      if (pdfError) throw pdfError;
+      if (error) throw error;
 
-      if (pdfData.url) {
-        // Open PDF in new tab for download
-        window.open(pdfData.url, '_blank');
-      } else if (pdfData.pdfBase64) {
-        // Fallback: download base64 PDF with correct filename
+      if (pdfData?.pdfBase64) {
         const byteCharacters = atob(pdfData.pdfBase64);
         const byteNumbers = new Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) {
@@ -708,24 +415,16 @@ export default function PrePlanSummary() {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        // Use filename from server response (includes "Planner for {Name}.pdf")
-        const filename = pdfData.filename || (isDraftMode 
-          ? `DRAFT-My-Life-and-Legacy-Planner-${new Date().toISOString().split('T')[0]}.pdf`
-          : `My-Life-and-Legacy-Planner-${new Date().toISOString().split('T')[0]}.pdf`);
+        const filename = pdfData.filename || `My-Planning-Document-${new Date().toISOString().split('T')[0]}.pdf`;
         link.download = filename;
         link.click();
         URL.revokeObjectURL(url);
       }
 
       toast({
-        title: isDraftMode ? "Draft Document Created" : "Document Created",
-        description: isDraftMode 
-          ? "Your draft document has been generated. Some fields may be blank."
-          : "Your planning document has been generated successfully."
+        title: "Document Created",
+        description: "Your planning document has been generated successfully."
       });
-      
-      // Reset draft mode after successful generation
-      setIsDraftMode(false);
     } catch (error) {
       console.error("Error generating document:", error);
       toast({
@@ -738,103 +437,43 @@ export default function PrePlanSummary() {
     }
   };
 
-  const handlePrint = async () => {
-    // Generate PDF and open in new tab for printing
-    handleDownloadPDF();
-  };
-
-  const handleSaveConfirmation = () => {
-    toast({
-      title: "Summary saved",
-      description: "Your summary is saved. You can return anytime."
-    });
-  };
-
-  const handleNavigateToSection = (sectionId: string) => {
-    const route = SECTION_ROUTES[sectionId] || "/preplandashboard/preferences";
-    navigate(route);
-  };
-
-  // Calculate missing sections - ONLY check sections user has selected in Preferences
-  const getMissingSections = () => {
-    const missing: Array<{id: string; name: string; status: string; actionLabel: string}> = [];
-    const selectedSet = new Set(selectedSections);
-    
-    // Only flag missing data for SELECTED sections
-    if (selectedSet.has("personal") && !profile?.full_name) {
-      missing.push({
-        id: "personal",
-        name: "Personal & Family Details",
-        status: "Incomplete",
-        actionLabel: "Add now"
-      });
+  // Render status icon
+  const StatusIcon = ({ status }: { status: "completed" | "started" | "not_started" }) => {
+    switch (status) {
+      case "completed":
+        return <Check className="h-5 w-5 text-green-600" />;
+      case "started":
+        return <Circle className="h-5 w-5 text-amber-500 fill-amber-200" />;
+      default:
+        return <Circle className="h-5 w-5 text-muted-foreground/40" />;
     }
-    
-    if (selectedSet.has("legacy") && !planData?.about_me_notes) {
-      missing.push({
-        id: "legacy",
-        name: "Life Story & Legacy",
-        status: "Incomplete",
-        actionLabel: "Add now"
-      });
-    }
-    
-    if (selectedSet.has("funeral") && !planData?.funeral_wishes_notes) {
-      missing.push({
-        id: "funeral",
-        name: "Funeral Wishes",
-        status: "Incomplete",
-        actionLabel: "Add now"
-      });
-    }
-    
-    if (selectedSet.has("contacts")) {
-      const hasContacts = contacts?.length > 0;
-      if (!hasContacts) {
-        missing.push({
-          id: "contacts",
-          name: "Key Contacts to Notify",
-          status: "Incomplete",
-          actionLabel: "Add now"
-        });
-      }
-    }
-    
-    if (selectedSet.has("legal") && !planData?.legal_notes) {
-      missing.push({
-        id: "legal",
-        name: "Legal & Planning Notes",
-        status: "Incomplete",
-        actionLabel: "Review"
-      });
-    }
-    
-    return missing;
   };
 
   if (loading) {
     return (
       <AuthenticatedLayout>
         <div className="min-h-screen flex items-center justify-center">
-          <p className="text-muted-foreground">Loading your summary...</p>
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+            <p className="text-muted-foreground text-lg">Loading your summary...</p>
+          </div>
         </div>
       </AuthenticatedLayout>
     );
   }
 
-  // Show empty state only if NO sections are selected (user hasn't set preferences)
   const noSectionsSelected = selectedSections.length === 0;
   
   if (noSectionsSelected) {
     return (
       <AuthenticatedLayout>
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="container mx-auto px-4 py-8 max-w-lg">
           <Card className="p-8 text-center">
-            <h2 className="text-xl font-semibold mb-4">Your Planning Document</h2>
-            <p className="text-muted-foreground mb-6">
-              You haven't chosen any sections yet. Start by selecting what you'd like to include in your plan.
+            <h2 className="text-xl font-semibold mb-4">Your Plan Summary</h2>
+            <p className="text-muted-foreground mb-6 text-lg">
+              You haven't chosen any sections yet. Start by selecting what you'd like to include.
             </p>
-            <Button onClick={() => navigate(SECTION_ROUTES.preferences)}>
+            <Button onClick={() => navigate(SECTION_ROUTES.preferences)} size="lg" className="w-full">
               Choose Your Sections
             </Button>
           </Card>
@@ -843,300 +482,195 @@ export default function PrePlanSummary() {
     );
   }
 
-  const missingSections = getMissingSections();
+  const completedCount = sections.filter(s => s.status === "completed").length;
+  const startedCount = sections.filter(s => s.status === "started").length;
 
   return (
     <AuthenticatedLayout>
-      <div className="container mx-auto px-4 py-8 max-w-4xl print:p-0">
-        {/* Senior-Friendly Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-3 text-foreground">Your Planning Summary</h1>
-          <div className="space-y-1 text-muted-foreground">
-            <p className="text-lg">This page shows everything you have written so far.</p>
-            <p>You do not need to finish every section.</p>
-            <p>You can review, print, or come back to your plan at any time.</p>
-          </div>
-          {lastUpdated && (
-            <p className="text-sm text-muted-foreground mt-3">
-              Last saved: {new Date(lastUpdated).toLocaleDateString()} at {new Date(lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </p>
-          )}
-        </div>
-
-        {/* What Can You Do Here - Helper Box */}
-        <div className="bg-senior-sage/20 border border-senior-sage/40 rounded-xl p-5 mb-6 print:hidden">
-          <h2 className="font-semibold text-foreground mb-3">What can you do on this page?</h2>
-          <ul className="space-y-2 text-muted-foreground">
-            <li className="flex items-start gap-2">
-              <span className="text-primary mt-0.5">•</span>
-              <span>Review what you have already filled out</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-primary mt-0.5">•</span>
-              <span>See which sections are still optional or empty</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-primary mt-0.5">•</span>
-              <span>Print or save a summary for your records</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-primary mt-0.5">•</span>
-              <span>Return to your planner to make changes anytime</span>
-            </li>
-          </ul>
-        </div>
-
-        {/* First-time helper - keep but simplify */}
-        {showFirstTimeHelper && (
-          <Alert className="mb-6 border-primary/30 bg-primary/5 print:hidden">
-            <AlertDescription className="flex items-center justify-between">
-              <span>This is your personal summary. Take your time reviewing it.</span>
-              <Button variant="ghost" size="sm" onClick={dismissFirstTimeHelper} className="h-6 w-6 p-0">
-                <X className="h-4 w-4" />
-              </Button>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Disclaimer - softer language */}
-        <Alert className="mb-6 border-amber-200 bg-amber-50/50 dark:bg-amber-950/20 print:hidden">
-          <AlertTriangle className="h-4 w-4 text-amber-600" />
-          <AlertDescription className="text-amber-800 dark:text-amber-200">
-            <strong>For Your Records Only</strong> — This summary helps you organize your wishes. It is not a legal document.
-          </AlertDescription>
-        </Alert>
-
-        {/* PDF Readiness Badge */}
-        <div className="mb-6 print:hidden">
-          <PdfReadinessBadge
-            isReady={validationResult.isValid}
-            missingSectionCount={validationResult.missingSectionCount}
-            onFixClick={() => setShowReadinessModal(true)}
-          />
-        </div>
-
-        {/* What's Missing - only show if there are missing sections */}
-        {missingSections.length > 0 && (
-          <div className="mb-6 print:hidden">
-            <WhatsMissingIndicator
-              missingSections={missingSections}
-              onNavigateToSection={handleNavigateToSection}
-            />
-          </div>
-        )}
-
-        {/* Primary Action Bar - Senior-Friendly */}
-        <div className="bg-white dark:bg-card border rounded-xl p-5 mb-6 print:hidden shadow-sm">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-4">
-            <Button 
-              onClick={() => navigate("/preplandashboard")} 
-              variant="outline"
-              size="lg"
-              className="gap-2 min-w-[200px]"
-            >
-              <ArrowRight className="h-4 w-4 rotate-180" />
-              Return to My Planner
-            </Button>
-            <Button 
-              onClick={handleDownloadPDF} 
-              size="lg"
-              className="gap-2 min-w-[200px]"
-            >
-              <Download className="h-4 w-4" />
-              View or Print My Plan
-            </Button>
-          </div>
-          
-          {/* Secondary actions */}
-          <div className="flex flex-wrap gap-2 justify-center border-t pt-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/preplandashboard/preferences")} className="gap-1 text-muted-foreground">
-              Continue filling sections
-            </Button>
-            <Button variant="ghost" size="sm" onClick={handleSaveConfirmation} className="gap-1 text-muted-foreground">
-              <Save className="h-3 w-3" />
-              Save and come back later
-            </Button>
-          </div>
-          
-          {/* Reassurance text */}
-          <p className="text-center text-sm text-muted-foreground mt-4">
-            You can always return to your planner or home page.<br />
-            Nothing is final unless you choose to print or share it.
+      <div className="container mx-auto px-4 py-6 max-w-lg print:p-0">
+        {/* Page Title */}
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-3 text-foreground">Your Plan Summary</h1>
+          <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
+            You can review or change anything at any time. You do not need to finish everything at once.
           </p>
         </div>
 
-        {/* More Actions - Collapsed */}
-        <div className="bg-muted/30 border rounded-xl p-4 mb-6 print:hidden">
-          <p className="text-sm font-medium text-muted-foreground mb-3 text-center">More options</p>
-          <TooltipProvider>
-            <div className="flex flex-wrap gap-2 justify-center">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="sm" onClick={handleDownloadSummaryReport} className="gap-2">
-                    <FileText className="h-4 w-4" />
-                    Short Summary
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Downloads a shorter 3-page summary</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="sm" onClick={handlePrint} className="gap-2">
-                    <Printer className="h-4 w-4" />
-                    Print Paper Copy
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Prints your planning document</TooltipContent>
-              </Tooltip>
-              
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="sm" onClick={() => setShowShareDialog(true)} className="gap-2">
-                    <Mail className="h-4 w-4" />
-                    Email to Family
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Sends your planning document by email</TooltipContent>
-              </Tooltip>
-              
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="sm" onClick={() => toast({ title: "Coming soon", description: "Family Notice view is being prepared." })} className="gap-2">
-                    <Heart className="h-4 w-4" />
-                    One-Page Family Notice
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Shares a simplified one-page summary for loved ones</TooltipContent>
-              </Tooltip>
-            </div>
-          </TooltipProvider>
+        {/* Primary Action Button */}
+        <div className="mb-8">
+          <Button 
+            onClick={handleDownloadPDF}
+            disabled={generatingPdf}
+            size="lg"
+            className="w-full h-14 text-lg font-medium gap-3"
+          >
+            {generatingPdf ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Creating Document...
+              </>
+            ) : (
+              <>
+                <Download className="h-5 w-5" />
+                View or Print My Planning Document
+              </>
+            )}
+          </Button>
         </div>
 
-        {/* Content Sections - Senior-Friendly Language */}
-        <div className="space-y-4 mb-8">
-          <h2 className="text-xl font-semibold text-foreground">Your Sections</h2>
-          <p className="text-muted-foreground mb-4">
-            Below are the sections you have chosen to include. You can edit any section at any time.
-          </p>
-          
-          {sections.map((section) => (
-            <Card key={section.id} className="print:shadow-none print:border">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <div className={`p-2 rounded-lg ${section.hasContent ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                      {section.icon}
-                    </div>
-                    {section.label}
-                  </CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => navigate(section.editRoute)}
-                    className="gap-1 text-muted-foreground hover:text-primary print:hidden"
-                  >
-                    <Edit className="h-3 w-3" />
-                    Edit
-                    <ArrowRight className="h-3 w-3" />
-                  </Button>
+        {/* Expandable Section Summary */}
+        <Card className="mb-6">
+          <Collapsible open={sectionsExpanded} onOpenChange={setSectionsExpanded}>
+            <CollapsibleTrigger asChild>
+              <button className="w-full p-5 flex items-center justify-between text-left hover:bg-muted/50 transition-colors rounded-t-lg">
+                <div>
+                  <p className="font-medium text-foreground text-lg">
+                    View what you've already filled in
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    You can update any section at any time.
+                  </p>
                 </div>
-              </CardHeader>
-              <CardContent>
-                {section.hasContent && section.content ? (
-                  <div>
-                    <p className="text-xs text-green-600 dark:text-green-400 mb-2 font-medium">
-                      ✓ You have added information to this section.
-                    </p>
-                    {section.content}
-                  </div>
+                {sectionsExpanded ? (
+                  <ChevronUp className="h-6 w-6 text-muted-foreground flex-shrink-0" />
                 ) : (
-                  <div className="text-sm text-muted-foreground bg-muted/30 rounded-lg p-4">
-                    <p className="mb-2">You have not added anything here yet. This is optional.</p>
+                  <ChevronDown className="h-6 w-6 text-muted-foreground flex-shrink-0" />
+                )}
+              </button>
+            </CollapsibleTrigger>
+            
+            {/* Summary stats when collapsed */}
+            {!sectionsExpanded && (
+              <div className="px-5 pb-4 flex gap-4 text-sm text-muted-foreground">
+                {completedCount > 0 && (
+                  <span className="flex items-center gap-1">
+                    <Check className="h-4 w-4 text-green-600" />
+                    {completedCount} completed
+                  </span>
+                )}
+                {startedCount > 0 && (
+                  <span className="flex items-center gap-1">
+                    <Circle className="h-4 w-4 text-amber-500 fill-amber-200" />
+                    {startedCount} started
+                  </span>
+                )}
+              </div>
+            )}
+            
+            <CollapsibleContent>
+              <div className="border-t divide-y">
+                {sections.map((section) => (
+                  <div 
+                    key={section.id}
+                    className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors"
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <StatusIcon status={section.status} />
+                      <span className="text-foreground truncate">{section.label}</span>
+                    </div>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => navigate(section.editRoute)}
-                      className="text-primary print:hidden"
+                      className="flex-shrink-0 h-10 px-4"
                     >
-                      Add information →
+                      {section.status === "not_started" ? (
+                        <>
+                          <Play className="h-4 w-4 mr-1" />
+                          Start
+                        </>
+                      ) : (
+                        <>
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
+                        </>
+                      )}
                     </Button>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        </Card>
 
-        {/* Reminder Opt-In */}
-        {missingSections.length > 0 && (
-          <div className="mb-8 print:hidden">
-            <ReminderEmailOptIn userEmail={userEmail} />
-          </div>
-        )}
+        {/* Personal Notes Section */}
+        <Card className="mb-6">
+          <CardContent className="p-5">
+            <h2 className="font-semibold text-foreground text-lg mb-2">
+              Notes or Reminders for Yourself
+            </h2>
+            <p className="text-muted-foreground text-sm mb-4">
+              Use this space to write things you still want to do, questions you have, or anything you want your family to know.
+            </p>
+            <Textarea
+              value={personalNotes}
+              onChange={(e) => setPersonalNotes(e.target.value)}
+              placeholder="For example: 'Need to talk to my daughter about this.' or 'Still deciding on burial.'"
+              className="min-h-[120px] text-base resize-none"
+            />
+            <p className="text-xs text-muted-foreground mt-2">
+              Your notes are saved automatically.
+            </p>
+          </CardContent>
+        </Card>
 
-        {/* Optional Add-Ons Section */}
-        <div className="border-t pt-8 mb-8 print:hidden">
-          <h2 className="text-xl font-semibold text-foreground mb-2">Optional Add-Ons</h2>
-          <p className="text-muted-foreground mb-4">Only if you want them — these do not affect your plan.</p>
+        {/* Optional Extras Section */}
+        <div className="bg-primary/5 border border-primary/20 rounded-xl p-5 mb-6">
+          <h2 className="font-semibold text-foreground mb-1">
+            Optional extras
+          </h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Only if helpful — these do not affect your plan.
+          </p>
           
-          <div className="grid gap-4 sm:grid-cols-2">
-            {/* Printed Binder */}
-            <Card className="border-senior-sage/30 hover:border-senior-sage/50 transition-colors">
-              <CardContent className="p-5">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-senior-sage/20 text-primary">
-                    <FileText className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-foreground mb-1">Purchase a Printed Binder</h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      A physical copy for your home or family.
-                    </p>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => navigate("/product-binder")}
-                      className="w-full"
-                    >
-                      Learn More
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="space-y-3">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start h-auto py-3 px-4"
+              onClick={() => navigate("/product-binder")}
+            >
+              <FileText className="h-5 w-5 mr-3 text-primary" />
+              <div className="text-left">
+                <p className="font-medium">Purchase a Printed Binder</p>
+                <p className="text-sm text-muted-foreground">A physical copy for your home</p>
+              </div>
+            </Button>
             
-            {/* Memorial Song */}
-            <Card className="border-senior-sage/30 hover:border-senior-sage/50 transition-colors">
-              <CardContent className="p-5">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-senior-sage/20 text-primary">
-                    <Heart className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-foreground mb-1">Create a Memorial Song</h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      A personalized song to remember a loved one.
-                    </p>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => navigate("/custom-song")}
-                      className="w-full"
-                    >
-                      Learn More
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <Button 
+              variant="outline" 
+              className="w-full justify-start h-auto py-3 px-4"
+              onClick={() => navigate("/custom-song")}
+            >
+              <Heart className="h-5 w-5 mr-3 text-primary" />
+              <div className="text-left">
+                <p className="font-medium">Create a Memorial Song</p>
+                <p className="text-sm text-muted-foreground">A personalized song for loved ones</p>
+              </div>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="w-full justify-start h-auto py-3 px-4"
+              onClick={() => setShowShareDialog(true)}
+            >
+              <MessageSquare className="h-5 w-5 mr-3 text-primary" />
+              <div className="text-left">
+                <p className="font-medium">Share with Family</p>
+                <p className="text-sm text-muted-foreground">Email your plan to loved ones</p>
+              </div>
+            </Button>
           </div>
         </div>
 
-        {/* Print Footer */}
-        <div className="hidden print:block mt-8 pt-4 border-t text-center text-sm text-muted-foreground">
-          <p>Planning Summary — For Your Records — Not a Legal Document</p>
-          <p>Generated on {new Date().toLocaleDateString()}</p>
+        {/* Return to Planner */}
+        <div className="text-center">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate("/preplandashboard")}
+            className="text-muted-foreground"
+          >
+            ← Return to My Planner
+          </Button>
         </div>
 
         {/* Dialogs */}
@@ -1151,17 +685,11 @@ export default function PrePlanSummary() {
           onOpenChange={setShowShareDialog}
         />
 
-        <PdfReadinessModal
-          open={showReadinessModal}
-          onOpenChange={setShowReadinessModal}
-          missing={validationResult.missing}
-          hasHardRequired={validationResult.hasHardRequired}
-          canBypass={validationResult.canBypass}
-          onFixItems={() => {}}
-          onDownloadDraft={handleDownloadDraft}
-          onPrintDraft={handlePrintDraft}
-          onEmailDraft={handleEmailDraft}
-        />
+        {/* Hidden print footer */}
+        <div className="hidden print:block mt-8 pt-4 border-t text-sm text-muted-foreground text-center">
+          <p>Generated from Your Plan Summary</p>
+          <p>For personal use only — not a legal document</p>
+        </div>
       </div>
     </AuthenticatedLayout>
   );
