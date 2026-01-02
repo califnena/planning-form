@@ -1,12 +1,11 @@
 /**
  * Section Routes - Single source of truth for section navigation
  * Used by PrePlanSummary, PdfReadinessModal, and any other deep-linking needs
- * 
- * TRUE ROUTES: Each section has its own URL path
  */
 
 // Section route mapping for deep-linking from summary/modals to specific planner sections
 export const SECTION_ROUTES: Record<string, string> = {
+  travel: "/preplandashboard?section=travel",
   personal: "/preplandashboard/personal-family",
   contacts: "/preplandashboard/contacts",
   funeral: "/preplandashboard/funeral-wishes",
@@ -36,6 +35,7 @@ export const SECTION_LABELS: Record<string, string> = {
   personal: "About You",
   healthcare: "Medical & Care Preferences",
   carepreferences: "Care Preferences",
+  travel: "Travel & Away-From-Home",
   funeral: "Funeral Wishes",
   insurance: "Insurance",
   contacts: "Important Contacts",

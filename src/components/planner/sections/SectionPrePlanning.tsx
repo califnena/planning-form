@@ -39,6 +39,12 @@ const PRE_PLANNING_ITEMS: PrePlanningItem[] = [
     learnMoreRoute: "/resources?topic=funeral-planning",
   },
   {
+    id: "travel_protection",
+    title: "I have reviewed travel or away-from-home protection",
+    goToRoute: "/preplandashboard?section=travel",
+    learnMoreRoute: "/travel-protection",
+  },
+  {
     id: "insurance_info",
     title: "I have listed important insurance information",
     goToRoute: "/preplandashboard?section=insurance",
