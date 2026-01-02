@@ -97,6 +97,7 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
   let localCarePreferences: any = null;
   let localPreplanning: any = null;
   let localTravel: any = null;
+  let localAdvanceDirective: any = null;
   try {
     const raw = localStorage.getItem(`plan_${userId}`);
     if (raw) {
@@ -115,6 +116,9 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
 
     const travelRaw = localStorage.getItem(`travel_planning_${userId}`);
     if (travelRaw) localTravel = JSON.parse(travelRaw);
+
+    const advDirRaw = localStorage.getItem(`advance_directive_${userId}`);
+    if (advDirRaw) localAdvanceDirective = JSON.parse(advDirRaw);
   } catch (e) {
     console.warn("[buildPlanDataForPdf] Failed to parse local data:", e);
   }
@@ -181,6 +185,13 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
       : undefined,
     preplanning: localPreplanning || undefined,
     travel: localTravel || undefined,
+    advance_directive: localAdvanceDirective || undefined,
+    
+    // Funeral data from localStorage plan object
+    funeral: localPlan?.funeral || undefined,
+    
+    // plan_payload from DB (unified storage)
+    plan_payload: plan.plan_payload || {},
 
     // Section visibility
     _visibleSections: userSettings?.selected_sections || undefined,

@@ -204,6 +204,7 @@ const App = () => (
                       <Route path="/preview/pdf" element={<PreviewPDF />} />
                       <Route path="/travel-protection" element={<TravelProtection />} />
                       <Route path="/preview-landing" element={<LandingAlt />} />
+                      <Route path="/landingold" element={<Landing />} />
                       <Route path="/home-senior" element={<LandingSenior />} />
                       <Route path="/after-death" element={<AfterDeathLanding />} />
                       <Route path="/plan-ahead" element={<PlanAheadLanding />} />

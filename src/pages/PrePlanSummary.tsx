@@ -235,6 +235,20 @@ export default function PrePlanSummary() {
           editRoute: "/preplandashboard/care-preferences",
         },
         {
+          id: "advancedirective",
+          label: "Advance Directive & DNR Status",
+          icon: <FileText className="h-5 w-5" />,
+          status: getSectionStatus("advancedirective"),
+          editRoute: "/preplandashboard/advance-directive",
+        },
+        {
+          id: "travel",
+          label: "Travel & Away-From-Home Plan",
+          icon: <Home className="h-5 w-5" />,
+          status: getSectionStatus("travel"),
+          editRoute: "/preplandashboard/travel-planning",
+        },
+        {
           id: "funeral",
           label: "Funeral Wishes",
           icon: <Heart className="h-5 w-5" />,
@@ -268,6 +282,20 @@ export default function PrePlanSummary() {
           icon: <MessageSquare className="h-5 w-5" />,
           status: getSectionStatus("messages"),
           editRoute: SECTION_ROUTES.messages,
+        },
+        {
+          id: "digital",
+          label: "Online Accounts",
+          icon: <Laptop className="h-5 w-5" />,
+          status: getSectionStatus("digital"),
+          editRoute: SECTION_ROUTES.digital,
+        },
+        {
+          id: "preplanning",
+          label: "Pre-Planning Checklist",
+          icon: <FileText className="h-5 w-5" />,
+          status: getSectionStatus("preplanning"),
+          editRoute: "/preplandashboard/checklist",
         },
       ];
 
@@ -573,10 +601,10 @@ export default function PrePlanSummary() {
               <button className="w-full p-5 flex items-center justify-between text-left hover:bg-muted/50 transition-colors rounded-t-lg">
                 <div>
                   <p className="font-medium text-foreground text-lg">
-                    Your completed sections
+                    View or edit sections
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    This shows what you have already filled in. You can view or edit any section at any time.
+                    Tap any section to review or change it. You can do this anytime.
                   </p>
                   {sectionsExpanded && (
                     <p className="text-sm text-primary mt-2">
