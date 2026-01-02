@@ -3,7 +3,6 @@ import { SectionContacts } from "@/components/planner/sections/SectionContacts";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { ViewDocumentButton } from "@/components/planner/ViewDocumentButton";
 import { useNavigate } from "react-router-dom";
 
 export default function ContactsPage() {
@@ -23,7 +22,6 @@ export default function ContactsPage() {
           error={saveState.error}
         />
       </div>
-      <ViewDocumentButton />
       <PreviewModeWrapper>
         <SectionContacts data={plan} onChange={updatePlan} />
       </PreviewModeWrapper>

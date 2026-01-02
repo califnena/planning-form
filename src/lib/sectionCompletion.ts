@@ -2,15 +2,13 @@
  * Section Completion Logic
  * 
  * SINGLE SOURCE OF TRUTH for determining if a section is "complete".
- * Uses the same data keys as buildPlanDataForPdf.ts and sectionRegistry.ts
+ * Checks both Supabase data AND localStorage data.
  * 
- * A section is "complete" if it has at least one meaningful value:
- * - Non-empty string
- * - True boolean
- * - Non-empty array
+ * A section is "complete" if it has at least one meaningful value.
  */
 
-import { getCompletableSections, getSectionDataKey } from "./sectionRegistry";
+import { getCompletableSections } from "./sectionRegistry";
+import { getStorageWithMigration, getIdentitySync } from "./identityUtils";
 
 export type CompletionStatus = "completed" | "not_started";
 
@@ -26,7 +24,6 @@ const hasItems = (arr: unknown): boolean => Array.isArray(arr) && arr.length > 0
 
 /**
  * Recursively checks if an object has any meaningful value.
- * Excludes: undefined, null, empty string, "unsure", false, empty arrays, empty objects
  */
 const hasAnyMeaningfulValue = (obj: unknown): boolean => {
   if (obj === undefined || obj === null) return false;
@@ -41,127 +38,177 @@ const hasAnyMeaningfulValue = (obj: unknown): boolean => {
   return false;
 };
 
-// ============= SECTION-SPECIFIC COMPLETION CHECKS =============
+/**
+ * Get localStorage data for a section using identity-based keys
+ */
+function getLocalStorageData(sectionId: string, userId?: string | null): any {
+  const identity = getIdentitySync(userId);
+  
+  // Try standardized key first
+  const standardData = getStorageWithMigration(sectionId, identity);
+  if (standardData && hasAnyMeaningfulValue(standardData)) {
+    return standardData;
+  }
+  
+  // Also check legacy keys directly (for backward compatibility)
+  const legacyKeys = getLegacyKeys(sectionId, userId);
+  for (const key of legacyKeys) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (hasAnyMeaningfulValue(parsed)) {
+          return parsed;
+        }
+      }
+    } catch {
+      continue;
+    }
+  }
+  
+  return null;
+}
 
 /**
- * Each section has its own completion check that looks at the specific
- * data locations used by that section's forms and buildPlanDataForPdf.
+ * Legacy keys to check for each section
  */
-const sectionChecks: Record<string, (pd: any) => boolean> = {
-  // Pre-planning checklist - stored in localStorage under preplanning_checklist
-  preplanning: (pd) => {
-    // Check localStorage key used by SectionPrePlanning
-    if (typeof window !== "undefined") {
-      const raw = localStorage.getItem("preplanning_checklist");
-      if (raw) {
-        const checks = JSON.parse(raw);
-        if (Object.values(checks).some((v) => v === true)) return true;
-      }
+function getLegacyKeys(sectionId: string, userId?: string | null): string[] {
+  const uid = userId || "";
+  switch (sectionId) {
+    case "preplanning":
+      return ["preplanning_checklist", `preplanning_${uid}`, "preplanning_notes"];
+    case "healthcare":
+      return [`healthcare_${uid}`, "healthcare_data"];
+    case "travel":
+      return [`travel_planning_${uid}`, "travel_planning_data", `travel_${uid}`];
+    case "advance_directive":
+      return [`advance_directive_${uid}`, "advance_directive_data"];
+    case "care_preferences":
+      return [`care_preferences_${uid}`, "care_preferences_data"];
+    case "personal":
+      return [`aboutyou_data`, `personal_info_${uid}`, `plan_${uid}`];
+    case "funeral":
+      return [`funeral_wishes_${uid}`, `plan_${uid}`];
+    default:
+      return [];
+  }
+}
+
+// ============= SECTION-SPECIFIC COMPLETION CHECKS =============
+
+const sectionChecks: Record<string, (pd: any, userId?: string | null) => boolean> = {
+  // Pre-planning checklist
+  preplanning: (pd, userId) => {
+    // Check localStorage (primary for checklist)
+    const localData = getLocalStorageData("preplanning", userId);
+    if (localData && Object.values(localData).some((v) => v === true)) {
+      return true;
     }
     // Also check plan_payload
-    return hasAnyMeaningfulValue(pd.plan_payload?.preplanning) ||
-           hasAnyMeaningfulValue(pd.preplanning);
+    return hasAnyMeaningfulValue(pd?.plan_payload?.preplanning) ||
+           hasAnyMeaningfulValue(pd?.preplanning);
   },
 
-  // Medical & Care - stored in localStorage under healthcare_{userId}
-  healthcare: (pd) => {
-    const h = pd.healthcare || pd.plan_payload?.healthcare || {};
+  // Medical & Care
+  healthcare: (pd, userId) => {
+    const localData = getLocalStorageData("healthcare", userId);
+    if (hasAnyMeaningfulValue(localData)) return true;
+    
+    const h = pd?.healthcare || pd?.plan_payload?.healthcare || {};
     return hasItems(h.conditions) ||
            hasItems(h.allergies) ||
            hasItems(h.medications) ||
            hasText(h.doctorPharmacy?.primaryDoctorName) ||
-           hasText(h.doctorPharmacy?.pharmacyName) ||
            hasAnyMeaningfulValue(h);
   },
 
-  // Advance Directive - stored in localStorage under advance_directive_{userId}
-  advance_directive: (pd) => {
-    const ad = pd.advance_directive || pd.plan_payload?.advance_directive || {};
+  // Advance Directive
+  advance_directive: (pd, userId) => {
+    const localData = getLocalStorageData("advance_directive", userId);
+    if (hasAnyMeaningfulValue(localData)) return true;
+    
+    const ad = pd?.advance_directive || pd?.plan_payload?.advance_directive || {};
     return hasText(ad.healthcareProxyName) ||
-           hasText(ad.healthcareProxyPhone) ||
-           (hasText(ad.advanceDirectiveStatus) && ad.advanceDirectiveStatus !== "unsure") ||
-           (hasText(ad.dnrStatus) && ad.dnrStatus !== "unsure") ||
-           (hasText(ad.polstStatus) && ad.polstStatus !== "unsure") ||
-           hasText(ad.documentLocation) ||
-           hasText(ad.dnrPolstLocation);
+           hasText(ad.advanceDirectiveStatus) ||
+           hasText(ad.dnrStatus);
   },
 
-  // Travel - stored in localStorage under travel_planning_{userId}
-  travel: (pd) => {
-    const t = pd.travel || pd.plan_payload?.travel || {};
+  // Travel
+  travel: (pd, userId) => {
+    const localData = getLocalStorageData("travel", userId);
+    if (hasAnyMeaningfulValue(localData)) return true;
+    
+    const t = pd?.travel || pd?.plan_payload?.travel || {};
     return hasText(t.emergencyContact) ||
            hasText(t.providerName) ||
-           hasText(t.notes) ||
-           (hasText(t.travelOvernight) && t.travelOvernight !== "unsure") ||
-           (hasText(t.travelOutOfState) && t.travelOutOfState !== "unsure") ||
-           (hasText(t.hasTravelProtection) && t.hasTravelProtection !== "unsure");
+           hasText(t.notes);
   },
 
-  // Funeral Wishes - stored in plan_payload.funeral OR funeral_wishes_notes
-  funeral: (pd) => {
-    const f = pd.funeral || pd.plan_payload?.funeral || {};
-    return hasText(pd.funeral_wishes_notes) ||
+  // Funeral Wishes
+  funeral: (pd, userId) => {
+    const localData = getLocalStorageData("funeral", userId);
+    if (hasAnyMeaningfulValue(localData)) return true;
+    
+    const f = pd?.funeral || pd?.plan_payload?.funeral || {};
+    return hasText(pd?.funeral_wishes_notes) ||
            hasText(f.funeralPreference) ||
            hasText(f.finalDisposition) ||
-           hasText(f.disposition) ||
-           hasText(f.service_type) ||
-           hasText(f.notes) ||
            hasAnyMeaningfulValue(f);
   },
 
-  // Messages - stored in messages table OR to_loved_ones_message
+  // Messages
   messages: (pd) => {
-    return hasItems(pd.messages) ||
-           hasText(pd.messages_notes) ||
-           hasText(pd.to_loved_ones_message) ||
-           hasAnyMeaningfulValue(pd.plan_payload?.messages);
+    return hasItems(pd?.messages) ||
+           hasText(pd?.messages_notes) ||
+           hasText(pd?.to_loved_ones_message) ||
+           hasAnyMeaningfulValue(pd?.plan_payload?.messages);
   },
 
-  // About You / Personal - stored in personal_profiles table
-  personal: (pd) => {
-    const profile = pd.personal_profile || {};
+  // About You / Personal
+  personal: (pd, userId) => {
+    const localData = getLocalStorageData("personal", userId);
+    if (hasAnyMeaningfulValue(localData)) return true;
+    
+    const profile = pd?.personal_profile || {};
     return hasText(profile.full_name) ||
            hasText(profile.preferred_name) ||
-           hasText(profile.phone) ||
-           hasText(profile.email) ||
            hasText(profile.address) ||
-           hasText(profile.birthplace) ||
-           hasAnyMeaningfulValue(pd.plan_payload?.about_you);
+           hasAnyMeaningfulValue(pd?.plan_payload?.about_you);
   },
 
-  // Important Contacts - stored in contacts_notify / contacts_professional tables
+  // Important Contacts
   contacts: (pd) => {
-    return hasItems(pd.contacts_notify) ||
-           hasItems(pd.contacts) ||
-           hasItems(pd.contacts_professional) ||
-           hasAnyMeaningfulValue(pd.plan_payload?.contacts);
+    return hasItems(pd?.contacts_notify) ||
+           hasItems(pd?.contacts) ||
+           hasItems(pd?.contacts_professional) ||
+           hasAnyMeaningfulValue(pd?.plan_payload?.contacts);
   },
 
-  // Insurance - stored in insurance_policies table
+  // Insurance
   insurance: (pd) => {
-    return hasItems(pd.insurance_policies) ||
-           hasText(pd.insurance_notes) ||
-           hasAnyMeaningfulValue(pd.plan_payload?.insurance);
+    return hasItems(pd?.insurance_policies) ||
+           hasText(pd?.insurance_notes) ||
+           hasAnyMeaningfulValue(pd?.plan_payload?.insurance);
   },
 
-  // Property - stored in properties table
+  // Property
   property: (pd) => {
-    return hasItems(pd.properties) ||
-           hasText(pd.property_notes) ||
-           hasAnyMeaningfulValue(pd.plan_payload?.property);
+    return hasItems(pd?.properties) ||
+           hasText(pd?.property_notes) ||
+           hasAnyMeaningfulValue(pd?.plan_payload?.property);
   },
 
-  // Pets - stored in pets table
+  // Pets
   pets: (pd) => {
-    return hasItems(pd.pets) ||
-           hasText(pd.pets_notes) ||
-           hasAnyMeaningfulValue(pd.plan_payload?.pets);
+    return hasItems(pd?.pets) ||
+           hasText(pd?.pets_notes) ||
+           hasAnyMeaningfulValue(pd?.plan_payload?.pets);
   },
 
-  // Digital / Online Accounts - stored in digital_notes
+  // Digital / Online Accounts
   digital: (pd) => {
-    return hasText(pd.digital_notes) ||
-           hasAnyMeaningfulValue(pd.plan_payload?.digital);
+    return hasText(pd?.digital_notes) ||
+           hasAnyMeaningfulValue(pd?.plan_payload?.digital);
   },
 };
 
@@ -170,12 +217,14 @@ const sectionChecks: Record<string, (pd: any) => boolean> = {
 /**
  * Computes completion status for each section based on stored data.
  * Returns a map of sectionId -> boolean (true = completed)
+ * 
+ * @param planData - Data from Supabase (optional)
+ * @param userId - User ID for localStorage key lookup (optional)
  */
-export function getSectionCompletion(planData: any): Record<string, boolean> {
+export function getSectionCompletion(planData: any, userId?: string | null): Record<string, boolean> {
   const pd = planData ?? {};
   const result: Record<string, boolean> = {};
 
-  // Get all completable sections from registry
   const sections = getCompletableSections();
 
   for (const section of sections) {
@@ -183,12 +232,15 @@ export function getSectionCompletion(planData: any): Record<string, boolean> {
     const checkFn = sectionChecks[dataKey];
 
     if (checkFn) {
-      result[section.id] = checkFn(pd);
+      result[section.id] = checkFn(pd, userId);
     } else {
       // Fallback: check plan_payload and direct property
-      const fromPayload = pd.plan_payload?.[dataKey];
-      const fromDirect = pd[dataKey];
-      result[section.id] = hasAnyMeaningfulValue(fromPayload) || hasAnyMeaningfulValue(fromDirect);
+      const fromPayload = pd?.plan_payload?.[dataKey];
+      const fromDirect = pd?.[dataKey];
+      const fromLocal = getLocalStorageData(dataKey, userId);
+      result[section.id] = hasAnyMeaningfulValue(fromPayload) || 
+                          hasAnyMeaningfulValue(fromDirect) ||
+                          hasAnyMeaningfulValue(fromLocal);
     }
   }
 
@@ -198,7 +250,7 @@ export function getSectionCompletion(planData: any): Record<string, boolean> {
 /**
  * Check if a single section is complete
  */
-export function isSectionComplete(sectionId: string, planData: any): boolean {
-  const completion = getSectionCompletion(planData);
+export function isSectionComplete(sectionId: string, planData: any, userId?: string | null): boolean {
+  const completion = getSectionCompletion(planData, userId);
   return completion[sectionId] || false;
 }

@@ -3,7 +3,6 @@ import { SectionHealthCare } from "@/components/planner/sections/SectionHealthCa
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { ViewDocumentButton } from "@/components/planner/ViewDocumentButton";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
@@ -11,7 +10,6 @@ export default function HealthCarePage() {
   const { user, saveState } = usePlanContext();
   const navigate = useNavigate();
 
-  // Store health care data in localStorage (not DB to avoid migration)
   const [healthCareData, setHealthCareData] = useState<any>({});
 
   useEffect(() => {
@@ -47,7 +45,6 @@ export default function HealthCarePage() {
           error={saveState.error}
         />
       </div>
-      <ViewDocumentButton />
       <PreviewModeWrapper>
         <SectionHealthCare data={healthCareData} onChange={handleChange} />
       </PreviewModeWrapper>
