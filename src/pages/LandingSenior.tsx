@@ -379,10 +379,8 @@ const LandingSenior = () => {
               <span className="text-[hsl(var(--senior-text))] font-medium text-lg">After-death guide for families</span>
             </Link>
             
-            <a 
-              href="https://lovable.dev/projects/698c7416-0181-4030-9345-897d253b438f" 
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link 
+              to="/resources" 
               className="flex items-center gap-5 p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors"
             >
               <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
@@ -392,7 +390,7 @@ const LandingSenior = () => {
                 <span className="text-[hsl(var(--senior-text))] font-medium text-lg block">Free Guides & Resources</span>
                 <span className="text-[hsl(var(--senior-text-soft))] text-sm">Interactive planning guide to help you get started</span>
               </div>
-            </a>
+            </Link>
           </div>
         </section>
 
@@ -448,10 +446,8 @@ const LandingSenior = () => {
           </h2>
           
           <div className="grid md:grid-cols-3 gap-5 mb-6">
-            <a 
-              href="https://lovable.dev/projects/698c7416-0181-4030-9345-897d253b438f" 
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link 
+              to="/resources" 
               className="flex flex-col items-center text-center p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors"
             >
               <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center mb-4">
@@ -459,7 +455,7 @@ const LandingSenior = () => {
               </div>
               <span className="font-medium text-[hsl(var(--senior-text))]">Free Guides & Resources</span>
               <span className="text-sm text-[hsl(var(--senior-text-soft))] mt-1">Interactive planning guide</span>
-            </a>
+            </Link>
             
             <Link 
               to="/do-it-for-you" 
