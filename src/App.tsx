@@ -94,6 +94,9 @@ import {
   InstructionsPage,
   LegalResourcesPage,
   WillPrepPage,
+  PrePlanningPage,
+  HealthCarePage,
+  CarePreferencesPage,
 } from "./pages/planner";
 
 const queryClient = new QueryClient();
@@ -134,6 +137,9 @@ const App = () => (
                         <Route index element={<Navigate to="/preplandashboard/preferences" replace />} />
                         <Route path="preferences" element={<PreferencesPage />} />
                         <Route path="overview" element={<OverviewPage />} />
+                        <Route path="pre-planning" element={<PrePlanningPage />} />
+                        <Route path="health-care" element={<HealthCarePage />} />
+                        <Route path="care-preferences" element={<CarePreferencesPage />} />
                         <Route path="personal-family" element={<PersonalFamilyPage />} />
                         <Route path="life-story" element={<LifeStoryPage />} />
                         <Route path="funeral-wishes" element={<FuneralWishesPage />} />

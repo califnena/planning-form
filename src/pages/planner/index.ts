@@ -18,3 +18,6 @@ export { default as ChecklistPage } from "./ChecklistPage";
 export { default as InstructionsPage } from "./InstructionsPage";
 export { default as LegalResourcesPage } from "./LegalResourcesPage";
 export { default as WillPrepPage } from "./WillPrepPage";
+export { default as PrePlanningPage } from "./PrePlanningPage";
+export { default as HealthCarePage } from "./HealthCarePage";
+export { default as CarePreferencesPage } from "./CarePreferencesPage";

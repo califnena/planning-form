@@ -48,6 +48,9 @@ export const usePlanContext = () => {
 const routeToSectionId: Record<string, string> = {
   "/preplandashboard/preferences": "preferences",
   "/preplandashboard/overview": "overview",
+  "/preplandashboard/pre-planning": "preplanning",
+  "/preplandashboard/health-care": "healthcare",
+  "/preplandashboard/care-preferences": "carepreferences",
   "/preplandashboard/personal-family": "personal",
   "/preplandashboard/life-story": "legacy",
   "/preplandashboard/funeral-wishes": "funeral",
@@ -429,6 +432,9 @@ export default function PlannerLayout() {
   const sectionIdToRoute: Record<string, string> = {
     preferences: "/preplandashboard/preferences",
     overview: "/preplandashboard/overview",
+    preplanning: "/preplandashboard/pre-planning",
+    healthcare: "/preplandashboard/health-care",
+    carepreferences: "/preplandashboard/care-preferences",
     personal: "/preplandashboard/personal-family",
     legacy: "/preplandashboard/life-story",
     funeral: "/preplandashboard/funeral-wishes",
