@@ -3,7 +3,6 @@ import { SectionFuneral } from "@/components/planner/sections/SectionFuneral";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { ViewDocumentButton } from "@/components/planner/ViewDocumentButton";
 import { useNavigate } from "react-router-dom";
 
 export default function FuneralWishesPage() {
@@ -23,7 +22,6 @@ export default function FuneralWishesPage() {
           error={saveState.error}
         />
       </div>
-      <ViewDocumentButton />
       <PreviewModeWrapper>
         <SectionFuneral data={plan} onChange={(data) => updatePlan(data)} />
       </PreviewModeWrapper>

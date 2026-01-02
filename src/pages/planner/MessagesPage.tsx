@@ -3,7 +3,6 @@ import { SectionMessages } from "@/components/planner/sections/SectionMessages";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { ViewDocumentButton } from "@/components/planner/ViewDocumentButton";
 import { useNavigate } from "react-router-dom";
 
 export default function MessagesPage() {
@@ -19,7 +18,6 @@ export default function MessagesPage() {
           error={saveState.error}
         />
       </div>
-      <ViewDocumentButton />
       <PreviewModeWrapper>
         <SectionMessages data={plan} onChange={(data) => updatePlan(data)} />
       </PreviewModeWrapper>

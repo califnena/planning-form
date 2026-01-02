@@ -28,6 +28,7 @@ import { useActivePlan, fetchPlanData } from "@/hooks/useActivePlan";
 import { buildPlanDataForPdf, normalizePlanDataForPdf } from "@/lib/buildPlanDataForPdf";
 import { getSectionCompletion } from "@/lib/sectionCompletion";
 import { getCompletableSections, type SectionDefinition } from "@/lib/sectionRegistry";
+import { getOrCreateGuestId } from "@/lib/identityUtils";
 
 interface SectionData {
   id: string;
@@ -133,11 +134,12 @@ export default function PrePlanSummary() {
 
       setPlanData(mergedPlanData);
 
-      // Compute completion using unified logic
-      const completion = getSectionCompletion(mergedPlanData);
+      // Compute completion using unified logic - pass userId for localStorage key lookup
+      const completion = getSectionCompletion(mergedPlanData, user.id);
 
       if (import.meta.env.DEV) {
         console.log("[PrePlanSummary] completion map:", completion);
+        console.log("[PrePlanSummary] userId:", user.id);
       }
 
       // Build sections list from UNIFIED REGISTRY
@@ -218,21 +220,23 @@ export default function PrePlanSummary() {
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        if (newWindow) newWindow.close();
-        toast({
-          title: "Please sign in",
-          description: "You need to be signed in to generate your document.",
-          variant: "destructive",
-        });
-        setGeneratingPdf(false);
-        return;
+      
+      // Support both authenticated users and guests
+      let identityType: "user" | "guest" = "guest";
+      let identityId: string = getOrCreateGuestId();
+      let planDataForPdf: any;
+
+      if (session?.user) {
+        identityType = "user";
+        identityId = session.user.id;
+        console.log("[PDF] Building plan data for user:", identityId);
+        planDataForPdf = await buildPlanDataForPdf(identityId);
+      } else {
+        console.log("[PDF] Building plan data for guest:", identityId);
+        // For guests, we use data from planData state if available
+        planDataForPdf = planData || {};
       }
 
-      console.log("[PDF] Building plan data for user:", session.user.id);
-
-      // Build payload from unified source - this will create plan if needed
-      const planDataForPdf = await buildPlanDataForPdf(session.user.id);
       const normalizedPlanData = normalizePlanDataForPdf(planDataForPdf);
 
       console.log("[PDF] Plan data built, invoking edge function");
@@ -244,6 +248,8 @@ export default function PrePlanSummary() {
           piiData: {},
           docType: "planner",
           isDraft: false,
+          identityType,
+          identityId,
         },
       });
 

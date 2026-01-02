@@ -54,32 +54,43 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-
-    if (userError || !user) {
-      console.error("[generate-planner-pdf] Auth error:", userError);
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
+    // Parse request body first to check for guest identity
     const {
       planData: rawPlanData,
       selectedSections = [],
       piiData,
       docType = "planner",
       isDraft = false,
+      identityType = "user",
+      identityId = null,
     } = await req.json();
+
+    // Determine identity - support both authenticated users and guests
+    let effectiveIdentityType = identityType;
+    let effectiveIdentityId = identityId;
+
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader) {
+      const token = authHeader.replace("Bearer ", "");
+      const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+
+      if (user && !userError) {
+        effectiveIdentityType = "user";
+        effectiveIdentityId = user.id;
+      }
+    }
+
+    // For guests, require identityType and identityId in request body
+    if (effectiveIdentityType === "guest" && !effectiveIdentityId) {
+      console.error("[generate-planner-pdf] Guest request missing identityId");
+      return new Response(JSON.stringify({ error: "Guest identity required" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Log identity for debugging
+    console.log("[generate-planner-pdf] Identity:", { effectiveIdentityType, effectiveIdentityId });
 
     // Ensure all expected planData keys exist with defaults
     const planData = rawPlanData || {};
@@ -107,7 +118,8 @@ serve(async (req) => {
     const hasFilter = selectedSet.size > 0;
 
     console.log("[generate-planner-pdf] Generating planner PDF", {
-      userId: user.id,
+      identityType: effectiveIdentityType,
+      identityId: effectiveIdentityId,
       docType,
       isDraft,
       selectedSectionsCount: Array.isArray(selectedSections) ? selectedSections.length : 0,
@@ -131,7 +143,7 @@ serve(async (req) => {
       planData,
       Array.isArray(selectedSections) ? selectedSections : [],
       piiData,
-      user.id,
+      effectiveIdentityId || "guest",
       supabase,
       corsHeaders,
       isDraft,
