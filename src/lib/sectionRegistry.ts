@@ -24,7 +24,8 @@ import {
   HelpCircle,
   Stethoscope,
   Plane,
-  Laptop
+  Laptop,
+  Wallet
 } from "lucide-react";
 
 export interface SectionDefinition {
@@ -105,7 +106,7 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     showCompletionDot: true,
   },
 
-  // YOUR WISHES (order: funeral, insurance, contacts, property, pets, messages)
+  // YOUR WISHES (order: funeral, insurance, contacts, financial, property, pets, messages)
   {
     id: "funeral",
     label: "Funeral Wishes",
@@ -130,6 +131,15 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     icon: Users,
     route: "/preplandashboard/contacts",
     dataKey: "contacts",
+    group: "wishes",
+    showCompletionDot: true,
+  },
+  {
+    id: "financial",
+    label: "Financial Life",
+    icon: Wallet,
+    route: "/preplandashboard/financial-life",
+    dataKey: "financial",
     group: "wishes",
     showCompletionDot: true,
   },

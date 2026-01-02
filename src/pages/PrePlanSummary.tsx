@@ -149,10 +149,12 @@ export default function PrePlanSummary() {
         "contacts",    // Important Contacts
         "healthcare",  // Medical & Care Preferences
         "funeral",     // Funeral Wishes
+        "financial",   // Financial Life
         "insurance",   // Insurance
         "property",    // Property & Valuables
         "pets",        // Pets
         "messages",    // Messages to Loved Ones
+        "digital",     // Online Accounts
       ];
 
       const registrySections = getCompletableSections();
