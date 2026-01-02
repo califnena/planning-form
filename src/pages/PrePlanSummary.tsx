@@ -23,7 +23,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ShareSummaryDialog } from "@/components/summary/ShareSummaryDialog";
-import { SETTINGS_DEFAULT } from "@/lib/sections";
+// SETTINGS_DEFAULT removed - we now show a fixed list of required sections
 import { useActivePlan, fetchPlanData } from "@/hooks/useActivePlan";
 import { buildPlanDataForPdf, normalizePlanDataForPdf } from "@/lib/buildPlanDataForPdf";
 import { getSectionCompletion } from "@/lib/sectionCompletion";
@@ -51,7 +51,7 @@ export default function PrePlanSummary() {
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
-  const [selectedSections, setSelectedSections] = useState<string[]>(SETTINGS_DEFAULT);
+  const [selectedSections, setSelectedSections] = useState<string[]>(["personal", "contacts", "healthcare", "funeral", "insurance", "property", "pets", "messages"]);
   const [generatingPdf, setGeneratingPdf] = useState(false);
   
   // Simplified UI state
@@ -141,24 +141,34 @@ export default function PrePlanSummary() {
       }
 
       // Build sections list from UNIFIED REGISTRY
-      const userSelectedSections = settings?.selected_sections?.length
-        ? settings.selected_sections
-        : SETTINGS_DEFAULT;
-      const selectedSet = new Set(userSelectedSections);
+      // Show the REQUIRED sections for "View or edit sections" per specification
+      const REQUIRED_SECTION_IDS = [
+        "personal",    // About You
+        "contacts",    // Important Contacts
+        "healthcare",  // Medical & Care Preferences
+        "funeral",     // Funeral Wishes
+        "insurance",   // Insurance
+        "property",    // Property & Valuables
+        "pets",        // Pets
+        "messages",    // Messages to Loved Ones
+      ];
 
       const registrySections = getCompletableSections();
       const sectionList: SectionData[] = registrySections
-        .filter((s) => selectedSet.has(s.id))
+        .filter((s) => REQUIRED_SECTION_IDS.includes(s.id))
         .map((s) => {
           const Icon = s.icon;
+          const status: "completed" | "not_started" = completion[s.id] ? "completed" : "not_started";
           return {
             id: s.id,
             label: s.label,
             icon: <Icon className="h-5 w-5" />,
-            status: completion[s.id] ? "completed" : "not_started",
+            status,
             editRoute: s.route,
           };
-        });
+        })
+        // Sort by REQUIRED_SECTION_IDS order
+        .sort((a, b) => REQUIRED_SECTION_IDS.indexOf(a.id) - REQUIRED_SECTION_IDS.indexOf(b.id));
 
       setSections(sectionList);
     } catch (error) {
@@ -189,7 +199,7 @@ export default function PrePlanSummary() {
     
     if (!newWindow) {
       // Popup blocked - we'll show fallback buttons after generation
-      setPdfError("popup_blocked");
+      console.warn("[PDF] Popup was blocked");
     } else {
       // Show loading message in the new tab
       newWindow.document.write(`
@@ -219,9 +229,13 @@ export default function PrePlanSummary() {
         return;
       }
 
-      // Build payload from unified source
+      console.log("[PDF] Building plan data for user:", session.user.id);
+
+      // Build payload from unified source - this will create plan if needed
       const planDataForPdf = await buildPlanDataForPdf(session.user.id);
       const normalizedPlanData = normalizePlanDataForPdf(planDataForPdf);
+
+      console.log("[PDF] Plan data built, invoking edge function");
 
       const { data: pdfData, error } = await supabase.functions.invoke("generate-planner-pdf", {
         body: {
@@ -233,8 +247,17 @@ export default function PrePlanSummary() {
         },
       });
 
-      if (error) throw error;
-      if (!pdfData?.pdfBase64) throw new Error("No PDF data returned");
+      if (error) {
+        console.error("[PDF] Edge function error:", error);
+        throw error;
+      }
+      
+      if (!pdfData?.pdfBase64) {
+        console.error("[PDF] No pdfBase64 in response:", pdfData);
+        throw new Error("No PDF data returned from server");
+      }
+
+      console.log("[PDF] PDF generated successfully, creating blob");
 
       // Create blob URL
       const byteCharacters = atob(pdfData.pdfBase64);
@@ -263,13 +286,14 @@ export default function PrePlanSummary() {
           description: "Use the buttons below to open or download.",
         });
       }
-    } catch (error) {
-      console.error("Error generating document:", error);
+    } catch (error: any) {
+      console.error("[PDF] Error generating document:", error);
+      console.error("[PDF] Error details:", error?.message, error?.context, error?.details);
       if (newWindow && !newWindow.closed) newWindow.close();
       setPdfError("generation_failed");
       toast({
-        title: "Something didn't work",
-        description: "Please try again or call us for help.",
+        title: "Your printable plan could not be created",
+        description: "Please try again.",
         variant: "destructive",
       });
     } finally {

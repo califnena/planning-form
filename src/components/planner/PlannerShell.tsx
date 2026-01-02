@@ -85,7 +85,7 @@ export const PlannerShell = ({
               size="lg"
               variant="default"
               className="rounded-full shadow-lg gap-2"
-              onClick={() => navigate("/plan-summary")}
+              onClick={() => navigate("/preplan-summary")}
             >
               <FileText className="h-5 w-5" />
               <span className="hidden sm:inline">View My Document</span>

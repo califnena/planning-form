@@ -2,72 +2,60 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, Check } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowRight, Check, Info } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 interface PrePlanningItem {
   id: string;
   title: string;
   goToRoute: string;
+  /** Optional "More info" internal link */
+  moreInfoRoute?: string;
+  moreInfoLabel?: string;
 }
 
-// EXACT checklist wording as specified - NO Learn more links
+// EXACT checklist wording as specified - NO external Learn more links
+// Internal "More info" links for Advance Directive and DNR/POLST only
 const PRE_PLANNING_ITEMS: PrePlanningItem[] = [
   {
     id: "emergency_contacts",
-    title: "I wrote down who to contact in an emergency.",
+    title: "Emergency contacts written down.",
     goToRoute: "/preplandashboard/contacts",
   },
   {
     id: "healthcare_proxy",
-    title: "I chose someone to make medical decisions if I cannot.",
+    title: "Healthcare decision-maker named.",
     goToRoute: "/preplandashboard/advance-directive",
   },
   {
     id: "care_preferences",
-    title: "I noted my care and comfort preferences.",
+    title: "Care and comfort preferences noted.",
     goToRoute: "/preplandashboard/care-preferences",
   },
   {
-    id: "medications",
-    title: "I listed my medicines and allergies.",
-    goToRoute: "/preplandashboard/health-care",
+    id: "advance_directive",
+    title: "Advance Directive status.",
+    goToRoute: "/preplandashboard/advance-directive",
+    moreInfoRoute: "/resources#advance-directives",
+    moreInfoLabel: "More info",
   },
   {
-    id: "conditions",
-    title: "I listed major health conditions doctors should know about.",
-    goToRoute: "/preplandashboard/health-care",
-  },
-  {
-    id: "doctor_pharmacy",
-    title: "I wrote down my doctor and pharmacy information.",
-    goToRoute: "/preplandashboard/health-care",
-  },
-  {
-    id: "insurance_info",
-    title: "I noted where my insurance card and details are kept.",
-    goToRoute: "/preplandashboard/insurance",
+    id: "dnr_polst",
+    title: "DNR / POLST status.",
+    goToRoute: "/preplandashboard/advance-directive",
+    moreInfoRoute: "/resources#dnr-polst",
+    moreInfoLabel: "More info",
   },
   {
     id: "funeral_wishes",
-    title: "I recorded my funeral or memorial wishes.",
+    title: "Funeral or memorial wishes recorded.",
     goToRoute: "/preplandashboard/funeral-wishes",
   },
   {
-    id: "advance_directive",
-    title: "I reviewed Advance Directive and DNR/POLST status.",
-    goToRoute: "/preplandashboard/advance-directive",
-  },
-  {
     id: "travel_protection",
-    title: "I reviewed travel or away-from-home protection.",
+    title: "Travel / away-from-home protection reviewed.",
     goToRoute: "/preplandashboard/travel-planning",
-  },
-  {
-    id: "plan_reviewed",
-    title: "I reviewed my plan and saved a printable copy.",
-    goToRoute: "/preplan-summary",
   },
 ];
 
@@ -163,9 +151,20 @@ export const SectionPrePlanning = ({ statuses: externalStatuses, onStatusChange 
                 </button>
                 
                 <div className="flex-1 min-w-0 space-y-3">
-                  <h3 className="text-base sm:text-lg font-medium text-foreground leading-relaxed">
-                    {item.title}
-                  </h3>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-base sm:text-lg font-medium text-foreground leading-relaxed">
+                      {item.title}
+                    </h3>
+                    {item.moreInfoRoute && (
+                      <Link 
+                        to={item.moreInfoRoute}
+                        className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                      >
+                        <Info className="h-4 w-4" />
+                        {item.moreInfoLabel}
+                      </Link>
+                    )}
+                  </div>
 
                   {/* Go to section button - large touch target */}
                   <Button
