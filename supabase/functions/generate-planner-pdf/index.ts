@@ -338,10 +338,27 @@ async function generateSimplePdf(
     return Array.isArray(items) && items.length > 0;
   };
 
-  // Helper: draw "No information entered" placeholder
-  const drawEmpty = (page: any, y: number, msg = "No information was entered for this section."): number => {
-    page.drawText(msg, { x: margin, y, size: 10, font: helvetica, color: rgb(0.5, 0.5, 0.5) });
-    return y - lineHeight;
+  // Helper: draw blank handwriting lines instead of "No information entered"
+  // CONTENT RULE: Empty fields show blank lines, NOT placeholder text
+  const drawBlankLines = (page: any, y: number, numLines: number = 3): number => {
+    let currentY = y;
+    for (let i = 0; i < numLines; i++) {
+      if (currentY <= 80) break;
+      page.drawLine({
+        start: { x: margin, y: currentY },
+        end: { x: pageWidth - margin, y: currentY },
+        thickness: 0.5,
+        color: rgb(0.85, 0.85, 0.85),
+      });
+      currentY -= 22; // ~0.3 inch spacing for handwriting
+    }
+    return currentY;
+  };
+
+  // DEPRECATED: No longer used - empty sections show blank lines
+  const drawEmpty = (page: any, y: number, _msg?: string): number => {
+    // Draw blank lines instead of text message
+    return drawBlankLines(page, y, 3);
   };
 
   const addNotesBox = (page: any, label: string, notes: string, y: number): number => {

@@ -41,10 +41,10 @@ export const EmailPlanDialog = ({
 
     setLoading(true);
     try {
-      // Always use fillable PDF for email
-      const { generatePlanPDF } = await import("@/lib/pdfGenerator");
-      const pdf = generatePlanPDF(planData);
-      const pdfBlob = pdf.output('blob');
+      // Use locked PDF generator for consistency
+      const { getLockedPlanPDFBlob } = await import("@/lib/lockedPdfGenerator");
+      const pdfBlob = getLockedPlanPDFBlob(planData);
+      
       
       // Convert blob to base64
       const reader = new FileReader();
