@@ -9,6 +9,7 @@ export const ALL_SECTIONS: Section[] = [
   { id: "preplanning", title: "Pre-Planning Checklist", description: "A gentle orientation to help you get started." },
   { id: "personal", title: "About You", description: "Basic information about you." },
   { id: "healthcare", title: "Medical & Care Preferences", description: "Medical conditions, medications, and care preferences." },
+  { id: "travel", title: "Travel & Away-From-Home", description: "Planning for travel or time away from home." },
   { id: "funeral", title: "Funeral Wishes", description: "The kind of service you want, music, readings, and more." },
   { id: "insurance", title: "Insurance", description: "Life insurance, pensions, and benefits information." },
   { id: "contacts", title: "Important Contacts", description: "People who should be contacted." },
@@ -26,7 +27,7 @@ export const REQUIRED_SECTIONS: Section[] = [
   { id: "printableplan", title: "My Printable Plan", description: "View or print your planning document." },
 ];
 
-export const SETTINGS_DEFAULT = ["preplanning", "personal", "healthcare", "funeral", "insurance", "contacts", "property", "pets", "messages"];
+export const SETTINGS_DEFAULT = ["preplanning", "personal", "healthcare", "travel", "funeral", "insurance", "contacts", "property", "pets", "messages"];
 
 export function mergeVisibleSections(selected: string[] | null): Section[] {
   const userSet = new Set(selected && selected.length ? selected : SETTINGS_DEFAULT);
