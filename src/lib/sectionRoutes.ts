@@ -25,17 +25,20 @@ export const SECTION_ROUTES: Record<string, string> = {
   willprep: "/preplandashboard/willprep",
   providers: "/preplandashboard/providers",
   instructions: "/preplandashboard/instructions",
+  healthcare: "/preplandashboard/health-care",
+  carepreferences: "/preplandashboard/care-preferences",
+  preplanning: "/preplandashboard/pre-planning",
 };
 
 // Section labels for display
 export const SECTION_LABELS: Record<string, string> = {
   personal: "Personal & Family Details",
-  contacts: "Key Contacts to Notify",
+  contacts: "Important Contacts",
   funeral: "Funeral Wishes",
   legacy: "Life Story & Legacy",
   legal: "Legal Documents",
   financial: "Financial Life",
-  insurance: "Insurance",
+  insurance: "Insurance Overview",
   property: "Property & Valuables",
   pets: "Pet Care",
   digital: "Digital Accounts",
@@ -47,6 +50,9 @@ export const SECTION_LABELS: Record<string, string> = {
   willprep: "Will Preparation",
   providers: "Service Providers",
   instructions: "Instructions",
+  healthcare: "Medical Information",
+  carepreferences: "Care Preferences",
+  preplanning: "Pre-Planning Checklist",
 };
 
 /**

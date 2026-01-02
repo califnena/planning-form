@@ -13,17 +13,17 @@ interface SectionCarePreferencesProps {
   onChange?: (data: CarePreferencesData) => void;
 }
 
-// Exact checkbox questions from the requirements - one per line
+// Exact checkbox questions from requirements - one per line
 const PREFERENCE_OPTIONS = [
-  { id: "comfort_focused", label: "I prefer comfort-focused care if seriously ill" },
-  { id: "pain_managed", label: "I want pain managed even if it causes drowsiness" },
-  { id: "stay_home", label: "I prefer to stay at home if possible" },
-  { id: "hospital_care", label: "I prefer hospital care if needed" },
-  { id: "family_present", label: "I want family present as much as possible" },
-  { id: "limited_visitors", label: "I prefer limited visitors" },
-  { id: "spiritual_support", label: "I want spiritual or religious support" },
-  { id: "no_spiritual", label: "I do not want spiritual or religious care" },
-  { id: "music_prayer_quiet", label: "I want music, prayer, or quiet time" },
+  { id: "comfort_priority", label: "Comfort and pain relief are a priority" },
+  { id: "avoid_aggressive", label: "Avoid aggressive treatment if recovery is unlikely" },
+  { id: "healthcare_proxy", label: "Healthcare proxy should be involved" },
+  { id: "prefer_home", label: "Prefer care at home if possible" },
+  { id: "open_hospice", label: "Open to hospice care" },
+  { id: "loved_ones_present", label: "Want loved ones present" },
+  { id: "clear_explanations", label: "Want clear explanations" },
+  { id: "spiritual_support", label: "Want spiritual or religious support" },
+  { id: "additional_wishes", label: "Additional wishes matter" },
 ];
 
 export const SectionCarePreferences = ({ data = {}, onChange }: SectionCarePreferencesProps) => {
@@ -54,7 +54,7 @@ export const SectionCarePreferences = ({ data = {}, onChange }: SectionCarePrefe
         <div className="flex items-start gap-3">
           <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-foreground">
+            <p className="text-foreground text-base">
               Everything here is optional. Check what applies to you and skip anything that doesn't.
               This does not replace medical or legal documents.
             </p>
@@ -62,7 +62,7 @@ export const SectionCarePreferences = ({ data = {}, onChange }: SectionCarePrefe
         </div>
       </Card>
 
-      {/* Preference Checkboxes - One per line, large square checkboxes */}
+      {/* Preference Checkboxes - One per line, large square checkboxes (min 44px) */}
       <Card className="p-5 mb-6">
         <div className="space-y-4">
           {PREFERENCE_OPTIONS.map((option) => (
@@ -70,18 +70,20 @@ export const SectionCarePreferences = ({ data = {}, onChange }: SectionCarePrefe
               key={option.id}
               className="flex items-center gap-4 cursor-pointer py-2"
             >
-              <div
+              <button
+                type="button"
                 className={cn(
-                  "h-7 w-7 rounded border-2 flex items-center justify-center transition-all flex-shrink-0",
+                  "h-11 w-11 rounded border-2 flex items-center justify-center transition-all flex-shrink-0",
                   isChecked(option.id)
                     ? "bg-primary border-primary"
                     : "border-muted-foreground hover:border-primary"
                 )}
                 onClick={() => togglePreference(option.id)}
+                aria-label={option.label}
               >
                 {isChecked(option.id) && (
                   <svg
-                    className="h-5 w-5 text-primary-foreground"
+                    className="h-6 w-6 text-primary-foreground"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -90,7 +92,7 @@ export const SectionCarePreferences = ({ data = {}, onChange }: SectionCarePrefe
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 )}
-              </div>
+              </button>
               <input
                 type="checkbox"
                 className="sr-only"
@@ -103,7 +105,7 @@ export const SectionCarePreferences = ({ data = {}, onChange }: SectionCarePrefe
         </div>
       </Card>
 
-      {/* Other Preferences - Short text field */}
+      {/* Optional Notes Field */}
       <Card className="p-5">
         <h3 className="text-lg font-medium text-foreground mb-3">Other preferences (optional)</h3>
         <Textarea
