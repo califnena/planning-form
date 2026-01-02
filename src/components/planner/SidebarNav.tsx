@@ -92,7 +92,7 @@ export const SidebarNav = ({
 
       {/* Pre-Planning Area */}
       <hr className="my-4 border-border mx-4" />
-      {renderSectionGroup("Pre-Planning Area", "preplanning")}
+      {renderSectionGroup("Pre-Planning", "preplanning")}
 
       {/* Your Wishes */}
       <hr className="my-4 border-border mx-4" />

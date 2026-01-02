@@ -41,6 +41,10 @@ export interface SectionDefinition {
 }
 
 // ============= SECTION DEFINITIONS =============
+// ORDERED per specification:
+// Pre-Planning Checklist → About You → Medical & Care → Advance Directive
+// → Funeral Wishes → Insurance → Important Contacts → Property → Pets
+// → Messages → Resources → FAQs → Printable Copy
 
 export const SECTION_REGISTRY: SectionDefinition[] = [
   // TOP (no completion dots)
@@ -63,13 +67,22 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     showCompletionDot: false,
   },
 
-  // PRE-PLANNING AREA
+  // PRE-PLANNING AREA (order: checklist, medical, advance directive, travel)
   {
     id: "preplanning",
     label: "Pre-Planning Checklist",
     icon: ClipboardList,
     route: "/preplandashboard/checklist",
     dataKey: "preplanning",
+    group: "preplanning",
+    showCompletionDot: true,
+  },
+  {
+    id: "personal",
+    label: "About You",
+    icon: User,
+    route: "/preplandashboard/personal-family",
+    dataKey: "personal",
     group: "preplanning",
     showCompletionDot: true,
   },
@@ -84,30 +97,57 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
   },
   {
     id: "advancedirective",
-    label: "Advance Directive & DNR Status",
+    label: "Advance Directive",
     icon: Heart,
     route: "/preplandashboard/advance-directive",
     dataKey: "advance_directive",
     group: "preplanning",
     showCompletionDot: true,
   },
-  {
-    id: "travel",
-    label: "Travel & Away-From-Home Plan",
-    icon: Plane,
-    route: "/preplandashboard/travel-planning",
-    dataKey: "travel",
-    group: "preplanning",
-    showCompletionDot: true,
-  },
 
-  // YOUR WISHES
+  // YOUR WISHES (order: funeral, insurance, contacts, property, pets, messages)
   {
     id: "funeral",
     label: "Funeral Wishes",
     icon: Heart,
     route: "/preplandashboard/funeral-wishes",
     dataKey: "funeral",
+    group: "wishes",
+    showCompletionDot: true,
+  },
+  {
+    id: "insurance",
+    label: "Insurance",
+    icon: Shield,
+    route: "/preplandashboard/insurance",
+    dataKey: "insurance",
+    group: "wishes",
+    showCompletionDot: true,
+  },
+  {
+    id: "contacts",
+    label: "Important Contacts",
+    icon: Users,
+    route: "/preplandashboard/contacts",
+    dataKey: "contacts",
+    group: "wishes",
+    showCompletionDot: true,
+  },
+  {
+    id: "property",
+    label: "Property & Valuables",
+    icon: HomeIcon,
+    route: "/preplandashboard/property-valuables",
+    dataKey: "property",
+    group: "wishes",
+    showCompletionDot: true,
+  },
+  {
+    id: "pets",
+    label: "Pets",
+    icon: Dog,
+    route: "/preplandashboard/pets",
+    dataKey: "pets",
     group: "wishes",
     showCompletionDot: true,
   },
@@ -121,49 +161,13 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     showCompletionDot: true,
   },
 
-  // IMPORTANT RECORDS
+  // IMPORTANT RECORDS (travel, digital)
   {
-    id: "personal",
-    label: "About You",
-    icon: User,
-    route: "/preplandashboard/personal-family",
-    dataKey: "personal",
-    group: "records",
-    showCompletionDot: true,
-  },
-  {
-    id: "contacts",
-    label: "Important Contacts",
-    icon: Users,
-    route: "/preplandashboard/contacts",
-    dataKey: "contacts",
-    group: "records",
-    showCompletionDot: true,
-  },
-  {
-    id: "insurance",
-    label: "Insurance",
-    icon: Shield,
-    route: "/preplandashboard/insurance",
-    dataKey: "insurance",
-    group: "records",
-    showCompletionDot: true,
-  },
-  {
-    id: "property",
-    label: "Property & Valuables",
-    icon: HomeIcon,
-    route: "/preplandashboard/property-valuables",
-    dataKey: "property",
-    group: "records",
-    showCompletionDot: true,
-  },
-  {
-    id: "pets",
-    label: "Pets",
-    icon: Dog,
-    route: "/preplandashboard/pets",
-    dataKey: "pets",
+    id: "travel",
+    label: "Travel & Away-From-Home",
+    icon: Plane,
+    route: "/preplandashboard/travel-planning",
+    dataKey: "travel",
     group: "records",
     showCompletionDot: true,
   },

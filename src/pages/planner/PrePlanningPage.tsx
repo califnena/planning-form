@@ -1,7 +1,6 @@
 import { usePlanContext } from "./PlannerLayout";
 import { SectionPrePlanning } from "@/components/planner/sections/SectionPrePlanning";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { ViewDocumentButton } from "@/components/planner/ViewDocumentButton";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -48,7 +47,6 @@ export default function PrePlanningPage() {
           error={saveState.error}
         />
       </div>
-      <ViewDocumentButton />
       <SectionPrePlanning 
         statuses={statuses}
         onStatusChange={handleStatusChange}
