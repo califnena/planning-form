@@ -276,6 +276,79 @@ const Resources = () => {
 
       <ResourcesDownloadSection />
 
+      {/* Checklists Section */}
+      <div className="bg-card border-2 border-primary/20 rounded-xl p-6 shadow-lg">
+        <div className="mb-6">
+          <span className="inline-block px-3 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full mb-2">
+            ✅ Interactive Checklists
+          </span>
+          <h2 className="text-xl font-bold text-foreground">
+            Planning Checklists
+          </h2>
+          <p className="text-muted-foreground mt-2">
+            Step-by-step checklists to guide you through the planning process.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Pre-Planning Checklist */}
+          <div className="bg-muted/30 rounded-lg p-4">
+            <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+              <span>📋</span> Pre-Planning Checklist
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Everything you need to prepare ahead of time for peace of mind.
+            </p>
+            <div className="flex justify-center mb-4">
+              <iframe 
+                src="https://gamma.app/embed/plsn9a9j7cvzdh5" 
+                style={{ width: '100%', maxWidth: '700px', height: '400px' }}
+                allow="fullscreen" 
+                title="Pre-Planning Checklist" 
+                className="rounded-lg border border-border" 
+              />
+            </div>
+            <a 
+              href="https://gamma.app/docs/plsn9a9j7cvzdh5" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Open Full Checklist
+            </a>
+          </div>
+
+          {/* After-Death Checklist */}
+          <div className="bg-muted/30 rounded-lg p-4">
+            <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+              <span>📝</span> After-Death Checklist
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Essential steps and tasks for families after the loss of a loved one.
+            </p>
+            <div className="flex justify-center mb-4">
+              <iframe 
+                src="https://gamma.app/embed/h13wkygxlos50w9" 
+                style={{ width: '100%', maxWidth: '700px', height: '400px' }}
+                allow="fullscreen" 
+                title="After-Death Planner & Checklist" 
+                className="rounded-lg border border-border" 
+              />
+            </div>
+            <a 
+              href="https://gamma.app/docs/After-Death-Planner-Checklist-h13wkygxlos50w9" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Open Full Checklist
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Know Your Rights Card */}
       <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
         <div className="p-6 md:p-8">
