@@ -255,31 +255,41 @@ export default function PrePlanSummary() {
 
       if (error) {
         console.error("[PDF] Edge function error:", error);
+        console.error("[PDF] Error details:", JSON.stringify(error));
         throw error;
       }
       
-      if (!pdfData?.pdfBase64) {
-        console.error("[PDF] No pdfBase64 in response:", pdfData);
+      console.log("[PDF] Response received:", pdfData);
+
+      // Edge function returns EITHER { url, filename } (signed URL) OR { pdfBase64, filename } (fallback)
+      let pdfUrl: string;
+      let filename = pdfData?.filename || "My-Planning-Document.pdf";
+
+      if (pdfData?.url) {
+        // Signed URL from Supabase Storage - use directly
+        pdfUrl = pdfData.url;
+        console.log("[PDF] Using signed URL:", pdfUrl);
+      } else if (pdfData?.pdfBase64) {
+        // Fallback: base64 encoded PDF
+        console.log("[PDF] Using base64 fallback, creating blob");
+        const byteCharacters = atob(pdfData.pdfBase64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: "application/pdf" });
+        pdfUrl = URL.createObjectURL(blob);
+      } else {
+        console.error("[PDF] No URL or pdfBase64 in response:", pdfData);
         throw new Error("No PDF data returned from server");
       }
 
-      console.log("[PDF] PDF generated successfully, creating blob");
-
-      // Create blob URL
-      const byteCharacters = atob(pdfData.pdfBase64);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-
-      setLastPdfUrl(url);
+      setLastPdfUrl(pdfUrl);
 
       if (newWindow && !newWindow.closed) {
         // Navigate the already-open window to the PDF
-        newWindow.location.href = url;
+        newWindow.location.href = pdfUrl;
         toast({
           title: "Your printable copy is ready",
           description: "It opened in a new tab.",
@@ -294,12 +304,14 @@ export default function PrePlanSummary() {
       }
     } catch (error: any) {
       console.error("[PDF] Error generating document:", error);
-      console.error("[PDF] Error details:", error?.message, error?.context, error?.details);
+      console.error("[PDF] Error message:", error?.message);
+      console.error("[PDF] Error context:", error?.context);
+      console.error("[PDF] Error details:", error?.details);
       if (newWindow && !newWindow.closed) newWindow.close();
       setPdfError("generation_failed");
       toast({
-        title: "Your printable plan could not be created",
-        description: "Please try again.",
+        title: "Printable copy could not be created",
+        description: error?.message || "Please try again.",
         variant: "destructive",
       });
     } finally {

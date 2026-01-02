@@ -15,46 +15,60 @@ interface PrePlanningItem {
   moreInfoLabel?: string;
 }
 
-// EXACT checklist wording as specified - NO external Learn more links
-// Internal "More info" links for Advance Directive and DNR/POLST only
+// Complete checklist with ALL required items per specification
 const PRE_PLANNING_ITEMS: PrePlanningItem[] = [
   {
     id: "emergency_contacts",
-    title: "Emergency contacts written down.",
+    title: "Emergency contacts written down",
     goToRoute: "/preplandashboard/contacts",
   },
   {
     id: "healthcare_proxy",
-    title: "Healthcare decision-maker named.",
+    title: "Healthcare decision-maker named",
     goToRoute: "/preplandashboard/advance-directive",
   },
   {
     id: "care_preferences",
-    title: "Care and comfort preferences noted.",
+    title: "Care and comfort preferences noted",
     goToRoute: "/preplandashboard/care-preferences",
   },
   {
     id: "advance_directive",
-    title: "Advance Directive status.",
+    title: "Advance Directive status",
     goToRoute: "/preplandashboard/advance-directive",
     moreInfoRoute: "/resources#advance-directives",
     moreInfoLabel: "More info",
   },
   {
     id: "dnr_polst",
-    title: "DNR / POLST status.",
+    title: "DNR / POLST status",
     goToRoute: "/preplandashboard/advance-directive",
     moreInfoRoute: "/resources#dnr-polst",
     moreInfoLabel: "More info",
   },
   {
+    id: "primary_doctor",
+    title: "Primary doctor and pharmacy contacts",
+    goToRoute: "/preplandashboard/health-care",
+  },
+  {
+    id: "allergies",
+    title: "Allergies and reactions recorded",
+    goToRoute: "/preplandashboard/health-care",
+  },
+  {
+    id: "medical_conditions",
+    title: "Major medical conditions noted",
+    goToRoute: "/preplandashboard/health-care",
+  },
+  {
     id: "funeral_wishes",
-    title: "Funeral or memorial wishes recorded.",
+    title: "Funeral or memorial wishes recorded",
     goToRoute: "/preplandashboard/funeral-wishes",
   },
   {
     id: "travel_protection",
-    title: "Travel / away-from-home protection reviewed.",
+    title: "Travel / away-from-home protection reviewed",
     goToRoute: "/preplandashboard/travel-planning",
   },
 ];
@@ -177,7 +191,7 @@ export const SectionPrePlanning = ({ statuses: externalStatuses, onStatusChange 
                     <ArrowRight className="h-4 w-4" />
                   </Button>
 
-                  {/* Optional notes field */}
+                  {/* Optional notes field per item */}
                   <div className="pt-2">
                     <Textarea
                       value={notes[item.id] || ""}
