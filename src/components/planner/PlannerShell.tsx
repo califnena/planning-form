@@ -56,7 +56,8 @@ export const PlannerShell = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [browseMode, setBrowseMode] = useState(false);
+  // Default to browse mode (full navigation with labels) - senior-friendly
+  const [browseMode, setBrowseMode] = useState(true);
 
   const sidebarContent = (
     <div className="flex flex-col h-full">

@@ -170,7 +170,7 @@ export const SidebarNav = ({
       
       return (
         <div key={group.label} className="mb-6">
-          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-4">
+          <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-4">
             {group.label}
           </h4>
           <div className="space-y-1">
@@ -225,7 +225,7 @@ export const SidebarNav = ({
       {/* Ungrouped Sections (if any) */}
       {getUngroupedSections().length > 0 && sectionGroups.length > 0 && (
         <div className="mb-6">
-          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-4">
+          <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-4">
             Other Sections
           </h4>
           <div className="space-y-1">
@@ -274,7 +274,7 @@ export const SidebarNav = ({
           <hr className="my-4 border-2 border-border mx-4" />
 
           <div className="space-y-1 mt-6">
-            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-4">
+            <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-4">
               Support & Services
             </h4>
             {supportServicesItems.map((item) => {
