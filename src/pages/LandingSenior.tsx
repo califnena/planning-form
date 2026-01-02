@@ -380,15 +380,15 @@ const LandingSenior = () => {
             </Link>
             
             <Link 
-              to="/care-support" 
+              to="/plan-ahead/guide" 
               className="flex items-center gap-5 p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors"
             >
               <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
-                <Bot className="h-7 w-7 text-primary" />
+                <BookOpen className="h-7 w-7 text-primary" />
               </div>
               <div>
-                <span className="text-[hsl(var(--senior-text))] font-medium text-lg block">24/7 Automated Support</span>
-                <span className="text-[hsl(var(--senior-text-soft))] text-sm">(Planning & Emotional Guidance)</span>
+                <span className="text-[hsl(var(--senior-text))] font-medium text-lg block">Free Guides & Resources</span>
+                <span className="text-[hsl(var(--senior-text-soft))] text-sm">Interactive planning guide to help you get started</span>
               </div>
             </Link>
           </div>
@@ -447,14 +447,14 @@ const LandingSenior = () => {
           
           <div className="grid md:grid-cols-3 gap-5 mb-6">
             <Link 
-              to="/care-support" 
+              to="/plan-ahead/guide" 
               className="flex flex-col items-center text-center p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors"
             >
               <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center mb-4">
-                <Bot className="h-7 w-7 text-primary" />
+                <BookOpen className="h-7 w-7 text-primary" />
               </div>
-              <span className="font-medium text-[hsl(var(--senior-text))]">24/7 Automated Support</span>
-              <span className="text-sm text-[hsl(var(--senior-text-soft))] mt-1">(Planning & Emotional Guidance)</span>
+              <span className="font-medium text-[hsl(var(--senior-text))]">Free Guides & Resources</span>
+              <span className="text-sm text-[hsl(var(--senior-text-soft))] mt-1">Interactive planning guide</span>
             </Link>
             
             <Link 
