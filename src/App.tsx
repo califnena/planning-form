@@ -46,6 +46,7 @@ import NotFound from "./pages/NotFound";
 import CustomSong from "./pages/CustomSong";
 import SongInfo from "./pages/SongInfo";
 import PrePlanningGuide from "./pages/PrePlanningGuide";
+import Guide from "./pages/Guide";
 import PlanAheadGuideViewer from "./pages/PlanAheadGuideViewer";
 import SongConfirmation from "./pages/SongConfirmation";
 import PurchaseSuccess from "./pages/PurchaseSuccess";
@@ -179,7 +180,8 @@ const App = () => (
                       <Route path="/wizard/preplanning" element={<PrePlanningWizard />} />
                       <Route path="/wizard/afterdeath" element={<AfterDeathWizard />} />
                       <Route path="/vendors" element={<Vendors />} />
-                      <Route path="/guide" element={<PrePlanningGuide />} />
+                      <Route path="/guide" element={<Guide />} />
+                      <Route path="/guide/legacy" element={<PrePlanningGuide />} />
                       <Route path="/forms" element={<Forms />} />
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/resources" element={<Resources />} />
