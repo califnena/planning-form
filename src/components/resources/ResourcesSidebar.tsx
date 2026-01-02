@@ -19,12 +19,14 @@ export interface ResourceSection {
 
 export const resourceSections: ResourceSection[] = [
   {
-    id: 'planning-guides',
-    label: 'Planning Guides',
+    id: 'education',
+    label: 'Educational Resources',
     icon: BookOpen,
     subItems: [
-      { id: 'pre-planning-guide', label: 'Pre-Planning Guide' },
-      { id: 'when-death-happens', label: 'When Death Happens Guide' },
+      { id: 'legal-medical', label: 'Legal & Medical Planning' },
+      { id: 'funeral-planning', label: 'Funeral Planning' },
+      { id: 'digital-organization', label: 'Digital & Organization' },
+      { id: 'travel-protection', label: 'Travel Protection' },
     ],
   },
   {
@@ -45,41 +47,16 @@ export const resourceSections: ResourceSection[] = [
     id: 'tools-calculators',
     label: 'Tools & Calculators',
     icon: Calculator,
-    subItems: [
-      { id: 'cost-estimator', label: 'Cost Estimator' },
-      { id: 'progress-tracker', label: 'Planning Progress' },
-      { id: 'document-checklist', label: 'Document Checklist' },
-    ],
-  },
-  {
-    id: 'faqs',
-    label: 'FAQs',
-    icon: HelpCircle,
-    subItems: [
-      { id: 'general', label: 'General Questions' },
-      { id: 'legal-financial', label: 'Legal & Financial' },
-      { id: 'travel-protection', label: 'Travel Protection' },
-      { id: 'funeral-process', label: 'Funeral Process' },
-      { id: 'app-account', label: 'App & Account' },
-    ],
   },
   {
     id: 'trusted-resources',
     label: 'Trusted Resources',
     icon: Link2,
-    subItems: [
-      { id: 'government', label: 'Government Resources' },
-      { id: 'consumer-protection', label: 'Consumer Protection' },
-    ],
   },
   {
     id: 'support-help',
     label: 'Support & Help',
     icon: Headphones,
-    subItems: [
-      { id: 'contact', label: 'Contact Support' },
-      { id: 'how-to-get-help', label: 'How to Get Help' },
-    ],
   },
 ];
 

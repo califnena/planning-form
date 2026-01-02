@@ -11,6 +11,42 @@ import {
 } from '@/components/ui/accordion';
 
 const FAQ = () => {
+  // Required senior-friendly questions (always shown first)
+  const requiredQuestions = [
+    {
+      q: "Do I need to complete everything at once?",
+      a: "No. You can fill out as much or as little as you want, and come back anytime. Your progress is saved automatically."
+    },
+    {
+      q: "Is this a legal document?",
+      a: "No. This is a planning tool to organize your wishes and important information. It helps you prepare, but it is not a substitute for legal documents like a will or power of attorney."
+    },
+    {
+      q: "Does this replace a will or lawyer?",
+      a: "No. We help you organize your thoughts and preferences, but you should work with an attorney for legally binding documents like wills, trusts, and powers of attorney."
+    },
+    {
+      q: "Do you store my legal documents?",
+      a: "No. We help you record WHERE your documents are stored (like 'in my safe' or 'with my attorney'), but we do not store the actual documents."
+    },
+    {
+      q: "Can my family see this?",
+      a: "Only if you choose to share it with them. Your information is private until you decide to print it, email it, or share a link."
+    },
+    {
+      q: "Do I have to buy funeral products here?",
+      a: "No. Our planning tools are separate from any products or services. You are never required to buy anything."
+    },
+    {
+      q: "What if I don't know the answer yet?",
+      a: "That's okay. Skip any question you're not ready to answer. You can always come back later."
+    },
+    {
+      q: "What happens if I change my mind?",
+      a: "You can update your plan anytime. Just log in and make changes. We recommend reviewing your plan once a year."
+    },
+  ];
+
   const faqSections = [
     {
       title: "Funeral & Preplanning Basics",
@@ -501,41 +537,50 @@ const FAQ = () => {
         </div>
         
         <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-          Common Questions
+          Frequently Asked Questions
         </h1>
         <p className="text-base md:text-lg text-muted-foreground mb-8">
           Answers to the questions families ask most often, in plain language.
         </p>
 
-        <div className="mb-8">
-          {/* Featured Pre-Planning Guide */}
-          <div className="bg-card border-2 border-primary/20 rounded-lg p-6 md:p-8 shadow-lg">
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-              <div className="flex-shrink-0">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
-                  <Download className="h-7 w-7 text-white" />
-                </div>
-              </div>
-              <div className="flex-1">
-                <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">
-                  Pre-Planning Your Funeral: A Gift of Peace and Clarity
-                </h2>
-                <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                  A comprehensive guide to help you understand the importance of pre-planning your funeral arrangements. Learn about different burial options, service types, and how to communicate your wishes to loved ones.
-                </p>
-              </div>
-              <div className="flex-shrink-0">
-                <Button 
-                  size="lg" 
-                  className="gap-2 whitespace-nowrap"
-                  onClick={() => window.location.href = '/guide'}
+        {/* Essential Questions Section - Required senior-friendly questions */}
+        <div className="mb-10">
+          <div className="bg-primary/5 border-2 border-primary/20 rounded-xl p-6 md:p-8">
+            <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
+              <span className="text-2xl" aria-hidden="true">❓</span>
+              Essential Questions
+            </h2>
+            <p className="text-base text-muted-foreground mb-6">
+              The most important things to know before you start.
+            </p>
+            
+            <Accordion type="single" collapsible className="w-full">
+              {requiredQuestions.map((qa, qIndex) => (
+                <AccordionItem 
+                  key={qIndex} 
+                  value={`required-q-${qIndex}`}
+                  className="border-b last:border-b-0"
                 >
-                  <FileText className="h-5 w-5" />
-                  View Guide
-                </Button>
-              </div>
-            </div>
+                  <AccordionTrigger className="text-left text-base md:text-lg font-semibold text-foreground py-4 hover:no-underline">
+                    {qa.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-base text-muted-foreground pb-4 leading-relaxed">
+                    {qa.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </div>
+        </div>
+
+        {/* View All FAQs Section */}
+        <div className="mb-8">
+          <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6">
+            All Frequently Asked Questions
+          </h2>
+          <p className="text-base text-muted-foreground mb-6">
+            Browse all questions by topic, or scroll through the full list.
+          </p>
         </div>
         
         <div className="space-y-6">
@@ -571,7 +616,7 @@ const FAQ = () => {
                     <AccordionTrigger className="text-left text-base md:text-lg font-semibold text-foreground py-4 hover:no-underline">
                       {qa.q}
                     </AccordionTrigger>
-                    <AccordionContent className="text-sm md:text-base text-muted-foreground pb-4">
+                    <AccordionContent className="text-base text-muted-foreground pb-4 leading-relaxed">
                       {qa.a}
                     </AccordionContent>
                   </AccordionItem>
@@ -581,21 +626,22 @@ const FAQ = () => {
           ))}
         </div>
         
-        {/* Footer Disclaimer */}
+        {/* Footer with helpful links */}
         <div className="mt-12 pt-6 border-t border-border">
-          <p className="text-xs text-muted-foreground text-center max-w-3xl mx-auto">
-            This information is provided for educational purposes only and is based on public consumer guidance from the Federal Trade Commission. Everlasting Funeral Advisors does not provide legal advice or funeral services directly.
+          <p className="text-sm text-muted-foreground text-center max-w-3xl mx-auto mb-6">
+            This information is provided for educational purposes only. Everlasting Funeral Advisors does not provide legal advice.
           </p>
-          <div className="flex flex-wrap justify-center gap-4 mt-4">
-            <Link to="/resources">
-              <Button variant="outline" size="sm" className="gap-2">
-                <Download className="h-4 w-4" />
-                Download the Funeral Planning Checklist
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link to="/guide">
+              <Button size="lg" className="w-full sm:w-auto gap-2 min-h-[52px]">
+                <FileText className="h-5 w-5" />
+                View Planning Guide
               </Button>
             </Link>
-            <Link to="/contact">
-              <Button variant="outline" size="sm">
-                Book a Planning Consultation
+            <Link to="/resources">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto gap-2 min-h-[52px]">
+                <Download className="h-5 w-5" />
+                Download Checklists
               </Button>
             </Link>
           </div>

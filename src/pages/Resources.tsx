@@ -38,10 +38,10 @@ const Resources = () => {
   // Quick access cards for top of page
   const quickAccessCards = [
     {
-      title: "Pre-Planning Guide",
-      description: "Step-by-step guide to plan ahead",
+      title: "Step-by-Step Guide",
+      description: "Learn before you fill",
       icon: BookOpen,
-      onClick: () => handleSectionChange('planning-guides', 'pre-planning-guide'),
+      onClick: () => navigate('/guide'),
       color: "bg-primary/10 text-primary"
     },
     {
@@ -62,21 +62,19 @@ const Resources = () => {
       title: "Printable Forms",
       description: "Download blank forms",
       icon: FileText,
-      onClick: () => handleSectionChange('forms-worksheets', 'printable-forms'),
+      onClick: () => handleSectionChange('forms-worksheets'),
       color: "bg-blue-500/10 text-blue-700"
     },
   ];
 
   const renderContent = () => {
     switch (activeSection) {
-      case 'planning-guides':
-        return renderPlanningGuides();
+      case 'education':
+        return renderEducation();
       case 'checklists':
         return renderChecklists();
       case 'forms-worksheets':
         return renderFormsWorksheets();
-      case 'faqs':
-        return renderFAQs();
       case 'tools-calculators':
         return renderToolsCalculators();
       case 'trusted-resources':
@@ -84,9 +82,179 @@ const Resources = () => {
       case 'support-help':
         return renderSupportHelp();
       default:
-        return renderPlanningGuides();
+        return renderEducation();
     }
   };
+
+  // Educational Resources Section - Read-only, no data collection
+  const renderEducation = () => (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Educational Resources</h1>
+        <p className="text-lg text-muted-foreground leading-relaxed">
+          Learn about planning concepts and understand your options. This section is for reading only—no forms to fill out.
+        </p>
+      </div>
+
+      {/* Legal & Medical Planning */}
+      {(!activeSubItem || activeSubItem === 'legal-medical') && (
+        <Card className="border-2 border-primary/20">
+          <CardHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="inline-block px-3 py-1 text-sm font-semibold bg-primary/10 text-primary rounded-full">
+                ⚕️ Legal & Medical
+              </span>
+            </div>
+            <CardTitle className="text-xl">Legal & Medical Planning</CardTitle>
+            <CardDescription className="text-base leading-relaxed">
+              Understanding your rights and medical documents.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4">
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <h4 className="font-semibold text-foreground mb-2">What is an Advance Directive?</h4>
+                <p className="text-muted-foreground text-base leading-relaxed">
+                  An Advance Directive is a legal document that tells doctors what kind of medical treatment you want if you can't speak for yourself. It helps your family and doctors make decisions that match your wishes.
+                </p>
+              </div>
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <h4 className="font-semibold text-foreground mb-2">DNR vs POLST</h4>
+                <p className="text-muted-foreground text-base leading-relaxed">
+                  A DNR (Do Not Resuscitate) order tells medical staff not to perform CPR. A POLST (Physician Orders for Life-Sustaining Treatment) is a broader form that covers more medical decisions and is signed by your doctor.
+                </p>
+              </div>
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <h4 className="font-semibold text-foreground mb-2">Why naming a Healthcare Proxy matters</h4>
+                <p className="text-muted-foreground text-base leading-relaxed">
+                  A Healthcare Proxy (also called Healthcare Agent) is someone you choose to make medical decisions for you. Without one, your family may disagree about your care, or a court may have to decide.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Funeral Planning */}
+      {(!activeSubItem || activeSubItem === 'funeral-planning') && (
+        <Card className="border-2 border-amber-500/20">
+          <CardHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="inline-block px-3 py-1 text-sm font-semibold bg-amber-500/10 text-amber-700 rounded-full">
+                🕊️ Funeral Planning
+              </span>
+            </div>
+            <CardTitle className="text-xl">Funeral Planning Basics</CardTitle>
+            <CardDescription className="text-base leading-relaxed">
+              Understanding your options for final arrangements.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4">
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <h4 className="font-semibold text-foreground mb-2">Burial vs Cremation</h4>
+                <p className="text-muted-foreground text-base leading-relaxed">
+                  Burial involves placing the body in a casket and burying it in a cemetery. Cremation uses heat to reduce the body to ashes, which can be kept in an urn, scattered, or buried. Both are respectful options.
+                </p>
+              </div>
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <h4 className="font-semibold text-foreground mb-2">Casket and Urn Basics</h4>
+                <p className="text-muted-foreground text-base leading-relaxed">
+                  Caskets range from simple wood to elaborate metal designs. Urns can be made of ceramic, wood, metal, or biodegradable materials. You are NOT required to buy from a funeral home—you can shop elsewhere.
+                </p>
+              </div>
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <h4 className="font-semibold text-foreground mb-2">Planning Ahead vs Last-Minute Decisions</h4>
+                <p className="text-muted-foreground text-base leading-relaxed">
+                  Planning ahead gives you time to research options, compare prices, and make thoughtful decisions. Last-minute arrangements often cost more and add stress to grieving families.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Digital & Organization */}
+      {(!activeSubItem || activeSubItem === 'digital-organization') && (
+        <Card className="border-2 border-blue-500/20">
+          <CardHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="inline-block px-3 py-1 text-sm font-semibold bg-blue-500/10 text-blue-700 rounded-full">
+                💻 Digital & Organization
+              </span>
+            </div>
+            <CardTitle className="text-xl">Digital Assets & Organization</CardTitle>
+            <CardDescription className="text-base leading-relaxed">
+              Keeping important information organized.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4">
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <h4 className="font-semibold text-foreground mb-2">Why Document Lists Matter</h4>
+                <p className="text-muted-foreground text-base leading-relaxed">
+                  When a loved one passes, families often spend weeks searching for important papers—wills, insurance policies, deeds. A simple list of where things are kept saves time and reduces stress.
+                </p>
+              </div>
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <h4 className="font-semibold text-foreground mb-2">Common Challenges Families Face</h4>
+                <p className="text-muted-foreground text-base leading-relaxed">
+                  Not knowing bank account numbers. Missing passwords. Unable to find the will. Not knowing who to notify. A little preparation prevents all of these problems.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Travel Protection */}
+      {(!activeSubItem || activeSubItem === 'travel-protection') && (
+        <Card className="border-2 border-green-500/20">
+          <CardHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="inline-block px-3 py-1 text-sm font-semibold bg-green-500/10 text-green-700 rounded-full">
+                ✈️ Travel Protection
+              </span>
+            </div>
+            <CardTitle className="text-xl">Travel Protection</CardTitle>
+            <CardDescription className="text-base leading-relaxed">
+              What happens if death occurs away from home.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4">
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <h4 className="font-semibold text-foreground mb-2">What Happens If Death Occurs Away from Home</h4>
+                <p className="text-muted-foreground text-base leading-relaxed">
+                  If someone dies while traveling—whether in another state or country—the family must arrange to have the body transported home. This can cost thousands of dollars and involves complex paperwork.
+                </p>
+              </div>
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <h4 className="font-semibold text-foreground mb-2">Transport Coverage Basics</h4>
+                <p className="text-muted-foreground text-base leading-relaxed">
+                  Some travel insurance and memberships include repatriation coverage, which pays to transport remains back home. Always check what your policy covers before traveling.
+                </p>
+              </div>
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <h4 className="font-semibold text-foreground mb-2">What to Ask Providers</h4>
+                <p className="text-muted-foreground text-base leading-relaxed">
+                  Ask about: coverage limits, what countries are included, what documentation is needed, and whether cremation abroad is covered if you prefer it.
+                </p>
+              </div>
+            </div>
+            <div className="pt-4">
+              <Link to="/travel-protection">
+                <Button size="lg" variant="outline" className="min-h-[52px] gap-2">
+                  Learn More About Travel Protection
+                  <ChevronRight className="h-5 w-5" />
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
 
   // Planning Guides Section - Using PDF with fallback instead of Gamma embeds
   const renderPlanningGuides = () => (
