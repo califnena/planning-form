@@ -1,8 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { CheckCircle2, Clock, Circle, ArrowRight, BookOpen } from "lucide-react";
+import { CheckCircle2, Circle, ArrowRight, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -12,32 +10,38 @@ interface PrePlanningItem {
   description: string;
   learnMoreRoute: string;
   goToRoute: string;
-  status: "completed" | "in_progress" | "not_started";
 }
 
 interface SectionPrePlanningProps {
-  statuses?: Record<string, "completed" | "in_progress" | "not_started">;
-  onStatusChange?: (id: string, status: "completed" | "in_progress" | "not_started") => void;
+  statuses?: Record<string, "completed" | "not_started">;
+  onStatusChange?: (id: string, status: "completed" | "not_started") => void;
 }
 
-const PRE_PLANNING_ITEMS: Omit<PrePlanningItem, "status">[] = [
+const PRE_PLANNING_ITEMS: PrePlanningItem[] = [
   {
     id: "advance_directive",
-    title: "Advance Directive",
+    title: "Advance Directive (Living Will)",
     description: "A document that explains your medical wishes if you cannot speak for yourself.",
     learnMoreRoute: "/resources?topic=advance-directive",
     goToRoute: "/preplandashboard/health-care",
   },
   {
+    id: "healthcare_proxy",
+    title: "Healthcare Proxy",
+    description: "Names the person who can make medical decisions for you if needed.",
+    learnMoreRoute: "/resources?topic=healthcare-proxy",
+    goToRoute: "/preplandashboard/health-care",
+  },
+  {
     id: "dnr_polst",
-    title: "DNR / POLST",
+    title: "DNR or POLST",
     description: "Lets others know if you have special medical orders and where they are kept.",
     learnMoreRoute: "/resources?topic=dnr-polst",
     goToRoute: "/preplandashboard/health-care",
   },
   {
-    id: "health_care_overview",
-    title: "Health & Care Overview",
+    id: "medical_information",
+    title: "Medical Information Summary",
     description: "A summary of health information your family and caregivers may need.",
     learnMoreRoute: "/resources?topic=health-overview",
     goToRoute: "/preplandashboard/health-care",
@@ -50,47 +54,46 @@ const PRE_PLANNING_ITEMS: Omit<PrePlanningItem, "status">[] = [
     goToRoute: "/preplandashboard/care-preferences",
   },
   {
-    id: "insurance_overview",
-    title: "Insurance Overview",
-    description: "Helps your family know what coverage exists and where to find details.",
-    learnMoreRoute: "/resources?topic=insurance",
-    goToRoute: "/preplandashboard/insurance",
+    id: "funeral_wishes",
+    title: "Funeral Wishes",
+    description: "Your preferences for services, burial or cremation, and final arrangements.",
+    learnMoreRoute: "/resources?topic=funeral-planning",
+    goToRoute: "/preplandashboard/funeral",
   },
   {
     id: "travel_protection",
-    title: "Travel Death / Transport Protection",
+    title: "Travel Death Protection",
     description: "Information to consider if death occurs away from home.",
     learnMoreRoute: "/resources?topic=travel-protection",
     goToRoute: "/travel-protection",
   },
+  {
+    id: "important_documents",
+    title: "Important Documents Location",
+    description: "Where to find wills, deeds, insurance papers, and other key documents.",
+    learnMoreRoute: "/resources?topic=document-location",
+    goToRoute: "/preplandashboard/legal",
+  },
 ];
 
-const StatusIcon = ({ status }: { status: "completed" | "in_progress" | "not_started" }) => {
-  switch (status) {
-    case "completed":
-      return <CheckCircle2 className="h-5 w-5 text-green-600" />;
-    case "in_progress":
-      return <Clock className="h-5 w-5 text-amber-500" />;
-    default:
-      return <Circle className="h-5 w-5 text-muted-foreground" />;
+const StatusIcon = ({ status, isChecked }: { status: "completed" | "not_started"; isChecked: boolean }) => {
+  if (isChecked) {
+    return <CheckCircle2 className="h-6 w-6 text-green-600" />;
   }
-};
-
-const StatusLabel = ({ status }: { status: "completed" | "in_progress" | "not_started" }) => {
-  switch (status) {
-    case "completed":
-      return <span className="text-green-600 font-medium">Completed</span>;
-    case "in_progress":
-      return <span className="text-amber-600 font-medium">In progress</span>;
-    default:
-      return <span className="text-muted-foreground">Not started</span>;
-  }
+  return <Circle className="h-6 w-6 text-muted-foreground/50" />;
 };
 
 export const SectionPrePlanning = ({ statuses = {}, onStatusChange }: SectionPrePlanningProps) => {
   const navigate = useNavigate();
 
   const getStatus = (id: string) => statuses[id] || "not_started";
+  const isChecked = (id: string) => getStatus(id) === "completed";
+
+  const toggleStatus = (id: string) => {
+    const currentStatus = getStatus(id);
+    const newStatus = currentStatus === "completed" ? "not_started" : "completed";
+    onStatusChange?.(id, newStatus);
+  };
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -99,73 +102,72 @@ export const SectionPrePlanning = ({ statuses = {}, onStatusChange }: SectionPre
           Pre-Planning Checklist
         </h1>
         <p className="text-lg text-muted-foreground leading-relaxed">
-          These are the important areas to consider when planning ahead.<br />
-          Take your time. You can update these anytime.
+          These are helpful things to think about. You can check off what you've already done or learn more when you're ready.
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {PRE_PLANNING_ITEMS.map((item) => {
-          const status = getStatus(item.id);
+          const checked = isChecked(item.id);
           
           return (
             <Card
               key={item.id}
               className={cn(
-                "p-5 transition-all border-2",
-                status === "completed" && "border-green-200 bg-green-50/50",
-                status === "in_progress" && "border-amber-200 bg-amber-50/50",
-                status === "not_started" && "border-border"
+                "p-4 sm:p-5 transition-all border-2",
+                checked && "border-green-200 bg-green-50/50",
+                !checked && "border-border"
               )}
             >
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 mt-1">
-                  <StatusIcon status={status} />
-                </div>
+                {/* Large Square Checkbox */}
+                <button
+                  onClick={() => toggleStatus(item.id)}
+                  className={cn(
+                    "flex-shrink-0 h-7 w-7 rounded border-2 flex items-center justify-center transition-all mt-0.5",
+                    checked
+                      ? "bg-green-600 border-green-600"
+                      : "border-muted-foreground/50 hover:border-primary"
+                  )}
+                  aria-label={checked ? "Mark as not done" : "Mark as done"}
+                >
+                  {checked && (
+                    <svg
+                      className="h-5 w-5 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={3}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </button>
                 
                 <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-medium text-foreground mb-1">
                     {item.title}
                   </h3>
-                  <p className="text-muted-foreground mb-4">
+                  <p className="text-muted-foreground text-base mb-3">
                     {item.description}
                   </p>
 
-                  {/* Status Selection */}
-                  <div className="mb-4">
-                    <RadioGroup
-                      value={status}
-                      onValueChange={(value) => onStatusChange?.(item.id, value as any)}
-                      className="flex flex-wrap gap-4"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="completed" id={`${item.id}-completed`} />
-                        <Label htmlFor={`${item.id}-completed`} className="text-sm cursor-pointer">
-                          Completed
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="in_progress" id={`${item.id}-progress`} />
-                        <Label htmlFor={`${item.id}-progress`} className="text-sm cursor-pointer">
-                          In progress
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="not_started" id={`${item.id}-not-started`} />
-                        <Label htmlFor={`${item.id}-not-started`} className="text-sm cursor-pointer">
-                          Not started
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
+                  {/* Status text */}
+                  <p className="text-sm mb-3">
+                    {checked ? (
+                      <span className="text-green-600 font-medium">Done</span>
+                    ) : (
+                      <span className="text-muted-foreground">Not done</span>
+                    )}
+                  </p>
 
                   {/* Actions */}
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap gap-2">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => navigate(item.learnMoreRoute)}
-                      className="gap-2"
+                      className="gap-2 h-10 px-4"
                     >
                       <BookOpen className="h-4 w-4" />
                       Learn more
@@ -174,7 +176,7 @@ export const SectionPrePlanning = ({ statuses = {}, onStatusChange }: SectionPre
                       variant="default"
                       size="sm"
                       onClick={() => navigate(item.goToRoute)}
-                      className="gap-2"
+                      className="gap-2 h-10 px-4"
                     >
                       Go to section
                       <ArrowRight className="h-4 w-4" />

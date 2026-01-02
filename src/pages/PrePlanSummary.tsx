@@ -229,6 +229,37 @@ export default function PrePlanSummary() {
 
       const displayProfile = Object.keys(mergedProfile).length > 0 ? mergedProfile : null;
       
+      // Load health care and care preferences from localStorage to determine status
+      let healthCareData: any = {};
+      let carePreferencesData: any = {};
+      try {
+        const healthRaw = localStorage.getItem(`healthcare_${user.id}`);
+        if (healthRaw) healthCareData = JSON.parse(healthRaw);
+        const careRaw = localStorage.getItem(`care_preferences_${user.id}`);
+        if (careRaw) carePreferencesData = JSON.parse(careRaw);
+      } catch (e) {
+        console.warn("[PrePlanSummary] Failed to parse health/care data", e);
+      }
+
+      const hasHealthCareData = !!(
+        (healthCareData.conditions?.length > 0) ||
+        (healthCareData.allergies?.length > 0) ||
+        (healthCareData.medications?.length > 0) ||
+        healthCareData.doctorPharmacy?.primaryDoctorName ||
+        healthCareData.advanceDirectiveStatus ||
+        healthCareData.dnrPolstStatus
+      );
+
+      const hasCarePreferencesData = !!(
+        (carePreferencesData.comfortPainCare?.length > 0) ||
+        (carePreferencesData.careSetting?.length > 0) ||
+        (carePreferencesData.visitorsCompanionship?.length > 0) ||
+        (carePreferencesData.spiritualCultural?.length > 0) ||
+        (carePreferencesData.communicationPreferences?.length > 0) ||
+        (carePreferencesData.personalComfortItems?.length > 0) ||
+        carePreferencesData.additionalNotes
+      );
+
       const allPossibleSections: SectionData[] = [
         {
           id: "personal",
@@ -248,11 +279,18 @@ export default function PrePlanSummary() {
           editRoute: SECTION_ROUTES.contacts,
         },
         {
-          id: "legacy",
-          label: "Life Story & Legacy",
-          icon: <BookHeart className="h-5 w-5" />,
-          status: getSectionStatus(!!mergedPlan.about_me_notes, false),
-          editRoute: SECTION_ROUTES.legacy,
+          id: "healthcare",
+          label: "Medical Information",
+          icon: <Heart className="h-5 w-5" />,
+          status: getSectionStatus(hasHealthCareData, false),
+          editRoute: "/preplandashboard/health-care",
+        },
+        {
+          id: "carepreferences",
+          label: "Care Preferences",
+          icon: <Heart className="h-5 w-5" />,
+          status: getSectionStatus(hasCarePreferencesData, false),
+          editRoute: "/preplandashboard/care-preferences",
         },
         {
           id: "funeral",
@@ -262,15 +300,8 @@ export default function PrePlanSummary() {
           editRoute: SECTION_ROUTES.funeral,
         },
         {
-          id: "financial",
-          label: "Financial Life",
-          icon: <Wallet className="h-5 w-5" />,
-          status: getSectionStatus(!!mergedPlan.financial_notes, false),
-          editRoute: SECTION_ROUTES.financial,
-        },
-        {
           id: "insurance",
-          label: "Insurance",
+          label: "Insurance Overview",
           icon: <Shield className="h-5 w-5" />,
           status: getSectionStatus(
             mergedInsurance.length > 0 || !!mergedPlan.insurance_notes,
@@ -289,13 +320,6 @@ export default function PrePlanSummary() {
           editRoute: SECTION_ROUTES.property,
         },
         {
-          id: "legal",
-          label: "Legal & Planning Notes",
-          icon: <Scale className="h-5 w-5" />,
-          status: getSectionStatus(!!mergedPlan.legal_notes, false),
-          editRoute: SECTION_ROUTES.legal,
-        },
-        {
           id: "pets",
           label: "Pet Care",
           icon: <Dog className="h-5 w-5" />,
@@ -304,13 +328,6 @@ export default function PrePlanSummary() {
             false
           ),
           editRoute: SECTION_ROUTES.pets,
-        },
-        {
-          id: "digital",
-          label: "Online Accounts",
-          icon: <Laptop className="h-5 w-5" />,
-          status: getSectionStatus(!!mergedPlan.digital_notes, false),
-          editRoute: SECTION_ROUTES.digital,
         },
         {
           id: "messages",
@@ -496,8 +513,8 @@ export default function PrePlanSummary() {
           </p>
         </div>
 
-        {/* Primary Action Button */}
-        <div className="mb-8">
+        {/* Primary Action + Share with Family */}
+        <div className="mb-8 space-y-3">
           <Button 
             onClick={handleDownloadPDF}
             disabled={generatingPdf}
@@ -515,6 +532,17 @@ export default function PrePlanSummary() {
                 View or Print My Planning Document
               </>
             )}
+          </Button>
+          
+          {/* Share with Family - secondary action, visually grouped */}
+          <Button 
+            variant="outline"
+            size="lg"
+            onClick={() => setShowShareDialog(true)}
+            className="w-full h-12 text-base font-medium gap-2"
+          >
+            <Users className="h-5 w-5" />
+            Share with Family
           </Button>
         </div>
 

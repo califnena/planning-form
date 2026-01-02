@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function PrePlanningPage() {
   const { user, saveState } = usePlanContext();
   const { toast } = useToast();
-  const [statuses, setStatuses] = useState<Record<string, "completed" | "in_progress" | "not_started">>({});
+  const [statuses, setStatuses] = useState<Record<string, "completed" | "not_started">>({});
 
   // Load statuses from localStorage (persisted per user)
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function PrePlanningPage() {
     }
   }, [user?.id]);
 
-  const handleStatusChange = (id: string, status: "completed" | "in_progress" | "not_started") => {
+  const handleStatusChange = (id: string, status: "completed" | "not_started") => {
     const newStatuses = { ...statuses, [id]: status };
     setStatuses(newStatuses);
     
