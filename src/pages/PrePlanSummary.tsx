@@ -642,12 +642,12 @@ export default function PrePlanSummary() {
           </CardContent>
         </Card>
 
-        {/* Optional Extras Section */}
+        {/* Optional Extras Section - removed duplicate Share button */}
         <div className="bg-primary/5 border border-primary/20 rounded-xl p-5 mb-6">
           <h2 className="font-semibold text-foreground mb-1">
             Optional extras
           </h2>
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className="text-base text-muted-foreground mb-4">
             Only if helpful — these do not affect your plan.
           </p>
           
@@ -660,7 +660,7 @@ export default function PrePlanSummary() {
               <FileText className="h-5 w-5 mr-3 text-primary" />
               <div className="text-left">
                 <p className="font-medium">Purchase a Printed Binder</p>
-                <p className="text-sm text-muted-foreground">A physical copy for your home</p>
+                <p className="text-base text-muted-foreground">A physical copy for your home</p>
               </div>
             </Button>
             
@@ -672,19 +672,7 @@ export default function PrePlanSummary() {
               <Heart className="h-5 w-5 mr-3 text-primary" />
               <div className="text-left">
                 <p className="font-medium">Create a Memorial Song</p>
-                <p className="text-sm text-muted-foreground">A personalized song for loved ones</p>
-              </div>
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              className="w-full justify-start h-auto py-3 px-4"
-              onClick={() => setShowShareDialog(true)}
-            >
-              <MessageSquare className="h-5 w-5 mr-3 text-primary" />
-              <div className="text-left">
-                <p className="font-medium">Share with Family</p>
-                <p className="text-sm text-muted-foreground">Email your plan to loved ones</p>
+                <p className="text-base text-muted-foreground">A personalized song for loved ones</p>
               </div>
             </Button>
           </div>

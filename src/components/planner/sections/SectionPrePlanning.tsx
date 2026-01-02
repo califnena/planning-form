@@ -17,71 +17,65 @@ interface SectionPrePlanningProps {
   onStatusChange?: (id: string, status: "completed" | "not_started") => void;
 }
 
+// Updated checklist with exact wording from requirements
 const PRE_PLANNING_ITEMS: PrePlanningItem[] = [
   {
-    id: "advance_directive",
-    title: "Advance Directive (Living Will)",
-    description: "A document that explains your medical wishes if you cannot speak for yourself.",
-    learnMoreRoute: "/resources?topic=advance-directive",
-    goToRoute: "/preplandashboard/health-care",
+    id: "emergency_contacts",
+    title: "I have written down who should be contacted in an emergency",
+    description: "List emergency contacts so family knows who to call.",
+    learnMoreRoute: "/resources?topic=contacts",
+    goToRoute: "/preplandashboard/contacts",
   },
   {
     id: "healthcare_proxy",
-    title: "Healthcare Proxy",
-    description: "Names the person who can make medical decisions for you if needed.",
+    title: "I have named someone to make medical decisions if needed",
+    description: "Choose a healthcare proxy to speak for you.",
     learnMoreRoute: "/resources?topic=healthcare-proxy",
     goToRoute: "/preplandashboard/health-care",
   },
   {
-    id: "dnr_polst",
-    title: "DNR or POLST",
-    description: "Lets others know if you have special medical orders and where they are kept.",
-    learnMoreRoute: "/resources?topic=dnr-polst",
-    goToRoute: "/preplandashboard/health-care",
-  },
-  {
-    id: "medical_information",
-    title: "Medical Information Summary",
-    description: "A summary of health information your family and caregivers may need.",
-    learnMoreRoute: "/resources?topic=health-overview",
-    goToRoute: "/preplandashboard/health-care",
-  },
-  {
     id: "care_preferences",
-    title: "Care Preferences",
-    description: "Helps others understand how you want to be cared for and what matters to you.",
+    title: "I have noted my care and comfort preferences",
+    description: "Share how you want to be cared for.",
     learnMoreRoute: "/resources?topic=care-preferences",
     goToRoute: "/preplandashboard/care-preferences",
   },
   {
     id: "funeral_wishes",
-    title: "Funeral Wishes",
-    description: "Your preferences for services, burial or cremation, and final arrangements.",
+    title: "I have recorded my funeral or memorial wishes",
+    description: "Let your family know your wishes for services.",
     learnMoreRoute: "/resources?topic=funeral-planning",
-    goToRoute: "/preplandashboard/funeral",
+    goToRoute: "/preplandashboard/funeral-wishes",
   },
   {
-    id: "travel_protection",
-    title: "Travel Death Protection",
-    description: "Information to consider if death occurs away from home.",
-    learnMoreRoute: "/resources?topic=travel-protection",
-    goToRoute: "/travel-protection",
+    id: "insurance_info",
+    title: "I have listed important insurance information",
+    description: "Note insurance policies your family may need.",
+    learnMoreRoute: "/resources?topic=insurance",
+    goToRoute: "/preplandashboard/insurance",
   },
   {
-    id: "important_documents",
-    title: "Important Documents Location",
-    description: "Where to find wills, deeds, insurance papers, and other key documents.",
+    id: "messages",
+    title: "I have written messages or notes for loved ones",
+    description: "Leave personal messages for family and friends.",
+    learnMoreRoute: "/resources?topic=messages",
+    goToRoute: "/preplandashboard/messages",
+  },
+  {
+    id: "documents_location",
+    title: "I know where important documents are kept",
+    description: "Document where to find wills, deeds, and papers.",
     learnMoreRoute: "/resources?topic=document-location",
-    goToRoute: "/preplandashboard/legal",
+    goToRoute: "/preplandashboard/legal-docs",
+  },
+  {
+    id: "plan_reviewed",
+    title: "I have reviewed my plan and saved a printable copy",
+    description: "Review everything and create your printable document.",
+    learnMoreRoute: "/resources",
+    goToRoute: "/plan-summary",
   },
 ];
-
-const StatusIcon = ({ status, isChecked }: { status: "completed" | "not_started"; isChecked: boolean }) => {
-  if (isChecked) {
-    return <CheckCircle2 className="h-6 w-6 text-green-600" />;
-  }
-  return <Circle className="h-6 w-6 text-muted-foreground/50" />;
-};
 
 export const SectionPrePlanning = ({ statuses = {}, onStatusChange }: SectionPrePlanningProps) => {
   const navigate = useNavigate();
@@ -120,11 +114,11 @@ export const SectionPrePlanning = ({ statuses = {}, onStatusChange }: SectionPre
               )}
             >
               <div className="flex items-start gap-4">
-                {/* Large Square Checkbox */}
+                {/* Large Square Checkbox - min 44px tap target */}
                 <button
                   onClick={() => toggleStatus(item.id)}
                   className={cn(
-                    "flex-shrink-0 h-7 w-7 rounded border-2 flex items-center justify-center transition-all mt-0.5",
+                    "flex-shrink-0 h-11 w-11 rounded border-2 flex items-center justify-center transition-all mt-0.5",
                     checked
                       ? "bg-green-600 border-green-600"
                       : "border-muted-foreground/50 hover:border-primary"
@@ -133,7 +127,7 @@ export const SectionPrePlanning = ({ statuses = {}, onStatusChange }: SectionPre
                 >
                   {checked && (
                     <svg
-                      className="h-5 w-5 text-white"
+                      className="h-6 w-6 text-white"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -145,7 +139,7 @@ export const SectionPrePlanning = ({ statuses = {}, onStatusChange }: SectionPre
                 </button>
                 
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-medium text-foreground mb-1">
+                  <h3 className="text-base sm:text-lg font-medium text-foreground mb-1">
                     {item.title}
                   </h3>
                   <p className="text-muted-foreground text-base mb-3">
@@ -153,7 +147,7 @@ export const SectionPrePlanning = ({ statuses = {}, onStatusChange }: SectionPre
                   </p>
 
                   {/* Status text */}
-                  <p className="text-sm mb-3">
+                  <p className="text-base mb-3">
                     {checked ? (
                       <span className="text-green-600 font-medium">Done</span>
                     ) : (
@@ -161,22 +155,22 @@ export const SectionPrePlanning = ({ statuses = {}, onStatusChange }: SectionPre
                     )}
                   </p>
 
-                  {/* Actions */}
+                  {/* Actions - large touch targets */}
                   <div className="flex flex-wrap gap-2">
                     <Button
                       variant="outline"
-                      size="sm"
+                      size="default"
                       onClick={() => navigate(item.learnMoreRoute)}
-                      className="gap-2 h-10 px-4"
+                      className="gap-2 h-11 px-4"
                     >
                       <BookOpen className="h-4 w-4" />
                       Learn more
                     </Button>
                     <Button
                       variant="default"
-                      size="sm"
+                      size="default"
                       onClick={() => navigate(item.goToRoute)}
-                      className="gap-2 h-10 px-4"
+                      className="gap-2 h-11 px-4"
                     >
                       Go to section
                       <ArrowRight className="h-4 w-4" />
