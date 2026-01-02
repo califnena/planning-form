@@ -37,6 +37,11 @@ export const resourceSections: ResourceSection[] = [
     ],
   },
   {
+    id: 'forms-worksheets',
+    label: 'Forms & Worksheets',
+    icon: FileText,
+  },
+  {
     id: 'tools-calculators',
     label: 'Tools & Calculators',
     icon: Calculator,
@@ -44,15 +49,6 @@ export const resourceSections: ResourceSection[] = [
       { id: 'cost-estimator', label: 'Cost Estimator' },
       { id: 'progress-tracker', label: 'Planning Progress' },
       { id: 'document-checklist', label: 'Document Checklist' },
-    ],
-  },
-  {
-    id: 'forms-worksheets',
-    label: 'Forms & Worksheets',
-    icon: FileText,
-    subItems: [
-      { id: 'printable-forms', label: 'Printable Blank Forms' },
-      { id: 'download-center', label: 'Download Center' },
     ],
   },
   {
