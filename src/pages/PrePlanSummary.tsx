@@ -10,33 +10,24 @@ import {
   ChevronDown,
   ChevronUp,
   Edit,
-  User,
   Users,
   Heart,
   FileText,
-  Wallet,
-  Shield,
-  Home,
-  Dog,
-  Laptop,
-  Scale,
-  MessageSquare,
-  BookHeart,
   Check,
   Circle,
   Loader2,
-  Play
+  Play,
+  Phone
 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-// PIICollectionDialog removed - PDF generates immediately without PII collection
 import { ShareSummaryDialog } from "@/components/summary/ShareSummaryDialog";
 import { SETTINGS_DEFAULT } from "@/lib/sections";
 import { useActivePlan, fetchPlanData } from "@/hooks/useActivePlan";
-import { SECTION_ROUTES } from "@/lib/sectionRoutes";
 import { buildPlanDataForPdf, normalizePlanDataForPdf } from "@/lib/buildPlanDataForPdf";
 import { getSectionCompletion } from "@/lib/sectionCompletion";
+import { getCompletableSections, type SectionDefinition } from "@/lib/sectionRegistry";
 
 interface SectionData {
   id: string;
@@ -57,34 +48,20 @@ export default function PrePlanSummary() {
   const [dataLoading, setDataLoading] = useState(true);
   const [planData, setPlanData] = useState<any>(null);
   const [sections, setSections] = useState<SectionData[]>([]);
-  // PII dialog removed - PDF generates immediately
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
-  const [profile, setProfile] = useState<any>(null);
-  const [contacts, setContacts] = useState<any[]>([]);
-  const [pets, setPets] = useState<any[]>([]);
-  const [insurance, setInsurance] = useState<any[]>([]);
-  const [properties, setProperties] = useState<any[]>([]);
-  const [messages, setMessages] = useState<any[]>([]);
-  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
-  const [investments, setInvestments] = useState<any[]>([]);
-  const [professionalContacts, setProfessionalContacts] = useState<any[]>([]);
-  const [funeralFunding, setFuneralFunding] = useState<any[]>([]);
-  const [debts, setDebts] = useState<any[]>([]);
-  const [businesses, setBusinesses] = useState<any[]>([]);
   const [selectedSections, setSelectedSections] = useState<string[]>(SETTINGS_DEFAULT);
   const [generatingPdf, setGeneratingPdf] = useState(false);
-  // exportKind removed - always opens in new tab
   
-  // New state for simplified UI
+  // Simplified UI state
   const [sectionsExpanded, setSectionsExpanded] = useState(false);
   const [personalNotes, setPersonalNotes] = useState("");
-  const [notesSaving, setNotesSaving] = useState(false);
   
-  // State for PDF fallback handling
+  // PDF fallback handling
   const [lastPdfUrl, setLastPdfUrl] = useState<string | null>(null);
   const [pdfError, setPdfError] = useState<string | null>(null);
+  const [pdfWindow, setPdfWindow] = useState<Window | null>(null);
   
   const loading = planLoading || dataLoading;
 
@@ -145,14 +122,9 @@ export default function PrePlanSummary() {
         setSelectedSections(settings.selected_sections);
       }
 
-      // We still fetch DB tables for the UI, but we compute completion + PDF payload
-      // from the SAME object used by the PDF generator (buildPlanDataForPdf).
-      const data = await fetchPlanData(activePlanId);
-
-      // Single source of truth for completion + PDF payload
+      // Single source of truth: buildPlanDataForPdf
       const pdfPlanData = await buildPlanDataForPdf(user.id);
 
-      // Also merge the currently resolved plan/org (defensive)
       const mergedPlanData: any = {
         ...(pdfPlanData || {}),
         id: activePlanId,
@@ -161,146 +133,34 @@ export default function PrePlanSummary() {
 
       setPlanData(mergedPlanData);
 
-      // Debug (dev-only): confirm we are seeing real persisted keys + completion map
+      // Compute completion using unified logic
+      const completion = getSectionCompletion(mergedPlanData);
+
       if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
-        console.log("[PrePlanSummary] planData keys:", Object.keys(mergedPlanData || {}));
-        // eslint-disable-next-line no-console
-        console.log("[PrePlanSummary] completion map:", getSectionCompletion(mergedPlanData));
+        console.log("[PrePlanSummary] completion map:", completion);
       }
 
-      // Hydrate UI section data (DB-first where relevant)
-      const displayProfile = mergedPlanData.personal_profile || data.personalProfile || null;
-      const mergedContacts = (data.contacts?.length ? data.contacts : mergedPlanData.contacts_notify) || [];
-      const mergedPets = (data.pets?.length ? data.pets : mergedPlanData.pets) || [];
-      const mergedInsurance = (data.insurance?.length ? data.insurance : mergedPlanData.insurance_policies) || [];
-      const mergedProperties = (data.properties?.length ? data.properties : mergedPlanData.properties) || [];
-      const mergedMessages = (data.messages?.length ? data.messages : mergedPlanData.messages) || [];
-      const mergedBankAccounts = (data.bankAccounts?.length ? data.bankAccounts : mergedPlanData.bank_accounts) || [];
-      const mergedInvestments = (data.investments?.length ? data.investments : mergedPlanData.investments) || [];
-      const mergedProfessionalContacts = (data.professionalContacts?.length ? data.professionalContacts : mergedPlanData.contacts_professional) || [];
-      const mergedFuneralFunding = (data.funeralFunding?.length ? data.funeralFunding : mergedPlanData.funeral_funding) || [];
-      const mergedDebts = (data.debts?.length ? data.debts : mergedPlanData.debts) || [];
-      const mergedBusinesses = (data.businesses?.length ? data.businesses : mergedPlanData.businesses) || [];
-
-      setProfile(displayProfile);
-      setContacts(mergedContacts);
-      setPets(mergedPets);
-      setInsurance(mergedInsurance);
-      setProperties(mergedProperties);
-      setMessages(mergedMessages);
-      setBankAccounts(mergedBankAccounts);
-      setInvestments(mergedInvestments);
-      setProfessionalContacts(mergedProfessionalContacts);
-      setFuneralFunding(mergedFuneralFunding);
-      setDebts(mergedDebts);
-      setBusinesses(mergedBusinesses);
-
+      // Build sections list from UNIFIED REGISTRY
       const userSelectedSections = settings?.selected_sections?.length
         ? settings.selected_sections
         : SETTINGS_DEFAULT;
       const selectedSet = new Set(userSelectedSections);
 
-      const completion = getSectionCompletion(mergedPlanData);
-      const getSectionStatus = (sectionId: string): "completed" | "started" | "not_started" =>
-        completion[sectionId] ? "completed" : "not_started";
+      const registrySections = getCompletableSections();
+      const sectionList: SectionData[] = registrySections
+        .filter((s) => selectedSet.has(s.id))
+        .map((s) => {
+          const Icon = s.icon;
+          return {
+            id: s.id,
+            label: s.label,
+            icon: <Icon className="h-5 w-5" />,
+            status: completion[s.id] ? "completed" : "not_started",
+            editRoute: s.route,
+          };
+        });
 
-      const allPossibleSections: SectionData[] = [
-        {
-          id: "personal",
-          label: "About You",
-          icon: <User className="h-5 w-5" />,
-          status: getSectionStatus("personal"),
-          editRoute: SECTION_ROUTES.personal,
-        },
-        {
-          id: "contacts",
-          label: "Important Contacts",
-          icon: <Users className="h-5 w-5" />,
-          status: getSectionStatus("contacts"),
-          editRoute: SECTION_ROUTES.contacts,
-        },
-        {
-          id: "healthcare",
-          label: "Medical & Care Preferences",
-          icon: <Heart className="h-5 w-5" />,
-          status: getSectionStatus("healthcare"),
-          editRoute: "/preplandashboard/health-care",
-        },
-        {
-          id: "carepreferences",
-          label: "Care Preferences",
-          icon: <Heart className="h-5 w-5" />,
-          status: getSectionStatus("carepreferences"),
-          editRoute: "/preplandashboard/care-preferences",
-        },
-        {
-          id: "advancedirective",
-          label: "Advance Directive & DNR Status",
-          icon: <FileText className="h-5 w-5" />,
-          status: getSectionStatus("advancedirective"),
-          editRoute: "/preplandashboard/advance-directive",
-        },
-        {
-          id: "travel",
-          label: "Travel & Away-From-Home Plan",
-          icon: <Home className="h-5 w-5" />,
-          status: getSectionStatus("travel"),
-          editRoute: "/preplandashboard/travel-planning",
-        },
-        {
-          id: "funeral",
-          label: "Funeral Wishes",
-          icon: <Heart className="h-5 w-5" />,
-          status: getSectionStatus("funeral"),
-          editRoute: SECTION_ROUTES.funeral,
-        },
-        {
-          id: "insurance",
-          label: "Insurance",
-          icon: <Shield className="h-5 w-5" />,
-          status: getSectionStatus("insurance"),
-          editRoute: SECTION_ROUTES.insurance,
-        },
-        {
-          id: "property",
-          label: "Property & Valuables",
-          icon: <Home className="h-5 w-5" />,
-          status: getSectionStatus("property"),
-          editRoute: SECTION_ROUTES.property,
-        },
-        {
-          id: "pets",
-          label: "Pets",
-          icon: <Dog className="h-5 w-5" />,
-          status: getSectionStatus("pets"),
-          editRoute: SECTION_ROUTES.pets,
-        },
-        {
-          id: "messages",
-          label: "Messages to Loved Ones",
-          icon: <MessageSquare className="h-5 w-5" />,
-          status: getSectionStatus("messages"),
-          editRoute: SECTION_ROUTES.messages,
-        },
-        {
-          id: "digital",
-          label: "Online Accounts",
-          icon: <Laptop className="h-5 w-5" />,
-          status: getSectionStatus("digital"),
-          editRoute: SECTION_ROUTES.digital,
-        },
-        {
-          id: "preplanning",
-          label: "Pre-Planning Checklist",
-          icon: <FileText className="h-5 w-5" />,
-          status: getSectionStatus("preplanning"),
-          editRoute: "/preplandashboard/checklist",
-        },
-      ];
-
-      const filtered = allPossibleSections.filter((s) => selectedSet.has(s.id));
-      setSections(filtered);
+      setSections(sectionList);
     } catch (error) {
       console.error("Error loading plan data:", error);
       toast({
@@ -313,27 +173,53 @@ export default function PrePlanSummary() {
     }
   };
 
+  /**
+   * PDF Generation with proper popup handling:
+   * 1. Open blank tab immediately on user gesture
+   * 2. Generate PDF
+   * 3. Load blob URL into the tab
+   * 4. Provide download fallback
+   */
   const handleDownloadPDF = async () => {
     setGeneratingPdf(true);
     setPdfError(null);
 
-    // Dev logging
-    if (import.meta.env.DEV) {
-      console.log("[PrePlanSummary] Starting printable copy generation...");
+    // CRITICAL: Open blank tab IMMEDIATELY on user gesture (before async work)
+    const newWindow = window.open("about:blank", "_blank");
+    
+    if (!newWindow) {
+      // Popup blocked - we'll show fallback buttons after generation
+      setPdfError("popup_blocked");
+    } else {
+      // Show loading message in the new tab
+      newWindow.document.write(`
+        <html>
+          <head><title>Loading Your Printable Copy...</title></head>
+          <body style="font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+            <div style="text-align: center;">
+              <p style="font-size: 18px;">Loading your printable copy...</p>
+              <p style="color: #666;">Please wait a moment.</p>
+            </div>
+          </body>
+        </html>
+      `);
+      setPdfWindow(newWindow);
     }
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
+        if (newWindow) newWindow.close();
         toast({
           title: "Please sign in",
           description: "You need to be signed in to generate your document.",
           variant: "destructive",
         });
+        setGeneratingPdf(false);
         return;
       }
 
-      // Build the payload from the SAME source used by PDF generation everywhere.
+      // Build payload from unified source
       const planDataForPdf = await buildPlanDataForPdf(session.user.id);
       const normalizedPlanData = normalizePlanDataForPdf(planDataForPdf);
 
@@ -347,21 +233,10 @@ export default function PrePlanSummary() {
         },
       });
 
-      if (error) {
-        if (import.meta.env.DEV) {
-          console.error("[PrePlanSummary] Edge function error:", error);
-        }
-        throw error;
-      }
+      if (error) throw error;
+      if (!pdfData?.pdfBase64) throw new Error("No PDF data returned");
 
-      if (!pdfData?.pdfBase64) {
-        throw new Error("Printable copy generation returned no data");
-      }
-
-      if (import.meta.env.DEV) {
-        console.log("[PrePlanSummary] Successfully received PDF data");
-      }
-
+      // Create blob URL
       const byteCharacters = atob(pdfData.pdfBase64);
       const byteNumbers = new Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
@@ -371,31 +246,30 @@ export default function PrePlanSummary() {
       const blob = new Blob([byteArray], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
 
-      // Store URL for fallback access
       setLastPdfUrl(url);
 
-      // Try to open in new tab
-      const newWindow = window.open(url, "_blank", "noopener,noreferrer");
-
-      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-        // Pop-up was blocked - show fallback UI
+      if (newWindow && !newWindow.closed) {
+        // Navigate the already-open window to the PDF
+        newWindow.location.href = url;
+        toast({
+          title: "Your printable copy is ready",
+          description: "It opened in a new tab.",
+        });
+      } else {
+        // Popup was blocked - show fallback
         setPdfError("popup_blocked");
         toast({
           title: "Your printable copy is ready",
-          description: "Use the buttons below to open or download your document.",
-        });
-      } else {
-        toast({
-          title: "Your printable copy is ready",
-          description: "It opened in a new tab. You can save or print from there.",
+          description: "Use the buttons below to open or download.",
         });
       }
     } catch (error) {
       console.error("Error generating document:", error);
+      if (newWindow && !newWindow.closed) newWindow.close();
       setPdfError("generation_failed");
       toast({
         title: "Something didn't work",
-        description: "Please try again. If the problem continues, call us for help.",
+        description: "Please try again or call us for help.",
         variant: "destructive",
       });
     } finally {
@@ -403,7 +277,6 @@ export default function PrePlanSummary() {
     }
   };
 
-  // Download PDF directly
   const handleDownloadDirectly = () => {
     if (lastPdfUrl) {
       const link = document.createElement('a');
@@ -415,14 +288,12 @@ export default function PrePlanSummary() {
     }
   };
 
-  // Open PDF in new tab (for retry)
   const handleOpenPdf = () => {
     if (lastPdfUrl) {
       window.open(lastPdfUrl, "_blank", "noopener,noreferrer");
     }
   };
 
-  // Render status icon
   const StatusIcon = ({ status }: { status: "completed" | "started" | "not_started" }) => {
     switch (status) {
       case "completed":
@@ -458,7 +329,7 @@ export default function PrePlanSummary() {
             <p className="text-muted-foreground mb-6 text-lg">
               You haven't chosen any sections yet. Start by selecting what you'd like to include.
             </p>
-            <Button onClick={() => navigate(SECTION_ROUTES.preferences)} size="lg" className="w-full">
+            <Button onClick={() => navigate("/preplandashboard/preferences")} size="lg" className="w-full">
               Choose Your Sections
             </Button>
           </Card>
@@ -491,11 +362,13 @@ export default function PrePlanSummary() {
           </Button>
         </div>
 
-        {/* Page Title */}
-        <div className="mb-6 text-center">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-3 text-foreground">Your Plan Summary</h1>
-          <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
-            You can review or change anything at any time. You do not need to finish everything at once.
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-foreground">
+            Your Plan Summary
+          </h1>
+          <p className="text-muted-foreground mt-2 text-lg">
+            Everything you've planned, in one place.
           </p>
         </div>
 
@@ -523,7 +396,7 @@ export default function PrePlanSummary() {
             You can print or save your plan anytime.
           </p>
           
-          {/* Fallback buttons when popup blocked or PDF ready */}
+          {/* Fallback buttons when popup blocked */}
           {pdfError === "popup_blocked" && lastPdfUrl && (
             <Card className="p-4 bg-amber-50 border-amber-200">
               <p className="text-foreground font-medium mb-3">
@@ -559,13 +432,22 @@ export default function PrePlanSummary() {
               <p className="text-sm text-muted-foreground mb-4">
                 If the problem continues, we're here to help.
               </p>
-              <Button 
-                variant="outline"
-                onClick={() => window.location.href = "tel:+18005551234"}
-                className="w-full h-12"
-              >
-                Call Us for Help
-              </Button>
+              <div className="space-y-2">
+                <Button 
+                  onClick={handleDownloadPDF}
+                  className="w-full h-12"
+                >
+                  Try Again
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => window.location.href = "tel:+18005551234"}
+                  className="w-full h-12 gap-2"
+                >
+                  <Phone className="h-4 w-4" />
+                  Call Us for Help
+                </Button>
+              </div>
             </Card>
           )}
 
@@ -582,7 +464,7 @@ export default function PrePlanSummary() {
             </div>
           )}
           
-          {/* Share with Family - secondary action, visually grouped */}
+          {/* Share with Family - ONLY placement */}
           <Button 
             variant="outline"
             size="lg"
@@ -695,7 +577,7 @@ export default function PrePlanSummary() {
           </CardContent>
         </Card>
 
-        {/* Optional Extras Section - removed duplicate Share button */}
+        {/* Optional Extras Section */}
         <div className="bg-primary/5 border border-primary/20 rounded-xl p-5 mb-6">
           <h2 className="font-semibold text-foreground mb-1">
             Optional extras
@@ -731,8 +613,7 @@ export default function PrePlanSummary() {
           </div>
         </div>
 
-
-        {/* Dialogs - PII dialog removed */}
+        {/* Dialogs */}
         <ShareSummaryDialog
           open={showShareDialog}
           onOpenChange={setShowShareDialog}
