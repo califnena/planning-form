@@ -36,6 +36,7 @@ import { SETTINGS_DEFAULT } from "@/lib/sections";
 import { useActivePlan, fetchPlanData } from "@/hooks/useActivePlan";
 import { SECTION_ROUTES } from "@/lib/sectionRoutes";
 import { buildPlanDataForPdf, normalizePlanDataForPdf } from "@/lib/buildPlanDataForPdf";
+import { getSectionCompletion } from "@/lib/sectionCompletion";
 
 interface SectionData {
   id: string;
@@ -140,69 +141,45 @@ export default function PrePlanSummary() {
         setSelectedSections(settings.selected_sections);
       }
 
+      // We still fetch DB tables for the UI, but we compute completion + PDF payload
+      // from the SAME object used by the PDF generator (buildPlanDataForPdf).
       const data = await fetchPlanData(activePlanId);
-      
-      let localPlan: any | null = null;
-      try {
-        const raw = localStorage.getItem(`plan_${user.id}`);
-        if (raw) localPlan = JSON.parse(raw);
-      } catch (e) {
-        console.warn("[PrePlanSummary] Failed to parse local plan", e);
-      }
 
-      const mergedPlan: any = {
-        ...(localPlan || {}),
-        ...(data.plan || {}),
+      // Single source of truth for completion + PDF payload
+      const pdfPlanData = await buildPlanDataForPdf(user.id);
+
+      // Also merge the currently resolved plan/org (defensive)
+      const mergedPlanData: any = {
+        ...(pdfPlanData || {}),
         id: activePlanId,
         org_id: orgId,
       };
 
-      setPlanData(mergedPlan);
+      setPlanData(mergedPlanData);
 
-      const dbProfile = data.personalProfile;
-      const localProfile = localPlan?.personal_profile;
-      const mergedProfile = {
-        ...(dbProfile || {}),
-        ...(localProfile || {}),
-      };
-      
-      const dbContacts = data.contacts || [];
-      const dbMessages = data.messages || [];
-      const dbProperties = data.properties || [];
-      const dbPets = data.pets || [];
-      const dbInsurance = data.insurance || [];
-      const dbBankAccounts = data.bankAccounts || [];
-      const dbInvestments = data.investments || [];
-      const dbProfessionalContacts = data.professionalContacts || [];
-      const dbFuneralFunding = data.funeralFunding || [];
-      const dbDebts = data.debts || [];
-      const dbBusinesses = data.businesses || [];
-      
-      const localContacts = localPlan?.contacts_notify || localPlan?.contacts || [];
-      const localPets = localPlan?.pets || [];
-      const localInsurance = localPlan?.insurance_policies || localPlan?.insurance || [];
-      const localProperties = localPlan?.properties || [];
-      const localMessages = localPlan?.messages || [];
-      const localBankAccounts = localPlan?.bank_accounts || [];
-      const localInvestments = localPlan?.investments || [];
-      const localProfessionalContacts = localPlan?.contacts_professional || [];
-      const localFuneralFunding = localPlan?.funeral_funding || [];
-      const localDebts = localPlan?.debts || [];
-      const localBusinesses = localPlan?.businesses || [];
-      
-      const mergedContacts = dbContacts.length > 0 ? dbContacts : localContacts;
-      const mergedPets = dbPets.length > 0 ? dbPets : localPets;
-      const mergedInsurance = dbInsurance.length > 0 ? dbInsurance : localInsurance;
-      const mergedProperties = dbProperties.length > 0 ? dbProperties : localProperties;
-      const mergedMessages = dbMessages.length > 0 ? dbMessages : localMessages;
-      const mergedBankAccounts = dbBankAccounts.length > 0 ? dbBankAccounts : localBankAccounts;
-      const mergedInvestments = dbInvestments.length > 0 ? dbInvestments : localInvestments;
-      const mergedProfessionalContacts = dbProfessionalContacts.length > 0 ? dbProfessionalContacts : localProfessionalContacts;
-      const mergedFuneralFunding = dbFuneralFunding.length > 0 ? dbFuneralFunding : localFuneralFunding;
-      const mergedDebts = dbDebts.length > 0 ? dbDebts : localDebts;
-      const mergedBusinesses = dbBusinesses.length > 0 ? dbBusinesses : localBusinesses;
+      // Debug (dev-only): confirm we are seeing real persisted keys + completion map
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.log("[PrePlanSummary] planData keys:", Object.keys(mergedPlanData || {}));
+        // eslint-disable-next-line no-console
+        console.log("[PrePlanSummary] completion map:", getSectionCompletion(mergedPlanData));
+      }
 
-      setProfile(Object.keys(mergedProfile).length > 0 ? mergedProfile : null);
+      // Hydrate UI section data (DB-first where relevant)
+      const displayProfile = mergedPlanData.personal_profile || data.personalProfile || null;
+      const mergedContacts = (data.contacts?.length ? data.contacts : mergedPlanData.contacts_notify) || [];
+      const mergedPets = (data.pets?.length ? data.pets : mergedPlanData.pets) || [];
+      const mergedInsurance = (data.insurance?.length ? data.insurance : mergedPlanData.insurance_policies) || [];
+      const mergedProperties = (data.properties?.length ? data.properties : mergedPlanData.properties) || [];
+      const mergedMessages = (data.messages?.length ? data.messages : mergedPlanData.messages) || [];
+      const mergedBankAccounts = (data.bankAccounts?.length ? data.bankAccounts : mergedPlanData.bank_accounts) || [];
+      const mergedInvestments = (data.investments?.length ? data.investments : mergedPlanData.investments) || [];
+      const mergedProfessionalContacts = (data.professionalContacts?.length ? data.professionalContacts : mergedPlanData.contacts_professional) || [];
+      const mergedFuneralFunding = (data.funeralFunding?.length ? data.funeralFunding : mergedPlanData.funeral_funding) || [];
+      const mergedDebts = (data.debts?.length ? data.debts : mergedPlanData.debts) || [];
+      const mergedBusinesses = (data.businesses?.length ? data.businesses : mergedPlanData.businesses) || [];
+
+      setProfile(displayProfile);
       setContacts(mergedContacts);
       setPets(mergedPets);
       setInsurance(mergedInsurance);
@@ -215,133 +192,82 @@ export default function PrePlanSummary() {
       setDebts(mergedDebts);
       setBusinesses(mergedBusinesses);
 
-      const userSelectedSections = settings?.selected_sections?.length 
-        ? settings.selected_sections 
+      const userSelectedSections = settings?.selected_sections?.length
+        ? settings.selected_sections
         : SETTINGS_DEFAULT;
       const selectedSet = new Set(userSelectedSections);
 
-      // Determine status for each section
-      const getSectionStatus = (hasContent: boolean, hasPartialContent: boolean): "completed" | "started" | "not_started" => {
-        if (hasContent) return "completed";
-        if (hasPartialContent) return "started";
-        return "not_started";
-      };
-
-      const displayProfile = Object.keys(mergedProfile).length > 0 ? mergedProfile : null;
-      
-      // Load health care and care preferences from localStorage to determine status
-      let healthCareData: any = {};
-      let carePreferencesData: any = {};
-      try {
-        const healthRaw = localStorage.getItem(`healthcare_${user.id}`);
-        if (healthRaw) healthCareData = JSON.parse(healthRaw);
-        const careRaw = localStorage.getItem(`care_preferences_${user.id}`);
-        if (careRaw) carePreferencesData = JSON.parse(careRaw);
-      } catch (e) {
-        console.warn("[PrePlanSummary] Failed to parse health/care data", e);
-      }
-
-      const hasHealthCareData = !!(
-        (healthCareData.conditions?.length > 0) ||
-        (healthCareData.allergies?.length > 0) ||
-        (healthCareData.medications?.length > 0) ||
-        healthCareData.doctorPharmacy?.primaryDoctorName ||
-        healthCareData.advanceDirectiveStatus ||
-        healthCareData.dnrPolstStatus
-      );
-
-      const hasCarePreferencesData = !!(
-        (carePreferencesData.comfortPainCare?.length > 0) ||
-        (carePreferencesData.careSetting?.length > 0) ||
-        (carePreferencesData.visitorsCompanionship?.length > 0) ||
-        (carePreferencesData.spiritualCultural?.length > 0) ||
-        (carePreferencesData.communicationPreferences?.length > 0) ||
-        (carePreferencesData.personalComfortItems?.length > 0) ||
-        carePreferencesData.additionalNotes
-      );
+      const completion = getSectionCompletion(mergedPlanData);
+      const getSectionStatus = (sectionId: string): "completed" | "started" | "not_started" =>
+        completion[sectionId] ? "completed" : "not_started";
 
       const allPossibleSections: SectionData[] = [
         {
           id: "personal",
-          label: "Personal & Family Details",
+          label: "About You",
           icon: <User className="h-5 w-5" />,
-          status: getSectionStatus(
-            !!(displayProfile?.full_name && displayProfile?.address),
-            !!(displayProfile?.full_name || displayProfile?.address || mergedPlan?.prepared_for)
-          ),
+          status: getSectionStatus("personal"),
           editRoute: SECTION_ROUTES.personal,
         },
         {
           id: "contacts",
-          label: "Key Contacts to Notify",
+          label: "Important Contacts",
           icon: <Users className="h-5 w-5" />,
-          status: getSectionStatus(mergedContacts.length >= 2, mergedContacts.length > 0),
+          status: getSectionStatus("contacts"),
           editRoute: SECTION_ROUTES.contacts,
         },
         {
           id: "healthcare",
-          label: "Medical Information",
+          label: "Medical & Care Preferences",
           icon: <Heart className="h-5 w-5" />,
-          status: getSectionStatus(hasHealthCareData, false),
+          status: getSectionStatus("healthcare"),
           editRoute: "/preplandashboard/health-care",
         },
         {
           id: "carepreferences",
           label: "Care Preferences",
           icon: <Heart className="h-5 w-5" />,
-          status: getSectionStatus(hasCarePreferencesData, false),
+          status: getSectionStatus("carepreferences"),
           editRoute: "/preplandashboard/care-preferences",
         },
         {
           id: "funeral",
           label: "Funeral Wishes",
           icon: <Heart className="h-5 w-5" />,
-          status: getSectionStatus(!!mergedPlan.funeral_wishes_notes, false),
+          status: getSectionStatus("funeral"),
           editRoute: SECTION_ROUTES.funeral,
         },
         {
           id: "insurance",
-          label: "Insurance Overview",
+          label: "Insurance",
           icon: <Shield className="h-5 w-5" />,
-          status: getSectionStatus(
-            mergedInsurance.length > 0 || !!mergedPlan.insurance_notes,
-            false
-          ),
+          status: getSectionStatus("insurance"),
           editRoute: SECTION_ROUTES.insurance,
         },
         {
           id: "property",
           label: "Property & Valuables",
           icon: <Home className="h-5 w-5" />,
-          status: getSectionStatus(
-            mergedProperties.length > 0 || !!mergedPlan.property_notes,
-            false
-          ),
+          status: getSectionStatus("property"),
           editRoute: SECTION_ROUTES.property,
         },
         {
           id: "pets",
-          label: "Pet Care",
+          label: "Pets",
           icon: <Dog className="h-5 w-5" />,
-          status: getSectionStatus(
-            mergedPets.length > 0 || !!mergedPlan.pets_notes,
-            false
-          ),
+          status: getSectionStatus("pets"),
           editRoute: SECTION_ROUTES.pets,
         },
         {
           id: "messages",
           label: "Messages to Loved Ones",
           icon: <MessageSquare className="h-5 w-5" />,
-          status: getSectionStatus(
-            mergedMessages.length > 0 || !!mergedPlan.messages_notes || !!mergedPlan.to_loved_ones_message,
-            false
-          ),
+          status: getSectionStatus("messages"),
           editRoute: SECTION_ROUTES.messages,
         },
       ];
 
-      const filtered = allPossibleSections.filter(s => selectedSet.has(s.id));
+      const filtered = allPossibleSections.filter((s) => selectedSet.has(s.id));
       setSections(filtered);
     } catch (error) {
       console.error("Error loading plan data:", error);
@@ -364,82 +290,53 @@ export default function PrePlanSummary() {
         toast({
           title: "Please sign in",
           description: "You need to be signed in to generate your document.",
-          variant: "destructive"
+          variant: "destructive",
         });
-        setGeneratingPdf(false);
         return;
       }
 
-      // Build the PDF payload using the already-loaded data - NO PII COLLECTION
-      const pdfPayload = {
-        id: planId,
-        org_id: orgId,
-        prepared_for: profile?.full_name || planData?.prepared_for || "",
-        personal_profile: profile || {},
-        contacts_notify: contacts || [],
-        pets: pets || [],
-        insurance_policies: insurance || [],
-        properties: properties || [],
-        messages: messages || [],
-        investments: investments || [],
-        debts: debts || [],
-        bank_accounts: bankAccounts || [],
-        businesses: businesses || [],
-        funeral_funding: funeralFunding || [],
-        contacts_professional: professionalContacts || [],
-        about_me_notes: planData?.about_me_notes || "",
-        funeral_wishes_notes: planData?.funeral_wishes_notes || "",
-        financial_notes: planData?.financial_notes || "",
-        insurance_notes: planData?.insurance_notes || "",
-        property_notes: planData?.property_notes || "",
-        pets_notes: planData?.pets_notes || "",
-        digital_notes: planData?.digital_notes || "",
-        legal_notes: planData?.legal_notes || "",
-        messages_notes: planData?.messages_notes || "",
-        to_loved_ones_message: planData?.to_loved_ones_message || "",
-      };
-
-      const normalizedPayload = normalizePlanDataForPdf(pdfPayload);
-
-      const payload = {
-        ...normalizedPayload,
-        pii: {}, // No PII collected - blank lines for handwriting
-        userId: userId,
-        planId: planId,
-        orgId: orgId,
-        selectedSections,
-      };
+      // Build the payload from the SAME source used by PDF generation everywhere.
+      const planDataForPdf = await buildPlanDataForPdf(session.user.id);
+      const normalizedPlanData = normalizePlanDataForPdf(planDataForPdf);
 
       const { data: pdfData, error } = await supabase.functions.invoke("generate-planner-pdf", {
-        body: payload,
+        body: {
+          planData: normalizedPlanData,
+          selectedSections,
+          piiData: {},
+          docType: "planner",
+          isDraft: false,
+        },
       });
 
       if (error) throw error;
 
-      if (pdfData?.pdfBase64) {
-        const byteCharacters = atob(pdfData.pdfBase64);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        
-        // Open PDF in new tab for immediate viewing/printing
-        window.open(url, '_blank');
-        
-        toast({
-          title: "Document Ready",
-          description: "Your planning document opened in a new tab. You can save or print from there."
-        });
+      if (!pdfData?.pdfBase64) {
+        throw new Error("PDF generation returned no data");
       }
+
+      const byteCharacters = atob(pdfData.pdfBase64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+
+      // Open PDF in new tab for immediate viewing/printing
+      window.open(url, "_blank", "noopener,noreferrer");
+
+      toast({
+        title: "Document Ready",
+        description: "Your planning document opened in a new tab. You can save or print from there.",
+      });
     } catch (error) {
       console.error("Error generating document:", error);
       toast({
         title: "Something didn't work",
-        description: "Please try again or call us for help at (XXX) XXX-XXXX.",
-        variant: "destructive"
+        description: "Something didn't work. Please try again. Or call us for help.",
+        variant: "destructive",
       });
     } finally {
       setGeneratingPdf(false);

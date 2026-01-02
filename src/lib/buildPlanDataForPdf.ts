@@ -90,17 +90,33 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     supabase.from("profiles").select("full_name").eq("id", userId).maybeSingle(),
   ]);
 
-  // Step 3: Also check localStorage for any unsaved data (form saves to localStorage)
+  // Step 3: Also check localStorage for any unsaved data (some screens save to localStorage)
   let localPlan: any = null;
   let localProfile: any = null;
+  let localHealthcare: any = null;
+  let localCarePreferences: any = null;
+  let localPreplanning: any = null;
+  let localTravel: any = null;
   try {
     const raw = localStorage.getItem(`plan_${userId}`);
     if (raw) {
       localPlan = JSON.parse(raw);
       localProfile = localPlan?.personal_profile;
     }
+
+    const healthRaw = localStorage.getItem(`healthcare_${userId}`);
+    if (healthRaw) localHealthcare = JSON.parse(healthRaw);
+
+    const careRaw = localStorage.getItem(`care_preferences_${userId}`);
+    if (careRaw) localCarePreferences = JSON.parse(careRaw);
+
+    const preplanRaw = localStorage.getItem(`preplanning_${userId}`);
+    if (preplanRaw) localPreplanning = JSON.parse(preplanRaw);
+
+    const travelRaw = localStorage.getItem(`travel_planning_${userId}`);
+    if (travelRaw) localTravel = JSON.parse(travelRaw);
   } catch (e) {
-    console.warn("[buildPlanDataForPdf] Failed to parse local plan:", e);
+    console.warn("[buildPlanDataForPdf] Failed to parse local data:", e);
   }
 
   // Step 4: Build the complete planData object
@@ -154,6 +170,17 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     businesses: businesses || [],
     funeral_funding: funeralFunding || [],
     contacts_professional: professionalContacts || [],
+
+    // Local-only planning data (still part of persisted planner state)
+    healthcare: localHealthcare || undefined,
+    care_preferences: localCarePreferences
+      ? {
+          checks: localCarePreferences.checks || localCarePreferences,
+          notes: localCarePreferences.notes || localCarePreferences.additionalNotes || "",
+        }
+      : undefined,
+    preplanning: localPreplanning || undefined,
+    travel: localTravel || undefined,
 
     // Section visibility
     _visibleSections: userSettings?.selected_sections || undefined,
