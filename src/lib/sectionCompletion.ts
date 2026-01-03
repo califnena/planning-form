@@ -3,123 +3,149 @@
  *
  * SINGLE SOURCE OF TRUTH for completion status on Plan Summary.
  *
- * Uses getSectionData to check REAL storage paths only.
- * No localStorage reads. No restructuring.
+ * Uses getUnifiedPlan/unified data for accurate completion detection.
  */
 
 import { getCompletableSections } from "./sectionRegistry";
-import { getSectionData, hasMeaningfulData, logSectionDataStatus } from "./getSectionData";
+import { hasMeaningfulData, type UnifiedData, getUnifiedCompletion } from "./getUnifiedPlan";
+
+// ============= EXPORTS FOR COMPATIBILITY =============
+
+// Re-export hasMeaningfulData for backwards compatibility
+export { hasMeaningfulData };
 
 // ============= SECTION COMPLETION =============
 
 /**
- * Check if contacts have any real data (not just empty objects)
+ * Get completion status for all sections from unified plan data.
+ * 
+ * This is the ONLY function that should be used to determine completion.
+ * It works with the UnifiedData structure from getUnifiedPlan.
  */
-function hasContactData(contacts: unknown): boolean {
-  if (!Array.isArray(contacts)) {
-    // Could be object with contacts array inside
-    if (contacts && typeof contacts === "object") {
-      const obj = contacts as Record<string, unknown>;
-      if (Array.isArray(obj.contacts)) {
-        return hasContactData(obj.contacts);
-      }
-    }
-    return hasMeaningfulData(contacts);
-  }
-  if (contacts.length === 0) return false;
-  return contacts.some((c) => {
-    if (!c || typeof c !== "object") return false;
-    const contact = c as Record<string, unknown>;
-    return !!(contact.name || contact.phone || contact.email || contact.relationship);
-  });
+export function getSectionCompletionFromUnified(unified: UnifiedData): Record<string, boolean> {
+  return getUnifiedCompletion(unified);
 }
 
 /**
- * Registry ID to section key mapping for data lookup.
- * Some IDs match directly, others need translation.
- */
-const SECTION_KEY_MAP: Record<string, string> = {
-  personal: "personal",
-  legacy: "legacy",
-  contacts: "contacts",
-  healthcare: "healthcare",
-  advancedirective: "advancedirective",
-  funeral: "funeral",
-  financial: "financial",
-  insurance: "insurance",
-  property: "property",
-  pets: "pets",
-  messages: "messages",
-  digital: "digital",
-  travel: "travel",
-};
-
-/**
- * Get completion status for all sections from plan data.
+ * Get completion status for all sections from raw plan data.
  * 
- * Data sources checked:
- * 1. planData.plan_payload (primary storage)
- * 2. planData top-level keys (buildPlanDataForPdf spreads normalized data there)
+ * This function is for backwards compatibility with existing code that
+ * passes buildPlanDataForPdf output. It extracts data and computes completion.
+ * 
+ * @param planData - Raw plan data from buildPlanDataForPdf or similar
  */
 export function getSectionCompletion(planData: unknown): Record<string, boolean> {
   const result: Record<string, boolean> = {};
   const sections = getCompletableSections();
   
-  // Get the payload - could be in plan_payload or at top level
   const data = planData as Record<string, unknown> | null;
   if (!data) {
-    // No data, all incomplete
     for (const section of sections) {
       result[section.id] = false;
     }
     return result;
   }
   
-  // Primary: check plan_payload
-  const planPayload = data.plan_payload;
+  // Extract plan_payload and merge with top-level keys
+  const planPayload = data.plan_payload as Record<string, unknown> | undefined;
+  const payloadObj = planPayload && typeof planPayload === "object" ? planPayload : {};
+  const payloadData = (payloadObj as any).data || {};
+  const payloadSections = (payloadObj as any).sections || {};
   
-  // Secondary: check top-level keys (buildPlanDataForPdf output)
-  // Merge approach: check payload first, then top-level fallback
-  const combinedPayload = {
-    // From plan_payload
-    ...(typeof planPayload === "object" && planPayload !== null ? planPayload : {}),
-    // Top-level fallbacks (only if not already in payload)
-    personal: data.personal || data.about_you || (planPayload as Record<string, unknown>)?.personal,
-    legacy: data.legacy || data.life_story || (planPayload as Record<string, unknown>)?.legacy,
-    contacts: data.contacts || (planPayload as Record<string, unknown>)?.contacts,
-    healthcare: data.healthcare || data.medical || (planPayload as Record<string, unknown>)?.healthcare,
-    advance_directive: data.advance_directive || (planPayload as Record<string, unknown>)?.advance_directive,
-    funeral: data.funeral || data.wishes || (planPayload as Record<string, unknown>)?.funeral,
-    financial: data.financial || (planPayload as Record<string, unknown>)?.financial,
-    insurance: data.insurance || (planPayload as Record<string, unknown>)?.insurance,
-    property: data.property || (planPayload as Record<string, unknown>)?.property,
-    pets: data.pets || (planPayload as Record<string, unknown>)?.pets,
-    digital: data.digital || (planPayload as Record<string, unknown>)?.digital,
-    messages: data.messages || (planPayload as Record<string, unknown>)?.messages,
-    travel: data.travel || (planPayload as Record<string, unknown>)?.travel,
-    // Also check contacts_notify table data
-    contacts_notify: data.contacts_notify,
-  };
-
-  // DEV logging
-  logSectionDataStatus(combinedPayload, "sectionCompletion");
-
+  // Merge all sources for checking
+  const merged = { ...payloadObj, ...payloadData, ...payloadSections };
+  
+  // Check each section
   for (const section of sections) {
-    const sectionKey = SECTION_KEY_MAP[section.id];
-    if (!sectionKey) {
-      result[section.id] = false;
-      continue;
+    const sectionId = section.id;
+    
+    switch (sectionId) {
+      case "personal":
+        result[sectionId] = hasMeaningfulData(
+          merged.personal || merged.about_you || merged.about || 
+          data.personal || data.about_you || data.personal_profile
+        );
+        break;
+        
+      case "legacy":
+        result[sectionId] = hasMeaningfulData(
+          merged.legacy || merged.life_story || merged.lifeStory || 
+          data.legacy || data.life_story
+        );
+        break;
+        
+      case "contacts":
+        // Check multiple contact sources
+        result[sectionId] = hasContactData(
+          merged.contacts,
+          data.contacts,
+          data.contacts_notify
+        );
+        break;
+        
+      case "healthcare":
+        result[sectionId] = hasMeaningfulData(
+          merged.healthcare || merged.health_care || merged.medical ||
+          data.healthcare || data.medical
+        );
+        break;
+        
+      case "advancedirective":
+        result[sectionId] = hasMeaningfulData(
+          merged.advance_directive || merged.advanceDirective ||
+          data.advance_directive
+        );
+        break;
+        
+      case "funeral":
+        result[sectionId] = hasMeaningfulData(
+          merged.funeral || merged.funeral_wishes || merged.wishes ||
+          data.funeral
+        );
+        break;
+        
+      case "financial":
+        result[sectionId] = hasMeaningfulData(
+          merged.financial || merged.financial_life || data.financial
+        ) || hasArrayData(data.bank_accounts) || hasArrayData(data.investments) || hasArrayData(data.debts);
+        break;
+        
+      case "insurance":
+        result[sectionId] = hasMeaningfulData(
+          merged.insurance || merged.insurance_policies || data.insurance
+        ) || hasArrayData(data.insurance_policies);
+        break;
+        
+      case "property":
+        result[sectionId] = hasMeaningfulData(
+          merged.property || merged.property_valuables || merged.properties || data.property
+        ) || hasArrayData(data.properties);
+        break;
+        
+      case "pets":
+        result[sectionId] = hasArrayData(data.pets) || hasArrayData(merged.pets);
+        break;
+        
+      case "digital":
+        result[sectionId] = hasMeaningfulData(
+          merged.digital || merged.digital_accounts || merged.digital_assets ||
+          data.digital
+        );
+        break;
+        
+      case "messages":
+        result[sectionId] = hasArrayData(data.messages) || hasArrayData(merged.messages);
+        break;
+        
+      case "travel":
+        result[sectionId] = hasMeaningfulData(
+          merged.travel || merged.travel_planning || data.travel
+        );
+        break;
+        
+      default:
+        result[sectionId] = false;
     }
-    
-    const sectionData = getSectionData(combinedPayload, sectionKey);
-    
-    // Special case for contacts - needs deeper check
-    if (section.id === "contacts") {
-      result[section.id] = hasContactData(sectionData);
-      continue;
-    }
-    
-    result[section.id] = hasMeaningfulData(sectionData);
   }
 
   if (import.meta.env.DEV) {
@@ -127,6 +153,75 @@ export function getSectionCompletion(planData: unknown): Record<string, boolean>
   }
 
   return result;
+}
+
+// ============= HELPERS =============
+
+/**
+ * Check if array has meaningful data
+ */
+function hasArrayData(arr: unknown): boolean {
+  if (!Array.isArray(arr) || arr.length === 0) return false;
+  return arr.some(item => hasMeaningfulData(item));
+}
+
+/**
+ * Check if contacts have any real data from multiple sources
+ */
+function hasContactData(...sources: unknown[]): boolean {
+  for (const source of sources) {
+    if (!source) continue;
+    
+    // Array of contacts
+    if (Array.isArray(source)) {
+      if (source.length > 0 && source.some(c => hasRealContactData(c))) {
+        return true;
+      }
+      continue;
+    }
+    
+    // Object with nested contacts
+    if (typeof source === "object") {
+      const obj = source as Record<string, unknown>;
+      
+      // Check contacts array inside object
+      if (Array.isArray(obj.contacts) && obj.contacts.some(c => hasRealContactData(c))) {
+        return true;
+      }
+      
+      // Check importantPeople array
+      if (Array.isArray(obj.importantPeople) && obj.importantPeople.some(c => hasRealContactData(c))) {
+        return true;
+      }
+      
+      // Check keyContacts array
+      if (Array.isArray(obj.keyContacts) && obj.keyContacts.some(c => hasRealContactData(c))) {
+        return true;
+      }
+      
+      // Check emergencyContacts array
+      if (Array.isArray(obj.emergencyContacts) && obj.emergencyContacts.some(c => hasRealContactData(c))) {
+        return true;
+      }
+    }
+  }
+  
+  return false;
+}
+
+/**
+ * Check if a single contact record has real data
+ */
+function hasRealContactData(contact: unknown): boolean {
+  if (!contact || typeof contact !== "object") return false;
+  const c = contact as Record<string, unknown>;
+  return !!(
+    (c.name && typeof c.name === "string" && c.name.trim()) ||
+    (c.phone && typeof c.phone === "string" && c.phone.trim()) ||
+    (c.email && typeof c.email === "string" && c.email.trim()) ||
+    (c.relationship && typeof c.relationship === "string" && c.relationship.trim()) ||
+    (c.contact && typeof c.contact === "string" && c.contact.trim())
+  );
 }
 
 /**
