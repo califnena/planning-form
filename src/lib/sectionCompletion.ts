@@ -223,11 +223,22 @@ export function getSectionCompletion(planData: any, userId?: string): Record<str
   }
 
   if (import.meta.env.DEV) {
-    // Diagnostic logging (remove once verified)
-    // eslint-disable-next-line no-console
-    console.log("[sectionCompletion] normalized.data keys:", Object.keys(data));
-    // eslint-disable-next-line no-console
-    console.log("[sectionCompletion] completion map:", result);
+    // Diagnostic logging - show which sections have data
+    const sectionsWithData = Object.entries(data)
+      .filter(([k, v]) => {
+        if (!v) return false;
+        if (Array.isArray(v)) return v.length > 0;
+        if (typeof v === "object") return Object.keys(v).length > 0;
+        return true;
+      })
+      .map(([k]) => k);
+    console.log("[sectionCompletion] Sections with data:", sectionsWithData);
+    console.log("[sectionCompletion] Completion results:", result);
+    
+    // Log specific section data for debugging
+    console.log("[sectionCompletion] Financial data:", data.financial);
+    console.log("[sectionCompletion] Digital data:", data.digital);
+    console.log("[sectionCompletion] Pets data:", data.pets);
   }
 
   return result;

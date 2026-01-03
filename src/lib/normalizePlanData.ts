@@ -8,6 +8,7 @@
  * - Flattens legacy nesting shapes so callers can always read from `normalized.data`.
  * - Merges duplicate contact arrays into one unified list.
  * - Reads from localStorage as fallback for legacy data (healthcare, care, advance_directive, travel).
+ * - CRITICAL: Also reads directly from the plan object's top-level keys (for data stored via usePlanData)
  */
 
 export type NormalizedPlanData<TPlan extends Record<string, any> = Record<string, any>> = {
@@ -104,6 +105,31 @@ function readLocalStorageDrafts(userId?: string): Record<string, any> {
     }
   }
 
+  // Also try to read the main plan from localStorage (this is where usePlanData stores everything)
+  try {
+    // Find any plan key in localStorage
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith("plan_")) {
+        const stored = localStorage.getItem(key);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && typeof parsed === "object") {
+            // Merge section data from localStorage plan
+            for (const sectionKey of ["financial", "digital", "property", "pets", "messages", "insurance", "contacts", "funeral", "healthcare", "care_preferences", "advance_directive", "travel", "personal", "about_you", "legal", "legacy", "preplanning"]) {
+              if (parsed[sectionKey] && typeof parsed[sectionKey] === "object" && Object.keys(parsed[sectionKey]).length > 0) {
+                result[sectionKey] = parsed[sectionKey];
+              }
+            }
+          }
+        }
+        break; // Only use the first plan found
+      }
+    }
+  } catch (e) {
+    // Ignore errors
+  }
+
   return result;
 }
 
@@ -112,8 +138,9 @@ function readLocalStorageDrafts(userId?: string): Record<string, any> {
  * - plan_payload.data
  * - plan_payload.plan_payload
  * - plan_payload.plan_payload.data
+ * - Top-level section keys on the plan object itself (from usePlanData merge)
  * 
- * @param plan - The plan object from DB
+ * @param plan - The plan object from DB or usePlanData
  * @param userId - Optional user ID to read localStorage fallbacks
  */
 export function normalizePlanData<TPlan extends Record<string, any> = Record<string, any>>(
@@ -131,31 +158,38 @@ export function normalizePlanData<TPlan extends Record<string, any> = Record<str
   // Read localStorage fallbacks for legacy data
   const localDrafts = readLocalStorageDrafts(userId);
 
-  // Merge order: oldest -> newest (newest wins)
-  // Also merge direct top-level keys from the plan object itself
+  // CRITICAL FIX: The `raw` object from usePlanData already has section data at top level
+  // (usePlanData merges plan_payload into the plan object on load)
+  // So we need to read from BOTH plan_payload AND the top-level keys
+  
+  // Merge order: localStorage -> DB plan_payload nested -> DB plan_payload -> top-level plan keys (newest wins)
   const merged: Record<string, any> = {
+    // Start with localStorage fallbacks (lowest priority for DB sections, but needed for legacy localStorage-only sections)
+    ...localDrafts,
+    // Then DB nested structures
     ...payloadNestedData,
     ...payloadNested,
     ...payloadData,
     ...payload,
-    // Also check for section data at the plan root level (from buildPlanDataForPdf)
-    ...(raw.financial ? { financial: raw.financial } : {}),
-    ...(raw.digital ? { digital: raw.digital } : {}),
-    ...(raw.property ? { property: raw.property } : {}),
+    // CRITICAL: Top-level section keys from the plan object itself (highest priority)
+    // These come from usePlanData which merges plan_payload into the plan object
+    ...(raw.financial && typeof raw.financial === "object" ? { financial: raw.financial } : {}),
+    ...(raw.digital && typeof raw.digital === "object" ? { digital: raw.digital } : {}),
+    ...(raw.property && typeof raw.property === "object" ? { property: raw.property } : {}),
     ...(raw.pets ? { pets: raw.pets } : {}),
     ...(raw.messages ? { messages: raw.messages } : {}),
-    ...(raw.insurance ? { insurance: raw.insurance } : {}),
+    ...(raw.insurance && typeof raw.insurance === "object" ? { insurance: raw.insurance } : {}),
     ...(raw.contacts ? { contacts: raw.contacts } : {}),
-    ...(raw.funeral ? { funeral: raw.funeral } : {}),
-    ...(raw.healthcare ? { healthcare: raw.healthcare } : {}),
-    ...(raw.care_preferences ? { care_preferences: raw.care_preferences } : {}),
-    ...(raw.advance_directive ? { advance_directive: raw.advance_directive } : {}),
-    ...(raw.travel ? { travel: raw.travel } : {}),
-    ...(raw.personal ? { personal: raw.personal } : {}),
-    ...(raw.about_you ? { about_you: raw.about_you } : {}),
-    ...(raw.legal ? { legal: raw.legal } : {}),
-    ...(raw.legacy ? { legacy: raw.legacy } : {}),
-    ...(raw.preplanning ? { preplanning: raw.preplanning } : {}),
+    ...(raw.funeral && typeof raw.funeral === "object" ? { funeral: raw.funeral } : {}),
+    ...(raw.healthcare && typeof raw.healthcare === "object" ? { healthcare: raw.healthcare } : {}),
+    ...(raw.care_preferences && typeof raw.care_preferences === "object" ? { care_preferences: raw.care_preferences } : {}),
+    ...(raw.advance_directive && typeof raw.advance_directive === "object" ? { advance_directive: raw.advance_directive } : {}),
+    ...(raw.travel && typeof raw.travel === "object" ? { travel: raw.travel } : {}),
+    ...(raw.personal && typeof raw.personal === "object" ? { personal: raw.personal } : {}),
+    ...(raw.about_you && typeof raw.about_you === "object" ? { about_you: raw.about_you } : {}),
+    ...(raw.legal && typeof raw.legal === "object" ? { legal: raw.legal } : {}),
+    ...(raw.legacy && typeof raw.legacy === "object" ? { legacy: raw.legacy } : {}),
+    ...(raw.preplanning && typeof raw.preplanning === "object" ? { preplanning: raw.preplanning } : {}),
   };
 
   // Canonical section keys. Always defined.
@@ -178,10 +212,10 @@ export function normalizePlanData<TPlan extends Record<string, any> = Record<str
     : { contacts: unifiedContacts };
 
   // For sections that may have localStorage fallbacks, use them if DB is empty
-  const healthcare = merged.healthcare ?? merged.health_care ?? merged.medical ?? localDrafts.healthcare ?? {};
-  const care_preferences = merged.care_preferences ?? merged.carePreferences ?? localDrafts.care_preferences ?? {};
-  const advance_directive = merged.advance_directive ?? merged.advanceDirective ?? localDrafts.advance_directive ?? {};
-  const travel = merged.travel ?? localDrafts.travel ?? {};
+  const healthcare = merged.healthcare ?? merged.health_care ?? merged.medical ?? {};
+  const care_preferences = merged.care_preferences ?? merged.carePreferences ?? {};
+  const advance_directive = merged.advance_directive ?? merged.advanceDirective ?? {};
+  const travel = merged.travel ?? {};
 
   // Start with merged data, then override with normalized versions
   const data = {

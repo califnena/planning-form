@@ -143,8 +143,32 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
 
   // Step 3: Read localStorage fallbacks for legacy data (until fully migrated to DB)
   // This ensures PDF includes data even if it's only in localStorage
+  // CRITICAL FIX: Also read the main plan from localStorage since DB plan_payload may be empty
   let localDrafts: Record<string, any> = {};
   if (typeof window !== "undefined") {
+    // First, try to read the main plan from localStorage (where usePlanData stores everything)
+    try {
+      const mainPlanKey = `plan_${userId}`;
+      const mainPlanStored = localStorage.getItem(mainPlanKey);
+      if (mainPlanStored) {
+        const mainPlan = JSON.parse(mainPlanStored);
+        if (mainPlan && typeof mainPlan === "object") {
+          // Extract section data from the localStorage plan
+          for (const sectionKey of ["financial", "digital", "property", "pets", "messages", "insurance", "contacts", "funeral", "healthcare", "care_preferences", "advance_directive", "travel", "personal", "about_you", "legal", "legacy", "preplanning"]) {
+            if (mainPlan[sectionKey] && typeof mainPlan[sectionKey] === "object") {
+              localDrafts[sectionKey] = mainPlan[sectionKey];
+            }
+          }
+          // Also get array fields
+          if (Array.isArray(mainPlan.pets)) localDrafts.pets = mainPlan.pets;
+          if (Array.isArray(mainPlan.messages)) localDrafts.messages = mainPlan.messages;
+        }
+      }
+    } catch (e) {
+      console.error("[buildPlanDataForPdf] Error reading main plan from localStorage:", e);
+    }
+
+    // Also read legacy separate localStorage keys
     const legacyKeys = [
       { localKey: `health_care_${userId}`, dataKey: "healthcare" },
       { localKey: `care_preferences_${userId}`, dataKey: "care_preferences" },
@@ -158,7 +182,10 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
         if (stored) {
           const parsed = JSON.parse(stored);
           if (parsed && typeof parsed === "object" && Object.keys(parsed).length > 0) {
-            localDrafts[dataKey] = parsed;
+            // Only override if not already set from main plan
+            if (!localDrafts[dataKey] || Object.keys(localDrafts[dataKey]).length === 0) {
+              localDrafts[dataKey] = parsed;
+            }
           }
         }
       } catch (e) {
@@ -166,6 +193,8 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
       }
     }
   }
+  
+  console.log("[buildPlanDataForPdf] localStorage section data found:", Object.keys(localDrafts));
 
   // Step 4: Build the complete planData object
   // Priority: DB plan_payload > localStorage fallbacks > defaults
@@ -183,30 +212,70 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     ? plan.plan_payload as Record<string, any>
     : {};
 
-  // CRITICAL: Merge plan_payload data to top level so completion checks work
-  // This makes pd.financial, pd.digital, pd.pets, etc. available directly
-  // For sections with localStorage fallbacks, use them if DB is empty
+  // CRITICAL FIX: Merge plan_payload data to top level so completion checks work
+  // Priority order: DB plan_payload (if non-empty) > localStorage (if non-empty) > undefined
+  // This ensures we get data from wherever it was stored
   const planPayloadMerged = {
-    // Section data from plan_payload (DB storage)
-    financial: planPayload.financial || undefined,
-    digital: planPayload.digital || undefined,
-    property: planPayload.property || undefined,
-    pets: planPayload.pets || undefined,
-    messages: planPayload.messages || undefined,
-    insurance: planPayload.insurance || undefined,
-    contacts: planPayload.contacts || undefined,
-    funeral: planPayload.funeral || undefined,
-    personal: planPayload.personal || planPayload.about_you || undefined,
-    about_you: planPayload.about_you || planPayload.personal || undefined,
-    // These sections may have localStorage fallbacks
-    healthcare: planPayload.healthcare || localDrafts.healthcare || undefined,
-    care_preferences: planPayload.care_preferences || localDrafts.care_preferences || undefined,
-    advance_directive: planPayload.advance_directive || localDrafts.advance_directive || undefined,
-    travel: planPayload.travel || localDrafts.travel || undefined,
-    preplanning: planPayload.preplanning || undefined,
-    legal: planPayload.legal || undefined,
-    legacy: planPayload.legacy || undefined,
+    // Section data - try DB first, then localStorage
+    financial: (planPayload.financial && Object.keys(planPayload.financial).length > 0) 
+      ? planPayload.financial 
+      : (localDrafts.financial || undefined),
+    digital: (planPayload.digital && Object.keys(planPayload.digital).length > 0) 
+      ? planPayload.digital 
+      : (localDrafts.digital || undefined),
+    property: (planPayload.property && Object.keys(planPayload.property).length > 0) 
+      ? planPayload.property 
+      : (localDrafts.property || undefined),
+    pets: (planPayload.pets && (Array.isArray(planPayload.pets) ? planPayload.pets.length > 0 : Object.keys(planPayload.pets).length > 0)) 
+      ? planPayload.pets 
+      : (localDrafts.pets || undefined),
+    messages: (planPayload.messages && (Array.isArray(planPayload.messages) ? planPayload.messages.length > 0 : Object.keys(planPayload.messages).length > 0)) 
+      ? planPayload.messages 
+      : (localDrafts.messages || undefined),
+    insurance: (planPayload.insurance && Object.keys(planPayload.insurance).length > 0) 
+      ? planPayload.insurance 
+      : (localDrafts.insurance || undefined),
+    contacts: (planPayload.contacts && Object.keys(planPayload.contacts).length > 0) 
+      ? planPayload.contacts 
+      : (localDrafts.contacts || undefined),
+    funeral: (planPayload.funeral && Object.keys(planPayload.funeral).length > 0) 
+      ? planPayload.funeral 
+      : (localDrafts.funeral || undefined),
+    personal: (planPayload.personal && Object.keys(planPayload.personal).length > 0) 
+      ? planPayload.personal 
+      : (planPayload.about_you && Object.keys(planPayload.about_you).length > 0 ? planPayload.about_you : (localDrafts.personal || localDrafts.about_you || undefined)),
+    about_you: (planPayload.about_you && Object.keys(planPayload.about_you).length > 0) 
+      ? planPayload.about_you 
+      : (planPayload.personal && Object.keys(planPayload.personal).length > 0 ? planPayload.personal : (localDrafts.about_you || localDrafts.personal || undefined)),
+    // These sections commonly have localStorage data
+    healthcare: (planPayload.healthcare && Object.keys(planPayload.healthcare).length > 0) 
+      ? planPayload.healthcare 
+      : (localDrafts.healthcare || undefined),
+    care_preferences: (planPayload.care_preferences && Object.keys(planPayload.care_preferences).length > 0) 
+      ? planPayload.care_preferences 
+      : (localDrafts.care_preferences || undefined),
+    advance_directive: (planPayload.advance_directive && Object.keys(planPayload.advance_directive).length > 0) 
+      ? planPayload.advance_directive 
+      : (localDrafts.advance_directive || undefined),
+    travel: (planPayload.travel && Object.keys(planPayload.travel).length > 0) 
+      ? planPayload.travel 
+      : (localDrafts.travel || undefined),
+    preplanning: (planPayload.preplanning && Object.keys(planPayload.preplanning).length > 0) 
+      ? planPayload.preplanning 
+      : (localDrafts.preplanning || undefined),
+    legal: (planPayload.legal && Object.keys(planPayload.legal).length > 0) 
+      ? planPayload.legal 
+      : (localDrafts.legal || undefined),
+    legacy: (planPayload.legacy && Object.keys(planPayload.legacy).length > 0) 
+      ? planPayload.legacy 
+      : (localDrafts.legacy || undefined),
   };
+  
+  console.log("[buildPlanDataForPdf] planPayloadMerged keys with data:", 
+    Object.entries(planPayloadMerged)
+      .filter(([_, v]) => v && (Array.isArray(v) ? v.length > 0 : Object.keys(v).length > 0))
+      .map(([k]) => k)
+  );
 
   return {
     // Plan metadata
