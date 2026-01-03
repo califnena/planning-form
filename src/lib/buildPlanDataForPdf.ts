@@ -279,8 +279,9 @@ function createEmptyPlanData(userId: string): any {
 }
 
 /**
- * Normalizes plan data to ensure consistent field names and types.
+ * Normalizes plan data to ensure consistent field names and types for PDF generation.
  * This prevents "UI shows data but PDF thinks empty" problems.
+ * Maps section data to the keys expected by the PDF edge function.
  */
 export function normalizePlanDataForPdf(raw: any): any {
   if (!raw) return createEmptyPlanData("");
@@ -306,6 +307,56 @@ export function normalizePlanDataForPdf(raw: any): any {
     normalizedName = raw.prepared_for || raw.prepared_by || "";
   }
 
+  // Extract contacts from different formats and merge
+  const contactsFromPayload = raw.contacts || {};
+  const contactsArray = Array.isArray(contactsFromPayload) 
+    ? contactsFromPayload 
+    : (contactsFromPayload.contacts || []);
+  const importantPeople = Array.isArray(contactsFromPayload.importantPeople)
+    ? contactsFromPayload.importantPeople
+    : [];
+  
+  // Merge contacts arrays
+  const allContacts = [...contactsArray, ...importantPeople];
+  
+  // Extract digital accounts from different formats
+  const digitalData = raw.digital || {};
+  const digitalAccounts = Array.isArray(digitalData.accounts) 
+    ? digitalData.accounts 
+    : [];
+  
+  // Extract financial data
+  const financialData = raw.financial || {};
+  const bankAccounts = Array.isArray(financialData.bankAccounts)
+    ? financialData.bankAccounts
+    : (raw.bank_accounts || []);
+  
+  // Extract property data
+  const propertyData = raw.property || {};
+  const properties = Array.isArray(propertyData.properties)
+    ? propertyData.properties
+    : (raw.properties || []);
+  const valuables = Array.isArray(propertyData.valuables)
+    ? propertyData.valuables
+    : [];
+  
+  // Extract insurance data
+  const insuranceData = raw.insurance || {};
+  const insurancePolicies = Array.isArray(insuranceData.policies)
+    ? insuranceData.policies
+    : (raw.insurance_policies || []);
+  
+  // Extract pets - ensure array format
+  const petsData = Array.isArray(raw.pets) ? raw.pets : [];
+  
+  // Extract messages - ensure array format
+  const messagesData = Array.isArray(raw.messages) ? raw.messages : [];
+  
+  // Extract healthcare/medical data for legal section
+  const healthcareData = raw.healthcare || {};
+  const advanceDirective = raw.advance_directive || {};
+  const carePreferences = raw.care_preferences || {};
+  
   return {
     ...raw,
     personal_profile: {
@@ -315,5 +366,34 @@ export function normalizePlanDataForPdf(raw: any): any {
     },
     prepared_for: normalizedName.trim() || raw.prepared_for || "",
     prepared_by: raw.prepared_by || normalizedName.trim() || "",
+    
+    // Map to PDF expected keys
+    contacts_notify: allContacts.length > 0 ? allContacts : (raw.contacts_notify || []),
+    pets: petsData.length > 0 ? petsData : (raw.pets || []),
+    messages: messagesData.length > 0 ? messagesData : (raw.messages || []),
+    insurance_policies: insurancePolicies.length > 0 ? insurancePolicies : (raw.insurance_policies || []),
+    bank_accounts: bankAccounts.length > 0 ? bankAccounts : (raw.bank_accounts || []),
+    properties: properties.length > 0 ? properties : (raw.properties || []),
+    valuables: valuables.length > 0 ? valuables : (raw.valuables || []),
+    digital_assets: digitalAccounts.length > 0 
+      ? digitalAccounts.map((a: any) => `${a.site || a.name || ""}: ${a.username || ""}`.trim())
+      : (raw.digital_assets || []),
+    
+    // Include section data for PDF rendering
+    financial: financialData,
+    digital: digitalData,
+    property: propertyData,
+    insurance: insuranceData,
+    healthcare: healthcareData,
+    advance_directive: advanceDirective,
+    care_preferences: carePreferences,
+    
+    // Legal section - include medical care summary
+    legal: {
+      ...(raw.legal || {}),
+      healthcare_summary: healthcareData,
+      advance_directive: advanceDirective,
+      care_preferences: carePreferences,
+    },
   };
 }

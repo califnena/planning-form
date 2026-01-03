@@ -540,10 +540,10 @@ export default function PrePlanSummary() {
               <button className="w-full p-5 flex items-center justify-between text-left hover:bg-muted/50 transition-colors rounded-t-lg">
                 <div>
                   <p className="font-medium text-foreground text-lg">
-                    View or edit sections
+                    Edit my sections
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Tap any section to review or change it. You can do this anytime.
+                    Tap any section to review or change it. A check mark means you added something.
                   </p>
                   {sectionsExpanded && (
                     <p className="text-sm text-primary mt-2">
@@ -647,7 +647,7 @@ export default function PrePlanSummary() {
             <Button 
               variant="outline" 
               className="w-full justify-start h-auto py-3 px-4"
-              onClick={() => navigate("/product-binder")}
+              onClick={() => navigate("/products/binder")}
             >
               <FileText className="h-5 w-5 mr-3 text-primary" />
               <div className="text-left">
@@ -659,7 +659,7 @@ export default function PrePlanSummary() {
             <Button 
               variant="outline" 
               className="w-full justify-start h-auto py-3 px-4"
-              onClick={() => navigate("/custom-song")}
+              onClick={() => navigate("/products/custom-song")}
             >
               <Heart className="h-5 w-5 mr-3 text-primary" />
               <div className="text-left">

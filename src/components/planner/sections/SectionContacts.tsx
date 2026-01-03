@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Plus, Save, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -11,14 +10,41 @@ import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import jsPDF from "jspdf";
 import everlastingLogo from "@/assets/everlasting-logo.png";
 
+interface Contact {
+  name: string;
+  relationship: string;
+  email: string;
+  phone: string;
+  note: string;
+}
+
 interface SectionContactsProps {
   data: any;
   onChange: (data: any) => void;
 }
 
 export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
-  const contacts = data.contacts || [];
-  const importantPeople = data.importantPeople || [];
+  // Merge both arrays into one unified "People to Notify" list
+  const existingContacts = data.contacts || [];
+  const existingImportantPeople = data.importantPeople || [];
+  
+  // Dedupe and merge on first render
+  const contacts: Contact[] = (() => {
+    const merged: Contact[] = [...existingContacts];
+    const seen = new Set(existingContacts.map((c: Contact) => 
+      `${c.name || ""}|${c.phone || ""}|${c.email || ""}`.toLowerCase()
+    ));
+    
+    for (const person of existingImportantPeople) {
+      const key = `${person.name || ""}|${person.phone || ""}|${person.email || ""}`.toLowerCase();
+      if (!seen.has(key) || key === "||") {
+        merged.push(person);
+        seen.add(key);
+      }
+    }
+    return merged;
+  })();
+
   const { toast } = useToast();
   const { t } = useTranslation();
   const { isPreviewMode } = usePreviewMode();
@@ -34,43 +60,27 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
     }
     onChange({
       ...data,
-      contacts: [...contacts, { name: "", relationship: "", email: "", phone: "", note: "" }]
+      contacts: [...contacts, { name: "", relationship: "", email: "", phone: "", note: "" }],
+      importantPeople: [], // Clear legacy array
     });
   };
 
   const updateContact = (index: number, field: string, value: any) => {
     const updated = [...contacts];
     updated[index] = { ...updated[index], [field]: value };
-    onChange({ ...data, contacts: updated });
-  };
-
-  const removeContact = (index: number) => {
-    onChange({ ...data, contacts: contacts.filter((_: any, i: number) => i !== index) });
-  };
-
-  const addImportantPerson = () => {
-    if (isPreviewMode) {
-      toast({
-        title: "Preview Mode",
-        description: "Editing is locked. Start a trial to unlock.",
-        variant: "destructive",
-      });
-      return;
-    }
-    onChange({
-      ...data,
-      importantPeople: [...importantPeople, { name: "", relationship: "", email: "", phone: "", note: "" }]
+    onChange({ 
+      ...data, 
+      contacts: updated,
+      importantPeople: [], // Clear legacy array
     });
   };
 
-  const updateImportantPerson = (index: number, field: string, value: any) => {
-    const updated = [...importantPeople];
-    updated[index] = { ...updated[index], [field]: value };
-    onChange({ ...data, importantPeople: updated });
-  };
-
-  const removeImportantPerson = (index: number) => {
-    onChange({ ...data, importantPeople: importantPeople.filter((_: any, i: number) => i !== index) });
+  const removeContact = (index: number) => {
+    onChange({ 
+      ...data, 
+      contacts: contacts.filter((_: any, i: number) => i !== index),
+      importantPeople: [], // Clear legacy array
+    });
   };
 
   const handleSave = () => {
@@ -104,7 +114,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
     // Title
     pdf.setFontSize(20);
     pdf.setFont("helvetica", "bold");
-    const title = "Key Contacts";
+    const title = "People to Notify";
     const titleWidth = pdf.getTextWidth(title);
     pdf.text(title, (pageWidth - titleWidth) / 2, 20);
 
@@ -132,7 +142,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
     yPos += 10;
     pdf.setFont("helvetica", "normal");
 
-    contacts.forEach((contact: any, index: number) => {
+    contacts.forEach((contact: Contact) => {
       if (yPos > pageHeight - 40) {
         pdf.addPage();
         yPos = 20;
@@ -171,11 +181,11 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
     
     pdf.addImage(everlastingLogo, "PNG", logoX, logoY, logoWidth, logoHeight);
 
-    pdf.save("key-contacts.pdf");
+    pdf.save("people-to-notify.pdf");
     
     toast({
       title: "Downloaded",
-      description: "Key contacts PDF has been generated.",
+      description: "Contacts PDF has been generated.",
     });
   };
 
@@ -183,8 +193,8 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-2">Key Contacts to Notify</h2>
-          <p className="text-muted-foreground">People who should be contacted immediately</p>
+          <h2 className="text-2xl font-bold mb-2">People to Notify</h2>
+          <p className="text-muted-foreground">People who should be contacted when needed</p>
         </div>
         <div className="flex gap-2">
           <Button onClick={handleSave} size="sm" variant="default" disabled={isPreviewMode}>
@@ -204,7 +214,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
 
       <PreviewModeWrapper>
         <div className="space-y-4">
-        {contacts.map((contact: any, index: number) => (
+        {contacts.map((contact: Contact, index: number) => (
           <div key={index} className="p-4 border border-border rounded-lg space-y-4">
             <div className="flex justify-between items-start">
               <h3 className="font-semibold">Contact {index + 1}</h3>
@@ -238,23 +248,12 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
               </div>
 
               <div className="space-y-2">
-                <Label>Relationship</Label>
+                <Label>Relationship (optional)</Label>
                 <p className="text-xs text-muted-foreground">How they're related to you</p>
                 <Input
                   value={contact.relationship || ""}
                   onChange={(e) => updateContact(index, "relationship", e.target.value)}
                   placeholder="e.g., Spouse, Child, Friend"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Email</Label>
-                <p className="text-xs text-muted-foreground">Email address</p>
-                <Input
-                  type="email"
-                  value={contact.email || ""}
-                  onChange={(e) => updateContact(index, "email", e.target.value)}
-                  placeholder="email@example.com"
                 />
               </div>
 
@@ -266,6 +265,17 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
                   value={contact.phone || ""}
                   onChange={(e) => updateContact(index, "phone", e.target.value)}
                   placeholder="(555) 123-4567"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Email</Label>
+                <p className="text-xs text-muted-foreground">Email address</p>
+                <Input
+                  type="email"
+                  value={contact.email || ""}
+                  onChange={(e) => updateContact(index, "email", e.target.value)}
+                  placeholder="email@example.com"
                 />
               </div>
             </div>
@@ -294,101 +304,6 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
         )}
       </div>
     </PreviewModeWrapper>
-
-      {/* Important People to Notify Section */}
-      <div className="mt-12 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold mb-2">Important People to Notify</h2>
-            <p className="text-muted-foreground">Additional people who should be informed</p>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={addImportantPerson} size="sm" variant="outline" disabled={isPreviewMode}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Person
-            </Button>
-          </div>
-        </div>
-
-        <PreviewModeWrapper>
-          <div className="space-y-4">
-            {importantPeople.map((person: any, index: number) => (
-              <div key={index} className="p-4 border border-border rounded-lg space-y-4">
-                <div className="flex justify-between items-start">
-                  <h3 className="font-semibold">Person {index + 1}</h3>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeImportantPerson(index)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Name</Label>
-                    <Input
-                      value={person.name || ""}
-                      onChange={(e) => updateImportantPerson(index, "name", e.target.value)}
-                      placeholder="Full name"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Relationship</Label>
-                    <Input
-                      value={person.relationship || ""}
-                      onChange={(e) => updateImportantPerson(index, "relationship", e.target.value)}
-                      placeholder="e.g., Friend, Colleague"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Email</Label>
-                    <Input
-                      type="email"
-                      value={person.email || ""}
-                      onChange={(e) => updateImportantPerson(index, "email", e.target.value)}
-                      placeholder="email@example.com"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Phone Number</Label>
-                    <Input
-                      type="tel"
-                      value={person.phone || ""}
-                      onChange={(e) => updateImportantPerson(index, "phone", e.target.value)}
-                      placeholder="(555) 123-4567"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Notes</Label>
-                  <Textarea
-                    value={person.note || ""}
-                    onChange={(e) => updateImportantPerson(index, "note", e.target.value)}
-                    placeholder="Add special instructions or context..."
-                    rows={2}
-                  />
-                </div>
-              </div>
-            ))}
-
-            {importantPeople.length === 0 && (
-              <div className="text-center py-12 border border-dashed rounded-lg">
-                <p className="text-muted-foreground mb-4">No important people added yet</p>
-                <Button onClick={addImportantPerson} variant="outline">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Your First Person
-                </Button>
-              </div>
-            )}
-          </div>
-        </PreviewModeWrapper>
-      </div>
     </div>
   );
 };
