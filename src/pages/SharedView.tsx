@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { logShareLinkAccess, ShareLink } from "@/lib/shareLinks";
+import { hasMeaningfulData, normalizePlanPayload } from "@/lib/normalizePlanPayload";
 import { AppFooter } from "@/components/AppFooter";
 
 export default function SharedView() {
@@ -49,6 +50,8 @@ export default function SharedView() {
           .eq("role", "owner")
           .maybeSingle();
 
+        let fetchedPlan: any = null;
+
         if (orgMember) {
           // Get plan data
           const { data: plan } = await supabase
@@ -58,20 +61,43 @@ export default function SharedView() {
             .eq("owner_user_id", link.user_id)
             .maybeSingle();
 
-          if (plan) {
-            setPlanData(plan);
+          fetchedPlan = plan;
+
+          if (fetchedPlan) {
+            setPlanData(fetchedPlan);
           }
         }
 
-        // Get completed sections from user_settings
-        const { data: settings } = await supabase
-          .from("user_settings")
-          .select("completed_sections")
-          .eq("user_id", link.user_id)
-          .maybeSingle();
+        // Compute completed sections from the same normalized plan_payload
+        if (fetchedPlan?.plan_payload) {
+          const n = normalizePlanPayload(fetchedPlan.plan_payload);
+          const computed: string[] = [];
 
-        const settingsData = settings as { completed_sections?: string[] } | null;
-        setCompletedSections(settingsData?.completed_sections || []);
+          const completionMap: Record<string, unknown> = {
+            personal: n.about,
+            legacy: n.legacy,
+            contacts: n.contacts,
+            healthcare: n.medical,
+            advancedirective: n.advance_directive,
+            funeral: n.wishes,
+            financial: n.financial,
+            insurance: n.insurance,
+            property: n.property,
+            pets: n.pets,
+            digital: n.digital,
+            messages: n.messages,
+            travel: n.travel,
+            notes: n.notes,
+          };
+
+          for (const [sectionId, value] of Object.entries(completionMap)) {
+            if (hasMeaningfulData(value)) computed.push(sectionId);
+          }
+
+          setCompletedSections(computed);
+        } else {
+          setCompletedSections([]);
+        }
 
       } catch (err) {
         console.error("Error loading shared content:", err);
@@ -111,19 +137,20 @@ export default function SharedView() {
 
   // Section display names
   const sectionLabels: Record<string, string> = {
-    personal: "Personal & Family Details",
+    personal: "About You & Family",
     legacy: "Life Story & Legacy",
-    funeral: "Funeral Wishes",
     contacts: "Important Contacts",
-    financial: "Financial Accounts",
-    insurance: "Insurance Policies",
-    property: "Property & Assets",
-    pets: "Pet Care Instructions",
-    digital: "Digital Accounts",
-    legal: "Legal Documents",
-    messages: "Personal Messages",
-    instructions: "Instructions",
-    checklist: "Checklist"
+    healthcare: "Medical & Care",
+    advancedirective: "Advance Directive",
+    funeral: "Funeral Wishes",
+    financial: "Financial Life",
+    insurance: "Insurance",
+    property: "Property & Valuables",
+    pets: "Pets",
+    digital: "Online Accounts",
+    messages: "Messages to Loved Ones",
+    travel: "Travel & Away-From-Home",
+    notes: "Notes",
   };
 
   return (
