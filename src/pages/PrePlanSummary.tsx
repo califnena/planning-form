@@ -137,11 +137,12 @@ export default function PrePlanSummary() {
 
       // Completion is computed ONLY from plan_payload via normalizePlanData
       // CRITICAL: Pass mergedPlanData directly - it already has plan_payload as a property
-      const completion = getSectionCompletion(mergedPlanData);
+      // Also pass userId to read localStorage fallbacks for legacy data
+      const completion = getSectionCompletion(mergedPlanData, user.id);
 
       // Diagnostic logging for debugging completion detection (dev only)
       if (import.meta.env.DEV) {
-        const normalized = normalizePlanData(mergedPlanData);
+        const normalized = normalizePlanData(mergedPlanData, user.id);
         console.log("[PrePlanSummary] plan_payload (raw):", mergedPlanData.plan_payload);
         console.log("[PrePlanSummary] normalized.data snapshot:", {
           financial: normalized.data.financial,
@@ -163,6 +164,7 @@ export default function PrePlanSummary() {
         "personal",    // About You
         "contacts",    // Important Contacts
         "healthcare",  // Medical & Care Preferences
+        "advancedirective", // Advance Directive
         "funeral",     // Funeral Wishes
         "financial",   // Financial Life
         "insurance",   // Insurance
@@ -170,6 +172,7 @@ export default function PrePlanSummary() {
         "pets",        // Pets
         "messages",    // Messages to Loved Ones
         "digital",     // Online Accounts
+        "travel",      // Travel & Away-From-Home
       ];
 
       const registrySections = getCompletableSections();

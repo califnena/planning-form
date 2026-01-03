@@ -197,12 +197,20 @@ const completionChecks: Record<string, (data: Record<string, any>) => boolean> =
     if (ad.healthcareProxyName) return true;
     return hasMeaningfulData(ad);
   },
+  // Alias for registry id "advancedirective" (no underscore)
+  advancedirective: (data) => {
+    const ad = data.advance_directive || {};
+    if (ad.advanceDirectiveStatus && ad.advanceDirectiveStatus !== "unsure") return true;
+    if (ad.dnrStatus && ad.dnrStatus !== "unsure") return true;
+    if (ad.healthcareProxyName) return true;
+    return hasMeaningfulData(ad);
+  },
   care_preferences: (data) => hasMeaningfulData(data.care_preferences),
   healthcare_proxy: (data) => hasContactData(data.contacts),
 };
 
-export function getSectionCompletion(planData: any): Record<string, boolean> {
-  const normalized = normalizePlanData(planData);
+export function getSectionCompletion(planData: any, userId?: string): Record<string, boolean> {
+  const normalized = normalizePlanData(planData, userId);
   const data = normalized.data;
 
   const result: Record<string, boolean> = {};
@@ -225,7 +233,7 @@ export function getSectionCompletion(planData: any): Record<string, boolean> {
   return result;
 }
 
-export function isSectionComplete(sectionId: string, planData: any): boolean {
-  const completion = getSectionCompletion(planData);
+export function isSectionComplete(sectionId: string, planData: any, userId?: string): boolean {
+  const completion = getSectionCompletion(planData, userId);
   return completion[sectionId] || false;
 }

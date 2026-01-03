@@ -141,12 +141,34 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     supabase.from("profiles").select("full_name").eq("id", userId).maybeSingle(),
   ]);
 
-  // Step 3: Do NOT read from localStorage here.
-  // All section data is expected to come from DB-backed plan_payload.
-  // (Any one-time migration from localStorage to plan_payload should happen in the section pages.)
+  // Step 3: Read localStorage fallbacks for legacy data (until fully migrated to DB)
+  // This ensures PDF includes data even if it's only in localStorage
+  let localDrafts: Record<string, any> = {};
+  if (typeof window !== "undefined") {
+    const legacyKeys = [
+      { localKey: `health_care_${userId}`, dataKey: "healthcare" },
+      { localKey: `care_preferences_${userId}`, dataKey: "care_preferences" },
+      { localKey: `advance_directive_${userId}`, dataKey: "advance_directive" },
+      { localKey: `travel_planning_${userId}`, dataKey: "travel" },
+    ];
+
+    for (const { localKey, dataKey } of legacyKeys) {
+      try {
+        const stored = localStorage.getItem(localKey);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && typeof parsed === "object" && Object.keys(parsed).length > 0) {
+            localDrafts[dataKey] = parsed;
+          }
+        }
+      } catch (e) {
+        // Ignore parse errors
+      }
+    }
+  }
 
   // Step 4: Build the complete planData object
-  // Priority: DB plan_payload > defaults
+  // Priority: DB plan_payload > localStorage fallbacks > defaults
   const mergedProfile = {
     ...(personalProfile || {}),
   };
@@ -163,6 +185,7 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
 
   // CRITICAL: Merge plan_payload data to top level so completion checks work
   // This makes pd.financial, pd.digital, pd.pets, etc. available directly
+  // For sections with localStorage fallbacks, use them if DB is empty
   const planPayloadMerged = {
     // Section data from plan_payload (DB storage)
     financial: planPayload.financial || undefined,
@@ -175,10 +198,11 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     funeral: planPayload.funeral || undefined,
     personal: planPayload.personal || planPayload.about_you || undefined,
     about_you: planPayload.about_you || planPayload.personal || undefined,
-    healthcare: planPayload.healthcare || undefined,
-    care_preferences: planPayload.care_preferences || undefined,
-    advance_directive: planPayload.advance_directive || undefined,
-    travel: planPayload.travel || undefined,
+    // These sections may have localStorage fallbacks
+    healthcare: planPayload.healthcare || localDrafts.healthcare || undefined,
+    care_preferences: planPayload.care_preferences || localDrafts.care_preferences || undefined,
+    advance_directive: planPayload.advance_directive || localDrafts.advance_directive || undefined,
+    travel: planPayload.travel || localDrafts.travel || undefined,
     preplanning: planPayload.preplanning || undefined,
     legal: planPayload.legal || undefined,
     legacy: planPayload.legacy || undefined,
