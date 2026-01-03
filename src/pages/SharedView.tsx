@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { logShareLinkAccess, ShareLink } from "@/lib/shareLinks";
-import { hasMeaningfulData, normalizePlanPayload } from "@/lib/normalizePlanPayload";
+import { getSectionCompletion } from "@/lib/sectionCompletion";
 import { AppFooter } from "@/components/AppFooter";
 
 export default function SharedView() {
@@ -68,32 +68,12 @@ export default function SharedView() {
           }
         }
 
-        // Compute completed sections from the same normalized plan_payload
-        if (fetchedPlan?.plan_payload) {
-          const n = normalizePlanPayload(fetchedPlan.plan_payload);
-          const computed: string[] = [];
-
-          const completionMap: Record<string, unknown> = {
-            personal: n.about,
-            legacy: n.legacy,
-            contacts: n.contacts,
-            healthcare: n.medical,
-            advancedirective: n.advance_directive,
-            funeral: n.wishes,
-            financial: n.financial,
-            insurance: n.insurance,
-            property: n.property,
-            pets: n.pets,
-            digital: n.digital,
-            messages: n.messages,
-            travel: n.travel,
-            notes: n.notes,
-          };
-
-          for (const [sectionId, value] of Object.entries(completionMap)) {
-            if (hasMeaningfulData(value)) computed.push(sectionId);
-          }
-
+        // Compute completed sections using unified completion logic
+        if (fetchedPlan) {
+          const completion = getSectionCompletion(fetchedPlan);
+          const computed: string[] = Object.entries(completion)
+            .filter(([_, isComplete]) => isComplete)
+            .map(([sectionId]) => sectionId);
           setCompletedSections(computed);
         } else {
           setCompletedSections([]);

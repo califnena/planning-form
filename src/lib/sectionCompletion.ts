@@ -3,129 +3,136 @@
  *
  * SINGLE SOURCE OF TRUTH for completion status on Plan Summary.
  *
- * Hard rule (per mandate): completion is computed from normalized plan data.
- * No localStorage reads.
- * 
- * Data sources checked (in order of precedence):
- * 1. planData.plan_payload (normalized)
- * 2. planData top-level keys (from buildPlanDataForPdf merged output)
- * 3. Related table data (contacts_notify, pets, etc.)
+ * Uses getSectionData to check REAL storage paths only.
+ * No localStorage reads. No restructuring.
  */
 
 import { getCompletableSections } from "./sectionRegistry";
-import { hasMeaningfulData, normalizePlanPayload } from "./normalizePlanPayload";
+import { getSectionData, hasMeaningfulData, logSectionDataStatus } from "./getSectionData";
 
 // ============= SECTION COMPLETION =============
 
-function hasContactData(contacts: any[]): boolean {
-  if (!Array.isArray(contacts) || contacts.length === 0) return false;
-  return contacts.some((c) => c && (c.name || c.phone || c.email || c.relationship));
+/**
+ * Check if contacts have any real data (not just empty objects)
+ */
+function hasContactData(contacts: unknown): boolean {
+  if (!Array.isArray(contacts)) {
+    // Could be object with contacts array inside
+    if (contacts && typeof contacts === "object") {
+      const obj = contacts as Record<string, unknown>;
+      if (Array.isArray(obj.contacts)) {
+        return hasContactData(obj.contacts);
+      }
+    }
+    return hasMeaningfulData(contacts);
+  }
+  if (contacts.length === 0) return false;
+  return contacts.some((c) => {
+    if (!c || typeof c !== "object") return false;
+    const contact = c as Record<string, unknown>;
+    return !!(contact.name || contact.phone || contact.email || contact.relationship);
+  });
 }
 
 /**
- * Build a merged normalized object from all available data sources in planData.
- * This handles cases where data may be in plan_payload OR at top-level keys.
+ * Registry ID to section key mapping for data lookup.
+ * Some IDs match directly, others need translation.
  */
-function buildNormalizedFromPlanData(planData: any): ReturnType<typeof normalizePlanPayload> {
-  // First normalize from plan_payload
-  const fromPayload = normalizePlanPayload(planData?.plan_payload);
-  
-  // Also check top-level keys (buildPlanDataForPdf spreads data there)
-  const topLevel = {
-    about: planData?.personal || planData?.about_you || planData?.about || {},
-    legacy: planData?.legacy || planData?.life_story || {},
-    contacts: planData?.contacts?.contacts || planData?.contacts_notify || [],
-    wishes: planData?.funeral || planData?.wishes || {},
-    insurance: planData?.insurance || {},
-    financial: planData?.financial || {},
-    property: planData?.property || {},
-    pets: planData?.pets || [],
-    digital: planData?.digital || {},
-    messages: planData?.messages || [],
-    medical: planData?.healthcare || planData?.medical || {},
-    advance_directive: planData?.advance_directive || {},
-    travel: planData?.travel || {},
-    notes: planData?.notes || {},
-  };
-  
-  // Merge: top-level wins if it has data
-  return {
-    about: hasMeaningfulData(topLevel.about) ? topLevel.about : fromPayload.about,
-    legacy: hasMeaningfulData(topLevel.legacy) ? topLevel.legacy : fromPayload.legacy,
-    contacts: (Array.isArray(topLevel.contacts) && topLevel.contacts.length > 0) 
-      ? topLevel.contacts 
-      : fromPayload.contacts,
-    wishes: hasMeaningfulData(topLevel.wishes) ? topLevel.wishes : fromPayload.wishes,
-    insurance: hasMeaningfulData(topLevel.insurance) ? topLevel.insurance : fromPayload.insurance,
-    financial: hasMeaningfulData(topLevel.financial) ? topLevel.financial : fromPayload.financial,
-    property: hasMeaningfulData(topLevel.property) ? topLevel.property : fromPayload.property,
-    pets: (Array.isArray(topLevel.pets) && topLevel.pets.length > 0) 
-      ? topLevel.pets 
-      : fromPayload.pets,
-    digital: hasMeaningfulData(topLevel.digital) ? topLevel.digital : fromPayload.digital,
-    messages: (Array.isArray(topLevel.messages) && topLevel.messages.length > 0) 
-      ? topLevel.messages 
-      : fromPayload.messages,
-    medical: hasMeaningfulData(topLevel.medical) ? topLevel.medical : fromPayload.medical,
-    advance_directive: hasMeaningfulData(topLevel.advance_directive) ? topLevel.advance_directive : fromPayload.advance_directive,
-    travel: hasMeaningfulData(topLevel.travel) ? topLevel.travel : fromPayload.travel,
-    notes: hasMeaningfulData(topLevel.notes) ? topLevel.notes : fromPayload.notes,
-    _raw: fromPayload._raw,
-  };
-}
-
-const completionChecks: Record<string, (n: ReturnType<typeof normalizePlanPayload>) => boolean> = {
-  // Registry ids mapped to normalized keys
-  personal: (n) => hasMeaningfulData(n.about),
-  legacy: (n) => hasMeaningfulData(n.legacy),
-  contacts: (n) => hasContactData(n.contacts) || hasMeaningfulData(n.contacts),
-  healthcare: (n) => hasMeaningfulData(n.medical),
-  advancedirective: (n) => hasMeaningfulData(n.advance_directive),
-  funeral: (n) => hasMeaningfulData(n.wishes),
-  financial: (n) => hasMeaningfulData(n.financial),
-  insurance: (n) => hasMeaningfulData(n.insurance),
-  property: (n) => hasMeaningfulData(n.property),
-  pets: (n) => hasMeaningfulData(n.pets),
-  messages: (n) => hasMeaningfulData(n.messages),
-  digital: (n) => hasMeaningfulData(n.digital),
-  travel: (n) => hasMeaningfulData(n.travel),
+const SECTION_KEY_MAP: Record<string, string> = {
+  personal: "personal",
+  legacy: "legacy",
+  contacts: "contacts",
+  healthcare: "healthcare",
+  advancedirective: "advancedirective",
+  funeral: "funeral",
+  financial: "financial",
+  insurance: "insurance",
+  property: "property",
+  pets: "pets",
+  messages: "messages",
+  digital: "digital",
+  travel: "travel",
 };
 
-export function getSectionCompletion(planData: any): Record<string, boolean> {
-  // Build normalized data from ALL sources (plan_payload + top-level)
-  const normalized = buildNormalizedFromPlanData(planData);
-
+/**
+ * Get completion status for all sections from plan data.
+ * 
+ * Data sources checked:
+ * 1. planData.plan_payload (primary storage)
+ * 2. planData top-level keys (buildPlanDataForPdf spreads normalized data there)
+ */
+export function getSectionCompletion(planData: unknown): Record<string, boolean> {
   const result: Record<string, boolean> = {};
   const sections = getCompletableSections();
+  
+  // Get the payload - could be in plan_payload or at top level
+  const data = planData as Record<string, unknown> | null;
+  if (!data) {
+    // No data, all incomplete
+    for (const section of sections) {
+      result[section.id] = false;
+    }
+    return result;
+  }
+  
+  // Primary: check plan_payload
+  const planPayload = data.plan_payload;
+  
+  // Secondary: check top-level keys (buildPlanDataForPdf output)
+  // Merge approach: check payload first, then top-level fallback
+  const combinedPayload = {
+    // From plan_payload
+    ...(typeof planPayload === "object" && planPayload !== null ? planPayload : {}),
+    // Top-level fallbacks (only if not already in payload)
+    personal: data.personal || data.about_you || (planPayload as Record<string, unknown>)?.personal,
+    legacy: data.legacy || data.life_story || (planPayload as Record<string, unknown>)?.legacy,
+    contacts: data.contacts || (planPayload as Record<string, unknown>)?.contacts,
+    healthcare: data.healthcare || data.medical || (planPayload as Record<string, unknown>)?.healthcare,
+    advance_directive: data.advance_directive || (planPayload as Record<string, unknown>)?.advance_directive,
+    funeral: data.funeral || data.wishes || (planPayload as Record<string, unknown>)?.funeral,
+    financial: data.financial || (planPayload as Record<string, unknown>)?.financial,
+    insurance: data.insurance || (planPayload as Record<string, unknown>)?.insurance,
+    property: data.property || (planPayload as Record<string, unknown>)?.property,
+    pets: data.pets || (planPayload as Record<string, unknown>)?.pets,
+    digital: data.digital || (planPayload as Record<string, unknown>)?.digital,
+    messages: data.messages || (planPayload as Record<string, unknown>)?.messages,
+    travel: data.travel || (planPayload as Record<string, unknown>)?.travel,
+    // Also check contacts_notify table data
+    contacts_notify: data.contacts_notify,
+  };
+
+  // DEV logging
+  logSectionDataStatus(combinedPayload, "sectionCompletion");
 
   for (const section of sections) {
-    const check = completionChecks[section.id];
-    result[section.id] = check ? check(normalized) : false;
+    const sectionKey = SECTION_KEY_MAP[section.id];
+    if (!sectionKey) {
+      result[section.id] = false;
+      continue;
+    }
+    
+    const sectionData = getSectionData(combinedPayload, sectionKey);
+    
+    // Special case for contacts - needs deeper check
+    if (section.id === "contacts") {
+      result[section.id] = hasContactData(sectionData);
+      continue;
+    }
+    
+    result[section.id] = hasMeaningfulData(sectionData);
   }
 
   if (import.meta.env.DEV) {
-    console.log("[sectionCompletion] normalized keys with data:", {
-      about: hasMeaningfulData(normalized.about),
-      legacy: hasMeaningfulData(normalized.legacy),
-      contacts: hasMeaningfulData(normalized.contacts),
-      medical: hasMeaningfulData(normalized.medical),
-      advance_directive: hasMeaningfulData(normalized.advance_directive),
-      wishes: hasMeaningfulData(normalized.wishes),
-      financial: hasMeaningfulData(normalized.financial),
-      insurance: hasMeaningfulData(normalized.insurance),
-      property: hasMeaningfulData(normalized.property),
-      pets: hasMeaningfulData(normalized.pets),
-      digital: hasMeaningfulData(normalized.digital),
-      messages: hasMeaningfulData(normalized.messages),
-      travel: hasMeaningfulData(normalized.travel),
-    });
     console.log("[sectionCompletion] completion results:", result);
   }
 
   return result;
 }
 
-export function isSectionComplete(sectionId: string, planData: any): boolean {
+/**
+ * Check if a single section is complete.
+ */
+export function isSectionComplete(sectionId: string, planData: unknown): boolean {
   const completion = getSectionCompletion(planData);
   return completion[sectionId] || false;
 }

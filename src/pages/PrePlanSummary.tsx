@@ -28,8 +28,8 @@ import { useActivePlan, fetchPlanData } from "@/hooks/useActivePlan";
 import { buildPlanDataForPdf, normalizePlanDataForPdf } from "@/lib/buildPlanDataForPdf";
 import { getSectionCompletion } from "@/lib/sectionCompletion";
 import { getCompletableSections, type SectionDefinition } from "@/lib/sectionRegistry";
-import { normalizePlanPayload } from "@/lib/normalizePlanPayload";
 import { getOrCreateGuestId } from "@/lib/identityUtils";
+import { logSectionDataStatus } from "@/lib/getSectionData";
 
 interface SectionData {
   id: string;
@@ -124,19 +124,8 @@ export default function PrePlanSummary() {
 
        // Diagnostic logging for debugging completion detection (dev only)
        if (import.meta.env.DEV) {
-         const normalized = normalizePlanPayload(mergedPlanData?.plan_payload);
          console.log("[PrePlanSummary] plan_payload (raw):", mergedPlanData.plan_payload);
-         console.log("[PrePlanSummary] normalized snapshot:", {
-           financial: normalized.financial,
-           digital: normalized.digital,
-           property: normalized.property,
-           pets: normalized.pets,
-           messages: normalized.messages,
-           medical: normalized.medical,
-           advance_directive: normalized.advance_directive,
-           travel: normalized.travel,
-           legacy: normalized.legacy,
-         });
+         logSectionDataStatus(mergedPlanData, "PrePlanSummary");
          console.log("[PrePlanSummary] completion map:", completion);
        }
 
