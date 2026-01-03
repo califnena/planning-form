@@ -28,7 +28,7 @@ import { useActivePlan, fetchPlanData } from "@/hooks/useActivePlan";
 import { buildPlanDataForPdf, normalizePlanDataForPdf } from "@/lib/buildPlanDataForPdf";
 import { getSectionCompletion } from "@/lib/sectionCompletion";
 import { getCompletableSections, type SectionDefinition } from "@/lib/sectionRegistry";
-import { normalizePlanData } from "@/lib/normalizePlanData";
+import { normalizePlanPayload } from "@/lib/normalizePlanPayload";
 import { getOrCreateGuestId } from "@/lib/identityUtils";
 
 interface SectionData {
@@ -67,23 +67,7 @@ export default function PrePlanSummary() {
   
   const loading = planLoading || dataLoading;
 
-  // Load personal notes from localStorage
-  useEffect(() => {
-    const savedNotes = localStorage.getItem("plan_personal_notes");
-    if (savedNotes) {
-      setPersonalNotes(savedNotes);
-    }
-  }, []);
-
-  // Auto-save personal notes
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (personalNotes) {
-        localStorage.setItem("plan_personal_notes", personalNotes);
-      }
-    }, 1000);
-    return () => clearTimeout(timeoutId);
-  }, [personalNotes]);
+  // Notes are kept in-memory only (per mandate: do not use localStorage)
 
   // Check for print param
   useEffect(() => {
@@ -133,47 +117,46 @@ export default function PrePlanSummary() {
         org_id: orgId,
       };
 
-      setPlanData(mergedPlanData);
+       setPlanData(mergedPlanData);
 
-      // Completion is computed ONLY from plan_payload via normalizePlanData
-      // CRITICAL: Pass mergedPlanData directly - it already has plan_payload as a property
-      // Also pass userId to read localStorage fallbacks for legacy data
-      const completion = getSectionCompletion(mergedPlanData, user.id);
+       // Completion is computed ONLY from normalized plan_payload
+       const completion = getSectionCompletion(mergedPlanData);
 
-      // Diagnostic logging for debugging completion detection (dev only)
-      if (import.meta.env.DEV) {
-        const normalized = normalizePlanData(mergedPlanData, user.id);
-        console.log("[PrePlanSummary] plan_payload (raw):", mergedPlanData.plan_payload);
-        console.log("[PrePlanSummary] normalized.data snapshot:", {
-          financial: normalized.data.financial,
-          digital: normalized.data.digital,
-          property: normalized.data.property,
-          pets: normalized.data.pets,
-          messages: normalized.data.messages,
-          healthcare: normalized.data.healthcare,
-          care_preferences: normalized.data.care_preferences,
-          advance_directive: normalized.data.advance_directive,
-          travel: normalized.data.travel,
-        });
-        console.log("[PrePlanSummary] completion map:", completion);
-      }
+       // Diagnostic logging for debugging completion detection (dev only)
+       if (import.meta.env.DEV) {
+         const normalized = normalizePlanPayload(mergedPlanData?.plan_payload);
+         console.log("[PrePlanSummary] plan_payload (raw):", mergedPlanData.plan_payload);
+         console.log("[PrePlanSummary] normalized snapshot:", {
+           financial: normalized.financial,
+           digital: normalized.digital,
+           property: normalized.property,
+           pets: normalized.pets,
+           messages: normalized.messages,
+           medical: normalized.medical,
+           advance_directive: normalized.advance_directive,
+           travel: normalized.travel,
+           legacy: normalized.legacy,
+         });
+         console.log("[PrePlanSummary] completion map:", completion);
+       }
 
       // Build sections list from UNIFIED REGISTRY
       // Show the REQUIRED sections for "View or edit sections" per specification
-      const REQUIRED_SECTION_IDS = [
-        "personal",    // About You
-        "contacts",    // Important Contacts
-        "healthcare",  // Medical & Care Preferences
-        "advancedirective", // Advance Directive
-        "funeral",     // Funeral Wishes
-        "financial",   // Financial Life
-        "insurance",   // Insurance
-        "property",    // Property & Valuables
-        "pets",        // Pets
-        "messages",    // Messages to Loved Ones
-        "digital",     // Online Accounts
-        "travel",      // Travel & Away-From-Home
-      ];
+       const REQUIRED_SECTION_IDS = [
+         "personal",    // About You
+         "legacy",      // Life Story
+         "contacts",    // Important Contacts
+         "healthcare",  // Medical & Care Preferences
+         "advancedirective", // Advance Directive
+         "funeral",     // Funeral Wishes
+         "financial",   // Financial Life
+         "insurance",   // Insurance
+         "property",    // Property & Valuables
+         "pets",        // Pets
+         "messages",    // Messages to Loved Ones
+         "digital",     // Online Accounts
+         "travel",      // Travel & Away-From-Home
+       ];
 
       const registrySections = getCompletableSections();
       const sectionList: SectionData[] = registrySections

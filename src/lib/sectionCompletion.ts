@@ -3,248 +3,71 @@
  *
  * SINGLE SOURCE OF TRUTH for completion status on Plan Summary.
  *
- * Hard rule: completion is computed ONLY from DB-backed plan_payload data
- * (via normalizePlanData()), not localStorage and not legacy table columns.
+ * Hard rule (per mandate): completion is computed ONLY from normalized `plan_payload`
+ * via normalizePlanPayload(). No localStorage reads.
  */
 
 import { getCompletableSections } from "./sectionRegistry";
-import { normalizePlanData } from "./normalizePlanData";
-
-// ============= VALUE CHECKING HELPERS =============
-
-/**
- * Recursively checks if a value is "meaningful".
- * - strings: trimmed length > 0 (and not placeholder-ish)
- * - numbers: not NaN
- * - booleans: true is meaningful
- * - arrays: any meaningful item
- * - objects: any meaningful value
- */
-export function hasMeaningfulData(value: unknown): boolean {
-  if (value === undefined || value === null) return false;
-
-  if (typeof value === "boolean") return value === true;
-
-  if (typeof value === "number") return !Number.isNaN(value);
-
-  if (typeof value === "string") {
-    const trimmed = value.trim();
-    if (!trimmed) return false;
-    const lowered = trimmed.toLowerCase();
-    const placeholders = new Set(["unsure", "not sure", "not specified", "n/a", "none"]);
-    return !placeholders.has(lowered);
-  }
-
-  if (Array.isArray(value)) {
-    if (value.length === 0) return false;
-    return value.some((v) => hasMeaningfulData(v));
-  }
-
-  if (typeof value === "object") {
-    const obj = value as Record<string, unknown>;
-    return Object.values(obj).some((v) => hasMeaningfulData(v));
-  }
-
-  return false;
-}
+import { hasMeaningfulData, normalizePlanPayload } from "./normalizePlanPayload";
 
 // ============= SECTION COMPLETION =============
 
-/**
- * Check if contacts section has meaningful data.
- * Handles both array format and object-with-arrays format.
- */
-function hasContactData(contacts: any): boolean {
-  if (!contacts) return false;
-  
-  // If it's an array directly
-  if (Array.isArray(contacts)) {
-    return contacts.some(c => c && (c.name || c.phone || c.email));
-  }
-  
-  // If it's an object with contacts/importantPeople arrays
-  if (typeof contacts === "object") {
-    const arr = contacts.contacts || contacts.importantPeople || [];
-    if (Array.isArray(arr) && arr.some((c: any) => c && (c.name || c.phone || c.email))) {
-      return true;
-    }
-    // Also check for any other meaningful fields
-    return hasMeaningfulData(contacts);
-  }
-  
-  return false;
+function hasContactData(contacts: any[]): boolean {
+  if (!Array.isArray(contacts) || contacts.length === 0) return false;
+  return contacts.some((c) => c && (c.name || c.phone || c.email || c.relationship));
 }
 
-/**
- * Check if healthcare/medical section has meaningful data.
- * Checks all sub-sections: medications, conditions, allergies, doctor/pharmacy, care prefs.
- */
-function hasHealthcareData(data: Record<string, any>): boolean {
-  const hc = data.healthcare || {};
-  const care = data.care_preferences || {};
-  const ad = data.advance_directive || {};
-  
-  // Check medications array
-  if (Array.isArray(hc.medications) && hc.medications.length > 0) return true;
-  
-  // Check conditions
-  if (hc.conditions && typeof hc.conditions === "string" && hc.conditions.trim()) return true;
-  if (Array.isArray(hc.conditions) && hc.conditions.length > 0) return true;
-  
-  // Check allergies
-  if (hc.allergies && typeof hc.allergies === "string" && hc.allergies.trim()) return true;
-  if (Array.isArray(hc.allergies) && hc.allergies.length > 0) return true;
-  
-  // Check doctor/pharmacy
-  if (hc.primaryDoctor || hc.pharmacy || hc.doctorPhone || hc.pharmacyPhone) return true;
-  
-  // Check care preferences (checkboxes)
-  if (care && typeof care === "object") {
-    const careValues = Object.values(care);
-    if (careValues.some(v => v === true)) return true;
-  }
-  
-  // Check advance directive status
-  if (ad.advanceDirectiveStatus && ad.advanceDirectiveStatus !== "unsure") return true;
-  if (ad.dnrStatus && ad.dnrStatus !== "unsure") return true;
-  if (ad.polstStatus && ad.polstStatus !== "unsure") return true;
-  if (ad.healthcareProxyName) return true;
-  
-  // General fallback
-  return hasMeaningfulData(hc) || hasMeaningfulData(care);
-}
-
-const completionChecks: Record<string, (data: Record<string, any>) => boolean> = {
-  personal: (data) => hasMeaningfulData(data.personal) || hasMeaningfulData(data.about_you),
-  contacts: (data) => hasContactData(data.contacts),
-
-  // Medical & Care should consider healthcare + care prefs + advance directive status
-  healthcare: (data) => hasHealthcareData(data),
-
-  funeral: (data) => hasMeaningfulData(data.funeral),
-  
-  financial: (data) => {
-    const fin = data.financial || {};
-    // Check for any checkboxes being true
-    if (fin.has_checking || fin.has_savings || fin.has_retirement || 
-        fin.has_investment || fin.has_crypto || fin.has_safe_deposit || 
-        fin.has_business || fin.has_debts) return true;
-    // Check for any accounts array
-    if (Array.isArray(fin.accounts) && fin.accounts.length > 0) return true;
-    if (Array.isArray(fin.bankAccounts) && fin.bankAccounts.length > 0) return true;
-    if (Array.isArray(fin.investments) && fin.investments.length > 0) return true;
-    if (fin.notes && fin.notes.trim()) return true;
-    if (fin.safe_deposit_details || fin.crypto_details || fin.business_details || fin.debts_details) return true;
-    return hasMeaningfulData(fin);
-  },
-  
-  insurance: (data) => {
-    const ins = data.insurance || {};
-    if (Array.isArray(ins.policies) && ins.policies.length > 0) return true;
-    if (ins.cardLocation && ins.cardLocation.trim()) return true;
-    if (ins.notes && ins.notes.trim()) return true;
-    return hasMeaningfulData(ins);
-  },
-  
-  property: (data) => {
-    const prop = data.property || {};
-    if (Array.isArray(prop.properties) && prop.properties.length > 0) return true;
-    if (Array.isArray(prop.valuables) && prop.valuables.length > 0) return true;
-    if (prop.notes && prop.notes.trim()) return true;
-    return hasMeaningfulData(prop);
-  },
-  
-  pets: (data) => {
-    const pets = data.pets;
-    if (Array.isArray(pets) && pets.length > 0) {
-      return pets.some(p => p && (p.name || p.caregiver || p.notes));
-    }
-    return false;
-  },
-  
-  messages: (data) => {
-    const msgs = data.messages;
-    if (Array.isArray(msgs) && msgs.length > 0) {
-      return msgs.some(m => m && (m.body || m.title || m.message || m.text));
-    }
-    return false;
-  },
-  
-  digital: (data) => {
-    const dig = data.digital || {};
-    // Check for accounts array (common structure)
-    if (Array.isArray(dig.accounts) && dig.accounts.length > 0) return true;
-    // Check for socialAccounts array
-    if (Array.isArray(dig.socialAccounts) && dig.socialAccounts.length > 0) return true;
-    // Check notes
-    if (dig.notes && String(dig.notes).trim()) return true;
-    // Check passwordManager or deviceAccess
-    if (dig.passwordManager || dig.deviceAccess) return true;
-    return hasMeaningfulData(dig);
-  },
-  
-  travel: (data) => {
-    const travel = data.travel || {};
-    return hasMeaningfulData(travel);
-  },
-
-  preplanning: (data) => hasMeaningfulData(data.preplanning),
-  legal: (data) => hasMeaningfulData(data.legal),
-  advance_directive: (data) => {
-    const ad = data.advance_directive || {};
-    if (ad.advanceDirectiveStatus && ad.advanceDirectiveStatus !== "unsure") return true;
-    if (ad.dnrStatus && ad.dnrStatus !== "unsure") return true;
-    if (ad.healthcareProxyName) return true;
-    return hasMeaningfulData(ad);
-  },
-  // Alias for registry id "advancedirective" (no underscore)
-  advancedirective: (data) => {
-    const ad = data.advance_directive || {};
-    if (ad.advanceDirectiveStatus && ad.advanceDirectiveStatus !== "unsure") return true;
-    if (ad.dnrStatus && ad.dnrStatus !== "unsure") return true;
-    if (ad.healthcareProxyName) return true;
-    return hasMeaningfulData(ad);
-  },
-  care_preferences: (data) => hasMeaningfulData(data.care_preferences),
-  healthcare_proxy: (data) => hasContactData(data.contacts),
+const completionChecks: Record<string, (n: ReturnType<typeof normalizePlanPayload>) => boolean> = {
+  // Registry ids
+  personal: (n) => hasMeaningfulData(n.about),
+  legacy: (n) => hasMeaningfulData(n.legacy),
+  contacts: (n) => hasContactData(n.contacts) || hasMeaningfulData(n.contacts),
+  healthcare: (n) => hasMeaningfulData(n.medical),
+  advancedirective: (n) => hasMeaningfulData(n.advance_directive),
+  funeral: (n) => hasMeaningfulData(n.wishes),
+  financial: (n) => hasMeaningfulData(n.financial),
+  insurance: (n) => hasMeaningfulData(n.insurance),
+  property: (n) => hasMeaningfulData(n.property),
+  pets: (n) => hasMeaningfulData(n.pets),
+  messages: (n) => hasMeaningfulData(n.messages),
+  digital: (n) => hasMeaningfulData(n.digital),
+  travel: (n) => hasMeaningfulData(n.travel),
 };
 
-export function getSectionCompletion(planData: any, userId?: string): Record<string, boolean> {
-  const normalized = normalizePlanData(planData, userId);
-  const data = normalized.data;
+export function getSectionCompletion(planData: any): Record<string, boolean> {
+  const normalized = normalizePlanPayload(planData?.plan_payload);
 
   const result: Record<string, boolean> = {};
   const sections = getCompletableSections();
 
   for (const section of sections) {
-    const key = section.dataKey;
-    const check = completionChecks[key];
-    result[section.id] = check ? check(data) : hasMeaningfulData(data[key]);
+    const check = completionChecks[section.id];
+    result[section.id] = check ? check(normalized) : false;
   }
 
   if (import.meta.env.DEV) {
-    // Diagnostic logging - show which sections have data
-    const sectionsWithData = Object.entries(data)
-      .filter(([k, v]) => {
-        if (!v) return false;
-        if (Array.isArray(v)) return v.length > 0;
-        if (typeof v === "object") return Object.keys(v).length > 0;
-        return true;
-      })
-      .map(([k]) => k);
-    console.log("[sectionCompletion] Sections with data:", sectionsWithData);
-    console.log("[sectionCompletion] Completion results:", result);
-    
-    // Log specific section data for debugging
-    console.log("[sectionCompletion] Financial data:", data.financial);
-    console.log("[sectionCompletion] Digital data:", data.digital);
-    console.log("[sectionCompletion] Pets data:", data.pets);
+    console.log("[sectionCompletion] normalized keys with data:", {
+      about: hasMeaningfulData(normalized.about),
+      legacy: hasMeaningfulData(normalized.legacy),
+      contacts: hasMeaningfulData(normalized.contacts),
+      medical: hasMeaningfulData(normalized.medical),
+      advance_directive: hasMeaningfulData(normalized.advance_directive),
+      wishes: hasMeaningfulData(normalized.wishes),
+      financial: hasMeaningfulData(normalized.financial),
+      insurance: hasMeaningfulData(normalized.insurance),
+      property: hasMeaningfulData(normalized.property),
+      pets: hasMeaningfulData(normalized.pets),
+      digital: hasMeaningfulData(normalized.digital),
+      messages: hasMeaningfulData(normalized.messages),
+      travel: hasMeaningfulData(normalized.travel),
+    });
+    console.log("[sectionCompletion] completion results:", result);
   }
 
   return result;
 }
 
-export function isSectionComplete(sectionId: string, planData: any, userId?: string): boolean {
-  const completion = getSectionCompletion(planData, userId);
+export function isSectionComplete(sectionId: string, planData: any): boolean {
+  const completion = getSectionCompletion(planData);
   return completion[sectionId] || false;
 }

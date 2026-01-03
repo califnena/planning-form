@@ -88,6 +88,15 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     showCompletionDot: true,
   },
   {
+    id: "legacy",
+    label: "Life Story & Legacy",
+    icon: BookOpen,
+    route: "/preplandashboard/life-story",
+    dataKey: "legacy",
+    group: "preplanning",
+    showCompletionDot: true,
+  },
+  {
     id: "healthcare",
     label: "Medical & Care Preferences",
     icon: Stethoscope,
@@ -105,8 +114,6 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     group: "preplanning",
     showCompletionDot: true,
   },
-
-  // YOUR WISHES (order: funeral, insurance, contacts, financial, property, pets, messages)
   {
     id: "funeral",
     label: "Funeral Wishes",
