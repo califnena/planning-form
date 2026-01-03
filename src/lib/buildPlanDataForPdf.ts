@@ -93,10 +93,20 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
   const normalizedPayload = normalizePlanPayload(planPayload);
 
   if (import.meta.env.DEV) {
-    console.log("[buildPlanDataForPdf] normalizedPayload keys with data:",
+    console.log("[buildPlanDataForPdf] normalizedPayload CANONICAL keys:",
+      {
+        personal_profile: hasMeaningfulData(normalizedPayload.personal_profile),
+        family: hasMeaningfulData(normalizedPayload.family),
+        online_accounts: hasMeaningfulData(normalizedPayload.online_accounts),
+        messages_to_loved_ones: {
+          main_message: !!normalizedPayload.messages_to_loved_ones.main_message,
+          individual_count: normalizedPayload.messages_to_loved_ones.individual.length,
+        },
+        legacy: hasMeaningfulData(normalizedPayload.legacy),
+      }
+    );
+    console.log("[buildPlanDataForPdf] other keys with data:",
       Object.entries({
-        about: normalizedPayload.about,
-        legacy: normalizedPayload.legacy,
         contacts: normalizedPayload.contacts,
         medical: normalizedPayload.medical,
         advance_directive: normalizedPayload.advance_directive,
@@ -105,8 +115,6 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
         insurance: normalizedPayload.insurance,
         property: normalizedPayload.property,
         pets: normalizedPayload.pets,
-        digital: normalizedPayload.digital,
-        messages: normalizedPayload.messages,
         travel: normalizedPayload.travel,
       })
         .filter(([_, v]) => v && (Array.isArray(v) ? v.length > 0 : Object.keys(v).length > 0))
@@ -116,6 +124,8 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
 
   const mergedProfile = {
     ...(personalProfile || {}),
+    // CANONICAL: Merge in personal_profile from payload
+    ...normalizedPayload.personal_profile,
   };
 
   // Ensure we have a name from somewhere
@@ -124,23 +134,34 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
   }
 
   // Merge normalized plan_payload sections to top level for consistent access (completion + PDF)
+  // CANONICAL KEYS take precedence
   const planPayloadMerged = {
-    // Canonical sections from normalizePlanPayload
-    personal: normalizedPayload.about,
-    about_you: normalizedPayload.about,
+    // CANONICAL: personal_profile
+    personal_profile: normalizedPayload.personal_profile,
+    personal: normalizedPayload.personal_profile,
+    about_you: normalizedPayload.personal_profile,
 
-    // Keep the original shape expected by many callers
+    // CANONICAL: family
+    family: normalizedPayload.family,
+
+    // CANONICAL: online_accounts
+    online_accounts: normalizedPayload.online_accounts,
+    digital: normalizedPayload.online_accounts, // backwards compat
+
+    // CANONICAL: messages_to_loved_ones
+    messages_to_loved_ones: normalizedPayload.messages_to_loved_ones,
+    messages: normalizedPayload.messages_to_loved_ones.individual, // backwards compat
+
+    // CANONICAL: legacy
+    legacy: normalizedPayload.legacy,
+
+    // Other sections
     funeral: normalizedPayload.wishes,
     insurance: normalizedPayload.insurance,
     financial: normalizedPayload.financial,
     property: normalizedPayload.property,
-    digital: normalizedPayload.digital,
     travel: normalizedPayload.travel,
-    legacy: normalizedPayload.legacy,
-
-    // Arrays
     pets: normalizedPayload.pets,
-    messages: normalizedPayload.messages,
 
     // Contacts as object-with-array (existing UI expects this)
     contacts: { contacts: normalizedPayload.contacts, importantPeople: [] },

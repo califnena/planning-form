@@ -15,26 +15,78 @@ interface SectionDigitalProps {
   onChange: (data: any) => void;
 }
 
+/**
+ * SectionDigital
+ * 
+ * CANONICAL KEY: online_accounts (object in plan_payload)
+ * 
+ * SAVE: data.online_accounts → plan_payload.online_accounts
+ * READ: data.online_accounts from plan_payload
+ * COMPLETION: hasMeaningfulData(plan_payload.online_accounts)
+ */
 export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
-  const digital = data.digital || {};
-  const accounts = digital.accounts || [];
-  const phones = digital.phones || [];
+  // CANONICAL: Read from online_accounts (migrate from digital if needed)
+  const online_accounts = data.online_accounts || data.digital || {};
+  const accounts = online_accounts.accounts || [];
+  const phones = online_accounts.phones || [];
   const { toast } = useToast();
   const { t } = useTranslation();
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
-  const updateDigital = (field: string, value: any) => {
-    onChange({
+  const updateOnlineAccounts = (field: string, value: any) => {
+    // CANONICAL: Write to online_accounts
+    const updated = {
       ...data,
-      digital: { ...digital, [field]: value }
-    });
+      online_accounts: { ...online_accounts, [field]: value }
+    };
     
-    // Auto-create account when checkbox is checked
+    if (import.meta.env.DEV) {
+      console.log("[SectionDigital] updateOnlineAccounts:", field, "→ online_accounts");
+    }
+    
+    onChange(updated);
+  };
+
+  const addAccount = () => {
+    updateOnlineAccounts("accounts", [...accounts, { platform: "", username: "", action: "" }]);
+  };
+
+  const addAccountWithPlatform = (platform: string) => {
+    updateOnlineAccounts("accounts", [...accounts, { platform, username: "", action: "" }]);
+  };
+
+  const updateAccount = (index: number, field: string, value: string | boolean) => {
+    const updated = [...accounts];
+    updated[index] = { ...updated[index], [field]: value };
+    updateOnlineAccounts("accounts", updated);
+  };
+
+  const removeAccount = (index: number) => {
+    updateOnlineAccounts("accounts", accounts.filter((_: any, i: number) => i !== index));
+  };
+
+  const addPhone = () => {
+    updateOnlineAccounts("phones", [...phones, { carrier: "", number: "", pin: "" }]);
+  };
+
+  const updatePhone = (index: number, field: string, value: string) => {
+    const updated = [...phones];
+    updated[index] = { ...updated[index], [field]: value };
+    updateOnlineAccounts("phones", updated);
+  };
+
+  const removePhone = (index: number) => {
+    updateOnlineAccounts("phones", phones.filter((_: any, i: number) => i !== index));
+  };
+
+  // Auto-create account when checkbox is checked
+  const handleCheckboxChange = (field: string, value: boolean) => {
+    updateOnlineAccounts(field, value);
+    
     if (field.startsWith('has_') && value === true && field !== 'has_password_manager') {
       const accountType = field.replace('has_', '').replace(/_/g, ' ');
       const typeCapitalized = accountType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
       
-      // Check if account already exists for this type
       const existingAccount = accounts.find((acc: any) => 
         acc.platform?.toLowerCase().includes(accountType.toLowerCase())
       );
@@ -43,38 +95,6 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
         addAccountWithPlatform(typeCapitalized);
       }
     }
-  };
-
-  const addAccount = () => {
-    updateDigital("accounts", [...accounts, { platform: "", username: "", action: "" }]);
-  };
-
-  const addAccountWithPlatform = (platform: string) => {
-    updateDigital("accounts", [...accounts, { platform, username: "", action: "" }]);
-  };
-
-  const updateAccount = (index: number, field: string, value: string | boolean) => {
-    const updated = [...accounts];
-    updated[index] = { ...updated[index], [field]: value };
-    updateDigital("accounts", updated);
-  };
-
-  const removeAccount = (index: number) => {
-    updateDigital("accounts", accounts.filter((_: any, i: number) => i !== index));
-  };
-
-  const addPhone = () => {
-    updateDigital("phones", [...phones, { carrier: "", number: "", pin: "" }]);
-  };
-
-  const updatePhone = (index: number, field: string, value: string) => {
-    const updated = [...phones];
-    updated[index] = { ...updated[index], [field]: value };
-    updateDigital("phones", updated);
-  };
-
-  const removePhone = (index: number) => {
-    updateDigital("phones", phones.filter((_: any, i: number) => i !== index));
   };
 
   const handleSave = () => {
@@ -114,64 +134,64 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
           <div className="flex items-center space-x-2">
             <Checkbox
               id="social_media"
-              checked={digital.has_social_media || false}
-              onCheckedChange={(checked) => updateDigital("has_social_media", checked)}
+              checked={online_accounts.has_social_media || false}
+              onCheckedChange={(checked) => handleCheckboxChange("has_social_media", checked as boolean)}
             />
             <Label htmlFor="social_media" className="font-normal">Social media accounts</Label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
               id="email"
-              checked={digital.has_email || false}
-              onCheckedChange={(checked) => updateDigital("has_email", checked)}
+              checked={online_accounts.has_email || false}
+              onCheckedChange={(checked) => handleCheckboxChange("has_email", checked as boolean)}
             />
             <Label htmlFor="email" className="font-normal">Email accounts</Label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
               id="cloud_storage"
-              checked={digital.has_cloud_storage || false}
-              onCheckedChange={(checked) => updateDigital("has_cloud_storage", checked)}
+              checked={online_accounts.has_cloud_storage || false}
+              onCheckedChange={(checked) => handleCheckboxChange("has_cloud_storage", checked as boolean)}
             />
             <Label htmlFor="cloud_storage" className="font-normal">Cloud storage (Google, iCloud, Dropbox)</Label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
               id="streaming"
-              checked={digital.has_streaming || false}
-              onCheckedChange={(checked) => updateDigital("has_streaming", checked)}
+              checked={online_accounts.has_streaming || false}
+              onCheckedChange={(checked) => handleCheckboxChange("has_streaming", checked as boolean)}
             />
             <Label htmlFor="streaming" className="font-normal">Streaming services</Label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
               id="shopping"
-              checked={digital.has_shopping || false}
-              onCheckedChange={(checked) => updateDigital("has_shopping", checked)}
+              checked={online_accounts.has_shopping || false}
+              onCheckedChange={(checked) => handleCheckboxChange("has_shopping", checked as boolean)}
             />
             <Label htmlFor="shopping" className="font-normal">Shopping accounts (Amazon, etc.)</Label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
               id="photo_sites"
-              checked={digital.has_photo_sites || false}
-              onCheckedChange={(checked) => updateDigital("has_photo_sites", checked)}
+              checked={online_accounts.has_photo_sites || false}
+              onCheckedChange={(checked) => handleCheckboxChange("has_photo_sites", checked as boolean)}
             />
             <Label htmlFor="photo_sites" className="font-normal">Photo sharing sites</Label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
               id="domains"
-              checked={digital.has_domains || false}
-              onCheckedChange={(checked) => updateDigital("has_domains", checked)}
+              checked={online_accounts.has_domains || false}
+              onCheckedChange={(checked) => handleCheckboxChange("has_domains", checked as boolean)}
             />
             <Label htmlFor="domains" className="font-normal">Domain names or websites</Label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
               id="password_manager"
-              checked={digital.has_password_manager || false}
-              onCheckedChange={(checked) => updateDigital("has_password_manager", checked)}
+              checked={online_accounts.has_password_manager || false}
+              onCheckedChange={(checked) => handleCheckboxChange("has_password_manager", checked as boolean)}
             />
             <Label htmlFor="password_manager" className="font-normal">Password manager</Label>
           </div>
@@ -312,7 +332,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
                     <Checkbox
                       id={`memorialize-${index}`}
                       checked={account.action_memorialize || false}
-                      onCheckedChange={(checked) => updateAccount(index, "action_memorialize", checked)}
+                      onCheckedChange={(checked) => updateAccount(index, "action_memorialize", checked as boolean)}
                     />
                     <Label htmlFor={`memorialize-${index}`} className="font-normal">Memorialize</Label>
                   </div>
@@ -320,7 +340,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
                     <Checkbox
                       id={`delete-${index}`}
                       checked={account.action_delete || false}
-                      onCheckedChange={(checked) => updateAccount(index, "action_delete", checked)}
+                      onCheckedChange={(checked) => updateAccount(index, "action_delete", checked as boolean)}
                     />
                     <Label htmlFor={`delete-${index}`} className="font-normal">Delete</Label>
                   </div>
@@ -328,7 +348,7 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
                     <Checkbox
                       id={`transfer-${index}`}
                       checked={account.action_transfer || false}
-                      onCheckedChange={(checked) => updateAccount(index, "action_transfer", checked)}
+                      onCheckedChange={(checked) => updateAccount(index, "action_transfer", checked as boolean)}
                     />
                     <Label htmlFor={`transfer-${index}`} className="font-normal">Transfer</Label>
                   </div>
@@ -359,8 +379,8 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
         <p className="text-xs text-muted-foreground">Which password manager you use and where the master password is stored</p>
         <Textarea
           id="password_manager_info"
-          value={digital.password_manager_info || ""}
-          onChange={(e) => updateDigital("password_manager_info", e.target.value)}
+          value={online_accounts.password_manager_info || ""}
+          onChange={(e) => updateOnlineAccounts("password_manager_info", e.target.value)}
           placeholder="Which password manager do you use? Where is the master password stored?"
           rows={3}
         />

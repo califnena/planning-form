@@ -3,13 +3,31 @@
  *
  * SINGLE SOURCE OF TRUTH for reading section data from `plan_payload`.
  *
- * Hard rules (per mandate):
+ * CANONICAL KEYS (per mandate):
+ * - personal_profile: object (Personal Information)
+ * - family: object (Family Information)
+ * - online_accounts: object (was 'digital')
+ * - messages_to_loved_ones: { main_message: string, individual: [] }
+ * - legacy: { life_story: string }
+ * 
+ * Hard rules:
  * - No localStorage reads
  * - No new storage keys
  * - All consumers (completion + PDF mapping + shared view) should read from this normalized object.
  */
 
 export type NormalizedPlanPayload = {
+  // CANONICAL KEYS
+  personal_profile: Record<string, any>;
+  family: Record<string, any>;
+  online_accounts: Record<string, any>;
+  messages_to_loved_ones: {
+    main_message: string;
+    individual: Array<{ to: string; message: string; audio_url?: string; video_url?: string }>;
+  };
+  legacy: Record<string, any>;
+  
+  // Other sections
   about: Record<string, any>;
   contacts: any[];
   wishes: Record<string, any>;
@@ -17,12 +35,11 @@ export type NormalizedPlanPayload = {
   financial: Record<string, any>;
   property: Record<string, any>;
   pets: any[];
-  digital: Record<string, any>;
-  messages: any[];
+  digital: Record<string, any>; // Kept for backwards compat, maps to online_accounts
+  messages: any[]; // Kept for backwards compat, maps to messages_to_loved_ones.individual
   medical: Record<string, any>;
   advance_directive: Record<string, any>;
   travel: Record<string, any>;
-  legacy: Record<string, any>;
   notes: Record<string, any>;
   _raw: Record<string, any>;
 };
@@ -82,16 +99,58 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
 
   const mergedRoot = { ...raw, ...rawData, ...rawSections };
 
-  // Known synonyms / legacy shapes observed in codebase
-  // personal_profile is used by SectionPersonal
-  const personal = {
+  // CANONICAL: personal_profile
+  const personal_profile = {
+    ...asObject(mergedRoot.personal_profile),
     ...asObject(mergedRoot.personal),
     ...asObject(mergedRoot.about_you),
     ...asObject(mergedRoot.personal_information),
     ...asObject(mergedRoot.about),
-    ...asObject(mergedRoot.personal_profile), // from SectionPersonal
   };
 
+  // CANONICAL: family (subset of personal or separate)
+  const family = {
+    ...asObject(mergedRoot.family),
+    partner_name: personal_profile.partner_name,
+    child_names: personal_profile.child_names,
+    children: personal_profile.children,
+    father_name: personal_profile.father_name,
+    mother_name: personal_profile.mother_name,
+  };
+
+  // CANONICAL: online_accounts (was 'digital')
+  const online_accounts = {
+    ...asObject(mergedRoot.online_accounts),
+    ...asObject(mergedRoot.digital),
+    ...asObject(mergedRoot.digital_accounts),
+    ...asObject(mergedRoot.digital_assets),
+  };
+
+  // CANONICAL: messages_to_loved_ones
+  const rawMessagesToLovedOnes = asObject(mergedRoot.messages_to_loved_ones);
+  const oldMessages = asArray(mergedRoot.messages);
+  
+  // Migrate from old messages array if needed
+  let messages_to_loved_ones: NormalizedPlanPayload['messages_to_loved_ones'] = {
+    main_message: rawMessagesToLovedOnes.main_message || "",
+    individual: asArray(rawMessagesToLovedOnes.individual),
+  };
+  
+  // If old format exists and new doesn't have individual messages, migrate
+  if (messages_to_loved_ones.individual.length === 0 && oldMessages.length > 0) {
+    messages_to_loved_ones.individual = oldMessages.map((m: any) => ({
+      to: m.recipients || m.to || "",
+      message: m.text_message || m.message || m.body || "",
+      audio_url: m.audio_url,
+      video_url: m.video_url,
+    }));
+    
+    if (import.meta.env.DEV) {
+      console.log("[normalizePlanPayload] Migrated old messages to messages_to_loved_ones");
+    }
+  }
+
+  // CANONICAL: legacy
   const legacy = {
     ...asObject(mergedRoot.legacy),
     ...asObject(mergedRoot.life_story),
@@ -119,12 +178,6 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
     ...asObject(mergedRoot.property_valuables),
     ...asObject(mergedRoot.properties),
     ...asObject(mergedRoot.valuables),
-  };
-
-  const digital = {
-    ...asObject(mergedRoot.digital),
-    ...asObject(mergedRoot.digital_accounts),
-    ...asObject(mergedRoot.digital_assets),
   };
 
   const healthcare = {
@@ -164,7 +217,6 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
   const contacts = [...contactsA, ...contactsB, ...contactsC, ...contactsNotify].filter(Boolean);
 
   const pets = asArray(mergedRoot.pets);
-  const messages = asArray(mergedRoot.messages);
 
   const notes = {
     ...asObject(mergedRoot.notes),
@@ -172,19 +224,28 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
   };
 
   return {
-    about: personal,
+    // CANONICAL KEYS
+    personal_profile,
+    family,
+    online_accounts,
+    messages_to_loved_ones,
+    legacy,
+    
+    // Backwards compat aliases
+    about: personal_profile,
+    digital: online_accounts,
+    messages: messages_to_loved_ones.individual,
+    
+    // Other sections
     contacts,
     wishes: funeral,
     insurance,
     financial,
     property,
     pets,
-    digital,
-    messages,
     medical,
     advance_directive: advanceDirective,
     travel,
-    legacy,
     notes,
     _raw: mergedRoot,
   };

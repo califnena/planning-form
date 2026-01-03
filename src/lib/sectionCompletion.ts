@@ -3,7 +3,12 @@
  *
  * SINGLE SOURCE OF TRUTH for completion status on Plan Summary.
  *
- * Uses getUnifiedPlan/unified data for accurate completion detection.
+ * CANONICAL KEYS:
+ * - personal_profile: object
+ * - family: object  
+ * - online_accounts: object (was 'digital')
+ * - messages_to_loved_ones: { main_message: string, individual: [] }
+ * - legacy: { life_story: string }
  */
 
 import { getCompletableSections } from "./sectionRegistry";
@@ -55,19 +60,21 @@ export function getSectionCompletion(planData: unknown): Record<string, boolean>
   // Merge all sources for checking
   const merged = { ...payloadObj, ...payloadData, ...payloadSections };
   
-  // Check each section
+  // Check each section using CANONICAL keys
   for (const section of sections) {
     const sectionId = section.id;
     
     switch (sectionId) {
       case "personal":
+        // CANONICAL: personal_profile
         result[sectionId] = hasMeaningfulData(
-          merged.personal || merged.about_you || merged.about || merged.personal_profile ||
-          data.personal || data.about_you || data.personal_profile
+          merged.personal_profile || merged.personal || merged.about_you || merged.about ||
+          data.personal_profile || data.personal || data.about_you
         );
         break;
         
       case "legacy":
+        // CANONICAL: legacy.life_story
         result[sectionId] = hasMeaningfulData(
           merged.legacy || merged.life_story || merged.lifeStory || 
           data.legacy || data.life_story
@@ -127,14 +134,27 @@ export function getSectionCompletion(planData: unknown): Record<string, boolean>
         break;
         
       case "digital":
+        // CANONICAL: online_accounts (also check old 'digital' key for migration)
         result[sectionId] = hasMeaningfulData(
-          merged.digital || merged.digital_accounts || merged.digital_assets ||
-          data.digital
+          merged.online_accounts || merged.digital || merged.digital_accounts || merged.digital_assets ||
+          data.online_accounts || data.digital
         );
         break;
         
       case "messages":
-        result[sectionId] = hasArrayData(data.messages) || hasArrayData(merged.messages);
+        // CANONICAL: messages_to_loved_ones
+        // Complete if main_message non-empty OR any individual[].message non-empty
+        const msgData = merged.messages_to_loved_ones || data.messages_to_loved_ones;
+        if (msgData && typeof msgData === 'object') {
+          const m = msgData as { main_message?: string; individual?: any[] };
+          const hasMainMessage = !!(m.main_message && m.main_message.trim());
+          const hasIndividualMessage = Array.isArray(m.individual) && 
+            m.individual.some((i: any) => i.message && i.message.trim());
+          result[sectionId] = hasMainMessage || hasIndividualMessage;
+        } else {
+          // Fallback to old messages array
+          result[sectionId] = hasArrayData(data.messages) || hasArrayData(merged.messages);
+        }
         break;
         
       case "travel":
