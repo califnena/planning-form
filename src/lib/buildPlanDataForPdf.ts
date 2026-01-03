@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { normalizePlanPayload } from "@/lib/normalizePlanPayload";
+import { getSectionData, hasMeaningfulData, logSectionDataStatus } from "@/lib/getSectionData";
 
 /**
  * Builds a complete plan data object from Supabase for PDF generation.
@@ -312,9 +313,16 @@ function createEmptyPlanData(userId: string): any {
  * Normalizes plan data to ensure consistent field names and types for PDF generation.
  * This prevents "UI shows data but PDF thinks empty" problems.
  * Maps section data to the keys expected by the PDF edge function.
+ * 
+ * Uses getSectionData to check real storage paths only.
  */
 export function normalizePlanDataForPdf(raw: any): any {
   if (!raw) return createEmptyPlanData("");
+
+  // DEV: Log section data status before normalization
+  if (import.meta.env.DEV) {
+    logSectionDataStatus(raw.plan_payload || raw, "normalizePlanDataForPdf:input");
+  }
 
   const profile = raw.personal_profile || {};
 
@@ -337,57 +345,80 @@ export function normalizePlanDataForPdf(raw: any): any {
     normalizedName = raw.prepared_for || raw.prepared_by || "";
   }
 
-  // Extract contacts from different formats and merge
-  const contactsFromPayload = raw.contacts || {};
-  const contactsArray = Array.isArray(contactsFromPayload) 
-    ? contactsFromPayload 
-    : (contactsFromPayload.contacts || []);
-  const importantPeople = Array.isArray(contactsFromPayload.importantPeople)
-    ? contactsFromPayload.importantPeople
-    : [];
+  // Use getSectionData for consistent path resolution
+  const payloadSource = raw.plan_payload || raw;
   
-  // Merge contacts arrays
-  const allContacts = [...contactsArray, ...importantPeople];
+  // Get section data using standardized getter
+  const contactsData = getSectionData(payloadSource, "contacts");
+  const petsData = getSectionData(payloadSource, "pets");
+  const messagesData = getSectionData(payloadSource, "messages");
+  const financialData = getSectionData(payloadSource, "financial");
+  const digitalData = getSectionData(payloadSource, "digital");
+  const propertyData = getSectionData(payloadSource, "property");
+  const insuranceData = getSectionData(payloadSource, "insurance");
+  const healthcareData = getSectionData(payloadSource, "healthcare");
+  const advanceDirective = getSectionData(payloadSource, "advancedirective");
+  const travelData = getSectionData(payloadSource, "travel");
+  const legacyData = getSectionData(payloadSource, "legacy");
+  const personalData = getSectionData(payloadSource, "personal");
   
-  // Extract digital accounts from different formats
-  const digitalData = raw.digital || {};
-  const digitalAccounts = Array.isArray(digitalData.accounts) 
-    ? digitalData.accounts 
-    : [];
+  // Normalize contacts to array
+  const contactsArray = Array.isArray(contactsData) 
+    ? contactsData 
+    : (typeof contactsData === "object" && contactsData !== null)
+      ? ((contactsData as any).contacts || [])
+      : [];
+  const allContacts = [...contactsArray, ...(raw.contacts_notify || [])];
   
-  // Extract financial data
-  const financialData = raw.financial || {};
-  const bankAccounts = Array.isArray(financialData.bankAccounts)
-    ? financialData.bankAccounts
+  // Normalize digital accounts
+  const digital = (digitalData && typeof digitalData === "object") ? digitalData as Record<string, any> : {};
+  const digitalAccounts = Array.isArray(digital.accounts) ? digital.accounts : [];
+  
+  // Normalize financial
+  const financial = (financialData && typeof financialData === "object") ? financialData as Record<string, any> : {};
+  const bankAccounts = Array.isArray(financial.accounts)
+    ? financial.accounts
     : (raw.bank_accounts || []);
   
-  // Extract property data
-  const propertyData = raw.property || {};
-  const properties = Array.isArray(propertyData.properties)
-    ? propertyData.properties
+  // Normalize property
+  const property = (propertyData && typeof propertyData === "object") ? propertyData as Record<string, any> : {};
+  const properties = Array.isArray(property.items)
+    ? property.items
     : (raw.properties || []);
-  const valuables = Array.isArray(propertyData.valuables)
-    ? propertyData.valuables
+  const valuables = Array.isArray(property.valuables)
+    ? property.valuables
     : [];
   
-  // Extract insurance data
-  const insuranceData = raw.insurance || {};
-  const insurancePolicies = Array.isArray(insuranceData.policies)
-    ? insuranceData.policies
+  // Normalize insurance
+  const insurance = (insuranceData && typeof insuranceData === "object") ? insuranceData as Record<string, any> : {};
+  const insurancePolicies = Array.isArray(insurance.policies)
+    ? insurance.policies
     : (raw.insurance_policies || []);
   
-  // Extract pets - ensure array format
-  const petsData = Array.isArray(raw.pets) ? raw.pets : [];
+  // Normalize pets and messages
+  const petsArray = Array.isArray(petsData) ? petsData : [];
+  const messagesArray = Array.isArray(messagesData) ? messagesData : [];
   
-  // Extract messages - ensure array format
-  const messagesData = Array.isArray(raw.messages) ? raw.messages : [];
-  
-  // Extract healthcare/medical data for legal section
-  const healthcareData = raw.healthcare || {};
-  const advanceDirective = raw.advance_directive || {};
-  const carePreferences = raw.care_preferences || {};
-  
-  return {
+  // DEV: Log PDF OMIT warnings
+  if (import.meta.env.DEV) {
+    const sectionsToCheck = [
+      { key: "financial", data: financialData, label: "Financial Life" },
+      { key: "digital", data: digitalData, label: "Online Accounts" },
+      { key: "property", data: propertyData, label: "Property & Valuables" },
+      { key: "pets", data: petsData, label: "Pets" },
+      { key: "messages", data: messagesData, label: "Messages to Loved Ones" },
+      { key: "healthcare", data: healthcareData, label: "Medical & Care" },
+      { key: "travel", data: travelData, label: "Travel" },
+    ];
+    
+    for (const { key, data, label } of sectionsToCheck) {
+      if (hasMeaningfulData(data)) {
+        console.log(`[PDF] Section ${label} has data:`, data);
+      }
+    }
+  }
+
+  const result = {
     ...raw,
     personal_profile: {
       ...profile,
@@ -399,31 +430,41 @@ export function normalizePlanDataForPdf(raw: any): any {
     
     // Map to PDF expected keys
     contacts_notify: allContacts.length > 0 ? allContacts : (raw.contacts_notify || []),
-    pets: petsData.length > 0 ? petsData : (raw.pets || []),
-    messages: messagesData.length > 0 ? messagesData : (raw.messages || []),
+    pets: petsArray.length > 0 ? petsArray : (raw.pets || []),
+    messages: messagesArray.length > 0 ? messagesArray : (raw.messages || []),
     insurance_policies: insurancePolicies.length > 0 ? insurancePolicies : (raw.insurance_policies || []),
     bank_accounts: bankAccounts.length > 0 ? bankAccounts : (raw.bank_accounts || []),
     properties: properties.length > 0 ? properties : (raw.properties || []),
     valuables: valuables.length > 0 ? valuables : (raw.valuables || []),
     digital_assets: digitalAccounts.length > 0 
-      ? digitalAccounts.map((a: any) => `${a.site || a.name || ""}: ${a.username || ""}`.trim())
+      ? digitalAccounts.map((a: any) => `${a.platform || a.site || a.name || ""}: ${a.username || ""}`.trim())
       : (raw.digital_assets || []),
     
     // Include section data for PDF rendering
-    financial: financialData,
-    digital: digitalData,
-    property: propertyData,
-    insurance: insuranceData,
+    financial: financial,
+    digital: digital,
+    property: property,
+    insurance: insurance,
     healthcare: healthcareData,
     advance_directive: advanceDirective,
-    care_preferences: carePreferences,
+    care_preferences: (healthcareData as any)?.care_preferences || {},
+    travel: travelData,
+    legacy: legacyData,
+    personal: personalData,
     
     // Legal section - include medical care summary
     legal: {
       ...(raw.legal || {}),
       healthcare_summary: healthcareData,
       advance_directive: advanceDirective,
-      care_preferences: carePreferences,
+      care_preferences: (healthcareData as any)?.care_preferences || {},
     },
   };
+
+  // DEV: Log final output status
+  if (import.meta.env.DEV) {
+    logSectionDataStatus(result, "normalizePlanDataForPdf:output");
+  }
+
+  return result;
 }
