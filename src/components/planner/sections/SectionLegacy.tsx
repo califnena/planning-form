@@ -18,9 +18,12 @@ interface SectionLegacyProps {
 /**
  * SectionLegacy
  * 
- * SAVE: data.legacy object → goes to plan_payload.legacy via updatePlan
- * READ: data.legacy from plan_payload
- * COMPLETION: checks legacy in payload
+ * CANONICAL KEY: legacy (object in plan_payload)
+ * Structure: { life_story: string }
+ * 
+ * SAVE: data.legacy.life_story → plan_payload.legacy.life_story
+ * READ: data.legacy.life_story from plan_payload
+ * COMPLETION: hasMeaningfulData(plan_payload.legacy)
  */
 export const SectionLegacy = ({ data, onChange }: SectionLegacyProps) => {
   const { toast } = useToast();
@@ -28,15 +31,23 @@ export const SectionLegacy = ({ data, onChange }: SectionLegacyProps) => {
   const { isPreviewMode } = usePreviewMode();
   const navigate = useNavigate();
 
+  // CANONICAL: Read from legacy object
   const legacy = data?.legacy || {};
   const lifeStory = legacy.life_story || "";
 
   const updateLegacy = (field: string, value: string) => {
     if (onChange) {
-      onChange({
+      // CANONICAL: Write to legacy object
+      const updated = {
         ...data,
         legacy: { ...legacy, [field]: value }
-      });
+      };
+      
+      if (import.meta.env.DEV) {
+        console.log("[SectionLegacy] updateLegacy:", field, "→ legacy.life_story");
+      }
+      
+      onChange(updated);
     }
   };
 

@@ -20,17 +20,34 @@ interface SectionPersonalProps {
   onChange: (data: any) => void;
 }
 
+/**
+ * SectionPersonal
+ * 
+ * CANONICAL KEY: personal_profile (object in plan_payload)
+ * 
+ * SAVE: data.personal_profile → plan_payload.personal_profile
+ * READ: data.personal_profile from plan_payload
+ * COMPLETION: hasMeaningfulData(plan_payload.personal_profile)
+ */
 export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
+  // CANONICAL: Read from personal_profile
   const profile = data.personal_profile || {};
   const { toast } = useToast();
   const { t } = useTranslation();
   const { isPreviewMode } = usePreviewMode();
 
   const updateProfile = (field: string, value: any) => {
-    onChange({
+    // CANONICAL: Write to personal_profile
+    const updated = {
       ...data,
       personal_profile: { ...profile, [field]: value }
-    });
+    };
+    
+    if (import.meta.env.DEV) {
+      console.log("[SectionPersonal] updateProfile:", field, "→ personal_profile");
+    }
+    
+    onChange(updated);
   };
 
   const handleSave = () => {

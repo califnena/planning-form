@@ -43,9 +43,23 @@ export interface UnifiedPlan {
 }
 
 export interface UnifiedData {
-  about: Record<string, any>;
+  // CANONICAL KEYS
+  personal_profile: Record<string, any>;
   family: Record<string, any>;
+  online_accounts: Record<string, any>;
+  messages_to_loved_ones: {
+    main_message: string;
+    individual: Array<{ to: string; message: string; audio_url?: string; video_url?: string }>;
+  };
+  legacy: Record<string, any>;
+  
+  // Aliases for backwards compat
+  about: Record<string, any>;
   lifeStory: Record<string, any>;
+  onlineAccounts: Record<string, any>;
+  messages: any[];
+  
+  // Other sections
   contacts: {
     keyContacts: any[];
     importantContacts: any[];
@@ -59,8 +73,6 @@ export interface UnifiedData {
   insurance: Record<string, any>;
   property: Record<string, any>;
   pets: any[];
-  onlineAccounts: Record<string, any>;
-  messages: any[];
   travel: Record<string, any>;
   notes: Record<string, any>;
 }
@@ -141,29 +153,30 @@ function buildUnifiedData(payload: Record<string, any>, raw: Record<string, any>
   // Merged payload sources
   const merged = { ...payload, ...payloadData, ...payloadSections };
 
-  // About You / Personal - also check personal_profile from SectionPersonal
-  const about = mergeObjects(
+  // CANONICAL: personal_profile
+  const personal_profile = mergeObjects(
+    merged.personal_profile,
     merged.personal,
     merged.about_you,
     merged.personal_information,
     merged.about,
-    raw.personal_profile, // from personal_profiles table AND SectionPersonal save
-    merged.personal_profile // if saved directly to payload
+    raw.personal_profile // from personal_profiles table
   );
 
-  // Family (subset of personal or separate)
+  // CANONICAL: family (subset of personal or separate)
   const family = mergeObjects(
     merged.family,
     { 
-      partner_name: about.partner_name,
-      child_names: about.child_names,
-      father_name: about.father_name,
-      mother_name: about.mother_name,
+      partner_name: personal_profile.partner_name,
+      child_names: personal_profile.child_names,
+      children: personal_profile.children,
+      father_name: personal_profile.father_name,
+      mother_name: personal_profile.mother_name,
     }
   );
 
-  // Life Story / Legacy  
-  const lifeStory = mergeObjects(
+  // CANONICAL: legacy
+  const legacy = mergeObjects(
     merged.legacy,
     merged.life_story,
     merged.lifeStory
@@ -248,17 +261,37 @@ function buildUnifiedData(payload: Record<string, any>, raw: Record<string, any>
   const tablePets = asArray(raw.pets);
   const pets = tablePets.length > 0 ? tablePets : payloadPets;
 
-  // Online Accounts / Digital
-  const onlineAccounts = mergeObjects(
+  // CANONICAL: online_accounts (was 'digital')
+  const online_accounts = mergeObjects(
+    merged.online_accounts,
     merged.digital,
     merged.digital_accounts,
     merged.digital_assets
   );
 
-  // Messages
-  const payloadMessages = asArray(merged.messages);
+  // CANONICAL: messages_to_loved_ones
+  const rawMessagesToLovedOnes = asObject(merged.messages_to_loved_ones);
+  const oldMessages = asArray(merged.messages);
   const tableMessages = asArray(raw.messages);
-  const messages = tableMessages.length > 0 ? tableMessages : payloadMessages;
+  
+  let messages_to_loved_ones: UnifiedData['messages_to_loved_ones'] = {
+    main_message: rawMessagesToLovedOnes.main_message || "",
+    individual: asArray(rawMessagesToLovedOnes.individual),
+  };
+  
+  // If old format exists and new doesn't have individual messages, migrate
+  if (messages_to_loved_ones.individual.length === 0 && (oldMessages.length > 0 || tableMessages.length > 0)) {
+    const sourceMessages = tableMessages.length > 0 ? tableMessages : oldMessages;
+    messages_to_loved_ones.individual = sourceMessages.map((m: any) => ({
+      to: m.recipients || m.to || m.audience || "",
+      message: m.text_message || m.message || m.body || "",
+      audio_url: m.audio_url,
+      video_url: m.video_url,
+    }));
+  }
+  
+  // Keep backwards compat array
+  const messages = messages_to_loved_ones.individual;
 
   // Travel
   const travel = mergeObjects(
@@ -278,9 +311,20 @@ function buildUnifiedData(payload: Record<string, any>, raw: Record<string, any>
   );
 
   return {
-    about,
+    // CANONICAL KEYS
+    personal_profile,
     family,
-    lifeStory,
+    online_accounts,
+    messages_to_loved_ones,
+    legacy,
+    
+    // Aliases for backwards compat
+    about: personal_profile,
+    lifeStory: legacy,
+    onlineAccounts: online_accounts,
+    messages,
+    
+    // Other sections
     contacts,
     medical,
     advanceDirective,
@@ -289,8 +333,6 @@ function buildUnifiedData(payload: Record<string, any>, raw: Record<string, any>
     insurance,
     property,
     pets,
-    onlineAccounts,
-    messages,
     travel,
     notes,
   };
@@ -393,8 +435,17 @@ export async function getUnifiedPlan(userId: string): Promise<UnifiedPlan> {
  */
 export function hasUnifiedSectionData(unified: UnifiedData, sectionId: string): boolean {
   const keyMap: Record<string, () => unknown> = {
-    personal: () => unified.about,
-    legacy: () => unified.lifeStory,
+    // CANONICAL keys
+    personal: () => unified.personal_profile,
+    legacy: () => unified.legacy,
+    digital: () => unified.online_accounts,
+    messages: () => {
+      // Special check for messages_to_loved_ones
+      return unified.messages_to_loved_ones.main_message?.trim() ||
+        unified.messages_to_loved_ones.individual.some(i => i.message?.trim());
+    },
+    
+    // Other sections
     contacts: () => unified.contacts.merged,
     healthcare: () => unified.medical,
     advancedirective: () => unified.advanceDirective,
@@ -403,8 +454,6 @@ export function hasUnifiedSectionData(unified: UnifiedData, sectionId: string): 
     insurance: () => unified.insurance,
     property: () => unified.property,
     pets: () => unified.pets,
-    digital: () => unified.onlineAccounts,
-    messages: () => unified.messages,
     travel: () => unified.travel,
   };
 
@@ -421,11 +470,18 @@ export function hasUnifiedSectionData(unified: UnifiedData, sectionId: string): 
 
 /**
  * Get completion status for all sections from unified plan
+ * Uses CANONICAL keys for consistency
  */
 export function getUnifiedCompletion(unified: UnifiedData): Record<string, boolean> {
+  // CANONICAL: messages completion check
+  const messagesComplete = !!(
+    unified.messages_to_loved_ones.main_message?.trim() ||
+    unified.messages_to_loved_ones.individual.some(i => i.message?.trim())
+  );
+  
   return {
-    personal: hasMeaningfulData(unified.about),
-    legacy: hasMeaningfulData(unified.lifeStory),
+    personal: hasMeaningfulData(unified.personal_profile),
+    legacy: hasMeaningfulData(unified.legacy),
     contacts: hasMeaningfulData(unified.contacts.merged),
     healthcare: hasMeaningfulData(unified.medical),
     advancedirective: hasMeaningfulData(unified.advanceDirective),
@@ -434,8 +490,8 @@ export function getUnifiedCompletion(unified: UnifiedData): Record<string, boole
     insurance: hasMeaningfulData(unified.insurance),
     property: hasMeaningfulData(unified.property),
     pets: hasMeaningfulData(unified.pets),
-    digital: hasMeaningfulData(unified.onlineAccounts),
-    messages: hasMeaningfulData(unified.messages),
+    digital: hasMeaningfulData(unified.online_accounts),
+    messages: messagesComplete,
     travel: hasMeaningfulData(unified.travel),
   };
 }

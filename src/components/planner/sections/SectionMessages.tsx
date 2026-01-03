@@ -9,11 +9,16 @@ import { useState, useRef } from "react";
 import { EmailPlanDialog } from "@/components/EmailPlanDialog";
 import { useTranslation } from "react-i18next";
 
-interface Message {
-  recipients: string;
-  text_message: string;
+interface IndividualMessage {
+  to: string;
+  message: string;
   audio_url?: string;
   video_url?: string;
+}
+
+interface MessagesToLovedOnes {
+  main_message: string;
+  individual: IndividualMessage[];
 }
 
 interface SectionMessagesProps {
@@ -21,32 +26,92 @@ interface SectionMessagesProps {
   onChange: (data: any) => void;
 }
 
+/**
+ * SectionMessages
+ * 
+ * CANONICAL KEY: messages_to_loved_ones (object in plan_payload)
+ * Structure: { main_message: string, individual: [{ to: string, message: string, ... }] }
+ * 
+ * SAVE: data.messages_to_loved_ones → plan_payload.messages_to_loved_ones
+ * READ: data.messages_to_loved_ones from plan_payload
+ * COMPLETION: main_message non-empty OR any individual[].message non-empty
+ */
 export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
-  const messages = data.messages || [];
+  // CANONICAL: Read from messages_to_loved_ones
+  // Migrate from old 'messages' array if needed
+  const getMessagesData = (): MessagesToLovedOnes => {
+    if (data.messages_to_loved_ones) {
+      return data.messages_to_loved_ones;
+    }
+    // Migrate from old format
+    if (Array.isArray(data.messages) && data.messages.length > 0) {
+      const migrated: MessagesToLovedOnes = {
+        main_message: "",
+        individual: data.messages.map((m: any) => ({
+          to: m.recipients || m.to || "",
+          message: m.text_message || m.message || m.body || "",
+          audio_url: m.audio_url,
+          video_url: m.video_url,
+        }))
+      };
+      if (import.meta.env.DEV) {
+        console.log("[SectionMessages] Migrated from old messages format:", migrated);
+      }
+      return migrated;
+    }
+    return { main_message: "", individual: [] };
+  };
+
+  const messagesData = getMessagesData();
+  const mainMessage = messagesData.main_message || "";
+  const individualMessages = messagesData.individual || [];
+
   const { toast } = useToast();
   const { t } = useTranslation();
   const [recordingIndex, setRecordingIndex] = useState<number | null>(null);
   const [recordingType, setRecordingType] = useState<'audio' | 'video' | null>(null);
-  const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set([0])); // First message open by default
+  const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set([0]));
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
-  const addMessage = () => {
-    onChange({
+  const updateMessagesData = (newData: Partial<MessagesToLovedOnes>) => {
+    // CANONICAL: Write to messages_to_loved_ones
+    const updated = {
       ...data,
-      messages: [...messages, { recipients: "", text_message: "" }]
+      messages_to_loved_ones: {
+        ...messagesData,
+        ...newData
+      }
+    };
+    
+    if (import.meta.env.DEV) {
+      console.log("[SectionMessages] updateMessagesData → messages_to_loved_ones:", newData);
+    }
+    
+    onChange(updated);
+  };
+
+  const updateMainMessage = (value: string) => {
+    updateMessagesData({ main_message: value });
+  };
+
+  const addMessage = () => {
+    updateMessagesData({
+      individual: [...individualMessages, { to: "", message: "" }]
     });
   };
 
-  const updateMessage = (index: number, field: string, value: any) => {
-    const updated = [...messages];
+  const updateIndividualMessage = (index: number, field: keyof IndividualMessage, value: any) => {
+    const updated = [...individualMessages];
     updated[index] = { ...updated[index], [field]: value };
-    onChange({ ...data, messages: updated });
+    updateMessagesData({ individual: updated });
   };
 
   const removeMessage = (index: number) => {
-    onChange({ ...data, messages: messages.filter((_: any, i: number) => i !== index) });
+    updateMessagesData({
+      individual: individualMessages.filter((_: any, i: number) => i !== index)
+    });
   };
 
   const startRecording = async (index: number, type: 'audio' | 'video') => {
@@ -71,7 +136,7 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
           type: type === 'audio' ? 'audio/webm' : 'video/webm'
         });
         const url = URL.createObjectURL(blob);
-        updateMessage(index, type === 'audio' ? 'audio_url' : 'video_url', url);
+        updateIndividualMessage(index, type === 'audio' ? 'audio_url' : 'video_url', url);
         stream.getTracks().forEach(track => track.stop());
       };
 
@@ -79,7 +144,6 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
       setRecordingIndex(index);
       setRecordingType(type);
 
-      // Auto-stop after 3 minutes
       setTimeout(() => {
         if (mediaRecorder.state === 'recording') {
           stopRecording();
@@ -112,7 +176,7 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
   };
 
   const deleteRecording = (index: number, type: 'audio' | 'video') => {
-    updateMessage(index, type === 'audio' ? 'audio_url' : 'video_url', undefined);
+    updateIndividualMessage(index, type === 'audio' ? 'audio_url' : 'video_url', undefined);
   };
 
   const downloadRecording = (url: string, type: 'audio' | 'video', index: number) => {
@@ -152,7 +216,7 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-2">❤️ Messages</h2>
+          <h2 className="text-2xl font-bold mb-2">❤️ Messages to Loved Ones</h2>
           <p className="text-muted-foreground">
             Leave heartfelt messages for your loved ones that will be cherished forever.
           </p>
@@ -166,15 +230,41 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
             <Save className="h-4 w-4 mr-2" />
             Save
           </Button>
+        </div>
+      </div>
+
+      {/* Main Message */}
+      <div className="space-y-2 p-4 border rounded-lg bg-muted/20">
+        <Label htmlFor="main_message" className="text-base font-semibold">Main Message to All Loved Ones</Label>
+        <p className="text-sm text-muted-foreground">
+          Write a general message that applies to everyone you love. This will appear at the top of your Messages section.
+        </p>
+        <Textarea
+          id="main_message"
+          value={mainMessage}
+          onChange={(e) => updateMainMessage(e.target.value)}
+          placeholder="Write your main message here... This message is for all your loved ones."
+          rows={6}
+          maxLength={5000}
+        />
+        {mainMessage && (
+          <p className="text-xs text-muted-foreground text-right">
+            {mainMessage.length}/5000 characters
+          </p>
+        )}
+      </div>
+
+      {/* Individual Messages */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Label className="text-base font-semibold">Individual Messages</Label>
           <Button onClick={addMessage} size="sm" variant="outline">
             <Plus className="h-4 w-4 mr-2" />
             Add Message
           </Button>
         </div>
-      </div>
 
-      <div className="space-y-4">
-        {messages.map((message: Message, index: number) => {
+        {individualMessages.map((message: IndividualMessage, index: number) => {
           const isExpanded = expandedMessages.has(index);
           
           return (
@@ -183,7 +273,7 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
                    onClick={() => toggleMessageExpanded(index)}>
                 <h3 className="font-semibold text-lg flex items-center gap-2">
                   Message {index + 1}
-                  {message.recipients && <span className="text-sm text-muted-foreground font-normal">- {message.recipients}</span>}
+                  {message.to && <span className="text-sm text-muted-foreground font-normal">- {message.to}</span>}
                 </h3>
                 <div className="flex gap-2 items-center">
                   <Button
@@ -212,154 +302,153 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
               
               {isExpanded && (
                 <div className="p-6 space-y-4">
-
-            <div className="space-y-2">
-              <Label>To (Recipients)</Label>
-              <p className="text-xs text-muted-foreground">Who this message is for (can be one person or multiple people)</p>
-              <Input
-                value={message.recipients || ""}
-                onChange={(e) => updateMessage(index, "recipients", e.target.value)}
-                placeholder="e.g., My children, Sarah and Michael, My spouse"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Written Message</Label>
-              <p className="text-xs text-muted-foreground">Share your love, memories, wisdom, and hopes for their future (max 5000 characters)</p>
-              <Textarea
-                value={message.text_message || ""}
-                onChange={(e) => updateMessage(index, "text_message", e.target.value)}
-                placeholder="Write your message here... Share your love, memories, wisdom, and hopes for their future."
-                rows={6}
-                maxLength={5000}
-              />
-              {message.text_message && (
-                <p className="text-xs text-muted-foreground text-right">
-                  {message.text_message.length}/5000 characters
-                </p>
-              )}
-            </div>
-
-            {/* Audio Recording */}
-            <div className="space-y-2">
-              <Label>Voice Message (optional, max 3 minutes)</Label>
-              <div className="flex gap-2 items-center">
-                {!message.audio_url ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => startRecording(index, 'audio')}
-                    disabled={recordingIndex === index && recordingType === 'audio'}
-                  >
-                    {recordingIndex === index && recordingType === 'audio' ? (
-                      <>
-                        <Pause className="h-4 w-4 mr-2" />
-                        Recording...
-                      </>
-                    ) : (
-                      <>
-                        <Mic className="h-4 w-4 mr-2" />
-                        Record Audio
-                      </>
-                    )}
-                  </Button>
-                ) : (
-                  <div className="flex gap-2 items-center flex-wrap">
-                    <audio controls src={message.audio_url} className="max-w-xs" />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => downloadRecording(message.audio_url!, 'audio', index)}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteRecording(index, 'audio')}
-                    >
-                      <RotateCcw className="h-4 w-4 mr-2" />
-                      Re-record
-                    </Button>
+                  <div className="space-y-2">
+                    <Label>To (Recipients)</Label>
+                    <p className="text-xs text-muted-foreground">Who this message is for (can be one person or multiple people)</p>
+                    <Input
+                      value={message.to || ""}
+                      onChange={(e) => updateIndividualMessage(index, "to", e.target.value)}
+                      placeholder="e.g., My children, Sarah and Michael, My spouse"
+                    />
                   </div>
-                )}
-                {recordingIndex === index && recordingType === 'audio' && (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={stopRecording}
-                  >
-                    Stop Recording
-                  </Button>
-                )}
-              </div>
-            </div>
 
-            {/* Video Recording */}
-            <div className="space-y-2">
-              <Label>Video Message (optional, max 3 minutes)</Label>
-              <div className="flex gap-2 items-center flex-wrap">
-                {!message.video_url ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => startRecording(index, 'video')}
-                    disabled={recordingIndex === index && recordingType === 'video'}
-                  >
-                    {recordingIndex === index && recordingType === 'video' ? (
-                      <>
-                        <Pause className="h-4 w-4 mr-2" />
-                        Recording...
-                      </>
-                    ) : (
-                      <>
-                        <Video className="h-4 w-4 mr-2" />
-                        Record Video
-                      </>
+                  <div className="space-y-2">
+                    <Label>Written Message</Label>
+                    <p className="text-xs text-muted-foreground">Share your love, memories, wisdom, and hopes for their future (max 5000 characters)</p>
+                    <Textarea
+                      value={message.message || ""}
+                      onChange={(e) => updateIndividualMessage(index, "message", e.target.value)}
+                      placeholder="Write your message here... Share your love, memories, wisdom, and hopes for their future."
+                      rows={6}
+                      maxLength={5000}
+                    />
+                    {message.message && (
+                      <p className="text-xs text-muted-foreground text-right">
+                        {message.message.length}/5000 characters
+                      </p>
                     )}
-                  </Button>
-                ) : (
-                  <div className="flex gap-2 items-center flex-wrap">
-                    <video controls src={message.video_url} className="max-w-md rounded" />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => downloadRecording(message.video_url!, 'video', index)}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteRecording(index, 'video')}
-                    >
-                      <RotateCcw className="h-4 w-4 mr-2" />
-                      Re-record
-                    </Button>
                   </div>
-                )}
-                {recordingIndex === index && recordingType === 'video' && (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={stopRecording}
-                  >
-                    Stop Recording
-                  </Button>
-                )}
-              </div>
-            </div>
+
+                  {/* Audio Recording */}
+                  <div className="space-y-2">
+                    <Label>Voice Message (optional, max 3 minutes)</Label>
+                    <div className="flex gap-2 items-center">
+                      {!message.audio_url ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => startRecording(index, 'audio')}
+                          disabled={recordingIndex === index && recordingType === 'audio'}
+                        >
+                          {recordingIndex === index && recordingType === 'audio' ? (
+                            <>
+                              <Pause className="h-4 w-4 mr-2" />
+                              Recording...
+                            </>
+                          ) : (
+                            <>
+                              <Mic className="h-4 w-4 mr-2" />
+                              Record Audio
+                            </>
+                          )}
+                        </Button>
+                      ) : (
+                        <div className="flex gap-2 items-center flex-wrap">
+                          <audio controls src={message.audio_url} className="max-w-xs" />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => downloadRecording(message.audio_url!, 'audio', index)}
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Download
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteRecording(index, 'audio')}
+                          >
+                            <RotateCcw className="h-4 w-4 mr-2" />
+                            Re-record
+                          </Button>
+                        </div>
+                      )}
+                      {recordingIndex === index && recordingType === 'audio' && (
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={stopRecording}
+                        >
+                          Stop Recording
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Video Recording */}
+                  <div className="space-y-2">
+                    <Label>Video Message (optional, max 3 minutes)</Label>
+                    <div className="flex gap-2 items-center flex-wrap">
+                      {!message.video_url ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => startRecording(index, 'video')}
+                          disabled={recordingIndex === index && recordingType === 'video'}
+                        >
+                          {recordingIndex === index && recordingType === 'video' ? (
+                            <>
+                              <Pause className="h-4 w-4 mr-2" />
+                              Recording...
+                            </>
+                          ) : (
+                            <>
+                              <Video className="h-4 w-4 mr-2" />
+                              Record Video
+                            </>
+                          )}
+                        </Button>
+                      ) : (
+                        <div className="flex gap-2 items-center flex-wrap">
+                          <video controls src={message.video_url} className="max-w-md rounded" />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => downloadRecording(message.video_url!, 'video', index)}
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Download
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteRecording(index, 'video')}
+                          >
+                            <RotateCcw className="h-4 w-4 mr-2" />
+                            Re-record
+                          </Button>
+                        </div>
+                      )}
+                      {recordingIndex === index && recordingType === 'video' && (
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={stopRecording}
+                        >
+                          Stop Recording
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
             </Card>
           );
         })}
 
-        {messages.length === 0 && (
+        {individualMessages.length === 0 && (
           <div className="text-center py-12 border border-dashed rounded-lg">
-            <p className="text-muted-foreground mb-4">No messages added yet</p>
+            <p className="text-muted-foreground mb-4">No individual messages added yet</p>
             <Button onClick={addMessage} variant="outline">
               <Plus className="h-4 w-4 mr-2" />
               Create Your First Message
@@ -384,7 +473,7 @@ export const SectionMessages = ({ data, onChange }: SectionMessagesProps) => {
         open={emailDialogOpen}
         onOpenChange={setEmailDialogOpen}
         planData={data}
-        preparedBy={data.about?.full_name || ""}
+        preparedBy={data.about?.full_name || data.personal_profile?.full_name || ""}
       />
     </div>
   );
