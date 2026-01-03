@@ -11,15 +11,34 @@ import { Card, CardContent } from "@/components/ui/card";
 import { WritingHelperButton } from "@/components/planner/WritingHelperButton";
 
 interface SectionLegacyProps {
-  value?: string;
-  onChange: (value: string) => void;
+  data?: any;
+  onChange?: (data: any) => void;
 }
 
-export const SectionLegacy = ({ value, onChange }: SectionLegacyProps) => {
+/**
+ * SectionLegacy
+ * 
+ * SAVE: data.legacy object → goes to plan_payload.legacy via updatePlan
+ * READ: data.legacy from plan_payload
+ * COMPLETION: checks legacy in payload
+ */
+export const SectionLegacy = ({ data, onChange }: SectionLegacyProps) => {
   const { toast } = useToast();
   const { t } = useTranslation();
   const { isPreviewMode } = usePreviewMode();
   const navigate = useNavigate();
+
+  const legacy = data?.legacy || {};
+  const lifeStory = legacy.life_story || "";
+
+  const updateLegacy = (field: string, value: string) => {
+    if (onChange) {
+      onChange({
+        ...data,
+        legacy: { ...legacy, [field]: value }
+      });
+    }
+  };
 
   const handleSave = () => {
     if (isPreviewMode) {
@@ -58,8 +77,8 @@ export const SectionLegacy = ({ value, onChange }: SectionLegacyProps) => {
             <WritingHelperButton
               fieldLabel="Your Life Story"
               fieldContext="life_story"
-              currentText={value || ""}
-              onInsert={onChange}
+              currentText={lifeStory}
+              onInsert={(value) => updateLegacy("life_story", value)}
               disabled={isPreviewMode}
             />
           </div>
@@ -69,8 +88,8 @@ export const SectionLegacy = ({ value, onChange }: SectionLegacyProps) => {
           <Textarea
             id="legacy"
             placeholder="Share your story, accomplishments, values, and the legacy you want to leave behind..."
-            value={value || ""}
-            onChange={(e) => onChange(e.target.value)}
+            value={lifeStory}
+            onChange={(e) => updateLegacy("life_story", e.target.value)}
             rows={12}
             className="resize-none"
           />

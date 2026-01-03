@@ -298,7 +298,7 @@ export function normalizePlanDataForPdf(raw: any): any {
   const merged = { ...payloadSource, ...payloadData, ...payloadSections };
   
   // Get section data with fallbacks
-  const personalData = merged.personal || merged.about_you || merged.about || raw.personal || {};
+  const personalData = merged.personal || merged.about_you || merged.about || merged.personal_profile || raw.personal || {};
   const legacyData = merged.legacy || merged.life_story || raw.legacy || {};
   const contactsData = merged.contacts || raw.contacts || {};
   const healthcareData = merged.healthcare || merged.health_care || merged.medical || raw.healthcare || {};

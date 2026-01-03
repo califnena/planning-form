@@ -84,6 +84,7 @@ const SECTION_DATA_KEYS = new Set([
   'preplanning',
   'personal',
   'about_you',
+  'personal_profile', // SectionPersonal saves here
   'legal',
   'legacy',
 ]);

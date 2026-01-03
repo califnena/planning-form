@@ -24,8 +24,8 @@ export default function LifeStoryPage() {
       </div>
       <PreviewModeWrapper>
         <SectionLegacy
-          value={plan.about_me_notes}
-          onChange={(value) => updatePlan({ about_me_notes: value })}
+          data={plan}
+          onChange={(data) => updatePlan(data)}
         />
       </PreviewModeWrapper>
       <SectionNavigation

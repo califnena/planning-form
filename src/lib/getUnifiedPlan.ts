@@ -141,13 +141,14 @@ function buildUnifiedData(payload: Record<string, any>, raw: Record<string, any>
   // Merged payload sources
   const merged = { ...payload, ...payloadData, ...payloadSections };
 
-  // About You / Personal
+  // About You / Personal - also check personal_profile from SectionPersonal
   const about = mergeObjects(
     merged.personal,
     merged.about_you,
     merged.personal_information,
     merged.about,
-    raw.personal_profile // from personal_profiles table
+    raw.personal_profile, // from personal_profiles table AND SectionPersonal save
+    merged.personal_profile // if saved directly to payload
   );
 
   // Family (subset of personal or separate)

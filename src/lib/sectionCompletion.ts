@@ -62,7 +62,7 @@ export function getSectionCompletion(planData: unknown): Record<string, boolean>
     switch (sectionId) {
       case "personal":
         result[sectionId] = hasMeaningfulData(
-          merged.personal || merged.about_you || merged.about || 
+          merged.personal || merged.about_you || merged.about || merged.personal_profile ||
           data.personal || data.about_you || data.personal_profile
         );
         break;
