@@ -125,10 +125,16 @@ const completionChecks: Record<string, (data: Record<string, any>) => boolean> =
   
   financial: (data) => {
     const fin = data.financial || {};
-    // Check for any bank accounts, notes, or meaningful fields
+    // Check for any checkboxes being true
+    if (fin.has_checking || fin.has_savings || fin.has_retirement || 
+        fin.has_investment || fin.has_crypto || fin.has_safe_deposit || 
+        fin.has_business || fin.has_debts) return true;
+    // Check for any accounts array
+    if (Array.isArray(fin.accounts) && fin.accounts.length > 0) return true;
     if (Array.isArray(fin.bankAccounts) && fin.bankAccounts.length > 0) return true;
     if (Array.isArray(fin.investments) && fin.investments.length > 0) return true;
     if (fin.notes && fin.notes.trim()) return true;
+    if (fin.safe_deposit_details || fin.crypto_details || fin.business_details || fin.debts_details) return true;
     return hasMeaningfulData(fin);
   },
   
@@ -166,13 +172,23 @@ const completionChecks: Record<string, (data: Record<string, any>) => boolean> =
   
   digital: (data) => {
     const dig = data.digital || {};
+    // Check for accounts array (common structure)
     if (Array.isArray(dig.accounts) && dig.accounts.length > 0) return true;
-    if (dig.notes && dig.notes.trim()) return true;
+    // Check for socialAccounts array
+    if (Array.isArray(dig.socialAccounts) && dig.socialAccounts.length > 0) return true;
+    // Check notes
+    if (dig.notes && String(dig.notes).trim()) return true;
+    // Check passwordManager or deviceAccess
+    if (dig.passwordManager || dig.deviceAccess) return true;
     return hasMeaningfulData(dig);
+  },
+  
+  travel: (data) => {
+    const travel = data.travel || {};
+    return hasMeaningfulData(travel);
   },
 
   preplanning: (data) => hasMeaningfulData(data.preplanning),
-  travel: (data) => hasMeaningfulData(data.travel),
   legal: (data) => hasMeaningfulData(data.legal),
   advance_directive: (data) => {
     const ad = data.advance_directive || {};
