@@ -156,6 +156,71 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
         </div>
       </div>
 
+      <div className="border-t pt-6">
+        <h3 className="text-lg font-semibold mb-4">Current Address</h3>
+        <div className="grid lg:grid-cols-2 gap-6">
+          <div className="space-y-2 lg:col-span-2">
+            <Label htmlFor="address_line1">Street Address</Label>
+            <Input
+              id="address_line1"
+              value={profile.address_line1 || ""}
+              onChange={(e) => updateProfile("address_line1", e.target.value)}
+              placeholder="123 Main Street"
+            />
+          </div>
+
+          <div className="space-y-2 lg:col-span-2">
+            <Label htmlFor="address_line2">Apartment, Suite, etc. (optional)</Label>
+            <Input
+              id="address_line2"
+              value={profile.address_line2 || ""}
+              onChange={(e) => updateProfile("address_line2", e.target.value)}
+              placeholder="Apt 4B"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="city">City</Label>
+            <Input
+              id="city"
+              value={profile.city || ""}
+              onChange={(e) => updateProfile("city", e.target.value)}
+              placeholder="City"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="state">State</Label>
+            <Input
+              id="state"
+              value={profile.state || ""}
+              onChange={(e) => updateProfile("state", e.target.value)}
+              placeholder="State"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="zip">ZIP Code</Label>
+            <Input
+              id="zip"
+              value={profile.zip || ""}
+              onChange={(e) => updateProfile("zip", e.target.value)}
+              placeholder="12345"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="country">Country (optional)</Label>
+            <Input
+              id="country"
+              value={profile.country || ""}
+              onChange={(e) => updateProfile("country", e.target.value)}
+              placeholder="United States"
+            />
+          </div>
+        </div>
+      </div>
+
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="marital_status">{t("personal.maritalStatus")}</Label>
