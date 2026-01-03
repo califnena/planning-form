@@ -28,6 +28,7 @@ import { useActivePlan, fetchPlanData } from "@/hooks/useActivePlan";
 import { buildPlanDataForPdf, normalizePlanDataForPdf } from "@/lib/buildPlanDataForPdf";
 import { getSectionCompletion } from "@/lib/sectionCompletion";
 import { getCompletableSections, type SectionDefinition } from "@/lib/sectionRegistry";
+import { normalizePlanData } from "@/lib/normalizePlanData";
 import { getOrCreateGuestId } from "@/lib/identityUtils";
 
 interface SectionData {
@@ -123,7 +124,7 @@ export default function PrePlanSummary() {
         setSelectedSections(settings.selected_sections);
       }
 
-      // Single source of truth: buildPlanDataForPdf
+      // Single source of truth: buildPlanDataForPdf (DB-backed)
       const pdfPlanData = await buildPlanDataForPdf(user.id);
 
       const mergedPlanData: any = {
@@ -134,20 +135,22 @@ export default function PrePlanSummary() {
 
       setPlanData(mergedPlanData);
 
-      // Compute completion using unified logic
-      const completion = getSectionCompletion(mergedPlanData, user.id);
+      // Completion is computed ONLY from plan_payload via normalizePlanData
+      const normalized = normalizePlanData(mergedPlanData);
+      const completion = getSectionCompletion({ plan_payload: normalized.payload });
 
-      // Diagnostic logging for debugging completion detection
+      // Diagnostic logging for debugging completion detection (dev only)
       if (import.meta.env.DEV) {
-        console.log("[PrePlanSummary] planData keys:", Object.keys(mergedPlanData));
-        console.log("[PrePlanSummary] plan_payload:", mergedPlanData.plan_payload);
-        console.log("[PrePlanSummary] Section data check:", {
-          financial: mergedPlanData.financial,
-          digital: mergedPlanData.digital,
-          property: mergedPlanData.property,
-          pets: mergedPlanData.pets,
-          messages: mergedPlanData.messages,
-          healthcare: mergedPlanData.healthcare,
+        console.log("[PrePlanSummary] plan_payload (raw):", mergedPlanData.plan_payload);
+        console.log("[PrePlanSummary] normalized.data snapshot:", {
+          financial: normalized.data.financial,
+          digital: normalized.data.digital,
+          property: normalized.data.property,
+          pets: normalized.data.pets,
+          messages: normalized.data.messages,
+          healthcare: normalized.data.healthcare,
+          care_preferences: normalized.data.care_preferences,
+          advance_directive: normalized.data.advance_directive,
         });
         console.log("[PrePlanSummary] completion map:", completion);
       }
