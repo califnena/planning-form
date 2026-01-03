@@ -2637,6 +2637,7 @@ export type Database = {
       }
       user_settings: {
         Row: {
+          active_plan_id: string | null
           completed_sections: string[] | null
           created_at: string | null
           focus_areas: string[] | null
@@ -2654,6 +2655,7 @@ export type Database = {
           wizard_completed: boolean | null
         }
         Insert: {
+          active_plan_id?: string | null
           completed_sections?: string[] | null
           created_at?: string | null
           focus_areas?: string[] | null
@@ -2671,6 +2673,7 @@ export type Database = {
           wizard_completed?: boolean | null
         }
         Update: {
+          active_plan_id?: string | null
           completed_sections?: string[] | null
           created_at?: string | null
           focus_areas?: string[] | null
@@ -2688,6 +2691,20 @@ export type Database = {
           wizard_completed?: boolean | null
         }
         Relationships: [
+          {
+            foreignKeyName: "user_settings_active_plan_id_fkey"
+            columns: ["active_plan_id"]
+            isOneToOne: false
+            referencedRelation: "admin_plans_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_settings_active_plan_id_fkey"
+            columns: ["active_plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "user_settings_user_id_fkey"
             columns: ["user_id"]

@@ -115,9 +115,42 @@ function separatePlanData(data: PlanData): { tableData: Record<string, any>; pay
   return { tableData, payload };
 }
 
+/**
+ * Gets the localStorage key for a specific plan.
+ * CRITICAL: Keys are now scoped by planId to prevent cross-plan contamination.
+ */
+function getLocalStorageKey(userId: string, planId: string): string {
+  return `plan_${userId}_${planId}`;
+}
+
+/**
+ * Migrates old localStorage data (plan_${userId}) to new format if needed.
+ */
+function migrateOldLocalStorage(userId: string, planId: string): void {
+  const oldKey = `plan_${userId}`;
+  const newKey = getLocalStorageKey(userId, planId);
+  
+  try {
+    const oldData = localStorage.getItem(oldKey);
+    if (oldData && !localStorage.getItem(newKey)) {
+      const parsed = JSON.parse(oldData);
+      // Only migrate if the old data matches this planId or has no id
+      if (!parsed.id || parsed.id === planId) {
+        localStorage.setItem(newKey, oldData);
+        if (import.meta.env.DEV) {
+          console.log("[usePlanData] Migrated localStorage from old key to:", newKey);
+        }
+      }
+    }
+  } catch (e) {
+    console.error("[usePlanData] Error migrating localStorage:", e);
+  }
+}
+
 export const usePlanData = (userId: string) => {
   const [plan, setPlan] = useState<PlanData>({});
   const [loading, setLoading] = useState(true);
+  const [activePlanId, setActivePlanId] = useState<string | null>(null);
   const [saveState, setSaveState] = useState<SaveState>({
     saving: false,
     lastSaved: null,
@@ -128,9 +161,9 @@ export const usePlanData = (userId: string) => {
 
   // Debounced save to Supabase
   const saveToDB = useCallback(
-    debounce(async (data: PlanData) => {
-      if (!data.id) {
-        console.warn("[usePlanData] Cannot save - plan has no id");
+    debounce(async (data: PlanData, currentPlanId: string) => {
+      if (!data.id || data.id !== currentPlanId) {
+        console.warn("[usePlanData] Cannot save - plan id mismatch or missing. Expected:", currentPlanId, "Got:", data.id);
         return;
       }
 
@@ -153,7 +186,7 @@ export const usePlanData = (userId: string) => {
 
         if (import.meta.env.DEV) {
           console.log("[usePlanData] Saving to DB:", {
-            planId: data.id,
+            planId: currentPlanId,
             tableDataKeys: Object.keys(tableData),
             payloadKeys: Object.keys(payload),
           });
@@ -162,7 +195,7 @@ export const usePlanData = (userId: string) => {
         const { error } = await supabase
           .from("plans")
           .update(updateData)
-          .eq("id", data.id);
+          .eq("id", currentPlanId);
 
         if (error) throw error;
         
@@ -194,17 +227,6 @@ export const usePlanData = (userId: string) => {
   useEffect(() => {
     const loadPlan = async () => {
       try {
-        // First, try to load from localStorage for instant display
-        const localData = localStorage.getItem(`plan_${userId}`);
-        if (localData) {
-          try {
-            const parsed = JSON.parse(localData);
-            setPlan(parsed);
-          } catch (e) {
-            console.error("Error parsing localStorage:", e);
-          }
-        }
-
         // Use centralized getActivePlanId (createIfMissing = true)
         const { planId, orgId, plan: existingPlan } = await getActivePlanId(userId, true);
 
@@ -214,8 +236,22 @@ export const usePlanData = (userId: string) => {
           return;
         }
 
+        setActivePlanId(planId);
+
         if (import.meta.env.DEV) {
           console.log("[usePlanData] Using planId:", planId);
+        }
+
+        // Migrate old localStorage if needed
+        migrateOldLocalStorage(userId, planId);
+
+        // Try to load from localStorage for instant display
+        const localKey = getLocalStorageKey(userId, planId);
+        let localData: string | null = null;
+        try {
+          localData = localStorage.getItem(localKey);
+        } catch (e) {
+          console.error("[usePlanData] Error reading localStorage:", e);
         }
 
         // Merge plan_payload back into the plan object for easy access
@@ -229,41 +265,52 @@ export const usePlanData = (userId: string) => {
         };
 
         // Merge server data with local data, preferring newer data
+        // CRITICAL: Only merge if local data matches this planId
         if (localData) {
-          const parsed = JSON.parse(localData) as PlanData;
-          const localTime = new Date(parsed.updated_at || 0);
-          const serverTime = new Date(existingPlan.updated_at || 0);
-          if (localTime > serverTime) {
-            // Local is newer, sync to server
-            // CRITICAL: Ensure the plan has the correct id from DB
-            const mergedWithId = { 
-              ...parsed, 
-              id: existingPlan.id, 
-              org_id: existingPlan.org_id 
-            };
-            setPlan(mergedWithId);
-            saveToDB(mergedWithId);
-            localStorage.setItem(`plan_${userId}`, JSON.stringify(mergedWithId));
-          } else {
-            // Server is newer, use server data
+          try {
+            const parsed = JSON.parse(localData) as PlanData;
+            // Only use local data if it's for this exact plan
+            if (parsed.id === planId) {
+              const localTime = new Date(parsed.updated_at || 0);
+              const serverTime = new Date(existingPlan.updated_at || 0);
+              if (localTime > serverTime) {
+                // Local is newer, sync to server
+                const mergedWithId = { 
+                  ...parsed, 
+                  id: planId, 
+                  org_id: existingPlan.org_id 
+                };
+                setPlan(mergedWithId);
+                saveToDB(mergedWithId, planId);
+                localStorage.setItem(localKey, JSON.stringify(mergedWithId));
+              } else {
+                // Server is newer, use server data
+                setPlan(mergedPlan);
+                localStorage.setItem(localKey, JSON.stringify(mergedPlan));
+              }
+            } else {
+              // Local data is for a different plan - ignore it
+              if (import.meta.env.DEV) {
+                console.log("[usePlanData] Ignoring local data for different planId:", parsed.id);
+              }
+              setPlan(mergedPlan);
+              localStorage.setItem(localKey, JSON.stringify(mergedPlan));
+            }
+          } catch (e) {
+            console.error("[usePlanData] Error parsing localStorage:", e);
             setPlan(mergedPlan);
-            localStorage.setItem(`plan_${userId}`, JSON.stringify(mergedPlan));
           }
         } else {
           setPlan(mergedPlan);
-          localStorage.setItem(`plan_${userId}`, JSON.stringify(mergedPlan));
+          localStorage.setItem(localKey, JSON.stringify(mergedPlan));
         }
       } catch (error: any) {
         console.error("Error loading plan:", error);
-        // Don't show error toast if we have local data
-        const localData = localStorage.getItem(`plan_${userId}`);
-        if (!localData) {
-          toast({
-            title: "Note",
-            description: "Working in offline mode. Your data is saved locally.",
-            variant: "default",
-          });
-        }
+        toast({
+          title: "Note",
+          description: "Working in offline mode. Your data is saved locally.",
+          variant: "default",
+        });
       } finally {
         setLoading(false);
       }
@@ -280,22 +327,32 @@ export const usePlanData = (userId: string) => {
       setPlan((prev) => {
         const updated = { ...prev, ...updates };
         
+        // Ensure we're using the correct planId
+        if (activePlanId && updated.id !== activePlanId) {
+          updated.id = activePlanId;
+        }
+        
         if (import.meta.env.DEV) {
           console.log("[usePlanData] updatePlan called:", {
-            hasId: !!updated.id,
+            planId: updated.id,
+            activePlanId,
             updateKeys: Object.keys(updates),
           });
         }
         
-        // Save to localStorage immediately
-        localStorage.setItem(`plan_${userId}`, JSON.stringify(updated));
-        // Debounced save to DB
-        saveToDB(updated);
+        // Save to localStorage immediately (only if we have a planId)
+        if (updated.id) {
+          const localKey = getLocalStorageKey(userId, updated.id);
+          localStorage.setItem(localKey, JSON.stringify(updated));
+          // Debounced save to DB
+          saveToDB(updated, updated.id);
+        }
+        
         return updated;
       });
     },
-    [userId, saveToDB]
+    [userId, saveToDB, activePlanId]
   );
 
-  return { plan, loading, updatePlan, saveState };
+  return { plan, loading, updatePlan, saveState, activePlanId };
 };

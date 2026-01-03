@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { getActivePlanId, getPlanTableCounts } from "@/lib/getActivePlanId";
-import { Bug } from "lucide-react";
+import { Bug, RefreshCw } from "lucide-react";
 
 interface PlanDebugInfo {
   userId: string | null;
@@ -14,6 +14,7 @@ interface PlanDebugInfo {
   payloadKeys: string[];
   tableCounts: Record<string, number>;
   loading: boolean;
+  activePlanIdFromSettings: string | null;
 }
 
 /**
@@ -24,6 +25,7 @@ interface PlanDebugInfo {
  * - Current user.id
  * - Current org_id
  * - Current plan_id (the one being used)
+ * - active_plan_id from user_settings (the saved preference)
  * - plan.updated_at
  * - plan.owner_user_id
  * - Table row counts by plan_id
@@ -39,47 +41,68 @@ export function PlanDebugPanel() {
     payloadKeys: [],
     tableCounts: {},
     loading: true,
+    activePlanIdFromSettings: null,
   });
   const [expanded, setExpanded] = useState(false);
 
-  useEffect(() => {
-    const loadDebugInfo = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          setInfo(prev => ({ ...prev, loading: false }));
-          return;
-        }
-
-        const { planId, orgId, plan } = await getActivePlanId(user.id);
-        
-        let tableCounts: Record<string, number> = {};
-        let payloadKeys: string[] = [];
-
-        if (planId) {
-          tableCounts = await getPlanTableCounts(planId);
-          
-          if (plan?.plan_payload && typeof plan.plan_payload === "object") {
-            payloadKeys = Object.keys(plan.plan_payload);
-          }
-        }
-
-        setInfo({
-          userId: user.id,
-          orgId,
-          planId,
-          planUpdatedAt: plan?.updated_at || null,
-          planOwnerUserId: plan?.owner_user_id || null,
-          payloadKeys,
-          tableCounts,
-          loading: false,
-        });
-      } catch (error) {
-        console.error("[PlanDebugPanel] Error:", error);
+  const loadDebugInfo = async () => {
+    try {
+      setInfo(prev => ({ ...prev, loading: true }));
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
         setInfo(prev => ({ ...prev, loading: false }));
+        return;
       }
-    };
 
+      // Get active_plan_id from user_settings
+      const { data: settings } = await supabase
+        .from("user_settings")
+        .select("active_plan_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      const { planId, orgId, plan } = await getActivePlanId(user.id);
+      
+      let tableCounts: Record<string, number> = {};
+      let payloadKeys: string[] = [];
+
+      if (planId) {
+        tableCounts = await getPlanTableCounts(planId);
+        
+        if (plan?.plan_payload && typeof plan.plan_payload === "object") {
+          payloadKeys = Object.keys(plan.plan_payload);
+        }
+      }
+
+      setInfo({
+        userId: user.id,
+        orgId,
+        planId,
+        planUpdatedAt: plan?.updated_at || null,
+        planOwnerUserId: plan?.owner_user_id || null,
+        payloadKeys,
+        tableCounts,
+        loading: false,
+        activePlanIdFromSettings: settings?.active_plan_id || null,
+      });
+
+      if (import.meta.env.DEV) {
+        console.log("[PlanDebugPanel] Loaded:", { 
+          userId: user.id, 
+          planId, 
+          activePlanIdFromSettings: settings?.active_plan_id,
+          tableCounts,
+          payloadKeys 
+        });
+      }
+    } catch (error) {
+      console.error("[PlanDebugPanel] Error:", error);
+      setInfo(prev => ({ ...prev, loading: false }));
+    }
+  };
+
+  useEffect(() => {
     loadDebugInfo();
   }, []);
 
@@ -105,6 +128,7 @@ export function PlanDebugPanel() {
 
   const totalRows = Object.values(info.tableCounts).reduce((a, b) => a + b, 0);
   const idMismatch = info.userId && info.planOwnerUserId && info.userId !== info.planOwnerUserId;
+  const settingsMismatch = info.activePlanIdFromSettings && info.planId && info.activePlanIdFromSettings !== info.planId;
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
@@ -116,9 +140,16 @@ export function PlanDebugPanel() {
           >
             <Bug className="h-4 w-4 text-yellow-600" />
             <span className="font-bold">DEV: Plan Debug</span>
-            <Badge variant={idMismatch ? "destructive" : "outline"} className="ml-auto text-[10px]">
-              {idMismatch ? "ID MISMATCH!" : `${totalRows} rows`}
+            <Badge variant={idMismatch || settingsMismatch ? "destructive" : "outline"} className="ml-auto text-[10px]">
+              {idMismatch ? "ID MISMATCH!" : settingsMismatch ? "SETTINGS MISMATCH!" : `${totalRows} rows`}
             </Badge>
+            <button 
+              onClick={(e) => { e.stopPropagation(); loadDebugInfo(); }}
+              className="ml-1 p-1 hover:bg-yellow-200 rounded"
+              title="Refresh"
+            >
+              <RefreshCw className={`h-3 w-3 ${info.loading ? 'animate-spin' : ''}`} />
+            </button>
           </button>
           
           {expanded && (
@@ -139,6 +170,12 @@ export function PlanDebugPanel() {
                 <span className="text-muted-foreground">plan_id:</span>
                 <span className={`truncate max-w-[160px] ${!info.planId ? "text-red-600" : ""}`} title={info.planId || ""}>
                   {info.planId?.slice(0, 8) || "NONE!"}...
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">saved_plan_id:</span>
+                <span className={`truncate max-w-[160px] ${settingsMismatch ? "text-orange-600" : ""}`} title={info.activePlanIdFromSettings || ""}>
+                  {info.activePlanIdFromSettings?.slice(0, 8) || "not set"}...
                 </span>
               </div>
               <div className="flex justify-between">

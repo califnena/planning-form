@@ -20,7 +20,11 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
   }
 
   if (import.meta.env.DEV) {
-    console.log("[buildPlanDataForPdf] Using planId:", planId, "for user:", userId);
+    console.log("=".repeat(50));
+    console.log("[buildPlanDataForPdf] PDF BUILD STARTED");
+    console.log("[buildPlanDataForPdf] planId:", planId);
+    console.log("[buildPlanDataForPdf] userId:", userId);
+    console.log("=".repeat(50));
   }
 
   // Fetch all related data in parallel using the resolved planId
@@ -55,6 +59,31 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     supabase.from("user_settings").select("selected_sections").eq("user_id", userId).maybeSingle(),
     supabase.from("profiles").select("full_name").eq("id", userId).maybeSingle(),
   ]);
+
+  // Log table counts for debugging
+  if (import.meta.env.DEV) {
+    const tableCounts = {
+      personal_profile: personalProfile ? 1 : 0,
+      contacts: contacts?.length || 0,
+      pets: pets?.length || 0,
+      insurance: insurance?.length || 0,
+      properties: properties?.length || 0,
+      messages: messages?.length || 0,
+      investments: investments?.length || 0,
+      debts: debts?.length || 0,
+      bankAccounts: bankAccounts?.length || 0,
+      businesses: businesses?.length || 0,
+      funeralFunding: funeralFunding?.length || 0,
+      professionalContacts: professionalContacts?.length || 0,
+    };
+    console.log("[buildPlanDataForPdf] Table counts for planId", planId, ":", tableCounts);
+    
+    const totalRows = Object.values(tableCounts).reduce((a, b) => a + b, 0);
+    if (totalRows === 0) {
+      console.warn("⚠️ [buildPlanDataForPdf] Active plan has ZERO rows in related tables!");
+      console.warn("⚠️ Data is either not being saved OR plan_id is wrong.");
+    }
+  }
 
   // Normalize plan_payload ONLY (per mandate: no localStorage fallbacks)
   const planPayload = (typeof plan.plan_payload === "object" && plan.plan_payload !== null)
