@@ -50,30 +50,139 @@ export function hasMeaningfulData(value: unknown): boolean {
 
 // ============= SECTION COMPLETION =============
 
+/**
+ * Check if contacts section has meaningful data.
+ * Handles both array format and object-with-arrays format.
+ */
+function hasContactData(contacts: any): boolean {
+  if (!contacts) return false;
+  
+  // If it's an array directly
+  if (Array.isArray(contacts)) {
+    return contacts.some(c => c && (c.name || c.phone || c.email));
+  }
+  
+  // If it's an object with contacts/importantPeople arrays
+  if (typeof contacts === "object") {
+    const arr = contacts.contacts || contacts.importantPeople || [];
+    if (Array.isArray(arr) && arr.some((c: any) => c && (c.name || c.phone || c.email))) {
+      return true;
+    }
+    // Also check for any other meaningful fields
+    return hasMeaningfulData(contacts);
+  }
+  
+  return false;
+}
+
+/**
+ * Check if healthcare/medical section has meaningful data.
+ * Checks all sub-sections: medications, conditions, allergies, doctor/pharmacy, care prefs.
+ */
+function hasHealthcareData(data: Record<string, any>): boolean {
+  const hc = data.healthcare || {};
+  const care = data.care_preferences || {};
+  const ad = data.advance_directive || {};
+  
+  // Check medications array
+  if (Array.isArray(hc.medications) && hc.medications.length > 0) return true;
+  
+  // Check conditions
+  if (hc.conditions && typeof hc.conditions === "string" && hc.conditions.trim()) return true;
+  if (Array.isArray(hc.conditions) && hc.conditions.length > 0) return true;
+  
+  // Check allergies
+  if (hc.allergies && typeof hc.allergies === "string" && hc.allergies.trim()) return true;
+  if (Array.isArray(hc.allergies) && hc.allergies.length > 0) return true;
+  
+  // Check doctor/pharmacy
+  if (hc.primaryDoctor || hc.pharmacy || hc.doctorPhone || hc.pharmacyPhone) return true;
+  
+  // Check care preferences (checkboxes)
+  if (care && typeof care === "object") {
+    const careValues = Object.values(care);
+    if (careValues.some(v => v === true)) return true;
+  }
+  
+  // Check advance directive status
+  if (ad.advanceDirectiveStatus && ad.advanceDirectiveStatus !== "unsure") return true;
+  if (ad.dnrStatus && ad.dnrStatus !== "unsure") return true;
+  if (ad.polstStatus && ad.polstStatus !== "unsure") return true;
+  if (ad.healthcareProxyName) return true;
+  
+  // General fallback
+  return hasMeaningfulData(hc) || hasMeaningfulData(care);
+}
+
 const completionChecks: Record<string, (data: Record<string, any>) => boolean> = {
   personal: (data) => hasMeaningfulData(data.personal) || hasMeaningfulData(data.about_you),
-  contacts: (data) => hasMeaningfulData(data.contacts),
+  contacts: (data) => hasContactData(data.contacts),
 
-  // Medical & Care should consider healthcare + care prefs + (if present) advance directive status
-  healthcare: (data) =>
-    hasMeaningfulData(data.healthcare) ||
-    hasMeaningfulData(data.care_preferences) ||
-    hasMeaningfulData(data.advance_directive),
+  // Medical & Care should consider healthcare + care prefs + advance directive status
+  healthcare: (data) => hasHealthcareData(data),
 
   funeral: (data) => hasMeaningfulData(data.funeral),
-  financial: (data) => hasMeaningfulData(data.financial),
-  insurance: (data) => hasMeaningfulData(data.insurance),
-  property: (data) => hasMeaningfulData(data.property),
-  pets: (data) => hasMeaningfulData(data.pets),
-  messages: (data) => hasMeaningfulData(data.messages),
-  digital: (data) => hasMeaningfulData(data.digital),
+  
+  financial: (data) => {
+    const fin = data.financial || {};
+    // Check for any bank accounts, notes, or meaningful fields
+    if (Array.isArray(fin.bankAccounts) && fin.bankAccounts.length > 0) return true;
+    if (Array.isArray(fin.investments) && fin.investments.length > 0) return true;
+    if (fin.notes && fin.notes.trim()) return true;
+    return hasMeaningfulData(fin);
+  },
+  
+  insurance: (data) => {
+    const ins = data.insurance || {};
+    if (Array.isArray(ins.policies) && ins.policies.length > 0) return true;
+    if (ins.cardLocation && ins.cardLocation.trim()) return true;
+    if (ins.notes && ins.notes.trim()) return true;
+    return hasMeaningfulData(ins);
+  },
+  
+  property: (data) => {
+    const prop = data.property || {};
+    if (Array.isArray(prop.properties) && prop.properties.length > 0) return true;
+    if (Array.isArray(prop.valuables) && prop.valuables.length > 0) return true;
+    if (prop.notes && prop.notes.trim()) return true;
+    return hasMeaningfulData(prop);
+  },
+  
+  pets: (data) => {
+    const pets = data.pets;
+    if (Array.isArray(pets) && pets.length > 0) {
+      return pets.some(p => p && (p.name || p.caregiver || p.notes));
+    }
+    return false;
+  },
+  
+  messages: (data) => {
+    const msgs = data.messages;
+    if (Array.isArray(msgs) && msgs.length > 0) {
+      return msgs.some(m => m && (m.body || m.title || m.message || m.text));
+    }
+    return false;
+  },
+  
+  digital: (data) => {
+    const dig = data.digital || {};
+    if (Array.isArray(dig.accounts) && dig.accounts.length > 0) return true;
+    if (dig.notes && dig.notes.trim()) return true;
+    return hasMeaningfulData(dig);
+  },
 
   preplanning: (data) => hasMeaningfulData(data.preplanning),
   travel: (data) => hasMeaningfulData(data.travel),
   legal: (data) => hasMeaningfulData(data.legal),
-  advance_directive: (data) => hasMeaningfulData(data.advance_directive),
+  advance_directive: (data) => {
+    const ad = data.advance_directive || {};
+    if (ad.advanceDirectiveStatus && ad.advanceDirectiveStatus !== "unsure") return true;
+    if (ad.dnrStatus && ad.dnrStatus !== "unsure") return true;
+    if (ad.healthcareProxyName) return true;
+    return hasMeaningfulData(ad);
+  },
   care_preferences: (data) => hasMeaningfulData(data.care_preferences),
-  healthcare_proxy: (data) => hasMeaningfulData(data.contacts), // fallback
+  healthcare_proxy: (data) => hasContactData(data.contacts),
 };
 
 export function getSectionCompletion(planData: any): Record<string, boolean> {

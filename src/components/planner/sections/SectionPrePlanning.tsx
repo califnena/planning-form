@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, Check, Info } from "lucide-react";
-import { useNavigate, Link } from "react-router-dom";
+import { ArrowRight, Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 interface PrePlanningItem {
@@ -169,15 +169,6 @@ export const SectionPrePlanning = ({ statuses: externalStatuses, onStatusChange 
                     <h3 className="text-base sm:text-lg font-medium text-foreground leading-relaxed">
                       {item.title}
                     </h3>
-                    {item.moreInfoRoute && (
-                      <Link 
-                        to={item.moreInfoRoute}
-                        className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-                      >
-                        <Info className="h-4 w-4" />
-                        {item.moreInfoLabel}
-                      </Link>
-                    )}
                   </div>
 
                   {/* Go to section button - large touch target */}

@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Info } from "lucide-react";
+import { Info, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 export interface AdvanceDirectiveData {
@@ -110,7 +110,16 @@ export const SectionAdvanceDirective = ({ data = {}, onChange }: SectionAdvanceD
 
       {/* Advance Directive Status */}
       <Card className="p-5 mb-6">
-        <h2 className="text-xl font-semibold text-foreground mb-4">Advance Directive</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-foreground">Advance Directive</h2>
+          <Link 
+            to="/resources?section=education&sub=legal-medical"
+            className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Learn more
+          </Link>
+        </div>
         <p className="text-muted-foreground mb-4">
           Do you have an advance directive (also called a living will)?
         </p>
@@ -133,7 +142,16 @@ export const SectionAdvanceDirective = ({ data = {}, onChange }: SectionAdvanceD
 
       {/* DNR Status */}
       <Card className="p-5 mb-6">
-        <h2 className="text-xl font-semibold text-foreground mb-4">DNR (Do Not Resuscitate)</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-foreground">DNR (Do Not Resuscitate)</h2>
+          <Link 
+            to="/resources?section=education&sub=legal-medical"
+            className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Learn more
+          </Link>
+        </div>
         <p className="text-muted-foreground mb-4">
           Do you have a DNR order?
         </p>
@@ -143,7 +161,16 @@ export const SectionAdvanceDirective = ({ data = {}, onChange }: SectionAdvanceD
 
       {/* POLST Status */}
       <Card className="p-5 mb-6">
-        <h2 className="text-xl font-semibold text-foreground mb-4">POLST / MOLST</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-foreground">POLST / MOLST</h2>
+          <Link 
+            to="/resources?section=education&sub=legal-medical"
+            className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Learn more
+          </Link>
+        </div>
         <p className="text-muted-foreground mb-4">
           Do you have a POLST or MOLST form? (Physician Orders for Life-Sustaining Treatment)
         </p>

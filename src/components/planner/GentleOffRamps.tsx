@@ -84,7 +84,7 @@ export const GentleOffRamps = ({ onTalkToClaire }: GentleOffRampsProps) => {
               <Button 
                 variant="outline" 
                 className="w-full"
-                onClick={() => navigate('/product-binder')}
+                onClick={() => navigate('/products/binder')}
               >
                 View Binder Details
               </Button>
