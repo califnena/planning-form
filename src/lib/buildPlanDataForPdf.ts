@@ -93,9 +93,18 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
   const normalizedPayload = normalizePlanPayload(planPayload);
 
   if (import.meta.env.DEV) {
+    console.log("=".repeat(50));
+    console.log("[buildPlanDataForPdf] PAYLOAD CANONICAL KEYS DEBUG:");
+    console.log("  payload keys:", Object.keys(planPayload));
+    console.log("  payload.personal:", planPayload.personal);
+    console.log("  payload.family:", planPayload.family);
+    console.log("  payload.online_accounts:", planPayload.online_accounts);
+    console.log("  payload.messages_to_loved_ones:", planPayload.messages_to_loved_ones);
+    console.log("=".repeat(50));
+    
     console.log("[buildPlanDataForPdf] normalizedPayload CANONICAL keys:",
       {
-        personal_profile: hasMeaningfulData(normalizedPayload.personal_profile),
+        personal: hasMeaningfulData(normalizedPayload.personal),
         family: hasMeaningfulData(normalizedPayload.family),
         online_accounts: hasMeaningfulData(normalizedPayload.online_accounts),
         messages_to_loved_ones: {
@@ -124,8 +133,8 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
 
   const mergedProfile = {
     ...(personalProfile || {}),
-    // CANONICAL: Merge in personal_profile from payload
-    ...normalizedPayload.personal_profile,
+    // CANONICAL: Merge in personal from payload
+    ...normalizedPayload.personal,
   };
 
   // Ensure we have a name from somewhere
@@ -136,10 +145,10 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
   // Merge normalized plan_payload sections to top level for consistent access (completion + PDF)
   // CANONICAL KEYS take precedence
   const planPayloadMerged = {
-    // CANONICAL: personal_profile
-    personal_profile: normalizedPayload.personal_profile,
-    personal: normalizedPayload.personal_profile,
-    about_you: normalizedPayload.personal_profile,
+    // CANONICAL: personal
+    personal: normalizedPayload.personal,
+    personal_profile: normalizedPayload.personal, // backwards compat
+    about_you: normalizedPayload.personal,
 
     // CANONICAL: family
     family: normalizedPayload.family,
@@ -150,7 +159,7 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
 
     // CANONICAL: messages_to_loved_ones
     messages_to_loved_ones: normalizedPayload.messages_to_loved_ones,
-    messages: normalizedPayload.messages_to_loved_ones.individual, // backwards compat
+    messages: normalizedPayload.messages_to_loved_ones.individual, // backwards compat for PDF
 
     // CANONICAL: legacy
     legacy: normalizedPayload.legacy,
