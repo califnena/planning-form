@@ -136,11 +136,12 @@ export default function PrePlanSummary() {
       setPlanData(mergedPlanData);
 
       // Completion is computed ONLY from plan_payload via normalizePlanData
-      const normalized = normalizePlanData(mergedPlanData);
-      const completion = getSectionCompletion({ plan_payload: normalized.payload });
+      // CRITICAL: Pass mergedPlanData directly - it already has plan_payload as a property
+      const completion = getSectionCompletion(mergedPlanData);
 
       // Diagnostic logging for debugging completion detection (dev only)
       if (import.meta.env.DEV) {
+        const normalized = normalizePlanData(mergedPlanData);
         console.log("[PrePlanSummary] plan_payload (raw):", mergedPlanData.plan_payload);
         console.log("[PrePlanSummary] normalized.data snapshot:", {
           financial: normalized.data.financial,
@@ -151,6 +152,7 @@ export default function PrePlanSummary() {
           healthcare: normalized.data.healthcare,
           care_preferences: normalized.data.care_preferences,
           advance_directive: normalized.data.advance_directive,
+          travel: normalized.data.travel,
         });
         console.log("[PrePlanSummary] completion map:", completion);
       }

@@ -1696,6 +1696,48 @@ async function generateSimplePdf(
   }
 
   // ============================================================
+  // PAGE: Travel & Away-From-Home
+  // ============================================================
+  const travelPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  addPageHeader(travelPage);
+  let travelY = addSectionHeader(travelPage, "Travel & Away-From-Home", pageHeight - 100);
+  
+  const travelObj = planData?.travel || {};
+  const travelNotes = travelObj.notes || "";
+  
+  console.log("[generate-planner-pdf] Travel section data:", {
+    travel_obj_keys: Object.keys(travelObj),
+    has_notes: !!travelNotes,
+  });
+  
+  const hasTravel = hasText(travelObj.emergencyContact) || 
+    hasText(travelObj.emergencyContactPhone) ||
+    hasText(travelObj.travelInsurance) ||
+    hasText(travelObj.medicalInfo) ||
+    hasText(travelObj.medications) ||
+    hasText(travelObj.allergies) ||
+    hasText(travelNotes) ||
+    Object.keys(travelObj).length > 0;
+  
+  if (!hasTravel) {
+    travelY = drawEmpty(travelPage, travelY);
+  } else {
+    if (travelObj.emergencyContact) travelY = addField(travelPage, "Emergency Contact", travelObj.emergencyContact, travelY);
+    if (travelObj.emergencyContactPhone) travelY = addField(travelPage, "Emergency Phone", travelObj.emergencyContactPhone, travelY);
+    if (travelObj.travelInsurance) travelY = addField(travelPage, "Travel Insurance", travelObj.travelInsurance, travelY);
+    if (travelObj.insurancePolicy) travelY = addField(travelPage, "Policy Number", travelObj.insurancePolicy, travelY);
+    if (travelObj.passportLocation) travelY = addField(travelPage, "Passport Location", travelObj.passportLocation, travelY);
+    if (travelObj.medicalInfo) travelY = addField(travelPage, "Medical Info", travelObj.medicalInfo, travelY);
+    if (travelObj.medications) travelY = addField(travelPage, "Medications", travelObj.medications, travelY);
+    if (travelObj.allergies) travelY = addField(travelPage, "Allergies", travelObj.allergies, travelY);
+    if (travelObj.doctorContact) travelY = addField(travelPage, "Doctor Contact", travelObj.doctorContact, travelY);
+    travelY -= 10;
+    travelY = addNotesBox(travelPage, "Notes", travelNotes, travelY);
+  }
+  addDraftWatermark(travelPage);
+  addFooter(travelPage, pageNum++);
+
+  // ============================================================
   // FINAL PAGE: Plan Review & Signature
   // ============================================================
   const signaturePage = pdfDoc.addPage([pageWidth, pageHeight]);

@@ -84,17 +84,37 @@ export function normalizePlanData<TPlan extends Record<string, any> = Record<str
 ): NormalizedPlanData<TPlan> {
   const raw = (plan ?? ({} as TPlan)) as TPlan;
 
+  // Extract plan_payload with multiple fallback shapes
   const payload = asObject((raw as any).plan_payload);
   const payloadData = asObject(payload.data);
   const payloadNested = asObject(payload.plan_payload);
   const payloadNestedData = asObject(payloadNested.data);
 
   // Merge order: oldest -> newest (newest wins)
-  const merged = {
+  // Also merge direct top-level keys from the plan object itself
+  const merged: Record<string, any> = {
     ...payloadNestedData,
     ...payloadNested,
     ...payloadData,
     ...payload,
+    // Also check for section data at the plan root level (from buildPlanDataForPdf)
+    ...(raw.financial ? { financial: raw.financial } : {}),
+    ...(raw.digital ? { digital: raw.digital } : {}),
+    ...(raw.property ? { property: raw.property } : {}),
+    ...(raw.pets ? { pets: raw.pets } : {}),
+    ...(raw.messages ? { messages: raw.messages } : {}),
+    ...(raw.insurance ? { insurance: raw.insurance } : {}),
+    ...(raw.contacts ? { contacts: raw.contacts } : {}),
+    ...(raw.funeral ? { funeral: raw.funeral } : {}),
+    ...(raw.healthcare ? { healthcare: raw.healthcare } : {}),
+    ...(raw.care_preferences ? { care_preferences: raw.care_preferences } : {}),
+    ...(raw.advance_directive ? { advance_directive: raw.advance_directive } : {}),
+    ...(raw.travel ? { travel: raw.travel } : {}),
+    ...(raw.personal ? { personal: raw.personal } : {}),
+    ...(raw.about_you ? { about_you: raw.about_you } : {}),
+    ...(raw.legal ? { legal: raw.legal } : {}),
+    ...(raw.legacy ? { legacy: raw.legacy } : {}),
+    ...(raw.preplanning ? { preplanning: raw.preplanning } : {}),
   };
 
   // Canonical section keys. Always defined.
@@ -129,8 +149,8 @@ export function normalizePlanData<TPlan extends Record<string, any> = Record<str
     financial: merged.financial ?? {},
     insurance: merged.insurance ?? {},
     property: merged.property ?? {},
-    pets: asArray(merged.pets),
-    messages: asArray(merged.messages),
+    pets: Array.isArray(merged.pets) ? merged.pets : (merged.pets ? [merged.pets] : []),
+    messages: Array.isArray(merged.messages) ? merged.messages : (merged.messages ? [merged.messages] : []),
     digital: merged.digital ?? {},
     travel: merged.travel ?? {},
     preplanning: merged.preplanning ?? {},
