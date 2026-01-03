@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { debounce } from "@/lib/utils";
+import { getActivePlanId } from "@/lib/getActivePlanId";
 
 export interface PlanData {
   id?: string;
@@ -193,7 +194,7 @@ export const usePlanData = (userId: string) => {
   useEffect(() => {
     const loadPlan = async () => {
       try {
-        // First, try to load from localStorage
+        // First, try to load from localStorage for instant display
         const localData = localStorage.getItem(`plan_${userId}`);
         if (localData) {
           try {
@@ -204,115 +205,53 @@ export const usePlanData = (userId: string) => {
           }
         }
 
-        // Get user's org - use maybeSingle to avoid errors
-        const { data: orgMember, error: orgError } = await supabase
-          .from("org_members")
-          .select("org_id")
-          .eq("user_id", userId)
-          .eq("role", "owner")
-          .maybeSingle();
+        // Use centralized getActivePlanId (createIfMissing = true)
+        const { planId, orgId, plan: existingPlan } = await getActivePlanId(userId, true);
 
-        if (orgError) {
-          console.error("Error fetching org member:", orgError);
+        if (!planId || !existingPlan) {
+          console.log("[usePlanData] No plan found or created");
           setLoading(false);
           return;
         }
 
-        if (!orgMember) {
-          console.log("No org found for user, data will be stored locally only");
-          setLoading(false);
-          return;
+        if (import.meta.env.DEV) {
+          console.log("[usePlanData] Using planId:", planId);
         }
 
-        // Get or create plan
-        const { data: existingPlan, error: planError } = await supabase
-          .from("plans")
-          .select("*")
-          .eq("org_id", orgMember.org_id)
-          .eq("owner_user_id", userId)
-          .maybeSingle();
+        // Merge plan_payload back into the plan object for easy access
+        const payloadData = (typeof existingPlan.plan_payload === 'object' && existingPlan.plan_payload !== null) 
+          ? existingPlan.plan_payload as Record<string, any>
+          : {};
+        const mergedPlan: PlanData = {
+          ...existingPlan,
+          ...payloadData,
+          plan_payload: payloadData,
+        };
 
-        if (planError) {
-          console.error("Error fetching plan:", planError);
-          setLoading(false);
-          return;
-        }
-
-        if (existingPlan) {
-          // Merge plan_payload back into the plan object for easy access
-          const payloadData = (typeof existingPlan.plan_payload === 'object' && existingPlan.plan_payload !== null) 
-            ? existingPlan.plan_payload as Record<string, any>
-            : {};
-          const mergedPlan: PlanData = {
-            ...existingPlan,
-            ...payloadData,
-            plan_payload: payloadData, // Ensure correct type
-          };
-
-          // Merge server data with local data, preferring newer data
-          if (localData) {
-            const parsed = JSON.parse(localData) as PlanData;
-            const localTime = new Date(parsed.updated_at || 0);
-            const serverTime = new Date(existingPlan.updated_at || 0);
-            if (localTime > serverTime) {
-              // Local is newer, sync to server
-              // CRITICAL: Ensure the plan has the correct id from DB
-              const mergedWithId = { 
-                ...parsed, 
-                id: existingPlan.id, 
-                org_id: existingPlan.org_id 
-              };
-              setPlan(mergedWithId);
-              saveToDB(mergedWithId);
-              localStorage.setItem(`plan_${userId}`, JSON.stringify(mergedWithId));
-            } else {
-              // Server is newer, use server data
-              setPlan(mergedPlan);
-              localStorage.setItem(`plan_${userId}`, JSON.stringify(mergedPlan));
-            }
+        // Merge server data with local data, preferring newer data
+        if (localData) {
+          const parsed = JSON.parse(localData) as PlanData;
+          const localTime = new Date(parsed.updated_at || 0);
+          const serverTime = new Date(existingPlan.updated_at || 0);
+          if (localTime > serverTime) {
+            // Local is newer, sync to server
+            // CRITICAL: Ensure the plan has the correct id from DB
+            const mergedWithId = { 
+              ...parsed, 
+              id: existingPlan.id, 
+              org_id: existingPlan.org_id 
+            };
+            setPlan(mergedWithId);
+            saveToDB(mergedWithId);
+            localStorage.setItem(`plan_${userId}`, JSON.stringify(mergedWithId));
           } else {
+            // Server is newer, use server data
             setPlan(mergedPlan);
             localStorage.setItem(`plan_${userId}`, JSON.stringify(mergedPlan));
           }
         } else {
-          // Create new plan in database
-          const planData = localData ? JSON.parse(localData) : {
-            title: "My Final Wishes Plan",
-          };
-
-          // Separate table data from section data for initial insert
-          const { tableData, payload } = separatePlanData(planData);
-
-          const { data: newPlan, error: createError } = await supabase
-            .from("plans")
-            .insert({
-              org_id: orgMember.org_id,
-              owner_user_id: userId,
-              ...tableData,
-              plan_payload: payload,
-            })
-            .select()
-            .single();
-
-          if (createError) {
-            console.error("Error creating plan:", createError);
-            // Plan creation failed, but we have local data
-            setLoading(false);
-            return;
-          }
-
-          if (newPlan) {
-            const payloadData = (typeof newPlan.plan_payload === 'object' && newPlan.plan_payload !== null)
-              ? newPlan.plan_payload as Record<string, any>
-              : {};
-            const mergedPlan: PlanData = {
-              ...newPlan,
-              ...payloadData,
-              plan_payload: payloadData, // Ensure correct type
-            };
-            setPlan(mergedPlan);
-            localStorage.setItem(`plan_${userId}`, JSON.stringify(mergedPlan));
-          }
+          setPlan(mergedPlan);
+          localStorage.setItem(`plan_${userId}`, JSON.stringify(mergedPlan));
         }
       } catch (error: any) {
         console.error("Error loading plan:", error);

@@ -28,6 +28,7 @@ import { buildPlanDataForPdf, normalizePlanDataForPdf } from "@/lib/buildPlanDat
 import { getCompletableSections, type SectionDefinition } from "@/lib/sectionRegistry";
 import { getOrCreateGuestId } from "@/lib/identityUtils";
 import { getUnifiedPlan, getUnifiedCompletion, hasMeaningfulData } from "@/lib/getUnifiedPlan";
+import { PlanDebugPanel } from "@/components/debug/PlanDebugPanel";
 
 interface SectionData {
   id: string;
@@ -381,6 +382,8 @@ export default function PrePlanSummary() {
 
   return (
     <AuthenticatedLayout>
+      {/* DEV: Plan debug panel */}
+      <PlanDebugPanel />
       <div className="container mx-auto px-4 py-6 max-w-lg print:p-0">
         {/* Top Navigation */}
         <div className="mb-6 space-y-2">
