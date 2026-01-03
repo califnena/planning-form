@@ -1,49 +1,30 @@
-import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shield } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-interface AboutYouData {
-  full_name: string;
-  preferred_name: string;
-  phone: string;
-  email: string;
-}
-
 interface SectionAboutYouProps {
-  data?: AboutYouData;
-  onChange?: (data: AboutYouData) => void;
+  data?: any;
+  onChange?: (data: any) => void;
 }
 
+/**
+ * SectionAboutYou
+ * 
+ * SAVE: data.about_you object → goes to plan_payload.about_you via updatePlan
+ * READ: data.about_you from plan_payload
+ * COMPLETION: checks about_you in payload
+ */
 export const SectionAboutYou = ({ data, onChange }: SectionAboutYouProps) => {
-  const [formData, setFormData] = useState<AboutYouData>({
-    full_name: "",
-    preferred_name: "",
-    phone: "",
-    email: "",
-  });
+  const aboutYou = data?.about_you || {};
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    if (data) {
-      setFormData(data);
-    } else {
-      const saved = localStorage.getItem("aboutyou_data");
-      if (saved) {
-        setFormData(JSON.parse(saved));
-      }
+  const updateField = (field: string, value: string) => {
+    if (onChange) {
+      onChange({
+        ...data,
+        about_you: { ...aboutYou, [field]: value }
+      });
     }
-  }, [data]);
-
-  // Auto-save to localStorage
-  useEffect(() => {
-    localStorage.setItem("aboutyou_data", JSON.stringify(formData));
-    onChange?.(formData);
-  }, [formData, onChange]);
-
-  const updateField = (field: keyof AboutYouData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -79,7 +60,7 @@ export const SectionAboutYou = ({ data, onChange }: SectionAboutYouProps) => {
           </p>
           <Input
             id="full_name"
-            value={formData.full_name}
+            value={aboutYou.full_name || ""}
             onChange={(e) => updateField("full_name", e.target.value)}
             placeholder="e.g., John Robert Smith"
             className="text-base h-12"
@@ -95,7 +76,7 @@ export const SectionAboutYou = ({ data, onChange }: SectionAboutYouProps) => {
           </p>
           <Input
             id="preferred_name"
-            value={formData.preferred_name}
+            value={aboutYou.preferred_name || ""}
             onChange={(e) => updateField("preferred_name", e.target.value)}
             placeholder="e.g., Johnny, Dad, Grandpa"
             className="text-base h-12"
@@ -112,7 +93,7 @@ export const SectionAboutYou = ({ data, onChange }: SectionAboutYouProps) => {
           <Input
             id="phone"
             type="tel"
-            value={formData.phone}
+            value={aboutYou.phone || ""}
             onChange={(e) => updateField("phone", e.target.value)}
             placeholder="(555) 123-4567"
             className="text-base h-12"
@@ -129,7 +110,7 @@ export const SectionAboutYou = ({ data, onChange }: SectionAboutYouProps) => {
           <Input
             id="email"
             type="email"
-            value={formData.email}
+            value={aboutYou.email || ""}
             onChange={(e) => updateField("email", e.target.value)}
             placeholder="you@example.com"
             className="text-base h-12"

@@ -83,11 +83,13 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
   const mergedRoot = { ...raw, ...rawData, ...rawSections };
 
   // Known synonyms / legacy shapes observed in codebase
+  // personal_profile is used by SectionPersonal
   const personal = {
     ...asObject(mergedRoot.personal),
     ...asObject(mergedRoot.about_you),
     ...asObject(mergedRoot.personal_information),
     ...asObject(mergedRoot.about),
+    ...asObject(mergedRoot.personal_profile), // from SectionPersonal
   };
 
   const legacy = {

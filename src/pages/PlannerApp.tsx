@@ -564,8 +564,8 @@ const PlannerApp = () => {
       case "legacy":
         sectionContent = (
           <SectionLegacy
-            value={plan.about_me_notes}
-            onChange={(value) => updatePlan({ about_me_notes: value })}
+            data={plan}
+            onChange={(data) => updatePlan(data)}
           />
         );
         break;
