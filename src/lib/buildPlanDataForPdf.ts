@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { normalizePlanPayload } from "@/lib/normalizePlanPayload";
-import { getSectionData, hasMeaningfulData, logSectionDataStatus } from "@/lib/getSectionData";
+import { hasMeaningfulData } from "@/lib/getUnifiedPlan";
 
 /**
  * Builds a complete plan data object from Supabase for PDF generation.
@@ -314,14 +314,14 @@ function createEmptyPlanData(userId: string): any {
  * This prevents "UI shows data but PDF thinks empty" problems.
  * Maps section data to the keys expected by the PDF edge function.
  * 
- * Uses getSectionData to check real storage paths only.
+ * Uses unified data approach for consistent section data extraction.
  */
 export function normalizePlanDataForPdf(raw: any): any {
   if (!raw) return createEmptyPlanData("");
 
   // DEV: Log section data status before normalization
   if (import.meta.env.DEV) {
-    logSectionDataStatus(raw.plan_payload || raw, "normalizePlanDataForPdf:input");
+    console.log("[normalizePlanDataForPdf] input keys:", Object.keys(raw));
   }
 
   const profile = raw.personal_profile || {};
@@ -345,43 +345,46 @@ export function normalizePlanDataForPdf(raw: any): any {
     normalizedName = raw.prepared_for || raw.prepared_by || "";
   }
 
-  // Use getSectionData for consistent path resolution
-  const payloadSource = raw.plan_payload || raw;
+  // Extract section data using multiple fallback paths
+  const payloadSource = raw.plan_payload || {};
+  const payloadData = payloadSource.data || {};
+  const payloadSections = payloadSource.sections || {};
+  const merged = { ...payloadSource, ...payloadData, ...payloadSections };
   
-  // Get section data using standardized getter
-  const contactsData = getSectionData(payloadSource, "contacts");
-  const petsData = getSectionData(payloadSource, "pets");
-  const messagesData = getSectionData(payloadSource, "messages");
-  const financialData = getSectionData(payloadSource, "financial");
-  const digitalData = getSectionData(payloadSource, "digital");
-  const propertyData = getSectionData(payloadSource, "property");
-  const insuranceData = getSectionData(payloadSource, "insurance");
-  const healthcareData = getSectionData(payloadSource, "healthcare");
-  const advanceDirective = getSectionData(payloadSource, "advancedirective");
-  const travelData = getSectionData(payloadSource, "travel");
-  const legacyData = getSectionData(payloadSource, "legacy");
-  const personalData = getSectionData(payloadSource, "personal");
+  // Get section data with fallbacks
+  const personalData = merged.personal || merged.about_you || merged.about || raw.personal || {};
+  const legacyData = merged.legacy || merged.life_story || raw.legacy || {};
+  const contactsData = merged.contacts || raw.contacts || {};
+  const healthcareData = merged.healthcare || merged.health_care || merged.medical || raw.healthcare || {};
+  const advanceDirective = merged.advance_directive || merged.advanceDirective || raw.advance_directive || {};
+  const financialData = merged.financial || merged.financial_life || raw.financial || {};
+  const digitalData = merged.digital || merged.digital_accounts || raw.digital || {};
+  const propertyData = merged.property || merged.property_valuables || raw.property || {};
+  const insuranceData = merged.insurance || merged.insurance_policies || raw.insurance || {};
+  const travelData = merged.travel || merged.travel_planning || raw.travel || {};
+  const petsData = merged.pets || raw.pets || [];
+  const messagesData = merged.messages || raw.messages || [];
   
   // Normalize contacts to array
   const contactsArray = Array.isArray(contactsData) 
     ? contactsData 
     : (typeof contactsData === "object" && contactsData !== null)
-      ? ((contactsData as any).contacts || [])
+      ? (contactsData.contacts || contactsData.importantPeople || [])
       : [];
   const allContacts = [...contactsArray, ...(raw.contacts_notify || [])];
   
   // Normalize digital accounts
-  const digital = (digitalData && typeof digitalData === "object") ? digitalData as Record<string, any> : {};
+  const digital = (digitalData && typeof digitalData === "object") ? digitalData : {};
   const digitalAccounts = Array.isArray(digital.accounts) ? digital.accounts : [];
   
   // Normalize financial
-  const financial = (financialData && typeof financialData === "object") ? financialData as Record<string, any> : {};
+  const financial = (financialData && typeof financialData === "object") ? financialData : {};
   const bankAccounts = Array.isArray(financial.accounts)
     ? financial.accounts
     : (raw.bank_accounts || []);
   
   // Normalize property
-  const property = (propertyData && typeof propertyData === "object") ? propertyData as Record<string, any> : {};
+  const property = (propertyData && typeof propertyData === "object") ? propertyData : {};
   const properties = Array.isArray(property.items)
     ? property.items
     : (raw.properties || []);
@@ -390,30 +393,32 @@ export function normalizePlanDataForPdf(raw: any): any {
     : [];
   
   // Normalize insurance
-  const insurance = (insuranceData && typeof insuranceData === "object") ? insuranceData as Record<string, any> : {};
+  const insurance = (insuranceData && typeof insuranceData === "object") ? insuranceData : {};
   const insurancePolicies = Array.isArray(insurance.policies)
     ? insurance.policies
     : (raw.insurance_policies || []);
   
   // Normalize pets and messages
-  const petsArray = Array.isArray(petsData) ? petsData : [];
-  const messagesArray = Array.isArray(messagesData) ? messagesData : [];
+  const petsArray = Array.isArray(petsData) ? petsData : (raw.pets || []);
+  const messagesArray = Array.isArray(messagesData) ? messagesData : (raw.messages || []);
   
   // DEV: Log PDF OMIT warnings
   if (import.meta.env.DEV) {
     const sectionsToCheck = [
-      { key: "financial", data: financialData, label: "Financial Life" },
-      { key: "digital", data: digitalData, label: "Online Accounts" },
-      { key: "property", data: propertyData, label: "Property & Valuables" },
-      { key: "pets", data: petsData, label: "Pets" },
-      { key: "messages", data: messagesData, label: "Messages to Loved Ones" },
-      { key: "healthcare", data: healthcareData, label: "Medical & Care" },
-      { key: "travel", data: travelData, label: "Travel" },
+      { key: "financial", data: financialData, mapped: financial, label: "Financial Life" },
+      { key: "digital", data: digitalData, mapped: digital, label: "Online Accounts" },
+      { key: "property", data: propertyData, mapped: property, label: "Property & Valuables" },
+      { key: "pets", data: petsData, mapped: petsArray, label: "Pets" },
+      { key: "messages", data: messagesData, mapped: messagesArray, label: "Messages to Loved Ones" },
+      { key: "healthcare", data: healthcareData, mapped: healthcareData, label: "Medical & Care" },
+      { key: "travel", data: travelData, mapped: travelData, label: "Travel" },
     ];
     
-    for (const { key, data, label } of sectionsToCheck) {
-      if (hasMeaningfulData(data)) {
-        console.log(`[PDF] Section ${label} has data:`, data);
+    for (const { key, data, mapped, label } of sectionsToCheck) {
+      if (hasMeaningfulData(data) && !hasMeaningfulData(mapped)) {
+        console.warn(`[PDF OMIT] ${label} has source data but mapped output is empty!`);
+      } else if (hasMeaningfulData(data)) {
+        console.log(`[PDF] Section ${label} has data`);
       }
     }
   }
@@ -463,7 +468,9 @@ export function normalizePlanDataForPdf(raw: any): any {
 
   // DEV: Log final output status
   if (import.meta.env.DEV) {
-    logSectionDataStatus(result, "normalizePlanDataForPdf:output");
+    const outputSections = ["pets", "messages", "bank_accounts", "properties", "digital", "financial", "healthcare", "travel"];
+    const withData = outputSections.filter(k => hasMeaningfulData(result[k]));
+    console.log("[normalizePlanDataForPdf] output sections with data:", withData);
   }
 
   return result;

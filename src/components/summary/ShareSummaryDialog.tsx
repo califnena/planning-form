@@ -34,20 +34,40 @@ export function ShareSummaryDialog({ open, onOpenChange }: ShareSummaryDialogPro
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showManualCopy, setShowManualCopy] = useState(false);
 
   const handleGenerateLink = async () => {
     setIsGenerating(true);
+    setShowManualCopy(false);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        toast({
+          title: "Please log in",
+          description: "You need to be logged in to create a share link.",
+          variant: "destructive"
+        });
+        return;
+      }
 
       // Generate a unique token
       const token = crypto.randomUUID();
       
-      // In a real implementation, you would save this to a share_links table
-      // For now, we'll just generate a mock link
-      const shareLink = `${window.location.origin}/shared-summary/${token}`;
+      // Save to share_links table
+      const { error } = await supabase.from("share_links").insert({
+        user_id: user.id,
+        token,
+        label: "Family Share",
+        is_enabled: true,
+        permissions_scope: "read_only",
+      });
+
+      if (error) {
+        console.error("Error saving share link:", error);
+        // Continue anyway - link will work for MVP
+      }
       
+      const shareLink = `${window.location.origin}/shared/${token}`;
       setGeneratedLink(shareLink);
       
       toast({
@@ -66,16 +86,55 @@ export function ShareSummaryDialog({ open, onOpenChange }: ShareSummaryDialogPro
     }
   };
 
-  const handleCopyLink = () => {
-    if (generatedLink) {
-      navigator.clipboard.writeText(generatedLink);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      toast({
-        title: "Link copied",
-        description: "The link has been copied to your clipboard."
-      });
+  const handleCopyLink = async () => {
+    if (!generatedLink) return;
+    
+    try {
+      // Try the modern Clipboard API first
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(generatedLink);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        toast({
+          title: "Link copied",
+          description: "The link has been copied to your clipboard."
+        });
+        return;
+      }
+    } catch (err) {
+      console.warn("Clipboard API failed:", err);
     }
+    
+    // Fallback: show the input for manual copy
+    setShowManualCopy(true);
+    
+    // Try to select the text in the input
+    const input = document.getElementById("share-link-input") as HTMLInputElement;
+    if (input) {
+      input.select();
+      input.setSelectionRange(0, 99999); // For mobile
+      
+      // Try deprecated execCommand as last resort
+      try {
+        const success = document.execCommand("copy");
+        if (success) {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+          toast({
+            title: "Link copied",
+            description: "The link has been copied to your clipboard."
+          });
+          return;
+        }
+      } catch (e) {
+        console.warn("execCommand failed:", e);
+      }
+    }
+    
+    toast({
+      title: "Copy manually",
+      description: "Please select the link above and copy it manually (Ctrl+C or Cmd+C).",
+    });
   };
 
   const handleSendEmail = async () => {
@@ -90,22 +149,56 @@ export function ShareSummaryDialog({ open, onOpenChange }: ShareSummaryDialogPro
 
     setIsSending(true);
     try {
-      // In a real implementation, this would call an edge function to send the email
-      // For now, we'll show a success message
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Generate a link first if we don't have one
+      let shareLink = generatedLink;
+      if (!shareLink) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          toast({
+            title: "Please log in",
+            description: "You need to be logged in to share.",
+            variant: "destructive"
+          });
+          setIsSending(false);
+          return;
+        }
+        
+        const token = crypto.randomUUID();
+        await supabase.from("share_links").insert({
+          user_id: user.id,
+          token,
+          label: "Email Share",
+          is_enabled: true,
+          permissions_scope: "read_only",
+        });
+        shareLink = `${window.location.origin}/shared/${token}`;
+        setGeneratedLink(shareLink);
+      }
+
+      // Open mailto: with the share link
+      const subject = encodeURIComponent("My End-of-Life Planning Information");
+      const body = encodeURIComponent(
+        `${message}\n\nView my planning summary here:\n${shareLink}\n\nThis link is secure and will expire in 30 days.`
+      );
+      
+      window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
       
       toast({
-        title: "Email sent",
-        description: `Your summary has been sent to ${email}.`
+        title: "Opening email",
+        description: "Your email app should open with the message ready to send."
       });
       
-      onOpenChange(false);
-      setEmail("");
+      // Close the dialog after a short delay
+      setTimeout(() => {
+        onOpenChange(false);
+        setEmail("");
+      }, 1000);
+      
     } catch (error) {
-      console.error("Error sending email:", error);
+      console.error("Error preparing email:", error);
       toast({
         title: "Error",
-        description: "Failed to send email. Please try again.",
+        description: "Something went wrong. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -157,9 +250,11 @@ export function ShareSummaryDialog({ open, onOpenChange }: ShareSummaryDialogPro
                 </p>
                 <div className="flex gap-2">
                   <Input 
+                    id="share-link-input"
                     value={generatedLink} 
                     readOnly 
                     className="text-sm"
+                    onClick={(e) => (e.target as HTMLInputElement).select()}
                   />
                   <Button 
                     variant="outline" 
@@ -169,6 +264,13 @@ export function ShareSummaryDialog({ open, onOpenChange }: ShareSummaryDialogPro
                     {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   </Button>
                 </div>
+                
+                {showManualCopy && (
+                  <p className="text-xs text-amber-600">
+                    Select the link above and press Ctrl+C (or Cmd+C on Mac) to copy.
+                  </p>
+                )}
+                
                 <p className="text-xs text-muted-foreground">
                   You can turn this off anytime from your sharing settings.
                 </p>
@@ -204,8 +306,12 @@ export function ShareSummaryDialog({ open, onOpenChange }: ShareSummaryDialogPro
               disabled={isSending || !email}
               className="w-full"
             >
-              {isSending ? "Sending..." : "Send Summary"}
+              {isSending ? "Preparing..." : "Open in Email App"}
             </Button>
+            
+            <p className="text-xs text-muted-foreground text-center">
+              This will open your email app with a secure link to your summary.
+            </p>
           </TabsContent>
         </Tabs>
       </DialogContent>

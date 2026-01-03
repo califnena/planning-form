@@ -23,13 +23,11 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ShareSummaryDialog } from "@/components/summary/ShareSummaryDialog";
-// SETTINGS_DEFAULT removed - we now show a fixed list of required sections
-import { useActivePlan, fetchPlanData } from "@/hooks/useActivePlan";
+import { useActivePlan } from "@/hooks/useActivePlan";
 import { buildPlanDataForPdf, normalizePlanDataForPdf } from "@/lib/buildPlanDataForPdf";
-import { getSectionCompletion } from "@/lib/sectionCompletion";
 import { getCompletableSections, type SectionDefinition } from "@/lib/sectionRegistry";
 import { getOrCreateGuestId } from "@/lib/identityUtils";
-import { logSectionDataStatus } from "@/lib/getSectionData";
+import { getUnifiedPlan, getUnifiedCompletion, hasMeaningfulData } from "@/lib/getUnifiedPlan";
 
 interface SectionData {
   id: string;
@@ -108,7 +106,10 @@ export default function PrePlanSummary() {
         setSelectedSections(settings.selected_sections);
       }
 
-      // Single source of truth: buildPlanDataForPdf (DB-backed)
+      // Use getUnifiedPlan as SINGLE SOURCE OF TRUTH for completion
+      const unifiedPlan = await getUnifiedPlan(user.id);
+      
+      // Also get buildPlanDataForPdf for PDF generation compatibility
       const pdfPlanData = await buildPlanDataForPdf(user.id);
 
       const mergedPlanData: any = {
@@ -117,17 +118,20 @@ export default function PrePlanSummary() {
         org_id: orgId,
       };
 
-       setPlanData(mergedPlanData);
+      setPlanData(mergedPlanData);
 
-       // Completion is computed ONLY from normalized plan_payload
-       const completion = getSectionCompletion(mergedPlanData);
+      // Completion is computed from UNIFIED plan data
+      const completion = getUnifiedCompletion(unifiedPlan.unified);
 
-       // Diagnostic logging for debugging completion detection (dev only)
-       if (import.meta.env.DEV) {
-         console.log("[PrePlanSummary] plan_payload (raw):", mergedPlanData.plan_payload);
-         logSectionDataStatus(mergedPlanData, "PrePlanSummary");
-         console.log("[PrePlanSummary] completion map:", completion);
-       }
+      // Diagnostic logging for debugging completion detection (dev only)
+      if (import.meta.env.DEV) {
+        console.log("[PrePlanSummary] unified plan sections with data:", 
+          Object.entries(unifiedPlan.unified)
+            .filter(([_, v]) => hasMeaningfulData(v))
+            .map(([k]) => k)
+        );
+        console.log("[PrePlanSummary] completion map:", completion);
+      }
 
       // Build sections list from UNIFIED REGISTRY
       // Show the REQUIRED sections for "View or edit sections" per specification
