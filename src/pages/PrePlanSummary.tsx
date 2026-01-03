@@ -134,12 +134,22 @@ export default function PrePlanSummary() {
 
       setPlanData(mergedPlanData);
 
-      // Compute completion using unified logic - pass userId for localStorage key lookup
+      // Compute completion using unified logic
       const completion = getSectionCompletion(mergedPlanData, user.id);
 
+      // Diagnostic logging for debugging completion detection
       if (import.meta.env.DEV) {
+        console.log("[PrePlanSummary] planData keys:", Object.keys(mergedPlanData));
+        console.log("[PrePlanSummary] plan_payload:", mergedPlanData.plan_payload);
+        console.log("[PrePlanSummary] Section data check:", {
+          financial: mergedPlanData.financial,
+          digital: mergedPlanData.digital,
+          property: mergedPlanData.property,
+          pets: mergedPlanData.pets,
+          messages: mergedPlanData.messages,
+          healthcare: mergedPlanData.healthcare,
+        });
         console.log("[PrePlanSummary] completion map:", completion);
-        console.log("[PrePlanSummary] userId:", user.id);
       }
 
       // Build sections list from UNIFIED REGISTRY

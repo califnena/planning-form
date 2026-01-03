@@ -175,7 +175,7 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
   }
 
   // Step 4: Build the complete planData object
-  // Priority: localStorage > DB > defaults
+  // Priority: localStorage > DB plan_payload > defaults
   const mergedProfile = {
     ...(personalProfile || {}),
     ...(localProfile || {}),
@@ -185,6 +185,34 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
   if (!mergedProfile.full_name) {
     mergedProfile.full_name = plan.prepared_for || userProfile?.full_name || "";
   }
+
+  // Extract plan_payload and merge it to top level for consistent access
+  const planPayload = (typeof plan.plan_payload === 'object' && plan.plan_payload !== null)
+    ? plan.plan_payload as Record<string, any>
+    : {};
+
+  // CRITICAL: Merge plan_payload data to top level so completion checks work
+  // This makes pd.financial, pd.digital, pd.pets, etc. available directly
+  const planPayloadMerged = {
+    // Section data from plan_payload (DB storage)
+    financial: planPayload.financial || undefined,
+    digital: planPayload.digital || undefined,
+    property: planPayload.property || undefined,
+    pets: planPayload.pets || undefined,
+    messages: planPayload.messages || undefined,
+    insurance: planPayload.insurance || undefined,
+    contacts: planPayload.contacts || undefined,
+    funeral: planPayload.funeral || undefined,
+    personal: planPayload.personal || planPayload.about_you || undefined,
+    about_you: planPayload.about_you || planPayload.personal || undefined,
+    healthcare: planPayload.healthcare || undefined,
+    care_preferences: planPayload.care_preferences || undefined,
+    advance_directive: planPayload.advance_directive || undefined,
+    travel: planPayload.travel || undefined,
+    preplanning: planPayload.preplanning || undefined,
+    legal: planPayload.legal || undefined,
+    legacy: planPayload.legacy || undefined,
+  };
 
   return {
     // Plan metadata
@@ -213,7 +241,7 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     messages_notes: plan.messages_notes || localPlan?.messages_notes || "",
     to_loved_ones_message: plan.to_loved_ones_message || localPlan?.to_loved_ones_message || "",
 
-    // Related data arrays (from Supabase)
+    // Related data arrays (from Supabase separate tables)
     contacts_notify: contacts || [],
     pets: pets || [],
     insurance_policies: insurance || [],
@@ -226,23 +254,26 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     funeral_funding: funeralFunding || [],
     contacts_professional: professionalContacts || [],
 
-    // Local-only planning data (still part of persisted planner state)
-    healthcare: localHealthcare || undefined,
+    // Merged plan_payload sections at top level (CRITICAL for completion detection)
+    ...planPayloadMerged,
+    
+    // Override with localStorage data if available (localStorage takes priority)
+    healthcare: localHealthcare || planPayloadMerged.healthcare || undefined,
     care_preferences: localCarePreferences
       ? {
           checks: localCarePreferences.checks || localCarePreferences,
           notes: localCarePreferences.notes || localCarePreferences.additionalNotes || "",
         }
-      : undefined,
-    preplanning: localPreplanning || undefined,
-    travel: localTravel || undefined,
-    advance_directive: localAdvanceDirective || undefined,
+      : planPayloadMerged.care_preferences || undefined,
+    preplanning: localPreplanning || planPayloadMerged.preplanning || undefined,
+    travel: localTravel || planPayloadMerged.travel || undefined,
+    advance_directive: localAdvanceDirective || planPayloadMerged.advance_directive || undefined,
     
-    // Funeral data from localStorage plan object
-    funeral: localPlan?.funeral || undefined,
+    // Funeral data - localStorage plan object takes priority
+    funeral: localPlan?.funeral || planPayloadMerged.funeral || undefined,
     
-    // plan_payload from DB (unified storage)
-    plan_payload: plan.plan_payload || {},
+    // Keep plan_payload as reference too
+    plan_payload: planPayload,
 
     // Section visibility
     _visibleSections: userSettings?.selected_sections || undefined,
