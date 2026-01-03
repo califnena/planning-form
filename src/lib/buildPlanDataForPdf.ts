@@ -1,116 +1,29 @@
 import { supabase } from "@/integrations/supabase/client";
 import { normalizePlanPayload } from "@/lib/normalizePlanPayload";
 import { hasMeaningfulData } from "@/lib/getUnifiedPlan";
+import { getActivePlanId } from "@/lib/getActivePlanId";
 
 /**
  * Builds a complete plan data object from Supabase for PDF generation.
  * This is the SINGLE SOURCE OF TRUTH for PDF generation data.
  * 
- * The returned object includes all plan-related data from all relevant tables,
- * ensuring the PDF generator has everything it needs.
+ * Uses centralized getActivePlanId for consistent plan resolution.
  */
 export async function buildPlanDataForPdf(userId: string): Promise<any> {
-  // Step 1: Get the user's org membership or create one
-  let orgId: string | null = null;
-  
-  const { data: orgMember } = await supabase
-    .from("org_members")
-    .select("org_id")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  // Use centralized plan resolution (createIfMissing = true for PDF)
+  const { planId, orgId, plan } = await getActivePlanId(userId, true);
 
-  if (orgMember?.org_id) {
-    orgId = orgMember.org_id;
-  }
-
-  let planId: string | null = null;
-  let plan: any = null;
-
-  // Try to find existing plan
-  if (orgId) {
-    const { data: existingPlan } = await supabase
-      .from("plans")
-      .select("*")
-      .eq("org_id", orgId)
-      .eq("owner_user_id", userId)
-      .order("updated_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (existingPlan) {
-      planId = existingPlan.id;
-      plan = existingPlan;
-    }
-  }
-
-  // Fallback: Find plan directly by owner_user_id
-  if (!planId) {
-    const { data: fallbackPlan } = await supabase
-      .from("plans")
-      .select("*")
-      .eq("owner_user_id", userId)
-      .order("updated_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (fallbackPlan) {
-      planId = fallbackPlan.id;
-      plan = fallbackPlan;
-      orgId = fallbackPlan.org_id || orgId;
-    }
-  }
-
-  // CRITICAL: If no plan exists, CREATE one so PDF generation can proceed
+  // If still no plan, return empty
   if (!planId || !plan) {
-    console.log("[buildPlanDataForPdf] No plan found - creating default plan for user:", userId);
-    
-    // Create org if needed
-    if (!orgId) {
-      const { data: newOrg, error: orgError } = await supabase
-        .from("orgs")
-        .insert({ name: "Personal" })
-        .select("id")
-        .single();
-      
-      if (orgError) {
-        console.error("[buildPlanDataForPdf] Failed to create org:", orgError);
-        return createEmptyPlanData(userId);
-      }
-      orgId = newOrg.id;
-      
-      // Add user to org
-      await supabase.from("org_members").insert({
-        org_id: orgId,
-        user_id: userId,
-        role: "owner"
-      });
-    }
-    
-    // Create the plan
-    const { data: newPlan, error: planError } = await supabase
-      .from("plans")
-      .insert({
-        org_id: orgId,
-        owner_user_id: userId,
-        title: "My Final Wishes Plan",
-        plan_payload: {}
-      })
-      .select("*")
-      .single();
-    
-    if (planError) {
-      console.error("[buildPlanDataForPdf] Failed to create plan:", planError);
-      return createEmptyPlanData(userId);
-    }
-    
-    planId = newPlan.id;
-    plan = newPlan;
-    console.log("[buildPlanDataForPdf] Created new plan:", planId);
+    console.warn("[buildPlanDataForPdf] No plan available for user:", userId);
+    return createEmptyPlanData(userId);
   }
 
-  // Step 2: Fetch all related data in parallel
+  if (import.meta.env.DEV) {
+    console.log("[buildPlanDataForPdf] Using planId:", planId, "for user:", userId);
+  }
+
+  // Fetch all related data in parallel using the resolved planId
   const [
     { data: personalProfile },
     { data: contacts },
@@ -143,32 +56,34 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     supabase.from("profiles").select("full_name").eq("id", userId).maybeSingle(),
   ]);
 
-  // Step 3: Normalize plan_payload ONLY (per mandate: no localStorage fallbacks)
+  // Normalize plan_payload ONLY (per mandate: no localStorage fallbacks)
   const planPayload = (typeof plan.plan_payload === "object" && plan.plan_payload !== null)
     ? (plan.plan_payload as Record<string, any>)
     : {};
 
   const normalizedPayload = normalizePlanPayload(planPayload);
 
-  console.log("[buildPlanDataForPdf] normalizedPayload keys with data:",
-    Object.entries({
-      about: normalizedPayload.about,
-      legacy: normalizedPayload.legacy,
-      contacts: normalizedPayload.contacts,
-      medical: normalizedPayload.medical,
-      advance_directive: normalizedPayload.advance_directive,
-      wishes: normalizedPayload.wishes,
-      financial: normalizedPayload.financial,
-      insurance: normalizedPayload.insurance,
-      property: normalizedPayload.property,
-      pets: normalizedPayload.pets,
-      digital: normalizedPayload.digital,
-      messages: normalizedPayload.messages,
-      travel: normalizedPayload.travel,
-    })
-      .filter(([_, v]) => v && (Array.isArray(v) ? v.length > 0 : Object.keys(v).length > 0))
-      .map(([k]) => k)
-  );
+  if (import.meta.env.DEV) {
+    console.log("[buildPlanDataForPdf] normalizedPayload keys with data:",
+      Object.entries({
+        about: normalizedPayload.about,
+        legacy: normalizedPayload.legacy,
+        contacts: normalizedPayload.contacts,
+        medical: normalizedPayload.medical,
+        advance_directive: normalizedPayload.advance_directive,
+        wishes: normalizedPayload.wishes,
+        financial: normalizedPayload.financial,
+        insurance: normalizedPayload.insurance,
+        property: normalizedPayload.property,
+        pets: normalizedPayload.pets,
+        digital: normalizedPayload.digital,
+        messages: normalizedPayload.messages,
+        travel: normalizedPayload.travel,
+      })
+        .filter(([_, v]) => v && (Array.isArray(v) ? v.length > 0 : Object.keys(v).length > 0))
+        .map(([k]) => k)
+    );
+  }
 
   const mergedProfile = {
     ...(personalProfile || {}),
@@ -207,12 +122,14 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     advance_directive: normalizedPayload.advance_directive,
   };
 
-  console.log(
-    "[buildPlanDataForPdf] planPayloadMerged keys with data:",
-    Object.entries(planPayloadMerged)
-      .filter(([_, v]) => v && (Array.isArray(v) ? v.length > 0 : Object.keys(v).length > 0))
-      .map(([k]) => k)
-  );
+  if (import.meta.env.DEV) {
+    console.log(
+      "[buildPlanDataForPdf] planPayloadMerged keys with data:",
+      Object.entries(planPayloadMerged)
+        .filter(([_, v]) => v && (Array.isArray(v) ? v.length > 0 : Object.keys(v).length > 0))
+        .map(([k]) => k)
+    );
+  }
 
 
   return {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getActivePlanId } from "@/lib/getActivePlanId";
 
 interface ActivePlanResult {
   loading: boolean;
@@ -13,10 +14,7 @@ interface ActivePlanResult {
  * Unified hook for resolving the active plan for the current user.
  * This is the SINGLE SOURCE OF TRUTH for plan_id across the app.
  * 
- * Behavior:
- * 1. Finds the user's org from org_members
- * 2. Finds or creates a plan for that org
- * 3. NEVER returns null planId for an authenticated user
+ * Uses the centralized getActivePlanId function to ensure consistency.
  */
 export function useActivePlan(): ActivePlanResult {
   const [state, setState] = useState<ActivePlanResult>({
@@ -40,102 +38,17 @@ export function useActivePlan(): ActivePlanResult {
         }
 
         console.log("[useActivePlan] Resolving plan for user:", user.id);
-        let orgId: string | null = null;
-        let planId: string | null = null;
-        let plan: any | null = null;
 
-        // Step 2: Try to get org from org_members
-        const { data: orgMember, error: orgError } = await supabase
-          .from("org_members")
-          .select("org_id")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
+        // Step 2: Use centralized getActivePlanId (createIfMissing = true)
+        const { planId, orgId, plan } = await getActivePlanId(user.id, true);
 
-        if (orgError) {
-          console.log("[useActivePlan] org_members error:", orgError.message);
-        }
-
-        if (orgMember?.org_id) {
-          orgId = orgMember.org_id;
-          console.log("[useActivePlan] Found org:", orgId);
-
-          // Try to get existing plan for this org
-          const { data: existingPlan, error: planError } = await supabase
-            .from("plans")
-            .select("*")
-            .eq("org_id", orgId)
-            .eq("owner_user_id", user.id)
-            .order("updated_at", { ascending: false })
-            .limit(1)
-            .maybeSingle();
-
-          if (!planError && existingPlan) {
-            planId = existingPlan.id;
-            plan = existingPlan;
-            console.log("[useActivePlan] Found existing plan:", planId);
-          }
-        }
-
-        // Step 3: Fallback - Try to find plan directly by owner_user_id
         if (!planId) {
-          const { data: fallbackPlan, error: fallbackError } = await supabase
-            .from("plans")
-            .select("*")
-            .eq("owner_user_id", user.id)
-            .order("updated_at", { ascending: false })
-            .limit(1)
-            .maybeSingle();
-
-          if (!fallbackError && fallbackPlan) {
-            planId = fallbackPlan.id;
-            plan = fallbackPlan;
-            orgId = fallbackPlan.org_id || orgId;
-            console.log("[useActivePlan] Fallback found plan:", planId);
-          }
-        }
-
-        // Step 4: If still no plan and we have an org, create one
-        if (!planId && orgId) {
-          console.log("[useActivePlan] Creating new plan for org:", orgId);
-          
-          // Get profile for prepared_for name
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("full_name")
-            .eq("id", user.id)
-            .maybeSingle();
-
-          const { data: newPlan, error: createError } = await supabase
-            .from("plans")
-            .insert({
-              org_id: orgId,
-              owner_user_id: user.id,
-              title: "My Final Wishes Plan",
-              prepared_for: profile?.full_name || null,
-            })
-            .select()
-            .single();
-
-          if (createError) {
-            console.error("[useActivePlan] Failed to create plan:", createError);
-            setState({ loading: false, planId: null, orgId, plan: null, error: createError.message });
-            return;
-          }
-
-          planId = newPlan.id;
-          plan = newPlan;
-          console.log("[useActivePlan] Created new plan:", planId);
-        }
-
-        // Step 5: If we have neither org nor plan, we cannot proceed
-        if (!planId) {
-          console.log("[useActivePlan] No org or plan found - user may need onboarding");
+          console.log("[useActivePlan] No plan found or created");
           setState({ loading: false, planId: null, orgId: null, plan: null, error: "No plan available" });
           return;
         }
 
+        console.log("[useActivePlan] Resolved plan:", planId);
         setState({ loading: false, planId, orgId, plan, error: null });
       } catch (error: any) {
         console.error("[useActivePlan] Error:", error);

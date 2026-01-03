@@ -26,6 +26,7 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
+import { getActivePlanId } from "@/lib/getActivePlanId";
 
 // ============= TYPES =============
 
@@ -299,59 +300,12 @@ function buildUnifiedData(payload: Record<string, any>, raw: Record<string, any>
 /**
  * Get unified plan data for a user.
  * This is the SINGLE ENTRY POINT for reading plan data.
+ * 
+ * Uses centralized getActivePlanId for consistent plan resolution.
  */
 export async function getUnifiedPlan(userId: string): Promise<UnifiedPlan> {
-  // Step 1: Get user's org membership
-  let orgId: string | null = null;
-  
-  const { data: orgMember } = await supabase
-    .from("org_members")
-    .select("org_id")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (orgMember?.org_id) {
-    orgId = orgMember.org_id;
-  }
-
-  let planId: string | null = null;
-  let plan: any = null;
-
-  // Step 2: Find existing plan
-  if (orgId) {
-    const { data: existingPlan } = await supabase
-      .from("plans")
-      .select("*")
-      .eq("org_id", orgId)
-      .eq("owner_user_id", userId)
-      .order("updated_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (existingPlan) {
-      planId = existingPlan.id;
-      plan = existingPlan;
-    }
-  }
-
-  // Fallback: Find plan directly by owner
-  if (!planId) {
-    const { data: fallbackPlan } = await supabase
-      .from("plans")
-      .select("*")
-      .eq("owner_user_id", userId)
-      .order("updated_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (fallbackPlan) {
-      planId = fallbackPlan.id;
-      plan = fallbackPlan;
-      orgId = fallbackPlan.org_id || orgId;
-    }
-  }
+  // Use centralized plan resolution
+  const { planId, orgId, plan } = await getActivePlanId(userId);
 
   // If no plan exists, return empty
   if (!planId || !plan) {
@@ -364,7 +318,7 @@ export async function getUnifiedPlan(userId: string): Promise<UnifiedPlan> {
     };
   }
 
-  // Step 3: Fetch related table data in parallel
+  // Fetch related table data in parallel using the resolved planId
   const [
     { data: personalProfile },
     { data: contacts },

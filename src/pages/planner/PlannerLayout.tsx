@@ -20,6 +20,7 @@ import { AppFooter } from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
 import { mergeVisibleSections } from "@/lib/sections";
+import { PlanDebugPanel } from "@/components/debug/PlanDebugPanel";
 
 // Preview Mode Context
 const PreviewModeContext = createContext<{ isPreviewMode: boolean }>({ isPreviewMode: false });
@@ -531,6 +532,9 @@ export default function PlannerLayout() {
               activeSection={activeSection}
             />
           )}
+          
+          {/* DEV: Plan debug panel to verify plan_id consistency */}
+          <PlanDebugPanel />
           
           <AppFooter />
         </div>
