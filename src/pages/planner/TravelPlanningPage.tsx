@@ -4,32 +4,35 @@ import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 export default function TravelPlanningPage() {
-  const { user, saveState } = usePlanContext();
+  const { user, plan, updatePlan, saveState } = usePlanContext();
   const navigate = useNavigate();
 
-  const [travelData, setTravelData] = useState<any>({});
+  // Read from DB-backed plan_payload (single source of truth)
+  const travelData = plan.travel || {};
 
+  // One-time migration: if user has legacy localStorage data but nothing in plan_payload yet
   useEffect(() => {
-    if (user?.id) {
-      const stored = localStorage.getItem(`travel_planning_${user.id}`);
-      if (stored) {
-        try {
-          setTravelData(JSON.parse(stored));
-        } catch (e) {
-          console.error("Error parsing travel data:", e);
-        }
+    if (!user?.id) return;
+    if (travelData && Object.keys(travelData).length > 0) return;
+
+    const stored = localStorage.getItem(`travel_planning_${user.id}`);
+    if (!stored) return;
+
+    try {
+      const parsed = JSON.parse(stored);
+      if (parsed && typeof parsed === "object") {
+        updatePlan({ travel: parsed });
       }
+    } catch (e) {
+      console.error("Error parsing travel data:", e);
     }
-  }, [user?.id]);
+  }, [user?.id, updatePlan]);
 
   const handleChange = (data: any) => {
-    setTravelData(data);
-    if (user?.id) {
-      localStorage.setItem(`travel_planning_${user.id}`, JSON.stringify(data));
-    }
+    updatePlan({ travel: data });
   };
 
   const handleNext = () => {

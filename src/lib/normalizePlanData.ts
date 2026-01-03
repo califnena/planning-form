@@ -7,7 +7,7 @@
  * - Uses DB-backed `plan_payload` as the source of truth.
  * - Flattens legacy nesting shapes so callers can always read from `normalized.data`.
  * - Merges duplicate contact arrays into one unified list.
- * - Does NOT read from localStorage.
+ * - Reads from localStorage as fallback for legacy data (healthcare, care, advance_directive, travel).
  */
 
 export type NormalizedPlanData<TPlan extends Record<string, any> = Record<string, any>> = {
@@ -74,13 +74,51 @@ function mergeContactArrays(sources: any[]): any[] {
 }
 
 /**
+ * Read localStorage drafts for sections that may have legacy data.
+ * Only used as fallback when DB data is empty.
+ */
+function readLocalStorageDrafts(userId?: string): Record<string, any> {
+  if (!userId || typeof window === "undefined") return {};
+
+  const result: Record<string, any> = {};
+
+  // Try to read legacy localStorage keys
+  const legacyKeys = [
+    { localKey: `health_care_${userId}`, dataKey: "healthcare" },
+    { localKey: `care_preferences_${userId}`, dataKey: "care_preferences" },
+    { localKey: `advance_directive_${userId}`, dataKey: "advance_directive" },
+    { localKey: `travel_planning_${userId}`, dataKey: "travel" },
+  ];
+
+  for (const { localKey, dataKey } of legacyKeys) {
+    try {
+      const stored = localStorage.getItem(localKey);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && typeof parsed === "object" && Object.keys(parsed).length > 0) {
+          result[dataKey] = parsed;
+        }
+      }
+    } catch (e) {
+      // Ignore parse errors
+    }
+  }
+
+  return result;
+}
+
+/**
  * Supports legacy shapes:
  * - plan_payload.data
  * - plan_payload.plan_payload
  * - plan_payload.plan_payload.data
+ * 
+ * @param plan - The plan object from DB
+ * @param userId - Optional user ID to read localStorage fallbacks
  */
 export function normalizePlanData<TPlan extends Record<string, any> = Record<string, any>>(
-  plan: TPlan | null | undefined
+  plan: TPlan | null | undefined,
+  userId?: string
 ): NormalizedPlanData<TPlan> {
   const raw = (plan ?? ({} as TPlan)) as TPlan;
 
@@ -89,6 +127,9 @@ export function normalizePlanData<TPlan extends Record<string, any> = Record<str
   const payloadData = asObject(payload.data);
   const payloadNested = asObject(payload.plan_payload);
   const payloadNestedData = asObject(payloadNested.data);
+
+  // Read localStorage fallbacks for legacy data
+  const localDrafts = readLocalStorageDrafts(userId);
 
   // Merge order: oldest -> newest (newest wins)
   // Also merge direct top-level keys from the plan object itself
@@ -136,15 +177,21 @@ export function normalizePlanData<TPlan extends Record<string, any> = Record<str
     ? { ...merged.contacts, contacts: unifiedContacts }
     : { contacts: unifiedContacts };
 
+  // For sections that may have localStorage fallbacks, use them if DB is empty
+  const healthcare = merged.healthcare ?? merged.health_care ?? merged.medical ?? localDrafts.healthcare ?? {};
+  const care_preferences = merged.care_preferences ?? merged.carePreferences ?? localDrafts.care_preferences ?? {};
+  const advance_directive = merged.advance_directive ?? merged.advanceDirective ?? localDrafts.advance_directive ?? {};
+  const travel = merged.travel ?? localDrafts.travel ?? {};
+
   // Start with merged data, then override with normalized versions
   const data = {
     ...merged,
     personal: personal ?? {},
     about_you: about_you ?? {},
     contacts: contactsData,
-    healthcare: merged.healthcare ?? merged.health_care ?? merged.medical ?? {},
-    care_preferences: merged.care_preferences ?? merged.carePreferences ?? {},
-    advance_directive: merged.advance_directive ?? merged.advanceDirective ?? {},
+    healthcare,
+    care_preferences,
+    advance_directive,
     funeral: merged.funeral ?? {},
     financial: merged.financial ?? {},
     insurance: merged.insurance ?? {},
@@ -152,7 +199,7 @@ export function normalizePlanData<TPlan extends Record<string, any> = Record<str
     pets: Array.isArray(merged.pets) ? merged.pets : (merged.pets ? [merged.pets] : []),
     messages: Array.isArray(merged.messages) ? merged.messages : (merged.messages ? [merged.messages] : []),
     digital: merged.digital ?? {},
-    travel: merged.travel ?? {},
+    travel,
     preplanning: merged.preplanning ?? {},
     legal: merged.legal ?? {},
     legacy: merged.legacy ?? {},
