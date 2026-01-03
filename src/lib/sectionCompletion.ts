@@ -4,7 +4,7 @@
  * SINGLE SOURCE OF TRUTH for completion status on Plan Summary.
  *
  * CANONICAL KEYS:
- * - personal_profile: object
+ * - personal: object (NOT personal_profile)
  * - family: object  
  * - online_accounts: object (was 'digital')
  * - messages_to_loved_ones: { main_message: string, individual: [] }
@@ -66,10 +66,10 @@ export function getSectionCompletion(planData: unknown): Record<string, boolean>
     
     switch (sectionId) {
       case "personal":
-        // CANONICAL: personal_profile
+        // CANONICAL: personal (NOT personal_profile)
         result[sectionId] = hasMeaningfulData(
-          merged.personal_profile || merged.personal || merged.about_you || merged.about ||
-          data.personal_profile || data.personal || data.about_you
+          merged.personal || merged.personal_profile || merged.about_you || merged.about ||
+          data.personal || data.personal_profile || data.about_you
         );
         break;
         

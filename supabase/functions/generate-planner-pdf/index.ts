@@ -895,30 +895,34 @@ async function generateSimplePdf(
   addFooter(funeral1, pageNum++);
 
   // ============================================================
-  // PAGE 12: Service Details (continued)
+  // PAGE 12: Service Details (continued) - ONLY IF CONTENT EXISTS
   // ============================================================
-  const funeral2 = pdfDoc.addPage([pageWidth, pageHeight]);
-  addPageHeader(funeral2);
-  let f2Y = addSectionHeader(funeral2, "Service Details (continued)", pageHeight - 100);
-  
-  // Additional funeral details
   const pallbearers = planData?.pallbearers || [];
-  if (pallbearers.length > 0) {
-    funeral2.drawText("Pallbearers:", { x: margin, y: f2Y, size: 10, font: helveticaBold, color: textColor });
-    f2Y -= lineHeight;
-    f2Y = addArrayItems(funeral2, pallbearers, (p) => p.name || p, f2Y, 10);
-    f2Y -= 10;
-  }
-  
   const honoraryPallbearers = planData?.honorary_pallbearers || [];
-  if (honoraryPallbearers.length > 0) {
-    funeral2.drawText("Honorary Pallbearers:", { x: margin, y: f2Y, size: 10, font: helveticaBold, color: textColor });
-    f2Y -= lineHeight;
-    f2Y = addArrayItems(funeral2, honoraryPallbearers, (p) => p.name || p, f2Y, 10);
-  }
+  const hasServiceContinued = pallbearers.length > 0 || honoraryPallbearers.length > 0;
   
-  addDraftWatermark(funeral2);
-  addFooter(funeral2, pageNum++);
+  if (hasServiceContinued) {
+    const funeral2 = pdfDoc.addPage([pageWidth, pageHeight]);
+    addPageHeader(funeral2);
+    let f2Y = addSectionHeader(funeral2, "Service Details (continued)", pageHeight - 100);
+    
+    // Additional funeral details
+    if (pallbearers.length > 0) {
+      funeral2.drawText("Pallbearers:", { x: margin, y: f2Y, size: 10, font: helveticaBold, color: textColor });
+      f2Y -= lineHeight;
+      f2Y = addArrayItems(funeral2, pallbearers, (p) => p.name || p, f2Y, 10);
+      f2Y -= 10;
+    }
+    
+    if (honoraryPallbearers.length > 0) {
+      funeral2.drawText("Honorary Pallbearers:", { x: margin, y: f2Y, size: 10, font: helveticaBold, color: textColor });
+      f2Y -= lineHeight;
+      f2Y = addArrayItems(funeral2, honoraryPallbearers, (p) => p.name || p, f2Y, 10);
+    }
+    
+    addDraftWatermark(funeral2);
+    addFooter(funeral2, pageNum++);
+  }
 
   // ============================================================
   // PAGE 13: Financial
@@ -1575,12 +1579,23 @@ async function generateSimplePdf(
   addPageHeader(messagesPage);
   let msgY = addSectionHeader(messagesPage, "Messages to Loved Ones", pageHeight - 100);
   
-  const messagesList = planData?.messages || [];
-  const generalMessage = planData?.to_loved_ones_message || planData?.messages_notes || "";
+  // CANONICAL: Read from messages_to_loved_ones if available, fall back to messages array
+  const messagesObj = planData?.messages_to_loved_ones || {};
+  const messagesList = messagesObj.individual?.length > 0 
+    ? messagesObj.individual 
+    : (planData?.messages || []);
+  
+  // CANONICAL: Read main_message from messages_to_loved_ones, fall back to to_loved_ones_message
+  const generalMessage = messagesObj.main_message || planData?.to_loved_ones_message || planData?.messages_notes || "";
   const hasMessages = hasAny(messagesList) || hasText(generalMessage);
   
   console.log("[generate-planner-pdf] Messages section data:", {
-    messages_count: messagesList.length,
+    messages_to_loved_ones: {
+      main_message_len: messagesObj.main_message?.length || 0,
+      individual_count: messagesObj.individual?.length || 0,
+    },
+    legacy_messages_count: planData?.messages?.length || 0,
+    messages_list_final: messagesList.length,
     general_message_len: generalMessage.length,
     has_messages: hasMessages,
   });
@@ -1602,9 +1617,10 @@ async function generateSimplePdf(
       for (const msg of messagesList.slice(0, 4)) {
         if (msgY <= 120) break;
         
-        const recipient = msg.audience || msg.to_name || msg.recipients || "(Unspecified recipient)";
+        // CANONICAL: 'to' and 'message' are the field names from messages_to_loved_ones.individual
+        const recipient = msg.to || msg.audience || msg.to_name || msg.recipients || "(Unspecified recipient)";
         const title = msg.title || "";
-        const body = msg.body || msg.message || msg.content || "";
+        const body = msg.message || msg.body || msg.content || "";
         
         // Recipient line
         messagesPage.drawText(`To: ${sanitizeForPdf(recipient)}${title ? ` - ${sanitizeForPdf(title)}` : ""}`, {
@@ -1660,9 +1676,10 @@ async function generateSimplePdf(
     for (const msg of remainingMessages) {
       if (contY <= 120) break;
       
-      const recipient = msg.audience || msg.to_name || msg.recipients || "(Unspecified recipient)";
+      // CANONICAL: 'to' and 'message' are the field names
+      const recipient = msg.to || msg.audience || msg.to_name || msg.recipients || "(Unspecified recipient)";
       const title = msg.title || "";
-      const body = msg.body || msg.message || msg.content || "";
+      const body = msg.message || msg.body || msg.content || "";
       
       msgContPage.drawText(`To: ${sanitizeForPdf(recipient)}${title ? ` - ${sanitizeForPdf(title)}` : ""}`, {
         x: margin,

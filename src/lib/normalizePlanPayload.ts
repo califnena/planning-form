@@ -4,7 +4,7 @@
  * SINGLE SOURCE OF TRUTH for reading section data from `plan_payload`.
  *
  * CANONICAL KEYS (per mandate):
- * - personal_profile: object (Personal Information)
+ * - personal: object (Personal Information) - NOT personal_profile
  * - family: object (Family Information)
  * - online_accounts: object (was 'digital')
  * - messages_to_loved_ones: { main_message: string, individual: [] }
@@ -18,7 +18,7 @@
 
 export type NormalizedPlanPayload = {
   // CANONICAL KEYS
-  personal_profile: Record<string, any>;
+  personal: Record<string, any>;
   family: Record<string, any>;
   online_accounts: Record<string, any>;
   messages_to_loved_ones: {
@@ -99,10 +99,10 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
 
   const mergedRoot = { ...raw, ...rawData, ...rawSections };
 
-  // CANONICAL: personal_profile
-  const personal_profile = {
-    ...asObject(mergedRoot.personal_profile),
+  // CANONICAL: personal (NOT personal_profile)
+  const personal = {
     ...asObject(mergedRoot.personal),
+    ...asObject(mergedRoot.personal_profile),
     ...asObject(mergedRoot.about_you),
     ...asObject(mergedRoot.personal_information),
     ...asObject(mergedRoot.about),
@@ -111,11 +111,11 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
   // CANONICAL: family (subset of personal or separate)
   const family = {
     ...asObject(mergedRoot.family),
-    partner_name: personal_profile.partner_name,
-    child_names: personal_profile.child_names,
-    children: personal_profile.children,
-    father_name: personal_profile.father_name,
-    mother_name: personal_profile.mother_name,
+    partner_name: personal.partner_name,
+    child_names: personal.child_names,
+    children: personal.children,
+    father_name: personal.father_name,
+    mother_name: personal.mother_name,
   };
 
   // CANONICAL: online_accounts (was 'digital')
@@ -225,14 +225,14 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
 
   return {
     // CANONICAL KEYS
-    personal_profile,
+    personal,
     family,
     online_accounts,
     messages_to_loved_ones,
     legacy,
     
     // Backwards compat aliases
-    about: personal_profile,
+    about: personal,
     digital: online_accounts,
     messages: messages_to_loved_ones.individual,
     
