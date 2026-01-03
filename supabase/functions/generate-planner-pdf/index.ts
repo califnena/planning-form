@@ -1393,12 +1393,35 @@ async function generateSimplePdf(
   // ============================================================
   const legal = planData?.legal || {};
   const legalNotes = planData?.legal_notes || "";
-  
+
+  // Medical & Care (new section data)
+  const healthcareObj = planData?.healthcare || {};
+  const carePrefsObj = planData?.care_preferences || {};
+
+  const conditions = Array.isArray(healthcareObj.conditions) ? healthcareObj.conditions : [];
+  const allergies = Array.isArray(healthcareObj.allergies) ? healthcareObj.allergies : [];
+  const medications = Array.isArray(healthcareObj.medications) ? healthcareObj.medications : [];
+  const doctorPharmacy = healthcareObj.doctorPharmacy || {};
+
+  const hasMedical =
+    hasAny(conditions) ||
+    hasAny(allergies) ||
+    hasAny(medications) ||
+    hasText(doctorPharmacy.primaryDoctorName) ||
+    hasText(doctorPharmacy.primaryDoctorPhone) ||
+    hasText(doctorPharmacy.pharmacyName) ||
+    hasText(doctorPharmacy.pharmacyPhone) ||
+    hasAny(Array.isArray(carePrefsObj.preferences) ? carePrefsObj.preferences : []) ||
+    hasText(carePrefsObj.additionalNotes) ||
+    // Some versions store these in healthcareObj
+    hasText(healthcareObj.advanceDirectiveLocation) ||
+    hasText(healthcareObj.dnrPolstLocation);
+
   // Check for document checkboxes
   const hasLegalDocCheckboxes = legal.has_will || legal.has_trust || legal.has_poa ||
     legal.has_healthcare_directive || legal.has_living_will || legal.has_beneficiary_designations ||
     legal.has_none;
-  
+
   const executorName = legal.executor_name || legal.executor || legal.executorName;
   const executorPhone = legal.executor_phone || legal.executorPhone;
   const executorEmail = legal.executor_email || legal.executorEmail;
@@ -1406,7 +1429,7 @@ async function generateSimplePdf(
   const poaPhone = legal.poa_phone || legal.poaPhone;
   const willLoc = legal.will_location || legal.willLocation;
   const trustLoc = legal.trust_location || legal.trustLocation;
-  
+
   console.log("[generate-planner-pdf] Legal section data:", {
     legal_keys: Object.keys(legal),
     has_doc_checkboxes: hasLegalDocCheckboxes,
@@ -1414,10 +1437,19 @@ async function generateSimplePdf(
     poa: poaName,
     will: willLoc,
     trust: trustLoc,
+    has_medical: hasMedical,
   });
-  
-  const hasLegal = hasText(executorName) || hasText(poaName) || hasText(willLoc) || hasText(trustLoc) || 
-    hasText(legal.healthcare_proxy) || hasText(legal.attorney_name) || hasText(legalNotes) || hasLegalDocCheckboxes;
+
+  const hasLegal =
+    hasText(executorName) ||
+    hasText(poaName) ||
+    hasText(willLoc) ||
+    hasText(trustLoc) ||
+    hasText(legal.healthcare_proxy) ||
+    hasText(legal.attorney_name) ||
+    hasText(legalNotes) ||
+    hasLegalDocCheckboxes ||
+    hasMedical;
 
   const legalPage = pdfDoc.addPage([pageWidth, pageHeight]);
   addPageHeader(legalPage);
@@ -1465,7 +1497,72 @@ async function generateSimplePdf(
     if (legal.attorney_name) legY = addField(legalPage, "Attorney", legal.attorney_name, legY);
     if (legal.attorney_phone) legY = addField(legalPage, "Attorney Phone", legal.attorney_phone, legY);
     if (legal.attorney_firm) legY = addField(legalPage, "Law Firm", legal.attorney_firm, legY);
-    
+
+    // Medical & Care Preferences (prints if present; keeps PDF page count unchanged)
+    if (hasMedical) {
+      legY -= 14;
+      legalPage.drawText("Medical & Care Preferences:", {
+        x: margin,
+        y: legY,
+        size: 10,
+        font: helveticaBold,
+        color: textColor,
+      });
+      legY -= lineHeight;
+
+      if (conditions.length > 0) {
+        legalPage.drawText("Conditions:", { x: margin, y: legY, size: 10, font: helveticaBold, color: textColor });
+        legY -= lineHeight;
+        legY = addArrayItems(legalPage, conditions, (c) => [c.condition, c.notes].filter(Boolean).join(" - "), legY, 6);
+        legY -= 10;
+      }
+
+      if (allergies.length > 0) {
+        legalPage.drawText("Allergies:", { x: margin, y: legY, size: 10, font: helveticaBold, color: textColor });
+        legY -= lineHeight;
+        legY = addArrayItems(legalPage, allergies, (a) => [a.substance, a.reaction].filter(Boolean).join(" - "), legY, 6);
+        legY -= 10;
+      }
+
+      if (medications.length > 0) {
+        legalPage.drawText("Medications:", { x: margin, y: legY, size: 10, font: helveticaBold, color: textColor });
+        legY -= lineHeight;
+        legY = addArrayItems(
+          legalPage,
+          medications,
+          (m) => {
+            const parts = [m.name, m.dose];
+            if (m.asNeeded) parts.push("as needed");
+            if (m.notes) parts.push(m.notes);
+            return parts.filter(Boolean).join(" - ");
+          },
+          legY,
+          6,
+        );
+        legY -= 10;
+      }
+
+      const doctorName = doctorPharmacy.primaryDoctorName;
+      const doctorPhone = doctorPharmacy.primaryDoctorPhone;
+      const pharmacyName = doctorPharmacy.pharmacyName;
+      const pharmacyPhone = doctorPharmacy.pharmacyPhone;
+
+      if (hasText(doctorName) || hasText(doctorPhone)) {
+        legY = addField(legalPage, "Primary Doctor", [doctorName, doctorPhone].filter(Boolean).join(" - "), legY);
+      }
+      if (hasText(pharmacyName) || hasText(pharmacyPhone)) {
+        legY = addField(legalPage, "Pharmacy", [pharmacyName, pharmacyPhone].filter(Boolean).join(" - "), legY);
+      }
+
+      const selectedPrefs = Array.isArray(carePrefsObj.preferences) ? carePrefsObj.preferences : [];
+      if (selectedPrefs.length > 0) {
+        legY = addField(legalPage, "Care Preferences", selectedPrefs.join(", "), legY);
+      }
+      if (hasText(carePrefsObj.additionalNotes)) {
+        legY = addNotesBox(legalPage, "Care Notes", carePrefsObj.additionalNotes, legY);
+      }
+    }
+
     legY = addNotesBox(legalPage, "Notes", legalNotes, legY);
   }
   addDraftWatermark(legalPage);

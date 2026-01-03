@@ -141,44 +141,14 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     supabase.from("profiles").select("full_name").eq("id", userId).maybeSingle(),
   ]);
 
-  // Step 3: Also check localStorage for any unsaved data (some screens save to localStorage)
-  let localPlan: any = null;
-  let localProfile: any = null;
-  let localHealthcare: any = null;
-  let localCarePreferences: any = null;
-  let localPreplanning: any = null;
-  let localTravel: any = null;
-  let localAdvanceDirective: any = null;
-  try {
-    const raw = localStorage.getItem(`plan_${userId}`);
-    if (raw) {
-      localPlan = JSON.parse(raw);
-      localProfile = localPlan?.personal_profile;
-    }
-
-    const healthRaw = localStorage.getItem(`healthcare_${userId}`);
-    if (healthRaw) localHealthcare = JSON.parse(healthRaw);
-
-    const careRaw = localStorage.getItem(`care_preferences_${userId}`);
-    if (careRaw) localCarePreferences = JSON.parse(careRaw);
-
-    const preplanRaw = localStorage.getItem(`preplanning_${userId}`);
-    if (preplanRaw) localPreplanning = JSON.parse(preplanRaw);
-
-    const travelRaw = localStorage.getItem(`travel_planning_${userId}`);
-    if (travelRaw) localTravel = JSON.parse(travelRaw);
-
-    const advDirRaw = localStorage.getItem(`advance_directive_${userId}`);
-    if (advDirRaw) localAdvanceDirective = JSON.parse(advDirRaw);
-  } catch (e) {
-    console.warn("[buildPlanDataForPdf] Failed to parse local data:", e);
-  }
+  // Step 3: Do NOT read from localStorage here.
+  // All section data is expected to come from DB-backed plan_payload.
+  // (Any one-time migration from localStorage to plan_payload should happen in the section pages.)
 
   // Step 4: Build the complete planData object
-  // Priority: localStorage > DB plan_payload > defaults
+  // Priority: DB plan_payload > defaults
   const mergedProfile = {
     ...(personalProfile || {}),
-    ...(localProfile || {}),
   };
 
   // Ensure we have a name from somewhere
@@ -228,25 +198,28 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     personal_profile: mergedProfile,
 
     // Notes from plans table
-    instructions_notes: plan.instructions_notes || localPlan?.instructions_notes || "",
-    about_me_notes: plan.about_me_notes || localPlan?.about_me_notes || "",
-    checklist_notes: plan.checklist_notes || localPlan?.checklist_notes || "",
-    funeral_wishes_notes: plan.funeral_wishes_notes || localPlan?.funeral_wishes_notes || "",
-    financial_notes: plan.financial_notes || localPlan?.financial_notes || "",
-    insurance_notes: plan.insurance_notes || localPlan?.insurance_notes || "",
-    property_notes: plan.property_notes || localPlan?.property_notes || "",
-    pets_notes: plan.pets_notes || localPlan?.pets_notes || "",
-    digital_notes: plan.digital_notes || localPlan?.digital_notes || "",
-    legal_notes: plan.legal_notes || localPlan?.legal_notes || "",
-    messages_notes: plan.messages_notes || localPlan?.messages_notes || "",
-    to_loved_ones_message: plan.to_loved_ones_message || localPlan?.to_loved_ones_message || "",
+    instructions_notes: plan.instructions_notes || "",
+    about_me_notes: plan.about_me_notes || "",
+    checklist_notes: plan.checklist_notes || "",
+    funeral_wishes_notes: plan.funeral_wishes_notes || "",
+    financial_notes: plan.financial_notes || "",
+    insurance_notes: plan.insurance_notes || "",
+    property_notes: plan.property_notes || "",
+    pets_notes: plan.pets_notes || "",
+    digital_notes: plan.digital_notes || "",
+    legal_notes: plan.legal_notes || "",
+    messages_notes: plan.messages_notes || "",
+    to_loved_ones_message: plan.to_loved_ones_message || "",
 
-    // Related data arrays (from Supabase separate tables)
+    // Related data arrays (from separate tables)
     contacts_notify: contacts || [],
-    pets: pets || [],
+
+    // IMPORTANT: If separate tables are empty, fall back to plan_payload values
+    pets: (Array.isArray(pets) && pets.length > 0) ? pets : (Array.isArray(planPayloadMerged.pets) ? planPayloadMerged.pets : []),
     insurance_policies: insurance || [],
     properties: properties || [],
-    messages: messages || [],
+    messages: (Array.isArray(messages) && messages.length > 0) ? messages : (Array.isArray(planPayloadMerged.messages) ? planPayloadMerged.messages : []),
+
     investments: investments || [],
     debts: debts || [],
     bank_accounts: bankAccounts || [],
@@ -254,24 +227,9 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     funeral_funding: funeralFunding || [],
     contacts_professional: professionalContacts || [],
 
-    // Merged plan_payload sections at top level (CRITICAL for completion detection)
+    // Merged plan_payload sections at top level (CRITICAL for completion + PDF)
     ...planPayloadMerged,
-    
-    // Override with localStorage data if available (localStorage takes priority)
-    healthcare: localHealthcare || planPayloadMerged.healthcare || undefined,
-    care_preferences: localCarePreferences
-      ? {
-          checks: localCarePreferences.checks || localCarePreferences,
-          notes: localCarePreferences.notes || localCarePreferences.additionalNotes || "",
-        }
-      : planPayloadMerged.care_preferences || undefined,
-    preplanning: localPreplanning || planPayloadMerged.preplanning || undefined,
-    travel: localTravel || planPayloadMerged.travel || undefined,
-    advance_directive: localAdvanceDirective || planPayloadMerged.advance_directive || undefined,
-    
-    // Funeral data - localStorage plan object takes priority
-    funeral: localPlan?.funeral || planPayloadMerged.funeral || undefined,
-    
+
     // Keep plan_payload as reference too
     plan_payload: planPayload,
 

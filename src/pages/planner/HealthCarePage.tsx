@@ -4,32 +4,35 @@ import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 export default function HealthCarePage() {
-  const { user, saveState } = usePlanContext();
+  const { user, plan, updatePlan, saveState } = usePlanContext();
   const navigate = useNavigate();
 
-  const [healthCareData, setHealthCareData] = useState<any>({});
+  // Read from DB-backed plan_payload (single source of truth)
+  const healthCareData = plan.healthcare || {};
 
+  // One-time migration: if user has legacy localStorage data but nothing in plan_payload yet
   useEffect(() => {
-    if (user?.id) {
-      const stored = localStorage.getItem(`health_care_${user.id}`);
-      if (stored) {
-        try {
-          setHealthCareData(JSON.parse(stored));
-        } catch (e) {
-          console.error("Error parsing health care data:", e);
-        }
+    if (!user?.id) return;
+    if (healthCareData && Object.keys(healthCareData).length > 0) return;
+
+    const stored = localStorage.getItem(`health_care_${user.id}`);
+    if (!stored) return;
+
+    try {
+      const parsed = JSON.parse(stored);
+      if (parsed && typeof parsed === "object") {
+        updatePlan({ healthcare: parsed });
       }
+    } catch (e) {
+      console.error("Error parsing health care data:", e);
     }
-  }, [user?.id]);
+  }, [user?.id, updatePlan]);
 
   const handleChange = (data: any) => {
-    setHealthCareData(data);
-    if (user?.id) {
-      localStorage.setItem(`health_care_${user.id}`, JSON.stringify(data));
-    }
+    updatePlan({ healthcare: data });
   };
 
   const handleNext = () => {

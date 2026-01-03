@@ -4,32 +4,34 @@ import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 export default function AdvanceDirectivePage() {
-  const { user, saveState } = usePlanContext();
+  const { user, plan, updatePlan, saveState } = usePlanContext();
   const navigate = useNavigate();
 
-  const [advanceDirectiveData, setAdvanceDirectiveData] = useState<any>({});
+  const advanceDirectiveData = plan.advance_directive || {};
 
+  // One-time migration from legacy localStorage
   useEffect(() => {
-    if (user?.id) {
-      const stored = localStorage.getItem(`advance_directive_${user.id}`);
-      if (stored) {
-        try {
-          setAdvanceDirectiveData(JSON.parse(stored));
-        } catch (e) {
-          console.error("Error parsing advance directive data:", e);
-        }
+    if (!user?.id) return;
+    if (advanceDirectiveData && Object.keys(advanceDirectiveData).length > 0) return;
+
+    const stored = localStorage.getItem(`advance_directive_${user.id}`);
+    if (!stored) return;
+
+    try {
+      const parsed = JSON.parse(stored);
+      if (parsed && typeof parsed === "object") {
+        updatePlan({ advance_directive: parsed });
       }
+    } catch (e) {
+      console.error("Error parsing advance directive data:", e);
     }
-  }, [user?.id]);
+  }, [user?.id, updatePlan]);
 
   const handleChange = (data: any) => {
-    setAdvanceDirectiveData(data);
-    if (user?.id) {
-      localStorage.setItem(`advance_directive_${user.id}`, JSON.stringify(data));
-    }
+    updatePlan({ advance_directive: data });
   };
 
   const handleNext = () => {

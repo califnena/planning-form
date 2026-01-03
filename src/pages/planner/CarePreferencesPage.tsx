@@ -4,32 +4,34 @@ import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 export default function CarePreferencesPage() {
-  const { user, saveState } = usePlanContext();
+  const { user, plan, updatePlan, saveState } = usePlanContext();
   const navigate = useNavigate();
 
-  const [carePreferencesData, setCarePreferencesData] = useState<any>({});
+  const carePreferencesData = plan.care_preferences || {};
 
+  // One-time migration from legacy localStorage
   useEffect(() => {
-    if (user?.id) {
-      const stored = localStorage.getItem(`care_preferences_${user.id}`);
-      if (stored) {
-        try {
-          setCarePreferencesData(JSON.parse(stored));
-        } catch (e) {
-          console.error("Error parsing care preferences data:", e);
-        }
+    if (!user?.id) return;
+    if (carePreferencesData && Object.keys(carePreferencesData).length > 0) return;
+
+    const stored = localStorage.getItem(`care_preferences_${user.id}`);
+    if (!stored) return;
+
+    try {
+      const parsed = JSON.parse(stored);
+      if (parsed && typeof parsed === "object") {
+        updatePlan({ care_preferences: parsed });
       }
+    } catch (e) {
+      console.error("Error parsing care preferences data:", e);
     }
-  }, [user?.id]);
+  }, [user?.id, updatePlan]);
 
   const handleChange = (data: any) => {
-    setCarePreferencesData(data);
-    if (user?.id) {
-      localStorage.setItem(`care_preferences_${user.id}`, JSON.stringify(data));
-    }
+    updatePlan({ care_preferences: data });
   };
 
   const handleNext = () => {
