@@ -2,99 +2,185 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Plus, Trash2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { PrivacyModal } from "@/components/PrivacyModal";
 
+interface Account {
+  id: string;
+  provider: string;
+  username: string;
+  twofa_method: string;
+  recovery_info: string;
+  notes: string;
+}
+
+interface PhoneAccount {
+  id: string;
+  carrier: string;
+  number: string;
+  pin_location: string;
+}
+
+interface OnlineAccountsData {
+  categories: {
+    email: Account[];
+    social: Account[];
+    banking: Account[];
+    subscriptions: Account[];
+    utilities: Account[];
+    phone: PhoneAccount[];
+    other: Account[];
+  };
+  password_manager_info: string;
+}
+
 interface SectionDigitalProps {
   data: any;
   onChange: (data: any) => void;
 }
 
+const ACCOUNT_CATEGORIES = [
+  { key: "email", label: "📧 Email Accounts", icon: "📧" },
+  { key: "social", label: "💬 Social Media", icon: "💬" },
+  { key: "banking", label: "🏦 Banking & Financial", icon: "🏦" },
+  { key: "subscriptions", label: "📺 Subscriptions & Streaming", icon: "📺" },
+  { key: "utilities", label: "🏠 Utilities & Bills", icon: "🏠" },
+  { key: "other", label: "📦 Other Accounts", icon: "📦" },
+];
+
+const TWOFA_METHODS = [
+  "None",
+  "Text/SMS",
+  "Authenticator App",
+  "Security Key",
+  "Email",
+  "Phone Call",
+  "Unknown",
+];
+
 /**
  * SectionDigital
  * 
  * CANONICAL KEY: online_accounts (object in plan_payload)
- * 
- * SAVE: data.online_accounts → plan_payload.online_accounts
- * READ: data.online_accounts from plan_payload
- * COMPLETION: hasMeaningfulData(plan_payload.online_accounts)
+ * Structure: { categories: { email:[], social:[], ... }, password_manager_info: string }
  */
 export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
-  // CANONICAL: Read from online_accounts (migrate from digital if needed)
-  const online_accounts = data.online_accounts || data.digital || {};
-  const accounts = online_accounts.accounts || [];
-  const phones = online_accounts.phones || [];
+  // Read and normalize from canonical key
+  const rawOnlineAccounts = data.online_accounts || data.digital || {};
   const { toast } = useToast();
   const { t } = useTranslation();
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
-  const updateOnlineAccounts = (field: string, value: any) => {
-    // CANONICAL: Write to online_accounts
-    const updated = {
-      ...data,
-      online_accounts: { ...online_accounts, [field]: value }
+  // Migrate old structure to new categories structure
+  const getOnlineAccounts = (): OnlineAccountsData => {
+    // If already has categories structure, use it
+    if (rawOnlineAccounts.categories) {
+      return rawOnlineAccounts as OnlineAccountsData;
+    }
+
+    // Migrate from old flat structure
+    const oldAccounts = rawOnlineAccounts.accounts || [];
+    const oldPhones = rawOnlineAccounts.phones || [];
+
+    // Create new categories structure with migrated data
+    const categories: OnlineAccountsData["categories"] = {
+      email: [],
+      social: [],
+      banking: [],
+      subscriptions: [],
+      utilities: [],
+      phone: oldPhones.map((p: any) => ({
+        id: p.id || crypto.randomUUID(),
+        carrier: p.carrier || "",
+        number: p.number || "",
+        pin_location: p.pin || "",
+      })),
+      other: oldAccounts.map((a: any) => ({
+        id: a.id || crypto.randomUUID(),
+        provider: a.platform || "",
+        username: a.username || "",
+        twofa_method: "",
+        recovery_info: "",
+        notes: a.action_custom || "",
+      })),
     };
-    
+
+    return {
+      categories,
+      password_manager_info: rawOnlineAccounts.password_manager_info || "",
+    };
+  };
+
+  const online_accounts = getOnlineAccounts();
+
+  const updateOnlineAccounts = (updated: OnlineAccountsData) => {
+    onChange({
+      ...data,
+      online_accounts: updated,
+    });
+
     if (import.meta.env.DEV) {
-      console.log("[SectionDigital] updateOnlineAccounts:", field, "→ online_accounts");
+      console.log("[SectionDigital] Updated online_accounts with categories");
     }
-    
-    onChange(updated);
   };
 
-  const addAccount = () => {
-    updateOnlineAccounts("accounts", [...accounts, { platform: "", username: "", action: "" }]);
-  };
-
-  const addAccountWithPlatform = (platform: string) => {
-    updateOnlineAccounts("accounts", [...accounts, { platform, username: "", action: "" }]);
-  };
-
-  const updateAccount = (index: number, field: string, value: string | boolean) => {
-    const updated = [...accounts];
-    updated[index] = { ...updated[index], [field]: value };
-    updateOnlineAccounts("accounts", updated);
-  };
-
-  const removeAccount = (index: number) => {
-    updateOnlineAccounts("accounts", accounts.filter((_: any, i: number) => i !== index));
-  };
-
-  const addPhone = () => {
-    updateOnlineAccounts("phones", [...phones, { carrier: "", number: "", pin: "" }]);
-  };
-
-  const updatePhone = (index: number, field: string, value: string) => {
-    const updated = [...phones];
-    updated[index] = { ...updated[index], [field]: value };
-    updateOnlineAccounts("phones", updated);
-  };
-
-  const removePhone = (index: number) => {
-    updateOnlineAccounts("phones", phones.filter((_: any, i: number) => i !== index));
-  };
-
-  // Auto-create account when checkbox is checked
-  const handleCheckboxChange = (field: string, value: boolean) => {
-    updateOnlineAccounts(field, value);
-    
-    if (field.startsWith('has_') && value === true && field !== 'has_password_manager') {
-      const accountType = field.replace('has_', '').replace(/_/g, ' ');
-      const typeCapitalized = accountType.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-      
-      const existingAccount = accounts.find((acc: any) => 
-        acc.platform?.toLowerCase().includes(accountType.toLowerCase())
-      );
-      
-      if (!existingAccount) {
-        addAccountWithPlatform(typeCapitalized);
-      }
+  const addAccount = (category: string) => {
+    if (category === "phone") {
+      const newPhone: PhoneAccount = {
+        id: crypto.randomUUID(),
+        carrier: "",
+        number: "",
+        pin_location: "",
+      };
+      const updated = { ...online_accounts };
+      updated.categories.phone = [...updated.categories.phone, newPhone];
+      updateOnlineAccounts(updated);
+    } else {
+      const newAccount: Account = {
+        id: crypto.randomUUID(),
+        provider: "",
+        username: "",
+        twofa_method: "",
+        recovery_info: "",
+        notes: "",
+      };
+      const updated = { ...online_accounts };
+      (updated.categories as any)[category] = [...(updated.categories as any)[category], newAccount];
+      updateOnlineAccounts(updated);
     }
+  };
+
+  const updateAccount = (category: string, index: number, field: string, value: string) => {
+    const updated = { ...online_accounts };
+    const categoryArray = [...(updated.categories as any)[category]];
+    categoryArray[index] = { ...categoryArray[index], [field]: value };
+    (updated.categories as any)[category] = categoryArray;
+    updateOnlineAccounts(updated);
+  };
+
+  const removeAccount = (category: string, index: number) => {
+    const updated = { ...online_accounts };
+    (updated.categories as any)[category] = (updated.categories as any)[category].filter(
+      (_: any, i: number) => i !== index
+    );
+    updateOnlineAccounts(updated);
   };
 
   const handleSave = () => {
@@ -102,6 +188,13 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
       title: "Saved",
       description: "Online accounts information has been saved.",
     });
+  };
+
+  const getTotalAccounts = () => {
+    return Object.values(online_accounts.categories).reduce(
+      (sum, arr) => sum + (arr?.length || 0),
+      0
+    );
   };
 
   return (
@@ -121,6 +214,9 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
               Privacy & Data
             </button>
           </p>
+          <p className="text-sm text-primary mt-1">
+            {getTotalAccounts()} accounts tracked
+          </p>
         </div>
         <Button onClick={handleSave} size="sm">
           <Save className="h-4 w-4 mr-2" />
@@ -128,264 +224,199 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
         </Button>
       </div>
 
-      <div className="space-y-4">
-        <Label className="text-base font-semibold">Digital Assets I Have</Label>
-        <div className="grid md:grid-cols-2 gap-3">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="social_media"
-              checked={online_accounts.has_social_media || false}
-              onCheckedChange={(checked) => handleCheckboxChange("has_social_media", checked as boolean)}
-            />
-            <Label htmlFor="social_media" className="font-normal">Social media accounts</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="email"
-              checked={online_accounts.has_email || false}
-              onCheckedChange={(checked) => handleCheckboxChange("has_email", checked as boolean)}
-            />
-            <Label htmlFor="email" className="font-normal">Email accounts</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="cloud_storage"
-              checked={online_accounts.has_cloud_storage || false}
-              onCheckedChange={(checked) => handleCheckboxChange("has_cloud_storage", checked as boolean)}
-            />
-            <Label htmlFor="cloud_storage" className="font-normal">Cloud storage (Google, iCloud, Dropbox)</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="streaming"
-              checked={online_accounts.has_streaming || false}
-              onCheckedChange={(checked) => handleCheckboxChange("has_streaming", checked as boolean)}
-            />
-            <Label htmlFor="streaming" className="font-normal">Streaming services</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="shopping"
-              checked={online_accounts.has_shopping || false}
-              onCheckedChange={(checked) => handleCheckboxChange("has_shopping", checked as boolean)}
-            />
-            <Label htmlFor="shopping" className="font-normal">Shopping accounts (Amazon, etc.)</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="photo_sites"
-              checked={online_accounts.has_photo_sites || false}
-              onCheckedChange={(checked) => handleCheckboxChange("has_photo_sites", checked as boolean)}
-            />
-            <Label htmlFor="photo_sites" className="font-normal">Photo sharing sites</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="domains"
-              checked={online_accounts.has_domains || false}
-              onCheckedChange={(checked) => handleCheckboxChange("has_domains", checked as boolean)}
-            />
-            <Label htmlFor="domains" className="font-normal">Domain names or websites</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="password_manager"
-              checked={online_accounts.has_password_manager || false}
-              onCheckedChange={(checked) => handleCheckboxChange("has_password_manager", checked as boolean)}
-            />
-            <Label htmlFor="password_manager" className="font-normal">Password manager</Label>
-          </div>
-        </div>
-      </div>
-
-      {/* Phone Section */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label className="text-base font-semibold">📱 Phone Accounts</Label>
-          <Button onClick={addPhone} size="sm" variant="outline">
+      {/* Phone Accounts - Special section */}
+      <Card className="p-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold text-lg">📱 Phone Accounts</h3>
+          <Button onClick={() => addAccount("phone")} size="sm" variant="outline">
             <Plus className="h-4 w-4 mr-2" />
             Add Phone
           </Button>
         </div>
 
-        {phones.map((phone: any, index: number) => (
-          <Card key={index} className="p-4 space-y-4">
-            <div className="flex justify-between items-start">
-              <h4 className="font-semibold">Phone {index + 1}</h4>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={addPhone}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removePhone(index)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label>Carrier</Label>
-                <p className="text-xs text-muted-foreground">Mobile service provider</p>
-                <Input
-                  value={phone.carrier || ""}
-                  onChange={(e) => updatePhone(index, "carrier", e.target.value)}
-                  placeholder="e.g., Verizon, AT&T"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Phone Number</Label>
-                <p className="text-xs text-muted-foreground">Your mobile number</p>
-                <Input
-                  value={phone.number || ""}
-                  onChange={(e) => updatePhone(index, "number", e.target.value)}
-                  placeholder="(123) 456-7890"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>PIN/Password Location</Label>
-                <p className="text-xs text-muted-foreground">Where account PIN is stored</p>
-                <Input
-                  value={phone.pin || ""}
-                  onChange={(e) => updatePhone(index, "pin", e.target.value)}
-                  placeholder="Where PIN is stored"
-                />
-              </div>
-            </div>
-          </Card>
-        ))}
-
-        {phones.length === 0 && (
-          <div className="text-center py-8 border border-dashed rounded-lg">
-            <p className="text-muted-foreground mb-3">No phones added yet</p>
-            <Button onClick={addPhone} variant="outline" size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Your First Phone
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {/* Digital Accounts */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label className="text-base font-semibold">Account Details</Label>
-          <Button onClick={addAccount} size="sm" variant="outline">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Account
-          </Button>
-        </div>
-
-        {accounts.map((account: any, index: number) => (
-          <Card key={index} className="p-4 space-y-4">
-            <div className="flex justify-between items-start">
-              <h4 className="font-semibold">Account {index + 1}</h4>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={addAccount}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeAccount(index)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Platform/Service</Label>
-                <p className="text-xs text-muted-foreground">Name of digital service or platform</p>
-                <Input
-                  value={account.platform || ""}
-                  onChange={(e) => updateAccount(index, "platform", e.target.value)}
-                  placeholder="e.g., Facebook, Gmail, Netflix"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Username/Email</Label>
-                <p className="text-xs text-muted-foreground">How you log into this account</p>
-                <Input
-                  value={account.username || ""}
-                  onChange={(e) => updateAccount(index, "username", e.target.value)}
-                  placeholder="Your account identifier"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Preferred Action</Label>
-              <p className="text-xs text-muted-foreground">What should happen to this account</p>
-              <div className="space-y-3">
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`memorialize-${index}`}
-                      checked={account.action_memorialize || false}
-                      onCheckedChange={(checked) => updateAccount(index, "action_memorialize", checked as boolean)}
+        {online_accounts.categories.phone.length === 0 ? (
+          <p className="text-muted-foreground text-sm">No phone accounts added yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {online_accounts.categories.phone.map((phone, index) => (
+              <div key={phone.id} className="border rounded-lg p-3 space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">Phone {index + 1}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeAccount("phone", index)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="grid md:grid-cols-3 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Carrier</Label>
+                    <Input
+                      value={phone.carrier}
+                      onChange={(e) => updateAccount("phone", index, "carrier", e.target.value)}
+                      placeholder="e.g., Verizon"
                     />
-                    <Label htmlFor={`memorialize-${index}`} className="font-normal">Memorialize</Label>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`delete-${index}`}
-                      checked={account.action_delete || false}
-                      onCheckedChange={(checked) => updateAccount(index, "action_delete", checked as boolean)}
+                  <div className="space-y-1">
+                    <Label className="text-xs">Phone Number</Label>
+                    <Input
+                      value={phone.number}
+                      onChange={(e) => updateAccount("phone", index, "number", e.target.value)}
+                      placeholder="(123) 456-7890"
                     />
-                    <Label htmlFor={`delete-${index}`} className="font-normal">Delete</Label>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`transfer-${index}`}
-                      checked={account.action_transfer || false}
-                      onCheckedChange={(checked) => updateAccount(index, "action_transfer", checked as boolean)}
+                  <div className="space-y-1">
+                    <Label className="text-xs">PIN Location</Label>
+                    <Input
+                      value={phone.pin_location}
+                      onChange={(e) => updateAccount("phone", index, "pin_location", e.target.value)}
+                      placeholder="Where PIN is stored"
                     />
-                    <Label htmlFor={`transfer-${index}`} className="font-normal">Transfer</Label>
                   </div>
                 </div>
-                <Input
-                  value={account.action_custom || ""}
-                  onChange={(e) => updateAccount(index, "action_custom", e.target.value)}
-                  placeholder="Additional instructions or specify transfer recipient..."
-                />
               </div>
-            </div>
-          </Card>
-        ))}
-
-        {accounts.length === 0 && (
-          <div className="text-center py-8 border border-dashed rounded-lg">
-            <p className="text-muted-foreground mb-3">No digital accounts added yet</p>
-            <Button onClick={addAccount} variant="outline" size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Your First Account
-            </Button>
+            ))}
           </div>
         )}
-      </div>
+      </Card>
 
+      {/* Account Categories - Accordion */}
+      <Accordion type="multiple" className="space-y-2">
+        {ACCOUNT_CATEGORIES.map(({ key, label }) => {
+          const accounts = (online_accounts.categories as any)[key] || [];
+          return (
+            <AccordionItem key={key} value={key} className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center gap-2">
+                  <span>{label}</span>
+                  <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
+                    {accounts.length}
+                  </span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pb-4">
+                <Button
+                  onClick={() => addAccount(key)}
+                  size="sm"
+                  variant="outline"
+                  className="w-full"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add {label.split(" ").slice(1).join(" ")} Account
+                </Button>
+
+                {accounts.map((account: Account, index: number) => (
+                  <Card key={account.id} className="p-4 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Account {index + 1}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeAccount(key, index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs">Provider/Service</Label>
+                        <Input
+                          value={account.provider}
+                          onChange={(e) =>
+                            updateAccount(key, index, "provider", e.target.value)
+                          }
+                          placeholder="e.g., Google, Netflix"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Username/Email</Label>
+                        <Input
+                          value={account.username}
+                          onChange={(e) =>
+                            updateAccount(key, index, "username", e.target.value)
+                          }
+                          placeholder="Your login identifier"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">2FA Method</Label>
+                        <Select
+                          value={account.twofa_method}
+                          onValueChange={(value) =>
+                            updateAccount(key, index, "twofa_method", value)
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select 2FA method" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {TWOFA_METHODS.map((method) => (
+                              <SelectItem key={method} value={method}>
+                                {method}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Recovery Info Location</Label>
+                        <Input
+                          value={account.recovery_info}
+                          onChange={(e) =>
+                            updateAccount(key, index, "recovery_info", e.target.value)
+                          }
+                          placeholder="Where recovery codes are stored"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-xs">Notes</Label>
+                      <Textarea
+                        value={account.notes}
+                        onChange={(e) => updateAccount(key, index, "notes", e.target.value)}
+                        placeholder="Additional instructions..."
+                        rows={2}
+                      />
+                    </div>
+                  </Card>
+                ))}
+
+                {accounts.length === 0 && (
+                  <p className="text-muted-foreground text-sm text-center py-2">
+                    No accounts in this category yet.
+                  </p>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          );
+        })}
+      </Accordion>
+
+      {/* Password Manager */}
       <div className="space-y-2">
-        <Label htmlFor="password_manager_info">Password Manager Information</Label>
-        <p className="text-xs text-muted-foreground">Which password manager you use and where the master password is stored</p>
+        <Label htmlFor="password_manager_info">🔐 Password Manager Information</Label>
+        <p className="text-xs text-muted-foreground">
+          Which password manager you use and where the master password is stored
+        </p>
         <Textarea
           id="password_manager_info"
           value={online_accounts.password_manager_info || ""}
-          onChange={(e) => updateOnlineAccounts("password_manager_info", e.target.value)}
+          onChange={(e) =>
+            updateOnlineAccounts({
+              ...online_accounts,
+              password_manager_info: e.target.value,
+            })
+          }
           placeholder="Which password manager do you use? Where is the master password stored?"
           rows={3}
         />
       </div>
 
+      {/* Helpful Resources */}
       <div className="p-4 bg-muted/50 rounded-lg">
         <h3 className="font-semibold mb-2">🔗 Helpful Resources:</h3>
         <ul className="text-sm space-y-1">
@@ -411,20 +442,17 @@ export const SectionDigital = ({ data, onChange }: SectionDigitalProps) => {
           </li>
           <li>
             <a
-              href="#faq"
-              onClick={(e) => {
-                e.preventDefault();
-                const faqSection = document.querySelector('[data-section="faq"]');
-                if (faqSection) faqSection.scrollIntoView({ behavior: 'smooth' });
-              }}
+              href="https://www.facebook.com/help/1568013990080948"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-primary hover:underline"
             >
-              Digital Legacy Section in Guide & FAQ
+              Facebook Legacy Contact
             </a>
           </li>
         </ul>
       </div>
-      
+
       <PrivacyModal open={showPrivacyModal} onOpenChange={setShowPrivacyModal} />
     </div>
   );

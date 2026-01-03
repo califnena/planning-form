@@ -26,6 +26,15 @@ export type NormalizedPlanPayload = {
     individual: Array<{ to: string; message: string; audio_url?: string; video_url?: string }>;
   };
   legacy: Record<string, any>;
+  signature: {
+    printed_name: string;
+    signature_png: string;
+    signed_at: string;
+  };
+  
+  // Contact arrays
+  contacts_professional: any[];
+  service_providers: any[];
   
   // Other sections
   about: Record<string, any>;
@@ -223,6 +232,18 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
     ...asObject(mergedRoot.instructions),
   };
 
+  // Professional contacts and service providers
+  const contacts_professional = asArray(mergedRoot.contacts_professional);
+  const service_providers = asArray(mergedRoot.service_providers);
+
+  // Signature
+  const signatureRaw = asObject(mergedRoot.signature);
+  const signature = {
+    printed_name: signatureRaw.printed_name || "",
+    signature_png: signatureRaw.signature_png || "",
+    signed_at: signatureRaw.signed_at || "",
+  };
+
   return {
     // CANONICAL KEYS
     personal,
@@ -230,6 +251,11 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
     online_accounts,
     messages_to_loved_ones,
     legacy,
+    signature,
+    
+    // Contact arrays
+    contacts_professional,
+    service_providers,
     
     // Backwards compat aliases
     about: personal,

@@ -611,7 +611,17 @@ async function generateSimplePdf(
   if (piiData?.ssn) pY = addField(personal1, "SSN", piiData.ssn, pY);
   pY = addField(personal1, "Citizenship", profile.citizenship || "", pY);
   pY -= 10;
-  pY = addField(personal1, "Address", profile.address || "", pY);
+  
+  // Build address from split fields or use legacy single field
+  const addressParts = [
+    profile.address_line1,
+    profile.address_line2,
+    [profile.city, profile.state, profile.zip].filter(Boolean).join(", "),
+    profile.country,
+  ].filter(Boolean);
+  const fullAddress = addressParts.length > 0 ? addressParts.join(", ") : (profile.address || "");
+  
+  pY = addField(personal1, "Address", fullAddress, pY);
   pY = addField(personal1, "Phone", profile.phone || "", pY);
   pY = addField(personal1, "Email", profile.email || "", pY);
   pY -= 10;
@@ -629,6 +639,19 @@ async function generateSimplePdf(
   pY = addField(personal2, "Ex-Spouse", profile.ex_spouse_name || "", pY);
   if (profile.child_names?.length) {
     pY = addField(personal2, "Children", profile.child_names.join(", "), pY);
+  }
+  // Support new children array structure
+  if (Array.isArray(profile.children) && profile.children.length > 0) {
+    pY -= 10;
+    personal2.drawText("Children:", { x: margin, y: pY, size: 10, font: helveticaBold, color: textColor });
+    pY -= lineHeight;
+    for (const child of profile.children.slice(0, 10)) {
+      if (pY <= 100) break;
+      const childInfo = [child.name, child.phone, child.email].filter(Boolean).join(" - ");
+      if (childInfo) {
+        pY = addField(personal2, "", `- ${childInfo}`, pY);
+      }
+    }
   }
   addDraftWatermark(personal2);
   addFooter(personal2, pageNum++);
@@ -1301,93 +1324,133 @@ async function generateSimplePdf(
   addFooter(petsPage, pageNum++);
 
   // ============================================================
-  // PAGE 17: Digital/Online Accounts
+  // PAGE 17: Digital/Online Accounts - IMPROVED STRUCTURE
   // ============================================================
   const digitalPage = pdfDoc.addPage([pageWidth, pageHeight]);
   addPageHeader(digitalPage);
   let digY = addSectionHeader(digitalPage, "Online Accounts", pageHeight - 100);
   
-  // CRITICAL: Read from multiple data sources
-  const digitalObj = planData?.digital || {};
+  // Read from multiple data sources - support new categories structure
+  const digitalObj = planData?.digital || planData?.online_accounts || {};
+  const hasCategories = digitalObj.categories && typeof digitalObj.categories === 'object';
+  
+  // Old flat structure
   const localDigitalAccounts = digitalObj.accounts || [];
   const localPhones = digitalObj.phones || [];
   
-  const digitalList = planData?.digital_assets?.length > 0 
-    ? planData.digital_assets 
-    : (planData?.digital_accounts?.length > 0 ? planData.digital_accounts : localDigitalAccounts);
-  const phonesList = planData?.phones?.length > 0 ? planData.phones : localPhones;
-  const digitalNotes = planData?.digital_notes || "";
+  // New categories structure
+  const categories = hasCategories ? digitalObj.categories : null;
   
-  // Check for digital type checkboxes
-  const hasDigitalCheckboxes = digitalObj.has_social_media || digitalObj.has_email || 
-    digitalObj.has_banking || digitalObj.has_shopping || digitalObj.has_streaming ||
-    digitalObj.has_gaming || digitalObj.has_other;
+  const digitalNotes = planData?.digital_notes || digitalObj.password_manager_info || "";
   
   console.log("[generate-planner-pdf] Digital section data:", {
-    digital_obj_keys: Object.keys(digitalObj),
+    has_categories: hasCategories,
+    category_keys: categories ? Object.keys(categories) : [],
     local_accounts_len: localDigitalAccounts.length,
     local_phones_len: localPhones.length,
-    digital_list_final: digitalList.length,
-    phones_list_final: phonesList.length,
-    has_digital_checkboxes: hasDigitalCheckboxes,
   });
   
-  const hasDigital = hasAny(digitalList) || hasAny(phonesList) || hasText(digitalNotes) || hasDigitalCheckboxes;
+  // Check if we have any digital data
+  const hasDigitalData = hasCategories 
+    ? Object.values(categories || {}).some((arr: any) => Array.isArray(arr) && arr.length > 0)
+    : (localDigitalAccounts.length > 0 || localPhones.length > 0);
+  
+  const hasDigital = hasDigitalData || hasText(digitalNotes);
   
   if (!hasDigital) {
     digY = drawEmpty(digitalPage, digY);
   } else {
-    // Show account types if checkboxes were checked
-    if (hasDigitalCheckboxes) {
-      const digitalTypes: string[] = [];
-      if (digitalObj.has_social_media) digitalTypes.push("Social Media");
-      if (digitalObj.has_email) digitalTypes.push("Email");
-      if (digitalObj.has_banking) digitalTypes.push("Banking");
-      if (digitalObj.has_shopping) digitalTypes.push("Shopping");
-      if (digitalObj.has_streaming) digitalTypes.push("Streaming");
-      if (digitalObj.has_gaming) digitalTypes.push("Gaming");
-      if (digitalObj.has_other) digitalTypes.push("Other");
+    // New categories structure - print by category
+    if (hasCategories) {
+      const categoryLabels: Record<string, string> = {
+        email: "Email Accounts",
+        social: "Social Media",
+        banking: "Banking & Financial",
+        subscriptions: "Subscriptions & Streaming",
+        utilities: "Utilities & Bills",
+        phone: "Phone Accounts",
+        other: "Other Accounts",
+      };
       
-      if (digitalTypes.length > 0) {
-        digY = addField(digitalPage, "Account Types", digitalTypes.join(", "), digY);
+      for (const [catKey, catLabel] of Object.entries(categoryLabels)) {
+        const items = (categories as any)[catKey] || [];
+        if (items.length === 0) continue;
+        
+        digitalPage.drawText(`${catLabel}:`, { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
+        digY -= lineHeight;
+        
+        if (catKey === 'phone') {
+          // Phone accounts have different structure
+          for (const phone of items.slice(0, 5)) {
+            if (digY <= 100) break;
+            const phoneInfo = [phone.carrier, phone.number, phone.pin_location ? `PIN: ${phone.pin_location}` : ""].filter(Boolean).join(" - ");
+            digitalPage.drawText(`  - ${sanitizeForPdf(phoneInfo)}`, {
+              x: margin + 10,
+              y: digY,
+              size: 10,
+              font: helvetica,
+              color: textColor,
+            });
+            digY -= lineHeight;
+          }
+        } else {
+          // Regular accounts
+          for (const account of items.slice(0, 5)) {
+            if (digY <= 100) break;
+            const accountInfo = [
+              account.provider,
+              account.username ? `(${account.username})` : "",
+              account.twofa_method ? `2FA: ${account.twofa_method}` : "",
+            ].filter(Boolean).join(" ");
+            digitalPage.drawText(`  - ${sanitizeForPdf(accountInfo)}`, {
+              x: margin + 10,
+              y: digY,
+              size: 10,
+              font: helvetica,
+              color: textColor,
+            });
+            digY -= lineHeight;
+          }
+        }
+        digY -= 8;
+      }
+    } else {
+      // Old flat structure
+      if (localPhones.length > 0) {
+        digitalPage.drawText("Phone Accounts:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
+        digY -= lineHeight;
+        digY = addArrayItems(
+          digitalPage,
+          localPhones,
+          (p: any) => [p.phone_number || p.number, p.carrier, p.access_info || p.pin].filter(Boolean).join(" - "),
+          digY,
+          8,
+        );
+        digY -= 10;
+      }
+      
+      if (localDigitalAccounts.length > 0) {
+        digitalPage.drawText("Online Accounts:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
+        digY -= lineHeight;
+        digY = addArrayItems(
+          digitalPage,
+          localDigitalAccounts,
+          (d: any) => [
+            d.provider || d.service || d.name || d.platform,
+            d.username ? `User: ${d.username}` : "",
+            d.notes || "",
+          ].filter(Boolean).join(" - "),
+          digY,
+          15,
+        );
         digY -= 10;
       }
     }
     
-    if (digitalList.length > 0) {
-      digitalPage.drawText("Online Accounts:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
-      digY -= lineHeight;
-      digY = addArrayItems(
-        digitalPage,
-        digitalList,
-        (d) => [
-          d.provider || d.service || d.name || d.platform,
-          d.type || d.account_type,
-          d.username ? `User: ${d.username}` : "",
-          d.access_person ? `Access: ${d.access_person}` : "",
-          d.action || d.preferred_action || "",
-          d.notes || "",
-        ].filter(Boolean).join(" - "),
-        digY,
-        15,
-      );
-      digY -= 10;
+    // Password manager info
+    if (digitalNotes) {
+      digY = addNotesBox(digitalPage, "Password Manager Info", digitalNotes, digY);
     }
-    
-    if (phonesList.length > 0) {
-      digitalPage.drawText("Phone Accounts:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
-      digY -= lineHeight;
-      digY = addArrayItems(
-        digitalPage,
-        phonesList,
-        (p) => [p.phone_number, p.carrier, p.access_info].filter(Boolean).join(" - "),
-        digY,
-        8,
-      );
-      digY -= 10;
-    }
-    
-    digY = addNotesBox(digitalPage, "Notes", digitalNotes, digY);
   }
   addDraftWatermark(digitalPage);
   addFooter(digitalPage, pageNum++);
@@ -1779,56 +1842,136 @@ async function generateSimplePdf(
   });
   sigY -= 50;
   
-  // Printed Name field
-  signaturePage.drawText("Printed Name:", {
-    x: margin,
-    y: sigY,
-    size: 12,
-    font: helveticaBold,
-    color: textColor,
-  });
-  sigY -= 8;
-  signaturePage.drawLine({
-    start: { x: margin + 110, y: sigY },
-    end: { x: pageWidth - margin, y: sigY },
-    thickness: 1,
-    color: rgb(0.6, 0.6, 0.6),
-  });
-  sigY -= 45;
+  // Check for digital signature in plan data
+  const signatureData = planData?.signature || {};
+  const hasDigitalSignature = signatureData.signature_png && signatureData.printed_name;
   
-  // Signature field
-  signaturePage.drawText("Signature:", {
-    x: margin,
-    y: sigY,
-    size: 12,
-    font: helveticaBold,
-    color: textColor,
-  });
-  sigY -= 8;
-  signaturePage.drawLine({
-    start: { x: margin + 110, y: sigY },
-    end: { x: pageWidth - margin, y: sigY },
-    thickness: 1,
-    color: rgb(0.6, 0.6, 0.6),
-  });
-  sigY -= 45;
-  
-  // Date field
-  signaturePage.drawText("Date:", {
-    x: margin,
-    y: sigY,
-    size: 12,
-    font: helveticaBold,
-    color: textColor,
-  });
-  sigY -= 8;
-  signaturePage.drawLine({
-    start: { x: margin + 110, y: sigY },
-    end: { x: margin + 280, y: sigY },
-    thickness: 1,
-    color: rgb(0.6, 0.6, 0.6),
-  });
-  sigY -= 60;
+  if (hasDigitalSignature) {
+    // Render digital signature
+    signaturePage.drawText("Printed Name:", {
+      x: margin,
+      y: sigY,
+      size: 12,
+      font: helveticaBold,
+      color: textColor,
+    });
+    signaturePage.drawText(sanitizeForPdf(signatureData.printed_name), {
+      x: margin + 110,
+      y: sigY,
+      size: 12,
+      font: helvetica,
+      color: textColor,
+    });
+    sigY -= 40;
+    
+    signaturePage.drawText("Signature:", {
+      x: margin,
+      y: sigY,
+      size: 12,
+      font: helveticaBold,
+      color: textColor,
+    });
+    
+    // Embed the signature image if it's a base64 PNG
+    try {
+      if (signatureData.signature_png.startsWith('data:image/png;base64,')) {
+        const base64Data = signatureData.signature_png.replace('data:image/png;base64,', '');
+        const sigBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+        const sigImage = await pdfDoc.embedPng(sigBytes);
+        const sigDims = sigImage.scale(0.5);
+        signaturePage.drawImage(sigImage, {
+          x: margin + 110,
+          y: sigY - sigDims.height + 15,
+          width: Math.min(sigDims.width, 200),
+          height: Math.min(sigDims.height, 50),
+        });
+        sigY -= 60;
+      }
+    } catch (e) {
+      console.error("[generate-planner-pdf] Error embedding signature:", e);
+      // Fallback to text
+      signaturePage.drawText("[Signature on file]", {
+        x: margin + 110,
+        y: sigY,
+        size: 10,
+        font: helvetica,
+        color: rgb(0.4, 0.4, 0.4),
+      });
+      sigY -= 40;
+    }
+    
+    if (signatureData.signed_at) {
+      const signedDate = new Date(signatureData.signed_at).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      signaturePage.drawText("Date:", {
+        x: margin,
+        y: sigY,
+        size: 12,
+        font: helveticaBold,
+        color: textColor,
+      });
+      signaturePage.drawText(signedDate, {
+        x: margin + 110,
+        y: sigY,
+        size: 12,
+        font: helvetica,
+        color: textColor,
+      });
+      sigY -= 50;
+    }
+  } else {
+    // Show blank signature lines for manual signing
+    signaturePage.drawText("Printed Name:", {
+      x: margin,
+      y: sigY,
+      size: 12,
+      font: helveticaBold,
+      color: textColor,
+    });
+    sigY -= 8;
+    signaturePage.drawLine({
+      start: { x: margin + 110, y: sigY },
+      end: { x: pageWidth - margin, y: sigY },
+      thickness: 1,
+      color: rgb(0.6, 0.6, 0.6),
+    });
+    sigY -= 45;
+    
+    signaturePage.drawText("Signature:", {
+      x: margin,
+      y: sigY,
+      size: 12,
+      font: helveticaBold,
+      color: textColor,
+    });
+    sigY -= 8;
+    signaturePage.drawLine({
+      start: { x: margin + 110, y: sigY },
+      end: { x: pageWidth - margin, y: sigY },
+      thickness: 1,
+      color: rgb(0.6, 0.6, 0.6),
+    });
+    sigY -= 45;
+    
+    signaturePage.drawText("Date:", {
+      x: margin,
+      y: sigY,
+      size: 12,
+      font: helveticaBold,
+      color: textColor,
+    });
+    sigY -= 8;
+    signaturePage.drawLine({
+      start: { x: margin + 110, y: sigY },
+      end: { x: margin + 280, y: sigY },
+      thickness: 1,
+      color: rgb(0.6, 0.6, 0.6),
+    });
+    sigY -= 50;
+  }
   
   // Additional notes
   signaturePage.drawText("Important Reminders:", {
