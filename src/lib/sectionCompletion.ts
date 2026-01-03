@@ -61,10 +61,22 @@ export function hasMeaningfulData(value: unknown): boolean {
  * Section-specific check functions.
  * Each function receives the full planData and checks all relevant paths.
  */
+/**
+ * Helper to get section data from planData.
+ * Checks multiple possible locations: direct property, plan_payload, and nested structures.
+ */
+function getSectionData(pd: any, key: string): any {
+  // Direct property (merged from plan_payload)
+  if (pd?.[key] !== undefined) return pd[key];
+  // From plan_payload
+  if (pd?.plan_payload?.[key] !== undefined) return pd.plan_payload[key];
+  return undefined;
+}
+
 const sectionChecks: Record<string, (pd: any) => boolean> = {
   // Pre-planning checklist - check for any checked item
   preplanning: (pd) => {
-    const pp = pd?.plan_payload?.preplanning || pd?.preplanning || {};
+    const pp = getSectionData(pd, 'preplanning') || {};
     // Check if any checkbox is true
     return Object.values(pp).some((v) => v === true || hasMeaningfulData(v));
   },
@@ -78,11 +90,13 @@ const sectionChecks: Record<string, (pd: any) => boolean> = {
         hasMeaningfulData(profile.address) ||
         hasMeaningfulData(profile.birthplace) ||
         hasMeaningfulData(profile.phone) ||
-        hasMeaningfulData(profile.email)) {
+        hasMeaningfulData(profile.email) ||
+        hasMeaningfulData(profile.religion) ||
+        hasMeaningfulData(profile.hobbies)) {
       return true;
     }
-    // Check plan_payload.about_you or plan_payload.personal
-    const aboutYou = pd?.plan_payload?.about_you || pd?.plan_payload?.personal || {};
+    // Check about_you or personal in plan data
+    const aboutYou = getSectionData(pd, 'about_you') || getSectionData(pd, 'personal') || {};
     if (hasMeaningfulData(aboutYou)) return true;
     // Check notes
     if (hasMeaningfulData(pd?.about_me_notes)) return true;
@@ -91,18 +105,17 @@ const sectionChecks: Record<string, (pd: any) => boolean> = {
 
   // Medical & Care Preferences
   healthcare: (pd) => {
-    const h = pd?.plan_payload?.healthcare || pd?.healthcare || {};
-    // Check for any data in healthcare object
+    const h = getSectionData(pd, 'healthcare') || {};
     if (hasMeaningfulData(h)) return true;
     // Also check care_preferences sub-object
-    const cp = pd?.plan_payload?.care_preferences || pd?.care_preferences || {};
+    const cp = getSectionData(pd, 'care_preferences') || {};
     if (hasMeaningfulData(cp)) return true;
     return false;
   },
 
   // Advance Directive
   advance_directive: (pd) => {
-    const ad = pd?.plan_payload?.advance_directive || pd?.advance_directive || {};
+    const ad = getSectionData(pd, 'advance_directive') || {};
     return hasMeaningfulData(ad);
   },
 
@@ -110,8 +123,8 @@ const sectionChecks: Record<string, (pd: any) => boolean> = {
   funeral: (pd) => {
     // Check funeral notes from DB
     if (hasMeaningfulData(pd?.funeral_wishes_notes)) return true;
-    // Check plan_payload.funeral
-    const f = pd?.plan_payload?.funeral || pd?.funeral || {};
+    // Check funeral data (direct or from payload)
+    const f = getSectionData(pd, 'funeral') || {};
     if (hasMeaningfulData(f)) return true;
     // Check funeral_funding array
     if (Array.isArray(pd?.funeral_funding) && pd.funeral_funding.length > 0) return true;
@@ -124,8 +137,8 @@ const sectionChecks: Record<string, (pd: any) => boolean> = {
     if (Array.isArray(pd?.insurance_policies) && pd.insurance_policies.length > 0) return true;
     // Check notes
     if (hasMeaningfulData(pd?.insurance_notes)) return true;
-    // Check plan_payload.insurance
-    const ins = pd?.plan_payload?.insurance || {};
+    // Check insurance data
+    const ins = getSectionData(pd, 'insurance') || {};
     if (hasMeaningfulData(ins)) return true;
     return false;
   },
@@ -138,8 +151,8 @@ const sectionChecks: Record<string, (pd: any) => boolean> = {
     if (Array.isArray(pd?.contacts) && pd.contacts.length > 0) return true;
     // Check contacts_professional array
     if (Array.isArray(pd?.contacts_professional) && pd.contacts_professional.length > 0) return true;
-    // Check plan_payload.contacts
-    const c = pd?.plan_payload?.contacts || {};
+    // Check contacts data
+    const c = getSectionData(pd, 'contacts') || {};
     if (hasMeaningfulData(c)) return true;
     return false;
   },
@@ -150,42 +163,56 @@ const sectionChecks: Record<string, (pd: any) => boolean> = {
     if (Array.isArray(pd?.properties) && pd.properties.length > 0) return true;
     // Check notes
     if (hasMeaningfulData(pd?.property_notes)) return true;
-    // Check plan_payload.property
-    const prop = pd?.plan_payload?.property || {};
+    // Check property data - this is what sections actually save to
+    const prop = getSectionData(pd, 'property') || {};
     if (hasMeaningfulData(prop)) return true;
+    // Check for property items array inside property object
+    if (Array.isArray(prop.items) && prop.items.length > 0) return true;
+    // Check for has_* checkboxes in property
+    const hasAnyChecked = Object.entries(prop).some(([k, v]) => k.startsWith('has_') && v === true);
+    if (hasAnyChecked) return true;
     return false;
   },
 
   // Pets
   pets: (pd) => {
-    // Check pets array from DB
-    if (Array.isArray(pd?.pets) && pd.pets.length > 0) return true;
+    // Check pets array from DB (separate table)
+    if (Array.isArray(pd?.pets) && pd.pets.length > 0) {
+      // Check if any pet has meaningful data
+      return pd.pets.some((pet: any) => hasMeaningfulData(pet.name) || hasMeaningfulData(pet.type));
+    }
     // Check notes
     if (hasMeaningfulData(pd?.pets_notes)) return true;
-    // Check plan_payload.pets (array or object with pets array)
-    const petsPayload = pd?.plan_payload?.pets;
-    if (Array.isArray(petsPayload) && petsPayload.length > 0) return true;
+    // Check pets data from plan_payload (sections save here as array)
+    const petsPayload = getSectionData(pd, 'pets');
+    if (Array.isArray(petsPayload) && petsPayload.length > 0) {
+      return petsPayload.some((pet: any) => hasMeaningfulData(pet.name) || hasMeaningfulData(pet.type));
+    }
     if (hasMeaningfulData(petsPayload)) return true;
     return false;
   },
 
   // Messages to Loved Ones
   messages: (pd) => {
-    // Check messages array from DB
-    if (Array.isArray(pd?.messages) && pd.messages.length > 0) return true;
+    // Check messages array from DB (separate table)
+    if (Array.isArray(pd?.messages) && pd.messages.length > 0) {
+      return pd.messages.some((msg: any) => hasMeaningfulData(msg.recipients) || hasMeaningfulData(msg.text_message));
+    }
     // Check notes
     if (hasMeaningfulData(pd?.messages_notes)) return true;
     if (hasMeaningfulData(pd?.to_loved_ones_message)) return true;
-    // Check plan_payload.messages (array or object)
-    const msgPayload = pd?.plan_payload?.messages;
-    if (Array.isArray(msgPayload) && msgPayload.length > 0) return true;
+    // Check messages data from plan_payload (sections save here as array)
+    const msgPayload = getSectionData(pd, 'messages');
+    if (Array.isArray(msgPayload) && msgPayload.length > 0) {
+      return msgPayload.some((msg: any) => hasMeaningfulData(msg.recipients) || hasMeaningfulData(msg.text_message));
+    }
     if (hasMeaningfulData(msgPayload)) return true;
     return false;
   },
 
   // Travel & Away-From-Home
   travel: (pd) => {
-    const t = pd?.plan_payload?.travel || pd?.travel || {};
+    const t = getSectionData(pd, 'travel') || {};
     return hasMeaningfulData(t);
   },
 
@@ -193,9 +220,15 @@ const sectionChecks: Record<string, (pd: any) => boolean> = {
   digital: (pd) => {
     // Check notes
     if (hasMeaningfulData(pd?.digital_notes)) return true;
-    // Check plan_payload.digital
-    const d = pd?.plan_payload?.digital || {};
+    // Check digital data from plan_payload
+    const d = getSectionData(pd, 'digital') || {};
     if (hasMeaningfulData(d)) return true;
+    // Check for accounts or phones arrays
+    if (Array.isArray(d.accounts) && d.accounts.length > 0) return true;
+    if (Array.isArray(d.phones) && d.phones.length > 0) return true;
+    // Check for has_* checkboxes
+    const hasAnyChecked = Object.entries(d).some(([k, v]) => k.startsWith('has_') && v === true);
+    if (hasAnyChecked) return true;
     return false;
   },
 
@@ -208,16 +241,21 @@ const sectionChecks: Record<string, (pd: any) => boolean> = {
     if (Array.isArray(pd?.businesses) && pd.businesses.length > 0) return true;
     // Check notes
     if (hasMeaningfulData(pd?.financial_notes)) return true;
-    // Check plan_payload.financial
-    const f = pd?.plan_payload?.financial || {};
+    // Check financial data from plan_payload
+    const f = getSectionData(pd, 'financial') || {};
     if (hasMeaningfulData(f)) return true;
+    // Check for accounts array
+    if (Array.isArray(f.accounts) && f.accounts.length > 0) return true;
+    // Check for has_* checkboxes (checking, savings, retirement, etc.)
+    const hasAnyChecked = Object.entries(f).some(([k, v]) => k.startsWith('has_') && v === true);
+    if (hasAnyChecked) return true;
     return false;
   },
 
   // Legal documents
   legal: (pd) => {
     if (hasMeaningfulData(pd?.legal_notes)) return true;
-    const l = pd?.plan_payload?.legal || {};
+    const l = getSectionData(pd, 'legal') || {};
     if (hasMeaningfulData(l)) return true;
     return false;
   },

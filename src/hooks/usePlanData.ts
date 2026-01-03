@@ -128,7 +128,10 @@ export const usePlanData = (userId: string) => {
   // Debounced save to Supabase
   const saveToDB = useCallback(
     debounce(async (data: PlanData) => {
-      if (!data.id) return;
+      if (!data.id) {
+        console.warn("[usePlanData] Cannot save - plan has no id");
+        return;
+      }
 
       saveInProgressRef.current = true;
       setSaveState(prev => ({ ...prev, saving: true, error: false }));
@@ -253,8 +256,15 @@ export const usePlanData = (userId: string) => {
             const serverTime = new Date(existingPlan.updated_at || 0);
             if (localTime > serverTime) {
               // Local is newer, sync to server
-              setPlan(parsed);
-              saveToDB(parsed);
+              // CRITICAL: Ensure the plan has the correct id from DB
+              const mergedWithId = { 
+                ...parsed, 
+                id: existingPlan.id, 
+                org_id: existingPlan.org_id 
+              };
+              setPlan(mergedWithId);
+              saveToDB(mergedWithId);
+              localStorage.setItem(`plan_${userId}`, JSON.stringify(mergedWithId));
             } else {
               // Server is newer, use server data
               setPlan(mergedPlan);
@@ -330,6 +340,14 @@ export const usePlanData = (userId: string) => {
     (updates: Partial<PlanData>) => {
       setPlan((prev) => {
         const updated = { ...prev, ...updates };
+        
+        if (import.meta.env.DEV) {
+          console.log("[usePlanData] updatePlan called:", {
+            hasId: !!updated.id,
+            updateKeys: Object.keys(updates),
+          });
+        }
+        
         // Save to localStorage immediately
         localStorage.setItem(`plan_${userId}`, JSON.stringify(updated));
         // Debounced save to DB
