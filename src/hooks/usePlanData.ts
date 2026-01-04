@@ -81,7 +81,8 @@ const SECTION_DATA_KEYS = new Set([
   'online_accounts',
   'messages_to_loved_ones',
   'legacy',
-  'signature',
+  'revisions',
+  'preparer_name',
   'contacts_professional',
   'service_providers',
   

@@ -52,6 +52,8 @@ export interface UnifiedData {
     individual: Array<{ to: string; message: string; audio_url?: string; video_url?: string }>;
   };
   legacy: Record<string, any>;
+  revisions: Array<{ revision_date: string; prepared_by: string; signature_png: string }>;
+  preparer_name: string;
   
   // Aliases for backwards compat
   about: Record<string, any>;
@@ -310,6 +312,10 @@ function buildUnifiedData(payload: Record<string, any>, raw: Record<string, any>
     }
   );
 
+  // Revisions (signature history)
+  const revisions = Array.isArray(merged.revisions) ? merged.revisions : [];
+  const preparer_name = merged.preparer_name || merged.prepared_by || raw.preparer_name || "";
+
   return {
     // CANONICAL KEYS
     personal_profile,
@@ -317,6 +323,8 @@ function buildUnifiedData(payload: Record<string, any>, raw: Record<string, any>
     online_accounts,
     messages_to_loved_ones,
     legacy,
+    revisions,
+    preparer_name,
     
     // Aliases for backwards compat
     about: personal_profile,
