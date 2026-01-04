@@ -663,11 +663,21 @@ async function generateSimplePdf(
   addPageHeader(legacyPage);
   let legacyY = addSectionHeader(legacyPage, "My Life Story & Legacy", pageHeight - 100);
   
-  // Get life story data from multiple sources
-  const lifeStoryNotes = planData?.about_me_notes || planData?.life_story || "";
-  const profileHobbies = profile?.hobbies || "";
-  const profileAccomplishments = profile?.accomplishments || "";
-  const profileRemembered = profile?.remembered || "";
+  // Get life story data from CANONICAL key: legacy.life_story
+  // CRITICAL: Always read from legacy.life_story to ensure fresh data from DB
+  const legacyObj = planData?.legacy || {};
+  const lifeStoryNotes = legacyObj.life_story || planData?.about_me_notes || planData?.life_story || "";
+  const profileHobbies = legacyObj.hobbies || profile?.hobbies || "";
+  const profileAccomplishments = legacyObj.accomplishments || profile?.accomplishments || "";
+  const profileRemembered = legacyObj.remembered || profile?.remembered || "";
+  
+  console.log("[generate-planner-pdf] Life Story section data:", {
+    legacy_obj_keys: Object.keys(legacyObj),
+    life_story_len: lifeStoryNotes.length,
+    hobbies_len: profileHobbies.length,
+    accomplishments_len: profileAccomplishments.length,
+    remembered_len: profileRemembered.length,
+  });
   
   const hasLifeStory = hasText(lifeStoryNotes) || hasText(profileHobbies) || 
     hasText(profileAccomplishments) || hasText(profileRemembered);
