@@ -488,23 +488,22 @@ async function generateSimplePdf(
   let tocY = addSectionHeader(tocPage, "Table of Contents", pageHeight - 100);
   
   // Define sections with their page numbers
+  // NOTE: Professional Contacts and Service Providers REMOVED from PDF per requirement
   const tocSections = [
     { title: "Checklist", page: 3 },
     { title: "Instructions", page: 4 },
     { title: "Personal Information", page: 5 },
     { title: "My Life Story & Legacy", page: 7 },
-    { title: "Contacts to Notify", page: 8 },
-    { title: "Professional Contacts", page: 9 },
-    { title: "Service Providers", page: 10 },
-    { title: "Funeral & Memorial Wishes", page: 11 },
-    { title: "Financial Life", page: 13 },
-    { title: "Insurance Policies", page: 14 },
-    { title: "Property & Valuables", page: 15 },
-    { title: "Pets", page: 16 },
-    { title: "Online Accounts", page: 17 },
-    { title: "Legal Documents", page: 18 },
-    { title: "Messages to Loved Ones", page: 19 },
-    { title: "Plan Review & Signature", page: 21 },
+    { title: "People to Notify", page: 8 },
+    { title: "Funeral & Memorial Wishes", page: 9 },
+    { title: "Financial Life", page: 11 },
+    { title: "Insurance Policies", page: 12 },
+    { title: "Property & Valuables", page: 13 },
+    { title: "Pets", page: 14 },
+    { title: "Online Accounts", page: 15 },
+    { title: "Legal Documents", page: 16 },
+    { title: "Messages to Loved Ones", page: 17 },
+    { title: "Plan Review & Signature", page: 19 },
   ];
   
   for (const section of tocSections) {
@@ -737,12 +736,43 @@ async function generateSimplePdf(
   addFooter(legacyPage, pageNum++);
 
   // ============================================================
-  // PAGE 8: Contacts to Notify
+  // PAGE 8: People to Notify (Family/Friends ONLY - no professionals or service providers)
   // ============================================================
   const contacts1 = pdfDoc.addPage([pageWidth, pageHeight]);
   addPageHeader(contacts1);
   let cY = addSectionHeader(contacts1, "People to Notify", pageHeight - 100);
-  const contactsList = planData?.contacts_notify || [];
+  
+  // Get contacts and FILTER to only include "person" type (not professional or service)
+  // This is a hard guard to prevent service/professional contacts from appearing
+  const rawContactsList = planData?.contacts_notify || [];
+  const unifiedContacts = planData?.contacts?.contacts || [];
+  
+  // Merge both sources and filter to ONLY "person" type or legacy entries without contact_type
+  const EXCLUDED_CONTACT_TYPES = ["service", "professional", "service_provider"];
+  const EXCLUDED_ROLES = [
+    "attorney", "accountant", "financial_advisor", "insurance_agent", 
+    "funeral_home", "cemetery", "church", "hospice", "medical_provider"
+  ];
+  
+  const allContacts = [...rawContactsList, ...unifiedContacts];
+  const contactsList = allContacts.filter((c: any) => {
+    // Exclude by contact_type
+    if (c.contact_type && EXCLUDED_CONTACT_TYPES.includes(c.contact_type)) {
+      return false;
+    }
+    // Exclude by role (for legacy data)
+    if (c.role && EXCLUDED_ROLES.includes(c.role?.toLowerCase())) {
+      return false;
+    }
+    // Include if contact_type is "person" or not set (legacy "people to notify")
+    return !c.contact_type || c.contact_type === "person";
+  });
+  
+  console.log("[generate-planner-pdf] People to Notify (filtered):", {
+    raw_contacts_count: rawContactsList.length,
+    unified_contacts_count: unifiedContacts.length,
+    filtered_count: contactsList.length,
+  });
   
   if (hasAny(contactsList)) {
     cY = addArrayItems(
@@ -759,55 +789,14 @@ async function generateSimplePdf(
   addFooter(contacts1, pageNum++);
 
   // ============================================================
-  // PAGE 9: Professional Contacts
+  // REMOVED: Professional Contacts page (per requirement - PDF only removal)
+  // Data remains in the app; just not rendered in PDF
   // ============================================================
-  const contacts2 = pdfDoc.addPage([pageWidth, pageHeight]);
-  addPageHeader(contacts2);
-  cY = addSectionHeader(contacts2, "Professional Contacts", pageHeight - 100);
-  const professionalList = planData?.contacts_professional || [];
-  if (hasAny(professionalList)) {
-    cY = addArrayItems(
-      contacts2,
-      professionalList,
-      (c) => [c.role, c.name, c.company, c.contact].filter(Boolean).join(" - "),
-      cY,
-      15,
-    );
-  } else {
-    cY = drawEmpty(contacts2, cY);
-  }
-  addDraftWatermark(contacts2);
-  addFooter(contacts2, pageNum++);
 
   // ============================================================
-  // PAGE 10: Service Providers
+  // REMOVED: Service Providers page (per requirement - PDF only removal)
+  // Data remains in the app; just not rendered in PDF
   // ============================================================
-  const vendorsPage = pdfDoc.addPage([pageWidth, pageHeight]);
-  addPageHeader(vendorsPage);
-  let vY = addSectionHeader(vendorsPage, "Service Providers", pageHeight - 100);
-  
-  // Render service providers array
-  const providersList = planData?.service_providers || planData?.providers || [];
-  const serviceProviderNotes = planData?.service_providers_notes || "";
-  const hasServiceProviders = hasAny(providersList) || hasText(serviceProviderNotes);
-  
-  if (!hasServiceProviders) {
-    vY = drawEmpty(vendorsPage, vY);
-  } else {
-    if (providersList.length > 0) {
-      vY = addArrayItems(
-        vendorsPage,
-        providersList,
-        (p) => [p.name, p.type ? `(${p.type})` : "", p.phone, p.website, p.address].filter(Boolean).join(" - "),
-        vY,
-        12,
-      );
-      vY -= 10;
-    }
-    vY = addNotesBox(vendorsPage, "Notes", serviceProviderNotes, vY);
-  }
-  addDraftWatermark(vendorsPage);
-  addFooter(vendorsPage, pageNum++);
 
   // ============================================================
   // PAGE 11-12: Funeral Wishes
