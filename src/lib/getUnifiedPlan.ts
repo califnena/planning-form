@@ -42,6 +42,17 @@ export interface UnifiedPlan {
   orgId: string | null;
 }
 
+export interface UnifiedContact {
+  id?: string;
+  name: string;
+  contact_type: "person" | "service" | "professional";
+  organization?: string;
+  role?: string;
+  phone?: string;
+  email?: string;
+  notes?: string;
+}
+
 export interface UnifiedData {
   // CANONICAL KEYS
   personal_profile: Record<string, any>;
@@ -55,6 +66,9 @@ export interface UnifiedData {
   revisions: Array<{ revision_date: string; prepared_by: string; signature_png: string }>;
   preparer_name: string;
   
+  // CANONICAL: Unified contacts array
+  contacts: UnifiedContact[];
+  
   // Aliases for backwards compat
   about: Record<string, any>;
   lifeStory: Record<string, any>;
@@ -62,12 +76,6 @@ export interface UnifiedData {
   messages: any[];
   
   // Other sections
-  contacts: {
-    keyContacts: any[];
-    importantContacts: any[];
-    emergencyContacts: any[];
-    merged: any[];
-  };
   medical: Record<string, any>;
   advanceDirective: Record<string, any>;
   funeral: Record<string, any>;
@@ -184,32 +192,78 @@ function buildUnifiedData(payload: Record<string, any>, raw: Record<string, any>
     merged.lifeStory
   );
 
-  // Contacts - handle multiple sources
+  // CANONICAL: Unified contacts array
+  // Merge from multiple sources and normalize to UnifiedContact shape
   const payloadContacts = asArray(merged.contacts);
   const payloadContactsObj = asObject(merged.contacts);
   const payloadContactsNested = asArray(payloadContactsObj.contacts);
   const payloadImportantPeople = asArray(payloadContactsObj.importantPeople);
-  const payloadKeyContacts = asArray(payloadContactsObj.keyContacts);
-  const payloadEmergency = asArray(payloadContactsObj.emergencyContacts);
-  const contactsNotify = asArray(raw.contacts_notify);
-  const rawKeyContacts = asArray(raw.key_contacts);
-  const rawImportantContacts = asArray(raw.important_contacts);
+  const rawContactsNotify = asArray(raw.contacts_notify);
+  const rawProfessionalContacts = asArray(raw.contacts_professional);
+  const rawServiceProviders = asArray(merged.service_providers);
+  const rawVendors = asArray(merged.vendors);
 
-  const contacts = {
-    keyContacts: [...payloadKeyContacts, ...rawKeyContacts].filter(Boolean),
-    importantContacts: [...payloadContacts, ...payloadContactsNested, ...payloadImportantPeople, ...contactsNotify, ...rawImportantContacts].filter(Boolean),
-    emergencyContacts: payloadEmergency.filter(Boolean),
-    merged: [...new Set([
-      ...payloadContacts,
-      ...payloadContactsNested,
-      ...payloadImportantPeople,
-      ...payloadKeyContacts,
-      ...payloadEmergency,
-      ...contactsNotify,
-      ...rawKeyContacts,
-      ...rawImportantContacts
-    ].filter(Boolean))]
-  };
+  // Helper to normalize legacy contact formats to UnifiedContact
+  const normalizeContact = (c: any, defaultType: "person" | "service" | "professional"): UnifiedContact => ({
+    id: c.id || crypto.randomUUID(),
+    name: c.name || c.full_name || "",
+    contact_type: c.contact_type || defaultType,
+    organization: c.organization || c.company || c.firm || "",
+    role: c.role || c.type || c.relationship || "",
+    phone: c.phone || c.phone_number || c.contact || "",
+    email: c.email || "",
+    notes: c.notes || c.note || "",
+  });
+
+  // Build unified contacts array
+  const unifiedContacts: UnifiedContact[] = [];
+  const seenIds = new Set<string>();
+
+  // Add from new canonical contacts array first (already in correct format)
+  for (const c of payloadContacts) {
+    if (c && typeof c === "object" && c.contact_type) {
+      const id = c.id || crypto.randomUUID();
+      if (!seenIds.has(id)) {
+        unifiedContacts.push({ ...c, id });
+        seenIds.add(id);
+      }
+    }
+  }
+
+  // Migrate legacy person contacts
+  for (const c of [...payloadContactsNested, ...payloadImportantPeople, ...rawContactsNotify]) {
+    if (c && typeof c === "object") {
+      const normalized = normalizeContact(c, "person");
+      if (normalized.name && !seenIds.has(normalized.id!)) {
+        unifiedContacts.push(normalized);
+        seenIds.add(normalized.id!);
+      }
+    }
+  }
+
+  // Migrate legacy professional contacts
+  for (const c of rawProfessionalContacts) {
+    if (c && typeof c === "object") {
+      const normalized = normalizeContact(c, "professional");
+      if (normalized.name && !seenIds.has(normalized.id!)) {
+        unifiedContacts.push(normalized);
+        seenIds.add(normalized.id!);
+      }
+    }
+  }
+
+  // Migrate legacy service providers and vendors
+  for (const c of [...rawServiceProviders, ...rawVendors]) {
+    if (c && typeof c === "object") {
+      const normalized = normalizeContact(c, "service");
+      if (normalized.name && !seenIds.has(normalized.id!)) {
+        unifiedContacts.push(normalized);
+        seenIds.add(normalized.id!);
+      }
+    }
+  }
+
+  const contacts = unifiedContacts;
 
   // Medical & Care
   const medical = mergeObjects(
@@ -454,7 +508,7 @@ export function hasUnifiedSectionData(unified: UnifiedData, sectionId: string): 
     },
     
     // Other sections
-    contacts: () => unified.contacts.merged,
+    contacts: () => unified.contacts,
     healthcare: () => unified.medical,
     advancedirective: () => unified.advanceDirective,
     funeral: () => unified.funeral,
@@ -490,7 +544,7 @@ export function getUnifiedCompletion(unified: UnifiedData): Record<string, boole
   return {
     personal: hasMeaningfulData(unified.personal_profile),
     legacy: hasMeaningfulData(unified.legacy),
-    contacts: hasMeaningfulData(unified.contacts.merged),
+    contacts: hasMeaningfulData(unified.contacts),
     healthcare: hasMeaningfulData(unified.medical),
     advancedirective: hasMeaningfulData(unified.advanceDirective),
     funeral: hasMeaningfulData(unified.funeral),

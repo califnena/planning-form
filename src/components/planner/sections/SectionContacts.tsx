@@ -2,54 +2,67 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Trash2, Plus, Save, Download } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Trash2, Plus, Save, Download, Users, Briefcase, Building2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { usePreviewMode } from "@/pages/PlannerApp";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import jsPDF from "jspdf";
 import everlastingLogo from "@/assets/everlasting-logo.png";
-
-interface Contact {
-  name: string;
-  relationship: string;
-  email: string;
-  phone: string;
-  note: string;
-}
+import type { UnifiedContact } from "@/lib/normalizePlanPayload";
 
 interface SectionContactsProps {
   data: any;
   onChange: (data: any) => void;
 }
 
-export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
-  // Merge both arrays into one unified "People to Notify" list
-  const existingContacts = data.contacts || [];
-  const existingImportantPeople = data.importantPeople || [];
-  
-  // Dedupe and merge on first render
-  const contacts: Contact[] = (() => {
-    const merged: Contact[] = [...existingContacts];
-    const seen = new Set(existingContacts.map((c: Contact) => 
-      `${c.name || ""}|${c.phone || ""}|${c.email || ""}`.toLowerCase()
-    ));
-    
-    for (const person of existingImportantPeople) {
-      const key = `${person.name || ""}|${person.phone || ""}|${person.email || ""}`.toLowerCase();
-      if (!seen.has(key) || key === "||") {
-        merged.push(person);
-        seen.add(key);
-      }
-    }
-    return merged;
-  })();
+const CONTACT_TYPES = [
+  { value: "person", label: "Person (Family/Friend)", icon: Users },
+  { value: "professional", label: "Professional (Attorney, etc.)", icon: Briefcase },
+  { value: "service", label: "Service Provider (Funeral Home, etc.)", icon: Building2 },
+] as const;
 
+const ROLE_OPTIONS: Record<string, string[]> = {
+  person: ["Spouse", "Child", "Parent", "Sibling", "Friend", "Neighbor", "Executor", "Other"],
+  professional: ["Attorney", "Accountant", "Financial Advisor", "Insurance Agent", "Doctor", "Clergy", "Estate Planner", "Other"],
+  service: ["Funeral Home", "Cemetery", "Crematory", "Florist", "Caterer", "Transportation", "Venue", "Other"],
+};
+
+/**
+ * SectionContacts - Unified contacts section
+ * 
+ * CANONICAL KEY: contacts (array of UnifiedContact in plan_payload)
+ */
+export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
+  const contacts: UnifiedContact[] = data.contacts || [];
   const { toast } = useToast();
   const { t } = useTranslation();
   const { isPreviewMode } = usePreviewMode();
 
-  const addContact = () => {
+  const updateContacts = (updated: UnifiedContact[]) => {
+    onChange({
+      ...data,
+      contacts: updated,
+      // Clear legacy arrays on save
+      contacts_professional: [],
+      service_providers: [],
+      importantPeople: [],
+    });
+    
+    if (import.meta.env.DEV) {
+      console.log("[SectionContacts] Updated unified contacts:", updated.length);
+    }
+  };
+
+  const addContact = (type: "person" | "service" | "professional" = "person") => {
     if (isPreviewMode) {
       toast({
         title: "Preview Mode",
@@ -58,29 +71,27 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
       });
       return;
     }
-    onChange({
-      ...data,
-      contacts: [...contacts, { name: "", relationship: "", email: "", phone: "", note: "" }],
-      importantPeople: [], // Clear legacy array
-    });
+    const newContact: UnifiedContact = {
+      id: crypto.randomUUID(),
+      name: "",
+      contact_type: type,
+      organization: "",
+      role: "",
+      phone: "",
+      email: "",
+      notes: "",
+    };
+    updateContacts([...contacts, newContact]);
   };
 
-  const updateContact = (index: number, field: string, value: any) => {
+  const updateContact = (index: number, field: keyof UnifiedContact, value: string) => {
     const updated = [...contacts];
     updated[index] = { ...updated[index], [field]: value };
-    onChange({ 
-      ...data, 
-      contacts: updated,
-      importantPeople: [], // Clear legacy array
-    });
+    updateContacts(updated);
   };
 
   const removeContact = (index: number) => {
-    onChange({ 
-      ...data, 
-      contacts: contacts.filter((_: any, i: number) => i !== index),
-      importantPeople: [], // Clear legacy array
-    });
+    updateContacts(contacts.filter((_, i) => i !== index));
   };
 
   const handleSave = () => {
@@ -94,7 +105,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
     }
     toast({
       title: t("common.saved"),
-      description: t("contacts.saved"),
+      description: "Contacts saved.",
     });
   };
 
@@ -111,77 +122,83 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
-    // Title
     pdf.setFontSize(20);
     pdf.setFont("helvetica", "bold");
-    const title = "People to Notify";
+    const title = "Important Contacts";
     const titleWidth = pdf.getTextWidth(title);
     pdf.text(title, (pageWidth - titleWidth) / 2, 20);
 
-    // Subtitle
-    pdf.setFontSize(12);
-    pdf.setFont("helvetica", "normal");
-    const subtitle = `Contacts for ${data.personalInfo?.legalName || ""}`;
-    const subtitleWidth = pdf.getTextWidth(subtitle);
-    pdf.text(subtitle, (pageWidth - subtitleWidth) / 2, 30);
+    let yPos = 40;
 
-    // Table headers
-    let yPos = 45;
-    pdf.setFontSize(10);
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Name", 15, yPos);
-    pdf.text("Relationship", 60, yPos);
-    pdf.text("Email", 100, yPos);
-    pdf.text("Phone", 140, yPos);
+    // Group by contact type
+    const grouped = {
+      person: contacts.filter(c => c.contact_type === "person"),
+      professional: contacts.filter(c => c.contact_type === "professional"),
+      service: contacts.filter(c => c.contact_type === "service"),
+    };
 
-    // Draw header line
-    pdf.setLineWidth(0.5);
-    pdf.line(15, yPos + 2, pageWidth - 15, yPos + 2);
+    for (const [type, list] of Object.entries(grouped)) {
+      if (list.length === 0) continue;
 
-    // Table content
-    yPos += 10;
-    pdf.setFont("helvetica", "normal");
-
-    contacts.forEach((contact: Contact) => {
-      if (yPos > pageHeight - 40) {
+      if (yPos > pageHeight - 60) {
         pdf.addPage();
         yPos = 20;
       }
 
-      pdf.text(contact.name || "", 15, yPos);
-      pdf.text(contact.relationship || "", 60, yPos);
-      
-      // Split email and phone to fit in smaller columns
-      const email = contact.email || "";
-      const phone = contact.phone || "";
-      pdf.setFontSize(9);
-      pdf.text(email.length > 20 ? email.substring(0, 18) + "..." : email, 100, yPos);
-      pdf.text(phone, 140, yPos);
-      pdf.setFontSize(10);
-
-      if (contact.note) {
-        yPos += 5;
-        pdf.setFontSize(8);
-        pdf.setTextColor(100, 100, 100);
-        const noteLines = pdf.splitTextToSize(`Note: ${contact.note}`, pageWidth - 30);
-        pdf.text(noteLines, 15, yPos);
-        pdf.setFontSize(10);
-        pdf.setTextColor(0, 0, 0);
-        yPos += noteLines.length * 3;
-      }
-
+      const typeLabel = type === "person" ? "People to Notify" : type === "professional" ? "Professional Contacts" : "Service Providers";
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.text(typeLabel, 15, yPos);
       yPos += 8;
-    });
+
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "normal");
+
+      for (const contact of list) {
+        if (yPos > pageHeight - 40) {
+          pdf.addPage();
+          yPos = 20;
+        }
+
+        pdf.setFont("helvetica", "bold");
+        pdf.text(contact.name || "Unnamed", 15, yPos);
+        pdf.setFont("helvetica", "normal");
+        
+        if (contact.role) {
+          pdf.text(` - ${contact.role}`, 15 + pdf.getTextWidth(contact.name || "Unnamed"), yPos);
+        }
+        yPos += 5;
+
+        if (contact.organization) {
+          pdf.text(`Organization: ${contact.organization}`, 20, yPos);
+          yPos += 4;
+        }
+        if (contact.phone) {
+          pdf.text(`Phone: ${contact.phone}`, 20, yPos);
+          yPos += 4;
+        }
+        if (contact.email) {
+          pdf.text(`Email: ${contact.email}`, 20, yPos);
+          yPos += 4;
+        }
+        if (contact.notes) {
+          const noteLines = pdf.splitTextToSize(`Notes: ${contact.notes}`, pageWidth - 40);
+          pdf.text(noteLines, 20, yPos);
+          yPos += noteLines.length * 4;
+        }
+        yPos += 4;
+      }
+      yPos += 6;
+    }
 
     // Add logo at bottom
     const logoWidth = 40;
     const logoHeight = 10;
     const logoX = (pageWidth - logoWidth) / 2;
     const logoY = pageHeight - 20;
-    
     pdf.addImage(everlastingLogo, "PNG", logoX, logoY, logoWidth, logoHeight);
 
-    pdf.save("people-to-notify.pdf");
+    pdf.save("contacts.pdf");
     
     toast({
       title: "Downloaded",
@@ -189,14 +206,24 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
     });
   };
 
+  const getContactIcon = (type: string) => {
+    const config = CONTACT_TYPES.find(t => t.value === type);
+    if (!config) return Users;
+    return config.icon;
+  };
+
+  const getRoleOptions = (type: string) => {
+    return ROLE_OPTIONS[type] || ROLE_OPTIONS.person;
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h2 className="text-2xl font-bold mb-2">People to Notify</h2>
-          <p className="text-muted-foreground">People who should be contacted when needed</p>
+          <h2 className="text-2xl font-bold mb-2">Important Contacts</h2>
+          <p className="text-muted-foreground">Family, friends, professionals, and service providers</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button onClick={handleSave} size="sm" variant="default" disabled={isPreviewMode}>
             <Save className="h-4 w-4 mr-2" />
             Save
@@ -205,105 +232,161 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
             <Download className="h-4 w-4 mr-2" />
             Download PDF
           </Button>
-          <Button onClick={addContact} size="sm" variant="outline" disabled={isPreviewMode}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Contact
-          </Button>
         </div>
+      </div>
+
+      {/* Quick Add Buttons */}
+      <div className="flex gap-2 flex-wrap">
+        <Button onClick={() => addContact("person")} size="sm" variant="outline" disabled={isPreviewMode}>
+          <Users className="h-4 w-4 mr-2" />
+          Add Person
+        </Button>
+        <Button onClick={() => addContact("professional")} size="sm" variant="outline" disabled={isPreviewMode}>
+          <Briefcase className="h-4 w-4 mr-2" />
+          Add Professional
+        </Button>
+        <Button onClick={() => addContact("service")} size="sm" variant="outline" disabled={isPreviewMode}>
+          <Building2 className="h-4 w-4 mr-2" />
+          Add Service Provider
+        </Button>
       </div>
 
       <PreviewModeWrapper>
         <div className="space-y-4">
-        {contacts.map((contact: Contact, index: number) => (
-          <div key={index} className="p-4 border border-border rounded-lg space-y-4">
-            <div className="flex justify-between items-start">
-              <h3 className="font-semibold">Contact {index + 1}</h3>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={addContact}
-                >
-                  <Plus className="h-4 w-4" />
+          {contacts.map((contact, index) => {
+            const Icon = getContactIcon(contact.contact_type);
+            const roleOptions = getRoleOptions(contact.contact_type);
+            
+            return (
+              <Card key={contact.id || index} className="p-4 space-y-4">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-5 w-5 text-muted-foreground" />
+                    <h3 className="font-semibold">
+                      {contact.name || `New ${CONTACT_TYPES.find(t => t.value === contact.contact_type)?.label || "Contact"}`}
+                    </h3>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeContact(index)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Name *</Label>
+                    <Input
+                      value={contact.name || ""}
+                      onChange={(e) => updateContact(index, "name", e.target.value)}
+                      placeholder="Full name"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Type</Label>
+                    <Select
+                      value={contact.contact_type}
+                      onValueChange={(value) => updateContact(index, "contact_type", value as any)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CONTACT_TYPES.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Role/Relationship</Label>
+                    <Select
+                      value={contact.role || ""}
+                      onValueChange={(value) => updateContact(index, "role", value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {roleOptions.map((role) => (
+                          <SelectItem key={role} value={role}>
+                            {role}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Organization/Company</Label>
+                    <Input
+                      value={contact.organization || ""}
+                      onChange={(e) => updateContact(index, "organization", e.target.value)}
+                      placeholder="Company or organization name"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Phone</Label>
+                    <Input
+                      type="tel"
+                      value={contact.phone || ""}
+                      onChange={(e) => updateContact(index, "phone", e.target.value)}
+                      placeholder="(555) 123-4567"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Email</Label>
+                    <Input
+                      type="email"
+                      value={contact.email || ""}
+                      onChange={(e) => updateContact(index, "email", e.target.value)}
+                      placeholder="email@example.com"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Notes</Label>
+                  <Textarea
+                    value={contact.notes || ""}
+                    onChange={(e) => updateContact(index, "notes", e.target.value)}
+                    placeholder="Additional information..."
+                    rows={2}
+                  />
+                </div>
+              </Card>
+            );
+          })}
+
+          {contacts.length === 0 && (
+            <div className="text-center py-12 border border-dashed rounded-lg">
+              <p className="text-muted-foreground mb-4">No contacts added yet</p>
+              <div className="flex gap-2 justify-center flex-wrap">
+                <Button onClick={() => addContact("person")} variant="outline">
+                  <Users className="h-4 w-4 mr-2" />
+                  Add Person
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeContact(index)}
-                >
-                  <Trash2 className="h-4 w-4" />
+                <Button onClick={() => addContact("professional")} variant="outline">
+                  <Briefcase className="h-4 w-4 mr-2" />
+                  Add Professional
+                </Button>
+                <Button onClick={() => addContact("service")} variant="outline">
+                  <Building2 className="h-4 w-4 mr-2" />
+                  Add Service Provider
                 </Button>
               </div>
             </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Name</Label>
-                <p className="text-xs text-muted-foreground">Full name of the person to notify</p>
-                <Input
-                  value={contact.name || ""}
-                  onChange={(e) => updateContact(index, "name", e.target.value)}
-                  placeholder="Full name"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Relationship (optional)</Label>
-                <p className="text-xs text-muted-foreground">How they're related to you</p>
-                <Input
-                  value={contact.relationship || ""}
-                  onChange={(e) => updateContact(index, "relationship", e.target.value)}
-                  placeholder="e.g., Spouse, Child, Friend"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Phone Number</Label>
-                <p className="text-xs text-muted-foreground">Best phone number to reach them</p>
-                <Input
-                  type="tel"
-                  value={contact.phone || ""}
-                  onChange={(e) => updateContact(index, "phone", e.target.value)}
-                  placeholder="(555) 123-4567"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Email</Label>
-                <p className="text-xs text-muted-foreground">Email address</p>
-                <Input
-                  type="email"
-                  value={contact.email || ""}
-                  onChange={(e) => updateContact(index, "email", e.target.value)}
-                  placeholder="email@example.com"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Notes</Label>
-              <p className="text-xs text-muted-foreground">Any additional information about this contact</p>
-              <Textarea
-                value={contact.note || ""}
-                onChange={(e) => updateContact(index, "note", e.target.value)}
-                placeholder="Add special instructions or context..."
-                rows={2}
-              />
-            </div>
-          </div>
-        ))}
-
-        {contacts.length === 0 && (
-          <div className="text-center py-12 border border-dashed rounded-lg">
-            <p className="text-muted-foreground mb-4">No contacts added yet</p>
-            <Button onClick={addContact} variant="outline">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Your First Contact
-            </Button>
-          </div>
-        )}
-      </div>
-    </PreviewModeWrapper>
+          )}
+        </div>
+      </PreviewModeWrapper>
     </div>
   );
 };

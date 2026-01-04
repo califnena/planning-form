@@ -22,6 +22,21 @@ export interface RevisionRecord {
   signature_png: string;
 }
 
+/**
+ * Unified Contact type
+ * contact_type: "person" (family/friends), "service" (funeral home, etc), "professional" (attorney, etc)
+ */
+export interface UnifiedContact {
+  id?: string;
+  name: string;
+  contact_type: "person" | "service" | "professional";
+  organization?: string;
+  role?: string;
+  phone?: string;
+  email?: string;
+  notes?: string;
+}
+
 export type NormalizedPlanPayload = {
   // CANONICAL KEYS
   personal: Record<string, any>;
@@ -35,13 +50,15 @@ export type NormalizedPlanPayload = {
   revisions: RevisionRecord[];
   preparer_name: string;
   
-  // Contact arrays
+  // CANONICAL: Unified contacts array
+  contacts: UnifiedContact[];
+  
+  // Legacy arrays (kept for backwards compat, merged into contacts)
   contacts_professional: any[];
   service_providers: any[];
   
   // Other sections
   about: Record<string, any>;
-  contacts: any[];
   wishes: Record<string, any>;
   insurance: Record<string, any>;
   financial: Record<string, any>;
@@ -219,14 +236,76 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
     ...asObject(mergedRoot.travel_planning),
   };
 
-  // Contacts can appear in multiple forms
-  const contactsA = asArray(mergedRoot.contacts);
+  // CANONICAL: Unified contacts array
+  // Merge from multiple sources and normalize to UnifiedContact shape
+  const rawContactsArray = asArray(mergedRoot.contacts);
   const contactsObj = asObject(mergedRoot.contacts);
-  const contactsB = asArray(contactsObj.contacts);
-  const contactsC = asArray(contactsObj.importantPeople);
-  const contactsNotify = asArray(mergedRoot.contacts_notify);
+  const rawContactsNested = asArray(contactsObj.contacts);
+  const rawImportantPeople = asArray(contactsObj.importantPeople);
+  const rawContactsNotify = asArray(mergedRoot.contacts_notify);
+  const rawProfessionalContacts = asArray(mergedRoot.contacts_professional);
+  const rawServiceProviders = asArray(mergedRoot.service_providers);
+  const rawVendors = asArray(mergedRoot.vendors);
 
-  const contacts = [...contactsA, ...contactsB, ...contactsC, ...contactsNotify].filter(Boolean);
+  // Helper to normalize legacy contact formats to UnifiedContact
+  const normalizeContact = (c: any, defaultType: "person" | "service" | "professional"): UnifiedContact => ({
+    id: c.id || crypto.randomUUID(),
+    name: c.name || c.full_name || "",
+    contact_type: c.contact_type || defaultType,
+    organization: c.organization || c.company || c.firm || "",
+    role: c.role || c.type || c.relationship || "",
+    phone: c.phone || c.phone_number || c.contact || "",
+    email: c.email || "",
+    notes: c.notes || c.note || "",
+  });
+
+  // Build unified contacts array
+  const unifiedContacts: UnifiedContact[] = [];
+  const seenIds = new Set<string>();
+
+  // Add from new canonical contacts array first (already in correct format)
+  for (const c of rawContactsArray) {
+    if (c && typeof c === "object" && c.contact_type) {
+      const id = c.id || crypto.randomUUID();
+      if (!seenIds.has(id)) {
+        unifiedContacts.push({ ...c, id });
+        seenIds.add(id);
+      }
+    }
+  }
+
+  // Migrate legacy person contacts (contacts_notify, importantPeople, nested contacts)
+  for (const c of [...rawContactsNested, ...rawImportantPeople, ...rawContactsNotify]) {
+    if (c && typeof c === "object") {
+      const normalized = normalizeContact(c, "person");
+      if (normalized.name && !seenIds.has(normalized.id!)) {
+        unifiedContacts.push(normalized);
+        seenIds.add(normalized.id!);
+      }
+    }
+  }
+
+  // Migrate legacy professional contacts
+  for (const c of rawProfessionalContacts) {
+    if (c && typeof c === "object") {
+      const normalized = normalizeContact(c, "professional");
+      if (normalized.name && !seenIds.has(normalized.id!)) {
+        unifiedContacts.push(normalized);
+        seenIds.add(normalized.id!);
+      }
+    }
+  }
+
+  // Migrate legacy service providers and vendors
+  for (const c of [...rawServiceProviders, ...rawVendors]) {
+    if (c && typeof c === "object") {
+      const normalized = normalizeContact(c, "service");
+      if (normalized.name && !seenIds.has(normalized.id!)) {
+        unifiedContacts.push(normalized);
+        seenIds.add(normalized.id!);
+      }
+    }
+  }
 
   const pets = asArray(mergedRoot.pets);
 
@@ -235,9 +314,9 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
     ...asObject(mergedRoot.instructions),
   };
 
-  // Professional contacts and service providers
-  const contacts_professional = asArray(mergedRoot.contacts_professional);
-  const service_providers = asArray(mergedRoot.service_providers);
+  // Legacy arrays for backwards compat (will be empty if migrated)
+  const contacts_professional = rawProfessionalContacts;
+  const service_providers = rawServiceProviders;
 
   // Revisions array for signature history
   const revisions = asArray(mergedRoot.revisions);
@@ -253,7 +332,10 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
     revisions,
     preparer_name,
     
-    // Contact arrays
+    // CANONICAL: Unified contacts
+    contacts: unifiedContacts,
+    
+    // Legacy arrays (backwards compat)
     contacts_professional,
     service_providers,
     
@@ -263,7 +345,6 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
     messages: messages_to_loved_ones.individual,
     
     // Other sections
-    contacts,
     wishes: funeral,
     insurance,
     financial,
