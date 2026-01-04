@@ -68,6 +68,7 @@ const routeToSectionId: Record<string, string> = {
   "/preplandashboard/instructions": "instructions",
   "/preplandashboard/legalresources": "legalresources",
   "/preplandashboard/willprep": "willprep",
+  "/preplandashboard/signature": "signature",
 };
 
 export default function PlannerLayout() {
@@ -452,6 +453,7 @@ export default function PlannerLayout() {
     instructions: "/preplandashboard/instructions",
     legalresources: "/preplandashboard/legalresources",
     willprep: "/preplandashboard/willprep",
+    signature: "/preplandashboard/signature",
   };
 
   const handleSectionChange = (sectionId: string) => {

@@ -163,6 +163,16 @@ export function getSectionCompletion(planData: unknown): Record<string, boolean>
         );
         break;
         
+      case "signature":
+        // Complete if revisions array has at least one entry with signature_png
+        const revisions = merged.revisions || data.revisions;
+        if (Array.isArray(revisions) && revisions.length > 0) {
+          result[sectionId] = revisions.some((r: any) => r.signature_png && r.signature_png.trim());
+        } else {
+          result[sectionId] = false;
+        }
+        break;
+        
       default:
         result[sectionId] = false;
     }

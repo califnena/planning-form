@@ -23,3 +23,4 @@ export { default as HealthCarePage } from "./HealthCarePage";
 export { default as CarePreferencesPage } from "./CarePreferencesPage";
 export { default as AdvanceDirectivePage } from "./AdvanceDirectivePage";
 export { default as TravelPlanningPage } from "./TravelPlanningPage";
+export { default as SignaturePage } from "./SignaturePage";

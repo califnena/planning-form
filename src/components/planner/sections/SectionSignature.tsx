@@ -1,15 +1,16 @@
-import { useRef, useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Check, Eraser, PenLine } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { PenLine } from "lucide-react";
+import { SignaturePadModal } from "@/components/planner/SignaturePadModal";
+import { supabase } from "@/integrations/supabase/client";
 
-interface SignatureData {
-  printed_name: string;
+interface RevisionRecord {
+  revision_date: string;
+  prepared_by: string;
   signature_png: string;
-  signed_at: string;
 }
 
 interface SectionSignatureProps {
@@ -20,128 +21,49 @@ interface SectionSignatureProps {
 /**
  * SectionSignature
  * 
- * CANONICAL KEY: signature (object in plan_payload)
+ * CANONICAL KEY: revisions (array in plan_payload)
+ * Also updates: last_signed_at column on plans table
  */
 export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
-  const signature: SignatureData = data.signature || {};
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [hasDrawn, setHasDrawn] = useState(false);
-  const { toast } = useToast();
+  const [showModal, setShowModal] = useState(false);
+  
+  // Get planId from the plan data
+  const planId = data.id || data.plan_id;
+  
+  // Get revisions array and latest revision from plan_payload
+  const planPayload = data.plan_payload || data;
+  const revisions: RevisionRecord[] = planPayload.revisions || [];
+  const latestRevision = revisions.length > 0 ? revisions[revisions.length - 1] : null;
+  const preparerName = planPayload.preparer_name || data.preparer_name || '';
 
-  const updateSignature = (field: keyof SignatureData, value: string) => {
-    onChange({
-      ...data,
-      signature: { ...signature, [field]: value },
-    });
-  };
-
-  // Initialize canvas with existing signature if available
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    // Set canvas size
-    canvas.width = canvas.offsetWidth;
-    canvas.height = 150;
-
-    // White background
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Load existing signature
-    if (signature.signature_png) {
-      const img = new Image();
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0);
-        setHasDrawn(true);
-      };
-      img.src = signature.signature_png;
-    }
-  }, []);
-
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
-    setIsDrawing(true);
-    setHasDrawn(true);
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = "touches" in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = "touches" in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
-
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-  };
-
-  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = "touches" in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = "touches" in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
-
-    ctx.lineTo(x, y);
-    ctx.strokeStyle = "#1a1a1a";
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
-    ctx.stroke();
-  };
-
-  const stopDrawing = () => {
-    setIsDrawing(false);
-  };
-
-  const clearCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    setHasDrawn(false);
+  const handleSignatureSaved = async (signatureUrl: string, revisionData: RevisionRecord) => {
+    console.log('[signature] plan updated with revision');
     
-    updateSignature("signature_png", "");
-    updateSignature("signed_at", "");
-  };
-
-  const saveSignature = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const dataUrl = canvas.toDataURL("image/png");
-    const signedAt = new Date().toISOString();
-
+    // Append to revisions array
+    const updatedRevisions = [...revisions, revisionData];
+    
+    // Update plan_payload with new revision
     onChange({
       ...data,
-      signature: {
-        ...signature,
-        signature_png: dataUrl,
-        signed_at: signedAt,
-      },
+      revisions: updatedRevisions,
+      preparer_name: revisionData.prepared_by || preparerName,
     });
 
-    toast({
-      title: "Signature Saved",
-      description: `Signed on ${new Date(signedAt).toLocaleDateString()}`,
-    });
+    // Also update last_signed_at column on plans table directly
+    if (planId) {
+      const { error } = await supabase
+        .from('plans')
+        .update({ last_signed_at: new Date().toISOString() })
+        .eq('id', planId);
+
+      if (error) {
+        console.error('[signature] failed to update last_signed_at:', error);
+      }
+    }
   };
 
-  const formattedDate = signature.signed_at 
-    ? new Date(signature.signed_at).toLocaleDateString("en-US", {
+  const formattedDate = latestRevision?.revision_date 
+    ? new Date(latestRevision.revision_date).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -151,80 +73,82 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">✍️ Sign Your Plan</h2>
+        <h2 className="text-2xl font-bold mb-2">✍️ Review & Signature</h2>
         <p className="text-muted-foreground">
-          Add your signature to finalize this document. This is not a legal signature but helps verify your wishes.
+          Add your signature to finalize this document. This is a personal planning document, not a legal e-signature.
         </p>
       </div>
 
       <Card className="p-6 space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="printed_name">Printed Name</Label>
+          <Label htmlFor="preparer_name">Prepared By (Printed Name)</Label>
           <Input
-            id="printed_name"
-            value={signature.printed_name || ""}
-            onChange={(e) => updateSignature("printed_name", e.target.value)}
-            placeholder="Your full legal name"
+            id="preparer_name"
+            value={preparerName}
+            onChange={(e) => onChange({ ...data, preparer_name: e.target.value })}
+            placeholder="Your full name"
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-4">
           <Label>Signature</Label>
-          <p className="text-xs text-muted-foreground mb-2">
-            Draw your signature using your mouse or finger
-          </p>
-          <div className="border rounded-lg overflow-hidden bg-white">
-            <canvas
-              ref={canvasRef}
-              className="w-full cursor-crosshair touch-none"
-              style={{ height: 150 }}
-              onMouseDown={startDrawing}
-              onMouseMove={draw}
-              onMouseUp={stopDrawing}
-              onMouseLeave={stopDrawing}
-              onTouchStart={startDrawing}
-              onTouchMove={draw}
-              onTouchEnd={stopDrawing}
-            />
-          </div>
-          <div className="flex gap-2 mt-2">
-            <Button variant="outline" size="sm" onClick={clearCanvas}>
-              <Eraser className="h-4 w-4 mr-2" />
-              Clear
-            </Button>
-            <Button size="sm" onClick={saveSignature} disabled={!hasDrawn}>
-              <Check className="h-4 w-4 mr-2" />
-              Save Signature
-            </Button>
-          </div>
+          
+          {latestRevision?.signature_png ? (
+            <div className="p-4 bg-muted rounded-lg">
+              <img
+                src={latestRevision.signature_png}
+                alt="Your signature"
+                className="max-h-24 mx-auto bg-white rounded border"
+              />
+              <p className="text-center mt-2 text-sm font-medium">
+                {latestRevision.prepared_by || preparerName}
+              </p>
+              {formattedDate && (
+                <p className="text-center text-xs text-muted-foreground">
+                  <PenLine className="h-3 w-3 inline mr-1" />
+                  Signed on: {formattedDate}
+                </p>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No signature on file. Click below to sign your plan.
+            </p>
+          )}
+
+          <Button onClick={() => setShowModal(true)}>
+            <PenLine className="h-4 w-4 mr-2" />
+            {latestRevision ? 'Update Signature' : 'Sign Your Plan'}
+          </Button>
         </div>
 
-        {formattedDate && (
+        {revisions.length > 1 && (
           <div className="pt-4 border-t">
-            <p className="text-sm text-muted-foreground">
-              <PenLine className="h-4 w-4 inline mr-1" />
-              Signed on: <span className="font-medium text-foreground">{formattedDate}</span>
-            </p>
-          </div>
-        )}
-
-        {signature.signature_png && (
-          <div className="pt-4 border-t">
-            <Label>Signature Preview</Label>
-            <div className="mt-2 p-4 bg-muted rounded-lg">
-              <img
-                src={signature.signature_png}
-                alt="Your signature"
-                className="max-h-24 mx-auto"
-              />
-              <p className="text-center mt-2 text-sm font-medium">{signature.printed_name}</p>
-              {formattedDate && (
-                <p className="text-center text-xs text-muted-foreground">{formattedDate}</p>
-              )}
+            <Label>Revision History</Label>
+            <div className="mt-2 space-y-2">
+              {revisions.slice(0, -1).reverse().map((rev, idx) => (
+                <div key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
+                  <PenLine className="h-3 w-3" />
+                  <span>
+                    {new Date(rev.revision_date).toLocaleDateString()} 
+                    {rev.prepared_by && ` - ${rev.prepared_by}`}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         )}
       </Card>
+
+      {planId && (
+        <SignaturePadModal
+          open={showModal}
+          onOpenChange={setShowModal}
+          planId={planId}
+          preparerName={preparerName}
+          onSignatureSaved={handleSignatureSaved}
+        />
+      )}
     </div>
   );
 };

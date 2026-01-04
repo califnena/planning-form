@@ -198,6 +198,17 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     showCompletionDot: true,
   },
 
+  // SIGNATURE (final step)
+  {
+    id: "signature",
+    label: "Review & Signature",
+    icon: FileText,
+    route: "/preplandashboard/signature",
+    dataKey: "revisions",
+    group: "records",
+    showCompletionDot: true,
+  },
+
   // HELP & EDUCATION (no completion dots)
   {
     id: "resources",

@@ -16,6 +16,12 @@
  * - All consumers (completion + PDF mapping + shared view) should read from this normalized object.
  */
 
+export interface RevisionRecord {
+  revision_date: string;
+  prepared_by: string;
+  signature_png: string;
+}
+
 export type NormalizedPlanPayload = {
   // CANONICAL KEYS
   personal: Record<string, any>;
@@ -26,11 +32,8 @@ export type NormalizedPlanPayload = {
     individual: Array<{ to: string; message: string; audio_url?: string; video_url?: string }>;
   };
   legacy: Record<string, any>;
-  signature: {
-    printed_name: string;
-    signature_png: string;
-    signed_at: string;
-  };
+  revisions: RevisionRecord[];
+  preparer_name: string;
   
   // Contact arrays
   contacts_professional: any[];
@@ -236,13 +239,9 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
   const contacts_professional = asArray(mergedRoot.contacts_professional);
   const service_providers = asArray(mergedRoot.service_providers);
 
-  // Signature
-  const signatureRaw = asObject(mergedRoot.signature);
-  const signature = {
-    printed_name: signatureRaw.printed_name || "",
-    signature_png: signatureRaw.signature_png || "",
-    signed_at: signatureRaw.signed_at || "",
-  };
+  // Revisions array for signature history
+  const revisions = asArray(mergedRoot.revisions);
+  const preparer_name = mergedRoot.preparer_name || mergedRoot.prepared_by || "";
 
   return {
     // CANONICAL KEYS
@@ -251,7 +250,8 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
     online_accounts,
     messages_to_loved_ones,
     legacy,
-    signature,
+    revisions,
+    preparer_name,
     
     // Contact arrays
     contacts_professional,
