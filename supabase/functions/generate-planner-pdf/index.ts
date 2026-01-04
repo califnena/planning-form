@@ -1852,12 +1852,36 @@ async function generateSimplePdf(
   });
   sigY -= 50;
   
-  // Check for digital signature in plan data
-  const signatureData = planData?.signature || {};
-  const hasDigitalSignature = signatureData.signature_png && signatureData.printed_name;
+  // Check for digital signature in plan data - look in revisions array (canonical storage)
+  const revisionsArray = planData?.revisions || [];
+  // Get the latest revision (last item sorted by revision_date)
+  const sortedRevisions = [...revisionsArray].sort((a: any, b: any) => 
+    new Date(a.revision_date || 0).getTime() - new Date(b.revision_date || 0).getTime()
+  );
+  const latestRevision = sortedRevisions.length > 0 ? sortedRevisions[sortedRevisions.length - 1] : null;
+  
+  // Also check legacy signature object for backwards compatibility
+  const legacySignature = planData?.signature || {};
+  const signatureData = latestRevision || legacySignature;
+  
+  // Determine if we have a valid digital signature (from revisions or legacy)
+  const hasDigitalSignature = (latestRevision?.prepared_by) || 
+    (legacySignature.signature_png && legacySignature.printed_name);
+  
+  console.log("[generate-planner-pdf] Signature data:", {
+    revisions_count: revisionsArray.length,
+    has_latest_revision: !!latestRevision,
+    prepared_by: latestRevision?.prepared_by,
+    has_signature_png: !!signatureData?.signature_png,
+  });
   
   if (hasDigitalSignature) {
-    // Render digital signature
+    // Render digital signature from revisions array (preferred) or legacy signature object
+    const printedName = latestRevision?.prepared_by || legacySignature?.printed_name || "";
+    const signatureImg = latestRevision?.signature_png || legacySignature?.signature_png || "";
+    const signedDate = latestRevision?.revision_date || legacySignature?.signed_at || "";
+    const signatureNotes = latestRevision?.notes || "";
+    
     signaturePage.drawText("Printed Name:", {
       x: margin,
       y: sigY,
@@ -1865,7 +1889,7 @@ async function generateSimplePdf(
       font: helveticaBold,
       color: textColor,
     });
-    signaturePage.drawText(sanitizeForPdf(signatureData.printed_name), {
+    signaturePage.drawText(sanitizeForPdf(printedName), {
       x: margin + 110,
       y: sigY,
       size: 12,
@@ -1874,44 +1898,9 @@ async function generateSimplePdf(
     });
     sigY -= 40;
     
-    signaturePage.drawText("Signature:", {
-      x: margin,
-      y: sigY,
-      size: 12,
-      font: helveticaBold,
-      color: textColor,
-    });
-    
-    // Embed the signature image if it's a base64 PNG
-    try {
-      if (signatureData.signature_png.startsWith('data:image/png;base64,')) {
-        const base64Data = signatureData.signature_png.replace('data:image/png;base64,', '');
-        const sigBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
-        const sigImage = await pdfDoc.embedPng(sigBytes);
-        const sigDims = sigImage.scale(0.5);
-        signaturePage.drawImage(sigImage, {
-          x: margin + 110,
-          y: sigY - sigDims.height + 15,
-          width: Math.min(sigDims.width, 200),
-          height: Math.min(sigDims.height, 50),
-        });
-        sigY -= 60;
-      }
-    } catch (e) {
-      console.error("[generate-planner-pdf] Error embedding signature:", e);
-      // Fallback to text
-      signaturePage.drawText("[Signature on file]", {
-        x: margin + 110,
-        y: sigY,
-        size: 10,
-        font: helvetica,
-        color: rgb(0.4, 0.4, 0.4),
-      });
-      sigY -= 40;
-    }
-    
-    if (signatureData.signed_at) {
-      const signedDate = new Date(signatureData.signed_at).toLocaleDateString("en-US", {
+    // Date
+    if (signedDate) {
+      const formattedDate = new Date(signedDate).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -1923,14 +1912,120 @@ async function generateSimplePdf(
         font: helveticaBold,
         color: textColor,
       });
-      signaturePage.drawText(signedDate, {
+      signaturePage.drawText(formattedDate, {
         x: margin + 110,
         y: sigY,
         size: 12,
         font: helvetica,
         color: textColor,
       });
+      sigY -= 40;
+    }
+    
+    // Signature image
+    signaturePage.drawText("Signature (for reference):", {
+      x: margin,
+      y: sigY,
+      size: 12,
+      font: helveticaBold,
+      color: textColor,
+    });
+    
+    if (signatureImg) {
+      // Try to embed the signature image
+      try {
+        // Handle both base64 data URLs and regular URLs
+        if (signatureImg.startsWith('data:image/png;base64,')) {
+          const base64Data = signatureImg.replace('data:image/png;base64,', '');
+          const sigBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+          const sigImage = await pdfDoc.embedPng(sigBytes);
+          const sigDims = sigImage.scale(0.5);
+          signaturePage.drawImage(sigImage, {
+            x: margin + 10,
+            y: sigY - sigDims.height - 10,
+            width: Math.min(sigDims.width, 200),
+            height: Math.min(sigDims.height, 60),
+          });
+          sigY -= 80;
+        } else if (signatureImg.startsWith('http')) {
+          // Fetch the image from URL
+          try {
+            const imgResponse = await fetch(signatureImg);
+            if (imgResponse.ok) {
+              const imgArrayBuffer = await imgResponse.arrayBuffer();
+              const imgBytes = new Uint8Array(imgArrayBuffer);
+              const sigImage = await pdfDoc.embedPng(imgBytes);
+              const sigDims = sigImage.scale(0.3);
+              signaturePage.drawImage(sigImage, {
+                x: margin + 10,
+                y: sigY - Math.min(sigDims.height, 60) - 10,
+                width: Math.min(sigDims.width, 200),
+                height: Math.min(sigDims.height, 60),
+              });
+              sigY -= 80;
+            } else {
+              throw new Error("Failed to fetch signature image");
+            }
+          } catch (fetchErr) {
+            console.error("[generate-planner-pdf] Failed to fetch signature URL:", fetchErr);
+            signaturePage.drawText("[Signature image on file]", {
+              x: margin + 10,
+              y: sigY - 20,
+              size: 10,
+              font: helvetica,
+              color: rgb(0.4, 0.4, 0.4),
+            });
+            sigY -= 50;
+          }
+        }
+      } catch (e) {
+        console.error("[generate-planner-pdf] Error embedding signature:", e);
+        signaturePage.drawText("[Signature image on file]", {
+          x: margin + 10,
+          y: sigY - 20,
+          size: 10,
+          font: helvetica,
+          color: rgb(0.4, 0.4, 0.4),
+        });
+        sigY -= 50;
+      }
+    } else {
+      signaturePage.drawText("Signature not provided", {
+        x: margin + 10,
+        y: sigY - 20,
+        size: 10,
+        font: helvetica,
+        color: rgb(0.5, 0.5, 0.5),
+      });
       sigY -= 50;
+    }
+    
+    // Notes if present
+    if (signatureNotes) {
+      sigY -= 10;
+      signaturePage.drawText("Notes:", {
+        x: margin,
+        y: sigY,
+        size: 12,
+        font: helveticaBold,
+        color: textColor,
+      });
+      sigY -= lineHeight;
+      
+      // Wrap notes text
+      const notesMaxWidth = pageWidth - margin * 2;
+      const notesLines = wrapText(sanitizeForPdf(signatureNotes), notesMaxWidth, 11);
+      for (const line of notesLines.slice(0, 5)) { // Limit to 5 lines
+        signaturePage.drawText(line, {
+          x: margin,
+          y: sigY,
+          size: 11,
+          font: helvetica,
+          color: textColor,
+        });
+        sigY -= lineHeight;
+      }
+      sigY -= 20;
     }
   } else {
     // Show blank signature lines for manual signing

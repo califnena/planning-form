@@ -17,7 +17,8 @@ import {
   Circle,
   Loader2,
   Play,
-  Phone
+  Phone,
+  PenLine
 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
@@ -413,26 +414,37 @@ export default function PrePlanSummary() {
           </p>
         </div>
 
-        {/* Primary Action + Share with Family */}
+        {/* Primary Action + Sign Plan */}
         <div className="mb-8 space-y-3">
-          <Button 
-            onClick={handleDownloadPDF}
-            disabled={generatingPdf}
-            size="lg"
-            className="w-full h-14 text-lg font-medium gap-3"
-          >
-            {generatingPdf ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Creating Your Printable Copy...
-              </>
-            ) : (
-              <>
-                <Download className="h-5 w-5" />
-                Printable Copy
-              </>
-            )}
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button 
+              onClick={handleDownloadPDF}
+              disabled={generatingPdf}
+              size="lg"
+              className="flex-1 h-14 text-lg font-medium gap-3"
+            >
+              {generatingPdf ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Creating Your Printable Copy...
+                </>
+              ) : (
+                <>
+                  <Download className="h-5 w-5" />
+                  Printable Copy
+                </>
+              )}
+            </Button>
+            <Button 
+              onClick={() => navigate("/preplandashboard/signature")}
+              variant="outline"
+              size="lg"
+              className="h-14 text-lg font-medium gap-3"
+            >
+              <PenLine className="h-5 w-5" />
+              Sign Plan
+            </Button>
+          </div>
           <p className="text-sm text-muted-foreground text-center">
             You can print or save your plan anytime.
           </p>
