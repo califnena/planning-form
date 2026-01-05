@@ -5,6 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { LegalDisclaimer } from "@/components/ui/LegalDisclaimer";
 
 const LegalForms = () => {
   return (
@@ -28,34 +29,34 @@ const LegalForms = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 md:py-12 max-w-5xl">
-        {/* Page Title */}
+        {/* Page Title - Renamed to avoid "legal advice" language */}
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-            Essential Legal Documents & Resources
+            Document Information & Resources
           </h1>
           <p className="text-lg text-muted-foreground">
-            Free state-specific forms and guidance for end-of-life planning
+            Educational information about common planning documents
           </p>
         </div>
 
-        {/* Primary Disclaimer */}
+        {/* Primary Disclaimer - Softened language */}
         <Alert className="mb-8 border-destructive bg-destructive/5">
           <Shield className="h-5 w-5 text-destructive" />
           <AlertTitle className="text-destructive font-bold text-lg mb-2">
-            IMPORTANT LEGAL DISCLAIMER
+            IMPORTANT NOTICE
           </AlertTitle>
           <AlertDescription className="text-sm space-y-2 text-foreground/90">
             <p className="font-semibold">
-              The information and resources provided here are for educational purposes only and do not constitute legal advice. We are not a law firm and do not provide legal services.
+              The information provided here is for educational purposes only. It does not constitute legal, financial, or medical advice.
             </p>
             <ul className="list-disc list-inside space-y-1 ml-2">
-              <li>These forms must be specific to your state to be legally valid</li>
-              <li>State laws vary significantly regarding execution requirements (witnesses, notarization)</li>
-              <li>We strongly recommend consulting with an attorney for complex situations or if you have questions</li>
-              <li>Improperly executed documents may not be legally enforceable</li>
+              <li>Every situation is different—what works for one person may not work for another</li>
+              <li>Laws and regulations vary by state and change over time</li>
+              <li>We encourage you to consult with qualified professionals for your specific circumstances</li>
+              <li>This app does not prepare, review, or file any legal documents</li>
             </ul>
             <p className="font-semibold mt-3">
-              By using these resources, you acknowledge that you understand these limitations and agree to obtain proper legal counsel as needed.
+              Using this app does not create a professional-client relationship of any kind.
             </p>
           </AlertDescription>
         </Alert>
@@ -64,7 +65,7 @@ const LegalForms = () => {
         <Card className="mb-8">
           <CardContent className="pt-6">
             <p className="text-base text-muted-foreground leading-relaxed">
-              Planning ahead with the right legal documents ensures your wishes are honored and reduces burden on your loved ones during difficult times. Below is a guide to essential legal forms. <strong>Remember: these documents must be specific to your state to be legally valid.</strong> We've provided links to trusted resources where you can access free, state-specific forms.
+              Many people find it helpful to learn about common planning documents. Below is general educational information about different types of documents and links to trusted organizations that may provide resources in your state.
             </p>
           </CardContent>
         </Card>
@@ -658,6 +659,9 @@ const LegalForms = () => {
             </Link>
           </div>
         </section>
+        
+        {/* Bottom Disclaimer */}
+        <LegalDisclaimer variant="compact" className="mt-12" />
       </main>
 
       {/* Footer */}

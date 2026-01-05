@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { AppFooter } from "@/components/AppFooter";
+import { LegalDisclaimer } from "@/components/ui/LegalDisclaimer";
 import { ArrowRight, ArrowLeft, Info } from "lucide-react";
 
 // Guide topics matching the planner sections
@@ -182,6 +183,9 @@ export default function Guide() {
       <GlobalHeader />
       
       <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
+        {/* Top Disclaimer */}
+        <LegalDisclaimer variant="compact" className="mb-6" />
+        
         <div className="mb-8">
           <h1 className="text-2xl md:text-3xl font-bold mb-3">Step-by-Step Planning Guide</h1>
           <p className="text-lg text-muted-foreground leading-relaxed">
@@ -220,6 +224,9 @@ export default function Guide() {
             </Button>
           </Link>
         </div>
+        
+        {/* Bottom Disclaimer */}
+        <LegalDisclaimer variant="compact" className="mt-12" />
       </main>
       
       <AppFooter />
