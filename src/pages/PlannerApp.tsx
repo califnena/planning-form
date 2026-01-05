@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { RevisionPromptDialog } from "@/components/planner/RevisionPromptDialog";
 import { EmailPlanDialog } from "@/components/EmailPlanDialog";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
-import { PreviewModeBanner } from "@/components/PreviewModeBanner";
+import { PreviewLockBanner } from "@/components/planner/PreviewLockBanner";
 import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
 import { SectionOptionsMenu } from "@/components/planner/SectionOptionsMenu";
@@ -23,8 +23,16 @@ import { OnboardingTour } from "@/components/planner/OnboardingTour";
 import { AppFooter } from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
-// Preview Mode Context
-const PreviewModeContext = createContext<{ isPreviewMode: boolean }>({ isPreviewMode: false });
+/**
+ * Preview Mode Context
+ * 
+ * SINGLE SOURCE OF TRUTH: isPreviewMode = !hasActiveSubscription
+ * This drives the lock state for all planner sections.
+ */
+const PreviewModeContext = createContext<{ isPreviewMode: boolean; isUnlocked: boolean }>({ 
+  isPreviewMode: false, 
+  isUnlocked: true 
+});
 export const usePreviewMode = () => useContext(PreviewModeContext);
 
 // Section components
@@ -208,8 +216,15 @@ const PlannerApp = () => {
   };
 
   const { plan, loading: planLoading, updatePlan, saveState } = usePlanData(user?.id || "");
-  const { hasActiveSubscription, isLoading: subscriptionLoading } = useSubscriptionStatus(user?.id);
-  const isPreviewMode = !hasActiveSubscription;
+  const { hasActiveSubscription, isLoading: subscriptionLoading, isMasterAccount } = useSubscriptionStatus(user?.id);
+  
+  /**
+   * SINGLE SOURCE OF TRUTH for lock state
+   * isUnlocked = has subscription OR is admin/master account
+   * isPreviewMode = !isUnlocked (legacy alias)
+   */
+  const isUnlocked = hasActiveSubscription || isMasterAccount;
+  const isPreviewMode = !isUnlocked;
 
   // Handle section archive
   const handleArchiveSection = async (sectionId: string, note?: string) => {
@@ -728,7 +743,7 @@ const PlannerApp = () => {
   };
 
   return (
-    <PreviewModeContext.Provider value={{ isPreviewMode }}>
+    <PreviewModeContext.Provider value={{ isPreviewMode, isUnlocked }}>
       <div className="min-h-screen flex flex-col bg-background">
         <GlobalHeader onGenerateDocument={handleDownloadPDF} />
         
@@ -754,7 +769,7 @@ const PlannerApp = () => {
           onSave={handleManualSave}
           onAfterLifePlan={handleAfterLifePlan}
         >
-          {isPreviewMode && <PreviewModeBanner />}
+          <PreviewLockBanner />
           {renderSection()}
         </PlannerShell>
 

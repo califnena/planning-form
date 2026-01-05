@@ -9,7 +9,7 @@ import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { useToast } from "@/hooks/use-toast";
 import { RevisionPromptDialog } from "@/components/planner/RevisionPromptDialog";
 import { EmailPlanDialog } from "@/components/EmailPlanDialog";
-import { PreviewModeBanner } from "@/components/PreviewModeBanner";
+import { PreviewLockBanner } from "@/components/planner/PreviewLockBanner";
 import { PIICollectionDialog } from "@/components/planner/PIICollectionDialog";
 import { generatePlanPDF } from "@/lib/pdfGenerator";
 import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator";
@@ -22,8 +22,16 @@ import { Home } from "lucide-react";
 import { mergeVisibleSections } from "@/lib/sections";
 import { PlanDebugPanel } from "@/components/debug/PlanDebugPanel";
 
-// Preview Mode Context
-const PreviewModeContext = createContext<{ isPreviewMode: boolean }>({ isPreviewMode: false });
+/**
+ * Preview Mode Context
+ * 
+ * SINGLE SOURCE OF TRUTH: isPreviewMode = !hasActiveSubscription
+ * This drives the lock state for all planner sections.
+ */
+const PreviewModeContext = createContext<{ isPreviewMode: boolean; isUnlocked: boolean }>({ 
+  isPreviewMode: false, 
+  isUnlocked: true 
+});
 export const usePreviewMode = () => useContext(PreviewModeContext);
 
 // Plan Context for sharing data with section pages
@@ -223,8 +231,15 @@ export default function PlannerLayout() {
   };
 
   const { plan, loading: planLoading, updatePlan, saveState } = usePlanData(user?.id || "");
-  const { hasActiveSubscription, isLoading: subscriptionLoading } = useSubscriptionStatus(user?.id);
-  const isPreviewMode = !hasActiveSubscription;
+  const { hasActiveSubscription, isLoading: subscriptionLoading, isMasterAccount } = useSubscriptionStatus(user?.id);
+  
+  /**
+   * SINGLE SOURCE OF TRUTH for lock state
+   * isUnlocked = has subscription OR is admin/master account
+   * isPreviewMode = !isUnlocked (legacy alias)
+   */
+  const isUnlocked = hasActiveSubscription || isMasterAccount;
+  const isPreviewMode = !isUnlocked;
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -477,7 +492,7 @@ export default function PlannerLayout() {
   }
 
   return (
-    <PreviewModeContext.Provider value={{ isPreviewMode }}>
+    <PreviewModeContext.Provider value={{ isPreviewMode, isUnlocked }}>
       <PlanContext.Provider value={{ plan, updatePlan, saveState, user, isPreviewMode, userSettings }}>
         <div className="min-h-screen flex flex-col bg-background">
           <GlobalHeader onGenerateDocument={handleDownloadPDF} />
@@ -503,7 +518,8 @@ export default function PlannerLayout() {
             onSave={handleManualSave}
             onAfterLifePlan={handleAfterLifePlan}
           >
-            {isPreviewMode && <PreviewModeBanner />}
+            {/* Calm preview lock banner - shown when locked */}
+            <PreviewLockBanner />
             <Outlet />
           </PlannerShell>
 
