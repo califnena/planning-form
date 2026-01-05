@@ -18,7 +18,9 @@ import {
   Loader2,
   Play,
   Phone,
-  PenLine
+  PenLine,
+  Lock,
+  Unlock
 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +32,8 @@ import { getCompletableSections, type SectionDefinition } from "@/lib/sectionReg
 import { getOrCreateGuestId } from "@/lib/identityUtils";
 import { getUnifiedPlan, getUnifiedCompletion, hasMeaningfulData } from "@/lib/getUnifiedPlan";
 import { PlanDebugPanel } from "@/components/debug/PlanDebugPanel";
+import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
+import { PreviewLockBanner } from "@/components/planner/PreviewLockBanner";
 
 interface SectionData {
   id: string;
@@ -64,6 +68,16 @@ export default function PrePlanSummary() {
   const [lastPdfUrl, setLastPdfUrl] = useState<string | null>(null);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [pdfWindow, setPdfWindow] = useState<Window | null>(null);
+  
+  /**
+   * SINGLE SOURCE LOCK STATE
+   * Uses useSubscriptionStatus to determine if user is unlocked.
+   * Unlocked = can download final PDF
+   * Locked = can only preview (with watermark)
+   */
+  const { hasActiveSubscription, isLoading: subscriptionLoading, isMasterAccount } = useSubscriptionStatus(userId || undefined);
+  const isUnlocked = hasActiveSubscription || isMasterAccount;
+  const isLocked = !isUnlocked && !subscriptionLoading;
   
   const loading = planLoading || dataLoading;
 
@@ -189,8 +203,20 @@ export default function PrePlanSummary() {
    * 2. Generate PDF
    * 3. Load blob URL into the tab
    * 4. Provide download fallback
+   * 
+   * LOCK STATE HANDLING:
+   * - Unlocked users: Get full PDF (isDraft = false)
+   * - Locked users: Get preview PDF with watermark (isDraft = true)
    */
   const handleDownloadPDF = async () => {
+    // If locked, show guidance but continue to generate preview
+    if (isLocked) {
+      toast({
+        title: "Preview Mode",
+        description: "You can preview your plan. Unlock to download the final copy.",
+      });
+    }
+
     setGeneratingPdf(true);
     setPdfError(null);
 
@@ -204,10 +230,10 @@ export default function PrePlanSummary() {
       // Show loading message in the new tab
       newWindow.document.write(`
         <html>
-          <head><title>Loading Your Printable Copy...</title></head>
+          <head><title>Loading Your ${isLocked ? 'Preview' : 'Printable Copy'}...</title></head>
           <body style="font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
             <div style="text-align: center;">
-              <p style="font-size: 18px;">Loading your printable copy...</p>
+              <p style="font-size: 18px;">Loading your ${isLocked ? 'preview' : 'printable copy'}...</p>
               <p style="color: #666;">Please wait a moment.</p>
             </div>
           </body>
@@ -237,7 +263,7 @@ export default function PrePlanSummary() {
 
       const normalizedPlanData = normalizePlanDataForPdf(planDataForPdf);
 
-      console.log("[PDF] Plan data built, invoking edge function");
+      console.log("[PDF] Plan data built, invoking edge function, isLocked:", isLocked);
 
       const { data: pdfData, error } = await supabase.functions.invoke("generate-planner-pdf", {
         body: {
@@ -245,7 +271,8 @@ export default function PrePlanSummary() {
           selectedSections,
           piiData: {},
           docType: "planner",
-          isDraft: false,
+          // LOCK STATE: Use isDraft=true for locked users (adds watermark)
+          isDraft: isLocked,
           identityType,
           identityId,
         },
@@ -404,6 +431,9 @@ export default function PrePlanSummary() {
           </Button>
         </div>
 
+        {/* Preview Lock Banner - calm paywall messaging */}
+        <PreviewLockBanner />
+
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl sm:text-3xl font-semibold text-foreground">
@@ -426,12 +456,12 @@ export default function PrePlanSummary() {
               {generatingPdf ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  Creating Your Printable Copy...
+                  {isLocked ? "Creating Preview..." : "Creating Your Printable Copy..."}
                 </>
               ) : (
                 <>
-                  <Download className="h-5 w-5" />
-                  Printable Copy
+                  {isLocked ? <Lock className="h-5 w-5" /> : <Download className="h-5 w-5" />}
+                  {isLocked ? "Preview Copy" : "Printable Copy"}
                 </>
               )}
             </Button>
@@ -440,13 +470,17 @@ export default function PrePlanSummary() {
               variant="outline"
               size="lg"
               className="h-14 text-lg font-medium gap-3"
+              disabled={isLocked}
             >
               <PenLine className="h-5 w-5" />
               Sign Plan
             </Button>
           </div>
           <p className="text-sm text-muted-foreground text-center">
-            You can print or save your plan anytime.
+            {isLocked 
+              ? "Preview includes a watermark. Unlock to get your final copy."
+              : "You can print or save your plan anytime."
+            }
           </p>
           
           {/* Fallback buttons when popup blocked */}
