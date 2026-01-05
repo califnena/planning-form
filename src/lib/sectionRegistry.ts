@@ -204,7 +204,7 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     label: "Review & Signature",
     icon: FileText,
     route: "/preplandashboard/signature",
-    dataKey: "revisions",
+    dataKey: "signature",
     group: "records",
     showCompletionDot: true,
   },
