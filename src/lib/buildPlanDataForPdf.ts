@@ -179,6 +179,11 @@ export async function buildPlanDataForPdf(userId: string): Promise<any> {
     healthcare: normalizedPayload.medical,
     care_preferences: normalizedPayload.medical?.care_preferences || {},
     advance_directive: normalizedPayload.advance_directive,
+
+    // Signature data (new model: signature.current + signature.revisions)
+    signature: planPayload.signature || {},
+    // Also pass legacy revisions for backwards compatibility
+    revisions: planPayload.signature?.revisions || planPayload.revisions || [],
   };
 
   if (import.meta.env.DEV) {

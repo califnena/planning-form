@@ -164,12 +164,19 @@ export function getSectionCompletion(planData: unknown): Record<string, boolean>
         break;
         
       case "signature":
-        // Complete if revisions array has at least one entry with signature_png
-        const revisions = merged.revisions || data.revisions;
-        if (Array.isArray(revisions) && revisions.length > 0) {
-          result[sectionId] = revisions.some((r: any) => r.signature_png && r.signature_png.trim());
+        // Check new signature.current structure first, then legacy revisions[]
+        const signatureObj = merged.signature || data.signature;
+        if (signatureObj?.current?.signature_png) {
+          // New data model: signature.current.signature_png
+          result[sectionId] = !!(signatureObj.current.signature_png && signatureObj.current.signature_png.trim());
         } else {
-          result[sectionId] = false;
+          // Legacy: check revisions array for signature_png
+          const legacyRevisions = signatureObj?.revisions || merged.revisions || data.revisions;
+          if (Array.isArray(legacyRevisions) && legacyRevisions.length > 0) {
+            result[sectionId] = legacyRevisions.some((r: any) => r.signature_png && r.signature_png.trim());
+          } else {
+            result[sectionId] = false;
+          }
         }
         break;
         
