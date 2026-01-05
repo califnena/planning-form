@@ -1462,21 +1462,19 @@ async function generateSimplePdf(
   const legalNotes = planData?.legal_notes || "";
 
   // CANONICAL: Advance Directive data from plan_payload.advance_directive
+  // New canonical model: has_advance_directive, document_location, healthcare_proxy_name, healthcare_proxy_phone, notes
   const advanceDirective = planData?.advance_directive || {};
+  
+  // Check for meaningful data - section complete when has_advance_directive is set
   const hasAdvanceDirective =
-    hasText(advanceDirective.healthcare_proxy_name) ||
-    hasText(advanceDirective.healthcare_proxy_phone) ||
-    hasText(advanceDirective.advance_directive_status) ||
-    hasText(advanceDirective.advance_directive_location) ||
-    hasText(advanceDirective.dnr_status) ||
-    hasText(advanceDirective.polst_status) ||
-    hasText(advanceDirective.document_location);
+    advanceDirective.has_advance_directive !== null && 
+    advanceDirective.has_advance_directive !== undefined;
 
-  console.log("[generate-planner-pdf] Advance Directive data:", {
-    has_data: hasAdvanceDirective,
-    proxy_name: advanceDirective.healthcare_proxy_name,
-    ad_status: advanceDirective.advance_directive_status,
-    dnr_status: advanceDirective.dnr_status,
+  console.log("[generate-planner-pdf] Advance Directive data (CANONICAL):", {
+    has_advance_directive: advanceDirective.has_advance_directive,
+    document_location: advanceDirective.document_location,
+    healthcare_proxy_name: advanceDirective.healthcare_proxy_name,
+    notes: advanceDirective.notes,
   });
 
   // Medical & Care (new section data)
@@ -1585,10 +1583,11 @@ async function generateSimplePdf(
     if (legal.attorney_phone) legY = addField(legalPage, "Attorney Phone", legal.attorney_phone, legY);
     if (legal.attorney_firm) legY = addField(legalPage, "Law Firm", legal.attorney_firm, legY);
 
-    // Advance Directive & DNR Status (CANONICAL: from plan_payload.advance_directive)
+    // Advance Directive Section (CANONICAL: from plan_payload.advance_directive)
+    // Renders: has_advance_directive, document_location, healthcare_proxy_name, healthcare_proxy_phone, notes
     if (hasAdvanceDirective) {
       legY -= 14;
-      legalPage.drawText("Advance Directive & DNR Status:", {
+      legalPage.drawText("Advance Directive:", {
         x: margin,
         y: legY,
         size: 10,
@@ -1597,29 +1596,25 @@ async function generateSimplePdf(
       });
       legY -= lineHeight;
 
-      // Map status values to readable labels
-      const statusLabel = (status: string | undefined) => {
-        if (status === "yes") return "Yes";
-        if (status === "no") return "No";
-        if (status === "unsure") return "Not sure";
-        return "";
-      };
+      // Do you have an Advance Directive?
+      const hasADLabel = advanceDirective.has_advance_directive === "yes" ? "Yes" : 
+                         advanceDirective.has_advance_directive === "no" ? "No" : "Not provided";
+      legY = addField(legalPage, "Do you have an Advance Directive?", hasADLabel, legY);
 
-      if (advanceDirective.advance_directive_status) {
-        legY = addField(legalPage, "Has Advance Directive", statusLabel(advanceDirective.advance_directive_status), legY);
+      // Document location
+      legY = addField(legalPage, "Document Location", advanceDirective.document_location || "Not provided", legY);
+
+      // Healthcare proxy name
+      legY = addField(legalPage, "Healthcare Proxy Name", advanceDirective.healthcare_proxy_name || "Not provided", legY);
+
+      // Healthcare proxy phone
+      legY = addField(legalPage, "Healthcare Proxy Phone", advanceDirective.healthcare_proxy_phone || "Not provided", legY);
+
+      // Notes
+      if (hasText(advanceDirective.notes)) {
+        legY = addField(legalPage, "Notes", advanceDirective.notes, legY);
       }
-      if (advanceDirective.advance_directive_location) {
-        legY = addField(legalPage, "Directive Location", advanceDirective.advance_directive_location, legY);
-      }
-      if (advanceDirective.dnr_status) {
-        legY = addField(legalPage, "DNR Order", statusLabel(advanceDirective.dnr_status), legY);
-      }
-      if (advanceDirective.polst_status) {
-        legY = addField(legalPage, "POLST / MOLST", statusLabel(advanceDirective.polst_status), legY);
-      }
-      if (advanceDirective.document_location) {
-        legY = addField(legalPage, "Documents Location", advanceDirective.document_location, legY);
-      }
+      
       legY -= 10;
     }
 
