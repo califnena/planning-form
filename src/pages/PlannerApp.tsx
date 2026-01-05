@@ -344,31 +344,16 @@ const PlannerApp = () => {
     }
   };
 
+  /**
+   * All print/preview/download PDF actions route to the PDF Preview page.
+   * The PrePlanSummary page handles lock state and PDF generation.
+   */
   const handlePreviewPDF = () => {
-    if (isPreviewMode) {
-      toast({
-        title: "Read-Only Mode",
-        description: "Subscribe to create your printable copy.",
-        variant: "destructive",
-      });
-      return;
-    }
-    // Show PII dialog first
-    setPendingAction("preview");
-    setShowPIIDialog(true);
+    navigate("/preplan-summary");
   };
 
   const handleDownloadPDF = () => {
-    if (isPreviewMode) {
-      toast({
-        title: "Read-Only Mode",
-        description: "Subscribe to create your printable copy.",
-        variant: "destructive",
-      });
-      return;
-    }
-    setPendingAction("download");
-    setShowPIIDialog(true);  // Show PII dialog first
+    navigate("/preplan-summary");
   };
 
   const handleDownloadManualForm = () => {
