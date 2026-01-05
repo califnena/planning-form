@@ -1954,66 +1954,76 @@ async function generateSimplePdf(
   });
   sigY -= 50;
   
-  // Check for digital signature - prioritize new model (signature.revisions[]), then legacy formats
-  const signatureObj = planData?.signature || {};
-  const signatureRevisions = signatureObj?.revisions || [];
+  // CANONICAL: plan_payload.revisions[] with:
+  // { id, revision_number, signer_name, signature_image_data_url, signed_at, change_note, created_at }
+  const canonicalRevisions = planData?.revisions || [];
   
   // Also check legacy formats for backwards compatibility
-  const legacyCurrentSignature = signatureObj?.current || {}; // old .current format
-  const legacyRevisionsArray = planData?.revisions || [];
+  const signatureObj = planData?.signature || {};
+  const legacySigRevisions = signatureObj?.revisions || [];
+  const legacyCurrentSignature = signatureObj?.current || {};
   
-  // Get the latest revision from new model first
-  let latestRevision: any = null;
+  // Build unified revisions array from all sources
+  let allRevisions: any[] = [];
   
-  if (signatureRevisions.length > 0) {
-    // New model: signature.revisions[] with signed_at field
-    const sortedNew = [...signatureRevisions].sort((a: any, b: any) => 
-      new Date(a.signed_at || 0).getTime() - new Date(b.signed_at || 0).getTime()
-    );
-    latestRevision = sortedNew[sortedNew.length - 1];
+  if (canonicalRevisions.length > 0) {
+    // Canonical format
+    allRevisions = canonicalRevisions.map((r: any, idx: number) => ({
+      revision_number: r.revision_number || idx + 1,
+      signer_name: r.signer_name || r.signed_name || null,
+      signature_image: r.signature_image_data_url || r.signature_image_png || null,
+      signed_at: r.signed_at || r.created_at || null,
+      change_note: r.change_note || r.notes || null,
+    }));
+  } else if (legacySigRevisions.length > 0) {
+    // Legacy signature.revisions[] format
+    allRevisions = legacySigRevisions.map((r: any, idx: number) => ({
+      revision_number: idx + 1,
+      signer_name: r.signed_name || null,
+      signature_image: r.signature_image_png || null,
+      signed_at: r.signed_at || null,
+      change_note: r.notes || null,
+    }));
   } else if (legacyCurrentSignature?.signature_png || legacyCurrentSignature?.prepared_by) {
-    // Old .current format
-    latestRevision = {
-      signed_name: legacyCurrentSignature.prepared_by,
-      signature_image_png: legacyCurrentSignature.signature_png,
-      signed_at: legacyCurrentSignature.signed_at,
-      notes: undefined,
-    };
-  } else if (legacyRevisionsArray.length > 0) {
-    // Legacy top-level revisions array
-    const sortedLegacy = [...legacyRevisionsArray].sort((a: any, b: any) => 
-      new Date(a.revision_date || a.date || 0).getTime() - new Date(b.revision_date || b.date || 0).getTime()
-    );
-    const last = sortedLegacy[sortedLegacy.length - 1];
-    latestRevision = {
-      signed_name: last.prepared_by || last.signed_name || last.preparer,
-      signature_image_png: last.signature_png || last.signature_image_png,
-      signed_at: last.revision_date || last.signed_at || last.date,
-      notes: last.notes,
-    };
+    // Legacy .current format
+    allRevisions = [{
+      revision_number: 1,
+      signer_name: legacyCurrentSignature.prepared_by || null,
+      signature_image: legacyCurrentSignature.signature_png || null,
+      signed_at: legacyCurrentSignature.signed_at || null,
+      change_note: null,
+    }];
   }
+  
+  // Get latest revision (highest revision_number)
+  const latestRevision = allRevisions.length > 0
+    ? allRevisions.reduce((latest, r) => 
+        (r.revision_number > (latest?.revision_number || 0)) ? r : latest
+      , allRevisions[0])
+    : null;
   
   // Determine if we have a valid digital signature
   const hasDigitalSignature = !!(
-    latestRevision?.signed_name ||
-    latestRevision?.signature_image_png
+    latestRevision?.signer_name ||
+    latestRevision?.signature_image
   );
   
   console.log("[generate-planner-pdf] Signature data:", {
-    signature_revisions_count: signatureRevisions.length,
+    canonical_revisions_count: canonicalRevisions.length,
+    legacy_sig_revisions_count: legacySigRevisions.length,
     legacy_current_exists: !!(legacyCurrentSignature?.signature_png),
-    legacy_revisions_count: legacyRevisionsArray.length,
+    total_revisions: allRevisions.length,
     has_latest_revision: !!latestRevision,
-    signed_name: latestRevision?.signed_name,
-    has_signature_image: !!(latestRevision?.signature_image_png),
+    signer_name: latestRevision?.signer_name,
+    has_signature_image: !!(latestRevision?.signature_image),
   });
   
   if (hasDigitalSignature) {
-    // Render digital signature from latest revision
-    const printedName = latestRevision?.signed_name || "";
-    const signatureImg = latestRevision?.signature_image_png || "";
+    // Render digital signature from latest revision (canonical field names)
+    const printedName = latestRevision?.signer_name || "";
+    const signatureImg = latestRevision?.signature_image || "";
     const signedDate = latestRevision?.signed_at || "";
-    const signatureNotes = latestRevision?.notes || "";
+    const changeNote = latestRevision?.change_note || "";
     
     signaturePage.drawText("Printed Name:", {
       x: margin,
@@ -2133,10 +2143,10 @@ async function generateSimplePdf(
       sigY -= 50;
     }
     
-    // Notes if present
-    if (signatureNotes) {
+    // Change note if present
+    if (changeNote) {
       sigY -= 10;
-      signaturePage.drawText("Notes:", {
+      signaturePage.drawText("Revision Note:", {
         x: margin,
         y: sigY,
         size: 12,
@@ -2145,10 +2155,9 @@ async function generateSimplePdf(
       });
       sigY -= lineHeight;
       
-      // Wrap notes text
       const notesMaxWidth = pageWidth - margin * 2;
-      const notesLines = wrapText(sanitizeForPdf(signatureNotes), notesMaxWidth, 11);
-      for (const line of notesLines.slice(0, 5)) { // Limit to 5 lines
+      const notesLines = wrapText(sanitizeForPdf(changeNote), notesMaxWidth, 11);
+      for (const line of notesLines.slice(0, 5)) {
         signaturePage.drawText(line, {
           x: margin,
           y: sigY,
@@ -2159,6 +2168,59 @@ async function generateSimplePdf(
         sigY -= lineHeight;
       }
       sigY -= 20;
+    }
+    
+    // Revision History Table (if multiple revisions)
+    if (allRevisions.length > 1) {
+      sigY -= 20;
+      signaturePage.drawText("Revision History", {
+        x: margin,
+        y: sigY,
+        size: 12,
+        font: helveticaBold,
+        color: headerColor,
+      });
+      sigY -= 25;
+      
+      // Table header
+      const colRev = margin;
+      const colDate = margin + 50;
+      const colName = margin + 170;
+      const colNote = margin + 300;
+      
+      signaturePage.drawText("Rev", { x: colRev, y: sigY, size: 9, font: helveticaBold, color: textColor });
+      signaturePage.drawText("Date", { x: colDate, y: sigY, size: 9, font: helveticaBold, color: textColor });
+      signaturePage.drawText("Name", { x: colName, y: sigY, size: 9, font: helveticaBold, color: textColor });
+      signaturePage.drawText("Note", { x: colNote, y: sigY, size: 9, font: helveticaBold, color: textColor });
+      sigY -= 5;
+      
+      // Header underline
+      signaturePage.drawLine({
+        start: { x: margin, y: sigY },
+        end: { x: pageWidth - margin, y: sigY },
+        thickness: 0.5,
+        color: rgb(0.7, 0.7, 0.7),
+      });
+      sigY -= 15;
+      
+      // Sort by revision_number descending
+      const sortedRevisions = [...allRevisions].sort((a, b) => b.revision_number - a.revision_number);
+      
+      for (const rev of sortedRevisions.slice(0, 10)) { // Limit to 10 rows
+        if (sigY < 100) break;
+        
+        const revDate = rev.signed_at 
+          ? new Date(rev.signed_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+          : "-";
+        const revName = sanitizeForPdf(rev.signer_name || "-").substring(0, 20);
+        const revNote = sanitizeForPdf(rev.change_note || "-").substring(0, 30);
+        
+        signaturePage.drawText(`#${rev.revision_number}`, { x: colRev, y: sigY, size: 9, font: helvetica, color: textColor });
+        signaturePage.drawText(revDate, { x: colDate, y: sigY, size: 9, font: helvetica, color: textColor });
+        signaturePage.drawText(revName, { x: colName, y: sigY, size: 9, font: helvetica, color: textColor });
+        signaturePage.drawText(revNote, { x: colNote, y: sigY, size: 9, font: helvetica, color: textColor });
+        sigY -= 16;
+      }
     }
   } else {
     // Show blank signature lines for manual signing
