@@ -203,7 +203,8 @@ function hasArrayData(arr: unknown): boolean {
 }
 
 /**
- * Check if contacts have any real data from multiple sources
+ * Check if contacts have any "person" type contact with a name
+ * COMPLETION RULE: at least one contact with contact_type === "person" AND name
  */
 function hasContactData(...sources: unknown[]): boolean {
   for (const source of sources) {
@@ -211,7 +212,8 @@ function hasContactData(...sources: unknown[]): boolean {
     
     // Array of contacts
     if (Array.isArray(source)) {
-      if (source.length > 0 && source.some(c => hasRealContactData(c))) {
+      // New completion rule: at least one "person" with a name
+      if (source.some(c => isPersonContactWithName(c))) {
         return true;
       }
       continue;
@@ -222,22 +224,7 @@ function hasContactData(...sources: unknown[]): boolean {
       const obj = source as Record<string, unknown>;
       
       // Check contacts array inside object
-      if (Array.isArray(obj.contacts) && obj.contacts.some(c => hasRealContactData(c))) {
-        return true;
-      }
-      
-      // Check importantPeople array
-      if (Array.isArray(obj.importantPeople) && obj.importantPeople.some(c => hasRealContactData(c))) {
-        return true;
-      }
-      
-      // Check keyContacts array
-      if (Array.isArray(obj.keyContacts) && obj.keyContacts.some(c => hasRealContactData(c))) {
-        return true;
-      }
-      
-      // Check emergencyContacts array
-      if (Array.isArray(obj.emergencyContacts) && obj.emergencyContacts.some(c => hasRealContactData(c))) {
+      if (Array.isArray(obj.contacts) && obj.contacts.some(c => isPersonContactWithName(c))) {
         return true;
       }
     }
@@ -247,18 +234,18 @@ function hasContactData(...sources: unknown[]): boolean {
 }
 
 /**
- * Check if a single contact record has real data
+ * Check if a contact is a "person" type with a name
+ * This is the canonical completion check for contacts
  */
-function hasRealContactData(contact: unknown): boolean {
+function isPersonContactWithName(contact: unknown): boolean {
   if (!contact || typeof contact !== "object") return false;
   const c = contact as Record<string, unknown>;
-  return !!(
-    (c.name && typeof c.name === "string" && c.name.trim()) ||
-    (c.phone && typeof c.phone === "string" && c.phone.trim()) ||
-    (c.email && typeof c.email === "string" && c.email.trim()) ||
-    (c.relationship && typeof c.relationship === "string" && c.relationship.trim()) ||
-    (c.contact && typeof c.contact === "string" && c.contact.trim())
-  );
+  
+  // Must be contact_type "person" (or undefined for legacy data) AND have a name
+  const isPerson = !c.contact_type || c.contact_type === "person";
+  const hasName = !!(c.name && typeof c.name === "string" && c.name.trim());
+  
+  return isPerson && hasName;
 }
 
 /**

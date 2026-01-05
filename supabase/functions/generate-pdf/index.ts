@@ -755,9 +755,9 @@ async function generateSimplePdf(
   addDraftWatermark(legacyPage);
   addFooter(legacyPage, pageNum++);
 
-  // PAGE 8-9: Contacts to Notify
+  // PAGE 8-9: Important Contacts
   const contacts1 = pdfDoc.addPage([pageWidth, pageHeight]);
-  let cY = addSectionHeader(contacts1, 'People to Notify', pageHeight - 80);
+  let cY = addSectionHeader(contacts1, 'Important Contacts', pageHeight - 80);
   const contactsList = planData.contacts_notify || [];
   cY = addArrayItems(contacts1, contactsList, (c) => 
     [c.name, c.relationship ? `(${c.relationship})` : '', c.contact || c.phone || c.email].filter(Boolean).join(' - '),

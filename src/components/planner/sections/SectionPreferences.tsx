@@ -67,7 +67,7 @@ const FRIENDLY_SECTIONS = [
   {
     id: "contacts",
     label: "Important Contacts",
-    description: "People to notify and who can help"
+    description: "Family, friends, professionals, and service providers"
   },
   {
     id: "insurance",

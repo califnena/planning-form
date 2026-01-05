@@ -494,7 +494,7 @@ async function generateSimplePdf(
     { title: "Instructions", page: 4 },
     { title: "Personal Information", page: 5 },
     { title: "My Life Story & Legacy", page: 7 },
-    { title: "People to Notify", page: 8 },
+    { title: "Important Contacts", page: 8 },
     { title: "Funeral & Memorial Wishes", page: 9 },
     { title: "Financial Life", page: 11 },
     { title: "Insurance Policies", page: 12 },
@@ -736,11 +736,11 @@ async function generateSimplePdf(
   addFooter(legacyPage, pageNum++);
 
   // ============================================================
-  // PAGE 8: People to Notify (Family/Friends ONLY - no professionals or service providers)
+  // PAGE 8: Important Contacts (Family/Friends ONLY - contact_type = "person")
   // ============================================================
   const contacts1 = pdfDoc.addPage([pageWidth, pageHeight]);
   addPageHeader(contacts1);
-  let cY = addSectionHeader(contacts1, "People to Notify", pageHeight - 100);
+  let cY = addSectionHeader(contacts1, "Important Contacts", pageHeight - 100);
   
   // Get contacts and FILTER to only include "person" type (not professional or service)
   // This is a hard guard to prevent service/professional contacts from appearing
@@ -765,11 +765,11 @@ async function generateSimplePdf(
     if (roleValue && EXCLUDED_ROLES.includes(roleValue)) {
       return false;
     }
-    // Include if contact_type is "person" or not set (legacy "people to notify")
+    // Include if contact_type is "person" or not set (legacy contacts)
     return !c.contact_type || c.contact_type === "person";
   });
   
-  console.log("[generate-planner-pdf] People to Notify (filtered):", {
+  console.log("[generate-planner-pdf] Important Contacts (filtered to person only):", {
     raw_contacts_count: rawContactsList.length,
     unified_contacts_count: unifiedContacts.length,
     filtered_count: contactsList.length,
