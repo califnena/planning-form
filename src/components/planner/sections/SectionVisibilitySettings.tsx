@@ -28,8 +28,8 @@ const SECTION_METADATA: Record<string, { label: string; description: string }> =
     description: "Basic information about you, your family, and key personal details."
   },
   contacts: {
-    label: "Important Contacts",
-    description: "Family, friends, professionals, and service providers."
+    label: "People to Notify",
+    description: "Family and friends who should be contacted."
   },
   legacy: {
     label: "Life Story and Legacy",

@@ -160,8 +160,8 @@
         "description": "Your memories, achievements, and ideas for your obituary."
       },
       "contacts": {
-        "label": "Important Contacts",
-        "description": "Family, friends, professionals, and service providers."
+        "label": "People to Notify",
+        "description": "Family and friends who should be contacted."
       },
       "providers": {
         "label": "Service Providers & Arrangements",
@@ -328,7 +328,7 @@
     "instructions": "📝 My Instructions",
     "personal": "👤 Personal & Family Details",
     "about": "💬 Life Story & Legacy",
-    "contacts": "📞 Important Contacts",
+    "contacts": "📞 People to Notify",
     "vendors": "🪷 Service Providers & Arrangements",
     "checklist": "✅ Planning Overview (Checklist)",
     "funeral": "🕊️ Funeral Wishes",

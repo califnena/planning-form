@@ -39,8 +39,8 @@ const SECTION_CONFIG = {
   },
   contacts: {
     component: SectionContacts,
-    title: "Important Contacts",
-    subtitle: "List the people who should be notified and consulted"
+    title: "People to Notify",
+    subtitle: "List the people who should be notified"
   },
   financial: {
     component: SectionFinancial,

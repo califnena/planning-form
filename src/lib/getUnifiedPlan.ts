@@ -66,7 +66,10 @@ export interface UnifiedData {
   revisions: Array<{ revision_date: string; prepared_by: string; signature_png: string }>;
   preparer_name: string;
   
-  // CANONICAL: Unified contacts array
+  // CANONICAL: People to Notify array
+  people_to_notify: UnifiedContact[];
+  
+  // DEPRECATED: contacts (alias for backwards compat)
   contacts: UnifiedContact[];
   
   // Aliases for backwards compat
@@ -192,8 +195,9 @@ function buildUnifiedData(payload: Record<string, any>, raw: Record<string, any>
     merged.lifeStory
   );
 
-  // CANONICAL: Unified contacts array
+  // CANONICAL: People to Notify array
   // Merge from multiple sources and normalize to UnifiedContact shape
+  const payloadPeopleToNotify = asArray(merged.people_to_notify);
   const payloadContacts = asArray(merged.contacts);
   const payloadContactsObj = asObject(merged.contacts);
   const payloadContactsNested = asArray(payloadContactsObj.contacts);
@@ -215,55 +219,68 @@ function buildUnifiedData(payload: Record<string, any>, raw: Record<string, any>
     notes: c.notes || c.note || "",
   });
 
-  // Build unified contacts array
-  const unifiedContacts: UnifiedContact[] = [];
+  // Build people_to_notify array
+  const peopleToNotify: UnifiedContact[] = [];
   const seenIds = new Set<string>();
 
-  // Add from new canonical contacts array first (already in correct format)
-  for (const c of payloadContacts) {
-    if (c && typeof c === "object" && c.contact_type) {
+  // 1. Add from new canonical people_to_notify array first
+  for (const c of payloadPeopleToNotify) {
+    if (c && typeof c === "object") {
       const id = c.id || crypto.randomUUID();
       if (!seenIds.has(id)) {
-        unifiedContacts.push({ ...c, id });
+        peopleToNotify.push({ ...normalizeContact(c, "person"), id });
         seenIds.add(id);
       }
     }
   }
 
-  // Migrate legacy person contacts
+  // 2. Migrate from legacy contacts array
+  for (const c of payloadContacts) {
+    if (c && typeof c === "object") {
+      const id = c.id || crypto.randomUUID();
+      if (!seenIds.has(id)) {
+        peopleToNotify.push({ ...normalizeContact(c, "person"), id });
+        seenIds.add(id);
+      }
+    }
+  }
+
+  // 3. Migrate legacy person contacts
   for (const c of [...payloadContactsNested, ...payloadImportantPeople, ...rawContactsNotify]) {
     if (c && typeof c === "object") {
       const normalized = normalizeContact(c, "person");
       if (normalized.name && !seenIds.has(normalized.id!)) {
-        unifiedContacts.push(normalized);
+        peopleToNotify.push(normalized);
         seenIds.add(normalized.id!);
       }
     }
   }
 
-  // Migrate legacy professional contacts
+  // 4. Migrate legacy professional contacts
   for (const c of rawProfessionalContacts) {
     if (c && typeof c === "object") {
       const normalized = normalizeContact(c, "professional");
       if (normalized.name && !seenIds.has(normalized.id!)) {
-        unifiedContacts.push(normalized);
+        peopleToNotify.push(normalized);
         seenIds.add(normalized.id!);
       }
     }
   }
 
-  // Migrate legacy service providers and vendors
+  // 5. Migrate legacy service providers and vendors
   for (const c of [...rawServiceProviders, ...rawVendors]) {
     if (c && typeof c === "object") {
       const normalized = normalizeContact(c, "service");
       if (normalized.name && !seenIds.has(normalized.id!)) {
-        unifiedContacts.push(normalized);
+        peopleToNotify.push(normalized);
         seenIds.add(normalized.id!);
       }
     }
   }
 
-  const contacts = unifiedContacts;
+  // CANONICAL: people_to_notify + backwards compat alias
+  const people_to_notify = peopleToNotify;
+  const contacts = peopleToNotify;
 
   // Medical & Care
   const medical = mergeObjects(
@@ -380,6 +397,12 @@ function buildUnifiedData(payload: Record<string, any>, raw: Record<string, any>
     revisions,
     preparer_name,
     
+    // CANONICAL: People to Notify
+    people_to_notify,
+    
+    // DEPRECATED: contacts (alias for backwards compat)
+    contacts,
+    
     // Aliases for backwards compat
     about: personal_profile,
     lifeStory: legacy,
@@ -387,7 +410,6 @@ function buildUnifiedData(payload: Record<string, any>, raw: Record<string, any>
     messages,
     
     // Other sections
-    contacts,
     medical,
     advanceDirective,
     funeral,
@@ -507,8 +529,8 @@ export function hasUnifiedSectionData(unified: UnifiedData, sectionId: string): 
         unified.messages_to_loved_ones.individual.some(i => i.message?.trim());
     },
     
-    // Other sections
-    contacts: () => unified.contacts,
+    // CANONICAL: people_to_notify
+    contacts: () => unified.people_to_notify,
     healthcare: () => unified.medical,
     advancedirective: () => unified.advanceDirective,
     funeral: () => unified.funeral,
@@ -541,10 +563,13 @@ export function getUnifiedCompletion(unified: UnifiedData): Record<string, boole
     unified.messages_to_loved_ones.individual.some(i => i.message?.trim())
   );
   
+  // CANONICAL: people_to_notify completion - complete when length >= 1
+  const contactsComplete = unified.people_to_notify.length >= 1;
+  
   return {
     personal: hasMeaningfulData(unified.personal_profile),
     legacy: hasMeaningfulData(unified.legacy),
-    contacts: hasMeaningfulData(unified.contacts),
+    contacts: contactsComplete,
     healthcare: hasMeaningfulData(unified.medical),
     advancedirective: hasMeaningfulData(unified.advanceDirective),
     funeral: hasMeaningfulData(unified.funeral),

@@ -119,7 +119,7 @@ export default function SharedView() {
   const sectionLabels: Record<string, string> = {
     personal: "About You & Family",
     legacy: "Life Story & Legacy",
-    contacts: "Important Contacts",
+    contacts: "People to Notify",
     healthcare: "Medical & Care",
     advancedirective: "Advance Directive",
     funeral: "Funeral Wishes",

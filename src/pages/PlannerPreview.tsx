@@ -36,8 +36,8 @@ const PREVIEW_SECTIONS = [
   },
   {
     icon: Users,
-    title: "Important Contacts",
-    description: "Family, friends, professionals, and service providers",
+    title: "People to Notify",
+    description: "Family and friends who should be contacted",
     sampleFields: ["Family members", "Attorney", "Financial advisor", "Executor"]
   },
   {

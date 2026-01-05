@@ -82,12 +82,9 @@ export function getSectionCompletion(planData: unknown): Record<string, boolean>
         break;
         
       case "contacts":
-        // Check multiple contact sources
-        result[sectionId] = hasContactData(
-          merged.contacts,
-          data.contacts,
-          data.contacts_notify
-        );
+        // CANONICAL: people_to_notify - complete when length >= 1
+        const peopleToNotify = merged.people_to_notify || merged.contacts || data.people_to_notify || data.contacts;
+        result[sectionId] = Array.isArray(peopleToNotify) && peopleToNotify.length >= 1;
         break;
         
       case "healthcare":

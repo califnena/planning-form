@@ -50,10 +50,11 @@ export type NormalizedPlanPayload = {
   revisions: RevisionRecord[];
   preparer_name: string;
   
-  // CANONICAL: Unified contacts array
-  contacts: UnifiedContact[];
+  // CANONICAL: People to Notify array
+  people_to_notify: UnifiedContact[];
   
-  // Legacy arrays (kept for backwards compat, merged into contacts)
+  // Legacy arrays (kept for backwards compat, merged into people_to_notify)
+  contacts: UnifiedContact[]; // DEPRECATED - migrate to people_to_notify
   contacts_professional: any[];
   service_providers: any[];
   
@@ -255,8 +256,9 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
     ...asObject(mergedRoot.travel_planning),
   };
 
-  // CANONICAL: Unified contacts array
+  // CANONICAL: People to Notify array
   // Merge from multiple sources and normalize to UnifiedContact shape
+  const rawPeopleToNotify = asArray(mergedRoot.people_to_notify);
   const rawContactsArray = asArray(mergedRoot.contacts);
   const contactsObj = asObject(mergedRoot.contacts);
   const rawContactsNested = asArray(contactsObj.contacts);
@@ -284,49 +286,60 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
     };
   };
 
-  // Build unified contacts array
-  const unifiedContacts: UnifiedContact[] = [];
+  // Build people_to_notify array (canonical)
+  const peopleToNotify: UnifiedContact[] = [];
   const seenIds = new Set<string>();
 
-  // Add from new canonical contacts array first (already in correct format)
-  for (const c of rawContactsArray) {
-    if (c && typeof c === "object" && c.contact_type) {
+  // 1. Add from new canonical people_to_notify array first (already in correct format)
+  for (const c of rawPeopleToNotify) {
+    if (c && typeof c === "object") {
       const id = c.id || crypto.randomUUID();
       if (!seenIds.has(id)) {
-        unifiedContacts.push({ ...c, id });
+        peopleToNotify.push({ ...normalizeContact(c, "person"), id });
         seenIds.add(id);
       }
     }
   }
 
-  // Migrate legacy person contacts (contacts_notify, importantPeople, nested contacts)
+  // 2. Migrate from legacy 'contacts' array
+  for (const c of rawContactsArray) {
+    if (c && typeof c === "object") {
+      const id = c.id || crypto.randomUUID();
+      if (!seenIds.has(id)) {
+        peopleToNotify.push({ ...normalizeContact(c, "person"), id });
+        seenIds.add(id);
+      }
+    }
+  }
+
+  // 3. Migrate legacy person contacts (contacts_notify, importantPeople, nested contacts)
   for (const c of [...rawContactsNested, ...rawImportantPeople, ...rawContactsNotify]) {
     if (c && typeof c === "object") {
       const normalized = normalizeContact(c, "person");
       if (normalized.name && !seenIds.has(normalized.id!)) {
-        unifiedContacts.push(normalized);
+        peopleToNotify.push(normalized);
         seenIds.add(normalized.id!);
       }
     }
   }
 
-  // Migrate legacy professional contacts
+  // 4. Migrate legacy professional contacts
   for (const c of rawProfessionalContacts) {
     if (c && typeof c === "object") {
       const normalized = normalizeContact(c, "professional");
       if (normalized.name && !seenIds.has(normalized.id!)) {
-        unifiedContacts.push(normalized);
+        peopleToNotify.push(normalized);
         seenIds.add(normalized.id!);
       }
     }
   }
 
-  // Migrate legacy service providers and vendors
+  // 5. Migrate legacy service providers and vendors
   for (const c of [...rawServiceProviders, ...rawVendors]) {
     if (c && typeof c === "object") {
       const normalized = normalizeContact(c, "service_provider");
       if (normalized.name && !seenIds.has(normalized.id!)) {
-        unifiedContacts.push(normalized);
+        peopleToNotify.push(normalized);
         seenIds.add(normalized.id!);
       }
     }
@@ -357,8 +370,11 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
     revisions,
     preparer_name,
     
-    // CANONICAL: Unified contacts
-    contacts: unifiedContacts,
+    // CANONICAL: People to Notify
+    people_to_notify: peopleToNotify,
+    
+    // DEPRECATED: contacts (alias for backwards compat)
+    contacts: peopleToNotify,
     
     // Legacy arrays (backwards compat)
     contacts_professional,
