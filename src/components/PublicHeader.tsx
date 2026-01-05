@@ -36,7 +36,7 @@ export const PublicHeader = () => {
     <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         {/* Left: Logo */}
-        <Link to="/" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity">
+        <Link to="/home-senior" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity">
           <img src={logo} alt="Everlasting Funeral Advisors" className="h-8 w-8 md:h-10 md:w-10" />
           <div className="hidden sm:block">
             <h1 className="text-base md:text-lg font-semibold text-primary">Everlasting Funeral Advisors</h1>
@@ -46,9 +46,9 @@ export const PublicHeader = () => {
 
         {/* Center: Navigation (visible on larger screens) */}
         <nav className="hidden md:flex items-center gap-1">
-          <Link to="/">
+          <Link to="/home-senior">
             <Button 
-              variant={isActive("/") ? "secondary" : "ghost"} 
+              variant={isActive("/home-senior") || isActive("/") ? "secondary" : "ghost"} 
               size="sm" 
               className="gap-2"
             >
@@ -115,7 +115,7 @@ export const PublicHeader = () => {
 
       {/* Mobile Navigation */}
       <div className="md:hidden border-t border-border px-4 py-2 flex justify-center gap-4 bg-muted/30">
-        <Link to="/" className={`text-sm ${isActive("/") ? "text-primary font-medium" : "text-muted-foreground"}`}>
+        <Link to="/home-senior" className={`text-sm ${isActive("/home-senior") || isActive("/") ? "text-primary font-medium" : "text-muted-foreground"}`}>
           Home
         </Link>
         <Link to="/dashboard" className={`text-sm ${isActive("/dashboard") ? "text-primary font-medium" : "text-muted-foreground"}`}>

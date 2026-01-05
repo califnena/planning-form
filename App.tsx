@@ -7,6 +7,7 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n/config";
 import { TextSizeProvider } from "./contexts/TextSizeContext";
 import Landing from "./pages/Landing";
+import LandingSenior from "./pages/LandingSenior";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ResetPassword from "./pages/ResetPassword";
@@ -37,7 +38,9 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Landing />} />
+              <Route path="/" element={<LandingSenior />} />
+              <Route path="/home-senior" element={<LandingSenior />} />
+              <Route path="/landingold" element={<Landing />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/about-us" element={<AboutUs />} />
               <Route path="/legal-forms" element={<LegalForms />} />
