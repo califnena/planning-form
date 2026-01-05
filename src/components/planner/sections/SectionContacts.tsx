@@ -27,13 +27,13 @@ interface SectionContactsProps {
 const CONTACT_TYPES = [
   { value: "person", label: "Person (Family/Friend)", icon: Users },
   { value: "professional", label: "Professional (Attorney, etc.)", icon: Briefcase },
-  { value: "service", label: "Service Provider (Funeral Home, etc.)", icon: Building2 },
+  { value: "service_provider", label: "Service Provider (Funeral Home, etc.)", icon: Building2 },
 ] as const;
 
 const ROLE_OPTIONS: Record<string, string[]> = {
   person: ["Spouse", "Child", "Parent", "Sibling", "Friend", "Neighbor", "Executor", "Other"],
   professional: ["Attorney", "Accountant", "Financial Advisor", "Insurance Agent", "Doctor", "Clergy", "Estate Planner", "Other"],
-  service: ["Funeral Home", "Cemetery", "Crematory", "Florist", "Caterer", "Transportation", "Venue", "Other"],
+  service_provider: ["Funeral Home", "Cemetery", "Crematory", "Florist", "Caterer", "Transportation", "Venue", "Other"],
 };
 
 /**
@@ -62,7 +62,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
     }
   };
 
-  const addContact = (type: "person" | "service" | "professional" = "person") => {
+  const addContact = (type: "person" | "professional" | "service_provider" = "person") => {
     if (isPreviewMode) {
       toast({
         title: "Preview Mode",
@@ -76,7 +76,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
       name: "",
       contact_type: type,
       organization: "",
-      role: "",
+      role_or_relationship: "",
       phone: "",
       email: "",
       notes: "",
@@ -134,7 +134,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
     const grouped = {
       person: contacts.filter(c => c.contact_type === "person"),
       professional: contacts.filter(c => c.contact_type === "professional"),
-      service: contacts.filter(c => c.contact_type === "service"),
+      service_provider: contacts.filter(c => c.contact_type === "service_provider"),
     };
 
     for (const [type, list] of Object.entries(grouped)) {
@@ -164,8 +164,8 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
         pdf.text(contact.name || "Unnamed", 15, yPos);
         pdf.setFont("helvetica", "normal");
         
-        if (contact.role) {
-          pdf.text(` - ${contact.role}`, 15 + pdf.getTextWidth(contact.name || "Unnamed"), yPos);
+        if (contact.role_or_relationship) {
+          pdf.text(` - ${contact.role_or_relationship}`, 15 + pdf.getTextWidth(contact.name || "Unnamed"), yPos);
         }
         yPos += 5;
 
@@ -237,7 +237,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
 
       {/* Quick Add Buttons */}
       <div className="flex gap-2 flex-wrap">
-        <Button onClick={() => addContact("person")} size="sm" variant="outline" disabled={isPreviewMode}>
+      <Button onClick={() => addContact("person")} size="sm" variant="outline" disabled={isPreviewMode}>
           <Users className="h-4 w-4 mr-2" />
           Add Person
         </Button>
@@ -245,7 +245,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
           <Briefcase className="h-4 w-4 mr-2" />
           Add Professional
         </Button>
-        <Button onClick={() => addContact("service")} size="sm" variant="outline" disabled={isPreviewMode}>
+        <Button onClick={() => addContact("service_provider")} size="sm" variant="outline" disabled={isPreviewMode}>
           <Building2 className="h-4 w-4 mr-2" />
           Add Service Provider
         </Button>
@@ -307,8 +307,8 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
                   <div className="space-y-2">
                     <Label>Role/Relationship</Label>
                     <Select
-                      value={contact.role || ""}
-                      onValueChange={(value) => updateContact(index, "role", value)}
+                      value={contact.role_or_relationship || ""}
+                      onValueChange={(value) => updateContact(index, "role_or_relationship", value)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select role" />
@@ -378,7 +378,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
                   <Briefcase className="h-4 w-4 mr-2" />
                   Add Professional
                 </Button>
-                <Button onClick={() => addContact("service")} variant="outline">
+                <Button onClick={() => addContact("service_provider")} variant="outline">
                   <Building2 className="h-4 w-4 mr-2" />
                   Add Service Provider
                 </Button>
