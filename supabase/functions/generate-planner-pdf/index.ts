@@ -2024,28 +2024,9 @@ async function generateSimplePdf(
   // ============================================================
   const signaturePage = pdfDoc.addPage([pageWidth, pageHeight]);
   addPageHeader(signaturePage);
-  let sigY = addSectionHeader(signaturePage, "Plan Review & Signature", pageHeight - 100);
-  
-  // Purpose text
-  signaturePage.drawText("This section is for your personal records and family reference.", {
-    x: margin,
-    y: sigY,
-    size: 11,
-    font: helvetica,
-    color: textColor,
-  });
-  sigY -= 22;
-  signaturePage.drawText("Signing below indicates you have reviewed this document.", {
-    x: margin,
-    y: sigY,
-    size: 11,
-    font: helvetica,
-    color: textColor,
-  });
-  sigY -= 50;
   
   // CANONICAL: plan_payload.revisions[] with:
-  // { id, revision_number, signer_name, signature_image_data_url, signed_at, change_note }
+  // { id, revision_number, signer_name, signer_role, is_signing_for_another, signature_image_data_url, signed_at, change_note }
   const canonicalRevisions = planData?.revisions || [];
   
   // Also check legacy formats for backwards compatibility
@@ -2061,6 +2042,8 @@ async function generateSimplePdf(
     allRevisions = canonicalRevisions.map((r: any, idx: number) => ({
       revision_number: r.revision_number || idx + 1,
       signer_name: r.signer_name || r.signed_name || null,
+      signer_role: r.signer_role || null,
+      is_signing_for_another: r.is_signing_for_another || false,
       signature_image: r.signature_image_data_url || r.signature_image_png || null,
       signed_at: r.signed_at || r.created_at || null,
       change_note: r.change_note || r.notes || null,
@@ -2070,6 +2053,8 @@ async function generateSimplePdf(
     allRevisions = legacySigRevisions.map((r: any, idx: number) => ({
       revision_number: idx + 1,
       signer_name: r.signed_name || null,
+      signer_role: null,
+      is_signing_for_another: false,
       signature_image: r.signature_image_png || null,
       signed_at: r.signed_at || null,
       change_note: r.notes || null,
@@ -2079,6 +2064,8 @@ async function generateSimplePdf(
     allRevisions = [{
       revision_number: 1,
       signer_name: legacyCurrentSignature.prepared_by || null,
+      signer_role: null,
+      is_signing_for_another: false,
       signature_image: legacyCurrentSignature.signature_png || null,
       signed_at: legacyCurrentSignature.signed_at || null,
       change_note: null,
@@ -2108,6 +2095,28 @@ async function generateSimplePdf(
     latestRevision?.signature_image
   );
   
+  // Add section header with SIGNED or UNSIGNED status
+  const signatureStatus = hasDigitalSignature ? "SIGNED" : "UNSIGNED";
+  let sigY = addSectionHeader(signaturePage, `Plan Review & Signature — ${signatureStatus}`, pageHeight - 100);
+  
+  // Purpose text
+  signaturePage.drawText("This section is for your personal records and family reference.", {
+    x: margin,
+    y: sigY,
+    size: 11,
+    font: helvetica,
+    color: textColor,
+  });
+  sigY -= 22;
+  signaturePage.drawText("Signing is optional. You can print or save your plan without signing.", {
+    x: margin,
+    y: sigY,
+    size: 11,
+    font: helvetica,
+    color: textColor,
+  });
+  sigY -= 50;
+  
   console.log("[generate-planner-pdf] Signature data (CANONICAL):", {
     canonical_revisions_count: canonicalRevisions.length,
     legacy_sig_revisions_count: legacySigRevisions.length,
@@ -2116,17 +2125,21 @@ async function generateSimplePdf(
     has_latest_revision: !!latestRevision,
     latest_revision_number: latestRevision?.revision_number,
     signer_name: latestRevision?.signer_name,
+    signer_role: latestRevision?.signer_role,
+    is_signing_for_another: latestRevision?.is_signing_for_another,
     has_signature_image: !!(latestRevision?.signature_image),
   });
   
   if (hasDigitalSignature) {
     // Render digital signature from latest revision (canonical field names)
     const printedName = latestRevision?.signer_name || "";
+    const signerRole = latestRevision?.signer_role || "";
+    const isSigningForAnother = latestRevision?.is_signing_for_another || false;
     const signatureImg = latestRevision?.signature_image || "";
     const signedDate = latestRevision?.signed_at || "";
     const changeNote = latestRevision?.change_note || "";
     
-    // Printed Name
+    // Printed Name (with role if signing for another)
     signaturePage.drawText("Printed Name:", {
       x: margin,
       y: sigY,
@@ -2134,7 +2147,10 @@ async function generateSimplePdf(
       font: helveticaBold,
       color: textColor,
     });
-    signaturePage.drawText(sanitizeForPdf(printedName), {
+    const nameDisplay = isSigningForAnother && signerRole 
+      ? `${sanitizeForPdf(printedName)} (${sanitizeForPdf(signerRole)})`
+      : sanitizeForPdf(printedName);
+    signaturePage.drawText(nameDisplay, {
       x: margin + 110,
       y: sigY,
       size: 12,

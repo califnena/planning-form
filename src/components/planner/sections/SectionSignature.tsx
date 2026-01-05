@@ -40,6 +40,8 @@ interface Revision {
   id: string;
   revision_number: number;
   signer_name: string | null;
+  signer_role: string | null; // Role when signing for someone else
+  is_signing_for_another: boolean; // Flag for proxy signing
   signature_image_data_url: string | null;
   signed_at: string;
   change_note: string | null;
@@ -78,6 +80,8 @@ function migrateToCanonical(data: any): Revision[] {
         id: r.id || generateId(),
         revision_number: r.revision_number || idx + 1,
         signer_name: r.signer_name || r.signed_name || null,
+        signer_role: r.signer_role || null,
+        is_signing_for_another: r.is_signing_for_another || false,
         signature_image_data_url: r.signature_image_data_url || r.signature_image_png || null,
         signed_at: r.signed_at || new Date().toISOString(),
         change_note: r.change_note || r.notes || null,
@@ -93,6 +97,8 @@ function migrateToCanonical(data: any): Revision[] {
       id: r.revision_id || r.id || generateId(),
       revision_number: idx + 1,
       signer_name: r.signed_name || null,
+      signer_role: r.signer_role || null,
+      is_signing_for_another: r.is_signing_for_another || false,
       signature_image_data_url: r.signature_image_png || null,
       signed_at: r.signed_at || new Date().toISOString(),
       change_note: r.notes || null,
@@ -106,6 +112,8 @@ function migrateToCanonical(data: any): Revision[] {
       id: generateId(),
       revision_number: 1,
       signer_name: signatureObj.current.prepared_by || null,
+      signer_role: null,
+      is_signing_for_another: false,
       signature_image_data_url: signatureObj.current.signature_png,
       signed_at: signatureObj.current.signed_at || new Date().toISOString(),
       change_note: null,
@@ -119,6 +127,8 @@ function migrateToCanonical(data: any): Revision[] {
       id: r.revision_id || r.id || generateId(),
       revision_number: idx + 1,
       signer_name: r.signed_name || r.prepared_by || r.preparer || null,
+      signer_role: r.signer_role || null,
+      is_signing_for_another: r.is_signing_for_another || false,
       signature_image_data_url: r.signature_image_png || r.signature_png || null,
       signed_at: r.signed_at || r.revision_date || r.date || new Date().toISOString(),
       change_note: r.notes || null,
@@ -165,6 +175,8 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
   const [signerName, setSignerName] = useState(
     planPayload.preparer_name || data.preparer_name || ''
   );
+  const [signerRole, setSignerRole] = useState('');
+  const [isSigningForAnother, setIsSigningForAnother] = useState(false);
   const [changeNote, setChangeNote] = useState('');
   const [acknowledged, setAcknowledged] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -176,6 +188,8 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
 
   const handleOpenAddModal = () => {
     setSignerName(planPayload.preparer_name || data.preparer_name || '');
+    setSignerRole('');
+    setIsSigningForAnother(false);
     setChangeNote('');
     setAcknowledged(false);
     setIsAddModalOpen(true);
@@ -186,6 +200,11 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
   const handleSaveRevision = async () => {
     if (!signerName.trim()) {
       toast.error('Please type your full name');
+      return;
+    }
+
+    if (isSigningForAnother && !signerRole.trim()) {
+      toast.error('Please enter your role (e.g., "Daughter", "Attorney")');
       return;
     }
 
@@ -210,13 +229,15 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
       const maxRevNum = revisions.reduce((max, r) => Math.max(max, r.revision_number || 0), 0);
       const nextRevNum = maxRevNum + 1;
 
-      console.log('[signature] adding revision #', nextRevNum, { planId, signerName });
+      console.log('[signature] adding revision #', nextRevNum, { planId, signerName, isSigningForAnother, signerRole });
 
       // Build new revision (canonical format)
       const newRevision: Revision = {
         id: generateId(),
         revision_number: nextRevNum,
         signer_name: signerName.trim(),
+        signer_role: isSigningForAnother ? signerRole.trim() : null,
+        is_signing_for_another: isSigningForAnother,
         signature_image_data_url: signatureDataUrl,
         signed_at: nowISO,
         change_note: changeNote.trim() || null,
@@ -290,9 +311,10 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">✍️ Revisions and Signature</h2>
+        <h2 className="text-2xl font-bold mb-2">✍️ Sign This Plan (Optional)</h2>
         <p className="text-muted-foreground">
-          Each revision saves a snapshot. Older revisions stay in history.
+          Signing is optional. You can print or save your plan anytime without signing.
+          If you choose to sign, each revision saves a dated snapshot.
         </p>
       </div>
 
@@ -313,10 +335,13 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
             <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
             <div className="space-y-2 flex-1">
               <h3 className="font-semibold text-lg text-green-800 dark:text-green-200">
-                Latest Revision (#{latestRevision.revision_number})
+                ✓ Signed — Revision #{latestRevision.revision_number}
               </h3>
               <p className="text-foreground">
                 <span className="font-medium">Signed by:</span> {latestRevision.signer_name || '—'}
+                {latestRevision.is_signing_for_another && latestRevision.signer_role && (
+                  <span className="text-muted-foreground"> ({latestRevision.signer_role})</span>
+                )}
               </p>
               <p className="text-foreground">
                 <span className="font-medium">Date:</span> {formatDateTime(latestRevision.signed_at)}
@@ -393,11 +418,12 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
         </Card>
       )}
 
-      {/* No revisions message */}
+      {/* No revisions message - emphasize optional */}
       {revisions.length === 0 && (
         <Card className="p-6 text-center text-muted-foreground">
           <PenLine className="h-8 w-8 mx-auto mb-2 opacity-50" />
-          <p>No revisions yet. Click "Add a Revision" to sign your plan.</p>
+          <p className="mb-2">No signature yet.</p>
+          <p className="text-sm">Signing is optional. You can print or save your plan without signing.</p>
         </Card>
       )}
 
@@ -412,10 +438,23 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
           </DialogHeader>
           
           <div className="space-y-4 pt-4">
+            {/* Signing for someone else toggle */}
+            <div className="flex items-start gap-3 p-4 bg-muted/30 rounded-lg border">
+              <Checkbox
+                id="signing_for_another"
+                checked={isSigningForAnother}
+                onCheckedChange={(checked) => setIsSigningForAnother(checked === true)}
+                className="mt-0.5"
+              />
+              <Label htmlFor="signing_for_another" className="text-base cursor-pointer">
+                I am signing on behalf of someone else
+              </Label>
+            </div>
+
             {/* Name */}
             <div className="space-y-2">
               <Label htmlFor="signer_name" className="text-base font-medium">
-                Name (for this revision) <span className="text-destructive">*</span>
+                {isSigningForAnother ? "Your Name" : "Name"} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="signer_name"
@@ -425,6 +464,25 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
                 className="text-lg h-12"
               />
             </div>
+
+            {/* Role (only if signing for another) */}
+            {isSigningForAnother && (
+              <div className="space-y-2">
+                <Label htmlFor="signer_role" className="text-base font-medium">
+                  Your Role <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="signer_role"
+                  value={signerRole}
+                  onChange={(e) => setSignerRole(e.target.value)}
+                  placeholder="e.g., Daughter, Son, Attorney, Caregiver"
+                  className="text-lg h-12"
+                />
+                <p className="text-sm text-muted-foreground">
+                  Describe your relationship or role in helping with this plan.
+                </p>
+              </div>
+            )}
 
             {/* What changed */}
             <div className="space-y-2">
@@ -479,7 +537,7 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
             {/* Save Button */}
             <Button
               onClick={handleSaveRevision}
-              disabled={!signerName.trim() || !acknowledged || isSaving}
+              disabled={!signerName.trim() || (isSigningForAnother && !signerRole.trim()) || !acknowledged || isSaving}
               size="lg"
               className="w-full h-12"
             >
@@ -504,7 +562,12 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
             <div className="space-y-4 pt-4">
               <div>
                 <Label className="font-medium">Signed by</Label>
-                <p>{viewingRevision.signer_name || '—'}</p>
+                <p>
+                  {viewingRevision.signer_name || '—'}
+                  {viewingRevision.is_signing_for_another && viewingRevision.signer_role && (
+                    <span className="text-muted-foreground"> ({viewingRevision.signer_role})</span>
+                  )}
+                </p>
               </div>
               <div>
                 <Label className="font-medium">Date</Label>
