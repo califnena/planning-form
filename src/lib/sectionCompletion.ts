@@ -65,13 +65,28 @@ export function getSectionCompletion(planData: unknown): Record<string, boolean>
     const sectionId = section.id;
     
     switch (sectionId) {
-      case "personal":
-        // CANONICAL: personal (NOT personal_profile)
-        result[sectionId] = hasMeaningfulData(
-          merged.personal || merged.personal_profile || merged.about_you || merged.about ||
-          data.personal || data.personal_profile || data.about_you
-        );
+      case "address":
+        // CANONICAL: plan_payload.address
+        // Complete when at least one field has a value
+        const addressData = merged.address || data.address || {};
+        if (addressData && typeof addressData === 'object') {
+          const { full_name, street_1, street_2, city, state, postal_code, country, notes } = addressData as any;
+          result[sectionId] = !!(
+            (full_name && full_name.trim()) ||
+            (street_1 && street_1.trim()) ||
+            (street_2 && street_2.trim()) ||
+            (city && city.trim()) ||
+            (state && state.trim()) ||
+            (postal_code && postal_code.trim()) ||
+            (country && country.trim()) ||
+            (notes && notes.trim())
+          );
+        } else {
+          result[sectionId] = false;
+        }
         break;
+        
+      case "personal":
         
       case "legacy":
         // CANONICAL: legacy.life_story

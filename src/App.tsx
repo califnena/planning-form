@@ -100,6 +100,7 @@ import {
   AdvanceDirectivePage,
   TravelPlanningPage,
   SignaturePage,
+  AddressPage,
 } from "./pages/planner";
 
 const queryClient = new QueryClient();
@@ -145,6 +146,7 @@ const App = () => (
                       <Route path="care-preferences" element={<CarePreferencesPage />} />
                       <Route path="advance-directive" element={<AdvanceDirectivePage />} />
                       <Route path="travel-planning" element={<TravelPlanningPage />} />
+                      <Route path="address" element={<AddressPage />} />
                       <Route path="personal-family" element={<PersonalFamilyPage />} />
                       <Route path="life-story" element={<LifeStoryPage />} />
                       <Route path="funeral-wishes" element={<FuneralWishesPage />} />
