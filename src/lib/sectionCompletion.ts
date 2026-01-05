@@ -164,19 +164,23 @@ export function getSectionCompletion(planData: unknown): Record<string, boolean>
         break;
         
       case "signature":
-        // Check new signature.current structure first, then legacy revisions[]
+        // Section complete if revisions.length > 0
+        // Check new model: signature.revisions[] with signature_image_png
+        // Also check legacy formats for backward compatibility
         const signatureObj = merged.signature || data.signature;
-        if (signatureObj?.current?.signature_png) {
-          // New data model: signature.current.signature_png
+        const signatureRevisions = signatureObj?.revisions || merged.revisions || data.revisions;
+        
+        if (Array.isArray(signatureRevisions) && signatureRevisions.length > 0) {
+          // New model: check for signature_image_png, fallback to signature_png for legacy
+          result[sectionId] = signatureRevisions.some((r: any) => 
+            (r.signature_image_png && r.signature_image_png.trim()) ||
+            (r.signature_png && r.signature_png.trim())
+          );
+        } else if (signatureObj?.current?.signature_png) {
+          // Legacy .current format
           result[sectionId] = !!(signatureObj.current.signature_png && signatureObj.current.signature_png.trim());
         } else {
-          // Legacy: check revisions array for signature_png
-          const legacyRevisions = signatureObj?.revisions || merged.revisions || data.revisions;
-          if (Array.isArray(legacyRevisions) && legacyRevisions.length > 0) {
-            result[sectionId] = legacyRevisions.some((r: any) => r.signature_png && r.signature_png.trim());
-          } else {
-            result[sectionId] = false;
-          }
+          result[sectionId] = false;
         }
         break;
         
