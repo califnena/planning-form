@@ -78,6 +78,8 @@ import {
   PlannerLayout,
   PreferencesPage,
   OverviewPage,
+  PersonalInfoPage,
+  AboutYouPage,
   PersonalFamilyPage,
   LifeStoryPage,
   FuneralWishesPage,
@@ -147,6 +149,8 @@ const App = () => (
                       <Route path="advance-directive" element={<AdvanceDirectivePage />} />
                       <Route path="travel-planning" element={<TravelPlanningPage />} />
                       <Route path="address" element={<AddressPage />} />
+                      <Route path="personal-info" element={<PersonalInfoPage />} />
+                      <Route path="about-you" element={<AboutYouPage />} />
                       <Route path="personal-family" element={<PersonalFamilyPage />} />
                       <Route path="life-story" element={<LifeStoryPage />} />
                       <Route path="funeral-wishes" element={<FuneralWishesPage />} />
