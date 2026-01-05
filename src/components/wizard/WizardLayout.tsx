@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { ChevronLeft, ChevronRight, Home } from "lucide-react";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { cn } from "@/lib/utils";
@@ -65,15 +64,6 @@ export const WizardLayout = ({
               <Home className="h-4 w-4 mr-2" />
               {t("wizard.exitToDashboard")}
             </Button>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <span>{t("wizard.stepOf", { current: currentStep, total: totalSteps })}</span>
-              <span>{t("wizard.percentComplete", { percent: Math.round(progress) })}</span>
-            </div>
-            <Progress value={progress} className="h-3" />
           </div>
 
           {/* Step Header */}
