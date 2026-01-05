@@ -291,6 +291,10 @@ export const SectionGuide = () => {
                   <p className="text-xs text-muted-foreground">
                     Free state-specific advance directive forms and healthcare power of attorney documents
                   </p>
+                  <span className="text-xs text-primary/70 mt-1 inline-flex items-center gap-1">
+                    <ExternalLink className="h-3 w-3" />
+                    Opens in new tab
+                  </span>
                 </div>
                 <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
               </a>
@@ -305,6 +309,10 @@ export const SectionGuide = () => {
                   <p className="text-xs text-muted-foreground">
                     State-by-state advance directive forms from the National Hospice and Palliative Care Organization
                   </p>
+                  <span className="text-xs text-primary/70 mt-1 inline-flex items-center gap-1">
+                    <ExternalLink className="h-3 w-3" />
+                    Opens in new tab
+                  </span>
                 </div>
                 <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
               </a>
