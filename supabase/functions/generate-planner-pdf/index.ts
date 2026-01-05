@@ -1351,132 +1351,164 @@ async function generateSimplePdf(
   addFooter(petsPage, pageNum++);
 
   // ============================================================
-  // PAGE 17: Digital/Online Accounts - IMPROVED STRUCTURE
+  // PAGE 17: Online Accounts - CANONICAL TABLE FORMAT
   // ============================================================
   const digitalPage = pdfDoc.addPage([pageWidth, pageHeight]);
   addPageHeader(digitalPage);
   let digY = addSectionHeader(digitalPage, "Online Accounts", pageHeight - 100);
   
-  // Read from multiple data sources - support new categories structure
-  const digitalObj = planData?.digital || planData?.online_accounts || {};
-  const hasCategories = digitalObj.categories && typeof digitalObj.categories === 'object';
+  // CANONICAL: Read from plan_payload.online_accounts only
+  const onlineAccountsData = planData?.online_accounts || planData?.digital || {};
   
-  // Old flat structure
-  const localDigitalAccounts = digitalObj.accounts || [];
-  const localPhones = digitalObj.phones || [];
+  // Support both new flat structure and legacy categories
+  let accountsList: any[] = [];
   
-  // New categories structure
-  const categories = hasCategories ? digitalObj.categories : null;
+  if (Array.isArray(onlineAccountsData.accounts)) {
+    // New canonical flat structure
+    accountsList = onlineAccountsData.accounts;
+  } else if (onlineAccountsData.categories) {
+    // Legacy categories structure - flatten
+    const categories = onlineAccountsData.categories;
+    const categoryKeys = ["email", "social", "banking", "subscriptions", "utilities", "phone", "other", "investments", "crypto", "health", "shopping"];
+    categoryKeys.forEach((cat) => {
+      const catAccounts = categories[cat] || [];
+      catAccounts.forEach((acc: any) => {
+        if (cat === "phone" && (acc.carrier || acc.number)) {
+          accountsList.push({
+            category: "phone",
+            provider_name: acc.carrier || "",
+            website_url: null,
+            username_or_email: acc.number || null,
+            two_factor_enabled: null,
+            recovery_method: acc.pin_location || null,
+            notes: null,
+          });
+        } else if (acc.provider || acc.provider_name) {
+          accountsList.push({
+            category: cat,
+            provider_name: acc.provider_name || acc.provider || "",
+            website_url: acc.website_url || null,
+            username_or_email: acc.username_or_email || acc.username || null,
+            two_factor_enabled: acc.twofa_method && acc.twofa_method !== "None" ? "yes" : null,
+            recovery_method: acc.recovery_method || acc.recovery_info || null,
+            notes: acc.notes || null,
+          });
+        }
+      });
+    });
+  }
   
-  const digitalNotes = planData?.digital_notes || digitalObj.password_manager_info || "";
+  const accessInstructions = onlineAccountsData.access_instructions || onlineAccountsData.password_manager_info || "";
+  const passwordManagerUsed = onlineAccountsData.password_manager_used || "";
+  const passwordManagerName = onlineAccountsData.password_manager_name || "";
   
-  console.log("[generate-planner-pdf] Digital section data:", {
-    has_categories: hasCategories,
-    category_keys: categories ? Object.keys(categories) : [],
-    local_accounts_len: localDigitalAccounts.length,
-    local_phones_len: localPhones.length,
+  console.log("[generate-planner-pdf] Online Accounts data (CANONICAL):", {
+    accounts_count: accountsList.length,
+    has_access_instructions: !!accessInstructions,
+    password_manager_used: passwordManagerUsed,
   });
   
-  // Check if we have any digital data
-  const hasDigitalData = hasCategories 
-    ? Object.values(categories || {}).some((arr: any) => Array.isArray(arr) && arr.length > 0)
-    : (localDigitalAccounts.length > 0 || localPhones.length > 0);
+  const hasOnlineAccountsData = accountsList.length > 0 || hasText(accessInstructions);
   
-  const hasDigital = hasDigitalData || hasText(digitalNotes);
-  
-  if (!hasDigital) {
+  if (!hasOnlineAccountsData) {
     digY = drawEmpty(digitalPage, digY);
   } else {
-    // New categories structure - print by category
-    if (hasCategories) {
+    // Render accounts as a clean table
+    if (accountsList.length > 0) {
+      // Category label mapping
       const categoryLabels: Record<string, string> = {
-        email: "Email Accounts",
-        social: "Social Media",
-        banking: "Banking & Financial",
-        subscriptions: "Subscriptions & Streaming",
-        utilities: "Utilities & Bills",
-        phone: "Phone Accounts",
-        other: "Other Accounts",
+        email: "Email",
+        banking: "Banking",
+        investments: "Investments",
+        crypto: "Crypto",
+        social: "Social",
+        shopping: "Shopping",
+        utilities: "Utilities",
+        subscriptions: "Subscriptions",
+        phone: "Phone",
+        health: "Health",
+        other: "Other",
       };
       
-      for (const [catKey, catLabel] of Object.entries(categoryLabels)) {
-        const items = (categories as any)[catKey] || [];
-        if (items.length === 0) continue;
+      // Table header
+      const colCategory = margin;
+      const colProvider = margin + 70;
+      const colWebsite = margin + 170;
+      const colUsername = margin + 270;
+      const col2FA = margin + 370;
+      const colRecovery = margin + 410;
+      
+      digitalPage.drawText("Category", { x: colCategory, y: digY, size: 9, font: helveticaBold, color: textColor });
+      digitalPage.drawText("Provider", { x: colProvider, y: digY, size: 9, font: helveticaBold, color: textColor });
+      digitalPage.drawText("Website", { x: colWebsite, y: digY, size: 9, font: helveticaBold, color: textColor });
+      digitalPage.drawText("Username/Email", { x: colUsername, y: digY, size: 9, font: helveticaBold, color: textColor });
+      digitalPage.drawText("2FA", { x: col2FA, y: digY, size: 9, font: helveticaBold, color: textColor });
+      digitalPage.drawText("Recovery", { x: colRecovery, y: digY, size: 9, font: helveticaBold, color: textColor });
+      digY -= lineHeight;
+      
+      // Draw header line
+      digitalPage.drawLine({
+        start: { x: margin, y: digY + 5 },
+        end: { x: pageWidth - margin, y: digY + 5 },
+        thickness: 0.5,
+        color: rgb(0.7, 0.7, 0.7),
+      });
+      digY -= 5;
+      
+      // Table rows
+      for (const acc of accountsList.slice(0, 15)) {
+        if (digY <= 100) break;
         
-        digitalPage.drawText(`${catLabel}:`, { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
-        digY -= lineHeight;
-        
-        if (catKey === 'phone') {
-          // Phone accounts have different structure
-          for (const phone of items.slice(0, 5)) {
-            if (digY <= 100) break;
-            const phoneInfo = [phone.carrier, phone.number, phone.pin_location ? `PIN: ${phone.pin_location}` : ""].filter(Boolean).join(" - ");
-            digitalPage.drawText(`  - ${sanitizeForPdf(phoneInfo)}`, {
-              x: margin + 10,
-              y: digY,
-              size: 10,
-              font: helvetica,
-              color: textColor,
-            });
-            digY -= lineHeight;
-          }
-        } else {
-          // Regular accounts
-          for (const account of items.slice(0, 5)) {
-            if (digY <= 100) break;
-            const accountInfo = [
-              account.provider,
-              account.username ? `(${account.username})` : "",
-              account.twofa_method ? `2FA: ${account.twofa_method}` : "",
-            ].filter(Boolean).join(" ");
-            digitalPage.drawText(`  - ${sanitizeForPdf(accountInfo)}`, {
-              x: margin + 10,
-              y: digY,
-              size: 10,
-              font: helvetica,
-              color: textColor,
-            });
-            digY -= lineHeight;
+        const category = categoryLabels[acc.category] || acc.category || "";
+        const provider = sanitizeForPdf(acc.provider_name || "").substring(0, 15);
+        // Extract domain from URL if too long
+        let website = sanitizeForPdf(acc.website_url || "");
+        if (website.length > 15) {
+          try {
+            const urlObj = new URL(website.startsWith("http") ? website : `https://${website}`);
+            website = urlObj.hostname.replace("www.", "").substring(0, 15);
+          } catch {
+            website = website.substring(0, 15);
           }
         }
-        digY -= 8;
-      }
-    } else {
-      // Old flat structure
-      if (localPhones.length > 0) {
-        digitalPage.drawText("Phone Accounts:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
+        const username = sanitizeForPdf(acc.username_or_email || "").substring(0, 20);
+        const twoFA = acc.two_factor_enabled === "yes" ? "Yes" : (acc.two_factor_enabled === "no" ? "No" : "");
+        const recovery = sanitizeForPdf(acc.recovery_method || "").substring(0, 15);
+        
+        digitalPage.drawText(category, { x: colCategory, y: digY, size: 9, font: helvetica, color: textColor });
+        digitalPage.drawText(provider, { x: colProvider, y: digY, size: 9, font: helvetica, color: textColor });
+        digitalPage.drawText(website, { x: colWebsite, y: digY, size: 9, font: helvetica, color: textColor });
+        digitalPage.drawText(username, { x: colUsername, y: digY, size: 9, font: helvetica, color: textColor });
+        digitalPage.drawText(twoFA, { x: col2FA, y: digY, size: 9, font: helvetica, color: textColor });
+        digitalPage.drawText(recovery, { x: colRecovery, y: digY, size: 9, font: helvetica, color: textColor });
+        
         digY -= lineHeight;
-        digY = addArrayItems(
-          digitalPage,
-          localPhones,
-          (p: any) => [p.phone_number || p.number, p.carrier, p.access_info || p.pin].filter(Boolean).join(" - "),
-          digY,
-          8,
-        );
-        digY -= 10;
       }
       
-      if (localDigitalAccounts.length > 0) {
-        digitalPage.drawText("Online Accounts:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
-        digY -= lineHeight;
-        digY = addArrayItems(
-          digitalPage,
-          localDigitalAccounts,
-          (d: any) => [
-            d.provider || d.service || d.name || d.platform,
-            d.username ? `User: ${d.username}` : "",
-            d.notes || "",
-          ].filter(Boolean).join(" - "),
-          digY,
-          15,
-        );
-        digY -= 10;
-      }
+      digY -= 10;
     }
     
-    // Password manager info
-    if (digitalNotes) {
-      digY = addNotesBox(digitalPage, "Password Manager Info", digitalNotes, digY);
+    // Access Instructions block
+    if (accessInstructions) {
+      digY = addNotesBox(digitalPage, "Access Instructions", accessInstructions, digY);
+    }
+    
+    // Password Manager info
+    if (passwordManagerUsed === "yes" && passwordManagerName) {
+      digY -= 5;
+      digitalPage.drawText("Password Manager:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
+      digitalPage.drawText(sanitizeForPdf(passwordManagerName), { x: margin + 120, y: digY, size: 10, font: helvetica, color: textColor });
+      digY -= lineHeight;
+    } else if (passwordManagerUsed === "yes") {
+      digY -= 5;
+      digitalPage.drawText("Password Manager:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
+      digitalPage.drawText("Yes (name not specified)", { x: margin + 120, y: digY, size: 10, font: helvetica, color: textColor });
+      digY -= lineHeight;
+    } else if (passwordManagerUsed === "no") {
+      digY -= 5;
+      digitalPage.drawText("Password Manager:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
+      digitalPage.drawText("No", { x: margin + 120, y: digY, size: 10, font: helvetica, color: textColor });
+      digY -= lineHeight;
     }
   }
   addDraftWatermark(digitalPage);
