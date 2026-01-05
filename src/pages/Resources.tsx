@@ -13,6 +13,7 @@ import { ResourcesDownloadSection } from '@/components/resources/ResourcesDownlo
 import { ResourcesSidebar } from '@/components/resources/ResourcesSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorPanel } from '@/components/ui/ErrorPanel';
+import { LegalDisclaimer } from '@/components/ui/LegalDisclaimer';
 import { cn } from '@/lib/utils';
 
 const Resources = () => {
@@ -89,6 +90,9 @@ const Resources = () => {
   // Educational Resources Section - Read-only, no data collection
   const renderEducation = () => (
     <div className="space-y-8">
+      {/* Top Disclaimer */}
+      <LegalDisclaimer variant="compact" />
+      
       <div>
         <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Educational Resources</h1>
         <p className="text-lg text-muted-foreground leading-relaxed">

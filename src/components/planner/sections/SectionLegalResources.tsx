@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { LegalDisclaimer } from "@/components/ui/LegalDisclaimer";
 import { Scale, ExternalLink, FileText, AlertTriangle, ArrowRight, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -48,15 +49,15 @@ export const SectionLegalResources = () => {
 
   return (
     <div className="space-y-8 max-w-4xl">
-      {/* Header */}
+      {/* Header - renamed to avoid "legal advice" connotation */}
       <div>
         <h1 className="text-3xl font-bold mb-3 flex items-center gap-3">
           <Scale className="h-8 w-8 text-primary" />
-          Legal Documents & Resources
+          Document Information & Resources
         </h1>
         <p className="text-lg text-muted-foreground leading-relaxed">
-          Essential legal forms, guides, and resources to help you prepare important documents. 
-          Find state-specific information and trusted templates for advance directives, wills, and more.
+          Educational information about common planning documents. 
+          Find state-specific resources and links to trusted organizations.
         </p>
       </div>
 
@@ -107,18 +108,19 @@ export const SectionLegalResources = () => {
       {/* Legal Disclaimer - Prominent */}
       <Alert variant="destructive" className="border-2">
         <AlertTriangle className="h-5 w-5" />
-        <AlertTitle className="text-lg font-bold mb-2">Important Legal Disclaimer</AlertTitle>
+        <AlertTitle className="text-lg font-bold mb-2">Important Notice</AlertTitle>
         <AlertDescription className="text-base space-y-2">
           <p>
-            <strong>We are not attorneys and do not provide legal advice.</strong> The information on this page 
-            is for educational purposes only and should not be considered legal advice.
+            <strong>This information is for educational purposes only.</strong> It does not 
+            constitute legal, financial, or medical advice.
           </p>
           <p>
-            Legal requirements vary by state and change over time. Always consult with a qualified attorney 
-            in your state for advice specific to your situation.
+            Every situation is different. Laws vary by state and change over time. 
+            Consult with qualified professionals (attorneys, financial advisors, healthcare providers) 
+            for guidance specific to your circumstances.
           </p>
           <p className="pt-2 font-semibold">
-            Using these resources does not create an attorney-client relationship.
+            Using this app does not create a professional-client relationship.
           </p>
         </AlertDescription>
       </Alert>
@@ -483,6 +485,9 @@ export const SectionLegalResources = () => {
           </div>
         </CardContent>
       </Card>
+      
+      {/* Bottom Disclaimer */}
+      <LegalDisclaimer variant="compact" />
     </div>
   );
 };
