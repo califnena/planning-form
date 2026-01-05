@@ -1842,46 +1842,65 @@ async function generateSimplePdf(
   });
   sigY -= 50;
   
-  // Check for digital signature - prioritize new model (signature.current), then legacy revisions[]
+  // Check for digital signature - prioritize new model (signature.revisions[]), then legacy formats
   const signatureObj = planData?.signature || {};
-  const signatureCurrent = signatureObj?.current || {};
   const signatureRevisions = signatureObj?.revisions || [];
   
-  // Also check legacy top-level revisions array for backwards compatibility
+  // Also check legacy formats for backwards compatibility
+  const legacyCurrentSignature = signatureObj?.current || {}; // old .current format
   const legacyRevisionsArray = planData?.revisions || [];
   
-  // Merge all revisions (new + legacy)
-  const allRevisions = [...signatureRevisions, ...legacyRevisionsArray];
+  // Get the latest revision from new model first
+  let latestRevision: any = null;
   
-  // Get the latest revision (last item sorted by revision_date)
-  const sortedRevisions = [...allRevisions].sort((a: any, b: any) => 
-    new Date(a.revision_date || 0).getTime() - new Date(b.revision_date || 0).getTime()
-  );
-  const latestRevision = sortedRevisions.length > 0 ? sortedRevisions[sortedRevisions.length - 1] : null;
+  if (signatureRevisions.length > 0) {
+    // New model: signature.revisions[] with signed_at field
+    const sortedNew = [...signatureRevisions].sort((a: any, b: any) => 
+      new Date(a.signed_at || 0).getTime() - new Date(b.signed_at || 0).getTime()
+    );
+    latestRevision = sortedNew[sortedNew.length - 1];
+  } else if (legacyCurrentSignature?.signature_png || legacyCurrentSignature?.prepared_by) {
+    // Old .current format
+    latestRevision = {
+      signed_name: legacyCurrentSignature.prepared_by,
+      signature_image_png: legacyCurrentSignature.signature_png,
+      signed_at: legacyCurrentSignature.signed_at,
+      notes: undefined,
+    };
+  } else if (legacyRevisionsArray.length > 0) {
+    // Legacy top-level revisions array
+    const sortedLegacy = [...legacyRevisionsArray].sort((a: any, b: any) => 
+      new Date(a.revision_date || a.date || 0).getTime() - new Date(b.revision_date || b.date || 0).getTime()
+    );
+    const last = sortedLegacy[sortedLegacy.length - 1];
+    latestRevision = {
+      signed_name: last.prepared_by || last.signed_name || last.preparer,
+      signature_image_png: last.signature_png || last.signature_image_png,
+      signed_at: last.revision_date || last.signed_at || last.date,
+      notes: last.notes,
+    };
+  }
   
   // Determine if we have a valid digital signature
-  // Priority: signature.current > latest revision > legacy
   const hasDigitalSignature = !!(
-    signatureCurrent?.signature_png ||
-    signatureCurrent?.prepared_by ||
-    latestRevision?.prepared_by ||
-    latestRevision?.signature_png
+    latestRevision?.signed_name ||
+    latestRevision?.signature_image_png
   );
   
   console.log("[generate-planner-pdf] Signature data:", {
-    has_signature_current: !!(signatureCurrent?.signature_png),
     signature_revisions_count: signatureRevisions.length,
+    legacy_current_exists: !!(legacyCurrentSignature?.signature_png),
     legacy_revisions_count: legacyRevisionsArray.length,
     has_latest_revision: !!latestRevision,
-    prepared_by: signatureCurrent?.prepared_by || latestRevision?.prepared_by,
-    has_signature_png: !!(signatureCurrent?.signature_png || latestRevision?.signature_png),
+    signed_name: latestRevision?.signed_name,
+    has_signature_image: !!(latestRevision?.signature_image_png),
   });
   
   if (hasDigitalSignature) {
-    // Render digital signature - priority: signature.current > latest revision
-    const printedName = signatureCurrent?.prepared_by || latestRevision?.prepared_by || "";
-    const signatureImg = signatureCurrent?.signature_png || latestRevision?.signature_png || "";
-    const signedDate = signatureCurrent?.signed_at || latestRevision?.revision_date || "";
+    // Render digital signature from latest revision
+    const printedName = latestRevision?.signed_name || "";
+    const signatureImg = latestRevision?.signature_image_png || "";
+    const signedDate = latestRevision?.signed_at || "";
     const signatureNotes = latestRevision?.notes || "";
     
     signaturePage.drawText("Printed Name:", {
@@ -1924,8 +1943,8 @@ async function generateSimplePdf(
       sigY -= 40;
     }
     
-    // Signature image
-    signaturePage.drawText("Signature (for reference):", {
+    // Signature image footer
+    signaturePage.drawText("Signed electronically on this date.", {
       x: margin,
       y: sigY,
       size: 12,

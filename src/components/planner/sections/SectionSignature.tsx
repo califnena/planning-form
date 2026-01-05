@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { PenLine, Check, Eraser, Save, AlertCircle } from "lucide-react";
+import { PenLine, Check, Eraser, Save, AlertCircle, History } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SignaturePad, type SignaturePadRef } from "@/components/signature/SignaturePad";
@@ -14,22 +14,17 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 /**
  * Signature data model in plan_payload.signature
+ * Uses append-only revisions - never overwrite, always append
  */
-interface SignatureCurrent {
-  prepared_by: string;
-  signed_at: string;
-  signature_png: string;
-}
-
 interface SignatureRevision {
-  revision_date: string;
-  prepared_by: string;
-  signature_png: string;
+  revision_id: string;
+  signed_name: string;
+  signature_image_png: string;
+  signed_at: string;
   notes?: string;
 }
 
 interface SignatureData {
-  current?: SignatureCurrent;
   revisions?: SignatureRevision[];
 }
 
@@ -39,9 +34,21 @@ interface SectionSignatureProps {
 }
 
 /**
+ * Generate a simple UUID for revision_id
+ */
+function generateRevisionId(): string {
+  return crypto.randomUUID ? crypto.randomUUID() : 
+    'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+}
+
+/**
  * SectionSignature
  * 
- * CANONICAL KEY: plan_payload.signature (object with current + revisions)
+ * CANONICAL KEY: plan_payload.signature.revisions[]
  * Also updates: last_signed_at column on plans table
  * 
  * Features:
@@ -49,7 +56,7 @@ interface SectionSignatureProps {
  * - Typed name (required)
  * - Date (auto-set on save)
  * - Optional notes
- * - Revision history (append-only)
+ * - Revision history (append-only, never overwrite)
  */
 export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
   const signaturePadRef = useRef<SignaturePadRef>(null);
@@ -59,31 +66,44 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
   const planId = data.id || data.plan_id;
   
   // Get signature data from plan_payload.signature (new model)
-  // Also handle migration from old top-level revisions[]
   const planPayload = data.plan_payload || data;
   const signatureData: SignatureData = planPayload.signature || {};
   
-  // Migrate from old revisions[] if needed
+  // Migrate from old data formats if needed
   const legacyRevisions = planPayload.revisions || [];
-  const migratedRevisions = signatureData.revisions || 
-    (legacyRevisions.length > 0 ? legacyRevisions.map((r: any) => ({
-      revision_date: r.revision_date || r.date || new Date().toISOString(),
-      prepared_by: r.prepared_by || r.preparer || '',
-      signature_png: r.signature_png || '',
-      notes: r.notes || '',
-    })) : []);
+  const oldCurrentSignature = (signatureData as any).current; // old format had .current
   
-  // Get current signature from signature.current or latest revision
-  const currentSignature = signatureData.current || 
-    (migratedRevisions.length > 0 ? {
-      prepared_by: migratedRevisions[migratedRevisions.length - 1].prepared_by,
-      signed_at: migratedRevisions[migratedRevisions.length - 1].revision_date,
-      signature_png: migratedRevisions[migratedRevisions.length - 1].signature_png,
-    } : null);
+  // Build revisions array from all sources
+  let revisions: SignatureRevision[] = signatureData.revisions || [];
+  
+  // Migrate legacy top-level revisions[]
+  if (revisions.length === 0 && legacyRevisions.length > 0) {
+    revisions = legacyRevisions.map((r: any) => ({
+      revision_id: r.revision_id || generateRevisionId(),
+      signed_name: r.signed_name || r.prepared_by || r.preparer || '',
+      signature_image_png: r.signature_image_png || r.signature_png || '',
+      signed_at: r.signed_at || r.revision_date || r.date || new Date().toISOString(),
+      notes: r.notes || undefined,
+    }));
+  }
+  
+  // Migrate old .current format
+  if (revisions.length === 0 && oldCurrentSignature?.signature_png) {
+    revisions = [{
+      revision_id: generateRevisionId(),
+      signed_name: oldCurrentSignature.prepared_by || '',
+      signature_image_png: oldCurrentSignature.signature_png || '',
+      signed_at: oldCurrentSignature.signed_at || new Date().toISOString(),
+      notes: undefined,
+    }];
+  }
+  
+  // Get the latest revision (most recent signature)
+  const latestRevision = revisions.length > 0 ? revisions[revisions.length - 1] : null;
 
   // Form state
-  const [preparedBy, setPreparedBy] = useState(
-    currentSignature?.prepared_by || 
+  const [signedName, setSignedName] = useState(
+    latestRevision?.signed_name || 
     planPayload.preparer_name || 
     data.preparer_name || 
     ''
@@ -92,13 +112,13 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
   const [acknowledged, setAcknowledged] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(
-    currentSignature?.signed_at ? new Date(currentSignature.signed_at) : null
+    latestRevision?.signed_at ? new Date(latestRevision.signed_at) : null
   );
 
   // Load existing signature into canvas when component mounts
   useEffect(() => {
-    if (currentSignature?.signature_png && signaturePadRef.current) {
-      signaturePadRef.current.fromDataURL(currentSignature.signature_png);
+    if (latestRevision?.signature_image_png && signaturePadRef.current) {
+      signaturePadRef.current.fromDataURL(latestRevision.signature_image_png);
     }
   }, []);
 
@@ -108,7 +128,7 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
   };
 
   const handleSave = async () => {
-    if (!preparedBy.trim()) {
+    if (!signedName.trim()) {
       toast.error('Please type your full name');
       return;
     }
@@ -130,29 +150,22 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
 
     try {
       const nowISO = new Date().toISOString();
-      console.log('[signature] saving signature...', { planId, preparedBy });
+      console.log('[signature] adding new revision...', { planId, signedName });
 
-      // Build new revision record
+      // Build new revision record (append-only)
       const newRevision: SignatureRevision = {
-        revision_date: nowISO,
-        prepared_by: preparedBy.trim(),
-        signature_png: signaturePng,
+        revision_id: generateRevisionId(),
+        signed_name: signedName.trim(),
+        signature_image_png: signaturePng,
+        signed_at: nowISO,
         notes: notes.trim() || undefined,
       };
 
-      // Build new current signature
-      const newCurrent: SignatureCurrent = {
-        prepared_by: preparedBy.trim(),
-        signed_at: nowISO,
-        signature_png: signaturePng,
-      };
-
-      // Append to revisions array (immutable)
-      const updatedRevisions = [...migratedRevisions, newRevision];
+      // Append to revisions array (immutable - never overwrite)
+      const updatedRevisions = [...revisions, newRevision];
 
       // Build updated signature object
       const updatedSignature: SignatureData = {
-        current: newCurrent,
         revisions: updatedRevisions,
       };
 
@@ -161,8 +174,8 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
       onChange({
         ...data,
         signature: updatedSignature,
-        preparer_name: preparedBy.trim(),
-        // Clear old top-level revisions to prevent duplication
+        preparer_name: signedName.trim(),
+        // Clear old formats to prevent duplication
         revisions: undefined,
       });
 
@@ -182,8 +195,8 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
       setNotes('');
       setAcknowledged(false);
       
-      console.log('[signature] signature saved successfully, revisions count:', updatedRevisions.length);
-      toast.success('Signature saved successfully');
+      console.log('[signature] revision added, total revisions:', updatedRevisions.length);
+      toast.success('Signature revision saved');
     } catch (error) {
       console.error('[signature] save error:', error);
       toast.error('Failed to save signature');
@@ -201,6 +214,9 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
         minute: "2-digit",
       })
     : null;
+
+  // Previous revisions (all except the latest)
+  const previousRevisions = revisions.length > 1 ? revisions.slice(0, -1).reverse() : [];
 
   return (
     <div className="space-y-6">
@@ -222,25 +238,26 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
       )}
 
       {/* Current Signature Status */}
-      {currentSignature && lastSaved && (
-        <Card className="p-6 bg-muted/50 border-primary/20">
+      {latestRevision && lastSaved && (
+        <Card className="p-6 bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800">
           <div className="flex items-start gap-3">
             <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
             <div className="space-y-2 flex-1">
-              <h3 className="font-semibold text-lg">Plan Signed</h3>
+              <h3 className="font-semibold text-lg text-green-800 dark:text-green-200">
+                ✅ Plan Signed
+              </h3>
               <p className="text-foreground">
-                <span className="font-medium">Name:</span> {currentSignature.prepared_by}
+                <span className="font-medium">Signed by:</span> {latestRevision.signed_name}
               </p>
               <p className="text-foreground">
                 <span className="font-medium">Date:</span> {formattedLastSaved}
               </p>
-              {currentSignature.signature_png && (
+              {latestRevision.signature_image_png && (
                 <div className="mt-3">
-                  <span className="font-medium text-sm">Signature (for reference):</span>
                   <img
-                    src={currentSignature.signature_png}
+                    src={latestRevision.signature_image_png}
                     alt="Your signature"
-                    className="max-h-20 mt-2 bg-white rounded border p-2"
+                    className="max-h-20 bg-white rounded border p-2"
                   />
                 </div>
               )}
@@ -251,19 +268,26 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
 
       {/* Signature Form */}
       <Card className="p-6 space-y-6">
-        <h3 className="font-semibold text-lg">
-          {currentSignature ? 'Update Your Signature' : 'Sign Your Plan'}
-        </h3>
+        <div>
+          <h3 className="font-semibold text-lg">
+            {latestRevision ? 'Add New Signature Revision' : 'Sign Your Plan'}
+          </h3>
+          {latestRevision && (
+            <p className="text-sm text-muted-foreground mt-1">
+              Each signature creates a new dated revision. Previous signatures are preserved.
+            </p>
+          )}
+        </div>
 
-        {/* Prepared By - Required */}
+        {/* Signed Name - Required */}
         <div className="space-y-2">
-          <Label htmlFor="prepared_by" className="text-base font-medium">
+          <Label htmlFor="signed_name" className="text-base font-medium">
             Type your full name <span className="text-destructive">*</span>
           </Label>
           <Input
-            id="prepared_by"
-            value={preparedBy}
-            onChange={(e) => setPreparedBy(e.target.value)}
+            id="signed_name"
+            value={signedName}
+            onChange={(e) => setSignedName(e.target.value)}
             placeholder="Enter your full legal name"
             className="text-lg h-12"
             disabled={isPreviewMode}
@@ -312,7 +336,7 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
             disabled={isPreviewMode}
           />
           <Label htmlFor="acknowledge" className="text-base leading-relaxed cursor-pointer">
-            I reviewed my plan. I understand this is not a legal will. <span className="text-destructive">*</span>
+            I confirm this reflects my current wishes as of today. <span className="text-destructive">*</span>
           </Label>
         </div>
 
@@ -334,33 +358,41 @@ export const SectionSignature = ({ data, onChange }: SectionSignatureProps) => {
         {/* Save Button */}
         <Button
           onClick={handleSave}
-          disabled={!preparedBy.trim() || !acknowledged || isSaving || isPreviewMode}
+          disabled={!signedName.trim() || !acknowledged || isSaving || isPreviewMode}
           size="lg"
           className="w-full h-14 text-lg"
         >
           <Save className="h-5 w-5 mr-2" />
-          {isSaving ? 'Saving...' : currentSignature ? 'Update Signature' : 'Save Signature'}
+          {isSaving ? 'Saving...' : latestRevision ? 'Add Signature Revision' : 'Save Signature'}
         </Button>
       </Card>
 
-      {/* Revision History */}
-      {migratedRevisions.length > 1 && (
+      {/* Previous Signatures (read-only history) */}
+      {previousRevisions.length > 0 && (
         <Card className="p-6">
-          <h3 className="font-semibold mb-3">Previous Signatures ({migratedRevisions.length - 1})</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <History className="h-5 w-5 text-muted-foreground" />
+            <h3 className="font-semibold">Previous Signatures ({previousRevisions.length})</h3>
+          </div>
           <div className="space-y-3">
-            {migratedRevisions.slice(0, -1).reverse().slice(0, 5).map((rev: SignatureRevision, idx: number) => (
-              <div key={idx} className="text-sm text-muted-foreground flex items-center gap-2 p-3 bg-muted/30 rounded">
+            {previousRevisions.slice(0, 5).map((rev, idx) => (
+              <div key={rev.revision_id || idx} className="text-sm text-muted-foreground flex items-center gap-2 p-3 bg-muted/30 rounded">
                 <PenLine className="h-4 w-4 flex-shrink-0" />
                 <span>
-                  {new Date(rev.revision_date).toLocaleDateString("en-US", {
+                  {new Date(rev.signed_at).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
                   })}
-                  {rev.prepared_by && ` — ${rev.prepared_by}`}
+                  {rev.signed_name && ` — ${rev.signed_name}`}
                 </span>
               </div>
             ))}
+            {previousRevisions.length > 5 && (
+              <p className="text-xs text-muted-foreground italic">
+                ...and {previousRevisions.length - 5} more
+              </p>
+            )}
           </div>
         </Card>
       )}
