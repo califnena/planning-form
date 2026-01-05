@@ -597,7 +597,69 @@ async function generateSimplePdf(
   addFooter(instructionsPage, pageNum++);
 
   // ============================================================
-  // PAGE 5-6: Personal Information
+  // PAGE 5: Address (optional section from plan_payload.address)
+  // ============================================================
+  const addressPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  addPageHeader(addressPage);
+  let addrY = addSectionHeader(addressPage, "Address", pageHeight - 100);
+  
+  // Get address data from CANONICAL key: plan_payload.address
+  const addressObj = planData?.address || {};
+  const addrFullName = addressObj.full_name || "";
+  const addrStreet1 = addressObj.street_1 || "";
+  const addrStreet2 = addressObj.street_2 || "";
+  const addrCity = addressObj.city || "";
+  const addrState = addressObj.state || "";
+  const addrPostalCode = addressObj.postal_code || "";
+  const addrCountry = addressObj.country || "";
+  const addrNotes = addressObj.notes || "";
+  
+  const hasAddressData = hasText(addrFullName) || hasText(addrStreet1) || hasText(addrCity) || 
+    hasText(addrState) || hasText(addrPostalCode) || hasText(addrCountry);
+  
+  if (!hasAddressData) {
+    addressPage.drawText("Not provided", {
+      x: margin,
+      y: addrY,
+      size: 11,
+      font: helvetica,
+      color: rgb(0.5, 0.5, 0.5),
+    });
+  } else {
+    // Name
+    if (addrFullName) {
+      addrY = addField(addressPage, "Name", addrFullName, addrY);
+    }
+    
+    // Street (street_1 + street_2)
+    const streetLine = [addrStreet1, addrStreet2].filter(Boolean).join(", ");
+    if (streetLine) {
+      addrY = addField(addressPage, "Street", streetLine, addrY);
+    }
+    
+    // City, State ZIP
+    const cityStateZip = [addrCity, addrState, addrPostalCode].filter(Boolean).join(", ");
+    if (cityStateZip) {
+      addrY = addField(addressPage, "City, State ZIP", cityStateZip, addrY);
+    }
+    
+    // Country
+    if (addrCountry) {
+      addrY = addField(addressPage, "Country", addrCountry, addrY);
+    }
+    
+    // Notes
+    if (addrNotes) {
+      addrY -= 10;
+      addrY = addNotesBox(addressPage, "Notes", addrNotes, addrY);
+    }
+  }
+  
+  addDraftWatermark(addressPage);
+  addFooter(addressPage, pageNum++);
+
+  // ============================================================
+  // PAGE 6-7: Personal Information
   // ============================================================
   const personal1 = pdfDoc.addPage([pageWidth, pageHeight]);
   addPageHeader(personal1);

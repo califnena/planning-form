@@ -25,7 +25,8 @@ import {
   Stethoscope,
   Plane,
   Laptop,
-  Wallet
+  Wallet,
+  MapPin
 } from "lucide-react";
 
 export interface SectionDefinition {
@@ -75,6 +76,15 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     icon: ClipboardList,
     route: "/preplandashboard/checklist",
     dataKey: "preplanning",
+    group: "preplanning",
+    showCompletionDot: true,
+  },
+  {
+    id: "address",
+    label: "Address",
+    icon: MapPin,
+    route: "/preplandashboard/address",
+    dataKey: "address",
     group: "preplanning",
     showCompletionDot: true,
   },
