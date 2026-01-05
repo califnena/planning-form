@@ -102,7 +102,6 @@ import {
   AdvanceDirectivePage,
   TravelPlanningPage,
   SignaturePage,
-  AddressPage,
 } from "./pages/planner";
 
 const queryClient = new QueryClient();
@@ -148,7 +147,8 @@ const App = () => (
                       <Route path="care-preferences" element={<CarePreferencesPage />} />
                       <Route path="advance-directive" element={<AdvanceDirectivePage />} />
                       <Route path="travel-planning" element={<TravelPlanningPage />} />
-                      <Route path="address" element={<AddressPage />} />
+                      {/* Address route removed - address is now part of personal-info */}
+                      <Route path="address" element={<Navigate to="/preplandashboard/personal-info" replace />} />
                       <Route path="personal-info" element={<PersonalInfoPage />} />
                       <Route path="about-you" element={<AboutYouPage />} />
                       <Route path="personal-family" element={<PersonalFamilyPage />} />

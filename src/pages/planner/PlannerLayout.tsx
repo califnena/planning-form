@@ -79,7 +79,7 @@ const routeToSectionId: Record<string, string> = {
   "/preplandashboard/contacts": "contacts",
   "/preplandashboard/providers": "providers",
   "/preplandashboard/checklist": "checklist",
-  "/preplandashboard/address": "address",
+  "/preplandashboard/address": "personal_info", // legacy route redirects to personal_info
   "/preplandashboard/instructions": "instructions",
   "/preplandashboard/legalresources": "legalresources",
   "/preplandashboard/willprep": "willprep",

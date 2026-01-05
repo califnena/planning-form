@@ -597,22 +597,21 @@ async function generateSimplePdf(
   addFooter(instructionsPage, pageNum++);
 
   // ============================================================
-  // PAGE 5: Address (optional section from plan_payload.address)
+  // PAGE 5: Address (from plan_payload.personal_information)
   // ============================================================
   const addressPage = pdfDoc.addPage([pageWidth, pageHeight]);
   addPageHeader(addressPage);
   let addrY = addSectionHeader(addressPage, "Address", pageHeight - 100);
   
-  // Get address data from CANONICAL key: plan_payload.address
-  const addressObj = planData?.address || {};
-  const addrFullName = addressObj.full_name || "";
-  const addrStreet1 = addressObj.street_1 || "";
-  const addrStreet2 = addressObj.street_2 || "";
-  const addrCity = addressObj.city || "";
-  const addrState = addressObj.state || "";
-  const addrPostalCode = addressObj.postal_code || "";
-  const addrCountry = addressObj.country || "";
-  const addrNotes = addressObj.notes || "";
+  // Get address data from CANONICAL key: plan_payload.personal_information
+  const personalInfo = planData?.personal_information || {};
+  const addrFullName = personalInfo.full_legal_name || "";
+  const addrStreet1 = personalInfo.street_1 || "";
+  const addrStreet2 = personalInfo.street_2 || "";
+  const addrCity = personalInfo.city || "";
+  const addrState = personalInfo.state || "";
+  const addrPostalCode = personalInfo.postal_code || "";
+  const addrCountry = personalInfo.country || "";
   
   const hasAddressData = hasText(addrFullName) || hasText(addrStreet1) || hasText(addrCity) || 
     hasText(addrState) || hasText(addrPostalCode) || hasText(addrCountry);
@@ -646,12 +645,6 @@ async function generateSimplePdf(
     // Country
     if (addrCountry) {
       addrY = addField(addressPage, "Country", addrCountry, addrY);
-    }
-    
-    // Notes
-    if (addrNotes) {
-      addrY -= 10;
-      addrY = addNotesBox(addressPage, "Notes", addrNotes, addrY);
     }
   }
   

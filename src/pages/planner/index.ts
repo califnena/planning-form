@@ -26,4 +26,4 @@ export { default as CarePreferencesPage } from "./CarePreferencesPage";
 export { default as AdvanceDirectivePage } from "./AdvanceDirectivePage";
 export { default as TravelPlanningPage } from "./TravelPlanningPage";
 export { default as SignaturePage } from "./SignaturePage";
-export { default as AddressPage } from "./AddressPage";
+// AddressPage removed - address fields are now in PersonalInfoPage
