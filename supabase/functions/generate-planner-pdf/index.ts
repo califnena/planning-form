@@ -488,11 +488,13 @@ async function generateSimplePdf(
   let tocY = addSectionHeader(tocPage, "Table of Contents", pageHeight - 100);
   
   // Define sections with their page numbers
-  // NOTE: Professional Contacts and Service Providers REMOVED from PDF per requirement
+  // NOTE: Address is now part of Personal Information (consolidated)
+  // NOTE: About You (family) follows Personal Information
   const tocSections = [
     { title: "Checklist", page: 3 },
     { title: "Instructions", page: 4 },
     { title: "Personal Information", page: 5 },
+    { title: "About You", page: 6 },
     { title: "My Life Story & Legacy", page: 7 },
     { title: "People to Notify", page: 8 },
     { title: "Funeral & Memorial Wishes", page: 9 },
@@ -597,116 +599,113 @@ async function generateSimplePdf(
   addFooter(instructionsPage, pageNum++);
 
   // ============================================================
-  // PAGE 5: Address (from plan_payload.personal_information)
-  // ============================================================
-  const addressPage = pdfDoc.addPage([pageWidth, pageHeight]);
-  addPageHeader(addressPage);
-  let addrY = addSectionHeader(addressPage, "Address", pageHeight - 100);
-  
-  // Get address data from CANONICAL key: plan_payload.personal_information
-  const personalInfo = planData?.personal_information || {};
-  const addrFullName = personalInfo.full_legal_name || "";
-  const addrStreet1 = personalInfo.street_1 || "";
-  const addrStreet2 = personalInfo.street_2 || "";
-  const addrCity = personalInfo.city || "";
-  const addrState = personalInfo.state || "";
-  const addrPostalCode = personalInfo.postal_code || "";
-  const addrCountry = personalInfo.country || "";
-  
-  const hasAddressData = hasText(addrFullName) || hasText(addrStreet1) || hasText(addrCity) || 
-    hasText(addrState) || hasText(addrPostalCode) || hasText(addrCountry);
-  
-  if (!hasAddressData) {
-    addressPage.drawText("Not provided", {
-      x: margin,
-      y: addrY,
-      size: 11,
-      font: helvetica,
-      color: rgb(0.5, 0.5, 0.5),
-    });
-  } else {
-    // Name
-    if (addrFullName) {
-      addrY = addField(addressPage, "Name", addrFullName, addrY);
-    }
-    
-    // Street (street_1 + street_2)
-    const streetLine = [addrStreet1, addrStreet2].filter(Boolean).join(", ");
-    if (streetLine) {
-      addrY = addField(addressPage, "Street", streetLine, addrY);
-    }
-    
-    // City, State ZIP
-    const cityStateZip = [addrCity, addrState, addrPostalCode].filter(Boolean).join(", ");
-    if (cityStateZip) {
-      addrY = addField(addressPage, "City, State ZIP", cityStateZip, addrY);
-    }
-    
-    // Country
-    if (addrCountry) {
-      addrY = addField(addressPage, "Country", addrCountry, addrY);
-    }
-  }
-  
-  addDraftWatermark(addressPage);
-  addFooter(addressPage, pageNum++);
-
-  // ============================================================
-  // PAGE 6-7: Personal Information
+  // PAGE 5: Personal Information (name + address consolidated)
+  // CANONICAL KEY: plan_payload.personal_information
   // ============================================================
   const personal1 = pdfDoc.addPage([pageWidth, pageHeight]);
   addPageHeader(personal1);
   let pY = addSectionHeader(personal1, "Personal Information", pageHeight - 100);
-  pY = addField(personal1, "Full Legal Name", profile.full_name || "", pY);
-  pY = addField(personal1, "Nicknames", profile.nicknames || "", pY);
-  pY = addField(personal1, "Maiden Name", profile.maiden_name || "", pY);
-  pY = addField(personal1, "Date of Birth", profile.dob || profile.date_of_birth || "", pY);
-  pY = addField(personal1, "Place of Birth", profile.birthplace || profile.place_of_birth || "", pY);
+  
+  // Get data from CANONICAL key: plan_payload.personal_information
+  const personalInfo = planData?.personal_information || {};
+  
+  // Identity fields
+  pY = addField(personal1, "Full Legal Name", personalInfo.full_legal_name || profile.full_name || "", pY);
+  pY = addField(personal1, "Preferred Name", personalInfo.preferred_name || profile.nicknames || "", pY);
+  pY = addField(personal1, "Date of Birth", personalInfo.date_of_birth || profile.dob || "", pY);
+  pY = addField(personal1, "Place of Birth", personalInfo.place_of_birth || profile.birthplace || "", pY);
   if (piiData?.ssn) pY = addField(personal1, "SSN", piiData.ssn, pY);
-  pY = addField(personal1, "Citizenship", profile.citizenship || "", pY);
+  pY = addField(personal1, "Citizenship", personalInfo.citizenship || profile.citizenship || "", pY);
   pY -= 10;
   
-  // Build address from split fields or use legacy single field
-  const addressParts = [
-    profile.address_line1,
-    profile.address_line2,
-    [profile.city, profile.state, profile.zip].filter(Boolean).join(", "),
-    profile.country,
-  ].filter(Boolean);
-  const fullAddress = addressParts.length > 0 ? addressParts.join(", ") : (profile.address || "");
+  // Address fields (from personal_information - ONE location only)
+  const street1 = personalInfo.street_1 || "";
+  const street2 = personalInfo.street_2 || "";
+  const streetLine = [street1, street2].filter(Boolean).join(", ");
+  const cityStateZip = [
+    personalInfo.city || "",
+    personalInfo.state || "",
+    personalInfo.postal_code || ""
+  ].filter(Boolean).join(", ");
   
-  pY = addField(personal1, "Address", fullAddress, pY);
-  pY = addField(personal1, "Phone", profile.phone || "", pY);
-  pY = addField(personal1, "Email", profile.email || "", pY);
+  pY = addField(personal1, "Street Address", streetLine || "", pY);
+  pY = addField(personal1, "City, State ZIP", cityStateZip || "", pY);
+  pY = addField(personal1, "Country", personalInfo.country || "", pY);
   pY -= 10;
-  pY = addField(personal1, "Marital Status", profile.marital_status || "", pY);
-  pY = addField(personal1, "Spouse/Partner", profile.partner_name || "", pY);
-  pY = addField(personal1, "Religion", profile.religion || "", pY);
+  
+  // Contact info
+  pY = addField(personal1, "Phone", personalInfo.phone || profile.phone || "", pY);
+  pY = addField(personal1, "Email", personalInfo.email || profile.email || "", pY);
+  pY -= 10;
+  
+  // Marital & Military
+  pY = addField(personal1, "Marital Status", personalInfo.marital_status || profile.marital_status || "", pY);
+  pY = addField(personal1, "Spouse/Partner", personalInfo.spouse_name || profile.partner_name || "", pY);
+  if (personalInfo.military_service === "yes") {
+    pY = addField(personal1, "Military Service", personalInfo.military_branch || "Yes", pY);
+  }
   addDraftWatermark(personal1);
   addFooter(personal1, pageNum++);
 
+  // ============================================================
+  // PAGE 6: About You / Family Information
+  // CANONICAL KEY: plan_payload.about_you
+  // ============================================================
   const personal2 = pdfDoc.addPage([pageWidth, pageHeight]);
   addPageHeader(personal2);
-  pY = addSectionHeader(personal2, "Family Information", pageHeight - 100);
-  pY = addField(personal2, "Father", profile.father_name || "", pY);
-  pY = addField(personal2, "Mother", profile.mother_name || "", pY);
-  pY = addField(personal2, "Ex-Spouse", profile.ex_spouse_name || "", pY);
-  if (profile.child_names?.length) {
+  pY = addSectionHeader(personal2, "About You", pageHeight - 100);
+  
+  // Get data from CANONICAL key: plan_payload.about_you
+  const aboutYou = planData?.about_you || {};
+  
+  // Parents
+  const parents = Array.isArray(aboutYou.parents) ? aboutYou.parents.filter(Boolean) : [];
+  if (parents.length > 0) {
+    pY = addField(personal2, "Parents", parents.join(", "), pY);
+  } else {
+    pY = addField(personal2, "Parents", profile.father_name && profile.mother_name 
+      ? `${profile.father_name}, ${profile.mother_name}` 
+      : (profile.father_name || profile.mother_name || ""), pY);
+  }
+  
+  // Children
+  const children = Array.isArray(aboutYou.children) ? aboutYou.children.filter(Boolean) : [];
+  if (children.length > 0) {
+    pY = addField(personal2, "Children", children.join(", "), pY);
+  } else if (profile.child_names?.length) {
     pY = addField(personal2, "Children", profile.child_names.join(", "), pY);
   }
-  // Support new children array structure
-  if (Array.isArray(profile.children) && profile.children.length > 0) {
-    pY -= 10;
-    personal2.drawText("Children:", { x: margin, y: pY, size: 10, font: helveticaBold, color: textColor });
+  pY -= 10;
+  
+  // Family notes
+  if (aboutYou.family_notes) {
+    personal2.drawText("Family Notes:", { x: margin, y: pY, size: 10, font: helveticaBold, color: textColor });
     pY -= lineHeight;
-    for (const child of profile.children.slice(0, 10)) {
+    const famLines = wrapText(aboutYou.family_notes, pageWidth - margin * 2, 10);
+    for (const line of famLines.slice(0, 6)) {
       if (pY <= 100) break;
-      const childInfo = [child.name, child.phone, child.email].filter(Boolean).join(" - ");
-      if (childInfo) {
-        pY = addField(personal2, "", `- ${childInfo}`, pY);
-      }
+      personal2.drawText(line, { x: margin, y: pY, size: 10, font: helvetica, color: textColor });
+      pY -= lineHeight;
+    }
+    pY -= 10;
+  }
+  
+  // Faith/Religion
+  pY = addField(personal2, "Faith or Religion", aboutYou.faith_or_religion || profile.religion || "", pY);
+  pY -= 10;
+  
+  // Background notes
+  if (aboutYou.background_notes) {
+    personal2.drawText("Background:", { x: margin, y: pY, size: 10, font: helveticaBold, color: textColor });
+    pY -= lineHeight;
+    const bgLines = wrapText(aboutYou.background_notes, pageWidth - margin * 2, 10);
+    for (const line of bgLines.slice(0, 6)) {
+      if (pY <= 100) break;
+      personal2.drawText(line, { x: margin, y: pY, size: 10, font: helvetica, color: textColor });
+      pY -= lineHeight;
     }
   }
+  
   addDraftWatermark(personal2);
   addFooter(personal2, pageNum++);
 
