@@ -135,11 +135,17 @@ export function getSectionCompletion(planData: unknown): Record<string, boolean>
         break;
         
       case "digital":
-        // CANONICAL: online_accounts (also check old 'digital' key for migration)
-        result[sectionId] = hasMeaningfulData(
-          merged.online_accounts || merged.digital || merged.digital_accounts || merged.digital_assets ||
-          data.online_accounts || data.digital
-        );
+        // CANONICAL: online_accounts
+        // Completion = (accounts.length >= 1) OR (access_instructions is non-empty)
+        const onlineAccountsData = merged.online_accounts || merged.digital || data.online_accounts || data.digital;
+        if (onlineAccountsData && typeof onlineAccountsData === 'object') {
+          const oa = onlineAccountsData as { accounts?: any[]; access_instructions?: string };
+          const hasAccounts = Array.isArray(oa.accounts) && oa.accounts.length >= 1;
+          const hasInstructions = !!(oa.access_instructions && oa.access_instructions.trim());
+          result[sectionId] = hasAccounts || hasInstructions;
+        } else {
+          result[sectionId] = false;
+        }
         break;
         
       case "messages":

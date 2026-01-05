@@ -149,11 +149,58 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
   };
 
   // CANONICAL: online_accounts (was 'digital')
+  // Normalize to canonical structure with flat accounts array
+  const rawOnlineAccounts = asObject(mergedRoot.online_accounts) || asObject(mergedRoot.digital) || asObject(mergedRoot.digital_accounts) || asObject(mergedRoot.digital_assets);
+  
+  let canonicalAccounts: any[] = [];
+  
+  // Case 1: Already has canonical flat accounts array
+  if (Array.isArray(rawOnlineAccounts.accounts)) {
+    canonicalAccounts = rawOnlineAccounts.accounts;
+  } 
+  // Case 2: Legacy categorized structure
+  else if (rawOnlineAccounts.categories) {
+    const categories = rawOnlineAccounts.categories;
+    const categoryKeys = ["email", "social", "banking", "subscriptions", "utilities", "phone", "other", "investments", "crypto", "health", "shopping"];
+    categoryKeys.forEach((cat) => {
+      const catAccounts = categories[cat];
+      if (Array.isArray(catAccounts)) {
+        catAccounts.forEach((acc: any) => {
+          if (cat === "phone" && (acc.carrier || acc.number)) {
+            canonicalAccounts.push({
+              id: acc.id || crypto.randomUUID(),
+              category: "phone",
+              provider_name: acc.carrier || "",
+              website_url: null,
+              username_or_email: acc.number || null,
+              recovery_method: acc.pin_location || null,
+              two_factor_enabled: null,
+              notes: null,
+            });
+          } else if (acc.provider || acc.provider_name) {
+            canonicalAccounts.push({
+              id: acc.id || crypto.randomUUID(),
+              category: cat,
+              provider_name: acc.provider_name || acc.provider || "",
+              website_url: acc.website_url || null,
+              username_or_email: acc.username_or_email || acc.username || null,
+              recovery_method: acc.recovery_method || acc.recovery_info || null,
+              two_factor_enabled: acc.twofa_method && acc.twofa_method !== "None" ? "yes" : null,
+              notes: acc.notes || null,
+            });
+          }
+        });
+      }
+    });
+  }
+  
   const online_accounts = {
-    ...asObject(mergedRoot.online_accounts),
-    ...asObject(mergedRoot.digital),
-    ...asObject(mergedRoot.digital_accounts),
-    ...asObject(mergedRoot.digital_assets),
+    warning_acknowledged: rawOnlineAccounts.warning_acknowledged ?? false,
+    accounts: canonicalAccounts,
+    access_instructions: rawOnlineAccounts.access_instructions || rawOnlineAccounts.password_manager_info || null,
+    password_manager_used: rawOnlineAccounts.password_manager_used || null,
+    password_manager_name: rawOnlineAccounts.password_manager_name || null,
+    last_updated: rawOnlineAccounts.last_updated || null,
   };
 
   // CANONICAL: messages_to_loved_ones

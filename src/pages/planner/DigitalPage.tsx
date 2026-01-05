@@ -13,6 +13,11 @@ export default function DigitalPage() {
     navigate("/preplandashboard/legal-docs");
   };
 
+  // Handle data changes - writes to plan_payload.online_accounts
+  const handleChange = (updatedData: Record<string, any>) => {
+    updatePlan(updatedData);
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -23,7 +28,10 @@ export default function DigitalPage() {
         />
       </div>
       <PreviewModeWrapper>
-        <SectionDigital data={plan} onChange={(data) => updatePlan(data)} />
+        <SectionDigital 
+          data={plan} 
+          onChange={handleChange} 
+        />
       </PreviewModeWrapper>
       <SectionNavigation
         currentSection="digital"
