@@ -2021,7 +2021,7 @@ async function generateSimplePdf(
   sigY -= 50;
   
   // CANONICAL: plan_payload.revisions[] with:
-  // { id, revision_number, signer_name, signature_image_data_url, signed_at, change_note, created_at }
+  // { id, revision_number, signer_name, signature_image_data_url, signed_at, change_note }
   const canonicalRevisions = planData?.revisions || [];
   
   // Also check legacy formats for backwards compatibility
@@ -2032,8 +2032,8 @@ async function generateSimplePdf(
   // Build unified revisions array from all sources
   let allRevisions: any[] = [];
   
-  if (canonicalRevisions.length > 0) {
-    // Canonical format
+  if (Array.isArray(canonicalRevisions) && canonicalRevisions.length > 0) {
+    // Canonical format from plan_payload.revisions
     allRevisions = canonicalRevisions.map((r: any, idx: number) => ({
       revision_number: r.revision_number || idx + 1,
       signer_name: r.signer_name || r.signed_name || null,
@@ -2041,7 +2041,7 @@ async function generateSimplePdf(
       signed_at: r.signed_at || r.created_at || null,
       change_note: r.change_note || r.notes || null,
     }));
-  } else if (legacySigRevisions.length > 0) {
+  } else if (Array.isArray(legacySigRevisions) && legacySigRevisions.length > 0) {
     // Legacy signature.revisions[] format
     allRevisions = legacySigRevisions.map((r: any, idx: number) => ({
       revision_number: idx + 1,
@@ -2061,11 +2061,21 @@ async function generateSimplePdf(
     }];
   }
   
-  // Get latest revision (highest revision_number)
+  // Get latest revision by highest revision_number, or by signed_at as fallback
   const latestRevision = allRevisions.length > 0
-    ? allRevisions.reduce((latest, r) => 
-        (r.revision_number > (latest?.revision_number || 0)) ? r : latest
-      , allRevisions[0])
+    ? allRevisions.reduce((latest, r) => {
+        // Prefer higher revision_number
+        if ((r.revision_number || 0) > (latest?.revision_number || 0)) {
+          return r;
+        }
+        // If same revision_number, compare signed_at
+        if ((r.revision_number || 0) === (latest?.revision_number || 0)) {
+          const rDate = r.signed_at ? new Date(r.signed_at).getTime() : 0;
+          const latestDate = latest?.signed_at ? new Date(latest.signed_at).getTime() : 0;
+          return rDate > latestDate ? r : latest;
+        }
+        return latest;
+      }, allRevisions[0])
     : null;
   
   // Determine if we have a valid digital signature
@@ -2074,12 +2084,13 @@ async function generateSimplePdf(
     latestRevision?.signature_image
   );
   
-  console.log("[generate-planner-pdf] Signature data:", {
+  console.log("[generate-planner-pdf] Signature data (CANONICAL):", {
     canonical_revisions_count: canonicalRevisions.length,
     legacy_sig_revisions_count: legacySigRevisions.length,
     legacy_current_exists: !!(legacyCurrentSignature?.signature_png),
     total_revisions: allRevisions.length,
     has_latest_revision: !!latestRevision,
+    latest_revision_number: latestRevision?.revision_number,
     signer_name: latestRevision?.signer_name,
     has_signature_image: !!(latestRevision?.signature_image),
   });
@@ -2091,6 +2102,7 @@ async function generateSimplePdf(
     const signedDate = latestRevision?.signed_at || "";
     const changeNote = latestRevision?.change_note || "";
     
+    // Printed Name
     signaturePage.drawText("Printed Name:", {
       x: margin,
       y: sigY,
@@ -2131,8 +2143,8 @@ async function generateSimplePdf(
       sigY -= 40;
     }
     
-    // Signature image footer
-    signaturePage.drawText("Signed electronically on this date.", {
+    // Signature image
+    signaturePage.drawText("Signature:", {
       x: margin,
       y: sigY,
       size: 12,
@@ -2150,8 +2162,8 @@ async function generateSimplePdf(
           const sigImage = await pdfDoc.embedPng(sigBytes);
           const sigDims = sigImage.scale(0.5);
           signaturePage.drawImage(sigImage, {
-            x: margin + 10,
-            y: sigY - sigDims.height - 10,
+            x: margin + 110,
+            y: sigY - Math.min(sigDims.height, 60) - 5,
             width: Math.min(sigDims.width, 200),
             height: Math.min(sigDims.height, 60),
           });
@@ -2166,8 +2178,8 @@ async function generateSimplePdf(
               const sigImage = await pdfDoc.embedPng(imgBytes);
               const sigDims = sigImage.scale(0.3);
               signaturePage.drawImage(sigImage, {
-                x: margin + 10,
-                y: sigY - Math.min(sigDims.height, 60) - 10,
+                x: margin + 110,
+                y: sigY - Math.min(sigDims.height, 60) - 5,
                 width: Math.min(sigDims.width, 200),
                 height: Math.min(sigDims.height, 60),
               });
@@ -2178,36 +2190,57 @@ async function generateSimplePdf(
           } catch (fetchErr) {
             console.error("[generate-planner-pdf] Failed to fetch signature URL:", fetchErr);
             signaturePage.drawText("[Signature image on file]", {
-              x: margin + 10,
-              y: sigY - 20,
+              x: margin + 110,
+              y: sigY,
               size: 10,
               font: helvetica,
               color: rgb(0.4, 0.4, 0.4),
             });
-            sigY -= 50;
+            sigY -= 40;
           }
+        } else {
+          // Unknown format
+          signaturePage.drawText("[Signature image on file]", {
+            x: margin + 110,
+            y: sigY,
+            size: 10,
+            font: helvetica,
+            color: rgb(0.4, 0.4, 0.4),
+          });
+          sigY -= 40;
         }
       } catch (e) {
         console.error("[generate-planner-pdf] Error embedding signature:", e);
         signaturePage.drawText("[Signature image on file]", {
-          x: margin + 10,
-          y: sigY - 20,
+          x: margin + 110,
+          y: sigY,
           size: 10,
           font: helvetica,
           color: rgb(0.4, 0.4, 0.4),
         });
-        sigY -= 50;
+        sigY -= 40;
       }
     } else {
-      signaturePage.drawText("Signature not provided", {
-        x: margin + 10,
-        y: sigY - 20,
+      signaturePage.drawText("(No signature image)", {
+        x: margin + 110,
+        y: sigY,
         size: 10,
         font: helvetica,
         color: rgb(0.5, 0.5, 0.5),
       });
-      sigY -= 50;
+      sigY -= 40;
     }
+    
+    // "Signed electronically" label
+    sigY -= 10;
+    signaturePage.drawText("Signed electronically on this date.", {
+      x: margin,
+      y: sigY,
+      size: 11,
+      font: helvetica,
+      color: rgb(0.4, 0.4, 0.4),
+    });
+    sigY -= 30;
     
     // Change note if present
     if (changeNote) {
@@ -2233,11 +2266,11 @@ async function generateSimplePdf(
         });
         sigY -= lineHeight;
       }
-      sigY -= 20;
+      sigY -= 10;
     }
     
-    // Revision History Table (if multiple revisions)
-    if (allRevisions.length > 1) {
+    // Revision History Table (show for any number of revisions)
+    if (allRevisions.length >= 1) {
       sigY -= 20;
       signaturePage.drawText("Revision History", {
         x: margin,
@@ -2248,16 +2281,14 @@ async function generateSimplePdf(
       });
       sigY -= 25;
       
-      // Table header
+      // Table header: Rev # | Date | Name
       const colRev = margin;
-      const colDate = margin + 50;
-      const colName = margin + 170;
-      const colNote = margin + 300;
+      const colDate = margin + 60;
+      const colName = margin + 200;
       
-      signaturePage.drawText("Rev", { x: colRev, y: sigY, size: 9, font: helveticaBold, color: textColor });
+      signaturePage.drawText("Rev #", { x: colRev, y: sigY, size: 9, font: helveticaBold, color: textColor });
       signaturePage.drawText("Date", { x: colDate, y: sigY, size: 9, font: helveticaBold, color: textColor });
       signaturePage.drawText("Name", { x: colName, y: sigY, size: 9, font: helveticaBold, color: textColor });
-      signaturePage.drawText("Note", { x: colNote, y: sigY, size: 9, font: helveticaBold, color: textColor });
       sigY -= 5;
       
       // Header underline
@@ -2269,8 +2300,10 @@ async function generateSimplePdf(
       });
       sigY -= 15;
       
-      // Sort by revision_number descending
-      const sortedRevisions = [...allRevisions].sort((a, b) => b.revision_number - a.revision_number);
+      // Sort by revision_number descending (most recent first)
+      const sortedRevisions = [...allRevisions].sort((a, b) => 
+        (b.revision_number || 0) - (a.revision_number || 0)
+      );
       
       for (const rev of sortedRevisions.slice(0, 10)) { // Limit to 10 rows
         if (sigY < 100) break;
@@ -2278,13 +2311,11 @@ async function generateSimplePdf(
         const revDate = rev.signed_at 
           ? new Date(rev.signed_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
           : "-";
-        const revName = sanitizeForPdf(rev.signer_name || "-").substring(0, 20);
-        const revNote = sanitizeForPdf(rev.change_note || "-").substring(0, 30);
+        const revName = sanitizeForPdf(rev.signer_name || "-").substring(0, 30);
         
-        signaturePage.drawText(`#${rev.revision_number}`, { x: colRev, y: sigY, size: 9, font: helvetica, color: textColor });
+        signaturePage.drawText(`#${rev.revision_number || 1}`, { x: colRev, y: sigY, size: 9, font: helvetica, color: textColor });
         signaturePage.drawText(revDate, { x: colDate, y: sigY, size: 9, font: helvetica, color: textColor });
         signaturePage.drawText(revName, { x: colName, y: sigY, size: 9, font: helvetica, color: textColor });
-        signaturePage.drawText(revNote, { x: colNote, y: sigY, size: 9, font: helvetica, color: textColor });
         sigY -= 16;
       }
     }
