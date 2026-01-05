@@ -3,10 +3,11 @@ import { SectionDigital } from "@/components/planner/sections/SectionDigital";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
+import { ClearSectionButton } from "@/components/planner/ClearSectionButton";
 import { useNavigate } from "react-router-dom";
 
 export default function DigitalPage() {
-  const { plan, updatePlan, saveState } = usePlanContext();
+  const { plan, updatePlan, saveState, activePlanId, refreshPlan } = usePlanContext();
   const navigate = useNavigate();
 
   const handleNext = () => {
@@ -25,6 +26,12 @@ export default function DigitalPage() {
           saving={saveState.saving} 
           lastSaved={saveState.lastSaved}
           error={saveState.error}
+        />
+        <ClearSectionButton
+          sectionId="digital"
+          planId={activePlanId || plan?.id || ""}
+          currentPayload={plan?.plan_payload || {}}
+          onCleared={refreshPlan}
         />
       </div>
       <PreviewModeWrapper>
