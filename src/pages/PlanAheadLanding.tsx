@@ -205,42 +205,47 @@ export default function PlanAheadLanding() {
       <main className="container mx-auto px-4 py-8 md:py-12">
         <Breadcrumbs className="mb-6" />
 
-        {/* Hero Section */}
-        <section className="max-w-3xl mx-auto text-center space-y-6 mb-12">
+        {/* Senior-Friendly Hero Section */}
+        <section className="max-w-2xl mx-auto text-center space-y-6 mb-12">
           <div className="flex justify-center mb-6">
             <img 
               src={mascotFamilyPlanning} 
               alt="Planning together" 
-              className="w-full max-w-sm rounded-xl shadow-lg"
+              className="w-full max-w-xs rounded-xl shadow-lg"
             />
           </div>
           <h1 className="text-3xl md:text-4xl font-serif font-bold">
             Plan Ahead
           </h1>
-          <p className="text-xl text-muted-foreground">
-            Simple steps to record your wishes and give your family clarity
-          </p>
-          <p className="text-muted-foreground">
-            You can start by learning and previewing.<br />
-            You only pay when you're ready to save, download, or get guided help.
+          <p className="text-xl text-muted-foreground leading-relaxed">
+            Review your plan, print it, or go back to continue planning.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+          {/* Three Large Stacked Buttons */}
+          <div className="flex flex-col gap-4 pt-6 max-w-md mx-auto">
             <Button 
-              onClick={handleStartPlanning}
+              onClick={() => navigate("/preplan-summary")}
               size="lg"
-              className="min-h-[56px] text-lg px-8"
+              className="w-full min-h-[60px] text-lg font-semibold"
             >
-              {isLoggedIn && hasPlannerProgress ? "Continue Planning" : "Start Digital Planner"}
+              Back to My Plan
             </Button>
             <Button 
-              variant="outline"
+              onClick={() => navigate("/preplandashboard")}
               size="lg"
-              onClick={handlePreviewPlanner}
-              className="min-h-[56px] text-lg"
+              variant="secondary"
+              className="w-full min-h-[60px] text-lg font-semibold"
             >
-              <Eye className="h-4 w-4 mr-2" />
-              Preview how this works
+              Continue Planning
+            </Button>
+            <Button 
+              onClick={() => navigate("/preplan-summary")}
+              size="lg"
+              variant="outline"
+              className="w-full min-h-[60px] text-lg font-semibold"
+            >
+              <Printer className="h-5 w-5 mr-2" />
+              Print or Save PDF
             </Button>
           </div>
         </section>
