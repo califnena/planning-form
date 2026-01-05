@@ -103,7 +103,7 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 md:h-20 items-center justify-between px-2 md:px-4">
           {/* Left: Logo */}
-          <Link to="/" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity shrink-0">
+          <Link to="/home-senior" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity shrink-0">
             <img src={logo} alt="Everlasting Funeral Advisors" className="h-8 w-8 md:h-12 md:w-12" />
             <div className="hidden sm:block">
               <h1 className="text-lg font-semibold text-foreground">{t("header.plannerTitle")}</h1>
