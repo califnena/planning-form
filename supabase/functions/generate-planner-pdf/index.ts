@@ -804,25 +804,48 @@ async function generateSimplePdf(
   addPageHeader(contacts1);
   let cY = addSectionHeader(contacts1, "People to Notify", pageHeight - 100);
   
-  // CANONICAL: Read from people_to_notify first, then fall back to contacts
+  // CANONICAL: Read from plan_payload.contacts (unified model)
+  // Also check legacy locations for backwards compatibility
+  const unifiedContacts = planData?.contacts?.contacts || planData?.contacts || [];
   const rawPeopleToNotify = planData?.people_to_notify || [];
   const rawContactsList = planData?.contacts_notify || [];
-  const unifiedContacts = planData?.contacts?.contacts || planData?.contacts || [];
   
-  // Merge all sources and filter to ONLY "person" type or legacy entries without contact_type
+  // Merge all sources
+  const allContactsRaw = [
+    ...(Array.isArray(unifiedContacts) ? unifiedContacts : []),
+    ...rawPeopleToNotify,
+    ...rawContactsList,
+  ];
+  
+  // DEDUPLICATE by id (or by name if no id)
+  const seenIds = new Set<string>();
+  const seenNames = new Set<string>();
+  const deduplicatedContacts = allContactsRaw.filter((c: any) => {
+    if (c.id) {
+      if (seenIds.has(c.id)) return false;
+      seenIds.add(c.id);
+      return true;
+    }
+    // Fallback: dedupe by name if no id
+    const name = (c.name || c.full_name || "").toLowerCase().trim();
+    if (name && seenNames.has(name)) return false;
+    if (name) seenNames.add(name);
+    return true;
+  });
+  
+  // Filter to ONLY "person" type contacts (exclude professional/service_provider)
   const EXCLUDED_CONTACT_TYPES = ["service", "professional", "service_provider"];
   const EXCLUDED_ROLES = [
     "attorney", "accountant", "financial_advisor", "insurance_agent", 
     "funeral_home", "cemetery", "church", "hospice", "medical_provider"
   ];
   
-  const allContacts = [...rawPeopleToNotify, ...rawContactsList, ...(Array.isArray(unifiedContacts) ? unifiedContacts : [])];
-  const contactsList = allContacts.filter((c: any) => {
+  const contactsList = deduplicatedContacts.filter((c: any) => {
     // Exclude by contact_type
     if (c.contact_type && EXCLUDED_CONTACT_TYPES.includes(c.contact_type)) {
       return false;
     }
-    // Exclude by role (for legacy data) - check both role and role_or_relationship
+    // Exclude by role (for legacy data)
     const roleValue = (c.role_or_relationship || c.role || "").toLowerCase();
     if (roleValue && EXCLUDED_ROLES.includes(roleValue)) {
       return false;
@@ -831,21 +854,22 @@ async function generateSimplePdf(
     return !c.contact_type || c.contact_type === "person";
   });
   
-  console.log("[generate-planner-pdf] People to Notify (filtered to person only):", {
+  console.log("[generate-planner-pdf] People to Notify (deduplicated, person-only):", {
+    raw_unified_count: Array.isArray(unifiedContacts) ? unifiedContacts.length : 0,
     raw_people_to_notify_count: rawPeopleToNotify.length,
     raw_contacts_count: rawContactsList.length,
-    unified_contacts_count: Array.isArray(unifiedContacts) ? unifiedContacts.length : 0,
-    filtered_count: contactsList.length,
+    after_dedup_count: deduplicatedContacts.length,
+    final_filtered_count: contactsList.length,
   });
   
-  // Render as table: Name | Relationship | Phone | Email | When to Notify
+  // Render as simple table: Name | Relationship | Phone | Email
   if (hasAny(contactsList)) {
     // Table header
     cY -= 5;
     contacts1.drawText("Name", { x: margin, y: cY, size: 10, font: helveticaBold, color: textColor });
     contacts1.drawText("Relationship", { x: margin + 140, y: cY, size: 10, font: helveticaBold, color: textColor });
-    contacts1.drawText("Phone", { x: margin + 240, y: cY, size: 10, font: helveticaBold, color: textColor });
-    contacts1.drawText("Email", { x: margin + 340, y: cY, size: 10, font: helveticaBold, color: textColor });
+    contacts1.drawText("Phone", { x: margin + 250, y: cY, size: 10, font: helveticaBold, color: textColor });
+    contacts1.drawText("Email", { x: margin + 360, y: cY, size: 10, font: helveticaBold, color: textColor });
     cY -= lineHeight;
     
     // Draw a line under header
@@ -857,6 +881,7 @@ async function generateSimplePdf(
     });
     cY -= 5;
     
+    // Render each contact ONCE
     for (const c of contactsList.slice(0, 15)) {
       if (cY <= 80) break;
       
@@ -865,15 +890,22 @@ async function generateSimplePdf(
       const phone = sanitizeForPdf(c.phone || c.contact || "");
       const email = sanitizeForPdf(c.email || "");
       
-      contacts1.drawText(name.substring(0, 25), { x: margin, y: cY, size: 9, font: helvetica, color: textColor });
-      contacts1.drawText(relationship.substring(0, 18), { x: margin + 140, y: cY, size: 9, font: helvetica, color: textColor });
-      contacts1.drawText(phone.substring(0, 18), { x: margin + 240, y: cY, size: 9, font: helvetica, color: textColor });
-      contacts1.drawText(email.substring(0, 22), { x: margin + 340, y: cY, size: 9, font: helvetica, color: textColor });
+      contacts1.drawText(name.substring(0, 22), { x: margin, y: cY, size: 9, font: helvetica, color: textColor });
+      contacts1.drawText(relationship.substring(0, 16), { x: margin + 140, y: cY, size: 9, font: helvetica, color: textColor });
+      contacts1.drawText(phone.substring(0, 16), { x: margin + 250, y: cY, size: 9, font: helvetica, color: textColor });
+      contacts1.drawText(email.substring(0, 20), { x: margin + 360, y: cY, size: 9, font: helvetica, color: textColor });
       
       cY -= lineHeight;
     }
   } else {
-    cY = drawEmpty(contacts1, cY);
+    cY -= 10;
+    contacts1.drawText("No contacts listed.", {
+      x: margin,
+      y: cY,
+      size: 11,
+      font: helvetica,
+      color: rgb(0.4, 0.4, 0.4),
+    });
   }
   addDraftWatermark(contacts1);
   addFooter(contacts1, pageNum++);
