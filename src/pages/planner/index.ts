@@ -2,6 +2,8 @@
 export { default as PlannerLayout } from "./PlannerLayout";
 export { default as PreferencesPage } from "./PreferencesPage";
 export { default as OverviewPage } from "./OverviewPage";
+export { default as PersonalInfoPage } from "./PersonalInfoPage";
+export { default as AboutYouPage } from "./AboutYouPage";
 export { default as PersonalFamilyPage } from "./PersonalFamilyPage";
 export { default as LifeStoryPage } from "./LifeStoryPage";
 export { default as FuneralWishesPage } from "./FuneralWishesPage";
