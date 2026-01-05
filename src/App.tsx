@@ -138,7 +138,7 @@ const App = () => (
                       
                       {/* New nested planner routes */}
                       <Route path="/preplandashboard" element={<PlannerLayout />}>
-                        <Route index element={<Navigate to="/preplandashboard/preferences" replace />} />
+                        <Route index element={<Navigate to="/preplandashboard/overview" replace />} />
                       <Route path="preferences" element={<PreferencesPage />} />
                       <Route path="overview" element={<OverviewPage />} />
                       <Route path="pre-planning" element={<PrePlanningPage />} />

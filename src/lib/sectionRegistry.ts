@@ -52,9 +52,9 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
   // TOP (no completion dots)
   {
     id: "home",
-    label: "Home",
+    label: "Planning Menu",
     icon: HomeIcon,
-    route: "/dashboard",
+    route: "/preplandashboard/overview",
     dataKey: "",
     group: "top",
     showCompletionDot: false,

@@ -116,9 +116,9 @@ export default function PlannerLayout() {
       const selectedSections = data?.selected_sections || null;
       setUserSettings(selectedSections);
       
-      // If no sections selected and on base route, go to preferences
+      // If no sections selected and on base route, go to overview (section list)
       if ((!selectedSections || selectedSections.length === 0) && location.pathname === "/preplandashboard") {
-        navigate("/preplandashboard/preferences", { replace: true });
+        navigate("/preplandashboard/overview", { replace: true });
       }
     } catch (error) {
       console.error("Error loading user settings:", error);
@@ -167,14 +167,15 @@ export default function PlannerLayout() {
     return () => subscription.unsubscribe();
   }, [navigate, location.pathname]);
 
-  // Redirect base route to last visited or preferences
+  // Redirect base route to last visited or overview (section list)
   useEffect(() => {
     if (!authLoading && !settingsLoading && location.pathname === "/preplandashboard") {
       const lastRoute = localStorage.getItem("last_planner_route");
       if (lastRoute && lastRoute.startsWith("/preplandashboard/")) {
         navigate(lastRoute, { replace: true });
       } else {
-        navigate("/preplandashboard/preferences", { replace: true });
+        // Default to overview (section list page), not preferences or wishes
+        navigate("/preplandashboard/overview", { replace: true });
       }
     }
   }, [authLoading, settingsLoading, location.pathname, navigate]);
