@@ -226,9 +226,22 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
     care_preferences: carePreferences,
   };
 
-  const advanceDirective = {
+  // CANONICAL: advance_directive
+  // Normalize from camelCase (old format) to snake_case (new format)
+  const rawAdvanceDirective = {
     ...asObject(mergedRoot.advance_directive),
     ...asObject(mergedRoot.advanceDirective),
+  };
+  
+  // Migrate camelCase fields to snake_case
+  const advanceDirective = {
+    healthcare_proxy_name: rawAdvanceDirective.healthcare_proxy_name || rawAdvanceDirective.healthcareProxyName || "",
+    healthcare_proxy_phone: rawAdvanceDirective.healthcare_proxy_phone || rawAdvanceDirective.healthcareProxyPhone || "",
+    advance_directive_status: rawAdvanceDirective.advance_directive_status || rawAdvanceDirective.advanceDirectiveStatus || "",
+    advance_directive_location: rawAdvanceDirective.advance_directive_location || rawAdvanceDirective.advanceDirectiveLocation || "",
+    dnr_status: rawAdvanceDirective.dnr_status || rawAdvanceDirective.dnrStatus || "",
+    polst_status: rawAdvanceDirective.polst_status || rawAdvanceDirective.polstStatus || "",
+    document_location: rawAdvanceDirective.document_location || rawAdvanceDirective.documentLocation || "",
   };
 
   const travel = {
