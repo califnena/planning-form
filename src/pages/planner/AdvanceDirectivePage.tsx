@@ -1,36 +1,27 @@
 import { usePlanContext } from "./PlannerLayout";
-import { SectionAdvanceDirective } from "@/components/planner/sections/SectionAdvanceDirective";
+import { SectionAdvanceDirective, AdvanceDirectiveData } from "@/components/planner/sections/SectionAdvanceDirective";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
+/**
+ * CANONICAL STORAGE: plan_payload.advance_directive
+ * 
+ * Rules:
+ * - NO localStorage
+ * - NO duplicate keys
+ * - All reads/writes go through plan.advance_directive
+ */
 export default function AdvanceDirectivePage() {
-  const { user, plan, updatePlan, saveState } = usePlanContext();
+  const { plan, updatePlan, saveState } = usePlanContext();
   const navigate = useNavigate();
 
-  const advanceDirectiveData = plan.advance_directive || {};
+  // Read ONLY from plan.advance_directive (canonical path)
+  const advanceDirectiveData: Partial<AdvanceDirectiveData> = plan.advance_directive || {};
 
-  // One-time migration from legacy localStorage
-  useEffect(() => {
-    if (!user?.id) return;
-    if (advanceDirectiveData && Object.keys(advanceDirectiveData).length > 0) return;
-
-    const stored = localStorage.getItem(`advance_directive_${user.id}`);
-    if (!stored) return;
-
-    try {
-      const parsed = JSON.parse(stored);
-      if (parsed && typeof parsed === "object") {
-        updatePlan({ advance_directive: parsed });
-      }
-    } catch (e) {
-      console.error("Error parsing advance directive data:", e);
-    }
-  }, [user?.id, updatePlan]);
-
-  const handleChange = (data: any) => {
+  const handleChange = (data: AdvanceDirectiveData) => {
+    // Write ONLY to advance_directive in plan_payload
     updatePlan({ advance_directive: data });
   };
 

@@ -98,10 +98,14 @@ export function getSectionCompletion(planData: unknown): Record<string, boolean>
         break;
         
       case "advancedirective":
-        result[sectionId] = hasMeaningfulData(
-          merged.advance_directive || merged.advanceDirective ||
-          data.advance_directive
-        );
+        // CANONICAL: Section complete when has_advance_directive !== null
+        const advDirective = merged.advance_directive || merged.advanceDirective || data.advance_directive;
+        if (advDirective && typeof advDirective === 'object') {
+          const ad = advDirective as { has_advance_directive?: string | null };
+          result[sectionId] = ad.has_advance_directive !== null && ad.has_advance_directive !== undefined;
+        } else {
+          result[sectionId] = false;
+        }
         break;
         
       case "funeral":
