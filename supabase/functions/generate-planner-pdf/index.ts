@@ -1419,8 +1419,8 @@ async function generateSimplePdf(
   addPageHeader(digitalPage);
   let digY = addSectionHeader(digitalPage, "Online Accounts", pageHeight - 100);
   
-  // CANONICAL: Read from plan_payload.online_accounts only
-  const onlineAccountsData = planData?.online_accounts || planData?.digital || {};
+  // CANONICAL: Read ONLY from plan_payload.online_accounts
+  const onlineAccountsData = planData?.online_accounts || {};
   
   // Support both new flat structure and legacy categories
   let accountsList: any[] = [];
@@ -1442,8 +1442,7 @@ async function generateSimplePdf(
             website_url: null,
             username_or_email: acc.number || null,
             two_factor_enabled: null,
-            recovery_method: acc.pin_location || null,
-            notes: null,
+            notes: acc.pin_location || null,
           });
         } else if (acc.provider || acc.provider_name) {
           accountsList.push({
@@ -1452,7 +1451,6 @@ async function generateSimplePdf(
             website_url: acc.website_url || null,
             username_or_email: acc.username_or_email || acc.username || null,
             two_factor_enabled: acc.twofa_method && acc.twofa_method !== "None" ? "yes" : null,
-            recovery_method: acc.recovery_method || acc.recovery_info || null,
             notes: acc.notes || null,
           });
         }
@@ -1470,109 +1468,115 @@ async function generateSimplePdf(
     password_manager_used: passwordManagerUsed,
   });
   
-  const hasOnlineAccountsData = accountsList.length > 0 || hasText(accessInstructions);
-  
-  if (!hasOnlineAccountsData) {
-    digY = drawEmpty(digitalPage, digY);
+  // Always render section - show "No online accounts listed." if empty
+  if (accountsList.length === 0) {
+    digY -= 10;
+    digitalPage.drawText("No online accounts listed.", {
+      x: margin,
+      y: digY,
+      size: 11,
+      font: helvetica,
+      color: rgb(0.4, 0.4, 0.4),
+    });
+    digY -= lineHeight * 2;
   } else {
     // Render accounts as a clean table
-    if (accountsList.length > 0) {
-      // Category label mapping
-      const categoryLabels: Record<string, string> = {
-        email: "Email",
-        banking: "Banking",
-        investments: "Investments",
-        crypto: "Crypto",
-        social: "Social",
-        shopping: "Shopping",
-        utilities: "Utilities",
-        subscriptions: "Subscriptions",
-        phone: "Phone",
-        health: "Health",
-        other: "Other",
-      };
+    // Category label mapping
+    const categoryLabels: Record<string, string> = {
+      email: "Email",
+      banking: "Banking",
+      investments: "Investments",
+      crypto: "Crypto",
+      social: "Social",
+      shopping: "Shopping",
+      utilities: "Utilities",
+      subscriptions: "Subscriptions",
+      phone: "Phone",
+      health: "Health",
+      other: "Other",
+    };
+    
+    // Table header - Updated columns: Category | Provider | Website | Username/Email | 2FA | Notes
+    const colCategory = margin;
+    const colProvider = margin + 70;
+    const colWebsite = margin + 160;
+    const colUsername = margin + 260;
+    const col2FA = margin + 380;
+    const colNotes = margin + 420;
+    
+    digitalPage.drawText("Category", { x: colCategory, y: digY, size: 9, font: helveticaBold, color: textColor });
+    digitalPage.drawText("Provider", { x: colProvider, y: digY, size: 9, font: helveticaBold, color: textColor });
+    digitalPage.drawText("Website", { x: colWebsite, y: digY, size: 9, font: helveticaBold, color: textColor });
+    digitalPage.drawText("Username/Email", { x: colUsername, y: digY, size: 9, font: helveticaBold, color: textColor });
+    digitalPage.drawText("2FA", { x: col2FA, y: digY, size: 9, font: helveticaBold, color: textColor });
+    digitalPage.drawText("Notes", { x: colNotes, y: digY, size: 9, font: helveticaBold, color: textColor });
+    digY -= lineHeight;
+    
+    // Draw header line
+    digitalPage.drawLine({
+      start: { x: margin, y: digY + 5 },
+      end: { x: pageWidth - margin, y: digY + 5 },
+      thickness: 0.5,
+      color: rgb(0.7, 0.7, 0.7),
+    });
+    digY -= 5;
+    
+    // Table rows
+    for (const acc of accountsList.slice(0, 15)) {
+      if (digY <= 100) break;
       
-      // Table header
-      const colCategory = margin;
-      const colProvider = margin + 70;
-      const colWebsite = margin + 170;
-      const colUsername = margin + 270;
-      const col2FA = margin + 370;
-      const colRecovery = margin + 410;
-      
-      digitalPage.drawText("Category", { x: colCategory, y: digY, size: 9, font: helveticaBold, color: textColor });
-      digitalPage.drawText("Provider", { x: colProvider, y: digY, size: 9, font: helveticaBold, color: textColor });
-      digitalPage.drawText("Website", { x: colWebsite, y: digY, size: 9, font: helveticaBold, color: textColor });
-      digitalPage.drawText("Username/Email", { x: colUsername, y: digY, size: 9, font: helveticaBold, color: textColor });
-      digitalPage.drawText("2FA", { x: col2FA, y: digY, size: 9, font: helveticaBold, color: textColor });
-      digitalPage.drawText("Recovery", { x: colRecovery, y: digY, size: 9, font: helveticaBold, color: textColor });
-      digY -= lineHeight;
-      
-      // Draw header line
-      digitalPage.drawLine({
-        start: { x: margin, y: digY + 5 },
-        end: { x: pageWidth - margin, y: digY + 5 },
-        thickness: 0.5,
-        color: rgb(0.7, 0.7, 0.7),
-      });
-      digY -= 5;
-      
-      // Table rows
-      for (const acc of accountsList.slice(0, 15)) {
-        if (digY <= 100) break;
-        
-        const category = categoryLabels[acc.category] || acc.category || "";
-        const provider = sanitizeForPdf(acc.provider_name || "").substring(0, 15);
-        // Extract domain from URL if too long
-        let website = sanitizeForPdf(acc.website_url || "");
-        if (website.length > 15) {
-          try {
-            const urlObj = new URL(website.startsWith("http") ? website : `https://${website}`);
-            website = urlObj.hostname.replace("www.", "").substring(0, 15);
-          } catch {
-            website = website.substring(0, 15);
-          }
+      const category = categoryLabels[acc.category] || acc.category || "";
+      const provider = sanitizeForPdf(acc.provider_name || "").substring(0, 12);
+      // Extract domain from URL if too long
+      let website = sanitizeForPdf(acc.website_url || "");
+      if (website.length > 15) {
+        try {
+          const urlObj = new URL(website.startsWith("http") ? website : `https://${website}`);
+          website = urlObj.hostname.replace("www.", "").substring(0, 15);
+        } catch {
+          website = website.substring(0, 15);
         }
-        const username = sanitizeForPdf(acc.username_or_email || "").substring(0, 20);
-        const twoFA = acc.two_factor_enabled === "yes" ? "Yes" : (acc.two_factor_enabled === "no" ? "No" : "");
-        const recovery = sanitizeForPdf(acc.recovery_method || "").substring(0, 15);
-        
-        digitalPage.drawText(category, { x: colCategory, y: digY, size: 9, font: helvetica, color: textColor });
-        digitalPage.drawText(provider, { x: colProvider, y: digY, size: 9, font: helvetica, color: textColor });
-        digitalPage.drawText(website, { x: colWebsite, y: digY, size: 9, font: helvetica, color: textColor });
-        digitalPage.drawText(username, { x: colUsername, y: digY, size: 9, font: helvetica, color: textColor });
-        digitalPage.drawText(twoFA, { x: col2FA, y: digY, size: 9, font: helvetica, color: textColor });
-        digitalPage.drawText(recovery, { x: colRecovery, y: digY, size: 9, font: helvetica, color: textColor });
-        
-        digY -= lineHeight;
       }
+      const username = sanitizeForPdf(acc.username_or_email || "").substring(0, 18);
+      const twoFA = acc.two_factor_enabled === "yes" ? "Yes" : (acc.two_factor_enabled === "no" ? "No" : "");
+      const notes = sanitizeForPdf(acc.notes || "").substring(0, 12);
       
-      digY -= 10;
+      digitalPage.drawText(category, { x: colCategory, y: digY, size: 9, font: helvetica, color: textColor });
+      digitalPage.drawText(provider, { x: colProvider, y: digY, size: 9, font: helvetica, color: textColor });
+      digitalPage.drawText(website, { x: colWebsite, y: digY, size: 9, font: helvetica, color: textColor });
+      digitalPage.drawText(username, { x: colUsername, y: digY, size: 9, font: helvetica, color: textColor });
+      digitalPage.drawText(twoFA, { x: col2FA, y: digY, size: 9, font: helvetica, color: textColor });
+      digitalPage.drawText(notes, { x: colNotes, y: digY, size: 9, font: helvetica, color: textColor });
+      
+      digY -= lineHeight;
     }
     
-    // Access Instructions block
-    if (accessInstructions) {
-      digY = addNotesBox(digitalPage, "Access Instructions", accessInstructions, digY);
-    }
-    
-    // Password Manager info
-    if (passwordManagerUsed === "yes" && passwordManagerName) {
-      digY -= 5;
-      digitalPage.drawText("Password Manager:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
-      digitalPage.drawText(sanitizeForPdf(passwordManagerName), { x: margin + 120, y: digY, size: 10, font: helvetica, color: textColor });
-      digY -= lineHeight;
-    } else if (passwordManagerUsed === "yes") {
-      digY -= 5;
-      digitalPage.drawText("Password Manager:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
-      digitalPage.drawText("Yes (name not specified)", { x: margin + 120, y: digY, size: 10, font: helvetica, color: textColor });
-      digY -= lineHeight;
-    } else if (passwordManagerUsed === "no") {
-      digY -= 5;
-      digitalPage.drawText("Password Manager:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
-      digitalPage.drawText("No", { x: margin + 120, y: digY, size: 10, font: helvetica, color: textColor });
-      digY -= lineHeight;
-    }
+    digY -= 10;
   }
+  
+  // Access Instructions block (always check, even if accounts are empty)
+  if (accessInstructions) {
+    digY = addNotesBox(digitalPage, "Access Instructions", accessInstructions, digY);
+  }
+  
+  // Password Manager info
+  if (passwordManagerUsed === "yes" && passwordManagerName) {
+    digY -= 5;
+    digitalPage.drawText("Password Manager:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
+    digitalPage.drawText(sanitizeForPdf(passwordManagerName), { x: margin + 120, y: digY, size: 10, font: helvetica, color: textColor });
+    digY -= lineHeight;
+  } else if (passwordManagerUsed === "yes") {
+    digY -= 5;
+    digitalPage.drawText("Password Manager:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
+    digitalPage.drawText("Yes (name not specified)", { x: margin + 120, y: digY, size: 10, font: helvetica, color: textColor });
+    digY -= lineHeight;
+  } else if (passwordManagerUsed === "no") {
+    digY -= 5;
+    digitalPage.drawText("Password Manager:", { x: margin, y: digY, size: 10, font: helveticaBold, color: textColor });
+    digitalPage.drawText("No", { x: margin + 120, y: digY, size: 10, font: helvetica, color: textColor });
+    digY -= lineHeight;
+  }
+  
   addDraftWatermark(digitalPage);
   addFooter(digitalPage, pageNum++);
 
