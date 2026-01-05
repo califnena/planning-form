@@ -760,8 +760,9 @@ async function generateSimplePdf(
     if (c.contact_type && EXCLUDED_CONTACT_TYPES.includes(c.contact_type)) {
       return false;
     }
-    // Exclude by role (for legacy data)
-    if (c.role && EXCLUDED_ROLES.includes(c.role?.toLowerCase())) {
+    // Exclude by role (for legacy data) - check both role and role_or_relationship
+    const roleValue = (c.role_or_relationship || c.role || "").toLowerCase();
+    if (roleValue && EXCLUDED_ROLES.includes(roleValue)) {
       return false;
     }
     // Include if contact_type is "person" or not set (legacy "people to notify")

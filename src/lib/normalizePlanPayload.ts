@@ -29,9 +29,9 @@ export interface RevisionRecord {
 export interface UnifiedContact {
   id?: string;
   name: string;
-  contact_type: "person" | "service" | "professional";
+  contact_type: "person" | "professional" | "service_provider";
   organization?: string;
-  role?: string;
+  role_or_relationship?: string;
   phone?: string;
   email?: string;
   notes?: string;
@@ -248,16 +248,22 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
   const rawVendors = asArray(mergedRoot.vendors);
 
   // Helper to normalize legacy contact formats to UnifiedContact
-  const normalizeContact = (c: any, defaultType: "person" | "service" | "professional"): UnifiedContact => ({
-    id: c.id || crypto.randomUUID(),
-    name: c.name || c.full_name || "",
-    contact_type: c.contact_type || defaultType,
-    organization: c.organization || c.company || c.firm || "",
-    role: c.role || c.type || c.relationship || "",
-    phone: c.phone || c.phone_number || c.contact || "",
-    email: c.email || "",
-    notes: c.notes || c.note || "",
-  });
+  const normalizeContact = (c: any, defaultType: "person" | "professional" | "service_provider"): UnifiedContact => {
+    // Normalize legacy "service" to "service_provider"
+    let contactType = c.contact_type || defaultType;
+    if (contactType === "service") contactType = "service_provider";
+    
+    return {
+      id: c.id || crypto.randomUUID(),
+      name: c.name || c.full_name || "",
+      contact_type: contactType,
+      organization: c.organization || c.company || c.firm || "",
+      role_or_relationship: c.role_or_relationship || c.role || c.type || c.relationship || "",
+      phone: c.phone || c.phone_number || c.contact || "",
+      email: c.email || "",
+      notes: c.notes || c.note || "",
+    };
+  };
 
   // Build unified contacts array
   const unifiedContacts: UnifiedContact[] = [];
@@ -299,7 +305,7 @@ export function normalizePlanPayload(planPayload: any): NormalizedPlanPayload {
   // Migrate legacy service providers and vendors
   for (const c of [...rawServiceProviders, ...rawVendors]) {
     if (c && typeof c === "object") {
-      const normalized = normalizeContact(c, "service");
+      const normalized = normalizeContact(c, "service_provider");
       if (normalized.name && !seenIds.has(normalized.id!)) {
         unifiedContacts.push(normalized);
         seenIds.add(normalized.id!);
