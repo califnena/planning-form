@@ -145,7 +145,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
         yPos = 20;
       }
 
-      const typeLabel = type === "person" ? "People to Notify" : type === "professional" ? "Professional Contacts" : "Service Providers";
+      const typeLabel = type === "person" ? "Important Contacts - People" : type === "professional" ? "Important Contacts - Professionals" : "Important Contacts - Service Providers";
       pdf.setFontSize(14);
       pdf.setFont("helvetica", "bold");
       pdf.text(typeLabel, 15, yPos);
@@ -305,13 +305,13 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Role/Relationship</Label>
+                    <Label>Relationship / Role (e.g., sister, attorney, funeral home director)</Label>
                     <Select
                       value={contact.role_or_relationship || ""}
                       onValueChange={(value) => updateContact(index, "role_or_relationship", value)}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select role" />
+                        <SelectValue placeholder="Select relationship or role" />
                       </SelectTrigger>
                       <SelectContent>
                         {roleOptions.map((role) => (
