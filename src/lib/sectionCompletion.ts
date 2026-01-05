@@ -171,21 +171,27 @@ export function getSectionCompletion(planData: unknown): Record<string, boolean>
         break;
         
       case "signature":
-        // Section complete if revisions.length > 0
-        // Check new model: signature.revisions[] with signature_image_png
-        // Also check legacy formats for backward compatibility
-        const signatureObj = merged.signature || data.signature;
-        const signatureRevisions = signatureObj?.revisions || merged.revisions || data.revisions;
+        // CANONICAL: plan_payload.revisions[]
+        // Complete when revisions.length >= 1 AND latest revision has signature_image_data_url
+        const revisionsArray = merged.revisions || data.revisions || [];
+        const signatureObjLegacy = merged.signature || data.signature;
+        const legacySigRevisions = signatureObjLegacy?.revisions || [];
         
-        if (Array.isArray(signatureRevisions) && signatureRevisions.length > 0) {
-          // New model: check for signature_image_png, fallback to signature_png for legacy
-          result[sectionId] = signatureRevisions.some((r: any) => 
+        // Check canonical format first
+        if (Array.isArray(revisionsArray) && revisionsArray.length > 0) {
+          result[sectionId] = revisionsArray.some((r: any) => 
+            (r.signature_image_data_url && r.signature_image_data_url.trim()) ||
             (r.signature_image_png && r.signature_image_png.trim()) ||
             (r.signature_png && r.signature_png.trim())
           );
-        } else if (signatureObj?.current?.signature_png) {
+        } else if (Array.isArray(legacySigRevisions) && legacySigRevisions.length > 0) {
+          // Legacy signature.revisions format
+          result[sectionId] = legacySigRevisions.some((r: any) => 
+            (r.signature_image_png && r.signature_image_png.trim())
+          );
+        } else if (signatureObjLegacy?.current?.signature_png) {
           // Legacy .current format
-          result[sectionId] = !!(signatureObj.current.signature_png && signatureObj.current.signature_png.trim());
+          result[sectionId] = !!(signatureObjLegacy.current.signature_png.trim());
         } else {
           result[sectionId] = false;
         }
