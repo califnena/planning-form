@@ -69,15 +69,15 @@ const PLAN_TABLE_COLUMNS = new Set([
 
 // Section data keys that should be stored in plan_payload
 // CANONICAL KEYS per mandate:
-// - personal: object (Personal Information)
-// - family: object (Family Information)
+// - personal_information: object (core personal data: name, DOB, address, contact, military)
+// - about_you: object (family info: parents, children, faith, background)
 // - online_accounts: object (was 'digital')
 // - messages_to_loved_ones: { main_message: string, individual: [] }
 // - legacy: { life_story: string }
 const SECTION_DATA_KEYS = new Set([
-  // CANONICAL KEYS
-  'personal',
-  'family',
+  // CANONICAL KEYS (new schema)
+  'personal_information',
+  'about_you',
   'online_accounts',
   'messages_to_loved_ones',
   'legacy',
@@ -100,9 +100,13 @@ const SECTION_DATA_KEYS = new Set([
   'advance_directive',
   'travel',
   'preplanning',
-  'personal_profile', // backwards compat for personal
-  'about_you', // backwards compat for personal
+  'address',
   'legal',
+  
+  // Legacy keys for backwards compatibility
+  'personal', // old key, now split into personal_information + about_you
+  'personal_profile', // very old key
+  'family', // old key, now part of about_you
 ]);
 
 /**
