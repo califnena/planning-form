@@ -63,10 +63,10 @@ export const SECTION_LABELS: Record<string, string> = {
 
 /**
  * Get the route for a specific section
- * Falls back to /preplandashboard/preferences if section not found
+ * Falls back to /preplandashboard/overview (section list) if section not found
  */
 export function getSectionRoute(sectionId: string, focusField?: string): string {
-  const baseRoute = SECTION_ROUTES[sectionId] || "/preplandashboard/preferences";
+  const baseRoute = SECTION_ROUTES[sectionId] || "/preplandashboard/overview";
   
   if (focusField) {
     return `${baseRoute}?focus=${focusField}`;
