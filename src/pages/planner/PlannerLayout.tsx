@@ -42,6 +42,8 @@ interface PlanContextType {
   user: User | null;
   isPreviewMode: boolean;
   userSettings: string[] | null;
+  activePlanId: string | null;
+  refreshPlan: () => Promise<void>;
 }
 
 const PlanContext = createContext<PlanContextType | null>(null);
@@ -230,7 +232,7 @@ export default function PlannerLayout() {
     }
   };
 
-  const { plan, loading: planLoading, updatePlan, saveState } = usePlanData(user?.id || "");
+  const { plan, loading: planLoading, updatePlan, saveState, activePlanId, refreshPlan } = usePlanData(user?.id || "");
   const { hasActiveSubscription, isLoading: subscriptionLoading, isMasterAccount } = useSubscriptionStatus(user?.id);
   
   /**
@@ -493,7 +495,7 @@ export default function PlannerLayout() {
 
   return (
     <PreviewModeContext.Provider value={{ isPreviewMode, isUnlocked }}>
-      <PlanContext.Provider value={{ plan, updatePlan, saveState, user, isPreviewMode, userSettings }}>
+      <PlanContext.Provider value={{ plan, updatePlan, saveState, user, isPreviewMode, userSettings, activePlanId, refreshPlan }}>
         <div className="min-h-screen flex flex-col bg-background">
           <GlobalHeader onGenerateDocument={handleDownloadPDF} />
           
