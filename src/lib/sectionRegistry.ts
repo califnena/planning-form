@@ -8,6 +8,11 @@
  * - Completion detection keys
  * 
  * DO NOT define section lists elsewhere. Import from here.
+ * 
+ * ORDER MATCHES PDF TABLE OF CONTENTS:
+ * Checklist → Personal Info → Life Story → Medical & Care → Advance Directive
+ * → People to Notify → Funeral Wishes → Messages
+ * → Financial → Insurance → Property → Pets → Online Accounts → Signature
  */
 
 import { 
@@ -26,7 +31,8 @@ import {
   Plane,
   Laptop,
   Wallet,
-  MapPin
+  MapPin,
+  Building
 } from "lucide-react";
 
 export interface SectionDefinition {
@@ -37,16 +43,13 @@ export interface SectionDefinition {
   /** Key used in plan_payload and completion detection */
   dataKey: string;
   /** Group this section belongs to */
-  group: "top" | "preplanning" | "wishes" | "records" | "help";
+  group: "top" | "aboutyou" | "yourwishes" | "records" | "help";
   /** Whether to show completion dot in nav */
   showCompletionDot: boolean;
 }
 
 // ============= SECTION DEFINITIONS =============
-// ORDERED per specification:
-// Pre-Planning Checklist → About You → Medical & Care → Advance Directive
-// → Funeral Wishes → Insurance → Important Contacts → Property → Pets
-// → Messages → Resources → FAQs → Printable Copy
+// ORDER MATCHES PDF TABLE OF CONTENTS
 
 export const SECTION_REGISTRY: SectionDefinition[] = [
   // TOP (no completion dots)
@@ -69,23 +72,14 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     showCompletionDot: false,
   },
 
-  // PRE-PLANNING AREA (order: checklist, medical, advance directive, travel)
+  // ABOUT YOU - Personal information sections
   {
     id: "preplanning",
     label: "Pre-Planning Checklist",
     icon: ClipboardList,
     route: "/preplandashboard/checklist",
     dataKey: "preplanning",
-    group: "preplanning",
-    showCompletionDot: true,
-  },
-  {
-    id: "address",
-    label: "Address",
-    icon: MapPin,
-    route: "/preplandashboard/address",
-    dataKey: "address",
-    group: "preplanning",
+    group: "aboutyou",
     showCompletionDot: true,
   },
   {
@@ -94,7 +88,16 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     icon: User,
     route: "/preplandashboard/personal-family",
     dataKey: "personal",
-    group: "preplanning",
+    group: "aboutyou",
+    showCompletionDot: true,
+  },
+  {
+    id: "address",
+    label: "Address",
+    icon: MapPin,
+    route: "/preplandashboard/address",
+    dataKey: "address",
+    group: "aboutyou",
     showCompletionDot: true,
   },
   {
@@ -103,7 +106,7 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     icon: BookOpen,
     route: "/preplandashboard/life-story",
     dataKey: "legacy",
-    group: "preplanning",
+    group: "aboutyou",
     showCompletionDot: true,
   },
   {
@@ -112,7 +115,7 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     icon: Stethoscope,
     route: "/preplandashboard/health-care",
     dataKey: "healthcare",
-    group: "preplanning",
+    group: "aboutyou",
     showCompletionDot: true,
   },
   {
@@ -121,7 +124,18 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     icon: Heart,
     route: "/preplandashboard/advance-directive",
     dataKey: "advance_directive",
-    group: "preplanning",
+    group: "aboutyou",
+    showCompletionDot: true,
+  },
+
+  // YOUR WISHES - What you want and who to tell
+  {
+    id: "contacts",
+    label: "People to Notify",
+    icon: Users,
+    route: "/preplandashboard/contacts",
+    dataKey: "people_to_notify",
+    group: "yourwishes",
     showCompletionDot: true,
   },
   {
@@ -130,52 +144,7 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     icon: Heart,
     route: "/preplandashboard/funeral-wishes",
     dataKey: "funeral",
-    group: "wishes",
-    showCompletionDot: true,
-  },
-  {
-    id: "insurance",
-    label: "Insurance",
-    icon: Shield,
-    route: "/preplandashboard/insurance",
-    dataKey: "insurance",
-    group: "wishes",
-    showCompletionDot: true,
-  },
-  {
-    id: "contacts",
-    label: "People to Notify",
-    icon: Users,
-    route: "/preplandashboard/contacts",
-    dataKey: "people_to_notify",
-    group: "wishes",
-    showCompletionDot: true,
-  },
-  {
-    id: "financial",
-    label: "Financial Life",
-    icon: Wallet,
-    route: "/preplandashboard/financial-life",
-    dataKey: "financial",
-    group: "wishes",
-    showCompletionDot: true,
-  },
-  {
-    id: "property",
-    label: "Property & Valuables",
-    icon: HomeIcon,
-    route: "/preplandashboard/property-valuables",
-    dataKey: "property",
-    group: "wishes",
-    showCompletionDot: true,
-  },
-  {
-    id: "pets",
-    label: "Pets",
-    icon: Dog,
-    route: "/preplandashboard/pets",
-    dataKey: "pets",
-    group: "wishes",
+    group: "yourwishes",
     showCompletionDot: true,
   },
   {
@@ -184,17 +153,44 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     icon: MessageSquare,
     route: "/preplandashboard/messages",
     dataKey: "messages",
-    group: "wishes",
+    group: "yourwishes",
     showCompletionDot: true,
   },
 
-  // IMPORTANT RECORDS (travel, digital)
+  // IMPORTANT RECORDS - Assets, accounts, documents
   {
-    id: "travel",
-    label: "Travel & Away-From-Home",
-    icon: Plane,
-    route: "/preplandashboard/travel-planning",
-    dataKey: "travel",
+    id: "financial",
+    label: "Financial Life",
+    icon: Wallet,
+    route: "/preplandashboard/financial-life",
+    dataKey: "financial",
+    group: "records",
+    showCompletionDot: true,
+  },
+  {
+    id: "insurance",
+    label: "Insurance",
+    icon: Shield,
+    route: "/preplandashboard/insurance",
+    dataKey: "insurance",
+    group: "records",
+    showCompletionDot: true,
+  },
+  {
+    id: "property",
+    label: "Property & Valuables",
+    icon: Building,
+    route: "/preplandashboard/property-valuables",
+    dataKey: "property",
+    group: "records",
+    showCompletionDot: true,
+  },
+  {
+    id: "pets",
+    label: "Pets",
+    icon: Dog,
+    route: "/preplandashboard/pets",
+    dataKey: "pets",
     group: "records",
     showCompletionDot: true,
   },
@@ -207,8 +203,15 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     group: "records",
     showCompletionDot: true,
   },
-
-  // SIGNATURE (final step)
+  {
+    id: "travel",
+    label: "Travel & Away-From-Home",
+    icon: Plane,
+    route: "/preplandashboard/travel-planning",
+    dataKey: "travel",
+    group: "records",
+    showCompletionDot: true,
+  },
   {
     id: "signature",
     label: "Review & Signature",
