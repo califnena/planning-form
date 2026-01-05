@@ -62,6 +62,8 @@ const routeToSectionId: Record<string, string> = {
   "/preplandashboard/pre-planning": "preplanning",
   "/preplandashboard/health-care": "healthcare",
   "/preplandashboard/care-preferences": "carepreferences",
+  "/preplandashboard/advance-directive": "advancedirective",
+  "/preplandashboard/travel-planning": "travel",
   "/preplandashboard/personal-family": "personal",
   "/preplandashboard/life-story": "legacy",
   "/preplandashboard/funeral-wishes": "funeral",
