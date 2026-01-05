@@ -440,7 +440,7 @@ export default function PrePlanSummary() {
             Your Plan Summary
           </h1>
           <p className="text-muted-foreground mt-2 text-lg">
-            Everything you've planned, in one place.
+            Review what you've entered. You can update any section at any time.
           </p>
         </div>
 
@@ -456,12 +456,12 @@ export default function PrePlanSummary() {
               {generatingPdf ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  {isLocked ? "Creating Preview..." : "Creating Your Printable Copy..."}
+                  {isLocked ? "Creating Preview..." : "Preparing..."}
                 </>
               ) : (
                 <>
                   {isLocked ? <Lock className="h-5 w-5" /> : <Download className="h-5 w-5" />}
-                  {isLocked ? "Preview Copy" : "Printable Copy"}
+                  {isLocked ? "Preview Copy" : "Print or Save My Plan"}
                 </>
               )}
             </Button>
@@ -473,13 +473,13 @@ export default function PrePlanSummary() {
               disabled={isLocked}
             >
               <PenLine className="h-5 w-5" />
-              Sign Plan
+              Sign This Plan (Optional)
             </Button>
           </div>
           <p className="text-sm text-muted-foreground text-center">
             {isLocked 
               ? "Preview includes a watermark. Unlock to get your final copy."
-              : "You can print or save your plan anytime."
+              : "There's no deadline. Print or save whenever you're ready."
             }
           </p>
           
