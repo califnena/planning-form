@@ -1461,6 +1461,24 @@ async function generateSimplePdf(
   const legal = planData?.legal || {};
   const legalNotes = planData?.legal_notes || "";
 
+  // CANONICAL: Advance Directive data from plan_payload.advance_directive
+  const advanceDirective = planData?.advance_directive || {};
+  const hasAdvanceDirective =
+    hasText(advanceDirective.healthcare_proxy_name) ||
+    hasText(advanceDirective.healthcare_proxy_phone) ||
+    hasText(advanceDirective.advance_directive_status) ||
+    hasText(advanceDirective.advance_directive_location) ||
+    hasText(advanceDirective.dnr_status) ||
+    hasText(advanceDirective.polst_status) ||
+    hasText(advanceDirective.document_location);
+
+  console.log("[generate-planner-pdf] Advance Directive data:", {
+    has_data: hasAdvanceDirective,
+    proxy_name: advanceDirective.healthcare_proxy_name,
+    ad_status: advanceDirective.advance_directive_status,
+    dnr_status: advanceDirective.dnr_status,
+  });
+
   // Medical & Care (new section data)
   const healthcareObj = planData?.healthcare || {};
   const carePrefsObj = planData?.care_preferences || {};
@@ -1479,10 +1497,7 @@ async function generateSimplePdf(
     hasText(doctorPharmacy.pharmacyName) ||
     hasText(doctorPharmacy.pharmacyPhone) ||
     hasAny(Array.isArray(carePrefsObj.preferences) ? carePrefsObj.preferences : []) ||
-    hasText(carePrefsObj.additionalNotes) ||
-    // Some versions store these in healthcareObj
-    hasText(healthcareObj.advanceDirectiveLocation) ||
-    hasText(healthcareObj.dnrPolstLocation);
+    hasText(carePrefsObj.additionalNotes);
 
   // Check for document checkboxes
   const hasLegalDocCheckboxes = legal.has_will || legal.has_trust || legal.has_poa ||
@@ -1516,7 +1531,8 @@ async function generateSimplePdf(
     hasText(legal.attorney_name) ||
     hasText(legalNotes) ||
     hasLegalDocCheckboxes ||
-    hasMedical;
+    hasMedical ||
+    hasAdvanceDirective;
 
   const legalPage = pdfDoc.addPage([pageWidth, pageHeight]);
   addPageHeader(legalPage);
@@ -1550,8 +1566,12 @@ async function generateSimplePdf(
 
     if (poaName) legY = addField(legalPage, "Power of Attorney", poaName, legY);
     if (poaPhone) legY = addField(legalPage, "POA Phone", poaPhone, legY);
-    if (legal.healthcare_proxy) legY = addField(legalPage, "Healthcare Proxy", legal.healthcare_proxy, legY);
-    if (legal.healthcare_proxy_phone) legY = addField(legalPage, "Proxy Phone", legal.healthcare_proxy_phone, legY);
+    
+    // CANONICAL: Healthcare Proxy from advance_directive section (primary) or legal section (fallback)
+    const healthcareProxyName = advanceDirective.healthcare_proxy_name || legal.healthcare_proxy;
+    const healthcareProxyPhone = advanceDirective.healthcare_proxy_phone || legal.healthcare_proxy_phone;
+    if (healthcareProxyName) legY = addField(legalPage, "Healthcare Proxy", healthcareProxyName, legY);
+    if (healthcareProxyPhone) legY = addField(legalPage, "Proxy Phone", healthcareProxyPhone, legY);
     legY -= 10;
 
     if (willLoc) legY = addField(legalPage, "Will Location", willLoc, legY);
@@ -1564,6 +1584,44 @@ async function generateSimplePdf(
     if (legal.attorney_name) legY = addField(legalPage, "Attorney", legal.attorney_name, legY);
     if (legal.attorney_phone) legY = addField(legalPage, "Attorney Phone", legal.attorney_phone, legY);
     if (legal.attorney_firm) legY = addField(legalPage, "Law Firm", legal.attorney_firm, legY);
+
+    // Advance Directive & DNR Status (CANONICAL: from plan_payload.advance_directive)
+    if (hasAdvanceDirective) {
+      legY -= 14;
+      legalPage.drawText("Advance Directive & DNR Status:", {
+        x: margin,
+        y: legY,
+        size: 10,
+        font: helveticaBold,
+        color: textColor,
+      });
+      legY -= lineHeight;
+
+      // Map status values to readable labels
+      const statusLabel = (status: string | undefined) => {
+        if (status === "yes") return "Yes";
+        if (status === "no") return "No";
+        if (status === "unsure") return "Not sure";
+        return "";
+      };
+
+      if (advanceDirective.advance_directive_status) {
+        legY = addField(legalPage, "Has Advance Directive", statusLabel(advanceDirective.advance_directive_status), legY);
+      }
+      if (advanceDirective.advance_directive_location) {
+        legY = addField(legalPage, "Directive Location", advanceDirective.advance_directive_location, legY);
+      }
+      if (advanceDirective.dnr_status) {
+        legY = addField(legalPage, "DNR Order", statusLabel(advanceDirective.dnr_status), legY);
+      }
+      if (advanceDirective.polst_status) {
+        legY = addField(legalPage, "POLST / MOLST", statusLabel(advanceDirective.polst_status), legY);
+      }
+      if (advanceDirective.document_location) {
+        legY = addField(legalPage, "Documents Location", advanceDirective.document_location, legY);
+      }
+      legY -= 10;
+    }
 
     // Medical & Care Preferences (prints if present; keeps PDF page count unchanged)
     if (hasMedical) {

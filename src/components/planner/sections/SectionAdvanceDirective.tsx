@@ -5,14 +5,19 @@ import { Info, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
+/**
+ * CANONICAL DATA MODEL: plan_payload.advance_directive
+ * 
+ * All fields use snake_case for consistency with the rest of the app.
+ */
 export interface AdvanceDirectiveData {
-  healthcareProxyName?: string;
-  healthcareProxyPhone?: string;
-  advanceDirectiveStatus?: "yes" | "no" | "unsure";
-  advanceDirectiveLocation?: string;
-  dnrStatus?: "yes" | "no" | "unsure";
-  polstStatus?: "yes" | "no" | "unsure";
-  documentLocation?: string;
+  healthcare_proxy_name?: string;
+  healthcare_proxy_phone?: string;
+  advance_directive_status?: "yes" | "no" | "unsure";
+  advance_directive_location?: string;
+  dnr_status?: "yes" | "no" | "unsure";
+  polst_status?: "yes" | "no" | "unsure";
+  document_location?: string;
 }
 
 interface SectionAdvanceDirectiveProps {
@@ -89,8 +94,8 @@ export const SectionAdvanceDirective = ({ data = {}, onChange }: SectionAdvanceD
             <Label htmlFor="proxy-name" className="text-base">Name</Label>
             <Input
               id="proxy-name"
-              value={data.healthcareProxyName || ""}
-              onChange={(e) => updateData({ healthcareProxyName: e.target.value })}
+              value={data.healthcare_proxy_name || ""}
+              onChange={(e) => updateData({ healthcare_proxy_name: e.target.value })}
               placeholder="Full name"
               className="mt-1 text-base h-12"
             />
@@ -99,8 +104,8 @@ export const SectionAdvanceDirective = ({ data = {}, onChange }: SectionAdvanceD
             <Label htmlFor="proxy-phone" className="text-base">Phone</Label>
             <Input
               id="proxy-phone"
-              value={data.healthcareProxyPhone || ""}
-              onChange={(e) => updateData({ healthcareProxyPhone: e.target.value })}
+              value={data.healthcare_proxy_phone || ""}
+              onChange={(e) => updateData({ healthcare_proxy_phone: e.target.value })}
               placeholder="(555) 123-4567"
               className="mt-1 text-base h-12"
             />
@@ -124,15 +129,15 @@ export const SectionAdvanceDirective = ({ data = {}, onChange }: SectionAdvanceD
           Do you have an advance directive (also called a living will)?
         </p>
         
-        {renderStatusButtons("advanceDirectiveStatus", data.advanceDirectiveStatus)}
+        {renderStatusButtons("advance_directive_status", data.advance_directive_status)}
         
-        {data.advanceDirectiveStatus === "yes" && (
+        {data.advance_directive_status === "yes" && (
           <div className="mt-4">
             <Label htmlFor="ad-location" className="text-base">Where is it kept?</Label>
             <Input
               id="ad-location"
-              value={data.advanceDirectiveLocation || ""}
-              onChange={(e) => updateData({ advanceDirectiveLocation: e.target.value })}
+              value={data.advance_directive_location || ""}
+              onChange={(e) => updateData({ advance_directive_location: e.target.value })}
               placeholder="e.g., Filing cabinet, attorney's office"
               className="mt-1 text-base h-12"
             />
@@ -156,7 +161,7 @@ export const SectionAdvanceDirective = ({ data = {}, onChange }: SectionAdvanceD
           Do you have a DNR order?
         </p>
         
-        {renderStatusButtons("dnrStatus", data.dnrStatus)}
+        {renderStatusButtons("dnr_status", data.dnr_status)}
       </Card>
 
       {/* POLST Status */}
@@ -175,15 +180,15 @@ export const SectionAdvanceDirective = ({ data = {}, onChange }: SectionAdvanceD
           Do you have a POLST or MOLST form? (Physician Orders for Life-Sustaining Treatment)
         </p>
         
-        {renderStatusButtons("polstStatus", data.polstStatus)}
+        {renderStatusButtons("polst_status", data.polst_status)}
         
-        {(data.dnrStatus === "yes" || data.polstStatus === "yes") && (
+        {(data.dnr_status === "yes" || data.polst_status === "yes") && (
           <div className="mt-4">
             <Label htmlFor="doc-location" className="text-base">Where are these documents kept?</Label>
             <Input
               id="doc-location"
-              value={data.documentLocation || ""}
-              onChange={(e) => updateData({ documentLocation: e.target.value })}
+              value={data.document_location || ""}
+              onChange={(e) => updateData({ document_location: e.target.value })}
               placeholder="e.g., Refrigerator, bedside table"
               className="mt-1 text-base h-12"
             />
