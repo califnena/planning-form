@@ -494,7 +494,7 @@ async function generateSimplePdf(
     { title: "Instructions", page: 4 },
     { title: "Personal Information", page: 5 },
     { title: "My Life Story & Legacy", page: 7 },
-    { title: "Important Contacts", page: 8 },
+    { title: "People to Notify", page: 8 },
     { title: "Funeral & Memorial Wishes", page: 9 },
     { title: "Financial Life", page: 11 },
     { title: "Insurance Policies", page: 12 },
@@ -736,25 +736,25 @@ async function generateSimplePdf(
   addFooter(legacyPage, pageNum++);
 
   // ============================================================
-  // PAGE 8: Important Contacts (Family/Friends ONLY - contact_type = "person")
+  // PAGE 8: People to Notify (Family/Friends ONLY - contact_type = "person")
   // ============================================================
   const contacts1 = pdfDoc.addPage([pageWidth, pageHeight]);
   addPageHeader(contacts1);
-  let cY = addSectionHeader(contacts1, "Important Contacts", pageHeight - 100);
+  let cY = addSectionHeader(contacts1, "People to Notify", pageHeight - 100);
   
-  // Get contacts and FILTER to only include "person" type (not professional or service)
-  // This is a hard guard to prevent service/professional contacts from appearing
+  // CANONICAL: Read from people_to_notify first, then fall back to contacts
+  const rawPeopleToNotify = planData?.people_to_notify || [];
   const rawContactsList = planData?.contacts_notify || [];
-  const unifiedContacts = planData?.contacts?.contacts || [];
+  const unifiedContacts = planData?.contacts?.contacts || planData?.contacts || [];
   
-  // Merge both sources and filter to ONLY "person" type or legacy entries without contact_type
+  // Merge all sources and filter to ONLY "person" type or legacy entries without contact_type
   const EXCLUDED_CONTACT_TYPES = ["service", "professional", "service_provider"];
   const EXCLUDED_ROLES = [
     "attorney", "accountant", "financial_advisor", "insurance_agent", 
     "funeral_home", "cemetery", "church", "hospice", "medical_provider"
   ];
   
-  const allContacts = [...rawContactsList, ...unifiedContacts];
+  const allContacts = [...rawPeopleToNotify, ...rawContactsList, ...(Array.isArray(unifiedContacts) ? unifiedContacts : [])];
   const contactsList = allContacts.filter((c: any) => {
     // Exclude by contact_type
     if (c.contact_type && EXCLUDED_CONTACT_TYPES.includes(c.contact_type)) {
@@ -769,20 +769,47 @@ async function generateSimplePdf(
     return !c.contact_type || c.contact_type === "person";
   });
   
-  console.log("[generate-planner-pdf] Important Contacts (filtered to person only):", {
+  console.log("[generate-planner-pdf] People to Notify (filtered to person only):", {
+    raw_people_to_notify_count: rawPeopleToNotify.length,
     raw_contacts_count: rawContactsList.length,
-    unified_contacts_count: unifiedContacts.length,
+    unified_contacts_count: Array.isArray(unifiedContacts) ? unifiedContacts.length : 0,
     filtered_count: contactsList.length,
   });
   
+  // Render as table: Name | Relationship | Phone | Email | When to Notify
   if (hasAny(contactsList)) {
-    cY = addArrayItems(
-      contacts1,
-      contactsList,
-      (c) => [c.name, c.relationship ? `(${c.relationship})` : "", c.contact || c.phone || c.email].filter(Boolean).join(" - "),
-      cY,
-      15,
-    );
+    // Table header
+    cY -= 5;
+    contacts1.drawText("Name", { x: margin, y: cY, size: 10, font: helveticaBold, color: textColor });
+    contacts1.drawText("Relationship", { x: margin + 140, y: cY, size: 10, font: helveticaBold, color: textColor });
+    contacts1.drawText("Phone", { x: margin + 240, y: cY, size: 10, font: helveticaBold, color: textColor });
+    contacts1.drawText("Email", { x: margin + 340, y: cY, size: 10, font: helveticaBold, color: textColor });
+    cY -= lineHeight;
+    
+    // Draw a line under header
+    contacts1.drawLine({
+      start: { x: margin, y: cY + 5 },
+      end: { x: pageWidth - margin, y: cY + 5 },
+      thickness: 0.5,
+      color: rgb(0.7, 0.7, 0.7),
+    });
+    cY -= 5;
+    
+    for (const c of contactsList.slice(0, 15)) {
+      if (cY <= 80) break;
+      
+      const name = sanitizeForPdf(c.name || c.full_name || "");
+      const relationship = sanitizeForPdf(c.role_or_relationship || c.relationship || "");
+      const phone = sanitizeForPdf(c.phone || c.contact || "");
+      const email = sanitizeForPdf(c.email || "");
+      
+      contacts1.drawText(name.substring(0, 25), { x: margin, y: cY, size: 9, font: helvetica, color: textColor });
+      contacts1.drawText(relationship.substring(0, 18), { x: margin + 140, y: cY, size: 9, font: helvetica, color: textColor });
+      contacts1.drawText(phone.substring(0, 18), { x: margin + 240, y: cY, size: 9, font: helvetica, color: textColor });
+      contacts1.drawText(email.substring(0, 22), { x: margin + 340, y: cY, size: 9, font: helvetica, color: textColor });
+      
+      cY -= lineHeight;
+    }
   } else {
     cY = drawEmpty(contacts1, cY);
   }

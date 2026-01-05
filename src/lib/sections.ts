@@ -12,7 +12,7 @@ export const ALL_SECTIONS: Section[] = [
   { id: "travel", title: "Travel & Away-From-Home", description: "Planning for travel or time away from home." },
   { id: "funeral", title: "Funeral Wishes", description: "The kind of service you want, music, readings, and more." },
   { id: "insurance", title: "Insurance", description: "Life insurance, pensions, and benefits information." },
-  { id: "contacts", title: "Important Contacts", description: "People who should be contacted." },
+  { id: "contacts", title: "People to Notify", description: "People who should be contacted." },
   { id: "property", title: "Property & Valuables", description: "Homes, vehicles, and valuables." },
   { id: "pets", title: "Pets", description: "Who will care for your pets." },
   { id: "messages", title: "Messages to Loved Ones", description: "Letters and messages for family and friends." },

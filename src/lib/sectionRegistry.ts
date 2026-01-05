@@ -134,10 +134,10 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
   },
   {
     id: "contacts",
-    label: "Important Contacts",
+    label: "People to Notify",
     icon: Users,
     route: "/preplandashboard/contacts",
-    dataKey: "contacts",
+    dataKey: "people_to_notify",
     group: "wishes",
     showCompletionDot: true,
   },

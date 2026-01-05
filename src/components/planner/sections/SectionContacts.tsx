@@ -37,12 +37,12 @@ const ROLE_OPTIONS: Record<string, string[]> = {
 };
 
 /**
- * SectionContacts - Unified contacts section
+ * SectionContacts - People to Notify section
  * 
- * CANONICAL KEY: contacts (array of UnifiedContact in plan_payload)
+ * CANONICAL KEY: people_to_notify (array of UnifiedContact in plan_payload)
  */
 export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
-  const contacts: UnifiedContact[] = data.contacts || [];
+  const contacts: UnifiedContact[] = data.people_to_notify || [];
   const { toast } = useToast();
   const { t } = useTranslation();
   const { isPreviewMode } = usePreviewMode();
@@ -50,15 +50,17 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
   const updateContacts = (updated: UnifiedContact[]) => {
     onChange({
       ...data,
-      contacts: updated,
-      // Clear legacy arrays on save
+      people_to_notify: updated,
+      // Clear legacy arrays on save (migration)
+      contacts: undefined,
       contacts_professional: [],
       service_providers: [],
       importantPeople: [],
+      contacts_notify: [],
     });
     
     if (import.meta.env.DEV) {
-      console.log("[SectionContacts] Updated unified contacts:", updated.length);
+      console.log("[SectionContacts] Updated people_to_notify:", updated.length);
     }
   };
 
@@ -124,7 +126,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
 
     pdf.setFontSize(20);
     pdf.setFont("helvetica", "bold");
-    const title = "Important Contacts";
+    const title = "People to Notify";
     const titleWidth = pdf.getTextWidth(title);
     pdf.text(title, (pageWidth - titleWidth) / 2, 20);
 
@@ -145,7 +147,7 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
         yPos = 20;
       }
 
-      const typeLabel = type === "person" ? "Important Contacts - People" : type === "professional" ? "Important Contacts - Professionals" : "Important Contacts - Service Providers";
+      const typeLabel = type === "person" ? "People to Notify" : type === "professional" ? "Professional Contacts" : "Service Providers";
       pdf.setFontSize(14);
       pdf.setFont("helvetica", "bold");
       pdf.text(typeLabel, 15, yPos);
@@ -220,8 +222,8 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h2 className="text-2xl font-bold mb-2">Important Contacts</h2>
-          <p className="text-muted-foreground">Family, friends, professionals, and service providers</p>
+          <h2 className="text-2xl font-bold mb-2">People to Notify</h2>
+          <p className="text-muted-foreground">Family, friends, and others who should be contacted</p>
         </div>
         <div className="flex gap-2 flex-wrap">
           <Button onClick={handleSave} size="sm" variant="default" disabled={isPreviewMode}>

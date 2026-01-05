@@ -40,7 +40,7 @@ export const SECTION_LABELS: Record<string, string> = {
   travel: "Travel & Away-From-Home Plan",
   funeral: "Funeral Wishes",
   insurance: "Insurance",
-  contacts: "Important Contacts",
+  contacts: "People to Notify",
   property: "Property & Valuables",
   pets: "Pets",
   messages: "Messages to Loved Ones",
