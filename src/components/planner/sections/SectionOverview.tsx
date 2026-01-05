@@ -1,6 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { ArrowRight, FileText, Download, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePlanData } from "@/hooks/usePlanData";
@@ -104,34 +103,6 @@ export const SectionOverview = ({ onNavigateToSection }: SectionOverviewProps) =
           Your progress is saved automatically.
         </p>
       </div>
-
-      {/* Progress Snapshot */}
-      <Card>
-        <CardContent className="pt-6 space-y-4">
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">Completed sections</span>
-            <span className="font-medium">{completedSections} of {totalSections}</span>
-          </div>
-          
-          <Progress value={progressPercent} className="h-2" />
-          
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">Current step</span>
-            <span className="font-medium">
-              {firstIncompleteSection?.label || "All complete"}
-            </span>
-          </div>
-          
-          {lastUpdated && (
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-muted-foreground">Last updated</span>
-              <span className="font-medium">
-                {format(lastUpdated, "MMM d, yyyy 'at' h:mm a")}
-              </span>
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
       {/* Primary Action */}
       <Button 

@@ -14,7 +14,6 @@ import { generateManuallyFillablePDF } from "@/lib/manuallyFillablePdfGenerator"
 import { generateBlankAfterLifePlanPDF } from "@/lib/blankAfterLifePlanPdfGenerator";
 import { checkPaidAccess as checkPaidAccessFn, checkVIPAccess as checkVIPAccessFn, checkPrintableAccess as checkPrintableAccessFn, checkIsFreePlan as checkIsFreePlanFn } from "@/lib/accessChecks";
 import { ChecklistsSection } from "@/components/dashboard/ChecklistsSection";
-import { ResumeCard } from "@/components/dashboard/ResumeCard";
 import { MyPlanningDocumentCard } from "@/components/dashboard/MyPlanningDocumentCard";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
 import { usePlanDataStatus } from "@/hooks/usePlanDataStatus";
@@ -547,11 +546,6 @@ export default function Dashboard() {
   return (
     <AuthenticatedLayout>
       <div className="container mx-auto px-4 py-8 max-w-5xl">
-        {/* Resume Card - Shows if user has previous activity */}
-        <div className="mb-8">
-          <ResumeCard />
-        </div>
-
         {/* Page Title and Purpose - Unified "My Wishes" */}
         <div className="mb-10 text-center">
           <h1 className="text-3xl font-bold mb-3">My Wishes</h1>
