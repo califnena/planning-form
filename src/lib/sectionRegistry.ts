@@ -87,7 +87,7 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     label: "About You",
     icon: User,
     route: "/preplandashboard/personal-family",
-    dataKey: "personal",
+    dataKey: "personal_information",
     group: "aboutyou",
     showCompletionDot: true,
   },

@@ -4,8 +4,8 @@
  * SINGLE SOURCE OF TRUTH for completion status on Plan Summary.
  *
  * CANONICAL KEYS:
- * - personal: object (NOT personal_profile)
- * - family: object  
+ * - personal_information: object (core personal data: name, DOB, address, contact, military)
+ * - about_you: object (family info: parents, children, faith, background)
  * - online_accounts: object (was 'digital')
  * - messages_to_loved_ones: { main_message: string, individual: [] }
  * - legacy: { life_story: string }
@@ -87,6 +87,36 @@ export function getSectionCompletion(planData: unknown): Record<string, boolean>
         break;
         
       case "personal":
+        // CANONICAL: personal_information (core identity + address) AND about_you (family)
+        const personalInfo = merged.personal_information || data.personal_information || {};
+        const aboutYouData = merged.about_you || data.about_you || {};
+        
+        // Check personal_information for meaningful data
+        const hasPersonalInfo = !!(
+          personalInfo.full_legal_name?.trim() ||
+          personalInfo.date_of_birth?.trim() ||
+          personalInfo.phone?.trim() ||
+          personalInfo.email?.trim() ||
+          personalInfo.street_1?.trim() ||
+          personalInfo.city?.trim()
+        );
+        
+        // Check about_you for meaningful data
+        const hasParents = Array.isArray(aboutYouData.parents) && 
+          aboutYouData.parents.some((p: string) => p?.trim());
+        const hasChildren = Array.isArray(aboutYouData.children) && 
+          aboutYouData.children.some((c: string) => c?.trim());
+        const hasAboutYou = hasParents || hasChildren || 
+          !!(aboutYouData.family_notes?.trim()) ||
+          !!(aboutYouData.faith_or_religion?.trim()) ||
+          !!(aboutYouData.background_notes?.trim());
+        
+        // Fallback: check legacy 'personal' key for backwards compatibility
+        const legacyPersonal = merged.personal || data.personal || {};
+        const hasLegacyPersonal = hasMeaningfulData(legacyPersonal);
+        
+        result[sectionId] = hasPersonalInfo || hasAboutYou || hasLegacyPersonal;
+        break;
         
       case "legacy":
         // CANONICAL: legacy.life_story
