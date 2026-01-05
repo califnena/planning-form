@@ -96,11 +96,11 @@ export const SectionOverview = ({ onNavigateToSection }: SectionOverviewProps) =
 
   return (
     <div className="space-y-6 max-w-2xl">
-      {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold">Overview</h2>
-        <p className="text-sm text-muted-foreground">
-          Your progress is saved automatically.
+      {/* Page Heading */}
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold">My Planning Menu</h1>
+        <p className="text-lg text-muted-foreground">
+          Choose a section to record your wishes and important information.
         </p>
       </div>
 
