@@ -90,13 +90,13 @@ export const SidebarNav = ({
       {/* Top Navigation */}
       {topSections.map(section => renderNavButton(section))}
 
-      {/* Pre-Planning Area */}
+      {/* About You */}
       <hr className="my-4 border-border mx-4" />
-      {renderSectionGroup("Pre-Planning", "preplanning")}
+      {renderSectionGroup("About You", "aboutyou")}
 
       {/* Your Wishes */}
       <hr className="my-4 border-border mx-4" />
-      {renderSectionGroup("Your Wishes", "wishes")}
+      {renderSectionGroup("Your Wishes", "yourwishes")}
 
       {/* Important Records */}
       <hr className="my-4 border-border mx-4" />
