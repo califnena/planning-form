@@ -80,14 +80,8 @@ export const SectionOverview = ({ onNavigateToSection }: SectionOverviewProps) =
   };
 
   const handlePrintable = () => {
-    if (completedSections > 0) {
-      navigate('/preplan-summary?print=1');
-    } else {
-      toast({
-        title: "No planning data yet",
-        description: "Complete at least one section to generate a printable version.",
-      });
-    }
+    // Route to PDF Preview page - it handles print/download
+    navigate('/preplan-summary');
   };
 
   if (!userId || loading) {
