@@ -113,6 +113,17 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
 
           {/* Right: Controls */}
           <div className="flex items-center gap-1 md:gap-2">
+            {/* Home button - always visible escape hatch for seniors */}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="gap-2 text-base"
+              onClick={() => navigate("/home-senior")}
+            >
+              <span className="hidden sm:inline">Home</span>
+              <span className="sm:hidden">🏠</span>
+            </Button>
+            
             <GlobalSearch />
             
             {/* Mobile: A-/A+ buttons */}
