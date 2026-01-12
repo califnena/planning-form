@@ -18,6 +18,7 @@ import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import jsPDF from "jspdf";
 import everlastingLogo from "@/assets/everlasting-logo.png";
 import type { UnifiedContact } from "@/lib/normalizePlanPayload";
+import { StepProgress } from "@/components/planner/StepProgress";
 
 interface SectionContactsProps {
   data: any;
@@ -222,7 +223,10 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h2 className="text-2xl font-bold mb-2">People to Notify</h2>
+          <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+            <h2 className="text-2xl font-bold">People to Notify</h2>
+            <StepProgress />
+          </div>
           <p className="text-muted-foreground">Family, friends, and others who should be contacted</p>
         </div>
         <div className="flex gap-2 flex-wrap">
