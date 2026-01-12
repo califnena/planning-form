@@ -1490,31 +1490,17 @@ const Resources = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <GlobalHeader minimal />
       
-      {/* Top Action Bar - Senior Friendly */}
+      {/* Page Header - Clean and focused */}
       <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold text-foreground">Resources & Help</h1>
               <p className="text-sm text-muted-foreground">
                 Guides, checklists, and tools to help you plan ahead.
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
-              <Link to="/preplan-summary">
-                <Button size="lg" className="min-h-[48px] gap-2">
-                  <Eye className="h-5 w-5" />
-                  View My Plan
-                </Button>
-              </Link>
-              <Link to="/dashboard">
-                <Button size="lg" variant="outline" className="min-h-[48px] gap-2">
-                  <Home className="h-5 w-5" />
-                  Back to Dashboard
-                </Button>
-              </Link>
-              <TextSizeToggle />
-            </div>
+            <TextSizeToggle />
           </div>
         </div>
       </div>
