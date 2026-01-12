@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Shield } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
+import { StepProgress } from "@/components/planner/StepProgress";
 
 interface SectionAboutYouProps {
   data?: any;
@@ -31,9 +32,12 @@ export const SectionAboutYou = ({ data, onChange }: SectionAboutYouProps) => {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-semibold text-foreground mb-3">
-          About You
-        </h1>
+        <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-foreground">
+            About You
+          </h1>
+          <StepProgress />
+        </div>
         <p className="text-lg text-muted-foreground leading-relaxed">
           Basic information about you. This helps identify your plan.
         </p>

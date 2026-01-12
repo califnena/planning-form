@@ -285,6 +285,8 @@ export function getSectionNavigation(sectionId: string): {
   nextRoute: string;
   isFirst: boolean;
   isLast: boolean;
+  currentStep: number;
+  totalSteps: number;
 } {
   const navigable = getNavigableSections();
   const currentIndex = navigable.findIndex((s) => s.id === sectionId);
@@ -296,6 +298,8 @@ export function getSectionNavigation(sectionId: string): {
       nextRoute: "/preplan-summary",
       isFirst: true,
       isLast: true,
+      currentStep: 0,
+      totalSteps: navigable.length,
     };
   }
   
@@ -310,7 +314,14 @@ export function getSectionNavigation(sectionId: string): {
     ? "/preplan-summary" 
     : navigable[currentIndex + 1].route;
   
-  return { prevRoute, nextRoute, isFirst, isLast };
+  return { 
+    prevRoute, 
+    nextRoute, 
+    isFirst, 
+    isLast,
+    currentStep: currentIndex + 1,
+    totalSteps: navigable.length,
+  };
 }
 
 /**
@@ -324,8 +335,11 @@ export function getSectionNavigationByRoute(currentRoute: string): {
   isFirst: boolean;
   isLast: boolean;
   isRegistrySection: boolean;
+  currentStep: number;
+  totalSteps: number;
 } {
   const section = getSectionByRoute(currentRoute);
+  const navigable = getNavigableSections();
   
   // Non-registry route: provide safe navigation back to overview
   if (!section) {
@@ -336,6 +350,8 @@ export function getSectionNavigationByRoute(currentRoute: string): {
       isFirst: true,
       isLast: true,
       isRegistrySection: false,
+      currentStep: 0,
+      totalSteps: navigable.length,
     };
   }
   

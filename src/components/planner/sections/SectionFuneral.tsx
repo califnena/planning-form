@@ -16,6 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { WritingHelperButton } from "@/components/planner/WritingHelperButton";
+import { StepProgress } from "@/components/planner/StepProgress";
 
 interface SectionFuneralProps {
   data: any;
@@ -190,9 +191,12 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h2 className="text-2xl font-bold mb-2">{t("navigation.funeral")}</h2>
+          <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+            <h2 className="text-2xl font-bold">{t("navigation.funeral")}</h2>
+            <StepProgress />
+          </div>
           <p className="text-muted-foreground">
             {t("funeral.description")}
           </p>
