@@ -1,3 +1,15 @@
+/**
+ * ⚠️ DEPRECATED - DO NOT USE
+ * 
+ * This file is the LEGACY planner implementation.
+ * The ACTIVE planner is: src/pages/planner/PlannerLayout.tsx
+ * 
+ * All /preplansteps routes now redirect to /preplandashboard (see App.tsx).
+ * This file is kept temporarily for reference but should be deleted
+ * once migration is fully verified.
+ * 
+ * TODO: Delete this file after confirming all functionality works in PlannerLayout
+ */
 import { useState, useEffect, createContext, useContext } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
