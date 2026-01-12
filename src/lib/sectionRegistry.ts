@@ -269,6 +269,13 @@ export function getNavigableSections(): SectionDefinition[] {
 }
 
 /**
+ * Check if a route is in the registry
+ */
+export function isRegistryRoute(route: string): boolean {
+  return SECTION_REGISTRY.some((s) => s.route === route);
+}
+
+/**
  * Get the next and previous routes for a given section
  * - If first section, back goes to overview
  * - If last section, next goes to plan summary
@@ -308,6 +315,7 @@ export function getSectionNavigation(sectionId: string): {
 
 /**
  * Get navigation info by current route path
+ * If route is not in registry, returns safe defaults pointing to Overview
  */
 export function getSectionNavigationByRoute(currentRoute: string): {
   sectionId: string | null;
@@ -315,16 +323,19 @@ export function getSectionNavigationByRoute(currentRoute: string): {
   nextRoute: string;
   isFirst: boolean;
   isLast: boolean;
+  isRegistrySection: boolean;
 } {
   const section = getSectionByRoute(currentRoute);
   
+  // Non-registry route: provide safe navigation back to overview
   if (!section) {
     return {
       sectionId: null,
       prevRoute: "/preplandashboard/overview",
-      nextRoute: "/preplan-summary",
+      nextRoute: "/preplandashboard/overview",
       isFirst: true,
       isLast: true,
+      isRegistrySection: false,
     };
   }
   
@@ -332,5 +343,22 @@ export function getSectionNavigationByRoute(currentRoute: string): {
   return {
     sectionId: section.id,
     ...nav,
+    isRegistrySection: true,
   };
 }
+
+// ============= NON-REGISTRY ROUTES (AUDIT) =============
+// The following routes exist in App.tsx but are NOT in SECTION_REGISTRY.
+// Users should not navigate to these via Back/Next buttons.
+// Decision: "Remove from flow" - they can be reached via direct URL only.
+//
+// /preplandashboard/preferences - Settings page, not a section
+// /preplandashboard/pre-planning - Redundant with overview
+// /preplandashboard/health-care - Merged into care-preferences (not in registry)
+// /preplandashboard/personal-family - Merged into about-you
+// /preplandashboard/legal-docs - Not senior-focused
+// /preplandashboard/providers - Not senior-focused
+// /preplandashboard/checklist - Moved to pre-planning area (not in registry)
+// /preplandashboard/instructions - Merged elsewhere
+// /preplandashboard/legalresources - External resource link
+// /preplandashboard/willprep - Not senior-focused

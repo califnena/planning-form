@@ -17,6 +17,7 @@ interface SectionNavigationProps {
  * Provides Back/Next navigation using SECTION_REGISTRY as single source of truth.
  * - Back: goes to previous section, or Overview if first
  * - Next: goes to next section, or Plan Summary if last
+ * - Non-registry pages: both buttons go to Overview (safe fallback)
  */
 export const SectionNavigation = ({
   currentSection,
@@ -26,7 +27,7 @@ export const SectionNavigation = ({
   const location = useLocation();
   
   // Get navigation from registry based on current route
-  const { prevRoute, nextRoute, isFirst, isLast } = getSectionNavigationByRoute(location.pathname);
+  const { prevRoute, nextRoute, isFirst, isLast, isRegistrySection } = getSectionNavigationByRoute(location.pathname);
 
   const handleBack = () => {
     navigate(prevRoute);
@@ -35,6 +36,23 @@ export const SectionNavigation = ({
   const handleNext = () => {
     navigate(nextRoute);
   };
+
+  // Non-registry pages: show simplified navigation back to Overview
+  if (!isRegistrySection) {
+    return (
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t mt-8">
+        <Button 
+          onClick={() => navigate("/preplandashboard/overview")} 
+          variant="outline" 
+          size="lg" 
+          className="gap-2"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Back to Planning Menu
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t mt-8">
