@@ -233,6 +233,11 @@ export function getSectionById(id: string): SectionDefinition | undefined {
   return SECTION_REGISTRY.find((s) => s.id === id);
 }
 
+/** Get section by route */
+export function getSectionByRoute(route: string): SectionDefinition | undefined {
+  return SECTION_REGISTRY.find((s) => s.route === route);
+}
+
 /** Get route for a section */
 export function getSectionRoute(sectionId: string): string {
   const section = getSectionById(sectionId);
@@ -249,4 +254,83 @@ export function getSectionLabel(sectionId: string): string {
 export function getSectionDataKey(sectionId: string): string {
   const section = getSectionById(sectionId);
   return section?.dataKey || sectionId;
+}
+
+// ============= NAVIGATION HELPERS =============
+
+/**
+ * Get the navigable sections in order (excludes top nav items like home/plansummary and help items)
+ * This is the SINGLE SOURCE OF TRUTH for section navigation order
+ */
+export function getNavigableSections(): SectionDefinition[] {
+  return SECTION_REGISTRY.filter(
+    (s) => s.group !== "top" && s.group !== "help" && s.showCompletionDot
+  );
+}
+
+/**
+ * Get the next and previous routes for a given section
+ * - If first section, back goes to overview
+ * - If last section, next goes to plan summary
+ */
+export function getSectionNavigation(sectionId: string): {
+  prevRoute: string;
+  nextRoute: string;
+  isFirst: boolean;
+  isLast: boolean;
+} {
+  const navigable = getNavigableSections();
+  const currentIndex = navigable.findIndex((s) => s.id === sectionId);
+  
+  // Default fallback if section not found
+  if (currentIndex === -1) {
+    return {
+      prevRoute: "/preplandashboard/overview",
+      nextRoute: "/preplan-summary",
+      isFirst: true,
+      isLast: true,
+    };
+  }
+  
+  const isFirst = currentIndex === 0;
+  const isLast = currentIndex === navigable.length - 1;
+  
+  const prevRoute = isFirst 
+    ? "/preplandashboard/overview" 
+    : navigable[currentIndex - 1].route;
+    
+  const nextRoute = isLast 
+    ? "/preplan-summary" 
+    : navigable[currentIndex + 1].route;
+  
+  return { prevRoute, nextRoute, isFirst, isLast };
+}
+
+/**
+ * Get navigation info by current route path
+ */
+export function getSectionNavigationByRoute(currentRoute: string): {
+  sectionId: string | null;
+  prevRoute: string;
+  nextRoute: string;
+  isFirst: boolean;
+  isLast: boolean;
+} {
+  const section = getSectionByRoute(currentRoute);
+  
+  if (!section) {
+    return {
+      sectionId: null,
+      prevRoute: "/preplandashboard/overview",
+      nextRoute: "/preplan-summary",
+      isFirst: true,
+      isLast: true,
+    };
+  }
+  
+  const nav = getSectionNavigation(section.id);
+  return {
+    sectionId: section.id,
+    ...nav,
+  };
 }

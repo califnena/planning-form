@@ -3,11 +3,18 @@ import { SectionSignature } from "@/components/planner/sections/SectionSignature
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { useNavigate } from "react-router-dom";
 
+/**
+ * SignaturePage
+ * 
+ * CANONICAL KEY: signature / revisions
+ * Plan review and optional signature
+ * 
+ * SECTION_ID: signature
+ * Navigation is handled by SectionNavigation using SECTION_REGISTRY
+ */
 export default function SignaturePage() {
   const { plan, updatePlan, saveState } = usePlanContext();
-  const navigate = useNavigate();
 
   return (
     <div>
@@ -21,13 +28,7 @@ export default function SignaturePage() {
       <PreviewModeWrapper>
         <SectionSignature data={plan} onChange={(data) => updatePlan(data)} />
       </PreviewModeWrapper>
-      <SectionNavigation
-        currentSection="signature"
-        onNext={() => navigate("/preplan-summary")}
-        onGenerateDocument={() => navigate("/preplan-summary")}
-        isLastSection={true}
-        onSave={() => {}}
-      />
+      <SectionNavigation currentSection="signature" />
     </div>
   );
 }

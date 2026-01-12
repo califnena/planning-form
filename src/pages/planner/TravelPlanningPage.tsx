@@ -3,12 +3,19 @@ import { SectionTravelPlanning } from "@/components/planner/sections/SectionTrav
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
+/**
+ * TravelPlanningPage
+ * 
+ * CANONICAL KEY: travel
+ * Travel and away-from-home planning
+ * 
+ * SECTION_ID: travel
+ * Navigation is handled by SectionNavigation using SECTION_REGISTRY
+ */
 export default function TravelPlanningPage() {
   const { user, plan, updatePlan, saveState } = usePlanContext();
-  const navigate = useNavigate();
 
   // Read from DB-backed plan_payload (single source of truth)
   const travelData = plan.travel || {};
@@ -35,10 +42,6 @@ export default function TravelPlanningPage() {
     updatePlan({ travel: data });
   };
 
-  const handleNext = () => {
-    navigate("/preplandashboard/funeral-wishes");
-  };
-
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -51,13 +54,7 @@ export default function TravelPlanningPage() {
       <PreviewModeWrapper>
         <SectionTravelPlanning data={travelData} onChange={handleChange} />
       </PreviewModeWrapper>
-      <SectionNavigation
-        currentSection="travel-planning"
-        onNext={handleNext}
-        onGenerateDocument={() => navigate("/preplan-summary")}
-        isLastSection={false}
-        onSave={() => {}}
-      />
+      <SectionNavigation currentSection="travel" />
     </div>
   );
 }

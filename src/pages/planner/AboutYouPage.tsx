@@ -3,21 +3,18 @@ import { SectionAboutYouNew } from "@/components/planner/sections/SectionAboutYo
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { useNavigate } from "react-router-dom";
 
 /**
  * AboutYouPage
  * 
  * CANONICAL KEY: about_you
  * Family info: parents, children, faith, background
+ * 
+ * SECTION_ID: about_you
+ * Navigation is handled by SectionNavigation using SECTION_REGISTRY
  */
 export default function AboutYouPage() {
   const { plan, updatePlan, saveState } = usePlanContext();
-  const navigate = useNavigate();
-
-  const handleNext = () => {
-    navigate("/preplandashboard/life-story");
-  };
 
   return (
     <div>
@@ -31,13 +28,7 @@ export default function AboutYouPage() {
       <PreviewModeWrapper>
         <SectionAboutYouNew data={plan} onChange={updatePlan} />
       </PreviewModeWrapper>
-      <SectionNavigation
-        currentSection="about_you"
-        onNext={handleNext}
-        onGenerateDocument={() => navigate("/preplan-summary")}
-        isLastSection={false}
-        onSave={() => {}}
-      />
+      <SectionNavigation currentSection="about_you" />
     </div>
   );
 }

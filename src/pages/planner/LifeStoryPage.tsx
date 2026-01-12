@@ -3,15 +3,18 @@ import { SectionLegacy } from "@/components/planner/sections/SectionLegacy";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { useNavigate } from "react-router-dom";
 
+/**
+ * LifeStoryPage
+ * 
+ * CANONICAL KEY: legacy
+ * Life story and legacy information
+ * 
+ * SECTION_ID: legacy
+ * Navigation is handled by SectionNavigation using SECTION_REGISTRY
+ */
 export default function LifeStoryPage() {
   const { plan, updatePlan, saveState } = usePlanContext();
-  const navigate = useNavigate();
-
-  const handleNext = () => {
-    navigate("/preplandashboard/funeral-wishes");
-  };
 
   return (
     <div>
@@ -28,13 +31,7 @@ export default function LifeStoryPage() {
           onChange={(data) => updatePlan(data)}
         />
       </PreviewModeWrapper>
-      <SectionNavigation
-        currentSection="legacy"
-        onNext={handleNext}
-        onGenerateDocument={() => navigate("/preplan-summary")}
-        isLastSection={false}
-        onSave={() => {}}
-      />
+      <SectionNavigation currentSection="legacy" />
     </div>
   );
 }

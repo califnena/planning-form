@@ -3,15 +3,18 @@ import { SectionFuneral } from "@/components/planner/sections/SectionFuneral";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { useNavigate } from "react-router-dom";
 
+/**
+ * FuneralWishesPage
+ * 
+ * CANONICAL KEY: funeral
+ * Funeral wishes and preferences
+ * 
+ * SECTION_ID: funeral
+ * Navigation is handled by SectionNavigation using SECTION_REGISTRY
+ */
 export default function FuneralWishesPage() {
   const { plan, updatePlan, saveState } = usePlanContext();
-  const navigate = useNavigate();
-
-  const handleNext = () => {
-    navigate("/preplandashboard/financial-life");
-  };
 
   return (
     <div>
@@ -25,13 +28,7 @@ export default function FuneralWishesPage() {
       <PreviewModeWrapper>
         <SectionFuneral data={plan} onChange={(data) => updatePlan(data)} />
       </PreviewModeWrapper>
-      <SectionNavigation
-        currentSection="funeral"
-        onNext={handleNext}
-        onGenerateDocument={() => navigate("/preplan-summary")}
-        isLastSection={false}
-        onSave={() => {}}
-      />
+      <SectionNavigation currentSection="funeral" />
     </div>
   );
 }

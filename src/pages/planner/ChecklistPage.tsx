@@ -3,15 +3,16 @@ import { SectionChecklist } from "@/components/planner/sections/SectionChecklist
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { useNavigate } from "react-router-dom";
 
+/**
+ * ChecklistPage
+ * 
+ * Pre-planning checklist section
+ * 
+ * Navigation is handled by SectionNavigation using SECTION_REGISTRY
+ */
 export default function ChecklistPage() {
   const { plan, updatePlan, saveState } = usePlanContext();
-  const navigate = useNavigate();
-
-  const handleNext = () => {
-    navigate("/preplandashboard/instructions");
-  };
 
   return (
     <div>
@@ -25,13 +26,7 @@ export default function ChecklistPage() {
       <PreviewModeWrapper>
         <SectionChecklist data={plan} onChange={(data) => updatePlan(data)} />
       </PreviewModeWrapper>
-      <SectionNavigation
-        currentSection="checklist"
-        onNext={handleNext}
-        onGenerateDocument={() => navigate("/preplan-summary")}
-        isLastSection={false}
-        onSave={() => {}}
-      />
+      <SectionNavigation currentSection="checklist" />
     </div>
   );
 }

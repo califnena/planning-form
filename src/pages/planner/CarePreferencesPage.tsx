@@ -3,12 +3,18 @@ import { SectionCarePreferences } from "@/components/planner/sections/SectionCar
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
+/**
+ * CarePreferencesPage
+ * 
+ * CANONICAL KEY: care_preferences
+ * Care and comfort preferences
+ * 
+ * Navigation is handled by SectionNavigation using SECTION_REGISTRY
+ */
 export default function CarePreferencesPage() {
   const { user, plan, updatePlan, saveState } = usePlanContext();
-  const navigate = useNavigate();
 
   const carePreferencesData = plan.care_preferences || {};
 
@@ -34,10 +40,6 @@ export default function CarePreferencesPage() {
     updatePlan({ care_preferences: data });
   };
 
-  const handleNext = () => {
-    navigate("/preplandashboard/insurance");
-  };
-
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -50,13 +52,7 @@ export default function CarePreferencesPage() {
       <PreviewModeWrapper>
         <SectionCarePreferences data={carePreferencesData} onChange={handleChange} />
       </PreviewModeWrapper>
-      <SectionNavigation
-        currentSection="care-preferences"
-        onNext={handleNext}
-        onGenerateDocument={() => navigate("/preplan-summary")}
-        isLastSection={false}
-        onSave={() => {}}
-      />
+      <SectionNavigation currentSection="care-preferences" />
     </div>
   );
 }

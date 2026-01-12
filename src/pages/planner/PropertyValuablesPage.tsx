@@ -3,15 +3,18 @@ import { SectionProperty } from "@/components/planner/sections/SectionProperty";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { useNavigate } from "react-router-dom";
 
+/**
+ * PropertyValuablesPage
+ * 
+ * CANONICAL KEY: property
+ * Property and valuables information
+ * 
+ * SECTION_ID: property
+ * Navigation is handled by SectionNavigation using SECTION_REGISTRY
+ */
 export default function PropertyValuablesPage() {
   const { plan, updatePlan, saveState } = usePlanContext();
-  const navigate = useNavigate();
-
-  const handleNext = () => {
-    navigate("/preplandashboard/pets");
-  };
 
   return (
     <div>
@@ -25,13 +28,7 @@ export default function PropertyValuablesPage() {
       <PreviewModeWrapper>
         <SectionProperty data={plan} onChange={(data) => updatePlan(data)} />
       </PreviewModeWrapper>
-      <SectionNavigation
-        currentSection="property"
-        onNext={handleNext}
-        onGenerateDocument={() => navigate("/preplan-summary")}
-        isLastSection={false}
-        onSave={() => {}}
-      />
+      <SectionNavigation currentSection="property" />
     </div>
   );
 }
