@@ -7,7 +7,8 @@ import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-
+import { getSectionsByGroup, type SectionDefinition } from "@/lib/sectionRegistry";
+import { cn } from "@/lib/utils";
 interface SectionOverviewProps {
   onNavigateToChecklist?: () => void;
   onNavigateToSection?: (sectionId: string) => void;
@@ -134,6 +135,33 @@ export const SectionOverview = ({ onNavigateToSection }: SectionOverviewProps) =
         </Button>
       </div>
 
+      {/* Section Tiles with Icons */}
+      <div className="space-y-6 pt-4">
+        {/* About You Group */}
+        <SectionGroup 
+          title="About You" 
+          group="aboutyou" 
+          navigate={navigate}
+          accentClass="bg-[hsl(var(--section-aboutyou))] border-l-4 border-l-[hsl(var(--section-aboutyou-border))]"
+        />
+        
+        {/* Your Wishes Group */}
+        <SectionGroup 
+          title="Your Wishes" 
+          group="yourwishes" 
+          navigate={navigate}
+          accentClass="bg-[hsl(var(--section-yourwishes))] border-l-4 border-l-[hsl(var(--section-yourwishes-border))]"
+        />
+        
+        {/* Important Records Group */}
+        <SectionGroup 
+          title="Important Records" 
+          group="records" 
+          navigate={navigate}
+          accentClass="bg-[hsl(var(--section-records))] border-l-4 border-l-[hsl(var(--section-records-border))]"
+        />
+      </div>
+
       {/* Help Link */}
       <div className="pt-4 text-center">
         <button 
@@ -143,6 +171,47 @@ export const SectionOverview = ({ onNavigateToSection }: SectionOverviewProps) =
           <Heart className="h-3.5 w-3.5" />
           Need help? Compassionate Guidance
         </button>
+      </div>
+    </div>
+  );
+};
+
+// Section Group component with tiles
+interface SectionGroupProps {
+  title: string;
+  group: SectionDefinition["group"];
+  navigate: (path: string) => void;
+  accentClass: string;
+}
+
+const SectionGroup = ({ title, group, navigate, accentClass }: SectionGroupProps) => {
+  const sections = getSectionsByGroup(group);
+  if (sections.length === 0) return null;
+
+  return (
+    <div className={cn("rounded-lg p-4", accentClass)}>
+      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+        {title}
+      </h3>
+      <div className="grid gap-2">
+        {sections.map((section) => {
+          const Icon = section.icon;
+          return (
+            <button
+              key={section.id}
+              onClick={() => navigate(section.route)}
+              className={cn(
+                "w-full flex items-center gap-3 px-4 py-3 text-base rounded-lg transition-all duration-200 text-left",
+                "bg-background/80 hover:bg-background border border-border/50 hover:border-border",
+                "text-foreground"
+              )}
+            >
+              <Icon className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
+              <span className="flex-1">{section.label}</span>
+              <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+          );
+        })}
       </div>
     </div>
   );
