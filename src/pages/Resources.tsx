@@ -1519,22 +1519,19 @@ const Resources = () => {
         </div>
       </div>
       
-      {/* Quick Access Cards */}
-      <div className="bg-background border-b border-border py-6">
+      {/* Quick Access Cards - De-emphasized to reduce duplication with sidebar */}
+      <div className="bg-background border-b border-border py-4">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-lg font-semibold mb-4">Quick Access</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <p className="text-sm text-muted-foreground mb-3">Jump to a section:</p>
+          <div className="flex flex-wrap gap-2">
             {quickAccessCards.map((card) => (
               <button
                 key={card.title}
                 onClick={card.onClick}
-                className="flex flex-col items-center text-center p-4 rounded-xl bg-card border border-border hover:border-primary/50 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                <div className={cn("w-12 h-12 rounded-lg flex items-center justify-center mb-3", card.color)}>
-                  <card.icon className="h-6 w-6" />
-                </div>
-                <p className="font-medium text-foreground text-sm">{card.title}</p>
-                <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
+                <card.icon className="h-4 w-4" />
+                <span className="font-normal">{card.title}</span>
               </button>
             ))}
           </div>
