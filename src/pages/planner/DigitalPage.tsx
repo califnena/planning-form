@@ -4,15 +4,18 @@ import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
 import { ClearSectionButton } from "@/components/planner/ClearSectionButton";
-import { useNavigate } from "react-router-dom";
 
+/**
+ * DigitalPage
+ * 
+ * CANONICAL KEY: digital / online_accounts
+ * Online accounts and digital assets
+ * 
+ * SECTION_ID: digital
+ * Navigation is handled by SectionNavigation using SECTION_REGISTRY
+ */
 export default function DigitalPage() {
   const { plan, updatePlan, saveState, activePlanId, refreshPlan } = usePlanContext();
-  const navigate = useNavigate();
-
-  const handleNext = () => {
-    navigate("/preplandashboard/legal-docs");
-  };
 
   // Handle data changes - writes to plan_payload.online_accounts
   const handleChange = (updatedData: Record<string, any>) => {
@@ -40,13 +43,7 @@ export default function DigitalPage() {
           onChange={handleChange} 
         />
       </PreviewModeWrapper>
-      <SectionNavigation
-        currentSection="digital"
-        onNext={handleNext}
-        onGenerateDocument={() => navigate("/preplan-summary")}
-        isLastSection={false}
-        onSave={() => {}}
-      />
+      <SectionNavigation currentSection="digital" />
     </div>
   );
 }

@@ -3,11 +3,18 @@ import { SectionMessages } from "@/components/planner/sections/SectionMessages";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { useNavigate } from "react-router-dom";
 
+/**
+ * MessagesPage
+ * 
+ * CANONICAL KEY: messages
+ * Messages to loved ones
+ * 
+ * SECTION_ID: messages
+ * Navigation is handled by SectionNavigation using SECTION_REGISTRY
+ */
 export default function MessagesPage() {
   const { plan, updatePlan, saveState } = usePlanContext();
-  const navigate = useNavigate();
 
   return (
     <div>
@@ -21,13 +28,7 @@ export default function MessagesPage() {
       <PreviewModeWrapper>
         <SectionMessages data={plan} onChange={(data) => updatePlan(data)} />
       </PreviewModeWrapper>
-      <SectionNavigation
-        currentSection="messages"
-        onNext={() => navigate("/preplan-summary")}
-        onGenerateDocument={() => navigate("/preplan-summary")}
-        isLastSection={true}
-        onSave={() => {}}
-      />
+      <SectionNavigation currentSection="messages" />
     </div>
   );
 }

@@ -717,9 +717,6 @@ const PlannerApp = () => {
         {showNavigation && (
           <SectionNavigation
             currentSection={activeSection}
-            onNext={handleNextSection}
-            onGenerateDocument={handleDownloadPDF}
-            isLastSection={isLastSection}
             onSave={handleManualSave}
           />
         )}

@@ -4,7 +4,6 @@ import { SectionAboutYouNew } from "@/components/planner/sections/SectionAboutYo
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Users } from "lucide-react";
 
@@ -14,14 +13,11 @@ import { User, Users } from "lucide-react";
  * Displays two sections in tabs:
  * 1. Personal Information (personal_information) - core identity, address, contact
  * 2. About You (about_you) - family info, faith, background
+ * 
+ * Navigation is handled by SectionNavigation using SECTION_REGISTRY
  */
 export default function PersonalFamilyPage() {
   const { plan, updatePlan, saveState } = usePlanContext();
-  const navigate = useNavigate();
-
-  const handleNext = () => {
-    navigate("/preplandashboard/address");
-  };
 
   return (
     <div>
@@ -58,13 +54,7 @@ export default function PersonalFamilyPage() {
         </TabsContent>
       </Tabs>
       
-      <SectionNavigation
-        currentSection="personal"
-        onNext={handleNext}
-        onGenerateDocument={() => navigate("/preplan-summary")}
-        isLastSection={false}
-        onSave={() => {}}
-      />
+      <SectionNavigation currentSection="personal" />
     </div>
   );
 }

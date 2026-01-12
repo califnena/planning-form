@@ -3,15 +3,18 @@ import { SectionFinancial } from "@/components/planner/sections/SectionFinancial
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { useNavigate } from "react-router-dom";
 
+/**
+ * FinancialLifePage
+ * 
+ * CANONICAL KEY: financial
+ * Financial accounts and information
+ * 
+ * SECTION_ID: financial
+ * Navigation is handled by SectionNavigation using SECTION_REGISTRY
+ */
 export default function FinancialLifePage() {
   const { plan, updatePlan, saveState } = usePlanContext();
-  const navigate = useNavigate();
-
-  const handleNext = () => {
-    navigate("/preplandashboard/insurance");
-  };
 
   return (
     <div>
@@ -25,13 +28,7 @@ export default function FinancialLifePage() {
       <PreviewModeWrapper>
         <SectionFinancial data={plan} onChange={(data) => updatePlan(data)} />
       </PreviewModeWrapper>
-      <SectionNavigation
-        currentSection="financial"
-        onNext={handleNext}
-        onGenerateDocument={() => navigate("/preplan-summary")}
-        isLastSection={false}
-        onSave={() => {}}
-      />
+      <SectionNavigation currentSection="financial" />
     </div>
   );
 }

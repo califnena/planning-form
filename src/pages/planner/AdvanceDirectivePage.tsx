@@ -3,19 +3,21 @@ import { SectionAdvanceDirective, AdvanceDirectiveData } from "@/components/plan
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
-import { useNavigate } from "react-router-dom";
 
 /**
+ * AdvanceDirectivePage
+ * 
  * CANONICAL STORAGE: plan_payload.advance_directive
  * 
  * Rules:
  * - NO localStorage
  * - NO duplicate keys
  * - All reads/writes go through plan.advance_directive
+ * 
+ * Navigation is handled by SectionNavigation using SECTION_REGISTRY
  */
 export default function AdvanceDirectivePage() {
   const { plan, updatePlan, saveState } = usePlanContext();
-  const navigate = useNavigate();
 
   // Read ONLY from plan.advance_directive (canonical path)
   const advanceDirectiveData: Partial<AdvanceDirectiveData> = plan.advance_directive || {};
@@ -23,10 +25,6 @@ export default function AdvanceDirectivePage() {
   const handleChange = (data: AdvanceDirectiveData) => {
     // Write ONLY to advance_directive in plan_payload
     updatePlan({ advance_directive: data });
-  };
-
-  const handleNext = () => {
-    navigate("/preplandashboard/travel-planning");
   };
 
   return (
@@ -41,13 +39,7 @@ export default function AdvanceDirectivePage() {
       <PreviewModeWrapper>
         <SectionAdvanceDirective data={advanceDirectiveData} onChange={handleChange} />
       </PreviewModeWrapper>
-      <SectionNavigation
-        currentSection="advance-directive"
-        onNext={handleNext}
-        onGenerateDocument={() => navigate("/preplan-summary")}
-        isLastSection={false}
-        onSave={() => {}}
-      />
+      <SectionNavigation currentSection="advance-directive" />
     </div>
   );
 }
