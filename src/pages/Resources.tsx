@@ -1,3 +1,57 @@
+/**
+ * RESOURCES PAGE AUDIT - 2026-01-12
+ * 
+ * === ISSUES FOUND ===
+ * 
+ * 1. UNREACHABLE FUNCTION: renderPlanningGuides() (lines ~264-376)
+ *    - This function is defined but never called in renderContent() switch statement
+ *    - The 'planning-guides' case does not exist in the switch (line 72-88)
+ *    - Contains duplicate content with renderChecklists() - both have Pre-Planning Guide
+ *    - DUPLICATE: Pre-Planning Guide appears in both renderPlanningGuides() and renderEducation()
+ * 
+ * 2. MISSING SIDEBAR SECTION: 'planning-guides'
+ *    - ResourcesSidebar defines sections but 'planning-guides' is NOT in the list
+ *    - The switch default falls back to renderEducation() instead
+ * 
+ * 3. REDUNDANT/DUPLICATE CONTENT:
+ *    - renderEducation() has standalone educational cards (Legal & Medical, Funeral Planning, etc.)
+ *    - renderPlanningGuides() has PDF embeds for guides (but is never rendered)
+ *    - Some PDF guides appear in multiple sections:
+ *      * "Pre-Planning Guide" - appears in unreachable renderPlanningGuides()
+ *      * "Everlasting-Funeral-Advisors-Guide.pdf" - appears in renderPlanningGuides() as "After-Death Planner"
+ *      * "EFA-Pre-Planning-Checklist.pdf" - appears in both renderChecklists() AND renderFormsWorksheets()
+ *      * "EFA-After-Death-Planner-and-Checklist.pdf" - appears in both renderChecklists() AND renderFormsWorksheets()
+ * 
+ * 4. COMING SOON ITEMS (no content):
+ *    - "Personal Information Summary" form (line ~714) - isComingSoon: true
+ *    - "Emergency Contacts Sheet" form (line ~720) - isComingSoon: true
+ *    - "Decision Helper" tool (line ~579) - disabled button
+ * 
+ * 5. ROUTE POTENTIAL ISSUES:
+ *    - Link to "/resources/cost-estimator" (line 59, 504) - verify this route exists in App.tsx
+ *    - Link to "/forms" (line 554, 776) - verify this route exists
+ *    - Link to "/guide" (line 45) - verify this route exists
+ *    - Link to "/travel-protection" (line 250) - verify this route exists
+ *    - Link to "/care-support" (line 1132) - verify this route exists
+ * 
+ * 6. SIDEBAR MISMATCH WITH CONTENT:
+ *    - Sidebar has 'education' section but default content (line 86) returns renderEducation() 
+ *      with 'planning-guides' defaulted to, causing confusion
+ *    - Initial state (line 22) defaults to 'planning-guides' but that's not a valid section
+ * 
+ * 7. MISSING FAQs SECTION IN SWITCH:
+ *    - renderFAQs() function exists (line ~790) but no case for it in switch statement
+ *    - Sidebar does not have a 'faqs' section entry
+ * 
+ * === RECOMMENDATIONS ===
+ * - Remove or integrate renderPlanningGuides() - it's dead code
+ * - Add 'planning-guides' to sidebar OR change default state to valid section
+ * - Deduplicate PDF references across sections
+ * - Either complete "Coming Soon" items or remove them
+ * - Verify all internal routes exist
+ * - Add FAQs to sidebar or remove renderFAQs() function
+ */
+
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
