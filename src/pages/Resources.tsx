@@ -894,9 +894,14 @@ const Resources = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full min-h-[48px]" disabled>
-              Coming Soon
-            </Button>
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                We're still working on this section. It will be available soon.
+              </p>
+              <Button variant="outline" className="w-full min-h-[48px]" disabled>
+                Coming Soon
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -948,9 +953,14 @@ const Resources = () => {
         </CardHeader>
         <CardContent>
           {isComingSoon ? (
-            <Button variant="outline" className="w-full min-h-[48px]" disabled>
-              Coming Soon
-            </Button>
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                We're still working on this section. It will be available soon.
+              </p>
+              <Button variant="outline" className="w-full min-h-[48px]" disabled>
+                Coming Soon
+              </Button>
+            </div>
           ) : (
             <>
               <a 
