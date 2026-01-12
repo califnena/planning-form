@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom';
+import { useState, useMemo } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { TextSizeToggle } from '@/components/TextSizeToggle';
-import { ArrowLeft, Download, ExternalLink, FileText } from 'lucide-react';
+import { ArrowLeft, Download, ExternalLink, FileText, Search, X } from 'lucide-react';
 import { BackNavigation } from '@/components/BackNavigation';
 import {
   Accordion,
@@ -11,6 +12,9 @@ import {
 } from '@/components/ui/accordion';
 
 const FAQ = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   // Required senior-friendly questions (always shown first)
   const requiredQuestions = [
     {
@@ -528,6 +532,36 @@ const FAQ = () => {
     }
   ];
 
+  // Filter questions based on search query
+  const filteredRequiredQuestions = useMemo(() => {
+    if (!searchQuery.trim()) return requiredQuestions;
+    const query = searchQuery.toLowerCase();
+    return requiredQuestions.filter(qa => 
+      qa.q.toLowerCase().includes(query) || 
+      (typeof qa.a === 'string' && qa.a.toLowerCase().includes(query))
+    );
+  }, [searchQuery]);
+
+  const filteredSections = useMemo(() => {
+    if (!searchQuery.trim()) return faqSections;
+    const query = searchQuery.toLowerCase();
+    return faqSections.map(section => ({
+      ...section,
+      questions: section.questions.filter(qa => 
+        qa.q.toLowerCase().includes(query) || 
+        (typeof qa.a === 'string' && qa.a.toLowerCase().includes(query))
+      )
+    })).filter(section => section.questions.length > 0);
+  }, [searchQuery]);
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setSearchParams({});
+  };
+
+  const totalResults = filteredRequiredQuestions.length + 
+    filteredSections.reduce((acc, section) => acc + section.questions.length, 0);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
@@ -539,78 +573,58 @@ const FAQ = () => {
         <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
           Frequently Asked Questions
         </h1>
-        <p className="text-base md:text-lg text-muted-foreground mb-8">
+        <p className="text-base md:text-lg text-muted-foreground mb-6">
           Answers to the questions families ask most often, in plain language.
         </p>
 
-        {/* Essential Questions Section - Required senior-friendly questions */}
-        <div className="mb-10">
-          <div className="bg-primary/5 border-2 border-primary/20 rounded-xl p-6 md:p-8">
-            <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
-              <span className="text-2xl" aria-hidden="true">❓</span>
-              Essential Questions
-            </h2>
-            <p className="text-base text-muted-foreground mb-6">
-              The most important things to know before you start.
-            </p>
-            
-            <Accordion type="single" collapsible className="w-full">
-              {requiredQuestions.map((qa, qIndex) => (
-                <AccordionItem 
-                  key={qIndex} 
-                  value={`required-q-${qIndex}`}
-                  className="border-b last:border-b-0"
-                >
-                  <AccordionTrigger className="text-left text-base md:text-lg font-semibold text-foreground py-4 hover:no-underline">
-                    {qa.q}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-base text-muted-foreground pb-4 leading-relaxed">
-                    {qa.a}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+        {/* Search Input */}
+        <div className="mb-8">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search questions..."
+              className="w-full pl-10 pr-10 py-3 rounded-lg border border-border bg-background text-foreground text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              maxLength={100}
+            />
+            {searchQuery && (
+              <button
+                onClick={handleClearSearch}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted"
+                aria-label="Clear search"
+              >
+                <X className="h-4 w-4 text-muted-foreground" />
+              </button>
+            )}
           </div>
+          {searchQuery && (
+            <p className="text-sm text-muted-foreground mt-2">
+              {totalResults === 0 
+                ? 'No questions found. Try a different search term.' 
+                : `Found ${totalResults} question${totalResults === 1 ? '' : 's'} matching "${searchQuery}"`}
+            </p>
+          )}
         </div>
 
-        {/* View All FAQs Section */}
-        <div className="mb-8">
-          <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6">
-            All Frequently Asked Questions
-          </h2>
-          <p className="text-base text-muted-foreground mb-6">
-            Browse all questions by topic, or scroll through the full list.
-          </p>
-        </div>
-        
-        <div className="space-y-6">
-          {faqSections.map((section, sectionIndex) => (
-            <div key={sectionIndex} className="bg-card border border-border rounded-xl shadow-sm p-5 md:p-6">
-              <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2 flex items-center gap-3">
-                <span className="text-2xl" aria-hidden="true">{section.icon}</span>
-                {section.title}
+        {/* Essential Questions Section - Required senior-friendly questions */}
+        {filteredRequiredQuestions.length > 0 && (
+          <div className="mb-10">
+            <div className="bg-primary/5 border-2 border-primary/20 rounded-xl p-6 md:p-8">
+              <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
+                <span className="text-2xl" aria-hidden="true">❓</span>
+                Essential Questions
               </h2>
-              
-              {section.description && (
-                <p className="text-sm text-muted-foreground mb-2">{section.description}</p>
-              )}
-              
-              {section.source && (
-                <a 
-                  href={section.source} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-xs text-primary hover:underline inline-flex items-center gap-1 mb-4"
-                >
-                  Source: FTC Consumer Guidance <ExternalLink className="h-3 w-3" />
-                </a>
-              )}
+              <p className="text-base text-muted-foreground mb-6">
+                The most important things to know before you start.
+              </p>
               
               <Accordion type="single" collapsible className="w-full">
-                {section.questions.map((qa, qIndex) => (
+                {filteredRequiredQuestions.map((qa, qIndex) => (
                   <AccordionItem 
                     key={qIndex} 
-                    value={`section-${sectionIndex}-q-${qIndex}`}
+                    value={`required-q-${qIndex}`}
                     className="border-b last:border-b-0"
                   >
                     <AccordionTrigger className="text-left text-base md:text-lg font-semibold text-foreground py-4 hover:no-underline">
@@ -623,8 +637,67 @@ const FAQ = () => {
                 ))}
               </Accordion>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
+
+        {/* View All FAQs Section */}
+        {filteredSections.length > 0 && (
+          <>
+            <div className="mb-8">
+              <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6">
+                {searchQuery ? 'Matching Questions' : 'All Frequently Asked Questions'}
+              </h2>
+              {!searchQuery && (
+                <p className="text-base text-muted-foreground mb-6">
+                  Browse all questions by topic, or scroll through the full list.
+                </p>
+              )}
+            </div>
+            
+            <div className="space-y-6">
+              {filteredSections.map((section, sectionIndex) => (
+                <div key={sectionIndex} className="bg-card border border-border rounded-xl shadow-sm p-5 md:p-6">
+                  <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2 flex items-center gap-3">
+                    <span className="text-2xl" aria-hidden="true">{section.icon}</span>
+                    {section.title}
+                  </h2>
+                  
+                  {section.description && (
+                    <p className="text-sm text-muted-foreground mb-2">{section.description}</p>
+                  )}
+                  
+                  {section.source && (
+                    <a 
+                      href={section.source} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-xs text-primary hover:underline inline-flex items-center gap-1 mb-4"
+                    >
+                      Source: FTC Consumer Guidance <ExternalLink className="h-3 w-3" />
+                    </a>
+                  )}
+                  
+                  <Accordion type="single" collapsible className="w-full">
+                    {section.questions.map((qa, qIndex) => (
+                      <AccordionItem 
+                        key={qIndex} 
+                        value={`section-${sectionIndex}-q-${qIndex}`}
+                        className="border-b last:border-b-0"
+                      >
+                        <AccordionTrigger className="text-left text-base md:text-lg font-semibold text-foreground py-4 hover:no-underline">
+                          {qa.q}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-base text-muted-foreground pb-4 leading-relaxed">
+                          {qa.a}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
         
         {/* Footer with helpful links */}
         <div className="mt-12 pt-6 border-t border-border">

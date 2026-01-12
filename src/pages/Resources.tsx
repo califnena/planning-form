@@ -1572,6 +1572,50 @@ const Resources = () => {
           {renderContent()}
         </main>
       </div>
+
+      {/* FAQ Access Section */}
+      <div className="bg-muted/30 border-t border-border py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-xl font-semibold text-foreground mb-2">Frequently Asked Questions</h2>
+          <p className="text-base text-muted-foreground mb-6">
+            Find answers to common questions about planning, privacy, legal topics, and using this app.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.currentTarget);
+                  const query = formData.get('faq-search') as string;
+                  if (query && query.trim()) {
+                    navigate(`/faq?search=${encodeURIComponent(query.trim())}`);
+                  } else {
+                    navigate('/faq');
+                  }
+                }}
+                className="flex gap-2"
+              >
+                <input
+                  type="text"
+                  name="faq-search"
+                  placeholder="Search questions..."
+                  className="flex-1 px-4 py-3 rounded-lg border border-border bg-background text-foreground text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  maxLength={100}
+                />
+                <Button type="submit" variant="outline" className="min-h-[48px] px-6">
+                  Search
+                </Button>
+              </form>
+            </div>
+            <Link to="/faq">
+              <Button className="min-h-[48px] w-full sm:w-auto gap-2">
+                <HelpCircle className="h-5 w-5" />
+                View All Questions
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
       
       <AppFooter />
     </div>
