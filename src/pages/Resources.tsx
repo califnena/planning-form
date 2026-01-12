@@ -70,10 +70,17 @@ import { ErrorPanel } from '@/components/ui/ErrorPanel';
 import { LegalDisclaimer } from '@/components/ui/LegalDisclaimer';
 import { cn } from '@/lib/utils';
 
+// Valid sections: 'education', 'checklists', 'forms-worksheets', 'tools-calculators', 'trusted-resources', 'support-help'
+const VALID_SECTIONS = ['education', 'checklists', 'forms-worksheets', 'tools-calculators', 'trusted-resources', 'support-help'];
+const DEFAULT_SECTION = 'education';
+
 const Resources = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [activeSection, setActiveSection] = useState(searchParams.get('section') || 'planning-guides');
+  // Fix: Default to 'education' instead of non-existent 'planning-guides'
+  const initialSection = searchParams.get('section');
+  const validInitialSection = initialSection && VALID_SECTIONS.includes(initialSection) ? initialSection : DEFAULT_SECTION;
+  const [activeSection, setActiveSection] = useState(validInitialSection);
   const [activeSubItem, setActiveSubItem] = useState<string | undefined>(searchParams.get('sub') || undefined);
 
   useEffect(() => {
