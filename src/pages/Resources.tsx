@@ -958,6 +958,7 @@ const Resources = () => {
                 <Button className="w-full min-h-[48px] gap-2">
                   <ExternalLink className="h-4 w-4" />
                   Open or Download
+                  <span className="text-xs opacity-75">(Opens in a new tab)</span>
                 </Button>
               </a>
               <p className="text-sm text-muted-foreground text-center mt-2">
@@ -1329,16 +1330,18 @@ const Resources = () => {
           <CardContent>
             <ul className="space-y-4">
               <li>
-                <a href="https://www.va.gov/burials-memorials/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
+              <a href="https://www.va.gov/burials-memorials/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
                   <ExternalLink className="h-4 w-4 shrink-0" />
                   VA Burial Benefits
+                  <span className="text-xs text-muted-foreground font-normal">(Opens in a new tab)</span>
                 </a>
                 <p className="text-sm text-muted-foreground mt-1">Information for veterans and their families</p>
               </li>
               <li>
-                <a href="https://www.ssa.gov/benefits/survivors/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
+              <a href="https://www.ssa.gov/benefits/survivors/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
                   <ExternalLink className="h-4 w-4 shrink-0" />
                   Social Security Survivor Benefits
+                  <span className="text-xs text-muted-foreground font-normal">(Opens in a new tab)</span>
                 </a>
                 <p className="text-sm text-muted-foreground mt-1">Learn about benefits for surviving spouses and children</p>
               </li>
@@ -1355,23 +1358,26 @@ const Resources = () => {
           <CardContent>
             <ul className="space-y-4">
               <li>
-                <a href="https://consumer.ftc.gov/articles/planning-your-own-funeral" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
+              <a href="https://consumer.ftc.gov/articles/planning-your-own-funeral" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
                   <ExternalLink className="h-4 w-4 shrink-0" />
                   FTC Funeral Consumer Guide
+                  <span className="text-xs text-muted-foreground font-normal">(Opens in a new tab)</span>
                 </a>
                 <p className="text-sm text-muted-foreground mt-1">Official guidance on planning and your rights</p>
               </li>
               <li>
-                <a href="https://funerals.org" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
+              <a href="https://funerals.org" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
                   <ExternalLink className="h-4 w-4 shrink-0" />
                   Funeral Consumers Alliance
+                  <span className="text-xs text-muted-foreground font-normal">(Opens in a new tab)</span>
                 </a>
                 <p className="text-sm text-muted-foreground mt-1">Non-profit consumer advocacy organization</p>
               </li>
               <li>
-                <a href="https://reportfraud.ftc.gov" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
+              <a href="https://reportfraud.ftc.gov" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
                   <ExternalLink className="h-4 w-4 shrink-0" />
                   Report Fraud (FTC)
+                  <span className="text-xs text-muted-foreground font-normal">(Opens in a new tab)</span>
                 </a>
                 <p className="text-sm text-muted-foreground mt-1">Report concerns about funeral home practices</p>
               </li>
