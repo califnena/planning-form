@@ -417,27 +417,33 @@ const Resources = () => {
               Understanding your rights and medical documents.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4">
-              <div className="p-4 bg-muted/30 rounded-lg">
-                <h4 className="font-semibold text-foreground mb-2">What is an Advance Directive?</h4>
-                <p className="text-muted-foreground text-base leading-relaxed">
+          <CardContent>
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="advance-directive" className="border-b-0">
+                <AccordionTrigger className="text-left py-3 hover:no-underline">
+                  <span className="font-semibold text-foreground">What is an Advance Directive?</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-4">
                   An Advance Directive is a legal document that tells doctors what kind of medical treatment you want if you can't speak for yourself. It helps your family and doctors make decisions that match your wishes.
-                </p>
-              </div>
-              <div className="p-4 bg-muted/30 rounded-lg">
-                <h4 className="font-semibold text-foreground mb-2">DNR vs POLST</h4>
-                <p className="text-muted-foreground text-base leading-relaxed">
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="dnr-polst" className="border-b-0">
+                <AccordionTrigger className="text-left py-3 hover:no-underline">
+                  <span className="font-semibold text-foreground">DNR vs POLST</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-4">
                   A DNR (Do Not Resuscitate) order tells medical staff not to perform CPR. A POLST (Physician Orders for Life-Sustaining Treatment) is a broader form that covers more medical decisions and is signed by your doctor.
-                </p>
-              </div>
-              <div className="p-4 bg-muted/30 rounded-lg">
-                <h4 className="font-semibold text-foreground mb-2">Why naming a Healthcare Proxy matters</h4>
-                <p className="text-muted-foreground text-base leading-relaxed">
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="healthcare-proxy" className="border-b-0">
+                <AccordionTrigger className="text-left py-3 hover:no-underline">
+                  <span className="font-semibold text-foreground">Why naming a Healthcare Proxy matters</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-4">
                   A Healthcare Proxy (also called Healthcare Agent) is someone you choose to make medical decisions for you. Without one, your family may disagree about your care, or a court may have to decide.
-                </p>
-              </div>
-            </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </CardContent>
         </Card>
       )}
@@ -456,27 +462,33 @@ const Resources = () => {
               Understanding your options for final arrangements.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4">
-              <div className="p-4 bg-muted/30 rounded-lg">
-                <h4 className="font-semibold text-foreground mb-2">Burial vs Cremation</h4>
-                <p className="text-muted-foreground text-base leading-relaxed">
+          <CardContent>
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="burial-cremation" className="border-b-0">
+                <AccordionTrigger className="text-left py-3 hover:no-underline">
+                  <span className="font-semibold text-foreground">Burial vs Cremation</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-4">
                   Burial involves placing the body in a casket and burying it in a cemetery. Cremation uses heat to reduce the body to ashes, which can be kept in an urn, scattered, or buried. Both are respectful options.
-                </p>
-              </div>
-              <div className="p-4 bg-muted/30 rounded-lg">
-                <h4 className="font-semibold text-foreground mb-2">Casket and Urn Basics</h4>
-                <p className="text-muted-foreground text-base leading-relaxed">
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="casket-urn" className="border-b-0">
+                <AccordionTrigger className="text-left py-3 hover:no-underline">
+                  <span className="font-semibold text-foreground">Casket and Urn Basics</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-4">
                   Caskets range from simple wood to elaborate metal designs. Urns can be made of ceramic, wood, metal, or biodegradable materials. You are NOT required to buy from a funeral home—you can shop elsewhere.
-                </p>
-              </div>
-              <div className="p-4 bg-muted/30 rounded-lg">
-                <h4 className="font-semibold text-foreground mb-2">Planning Ahead vs Last-Minute Decisions</h4>
-                <p className="text-muted-foreground text-base leading-relaxed">
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="planning-ahead" className="border-b-0">
+                <AccordionTrigger className="text-left py-3 hover:no-underline">
+                  <span className="font-semibold text-foreground">Planning Ahead vs Last-Minute Decisions</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-4">
                   Planning ahead gives you time to research options, compare prices, and make thoughtful decisions. Last-minute arrangements often cost more and add stress to grieving families.
-                </p>
-              </div>
-            </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </CardContent>
         </Card>
       )}
@@ -495,21 +507,25 @@ const Resources = () => {
               Keeping important information organized.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4">
-              <div className="p-4 bg-muted/30 rounded-lg">
-                <h4 className="font-semibold text-foreground mb-2">Why Document Lists Matter</h4>
-                <p className="text-muted-foreground text-base leading-relaxed">
+          <CardContent>
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="document-lists" className="border-b-0">
+                <AccordionTrigger className="text-left py-3 hover:no-underline">
+                  <span className="font-semibold text-foreground">Why Document Lists Matter</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-4">
                   When a loved one passes, families often spend weeks searching for important papers—wills, insurance policies, deeds. A simple list of where things are kept saves time and reduces stress.
-                </p>
-              </div>
-              <div className="p-4 bg-muted/30 rounded-lg">
-                <h4 className="font-semibold text-foreground mb-2">Common Challenges Families Face</h4>
-                <p className="text-muted-foreground text-base leading-relaxed">
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="common-challenges" className="border-b-0">
+                <AccordionTrigger className="text-left py-3 hover:no-underline">
+                  <span className="font-semibold text-foreground">Common Challenges Families Face</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-4">
                   Not knowing bank account numbers. Missing passwords. Unable to find the will. Not knowing who to notify. A little preparation prevents all of these problems.
-                </p>
-              </div>
-            </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </CardContent>
         </Card>
       )}
@@ -529,26 +545,32 @@ const Resources = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-4">
-              <div className="p-4 bg-muted/30 rounded-lg">
-                <h4 className="font-semibold text-foreground mb-2">What Happens If Death Occurs Away from Home</h4>
-                <p className="text-muted-foreground text-base leading-relaxed">
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="death-away" className="border-b-0">
+                <AccordionTrigger className="text-left py-3 hover:no-underline">
+                  <span className="font-semibold text-foreground">What Happens If Death Occurs Away from Home</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-4">
                   If someone dies while traveling—whether in another state or country—the family must arrange to have the body transported home. This can cost thousands of dollars and involves complex paperwork.
-                </p>
-              </div>
-              <div className="p-4 bg-muted/30 rounded-lg">
-                <h4 className="font-semibold text-foreground mb-2">Transport Coverage Basics</h4>
-                <p className="text-muted-foreground text-base leading-relaxed">
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="transport-coverage" className="border-b-0">
+                <AccordionTrigger className="text-left py-3 hover:no-underline">
+                  <span className="font-semibold text-foreground">Transport Coverage Basics</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-4">
                   Some travel insurance and memberships include repatriation coverage, which pays to transport remains back home. Always check what your policy covers before traveling.
-                </p>
-              </div>
-              <div className="p-4 bg-muted/30 rounded-lg">
-                <h4 className="font-semibold text-foreground mb-2">What to Ask Providers</h4>
-                <p className="text-muted-foreground text-base leading-relaxed">
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="ask-providers" className="border-b-0">
+                <AccordionTrigger className="text-left py-3 hover:no-underline">
+                  <span className="font-semibold text-foreground">What to Ask Providers</span>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-4">
                   Ask about: coverage limits, what countries are included, what documentation is needed, and whether cremation abroad is covered if you prefer it.
-                </p>
-              </div>
-            </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
             <div className="pt-4">
               <Link to="/travel-protection">
                 <Button size="lg" variant="outline" className="min-h-[52px] gap-2">
