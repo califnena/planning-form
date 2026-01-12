@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shield } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card } from "@/components/ui/card";
 
 interface SectionAboutYouProps {
   data?: any;
@@ -50,7 +51,7 @@ export const SectionAboutYou = ({ data, onChange }: SectionAboutYouProps) => {
         </AlertDescription>
       </Alert>
 
-      <div className="space-y-6">
+      <Card variant="soft" className="p-6 space-y-6">
         <div className="space-y-2">
           <Label htmlFor="full_name" className="text-base font-medium">
             Full Legal Name
@@ -116,7 +117,7 @@ export const SectionAboutYou = ({ data, onChange }: SectionAboutYouProps) => {
             className="text-base h-12"
           />
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

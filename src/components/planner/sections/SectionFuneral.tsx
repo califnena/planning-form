@@ -3,6 +3,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 import { Save, Upload, X, Image as ImageIcon, FileText, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -212,7 +213,7 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
         </TooltipProvider>
       </div>
 
-      <div className="space-y-6">
+      <Card variant="soft" className="p-6 space-y-6">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="funeral_preference">{t("funeral.funeralPreference")}</Label>
@@ -1052,7 +1053,7 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
             </a>
           </Button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
