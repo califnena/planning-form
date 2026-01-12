@@ -1483,6 +1483,15 @@ const Resources = () => {
         </div>
       </div>
 
+      {/* Start Here Intro */}
+      <div className="bg-background border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <p className="text-base text-foreground">
+            This section provides helpful guides, forms, and information to support you and your family. You can read at your own pace and return anytime.
+          </p>
+        </div>
+      </div>
+
       {/* What is this page explanation */}
       <div className="bg-primary/5 border-b border-primary/10">
         <div className="max-w-7xl mx-auto px-4 py-4">
