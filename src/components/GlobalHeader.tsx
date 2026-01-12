@@ -28,9 +28,11 @@ import logo from "@/assets/everlasting-logo.png";
 
 interface GlobalHeaderProps {
   onGenerateDocument?: () => void;
+  /** When true, shows only the logo - used on /resources to reduce visual competition */
+  minimal?: boolean;
 }
 
-export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => {
+export const GlobalHeader = ({ onGenerateDocument, minimal = false }: GlobalHeaderProps = {}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -111,8 +113,9 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
             </div>
           </Link>
 
-          {/* Right: Controls */}
-          <div className="flex items-center gap-1 md:gap-2">
+          {/* Right: Controls - hidden in minimal mode */}
+          {!minimal && (
+            <div className="flex items-center gap-1 md:gap-2">
             {/* Home button - always visible escape hatch for seniors */}
             <Button 
               variant="ghost" 
@@ -240,7 +243,8 @@ export const GlobalHeader = ({ onGenerateDocument }: GlobalHeaderProps = {}) => 
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
+            </div>
+          )}
         </div>
       </header>
       

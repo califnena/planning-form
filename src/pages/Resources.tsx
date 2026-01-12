@@ -1488,7 +1488,7 @@ const Resources = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <GlobalHeader />
+      <GlobalHeader minimal />
       
       {/* Top Action Bar - Senior Friendly */}
       <div className="bg-card border-b border-border">
