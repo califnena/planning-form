@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { 
   BookOpen, FileText, HelpCircle, 
-  Calculator, Headphones, ChevronDown, ChevronRight,
-  Menu, CheckSquare, Link2
+  Lightbulb, ChevronDown, ChevronRight,
+  Menu, CheckSquare, Heart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -17,11 +17,12 @@ export interface ResourceSection {
   subItems?: { id: string; label: string }[];
 }
 
+// Senior-friendly 4-category organization
 export const resourceSections: ResourceSection[] = [
   {
-    id: 'education',
-    label: 'Educational Resources',
-    icon: BookOpen,
+    id: 'start-here',
+    label: 'Start Here',
+    icon: Lightbulb,
     subItems: [
       { id: 'legal-medical', label: 'Legal & Medical Planning' },
       { id: 'funeral-planning', label: 'Funeral Planning' },
@@ -30,33 +31,32 @@ export const resourceSections: ResourceSection[] = [
     ],
   },
   {
-    id: 'checklists',
-    label: 'Checklists',
-    icon: CheckSquare,
+    id: 'planning-guides',
+    label: 'Planning Guides',
+    icon: BookOpen,
     subItems: [
-      { id: 'pre-planning-checklist', label: 'Pre-Planning Checklist' },
-      { id: 'after-death-checklist', label: 'After-Death Checklist' },
+      { id: 'step-by-step', label: 'Step-by-Step Guide' },
+      { id: 'cost-estimator', label: 'Cost Estimator' },
     ],
   },
   {
-    id: 'forms-worksheets',
-    label: 'Forms & Worksheets',
+    id: 'forms-checklists',
+    label: 'Forms & Checklists',
     icon: FileText,
+    subItems: [
+      { id: 'checklists', label: 'Checklists' },
+      { id: 'forms', label: 'Printable Forms' },
+    ],
   },
   {
-    id: 'tools-calculators',
-    label: 'Tools & Calculators',
-    icon: Calculator,
-  },
-  {
-    id: 'trusted-resources',
-    label: 'Trusted Resources',
-    icon: Link2,
-  },
-  {
-    id: 'support-help',
-    label: 'Support & Help',
-    icon: Headphones,
+    id: 'learn-more',
+    label: 'Learn More (Optional)',
+    icon: HelpCircle,
+    subItems: [
+      { id: 'trusted-resources', label: 'Trusted Resources' },
+      { id: 'support-help', label: 'Support & Help' },
+      { id: 'faqs', label: 'FAQs' },
+    ],
   },
 ];
 

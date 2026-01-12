@@ -58,7 +58,7 @@ import { Button } from '@/components/ui/button';
 import { TextSizeToggle } from '@/components/TextSizeToggle';
 import { 
   ExternalLink, FileText, Download, Home, Eye, 
-  Calculator, ChevronRight, CheckSquare, BookOpen, Info
+  Calculator, ChevronRight, CheckSquare, BookOpen, Info, HelpCircle
 } from 'lucide-react';
 import { GlobalHeader } from '@/components/GlobalHeader';
 import { AppFooter } from '@/components/AppFooter';
@@ -70,9 +70,10 @@ import { ErrorPanel } from '@/components/ui/ErrorPanel';
 import { LegalDisclaimer } from '@/components/ui/LegalDisclaimer';
 import { cn } from '@/lib/utils';
 
-// Valid sections: 'education', 'checklists', 'forms-worksheets', 'tools-calculators', 'trusted-resources', 'support-help'
-const VALID_SECTIONS = ['education', 'checklists', 'forms-worksheets', 'tools-calculators', 'trusted-resources', 'support-help'];
-const DEFAULT_SECTION = 'education';
+// Senior-friendly 4-category organization
+// 'start-here', 'planning-guides', 'forms-checklists', 'learn-more'
+const VALID_SECTIONS = ['start-here', 'planning-guides', 'forms-checklists', 'learn-more'];
+const DEFAULT_SECTION = 'start-here';
 
 const Resources = () => {
   const navigate = useNavigate();
@@ -97,56 +98,297 @@ const Resources = () => {
     setActiveSubItem(subItemId);
   };
 
-  // Quick access cards for top of page
+  // Quick access cards for top of page - matches new 4-category structure
   const quickAccessCards = [
     {
-      title: "Step-by-Step Guide",
-      description: "Learn before you fill",
+      title: "Start Here",
+      description: "Learn the basics",
       icon: BookOpen,
-      onClick: () => navigate('/guide'),
+      onClick: () => handleSectionChange('start-here'),
       color: "bg-primary/10 text-primary"
     },
     {
-      title: "Checklists",
-      description: "Track what you've done",
-      icon: CheckSquare,
-      onClick: () => handleSectionChange('checklists'),
+      title: "Planning Guides",
+      description: "Step-by-step help",
+      icon: BookOpen,
+      onClick: () => handleSectionChange('planning-guides'),
       color: "bg-green-500/10 text-green-700"
     },
     {
-      title: "Cost Estimator",
-      description: "Get a funeral cost estimate",
-      icon: Calculator,
-      onClick: () => navigate('/resources/cost-estimator'),
-      color: "bg-amber-500/10 text-amber-700"
+      title: "Forms & Checklists",
+      description: "Printable documents",
+      icon: FileText,
+      onClick: () => handleSectionChange('forms-checklists'),
+      color: "bg-blue-500/10 text-blue-700"
     },
     {
-      title: "Printable Forms",
-      description: "Download blank forms",
-      icon: FileText,
-      onClick: () => handleSectionChange('forms-worksheets'),
-      color: "bg-blue-500/10 text-blue-700"
+      title: "Learn More",
+      description: "Additional resources",
+      icon: HelpCircle,
+      onClick: () => handleSectionChange('learn-more'),
+      color: "bg-amber-500/10 text-amber-700"
     },
   ];
 
   const renderContent = () => {
+    // Handle new 4-category structure with sub-items
     switch (activeSection) {
-      case 'education':
+      case 'start-here':
+        // Maps to old 'education' content
         return renderEducation();
-      case 'checklists':
-        return renderChecklists();
-      case 'forms-worksheets':
-        return renderFormsWorksheets();
-      case 'tools-calculators':
-        return renderToolsCalculators();
-      case 'trusted-resources':
-        return renderTrustedResources();
-      case 'support-help':
-        return renderSupportHelp();
+      case 'planning-guides':
+        // Sub-items: step-by-step, cost-estimator
+        if (activeSubItem === 'cost-estimator') {
+          // Redirect handled by navigation
+          return renderToolsCalculators();
+        }
+        return renderPlanningGuidesSection();
+      case 'forms-checklists':
+        // Sub-items: checklists, forms
+        if (activeSubItem === 'checklists') {
+          return renderChecklists();
+        }
+        if (activeSubItem === 'forms') {
+          return renderFormsWorksheets();
+        }
+        // Default to combined view
+        return renderFormsChecklistsCombined();
+      case 'learn-more':
+        // Sub-items: trusted-resources, support-help, faqs
+        if (activeSubItem === 'trusted-resources') {
+          return renderTrustedResources();
+        }
+        if (activeSubItem === 'support-help') {
+          return renderSupportHelp();
+        }
+        if (activeSubItem === 'faqs') {
+          return renderFAQs();
+        }
+        return renderLearnMoreOverview();
       default:
         return renderEducation();
     }
   };
+
+  // New: Planning Guides overview section
+  const renderPlanningGuidesSection = () => (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Planning Guides</h1>
+        <p className="text-lg text-muted-foreground">
+          Step-by-step resources to help you plan with confidence.
+        </p>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate('/guide')}>
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <BookOpen className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Step-by-Step Guide</CardTitle>
+                <CardDescription>Learn before you fill out forms</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              A friendly walkthrough of the planning process, one step at a time.
+            </p>
+            <Button className="w-full min-h-[48px]">
+              Start the Guide
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Link to="/resources/cost-estimator" className="block">
+          <Card className="h-full hover:border-primary/50 transition-colors cursor-pointer">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                  <Calculator className="h-6 w-6 text-amber-700" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Cost Estimator</CardTitle>
+                  <CardDescription>Get a general idea of funeral costs</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Enter your preferences to see estimated costs for different funeral options.
+              </p>
+              <Button variant="outline" className="w-full min-h-[48px]">
+                Open Cost Estimator
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </Button>
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
+    </div>
+  );
+
+  // New: Combined Forms & Checklists overview
+  const renderFormsChecklistsCombined = () => (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Forms & Checklists</h1>
+        <p className="text-lg text-muted-foreground">
+          Printable documents to help you stay organized.
+        </p>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card 
+          className="hover:border-primary/50 transition-colors cursor-pointer" 
+          onClick={() => handleSectionChange('forms-checklists', 'checklists')}
+        >
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
+                <CheckSquare className="h-6 w-6 text-green-700" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Checklists</CardTitle>
+                <CardDescription>Track what you've done</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Step-by-step checklists for pre-planning and after a loss.
+            </p>
+            <Button className="w-full min-h-[48px]">
+              View Checklists
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="hover:border-primary/50 transition-colors cursor-pointer" 
+          onClick={() => handleSectionChange('forms-checklists', 'forms')}
+        >
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                <FileText className="h-6 w-6 text-blue-700" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Printable Forms</CardTitle>
+                <CardDescription>Download blank forms</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Forms and worksheets you can print and fill out by hand.
+            </p>
+            <Button variant="outline" className="w-full min-h-[48px]">
+              View Forms
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  // New: Learn More overview section
+  const renderLearnMoreOverview = () => (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Learn More (Optional)</h1>
+        <p className="text-lg text-muted-foreground">
+          Additional resources and support when you need them.
+        </p>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card 
+          className="hover:border-primary/50 transition-colors cursor-pointer" 
+          onClick={() => handleSectionChange('learn-more', 'trusted-resources')}
+        >
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                <ExternalLink className="h-6 w-6 text-purple-700" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Trusted Resources</CardTitle>
+                <CardDescription>Government & consumer protection</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Verified external resources from official organizations.
+            </p>
+            <Button variant="outline" className="w-full min-h-[48px]">
+              View Resources
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="hover:border-primary/50 transition-colors cursor-pointer" 
+          onClick={() => handleSectionChange('learn-more', 'support-help')}
+        >
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Info className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Support & Help</CardTitle>
+                <CardDescription>Get help with the app</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Contact support or learn how to use the app.
+            </p>
+            <Button variant="outline" className="w-full min-h-[48px]">
+              Get Help
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="hover:border-primary/50 transition-colors cursor-pointer" 
+          onClick={() => handleSectionChange('learn-more', 'faqs')}
+        >
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                <HelpCircle className="h-6 w-6 text-amber-700" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">FAQs</CardTitle>
+                <CardDescription>Common questions answered</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Find answers to frequently asked questions.
+            </p>
+            <Button variant="outline" className="w-full min-h-[48px]">
+              View FAQs
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
 
   // Educational Resources Section - Read-only, no data collection
   const renderEducation = () => (
