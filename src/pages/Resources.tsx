@@ -879,22 +879,21 @@ const Resources = () => {
           </Card>
         </Link>
 
-        <Card className="h-full border-dashed">
+        <Card className="h-full border-dashed opacity-75">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
                 <Info className="h-6 w-6 text-muted-foreground" />
               </div>
               <div>
-                <CardTitle className="text-lg text-muted-foreground">Decision Helper</CardTitle>
-                <CardDescription>Guided questions for tough choices</CardDescription>
+                <div className="flex items-center gap-2">
+                  <CardTitle className="text-lg text-muted-foreground">Decision Helper</CardTitle>
+                  <span className="text-xs text-muted-foreground font-normal">(Coming Soon)</span>
+                </div>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground mb-4">
-              Coming soon: guided questions to help you make important decisions.
-            </p>
             <Button variant="outline" className="w-full min-h-[48px]" disabled>
               Coming Soon
             </Button>
@@ -922,25 +921,30 @@ const Resources = () => {
     }) => (
       <Card className={cn("h-full", isComingSoon && "border-dashed opacity-75")}>
         <CardHeader className="pb-3">
-          <div className="flex flex-wrap gap-2 mb-3">
-            {tags.map((tag, idx) => (
-              <span 
-                key={idx}
-                className={cn(
-                  "inline-block px-3 py-1 text-xs font-semibold rounded-full",
-                  tag === 'Fillable' && "bg-blue-500/10 text-blue-700",
-                  tag === 'Printable' && "bg-green-500/10 text-green-700",
-                  tag === 'Before Death' && "bg-primary/10 text-primary",
-                  tag === 'After Death' && "bg-amber-500/10 text-amber-700",
-                  tag === 'Reference' && "bg-purple-500/10 text-purple-700"
-                )}
-              >
-                {tag}
-              </span>
-            ))}
+          {!isComingSoon && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {tags.map((tag, idx) => (
+                <span 
+                  key={idx}
+                  className={cn(
+                    "inline-block px-3 py-1 text-xs font-semibold rounded-full",
+                    tag === 'Fillable' && "bg-blue-500/10 text-blue-700",
+                    tag === 'Printable' && "bg-green-500/10 text-green-700",
+                    tag === 'Before Death' && "bg-primary/10 text-primary",
+                    tag === 'After Death' && "bg-amber-500/10 text-amber-700",
+                    tag === 'Reference' && "bg-purple-500/10 text-purple-700"
+                  )}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <CardTitle className={cn("text-lg", isComingSoon && "text-muted-foreground")}>{title}</CardTitle>
+            {isComingSoon && <span className="text-xs text-muted-foreground font-normal">(Coming Soon)</span>}
           </div>
-          <CardTitle className="text-lg">{title}</CardTitle>
-          <CardDescription className="text-base">{description}</CardDescription>
+          {!isComingSoon && <CardDescription className="text-base">{description}</CardDescription>}
         </CardHeader>
         <CardContent>
           {isComingSoon ? (
