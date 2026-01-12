@@ -123,7 +123,7 @@ const App = () => (
                 <div className="flex flex-col min-h-screen">
                   <div className="flex-1">
                     <Routes>
-                      <Route path="/" element={<Landing />} />
+                      <Route path="/" element={<LandingSenior />} />
                       <Route path="/unsubscribe" element={<Unsubscribe />} />
                       <Route path="/pricing" element={<Pricing />} />
                       <Route path="/dashboard" element={<Dashboard />} />
