@@ -1519,19 +1519,20 @@ const Resources = () => {
         </div>
       </div>
       
-      {/* Quick Access Cards - De-emphasized to reduce duplication with sidebar */}
-      <div className="bg-background border-b border-border py-4">
+      {/* Quick Access - Primary starting point for seniors */}
+      <div className="bg-primary/5 border-b border-primary/10 py-6">
         <div className="max-w-7xl mx-auto px-4">
-          <p className="text-sm text-muted-foreground mb-3">Jump to a section:</p>
-          <div className="flex flex-wrap gap-2">
+          <h2 className="text-lg font-semibold text-foreground mb-1">Where would you like to start?</h2>
+          <p className="text-sm text-muted-foreground mb-4">Choose a category below, or use the menu on the left.</p>
+          <div className="flex flex-wrap gap-3">
             {quickAccessCards.map((card) => (
               <button
                 key={card.title}
                 onClick={card.onClick}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-2 px-4 py-3 rounded-lg bg-background border border-border hover:border-primary/50 hover:bg-primary/5 text-base text-foreground transition-colors shadow-sm"
               >
-                <card.icon className="h-4 w-4" />
-                <span className="font-normal">{card.title}</span>
+                <card.icon className="h-5 w-5 text-primary" />
+                <span className="font-medium">{card.title}</span>
               </button>
             ))}
           </div>
