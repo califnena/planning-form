@@ -81,6 +81,16 @@ All colors MUST be HSL.
     --senior-mission: 140 15% 95%;
     --senior-text: 215 15% 25%;
     --senior-text-soft: 215 12% 40%;
+    
+    /* Section accent colors - soft, muted for senior orientation */
+    --section-aboutyou: 200 30% 92%;        /* Soft blue - personal identity */
+    --section-aboutyou-border: 200 35% 80%;
+    --section-yourwishes: 340 25% 93%;      /* Soft rose - heartfelt wishes */
+    --section-yourwishes-border: 340 30% 82%;
+    --section-records: 45 35% 92%;          /* Soft amber - important documents */
+    --section-records-border: 45 40% 80%;
+    --section-help: 160 25% 92%;            /* Soft teal - support */
+    --section-help-border: 160 30% 80%;
   }
 
   .dark {

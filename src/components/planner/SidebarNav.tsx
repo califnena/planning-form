@@ -68,13 +68,24 @@ export const SidebarNav = ({
     );
   };
 
+  // Group accent colors for visual orientation
+  const groupAccentStyles: Record<SectionDefinition["group"], string> = {
+    top: "",
+    aboutyou: "bg-[hsl(var(--section-aboutyou))] border-l-4 border-l-[hsl(var(--section-aboutyou-border))]",
+    yourwishes: "bg-[hsl(var(--section-yourwishes))] border-l-4 border-l-[hsl(var(--section-yourwishes-border))]",
+    records: "bg-[hsl(var(--section-records))] border-l-4 border-l-[hsl(var(--section-records-border))]",
+    help: "bg-[hsl(var(--section-help))] border-l-4 border-l-[hsl(var(--section-help-border))]",
+  };
+
   const renderSectionGroup = (title: string, group: SectionDefinition["group"]) => {
     const sections = getSectionsByGroup(group);
     if (sections.length === 0) return null;
     
+    const accentStyle = groupAccentStyles[group];
+    
     return (
-      <div className="space-y-1">
-        <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-4">
+      <div className={cn("space-y-1 rounded-lg py-2 px-1", accentStyle)}>
+        <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-3">
           {title}
         </h4>
         {sections.map(section => renderNavButton(section))}
@@ -86,29 +97,32 @@ export const SidebarNav = ({
   const topSections = getSectionsByGroup("top");
 
   return (
-    <nav className="space-y-1">
+    <nav className="space-y-2">
       {/* Top Navigation */}
       {topSections.map(section => renderNavButton(section))}
 
       {/* About You */}
-      <hr className="my-4 border-border mx-4" />
-      {renderSectionGroup("About You", "aboutyou")}
+      <div className="pt-3">
+        {renderSectionGroup("About You", "aboutyou")}
+      </div>
 
       {/* Your Wishes */}
-      <hr className="my-4 border-border mx-4" />
-      {renderSectionGroup("Your Wishes", "yourwishes")}
+      <div className="pt-2">
+        {renderSectionGroup("Your Wishes", "yourwishes")}
+      </div>
 
       {/* Important Records */}
-      <hr className="my-4 border-border mx-4" />
-      {renderSectionGroup("Important Records", "records")}
+      <div className="pt-2">
+        {renderSectionGroup("Important Records", "records")}
+      </div>
 
       {/* Help & Education */}
-      <hr className="my-4 border-border mx-4" />
-      {renderSectionGroup("Help & Education", "help")}
+      <div className="pt-2">
+        {renderSectionGroup("Help & Education", "help")}
+      </div>
 
       {/* Printable Copy - Primary Access */}
-      <hr className="my-4 border-2 border-border mx-4" />
-      <div className="px-2">
+      <div className="pt-4 mt-2 border-t-2 border-border px-2">
         <button
           onClick={() => navigate("/preplan-summary")}
           className={cn(
