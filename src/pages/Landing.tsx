@@ -134,7 +134,10 @@ const Landing = () => {
           </h1>
           
           {/* Supporting sentence - single paragraph, clear spacing */}
-          
+          <p className="text-lg text-muted-foreground mt-4 mb-8 max-w-2xl mx-auto">
+            Whether you're planning ahead or dealing with a recent loss, we're here to help.
+          </p>
+
 
           {/* Benefits row - horizontal, structured, tight */}
           <div className="flex flex-col md:flex-row justify-center items-center gap-3 md:gap-8 text-muted-foreground text-sm mb-10">
