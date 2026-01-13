@@ -191,13 +191,6 @@ const LandingSenior = () => {
                   Get Help After a Loss
                 </Button>
               </Link>
-              
-
-              {!isLoggedIn && !isLoading && (
-                <Link to="/login" className="text-sm text-[hsl(var(--senior-text-soft))] hover:text-primary underline mt-2">
-                  Already started? Sign in to continue.
-                </Link>
-              )}
             </div>
           </div>
         </section>
