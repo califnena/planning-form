@@ -32,7 +32,7 @@ export const OrientationBanner = () => {
             </div>
             <div className="flex items-center gap-2">
               <Lock className="h-4 w-4 text-primary/70" />
-              <span>Private and secure</span>
+              <span>Just for you</span>
             </div>
           </div>
         </div>
