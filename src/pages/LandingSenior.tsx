@@ -460,50 +460,6 @@ const LandingSenior = () => {
           </div>
         </section>
 
-        {/* 7) "WHAT HAPPENS NEXT" - Simple vertical flow */}
-        <section className="bg-[hsl(var(--senior-sage))] rounded-3xl p-8 md:p-12 mb-16">
-          <h2 className="text-xl md:text-2xl font-semibold text-[hsl(var(--senior-text))] mb-10 text-center">
-            What happens after you start
-          </h2>
-          
-          <div className="space-y-5 max-w-2xl mx-auto">
-            <div className="flex items-start gap-5 p-6 bg-white rounded-2xl shadow-sm">
-              <div className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0 text-xl shadow-sm">
-                1
-              </div>
-              <div className="pt-2">
-                <p className="text-[hsl(var(--senior-text))] text-lg">Choose what you want to include.</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start gap-5 p-6 bg-white rounded-2xl shadow-sm">
-              <div className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0 text-xl shadow-sm">
-                2
-              </div>
-              <div className="pt-2">
-                <p className="text-[hsl(var(--senior-text))] text-lg">Fill out only what applies.</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start gap-5 p-6 bg-white rounded-2xl shadow-sm">
-              <div className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0 text-xl shadow-sm">
-                3
-              </div>
-              <div className="pt-2">
-                <p className="text-[hsl(var(--senior-text))] text-lg">Save anytime and come back later.</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start gap-5 p-6 bg-white rounded-2xl shadow-sm">
-              <div className="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0 text-xl shadow-sm">
-                4
-              </div>
-              <div className="pt-2">
-                <p className="text-[hsl(var(--senior-text))] text-lg">Print or share with your family when you are ready.</p>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* NEED HELP SECTION */}
         <section className="bg-white rounded-3xl shadow-sm border border-border/30 p-8 md:p-10 mb-16">
