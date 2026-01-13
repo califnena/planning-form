@@ -419,7 +419,7 @@ const Resources = () => {
             <p className="text-sm font-medium text-muted-foreground mt-2">Common Questions & Answers</p>
           </CardHeader>
           <CardContent>
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className="w-full" defaultValue="advance-directive">
               <AccordionItem value="advance-directive" className="border-b-0">
                 <AccordionTrigger className="text-left py-3 hover:no-underline">
                   <span className="font-semibold text-foreground">What is an Advance Directive?</span>
@@ -465,7 +465,7 @@ const Resources = () => {
             <p className="text-sm font-medium text-muted-foreground mt-2">Common Questions & Answers</p>
           </CardHeader>
           <CardContent>
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className="w-full" defaultValue="burial-cremation">
               <AccordionItem value="burial-cremation" className="border-b-0">
                 <AccordionTrigger className="text-left py-3 hover:no-underline">
                   <span className="font-semibold text-foreground">Burial vs Cremation</span>
@@ -511,7 +511,7 @@ const Resources = () => {
             <p className="text-sm font-medium text-muted-foreground mt-2">Common Questions & Answers</p>
           </CardHeader>
           <CardContent>
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className="w-full" defaultValue="document-lists">
               <AccordionItem value="document-lists" className="border-b-0">
                 <AccordionTrigger className="text-left py-3 hover:no-underline">
                   <span className="font-semibold text-foreground">Why Document Lists Matter</span>
@@ -549,7 +549,7 @@ const Resources = () => {
             <p className="text-sm font-medium text-muted-foreground mt-2">Common Questions & Answers</p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className="w-full" defaultValue="death-away">
               <AccordionItem value="death-away" className="border-b-0">
                 <AccordionTrigger className="text-left py-3 hover:no-underline">
                   <span className="font-semibold text-foreground">What Happens If Death Occurs Away from Home</span>
