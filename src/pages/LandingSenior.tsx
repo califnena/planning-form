@@ -226,6 +226,9 @@ const LandingSenior = () => {
               <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
                 No pressure. Clear options.
               </p>
+              <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed mt-2 text-sm">
+                If a death has just occurred, you don't have to figure this out alone.
+              </p>
             </div>
             
             <div className="flex flex-col items-center text-center">
