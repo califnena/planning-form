@@ -58,7 +58,7 @@ import { Button } from '@/components/ui/button';
 import { TextSizeToggle } from '@/components/TextSizeToggle';
 import { 
   ExternalLink, FileText, Download, Home, Eye, 
-  Calculator, ChevronRight, CheckSquare, BookOpen, Info, HelpCircle
+  Calculator, ChevronRight, CheckSquare, BookOpen, Info, HelpCircle, Mail
 } from 'lucide-react';
 import { GlobalHeader } from '@/components/GlobalHeader';
 import { AppFooter } from '@/components/AppFooter';
@@ -1004,6 +1004,46 @@ const Resources = () => {
                 View or Download Checklist
               </Button>
             </a>
+          </div>
+
+          {/* What to Do & When - Time-Based Guidance */}
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-semibold mb-4">What to Do & When</h3>
+            
+            {/* First 24-48 Hours */}
+            <div className="mb-4">
+              <h4 className="font-medium text-amber-700 mb-2">First 24–48 Hours</h4>
+              <ul className="space-y-2 text-muted-foreground">
+                <li className="flex gap-2">
+                  <span className="text-amber-600">•</span>
+                  <span><strong>Confirm who the decision-maker is.</strong> Identify the person legally or practically responsible for making arrangements and decisions.</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* 24-48 Hours */}
+            <div className="mb-4">
+              <h4 className="font-medium text-amber-700 mb-2">24–48 Hours</h4>
+              <ul className="space-y-2 text-muted-foreground">
+                <li className="flex gap-2">
+                  <span className="text-amber-600">•</span>
+                  <span><strong>If no plan exists, consider speaking with Everlasting Funeral Advisors.</strong> We can help you understand options, avoid unnecessary costs, and make informed funeral planning decisions without pressure.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Contact EFA Button */}
+          <div className="border-t pt-6">
+            <a href="mailto:info@everlastingfuneraladvisors.com">
+              <Button variant="outline" className="w-full min-h-[52px] text-base gap-2 border-amber-500/30 hover:bg-amber-50 hover:border-amber-500/50">
+                <Mail className="h-5 w-5" />
+                Contact Everlasting Funeral Advisors
+              </Button>
+            </a>
+            <p className="text-sm text-muted-foreground text-center mt-2">
+              Email us for guidance. We'll respond as soon as possible.
+            </p>
           </div>
         </CardContent>
       </Card>
