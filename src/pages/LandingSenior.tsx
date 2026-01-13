@@ -208,9 +208,9 @@ const LandingSenior = () => {
               <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-5">
                 <Clock className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">No Rush</h3>
+              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Free 30-Minute Consultation</h3>
               <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
-                Fill out only what applies. Leave anything blank.
+                No pressure. Clear options.
               </p>
             </div>
             
@@ -218,9 +218,9 @@ const LandingSenior = () => {
               <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-5">
                 <Heart className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Help When You Need It</h3>
+              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Guided Help</h3>
               <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
-                Get support if you want it. No pressure.
+                Emotional support and guidance.
               </p>
             </div>
           </div>
