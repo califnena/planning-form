@@ -307,16 +307,19 @@ const LandingSenior = () => {
           </div>
         </section>
 
-        {/* 3) "IS THIS SAFE?" REASSURANCE BAND - Soft sage background */}
+        {/* 3) "WHAT HAPPENS WHEN A DEATH OCCURS" BAND - Soft sage background */}
         <section className="bg-[hsl(var(--senior-sage))] rounded-3xl p-8 md:p-12 mb-16">
+          <h2 className="text-xl md:text-2xl font-semibold text-[hsl(var(--senior-text))] mb-10 text-center">
+            What Happens When a Death Occurs
+          </h2>
           <div className="grid md:grid-cols-3 gap-10">
             <div className="flex flex-col items-center text-center">
               <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-5">
                 <Shield className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Clear & In Your Control</h3>
+              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Step-by-Step Guidance</h3>
               <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
-                Your wishes stay yours. Share or print only if and when you choose.
+                Clear next steps when a death happens. No guessing.
               </p>
             </div>
             
@@ -324,12 +327,9 @@ const LandingSenior = () => {
               <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-5">
                 <Clock className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Free 30-Minute Consultation</h3>
+              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Human Support Options</h3>
               <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
-                No pressure. Clear options.
-              </p>
-              <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed mt-2 text-sm">
-                If a death has just occurred, you don't have to figure this out alone.
+                Get help filling things out if you're overwhelmed.
               </p>
             </div>
             
@@ -337,9 +337,9 @@ const LandingSenior = () => {
               <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-5">
                 <Heart className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Guided Help</h3>
+              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Nothing Is Forced</h3>
               <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
-                Emotional support and guidance.
+                Use only what you need. Stop anytime.
               </p>
             </div>
           </div>
