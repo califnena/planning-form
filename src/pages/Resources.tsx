@@ -982,13 +982,17 @@ const Resources = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* PDF Preview */}
+          {/* Image Preview - only renders if image exists */}
           <div className="w-full rounded-lg border border-border overflow-hidden bg-muted/30">
-            <iframe 
-              src="/guides/EFA-Pre-Planning-Checklist.pdf"
-              style={{ width: '100%', height: '500px' }}
-              title="Pre-Planning Checklist" 
-              className="w-full"
+            <img 
+              src="/checklists/Pre-Planning-Checklist-4.png"
+              alt="Pre-Planning Checklist Preview"
+              className="w-full h-auto"
+              onError={(e) => {
+                // Hide the entire preview container if image fails
+                const container = e.currentTarget.parentElement;
+                if (container) container.style.display = 'none';
+              }}
             />
           </div>
           
@@ -1023,13 +1027,17 @@ const Resources = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* PDF Preview */}
+          {/* Image Preview - only renders if image exists */}
           <div className="w-full rounded-lg border border-border overflow-hidden bg-muted/30">
-            <iframe 
-              src="/guides/EFA-After-Death-Planner-and-Checklist.pdf"
-              style={{ width: '100%', height: '500px' }}
-              title="After-Death Planner & Checklist" 
-              className="w-full"
+            <img 
+              src="/checklists/After-Death-Checklist-3.png"
+              alt="After-Death Checklist Preview"
+              className="w-full h-auto"
+              onError={(e) => {
+                // Hide the entire preview container if image fails
+                const container = e.currentTarget.parentElement;
+                if (container) container.style.display = 'none';
+              }}
             />
           </div>
           
