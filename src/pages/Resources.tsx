@@ -1501,35 +1501,10 @@ const Resources = () => {
             <div>
               <h1 className="text-xl font-bold text-foreground">Resources & Help</h1>
               <p className="text-sm text-muted-foreground">
-                Guides, checklists, and tools to help you plan ahead.
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">
                 Use the menu on the left to choose a topic, or open a section below to read common questions and answers.
               </p>
             </div>
             <TextSizeToggle />
-          </div>
-        </div>
-      </div>
-
-      {/* Start Here Intro */}
-      <div className="bg-background border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <p className="text-base text-foreground">
-            This section provides helpful guides, forms, and information to support you and your family. You can read at your own pace and return anytime.
-          </p>
-        </div>
-      </div>
-
-      {/* What is this page explanation */}
-      <div className="bg-primary/5 border-b border-primary/10">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-start gap-3">
-            <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-            <p className="text-sm text-foreground">
-              <strong>What is this page?</strong> This page has guides, checklists, and tools to help you plan ahead. 
-              You can read a guide, print a checklist, or use the calculators.
-            </p>
           </div>
         </div>
       </div>
