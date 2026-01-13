@@ -904,56 +904,6 @@ const Resources = () => {
         </CardContent>
       </Card>
 
-      {/* When Death Happens Guide - PDF-based for reliability */}
-      <Card className="border-2 border-amber-500/20">
-        <CardHeader>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="inline-block px-3 py-1 text-sm font-semibold bg-amber-500/10 text-amber-700 rounded-full">
-              🕊️ After a Loss
-            </span>
-          </div>
-          <CardTitle className="text-xl">When Death Happens: After-Death Planner Guide</CardTitle>
-          <CardDescription className="text-base leading-relaxed">
-            Step-by-step guidance for families navigating the first days and weeks after losing a loved one.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* PDF Preview */}
-          <div className="w-full rounded-lg border border-border overflow-hidden bg-muted/30">
-            <iframe 
-              src="/guides/Everlasting-Funeral-Advisors-Guide.pdf"
-              style={{ width: '100%', height: '500px' }}
-              title="After-Death Planner Guide" 
-              className="w-full"
-            />
-          </div>
-          
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <a 
-              href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex-1"
-            >
-              <Button className="w-full min-h-[52px] text-base gap-2">
-                <Eye className="h-5 w-5" />
-                View or Print Guide
-              </Button>
-            </a>
-            <a 
-              href="/guides/Everlasting-Funeral-Advisors-Guide.pdf" 
-              download="After-Death-Planner-Guide.pdf"
-              className="flex-1"
-            >
-              <Button variant="outline" className="w-full min-h-[52px] text-base gap-2">
-                <Download className="h-5 w-5" />
-                Download Printable Copy
-              </Button>
-            </a>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 
