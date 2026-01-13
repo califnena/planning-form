@@ -416,6 +416,7 @@ const Resources = () => {
             <CardDescription className="text-base leading-relaxed">
               Understanding your rights and medical documents.
             </CardDescription>
+            <p className="text-sm font-medium text-muted-foreground mt-2">Common Questions & Answers</p>
           </CardHeader>
           <CardContent>
             <Accordion type="single" collapsible className="w-full">
@@ -461,6 +462,7 @@ const Resources = () => {
             <CardDescription className="text-base leading-relaxed">
               Understanding your options for final arrangements.
             </CardDescription>
+            <p className="text-sm font-medium text-muted-foreground mt-2">Common Questions & Answers</p>
           </CardHeader>
           <CardContent>
             <Accordion type="single" collapsible className="w-full">
@@ -506,6 +508,7 @@ const Resources = () => {
             <CardDescription className="text-base leading-relaxed">
               Keeping important information organized.
             </CardDescription>
+            <p className="text-sm font-medium text-muted-foreground mt-2">Common Questions & Answers</p>
           </CardHeader>
           <CardContent>
             <Accordion type="single" collapsible className="w-full">
@@ -543,6 +546,7 @@ const Resources = () => {
             <CardDescription className="text-base leading-relaxed">
               What happens if death occurs away from home.
             </CardDescription>
+            <p className="text-sm font-medium text-muted-foreground mt-2">Common Questions & Answers</p>
           </CardHeader>
           <CardContent className="space-y-4">
             <Accordion type="single" collapsible className="w-full">
@@ -1498,6 +1502,9 @@ const Resources = () => {
               <h1 className="text-xl font-bold text-foreground">Resources & Help</h1>
               <p className="text-sm text-muted-foreground">
                 Guides, checklists, and tools to help you plan ahead.
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Use the menu on the left to choose a topic, or open a section below to read common questions and answers.
               </p>
             </div>
             <TextSizeToggle />
