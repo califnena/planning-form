@@ -181,8 +181,7 @@ const LandingSenior = () => {
               <Link to="/after-death">
                 <Button 
                   size="lg" 
-                  variant="outline"
-                  className="min-h-[52px] text-lg px-10 rounded-xl"
+                  className="min-h-[52px] text-lg px-10 rounded-xl bg-[hsl(var(--senior-text))] hover:bg-[hsl(var(--senior-text))]/90 text-white"
                 >
                   Get Help After a Loss
                 </Button>
