@@ -97,6 +97,54 @@ export const SectionOverview = ({ onNavigateToSection }: SectionOverviewProps) =
 
   return (
     <div className="space-y-6 max-w-2xl">
+      {/* How the Planning Process Works - Orientation Section */}
+      <div className="bg-[hsl(var(--senior-sage))] rounded-2xl p-6 md:p-8 mb-2">
+        <h2 className="text-xl md:text-2xl font-semibold text-[hsl(var(--senior-text))] mb-2 text-center">
+          How the Planning Process Works
+        </h2>
+        <p className="text-[hsl(var(--senior-text-soft))] text-center mb-6 text-base">
+          You are always in control. Nothing is required all at once.
+        </p>
+        
+        <div className="space-y-3">
+          <div className="flex items-start gap-4 p-4 bg-white rounded-xl shadow-sm">
+            <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0 text-lg shadow-sm">
+              1
+            </div>
+            <div className="pt-1.5">
+              <p className="text-[hsl(var(--senior-text))] text-base">Choose what you want to include.</p>
+            </div>
+          </div>
+          
+          <div className="flex items-start gap-4 p-4 bg-white rounded-xl shadow-sm">
+            <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0 text-lg shadow-sm">
+              2
+            </div>
+            <div className="pt-1.5">
+              <p className="text-[hsl(var(--senior-text))] text-base">Fill out only what applies.</p>
+            </div>
+          </div>
+          
+          <div className="flex items-start gap-4 p-4 bg-white rounded-xl shadow-sm">
+            <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0 text-lg shadow-sm">
+              3
+            </div>
+            <div className="pt-1.5">
+              <p className="text-[hsl(var(--senior-text))] text-base">Save anytime and come back later.</p>
+            </div>
+          </div>
+          
+          <div className="flex items-start gap-4 p-4 bg-white rounded-xl shadow-sm">
+            <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold flex-shrink-0 text-lg shadow-sm">
+              4
+            </div>
+            <div className="pt-1.5">
+              <p className="text-[hsl(var(--senior-text))] text-base">Print or share with your family when you are ready.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Page Heading */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">My Planning Menu</h1>
