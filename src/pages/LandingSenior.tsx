@@ -162,15 +162,11 @@ const LandingSenior = () => {
             </div>
             
             <h1 className="text-2xl md:text-[1.85rem] font-bold text-[hsl(var(--senior-text))] mb-5 leading-snug">
-              Write down your wishes so your family<br className="hidden md:block" /> knows what you want.
+              Whether you're planning ahead or facing a loss, we're here.
             </h1>
             
-            <p className="text-lg text-[hsl(var(--senior-text-soft))] max-w-xl mx-auto mb-4 leading-relaxed">
-              Whether you're planning ahead or dealing with a recent loss, we're here to help.
-            </p>
-            
             <p className="text-lg text-[hsl(var(--senior-text-soft))] max-w-xl mx-auto mb-10 leading-relaxed">
-              Safe, private, and simple. Go at your own pace.
+              Create a plan in advance or get guided help after a death. Private. Simple. On your terms.
             </p>
             
             <div className="flex flex-col items-center gap-4">
