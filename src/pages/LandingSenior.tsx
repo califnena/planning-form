@@ -466,23 +466,6 @@ const LandingSenior = () => {
               <span className="font-medium text-[hsl(var(--senior-text))]">View common questions</span>
             </Link>
           </div>
-          
-          {/* Compliance disclaimer */}
-          <p className="text-center text-sm text-[hsl(var(--senior-text-soft))] max-w-lg mx-auto">
-            Always available guidance to help you think through your wishes.<br />
-            This support is automated, not a live person.
-          </p>
-        </section>
-
-
-        {/* Cross-link to Version A */}
-        <section className="text-center py-8 border-t border-border/40">
-          <Link 
-            to="/" 
-            className="text-sm text-[hsl(var(--senior-text-soft))] hover:text-primary underline"
-          >
-            Back to standard home page
-          </Link>
         </section>
       </main>
 
