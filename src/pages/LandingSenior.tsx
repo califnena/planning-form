@@ -198,9 +198,9 @@ const LandingSenior = () => {
               <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-5">
                 <Shield className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Private & Secure</h3>
+              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Clear & In Your Control</h3>
               <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
-                Your information stays private unless you choose to print or share.
+                Your wishes stay yours. Share or print only if and when you choose.
               </p>
             </div>
             
