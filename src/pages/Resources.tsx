@@ -243,6 +243,9 @@ const Resources = () => {
         <p className="text-lg text-muted-foreground">
           Printable checklists to help you stay organized.
         </p>
+        <p className="text-base text-muted-foreground mt-2">
+          Free to view, download, or print.
+        </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
