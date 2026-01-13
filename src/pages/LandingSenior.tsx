@@ -165,6 +165,10 @@ const LandingSenior = () => {
               Write down your wishes so your family<br className="hidden md:block" /> knows what you want.
             </h1>
             
+            <p className="text-lg text-[hsl(var(--senior-text-soft))] max-w-xl mx-auto mb-4 leading-relaxed">
+              Whether you're planning ahead or dealing with a recent loss, we're here to help.
+            </p>
+            
             <p className="text-lg text-[hsl(var(--senior-text-soft))] max-w-xl mx-auto mb-10 leading-relaxed">
               Safe, private, and simple. Go at your own pace.
             </p>
