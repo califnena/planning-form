@@ -146,7 +146,7 @@ export default function Billing() {
   };
 
   const handleContactSupport = () => {
-    window.location.href = "mailto:support@everlastingfuneraladvisors.com?subject=Billing%20Support%20Request";
+    window.location.href = "mailto:info@everlastingfuneraladvisors.com?subject=Billing%20Support%20Request";
   };
 
   const formatCurrency = (amount: number, currency: string = "usd") => {

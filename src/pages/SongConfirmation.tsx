@@ -49,8 +49,8 @@ export default function SongConfirmation() {
                 <div>
                   <h3 className="font-semibold mb-1">Questions?</h3>
                   <p className="text-sm text-muted-foreground">
-                    If you have any questions about your order, please contact us at 
-                    efa.denisse@gmail.com
+                    If you have any questions about your order, please contact us at{" "}
+                    <a href="mailto:info@everlastingfuneraladvisors.com" className="text-primary hover:underline">info@everlastingfuneraladvisors.com</a>
                   </p>
                 </div>
               </div>
