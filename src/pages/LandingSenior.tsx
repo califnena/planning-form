@@ -363,26 +363,7 @@ const LandingSenior = () => {
           <p className="text-[hsl(var(--senior-text-soft))] text-center mb-10">(when you are ready)</p>
           
           <div className="grid sm:grid-cols-2 gap-5">
-            <Link 
-              to="/plan-ahead" 
-              className="flex items-center gap-5 p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors"
-            >
-              <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
-                <FileText className="h-7 w-7 text-primary" />
-              </div>
-              <span className="text-[hsl(var(--senior-text))] font-medium text-lg">Planning tools</span>
-            </Link>
-            
-            <a 
-              href="https://everlastingfuneraladvisors.com/shop/"
-              className="flex items-center gap-5 p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors cursor-pointer"
-            >
-              <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
-                <ShoppingBag className="h-7 w-7 text-primary" />
-              </div>
-              <span className="text-[hsl(var(--senior-text))] font-medium text-lg">Quality funeral selections within your budget</span>
-            </a>
-            
+            {/* 1. After-Death Help for Families */}
             <Link 
               to="/after-death" 
               className="flex items-center gap-5 p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors"
@@ -390,9 +371,27 @@ const LandingSenior = () => {
               <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
                 <BookOpen className="h-7 w-7 text-primary" />
               </div>
-              <span className="text-[hsl(var(--senior-text))] font-medium text-lg">After-death guide for families</span>
+              <div>
+                <span className="text-[hsl(var(--senior-text))] font-medium text-lg block">After-Death Help for Families</span>
+                <span className="text-[hsl(var(--senior-text-soft))] text-sm">Guidance, checklists, and support when a death has already occurred.</span>
+              </div>
             </Link>
             
+            {/* 2. Funeral & Memorial Products */}
+            <a 
+              href="https://everlastingfuneraladvisors.com/shop/"
+              className="flex items-center gap-5 p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors cursor-pointer"
+            >
+              <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
+                <ShoppingBag className="h-7 w-7 text-primary" />
+              </div>
+              <div>
+                <span className="text-[hsl(var(--senior-text))] font-medium text-lg block">Funeral & Memorial Products</span>
+                <span className="text-[hsl(var(--senior-text-soft))] text-sm">Caskets, urns, and memorial items selected for quality and value.</span>
+              </div>
+            </a>
+            
+            {/* 3. Free Guides & Checklists */}
             <Link 
               to="/resources" 
               className="flex items-center gap-5 p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors"
@@ -401,8 +400,22 @@ const LandingSenior = () => {
                 <BookOpen className="h-7 w-7 text-primary" />
               </div>
               <div>
-                <span className="text-[hsl(var(--senior-text))] font-medium text-lg block">Free Guides & Resources</span>
-                <span className="text-[hsl(var(--senior-text-soft))] text-sm">Interactive planning guide to help you get started</span>
+                <span className="text-[hsl(var(--senior-text))] font-medium text-lg block">Free Guides & Checklists</span>
+                <span className="text-[hsl(var(--senior-text-soft))] text-sm">Step-by-step help you can read, download, or print.</span>
+              </div>
+            </Link>
+            
+            {/* 4. Planning Tools */}
+            <Link 
+              to="/plan-ahead" 
+              className="flex items-center gap-5 p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors"
+            >
+              <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
+                <FileText className="h-7 w-7 text-primary" />
+              </div>
+              <div>
+                <span className="text-[hsl(var(--senior-text))] font-medium text-lg block">Planning Tools</span>
+                <span className="text-[hsl(var(--senior-text-soft))] text-sm">For those who want to plan ahead at their own pace.</span>
               </div>
             </Link>
           </div>
