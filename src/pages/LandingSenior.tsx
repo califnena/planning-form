@@ -300,20 +300,6 @@ const LandingSenior = () => {
           </div>
         </section>
 
-        {/* Support-focused testimonial for after-death guidance */}
-        <section className="bg-[hsl(40,35%,88%)] rounded-3xl p-8 md:p-12 mb-16 border-2 border-primary/20">
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-md border border-primary/15 p-8 relative">
-              <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/30" />
-              <div className="pl-8">
-                <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed mb-5 italic">
-                  "When my husband passed, I didn't know where to start. I called and spoke to Everlasting Funeral Advisors who calmly walked me through what needed to be done, step by step. They helped me organize everything, avoid unnecessary costs, and make decisions without pressure. I don't know what I would have done without that help."
-                </p>
-                <p className="text-primary font-bold text-base">— Linda M., 71</p>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* 4) "WHY FAMILIES CHOOSE TO PLAN" BAND - Clean white section */}
         <section className="bg-white rounded-3xl shadow-sm border border-border/30 p-8 md:p-12 mb-16">
@@ -350,7 +336,18 @@ const LandingSenior = () => {
           </h2>
           
           <div className="space-y-8 max-w-2xl mx-auto">
-            {/* Testimonial 1 */}
+            {/* Testimonial - Linda (support-focused) */}
+            <div className="bg-white rounded-2xl shadow-md border border-primary/15 p-8 relative">
+              <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/30" />
+              <div className="pl-8">
+                <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed mb-5 italic">
+                  "When my husband passed, I didn't know where to start. I called and spoke to Everlasting Funeral Advisors who calmly walked me through what needed to be done, step by step. They helped me organize everything, avoid unnecessary costs, and make decisions without pressure. I don't know what I would have done without that help."
+                </p>
+                <p className="text-primary font-bold text-base">— Linda M., 71</p>
+              </div>
+            </div>
+            
+            {/* Testimonial - Margaret */}
             <div className="bg-white rounded-2xl shadow-md border border-primary/15 p-8 relative">
               <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/30" />
               <div className="pl-8">
