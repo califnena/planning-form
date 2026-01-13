@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import mascotHeroCouple from "@/assets/mascot-hero-couple.png";
 import mascotFamiliesChoose from "@/assets/mascot-families-choose.png";
+import efaHeaderLogo from "@/assets/efa-header-logo.png";
 
 /**
  * LandingSenior (Version B)
@@ -90,10 +91,14 @@ const LandingSenior = () => {
     <div className="min-h-screen bg-[hsl(var(--senior-cream))] text-[1.1rem] leading-relaxed">
       {/* Simple Header - warm and calm */}
       <header className="border-b border-border/50 sticky top-0 z-50 bg-[hsl(var(--senior-cream))]/95 backdrop-blur">
-        <div className="max-w-[900px] mx-auto px-5 py-5 flex justify-between items-center">
-          <div>
-            <h1 className="text-lg font-semibold text-primary">Everlasting Funeral Advisors</h1>
-          </div>
+        <div className="max-w-[900px] mx-auto px-5 py-3 flex justify-between items-center">
+          <Link to="/home-senior" className="flex items-center">
+            <img 
+              src={efaHeaderLogo} 
+              alt="Everlasting Funeral Advisors" 
+              className="h-12 md:h-14 w-auto"
+            />
+          </Link>
           <div className="flex items-center gap-3">
             {/* Text Size Controls */}
             <div className="hidden sm:flex items-center gap-1 border border-border/60 rounded-lg px-2 py-1 bg-white/60">
@@ -169,11 +174,11 @@ const LandingSenior = () => {
               Create a plan in advance or get guided help after a death. Private. Simple. On your terms.
             </p>
             
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button 
                 size="lg" 
                 onClick={handlePrimaryCTA} 
-                className="min-h-[60px] text-lg px-14 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+                className="min-h-[56px] text-lg px-10 rounded-xl shadow-md hover:shadow-lg transition-shadow"
               >
                 Continue My Plan
               </Button>
@@ -181,7 +186,7 @@ const LandingSenior = () => {
               <Link to="/after-death">
                 <Button 
                   size="lg" 
-                  className="min-h-[52px] text-lg px-10 rounded-xl bg-[hsl(var(--senior-text))] hover:bg-[hsl(var(--senior-text))]/90 text-white"
+                  className="min-h-[56px] text-lg px-10 rounded-xl bg-[hsl(var(--senior-text))] hover:bg-[hsl(var(--senior-text))]/90 text-white"
                 >
                   Get Help After a Loss
                 </Button>
