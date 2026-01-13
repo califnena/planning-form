@@ -262,10 +262,10 @@ const LandingSenior = () => {
         </section>
 
 
-        {/* 3) "WHAT HAPPENS WHEN A DEATH OCCURS" BAND - Soft sage background */}
+        {/* 3) "GUIDANCE WHEN YOU NEED IT MOST" BAND - Soft sage background */}
         <section className="bg-[hsl(var(--senior-sage))] rounded-3xl p-8 md:p-12 mb-16">
           <h2 className="text-xl md:text-2xl font-semibold text-[hsl(var(--senior-text))] mb-10 text-center">
-            What Happens When a Death Occurs
+            Guidance When You Need It Most
           </h2>
           <div className="grid md:grid-cols-3 gap-10">
             <div className="flex flex-col items-center text-center">
@@ -296,6 +296,21 @@ const LandingSenior = () => {
               <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
                 Use only what you need. Stop anytime.
               </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Support-focused testimonial for after-death guidance */}
+        <section className="bg-[hsl(40,35%,88%)] rounded-3xl p-8 md:p-12 mb-16 border-2 border-primary/20">
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-md border border-primary/15 p-8 relative">
+              <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/30" />
+              <div className="pl-8">
+                <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed mb-5 italic">
+                  "When my husband passed, I didn't know where to start. I called and spoke to Everlasting Funeral Advisors who calmly walked me through what needed to be done, step by step. They helped me organize everything, avoid unnecessary costs, and make decisions without pressure. I don't know what I would have done without that help."
+                </p>
+                <p className="text-primary font-bold text-base">— Linda M., 71</p>
+              </div>
             </div>
           </div>
         </section>
