@@ -70,10 +70,10 @@ import { ErrorPanel } from '@/components/ui/ErrorPanel';
 import { LegalDisclaimer } from '@/components/ui/LegalDisclaimer';
 import { cn } from '@/lib/utils';
 
-// Senior-friendly 4-category organization
-// 'start-here', 'planning-guides', 'forms-checklists', 'learn-more'
-const VALID_SECTIONS = ['start-here', 'planning-guides', 'forms-checklists', 'learn-more'];
-const DEFAULT_SECTION = 'start-here';
+// Senior-friendly 3-category organization per Prompt C1
+// 'step-by-step', 'free-checklists', 'free-guides'
+const VALID_SECTIONS = ['step-by-step', 'free-checklists', 'free-guides'];
+const DEFAULT_SECTION = 'step-by-step';
 
 const Resources = () => {
   const navigate = useNavigate();
@@ -98,79 +98,326 @@ const Resources = () => {
     setActiveSubItem(subItemId);
   };
 
-  // Quick access cards for top of page - matches new 4-category structure
+  // Quick access cards for top of page - matches new 3-category structure
   const quickAccessCards = [
     {
-      title: "Start Here",
-      description: "Learn the basics",
+      title: "Step-by-Step Planning",
+      description: "In this app",
       icon: BookOpen,
-      onClick: () => handleSectionChange('start-here'),
+      onClick: () => handleSectionChange('step-by-step'),
       color: "bg-primary/10 text-primary"
     },
     {
-      title: "Planning Guides",
-      description: "Step-by-step help",
-      icon: BookOpen,
-      onClick: () => handleSectionChange('planning-guides'),
+      title: "Free Checklists",
+      description: "Printable",
+      icon: CheckSquare,
+      onClick: () => handleSectionChange('free-checklists'),
       color: "bg-green-500/10 text-green-700"
     },
     {
-      title: "Forms & Checklists",
-      description: "Printable documents",
+      title: "Free Guides",
+      description: "Optional reading",
       icon: FileText,
-      onClick: () => handleSectionChange('forms-checklists'),
+      onClick: () => handleSectionChange('free-guides'),
       color: "bg-blue-500/10 text-blue-700"
-    },
-    {
-      title: "Learn More",
-      description: "Additional resources",
-      icon: HelpCircle,
-      onClick: () => handleSectionChange('learn-more'),
-      color: "bg-amber-500/10 text-amber-700"
     },
   ];
 
   const renderContent = () => {
-    // Handle new 4-category structure with sub-items
+    // Handle new 3-category structure with sub-items per Prompt C1
     switch (activeSection) {
-      case 'start-here':
-        // Maps to old 'education' content
-        return renderEducation();
-      case 'planning-guides':
-        // Sub-items: step-by-step, cost-estimator
+      case 'step-by-step':
+        // In-app guidance content
+        if (activeSubItem === 'legal-medical') {
+          return renderEducation();
+        }
+        if (activeSubItem === 'funeral-planning') {
+          return renderEducation();
+        }
+        if (activeSubItem === 'digital-organization') {
+          return renderEducation();
+        }
+        if (activeSubItem === 'travel-protection') {
+          return renderEducation();
+        }
         if (activeSubItem === 'cost-estimator') {
-          // Redirect handled by navigation
           return renderToolsCalculators();
         }
-        return renderPlanningGuidesSection();
-      case 'forms-checklists':
-        // Sub-items: checklists, forms
-        if (activeSubItem === 'checklists') {
+        return renderStepByStepOverview();
+      case 'free-checklists':
+        // Printable checklists
+        if (activeSubItem === 'pre-planning') {
           return renderChecklists();
         }
-        if (activeSubItem === 'forms') {
+        if (activeSubItem === 'after-death') {
+          return renderChecklists();
+        }
+        return renderFreeChecklistsOverview();
+      case 'free-guides':
+        // Optional reading guides
+        if (activeSubItem === 'planning-guide') {
           return renderFormsWorksheets();
         }
-        // Default to combined view
-        return renderFormsChecklistsCombined();
-      case 'learn-more':
-        // Sub-items: trusted-resources, support-help, faqs
+        if (activeSubItem === 'after-death-guide') {
+          return renderFormsWorksheets();
+        }
         if (activeSubItem === 'trusted-resources') {
           return renderTrustedResources();
-        }
-        if (activeSubItem === 'support-help') {
-          return renderSupportHelp();
         }
         if (activeSubItem === 'faqs') {
           return renderFAQs();
         }
-        return renderLearnMoreOverview();
+        return renderFreeGuidesOverview();
       default:
-        return renderEducation();
+        return renderStepByStepOverview();
     }
   };
 
-  // New: Planning Guides overview section
+  // New: Step-by-Step Planning overview section
+  const renderStepByStepOverview = () => (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Step-by-Step Planning (In This App)</h1>
+        <p className="text-lg text-muted-foreground">
+          Guided help within this app to walk you through the planning process.
+        </p>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate('/guide')}>
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <BookOpen className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Start the Guide</CardTitle>
+                <CardDescription>Learn before you fill out forms</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              A friendly walkthrough of the planning process, one step at a time.
+            </p>
+            <Button className="w-full min-h-[48px]">
+              Start the Guide
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Link to="/resources/cost-estimator" className="block">
+          <Card className="h-full hover:border-primary/50 transition-colors cursor-pointer">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                  <Calculator className="h-6 w-6 text-amber-700" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Cost Estimator</CardTitle>
+                  <CardDescription>Get a general idea of funeral costs</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Enter your preferences to see estimated costs for different funeral options.
+              </p>
+              <Button variant="outline" className="w-full min-h-[48px]">
+                Open Cost Estimator
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </Button>
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
+    </div>
+  );
+
+  // New: Free Checklists overview section
+  const renderFreeChecklistsOverview = () => (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Free Checklists (Printable)</h1>
+        <p className="text-lg text-muted-foreground">
+          Printable checklists to help you stay organized.
+        </p>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card 
+          className="hover:border-primary/50 transition-colors cursor-pointer" 
+          onClick={() => handleSectionChange('free-checklists', 'pre-planning')}
+        >
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
+                <CheckSquare className="h-6 w-6 text-green-700" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Pre-Planning Checklist</CardTitle>
+                <CardDescription>Plan ahead step-by-step</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              A checklist to help you plan ahead for your family.
+            </p>
+            <Button className="w-full min-h-[48px]">
+              View Checklist
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="hover:border-primary/50 transition-colors cursor-pointer" 
+          onClick={() => handleSectionChange('free-checklists', 'after-death')}
+        >
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                <CheckSquare className="h-6 w-6 text-blue-700" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">After-Death Checklist</CardTitle>
+                <CardDescription>What to do after a loss</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              A checklist to guide you through the days after a loved one passes.
+            </p>
+            <Button variant="outline" className="w-full min-h-[48px]">
+              View Checklist
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  // New: Free Guides overview section
+  const renderFreeGuidesOverview = () => (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Free Guides (Optional Reading)</h1>
+        <p className="text-lg text-muted-foreground">
+          Additional reading to help you understand your options.
+        </p>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card 
+          className="hover:border-primary/50 transition-colors cursor-pointer" 
+          onClick={() => handleSectionChange('free-guides', 'planning-guide')}
+        >
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <FileText className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Pre-Planning Guide</CardTitle>
+                <CardDescription>Comprehensive planning guide</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              A detailed guide to help you understand all aspects of pre-planning.
+            </p>
+            <Button className="w-full min-h-[48px]">
+              View Guide
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="hover:border-primary/50 transition-colors cursor-pointer" 
+          onClick={() => handleSectionChange('free-guides', 'after-death-guide')}
+        >
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                <FileText className="h-6 w-6 text-blue-700" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">After-Death Planner</CardTitle>
+                <CardDescription>Guide for after a loss</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              A guide to help you navigate the days after a loved one passes.
+            </p>
+            <Button variant="outline" className="w-full min-h-[48px]">
+              View Guide
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="hover:border-primary/50 transition-colors cursor-pointer" 
+          onClick={() => handleSectionChange('free-guides', 'trusted-resources')}
+        >
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                <ExternalLink className="h-6 w-6 text-purple-700" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Trusted Resources</CardTitle>
+                <CardDescription>External resources</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Verified external resources from official organizations.
+            </p>
+            <Button variant="outline" className="w-full min-h-[48px]">
+              View Resources
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="hover:border-primary/50 transition-colors cursor-pointer" 
+          onClick={() => handleSectionChange('free-guides', 'faqs')}
+        >
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                <HelpCircle className="h-6 w-6 text-amber-700" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">FAQs</CardTitle>
+                <CardDescription>Common questions</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Find answers to frequently asked questions.
+            </p>
+            <Button variant="outline" className="w-full min-h-[48px]">
+              View FAQs
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
   const renderPlanningGuidesSection = () => (
     <div className="space-y-8">
       <div>

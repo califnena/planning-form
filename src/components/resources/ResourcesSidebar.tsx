@@ -17,44 +17,37 @@ export interface ResourceSection {
   subItems?: { id: string; label: string }[];
 }
 
-// Senior-friendly 4-category organization
+// Senior-friendly 3-category organization per Prompt C1
 export const resourceSections: ResourceSection[] = [
   {
-    id: 'start-here',
-    label: 'Start Here',
-    icon: Lightbulb,
+    id: 'step-by-step',
+    label: 'Step-by-Step Planning (In This App)',
+    icon: BookOpen,
     subItems: [
       { id: 'legal-medical', label: 'Legal & Medical Planning' },
       { id: 'funeral-planning', label: 'Funeral Planning' },
       { id: 'digital-organization', label: 'Digital & Organization' },
       { id: 'travel-protection', label: 'Travel Protection' },
-    ],
-  },
-  {
-    id: 'planning-guides',
-    label: 'Planning Guides',
-    icon: BookOpen,
-    subItems: [
-      { id: 'step-by-step', label: 'Step-by-Step Guide' },
       { id: 'cost-estimator', label: 'Cost Estimator' },
     ],
   },
   {
-    id: 'forms-checklists',
-    label: 'Forms & Checklists',
-    icon: FileText,
+    id: 'free-checklists',
+    label: 'Free Checklists (Printable)',
+    icon: CheckSquare,
     subItems: [
-      { id: 'checklists', label: 'Checklists' },
-      { id: 'forms', label: 'Printable Forms' },
+      { id: 'pre-planning', label: 'Pre-Planning Checklist' },
+      { id: 'after-death', label: 'After-Death Checklist' },
     ],
   },
   {
-    id: 'learn-more',
-    label: 'Learn More (Optional)',
-    icon: HelpCircle,
+    id: 'free-guides',
+    label: 'Free Guides (Optional Reading)',
+    icon: FileText,
     subItems: [
+      { id: 'planning-guide', label: 'Pre-Planning Guide' },
+      { id: 'after-death-guide', label: 'After-Death Planner' },
       { id: 'trusted-resources', label: 'Trusted Resources' },
-      { id: 'support-help', label: 'Support & Help' },
       { id: 'faqs', label: 'FAQs' },
     ],
   },
