@@ -312,6 +312,9 @@ const Resources = () => {
         <p className="text-lg text-muted-foreground">
           Additional reading to help you understand your options.
         </p>
+        <p className="text-base text-muted-foreground mt-2">
+          These guides are different from the step-by-step planning inside the app. They are optional reading only.
+        </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
