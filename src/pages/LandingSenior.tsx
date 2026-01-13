@@ -266,46 +266,6 @@ const LandingSenior = () => {
           </div>
         </section>
 
-        {/* PRIMARY PATHS - Two main user journeys */}
-        <section className="bg-[hsl(var(--senior-sage))] rounded-3xl p-8 md:p-12 mb-16">
-          <h2 className="text-xl md:text-2xl font-semibold text-[hsl(var(--senior-text))] mb-10 text-center">
-            How Can We Help You Right Now?
-          </h2>
-          
-          <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            {/* Planning Ahead Card */}
-            <div className="bg-white rounded-2xl shadow-sm border border-border/30 p-8 flex flex-col items-center text-center">
-              <h3 className="font-semibold text-[hsl(var(--senior-text))] text-xl mb-4">Planning Ahead</h3>
-              <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed mb-6">
-                Record wishes, organize details, and share when you're ready.
-              </p>
-              <Button 
-                size="lg" 
-                onClick={handlePrimaryCTA}
-                className="min-h-[52px] text-lg px-8 rounded-xl"
-              >
-                Start a Plan
-              </Button>
-            </div>
-            
-            {/* After a Death Card */}
-            <div className="bg-white rounded-2xl shadow-sm border border-border/30 p-8 flex flex-col items-center text-center">
-              <h3 className="font-semibold text-[hsl(var(--senior-text))] text-xl mb-4">After a Death</h3>
-              <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed mb-6">
-                Get clear next steps, guidance, and support during a difficult time.
-              </p>
-              <Link to="/after-death">
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="min-h-[52px] text-lg px-8 rounded-xl"
-                >
-                  Get Help After a Loss
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
 
         {/* 3) "WHAT HAPPENS WHEN A DEATH OCCURS" BAND - Soft sage background */}
         <section className="bg-[hsl(var(--senior-sage))] rounded-3xl p-8 md:p-12 mb-16">
@@ -345,10 +305,10 @@ const LandingSenior = () => {
           </div>
         </section>
 
-        {/* 4) "WHY DO THIS?" BAND - Clean white section */}
+        {/* 4) "WHY FAMILIES CHOOSE TO PLAN" BAND - Clean white section */}
         <section className="bg-white rounded-3xl shadow-sm border border-border/30 p-8 md:p-12 mb-16">
           <h2 className="text-xl md:text-2xl font-semibold text-[hsl(var(--senior-text))] mb-10 text-center">
-            Why having a plan helps
+            Why Families Choose to Plan
           </h2>
           
           <div className="max-w-lg mx-auto space-y-6">
@@ -356,19 +316,19 @@ const LandingSenior = () => {
               <div className="w-10 h-10 rounded-xl bg-[hsl(var(--senior-sage))] flex items-center justify-center flex-shrink-0">
                 <CheckCircle className="h-5 w-5 text-primary" />
               </div>
-              <p className="text-[hsl(var(--senior-text))] text-lg pt-1.5">It reduces stress for your family.</p>
+              <p className="text-[hsl(var(--senior-text))] text-lg pt-1.5">It gives your family peace of mind during a difficult time.</p>
             </div>
             <div className="flex items-start gap-5">
               <div className="w-10 h-10 rounded-xl bg-[hsl(var(--senior-sage))] flex items-center justify-center flex-shrink-0">
                 <CheckCircle className="h-5 w-5 text-primary" />
               </div>
-              <p className="text-[hsl(var(--senior-text))] text-lg pt-1.5">It helps prevent confusion and disagreements.</p>
+              <p className="text-[hsl(var(--senior-text))] text-lg pt-1.5">It helps avoid confusion about what you wanted.</p>
             </div>
             <div className="flex items-start gap-5">
               <div className="w-10 h-10 rounded-xl bg-[hsl(var(--senior-sage))] flex items-center justify-center flex-shrink-0">
                 <CheckCircle className="h-5 w-5 text-primary" />
               </div>
-              <p className="text-[hsl(var(--senior-text))] text-lg pt-1.5">It keeps important details in one place.</p>
+              <p className="text-[hsl(var(--senior-text))] text-lg pt-1.5">It keeps everything in one safe, easy-to-find place.</p>
             </div>
           </div>
         </section>
