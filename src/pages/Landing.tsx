@@ -166,9 +166,9 @@ const Landing = () => {
             <Button size="lg" onClick={handlePrimaryCTA} className="min-h-[48px] text-lg px-8">
               {isLoggedIn && hasPlannerProgress ? "Continue Planning" : "Start Digital Planner"}
             </Button>
-            <Link to="/resources">
+            <Link to="/after-death">
               <Button size="lg" variant="outline" className="min-h-[48px] text-lg px-8">
-                Explore Resources
+                Get Help After a Loss
               </Button>
             </Link>
           </div>

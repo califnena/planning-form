@@ -182,6 +182,16 @@ const LandingSenior = () => {
                 Continue My Plan
               </Button>
               
+              <Link to="/after-death">
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="min-h-[52px] text-lg px-10 rounded-xl"
+                >
+                  Get Help After a Loss
+                </Button>
+              </Link>
+              
               <p className="text-sm text-[hsl(var(--senior-text-soft))] mt-1">
                 You can skip anything and come back later.
               </p>
