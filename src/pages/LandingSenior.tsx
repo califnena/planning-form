@@ -380,7 +380,7 @@ const LandingSenior = () => {
               <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
                 <ShoppingBag className="h-7 w-7 text-primary" />
               </div>
-              <span className="text-[hsl(var(--senior-text))] font-medium text-lg">Affordable funeral products</span>
+              <span className="text-[hsl(var(--senior-text))] font-medium text-lg">Quality funeral selections within your budget</span>
             </a>
             
             <Link 
