@@ -187,9 +187,6 @@ const LandingSenior = () => {
                 </Button>
               </Link>
               
-              <p className="text-sm text-[hsl(var(--senior-text-soft))] mt-1">
-                You can skip anything and come back later.
-              </p>
 
               {!isLoggedIn && !isLoading && (
                 <Link to="/login" className="text-sm text-[hsl(var(--senior-text-soft))] hover:text-primary underline mt-2">
@@ -467,33 +464,6 @@ const LandingSenior = () => {
           </p>
         </section>
 
-        {/* 8) FINAL CTA - Calming container with reassurance */}
-        <section className="text-center mb-10">
-          <div className="bg-[hsl(var(--senior-sage-deep))] rounded-3xl p-10 md:p-14">
-            <div className="flex flex-col items-center gap-5 mb-8">
-              <Button 
-                size="lg" 
-                onClick={handlePrimaryCTA} 
-                className="min-h-[60px] text-lg px-14 rounded-xl shadow-md hover:shadow-lg transition-shadow"
-              >
-                Continue My Plan
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                size="lg" 
-                asChild
-                className="min-h-[56px] text-lg px-10 rounded-xl bg-white/80 hover:bg-white"
-              >
-                <Link to="/resources">Learn More First</Link>
-              </Button>
-            </div>
-            
-            <p className="text-[hsl(var(--senior-text-soft))]">
-              You can skip anything and come back later. Nothing is shared unless you choose.
-            </p>
-          </div>
-        </section>
 
         {/* Cross-link to Version A */}
         <section className="text-center py-8 border-t border-border/40">
