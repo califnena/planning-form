@@ -1535,23 +1535,6 @@ const Resources = () => {
         />
         
         <main className="flex-1 max-w-4xl px-4 py-8 md:py-12">
-          {/* Quick Access - Small box at top of main content */}
-          <div className="mb-8 p-4 rounded-lg border border-border bg-card shadow-sm">
-            <h3 className="text-base font-semibold text-foreground mb-3">Quick Access</h3>
-            <div className="flex flex-wrap gap-2">
-              {quickAccessCards.map((card) => (
-                <button
-                  key={card.title}
-                  onClick={card.onClick}
-                  className="flex items-center gap-2 px-4 py-3 rounded-lg bg-background border border-border hover:border-primary/50 hover:bg-primary/5 text-base text-foreground transition-colors"
-                >
-                  <card.icon className="h-5 w-5 text-primary" />
-                  <span className="font-medium">{card.title}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-          
           {renderContent()}
         </main>
       </div>
