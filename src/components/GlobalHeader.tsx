@@ -102,15 +102,29 @@ export const GlobalHeader = ({ onGenerateDocument, minimal = false }: GlobalHead
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 md:h-20 items-center justify-between px-2 md:px-4">
+      <header className={`sticky top-0 z-50 w-full border-b backdrop-blur supports-[backdrop-filter]:bg-background/60 ${
+        minimal 
+          ? 'bg-muted/50 border-border/50' 
+          : 'bg-background/95'
+      }`}>
+        <div className={`container flex items-center justify-between px-2 md:px-4 ${
+          minimal 
+            ? 'h-10 md:h-12' 
+            : 'h-14 md:h-20'
+        }`}>
           {/* Left: Logo */}
           <Link to="/home-senior" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity shrink-0">
-            <img src={logo} alt="Everlasting Funeral Advisors" className="h-8 w-8 md:h-12 md:w-12" />
-            <div className="hidden sm:block">
-              <h1 className="text-lg font-semibold text-foreground">{t("header.plannerTitle")}</h1>
-              <p className="text-xs text-muted-foreground">{t("header.plannerSubtitle")}</p>
-            </div>
+            <img 
+              src={logo} 
+              alt="Everlasting Funeral Advisors" 
+              className={minimal ? "h-6 w-6 md:h-8 md:w-8 opacity-80" : "h-8 w-8 md:h-12 md:w-12"} 
+            />
+            {!minimal && (
+              <div className="hidden sm:block">
+                <h1 className="text-lg font-semibold text-foreground">{t("header.plannerTitle")}</h1>
+                <p className="text-xs text-muted-foreground">{t("header.plannerSubtitle")}</p>
+              </div>
+            )}
           </Link>
 
           {/* Right: Controls - hidden in minimal mode */}
