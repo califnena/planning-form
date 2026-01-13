@@ -1527,26 +1527,6 @@ const Resources = () => {
         </div>
       </div>
       
-      {/* Quick Access - Primary starting point for seniors */}
-      <div className="bg-primary/5 border-b border-primary/10 py-6">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-lg font-semibold text-foreground mb-1">Where would you like to start?</h2>
-          <p className="text-sm text-muted-foreground mb-4">Choose a category below, or use the menu on the left.</p>
-          <div className="flex flex-wrap gap-3">
-            {quickAccessCards.map((card) => (
-              <button
-                key={card.title}
-                onClick={card.onClick}
-                className="flex items-center gap-2 px-4 py-3 rounded-lg bg-background border border-border hover:border-primary/50 hover:bg-primary/5 text-base text-foreground transition-colors shadow-sm"
-              >
-                <card.icon className="h-5 w-5 text-primary" />
-                <span className="font-medium">{card.title}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
       <div className="flex-1 flex">
         <ResourcesSidebar 
           activeSection={activeSection}
@@ -1555,6 +1535,23 @@ const Resources = () => {
         />
         
         <main className="flex-1 max-w-4xl px-4 py-8 md:py-12">
+          {/* Quick Access - Small box at top of main content */}
+          <div className="mb-8 p-4 rounded-lg border border-border bg-card shadow-sm">
+            <h3 className="text-base font-semibold text-foreground mb-3">Quick Access</h3>
+            <div className="flex flex-wrap gap-2">
+              {quickAccessCards.map((card) => (
+                <button
+                  key={card.title}
+                  onClick={card.onClick}
+                  className="flex items-center gap-2 px-4 py-3 rounded-lg bg-background border border-border hover:border-primary/50 hover:bg-primary/5 text-base text-foreground transition-colors"
+                >
+                  <card.icon className="h-5 w-5 text-primary" />
+                  <span className="font-medium">{card.title}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          
           {renderContent()}
         </main>
       </div>
