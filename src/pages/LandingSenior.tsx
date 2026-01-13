@@ -201,160 +201,7 @@ const LandingSenior = () => {
           </div>
         </section>
 
-        {/* 2) "IS THIS SAFE?" REASSURANCE BAND - Soft sage background */}
-        <section className="bg-[hsl(var(--senior-sage))] rounded-3xl p-8 md:p-12 mb-16">
-          <div className="grid md:grid-cols-3 gap-10">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-5">
-                <Shield className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Clear & In Your Control</h3>
-              <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
-                Your wishes stay yours. Share or print only if and when you choose.
-              </p>
-            </div>
-            
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-5">
-                <Clock className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Free 30-Minute Consultation</h3>
-              <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
-                No pressure. Clear options.
-              </p>
-              <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed mt-2 text-sm">
-                If a death has just occurred, you don't have to figure this out alone.
-              </p>
-            </div>
-            
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-5">
-                <Heart className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Guided Help</h3>
-              <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
-                Emotional support and guidance.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* 3) "WHY DO THIS?" BAND - Clean white section */}
-        <section className="bg-white rounded-3xl shadow-sm border border-border/30 p-8 md:p-12 mb-16">
-          <h2 className="text-xl md:text-2xl font-semibold text-[hsl(var(--senior-text))] mb-10 text-center">
-            Why having a plan helps
-          </h2>
-          
-          <div className="max-w-lg mx-auto space-y-6">
-            <div className="flex items-start gap-5">
-              <div className="w-10 h-10 rounded-xl bg-[hsl(var(--senior-sage))] flex items-center justify-center flex-shrink-0">
-                <CheckCircle className="h-5 w-5 text-primary" />
-              </div>
-              <p className="text-[hsl(var(--senior-text))] text-lg pt-1.5">It reduces stress for your family.</p>
-            </div>
-            <div className="flex items-start gap-5">
-              <div className="w-10 h-10 rounded-xl bg-[hsl(var(--senior-sage))] flex items-center justify-center flex-shrink-0">
-                <CheckCircle className="h-5 w-5 text-primary" />
-              </div>
-              <p className="text-[hsl(var(--senior-text))] text-lg pt-1.5">It helps prevent confusion and disagreements.</p>
-            </div>
-            <div className="flex items-start gap-5">
-              <div className="w-10 h-10 rounded-xl bg-[hsl(var(--senior-sage))] flex items-center justify-center flex-shrink-0">
-                <CheckCircle className="h-5 w-5 text-primary" />
-              </div>
-              <p className="text-[hsl(var(--senior-text))] text-lg pt-1.5">It keeps important details in one place.</p>
-            </div>
-          </div>
-        </section>
-
-        {/* 4) TESTIMONIALS - Warm, elevated, important with higher contrast */}
-        <section className="bg-[hsl(40,35%,88%)] rounded-3xl p-8 md:p-12 mb-16 border-2 border-primary/20">
-          <h2 className="text-xl md:text-2xl font-semibold text-[hsl(var(--senior-text))] mb-10 text-center">
-            What Families Are Saying
-          </h2>
-          
-          <div className="space-y-8 max-w-2xl mx-auto">
-            {/* Testimonial 1 */}
-            <div className="bg-white rounded-2xl shadow-md border border-primary/15 p-8 relative">
-              <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/30" />
-              <div className="pl-8">
-                <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed mb-5 italic">
-                  "I finally feel at peace knowing my children won't have to guess what I wanted. This was so much easier than I expected."
-                </p>
-                <p className="text-primary font-bold text-base">— Margaret, 72</p>
-              </div>
-            </div>
-            
-            {/* Testimonial 2 */}
-            <div className="bg-white rounded-2xl shadow-md border border-primary/15 p-8 relative">
-              <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/30" />
-              <div className="pl-8">
-                <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed mb-5 italic">
-                  "My husband and I filled this out together one evening. It brought us closer and gave us both comfort."
-                </p>
-                <p className="text-primary font-bold text-base">— Robert & Helen, 68</p>
-              </div>
-            </div>
-
-            {/* Additional testimonial (collapsible) */}
-            {showMoreTestimonials && (
-              <div className="bg-white rounded-2xl shadow-md border border-primary/15 p-8 relative">
-                <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/30" />
-                <div className="pl-8">
-                  <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed mb-5 italic">
-                    "When my mother passed, we had no idea what she wanted. I don't want my family to go through that. This tool helped me put everything in one place."
-                  </p>
-                  <p className="text-primary font-bold text-base">— David, 58</p>
-                </div>
-              </div>
-            )}
-
-            <button 
-              onClick={() => setShowMoreTestimonials(!showMoreTestimonials)}
-              className="flex items-center gap-2 mx-auto text-sm text-[hsl(var(--senior-text))] font-medium hover:text-primary transition-colors py-2"
-            >
-              {showMoreTestimonials ? (
-                <>
-                  <ChevronUp className="h-4 w-4" />
-                  Show fewer stories
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="h-4 w-4" />
-                  Read more stories
-                </>
-              )}
-            </button>
-          </div>
-        </section>
-
-        {/* 5) OUR MISSION - Calm letter/note style with trust image */}
-        <section className="mb-16">
-          <div className="bg-[hsl(var(--senior-mission))] rounded-3xl border-2 border-primary/15 p-8 md:p-12">
-            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
-              <div className="text-center md:text-left flex-1">
-                <h2 className="text-xl font-semibold text-[hsl(var(--senior-text))] mb-6">
-                  Our Mission
-                </h2>
-                <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed mb-4">
-                  Our mission is to help families plan ahead with clarity, compassion, and confidence—so no one is left guessing during a difficult time.
-                </p>
-                <p className="text-[hsl(var(--senior-text-soft))] text-base">
-                  We believe planning ahead is a gift of love, not a burden.
-                </p>
-              </div>
-              <div className="flex-shrink-0 w-full md:w-64">
-                <img 
-                  src={mascotFamiliesChoose} 
-                  alt="Why Families Choose Everlasting" 
-                  className="w-full rounded-2xl shadow-md"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 6) "WHAT WE OFFER" (Services) - Soft, no pressure */}
+        {/* 2) "WHAT WE OFFER" (Services) - Soft, no pressure */}
         <section className="bg-white rounded-3xl shadow-sm border border-border/30 p-8 md:p-12 mb-16">
           <h2 className="text-xl md:text-2xl font-semibold text-[hsl(var(--senior-text))] mb-2 text-center">
             What we offer
@@ -417,6 +264,159 @@ const LandingSenior = () => {
                 <span className="text-[hsl(var(--senior-text-soft))] text-sm">For those who want to plan ahead at their own pace.</span>
               </div>
             </Link>
+          </div>
+        </section>
+
+        {/* 3) "IS THIS SAFE?" REASSURANCE BAND - Soft sage background */}
+        <section className="bg-[hsl(var(--senior-sage))] rounded-3xl p-8 md:p-12 mb-16">
+          <div className="grid md:grid-cols-3 gap-10">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-5">
+                <Shield className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Clear & In Your Control</h3>
+              <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
+                Your wishes stay yours. Share or print only if and when you choose.
+              </p>
+            </div>
+            
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-5">
+                <Clock className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Free 30-Minute Consultation</h3>
+              <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
+                No pressure. Clear options.
+              </p>
+              <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed mt-2 text-sm">
+                If a death has just occurred, you don't have to figure this out alone.
+              </p>
+            </div>
+            
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-5">
+                <Heart className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Guided Help</h3>
+              <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
+                Emotional support and guidance.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* 4) "WHY DO THIS?" BAND - Clean white section */}
+        <section className="bg-white rounded-3xl shadow-sm border border-border/30 p-8 md:p-12 mb-16">
+          <h2 className="text-xl md:text-2xl font-semibold text-[hsl(var(--senior-text))] mb-10 text-center">
+            Why having a plan helps
+          </h2>
+          
+          <div className="max-w-lg mx-auto space-y-6">
+            <div className="flex items-start gap-5">
+              <div className="w-10 h-10 rounded-xl bg-[hsl(var(--senior-sage))] flex items-center justify-center flex-shrink-0">
+                <CheckCircle className="h-5 w-5 text-primary" />
+              </div>
+              <p className="text-[hsl(var(--senior-text))] text-lg pt-1.5">It reduces stress for your family.</p>
+            </div>
+            <div className="flex items-start gap-5">
+              <div className="w-10 h-10 rounded-xl bg-[hsl(var(--senior-sage))] flex items-center justify-center flex-shrink-0">
+                <CheckCircle className="h-5 w-5 text-primary" />
+              </div>
+              <p className="text-[hsl(var(--senior-text))] text-lg pt-1.5">It helps prevent confusion and disagreements.</p>
+            </div>
+            <div className="flex items-start gap-5">
+              <div className="w-10 h-10 rounded-xl bg-[hsl(var(--senior-sage))] flex items-center justify-center flex-shrink-0">
+                <CheckCircle className="h-5 w-5 text-primary" />
+              </div>
+              <p className="text-[hsl(var(--senior-text))] text-lg pt-1.5">It keeps important details in one place.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* 5) TESTIMONIALS - Warm, elevated, important with higher contrast */}
+        <section className="bg-[hsl(40,35%,88%)] rounded-3xl p-8 md:p-12 mb-16 border-2 border-primary/20">
+          <h2 className="text-xl md:text-2xl font-semibold text-[hsl(var(--senior-text))] mb-10 text-center">
+            What Families Are Saying
+          </h2>
+          
+          <div className="space-y-8 max-w-2xl mx-auto">
+            {/* Testimonial 1 */}
+            <div className="bg-white rounded-2xl shadow-md border border-primary/15 p-8 relative">
+              <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/30" />
+              <div className="pl-8">
+                <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed mb-5 italic">
+                  "I finally feel at peace knowing my children won't have to guess what I wanted. This was so much easier than I expected."
+                </p>
+                <p className="text-primary font-bold text-base">— Margaret, 72</p>
+              </div>
+            </div>
+            
+            {/* Testimonial 2 */}
+            <div className="bg-white rounded-2xl shadow-md border border-primary/15 p-8 relative">
+              <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/30" />
+              <div className="pl-8">
+                <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed mb-5 italic">
+                  "My husband and I filled this out together one evening. It brought us closer and gave us both comfort."
+                </p>
+                <p className="text-primary font-bold text-base">— Robert & Helen, 68</p>
+              </div>
+            </div>
+
+            {/* Additional testimonial (collapsible) */}
+            {showMoreTestimonials && (
+              <div className="bg-white rounded-2xl shadow-md border border-primary/15 p-8 relative">
+                <Quote className="absolute top-6 left-6 h-8 w-8 text-primary/30" />
+                <div className="pl-8">
+                  <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed mb-5 italic">
+                    "When my mother passed, we had no idea what she wanted. I don't want my family to go through that. This tool helped me put everything in one place."
+                  </p>
+                  <p className="text-primary font-bold text-base">— David, 58</p>
+                </div>
+              </div>
+            )}
+
+            <button 
+              onClick={() => setShowMoreTestimonials(!showMoreTestimonials)}
+              className="flex items-center gap-2 mx-auto text-sm text-[hsl(var(--senior-text))] font-medium hover:text-primary transition-colors py-2"
+            >
+              {showMoreTestimonials ? (
+                <>
+                  <ChevronUp className="h-4 w-4" />
+                  Show fewer stories
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="h-4 w-4" />
+                  Read more stories
+                </>
+              )}
+            </button>
+          </div>
+        </section>
+
+        {/* 6) OUR MISSION - Calm letter/note style with trust image */}
+        <section className="mb-16">
+          <div className="bg-[hsl(var(--senior-mission))] rounded-3xl border-2 border-primary/15 p-8 md:p-12">
+            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+              <div className="text-center md:text-left flex-1">
+                <h2 className="text-xl font-semibold text-[hsl(var(--senior-text))] mb-6">
+                  Our Mission
+                </h2>
+                <p className="text-[hsl(var(--senior-text))] text-lg leading-relaxed mb-4">
+                  Our mission is to help families plan ahead with clarity, compassion, and confidence—so no one is left guessing during a difficult time.
+                </p>
+                <p className="text-[hsl(var(--senior-text-soft))] text-base">
+                  We believe planning ahead is a gift of love, not a burden.
+                </p>
+              </div>
+              <div className="flex-shrink-0 w-full md:w-64">
+                <img 
+                  src={mascotFamiliesChoose} 
+                  alt="Why Families Choose Everlasting" 
+                  className="w-full rounded-2xl shadow-md"
+                />
+              </div>
+            </div>
           </div>
         </section>
 
