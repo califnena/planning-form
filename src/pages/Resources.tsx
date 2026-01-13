@@ -992,7 +992,7 @@ const Resources = () => {
             />
           </div>
           
-          {/* Action Buttons */}
+          {/* Action Button */}
           <div className="flex flex-col sm:flex-row gap-4">
             <a 
               href="/guides/EFA-Pre-Planning-Checklist.pdf" 
@@ -1002,17 +1002,7 @@ const Resources = () => {
             >
               <Button className="w-full min-h-[52px] text-base gap-2">
                 <Eye className="h-5 w-5" />
-                View or Print Checklist
-              </Button>
-            </a>
-            <a 
-              href="/guides/EFA-Pre-Planning-Checklist.pdf" 
-              download="Pre-Planning-Checklist.pdf"
-              className="flex-1"
-            >
-              <Button variant="outline" className="w-full min-h-[52px] text-base gap-2">
-                <Download className="h-5 w-5" />
-                Download Printable Copy
+                View or Download Checklist
               </Button>
             </a>
           </div>
@@ -1043,7 +1033,7 @@ const Resources = () => {
             />
           </div>
           
-          {/* Action Buttons */}
+          {/* Action Button */}
           <div className="flex flex-col sm:flex-row gap-4">
             <a 
               href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
@@ -1053,17 +1043,7 @@ const Resources = () => {
             >
               <Button className="w-full min-h-[52px] text-base gap-2">
                 <Eye className="h-5 w-5" />
-                View or Print Checklist
-              </Button>
-            </a>
-            <a 
-              href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
-              download="After-Death-Planner-and-Checklist.pdf"
-              className="flex-1"
-            >
-              <Button variant="outline" className="w-full min-h-[52px] text-base gap-2">
-                <Download className="h-5 w-5" />
-                Download Printable Copy
+                View or Download Checklist
               </Button>
             </a>
           </div>
