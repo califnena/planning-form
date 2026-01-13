@@ -310,7 +310,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            {/* CARD 3: Affordable Products */}
+            {/* CARD 3: Quality Funeral Selections */}
             <Card className="border-2 rounded-xl hover:border-primary/50 hover:shadow-lg transition-all duration-200 group cursor-pointer flex flex-col">
               <CardContent className="p-6 flex flex-col flex-1">
                 <div className="flex justify-center">
