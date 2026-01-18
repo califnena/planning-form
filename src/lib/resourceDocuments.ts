@@ -199,6 +199,7 @@ export const PRE_PLANNING_CHECKLIST: Record<string, string[]> = {
 // After-Death Checklist organized by timeline
 export const AFTER_DEATH_CHECKLIST: Record<string, string[]> = {
   'First 24-48 Hours': [
+    'Figure out who the decision-maker is (next-of-kin, executor, etc.)',
     'Contact funeral home to arrange transport',
     'Request the funeral home\'s General Price List (GPL) and review itemized options',
     'Locate important documents (will, insurance policies)',
@@ -206,7 +207,8 @@ export const AFTER_DEATH_CHECKLIST: Record<string, string[]> = {
     'Notify immediate family members',
     'Begin making funeral arrangements',
     'Request multiple certified death certificates',
-    'Care for any pets'
+    'Care for any pets',
+    'If no plan exists, contact Everlasting Funeral Advisors for guidance on next steps and ways to avoid overspending'
   ],
   'First Week': [
     'Notify employer and request final paycheck',

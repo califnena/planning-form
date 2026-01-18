@@ -89,7 +89,7 @@ export default function AfterDeathLanding() {
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2">
-                  {["Locate Everlasting Funeral Advisors app or binder", 'Read "My Instructions"', "Notify immediate family", "Secure home, pets, valuables", "Contact service provider"].map((item, i) => <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  {["Figure out who the decision-maker is", "Locate Everlasting Funeral Advisors app or binder", 'Read "My Instructions"', "Notify immediate family", "Secure home, pets, valuables", "Contact service provider", "If no plan exists, contact Everlasting Funeral Advisors for guidance"].map((item, i) => <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                       {item}
                     </li>)}
