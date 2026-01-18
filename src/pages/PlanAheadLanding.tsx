@@ -27,6 +27,7 @@ export default function PlanAheadLanding() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [learnOpen, setLearnOpen] = useState(false);
+  const [otherOptionsOpen, setOtherOptionsOpen] = useState(false);
   const [hasPlannerProgress, setHasPlannerProgress] = useState(false);
   const [plannerMode, setPlannerMode] = useState<string | null>(null);
   const [isResuming, setIsResuming] = useState(false);
@@ -280,102 +281,106 @@ export default function PlanAheadLanding() {
               </CardContent>
             </Card>
 
-            {/* Other Options Label */}
-            <div className="pt-6 border-t border-border mt-8">
-              <p className="text-lg font-medium text-muted-foreground text-center mb-6">
-                Other options
-              </p>
-            </div>
+            {/* Other Options - Collapsible */}
+            <Collapsible open={otherOptionsOpen} onOpenChange={setOtherOptionsOpen} className="pt-6 border-t border-border mt-8">
+              <CollapsibleTrigger asChild>
+                <button className="w-full flex items-center justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                  <span className="text-lg font-medium text-muted-foreground">Other ways to plan (optional)</span>
+                  {otherOptionsOpen ? <ChevronUp className="h-5 w-5 text-muted-foreground" /> : <ChevronDown className="h-5 w-5 text-muted-foreground" />}
+                </button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-4 space-y-4">
+                {/* Option 2: Printable Planning Form */}
+                <Card className="border hover:border-primary/30 transition-colors">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                        <Printer className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-xl font-semibold">Printable Planning Form</h3>
+                        <p className="text-muted-foreground mb-4">
+                          Prefer to write things down or fill out a form?
+                        </p>
+                        <p className="text-sm font-medium mb-2">What this includes:</p>
+                        <ul className="text-sm text-muted-foreground space-y-1 mb-4">
+                          <li>• A printable planning form</li>
+                          <li>• Fill it out at your own pace</li>
+                          <li>• Keep a copy for your records</li>
+                        </ul>
+                        <Button 
+                          onClick={handleGetPrintableForm}
+                          disabled={isLoading}
+                          variant="outline"
+                          className="w-full sm:w-auto min-h-[48px]"
+                        >
+                          {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                          Get Printable Form
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Requires purchase to download.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            {/* Option 2: Printable Planning Form */}
-            <Card className="border-2 hover:border-primary/50 transition-colors">
-              <CardContent className="p-6 space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                    <Printer className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold">Printable Planning Form</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Prefer to write things down or fill out a form?
-                    </p>
-                    <p className="text-sm font-medium mb-2">What this includes:</p>
-                    <ul className="text-sm text-muted-foreground space-y-1 mb-4">
-                      <li>• A printable planning form</li>
-                      <li>• Fill it out at your own pace</li>
-                      <li>• Keep a copy for your records</li>
-                    </ul>
-                    <Button 
-                      onClick={handleGetPrintableForm}
-                      disabled={isLoading}
-                      variant="outline"
-                      className="w-full sm:w-auto min-h-[48px]"
-                    >
-                      {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                      Get Printable Form
-                    </Button>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Requires purchase to download.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                {/* Option 3: Extra Help (CARE Support) */}
+                <Card className="border hover:border-primary/30 transition-colors">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                        <Heart className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-xl font-semibold">Extra Help (Optional)</h3>
+                        <p className="text-muted-foreground mb-4">
+                          If planning feels overwhelming, you can add extra support.<br />
+                          CARE Support gives you access to Claire, your planning assistant.
+                        </p>
+                        <Button 
+                          onClick={handleLearnAboutCARE}
+                          variant="outline"
+                          className="w-full sm:w-auto min-h-[48px]"
+                        >
+                          Learn About CARE Support
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Optional. Cancel anytime.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            {/* Option 3: Extra Help (CARE Support) */}
-            <Card className="border-2 hover:border-primary/50 transition-colors">
-              <CardContent className="p-6 space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                    <Heart className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold">Extra Help (Optional)</h3>
-                    <p className="text-muted-foreground mb-4">
-                      If planning feels overwhelming, you can add extra support.<br />
-                      CARE Support gives you access to Claire, your planning assistant.
-                    </p>
-                    <Button 
-                      onClick={handleLearnAboutCARE}
-                      variant="outline"
-                      className="w-full sm:w-auto min-h-[48px]"
-                    >
-                      Learn About CARE Support
-                    </Button>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Optional. Cancel anytime.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Option 4: Do-It-For-You */}
-            <Card className="border-2 hover:border-primary/50 transition-colors">
-              <CardContent className="p-6 space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                    <HandHelping className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold">Do-It-For-You Planning</h3>
-                    <p className="text-muted-foreground mb-4">
-                      If you'd rather not do this yourself, we can help.
-                    </p>
-                    <Button 
-                      onClick={handleDoItForYou}
-                      variant="outline"
-                      className="w-full sm:w-auto min-h-[48px]"
-                    >
-                      Have Us Help You
-                    </Button>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Someone will contact you to get started.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                {/* Option 4: Do-It-For-You */}
+                <Card className="border hover:border-primary/30 transition-colors">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                        <HandHelping className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-xl font-semibold">Do-It-For-You Planning</h3>
+                        <p className="text-muted-foreground mb-4">
+                          If you'd rather not do this yourself, we can help.
+                        </p>
+                        <Button 
+                          onClick={handleDoItForYou}
+                          variant="outline"
+                          className="w-full sm:w-auto min-h-[48px]"
+                        >
+                          Have Us Help You
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Someone will contact you to get started.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CollapsibleContent>
+            </Collapsible>
           </div>
         </section>
 
