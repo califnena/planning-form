@@ -474,7 +474,7 @@ export default function PlanAheadLanding() {
               size="lg"
               className="min-h-[56px] text-lg px-8"
             >
-              Start Planning
+              Start Digital Planner
             </Button>
             <Button 
               variant="outline"
