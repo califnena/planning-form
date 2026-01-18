@@ -281,8 +281,14 @@ export default function PlanAheadLanding() {
               </CardContent>
             </Card>
 
+            {/* Free Preview Note */}
+            <div className="flex items-center justify-center gap-2 py-4 text-muted-foreground">
+              <Eye className="h-4 w-4" />
+              <span>You can <button onClick={handlePreviewPlanner} className="underline hover:text-primary transition-colors">preview the planner for free</button> before deciding.</span>
+            </div>
+
             {/* Other Options - Collapsible */}
-            <Collapsible open={otherOptionsOpen} onOpenChange={setOtherOptionsOpen} className="pt-6 border-t border-border mt-8">
+            <Collapsible open={otherOptionsOpen} onOpenChange={setOtherOptionsOpen} className="pt-6 border-t border-border">
               <CollapsibleTrigger asChild>
                 <button className="w-full flex items-center justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
                   <span className="text-lg font-medium text-muted-foreground">Other ways to plan (optional)</span>
@@ -384,46 +390,6 @@ export default function PlanAheadLanding() {
           </div>
         </section>
 
-        {/* Section 3: What You Can Do for Free */}
-        <section className="max-w-3xl mx-auto mb-16">
-          <Card className="border-2 border-dashed bg-background">
-            <CardContent className="p-6 md:p-8 space-y-4 text-center">
-              <h2 className="text-2xl font-serif font-semibold">
-                You can start without paying
-              </h2>
-              <p className="text-muted-foreground">
-                Before you purchase anything, you can:
-              </p>
-              <ul className="text-left max-w-md mx-auto space-y-2">
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <span>Preview the planner</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <span>Learn what questions are asked</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <span>Review the checklist</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <span>Read guides and FAQs</span>
-                </li>
-              </ul>
-              <Button 
-                onClick={handlePreviewPlanner}
-                variant="outline"
-                size="lg"
-                className="mt-4 min-h-[48px]"
-              >
-                <Eye className="h-4 w-4 mr-2" />
-                Preview the Planner
-              </Button>
-            </CardContent>
-          </Card>
-        </section>
 
         {/* Section 4: Reassurance */}
         <section className="max-w-3xl mx-auto mb-16">
