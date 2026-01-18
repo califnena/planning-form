@@ -35,24 +35,24 @@ interface AssistantPanelProps {
 // Quick action buttons for seniors
 const QUICK_ACTIONS = [
   { 
-    label: "Help me understand my options", 
-    prompt: "Can you help me understand my planning options? I'm not sure where to start.",
-    icon: HelpCircle 
-  },
-  { 
-    label: "Help me continue my plan", 
-    prompt: "I want to continue working on my plan. What should I focus on next?",
+    label: "I'm planning ahead", 
+    prompt: "I'm planning ahead for myself or a loved one.",
     icon: FileText 
   },
   { 
+    label: "Someone has passed away", 
+    prompt: "Someone has passed away and I need guidance.",
+    icon: Heart 
+  },
+  { 
     label: "I have a question", 
-    prompt: "I have a question about planning.",
+    prompt: "I have a question about planning or next steps.",
     icon: MessageCircle 
   },
   { 
     label: "I need more support", 
     prompt: "I'm feeling a bit overwhelmed and could use some extra support.",
-    icon: Heart 
+    icon: HelpCircle 
   },
 ];
 
@@ -376,7 +376,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
               Hi, I'm Claire.
             </p>
             <p className="text-muted-foreground text-sm">
-              I'm here to help you with planning, one step at a time.
+              I help with planning ahead — or after a loss.
             </p>
           </div>
 
@@ -439,7 +439,8 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                 <div className="space-y-4">
                   <div className="text-center text-muted-foreground text-sm py-4">
                     <p className="text-base font-medium text-foreground">Hi, I'm Claire.</p>
-                    <p className="mt-2">How can I help today?</p>
+                    <p className="mt-2">I'm here for planning ahead — or after a loss.</p>
+                    <p className="mt-1">How can I help today?</p>
                   </div>
                   
                   {/* Quick action buttons for seniors */}

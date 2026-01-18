@@ -31,11 +31,11 @@ export function ClaireWelcomeModal({ isOpen, onClose }: ClaireWelcomeModalProps)
               Hi, I'm Claire.
             </p>
             <p className="text-muted-foreground">
-              I'm here to help you with planning, one step at a time.
+              I'm here to help — whether you're planning ahead or have recently lost someone.
             </p>
             <p className="text-muted-foreground">
-              You can ask questions, think through decisions, or just take things slowly.
-              There's no rush and no pressure.
+              Ask questions, think through decisions, or take things one step at a time.
+              No rush. No pressure.
             </p>
           </div>
 
@@ -62,8 +62,9 @@ export function ClaireWelcomeModal({ isOpen, onClose }: ClaireWelcomeModalProps)
             </CollapsibleTrigger>
             <CollapsibleContent className="mt-3">
               <div className="bg-muted/30 p-4 rounded-lg text-sm text-muted-foreground space-y-2">
-                <p>Claire can help explain planning steps, review options, and guide you through decisions.</p>
-                <p className="text-xs">She does not give legal or medical advice.</p>
+                <p><strong>Planning ahead:</strong> Walks you through decisions, one section at a time.</p>
+                <p><strong>After a loss:</strong> Guides you on next steps and how to avoid common mistakes.</p>
+                <p className="text-xs">Claire does not give legal, medical, or financial advice.</p>
               </div>
             </CollapsibleContent>
           </Collapsible>
