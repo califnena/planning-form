@@ -221,31 +221,14 @@ export default function PlanAheadLanding() {
             Review your plan, print it, or go back to continue planning.
           </p>
           
-          {/* Three Large Stacked Buttons */}
+          {/* Primary Action Button */}
           <div className="flex flex-col gap-4 pt-6 max-w-md mx-auto">
-            <Button 
-              onClick={() => navigate("/preplan-summary")}
-              size="lg"
-              className="w-full min-h-[60px] text-lg font-semibold"
-            >
-              Back to My Plan
-            </Button>
             <Button 
               onClick={() => navigate("/preplandashboard")}
               size="lg"
-              variant="secondary"
               className="w-full min-h-[60px] text-lg font-semibold"
             >
-              Continue Planning
-            </Button>
-            <Button 
-              onClick={() => navigate("/preplan-summary")}
-              size="lg"
-              variant="outline"
-              className="w-full min-h-[60px] text-lg font-semibold"
-            >
-              <Printer className="h-5 w-5 mr-2" />
-              Print or Save PDF
+              Continue with Digital Planner
             </Button>
           </div>
         </section>
