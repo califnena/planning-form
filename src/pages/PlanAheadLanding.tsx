@@ -233,42 +233,6 @@ export default function PlanAheadLanding() {
           </div>
         </section>
 
-        {/* Section 1: What This Is */}
-        <section className="max-w-3xl mx-auto mb-16">
-          <Card className="border-none shadow-sm bg-muted/30">
-            <CardContent className="p-6 md:p-8 space-y-4">
-              <h2 className="text-2xl font-serif font-semibold text-center">
-                Planning ahead doesn't have to be overwhelming
-              </h2>
-              <p className="text-muted-foreground text-center">
-                This tool helps you organize your wishes in one place so your family is not left guessing later.
-              </p>
-              
-              <div className="pt-4 space-y-3">
-                <p className="font-medium">You can:</p>
-                <ul className="space-y-2">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span>Take things one step at a time</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span>Stop and come back anytime</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span>Choose the level of help that feels right</span>
-                  </li>
-                </ul>
-              </div>
-              
-              <p className="text-center text-muted-foreground pt-4 font-medium">
-                Nothing is final unless you choose to save or download.
-              </p>
-            </CardContent>
-          </Card>
-        </section>
-
         {/* Section 2: Choose How You Want to Plan */}
         <section className="max-w-3xl mx-auto mb-16">
           <h2 className="text-2xl md:text-3xl font-serif font-semibold text-center mb-2">
