@@ -289,10 +289,10 @@ export default function PlanAheadLanding() {
         {/* Section 2: Choose How You Want to Plan */}
         <section className="max-w-3xl mx-auto mb-16">
           <h2 className="text-2xl md:text-3xl font-serif font-semibold text-center mb-2">
-            Choose the approach that fits you
+            Recommended for You
           </h2>
           <p className="text-muted-foreground text-center mb-8">
-            Pick one. You can always change later.
+            Start here. You can always change later.
           </p>
 
           <div className="space-y-6">
@@ -332,6 +332,13 @@ export default function PlanAheadLanding() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Other Options Label */}
+            <div className="pt-6 border-t border-border mt-8">
+              <p className="text-lg font-medium text-muted-foreground text-center mb-6">
+                Other options
+              </p>
+            </div>
 
             {/* Option 2: Printable Planning Form */}
             <Card className="border-2 hover:border-primary/50 transition-colors">
