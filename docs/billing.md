@@ -170,4 +170,4 @@ if (isAdmin) return true;
 ## Support Contact
 
 For billing issues not resolvable via Stripe Portal:
-- Email: support@everlastingfuneraladvisors.com
+- Email: info@everlastingfuneraladvisors.com
