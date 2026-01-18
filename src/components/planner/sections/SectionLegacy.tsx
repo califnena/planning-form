@@ -86,7 +86,7 @@ export const SectionLegacy = ({ data, onChange }: SectionLegacyProps) => {
           <div className="flex items-center justify-between">
             <Label htmlFor="legacy">Your Life Story</Label>
             <WritingHelperButton
-              fieldLabel="Your Life Story"
+              fieldLabel="Life Story & Obituary"
               fieldContext="life_story"
               currentText={lifeStory}
               onInsert={(value) => updateLegacy("life_story", value)}
@@ -94,7 +94,7 @@ export const SectionLegacy = ({ data, onChange }: SectionLegacyProps) => {
             />
           </div>
           <p className="text-xs text-muted-foreground">
-            Write about your life journey, what made you proud, and how you want to be remembered
+            Need help writing? Use the button above for obituary and tribute wording ideas.
           </p>
           <Textarea
             id="legacy"

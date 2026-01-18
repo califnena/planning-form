@@ -222,13 +222,15 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
           <div className="flex items-center justify-between">
             <Label htmlFor="funeral_preference">{t("funeral.funeralPreference")}</Label>
             <WritingHelperButton
-              fieldLabel="Funeral Preference"
+              fieldLabel="Funeral & Memorial Wishes"
               fieldContext="funeral_wishes"
               currentText={funeral.funeral_preference || ""}
               onInsert={(text) => updateFuneral("funeral_preference", text)}
             />
           </div>
-          <p className="text-xs text-muted-foreground">{t("funeral.funeralPreferenceHelp")}</p>
+          <p className="text-xs text-muted-foreground">
+            Not sure what to write? Use the Writing Help button for ideas.
+          </p>
           <Textarea
             id="funeral_preference"
             value={funeral.funeral_preference || ""}
@@ -878,12 +880,15 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
               <div className="flex items-center justify-between">
                 <Label htmlFor="readings_content">Preferred Readings</Label>
                 <WritingHelperButton
-                  fieldLabel="Preferred Readings"
+                  fieldLabel="Readings & Tributes"
                   fieldContext="funeral_wishes"
                   currentText={funeral.readings_content || ""}
                   onInsert={(text) => updateFuneral("readings_content", text)}
                 />
               </div>
+              <p className="text-xs text-muted-foreground">
+                Use Writing Help for poem or scripture ideas.
+              </p>
               <Textarea
                 id="readings_content"
                 value={funeral.readings_content || ""}
@@ -946,13 +951,15 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
           <div className="flex items-center justify-between">
             <Label htmlFor="funeral_general_notes">Additional Details & Special Requests</Label>
             <WritingHelperButton
-              fieldLabel="Additional Details & Special Requests"
+              fieldLabel="Special Requests & Notes"
               fieldContext="funeral_wishes"
               currentText={funeral.general_notes || ""}
               onInsert={(text) => updateFuneral("general_notes", text)}
             />
           </div>
-          <p className="text-xs text-muted-foreground">Preferred funeral home, music, readings, speakers, traditions, dress code, budget, pre-paid plan details, and any other pertinent information</p>
+          <p className="text-xs text-muted-foreground">
+            Use Writing Help for wording ideas. Include funeral home, music, speakers, traditions, dress code, or budget notes.
+          </p>
           <Textarea
             id="funeral_general_notes"
             placeholder="Include:
