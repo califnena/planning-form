@@ -120,7 +120,8 @@ export default function ReliefCheckpoint() {
         )}
 
         <p className="text-lg text-muted-foreground text-center">
-          It's okay to pause here. Everything you've done is saved.
+          It's okay to pause here.<br />
+          Everything you've done is saved.
         </p>
 
         <div className="space-y-4 pt-4">
