@@ -960,6 +960,251 @@ const FAQ = () => {
           )
         }
       ]
+    },
+    {
+      title: "Travel Protection",
+      icon: "✈️",
+      questions: [
+        {
+          q: "What is travel protection?",
+          a: (
+            <>
+              <p className="mb-3">Travel protection refers to services that help if a medical emergency or death occurs while you are away from home.</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Medical evacuation: transport to a hospital or home</li>
+                <li>Repatriation: returning remains to your home area</li>
+                <li>Coordination with local authorities and funeral homes</li>
+              </ul>
+              <p className="mt-3">
+                <Link to="/travel-protection" className="text-primary hover:underline inline-flex items-center gap-1">
+                  Learn more about travel protection →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "Why does travel protection matter?",
+          a: (
+            <>
+              <p className="mb-3">If something happens far from home:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Medical transport can cost $50,000 or more</li>
+                <li>International repatriation is complex and expensive</li>
+                <li>Families may face unexpected decisions and delays</li>
+              </ul>
+              <p className="mt-3">Travel protection can provide peace of mind and financial coverage.</p>
+            </>
+          )
+        },
+        {
+          q: "Does regular travel insurance cover this?",
+          a: (
+            <>
+              <p className="mb-3">Not always. Standard travel insurance often covers:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Trip cancellation</li>
+                <li>Lost baggage</li>
+                <li>Some medical expenses</li>
+              </ul>
+              <p className="mb-3">But medical evacuation and repatriation may require separate coverage or higher limits.</p>
+              <p>Always read the policy carefully.</p>
+            </>
+          )
+        },
+        {
+          q: "Who should consider travel protection?",
+          a: (
+            <>
+              <p className="mb-3">Consider travel protection if you:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Travel frequently or internationally</li>
+                <li>Spend extended time away from home (snowbirds, RVers)</li>
+                <li>Have health conditions that could require emergency care</li>
+                <li>Want peace of mind for your family</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "What questions should I ask a provider?",
+          a: (
+            <>
+              <p className="mb-3">Before signing up, ask:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>What is covered (medical transport, repatriation, escorts)?</li>
+                <li>Are there geographic limits?</li>
+                <li>Are pre-existing conditions covered?</li>
+                <li>What is the claims process?</li>
+                <li>Is there 24/7 assistance available?</li>
+              </ul>
+              <p className="mt-3">
+                <Link to="/travel-protection" className="text-primary hover:underline inline-flex items-center gap-1">
+                  See more travel protection FAQs →
+                </Link>
+              </p>
+            </>
+          )
+        }
+      ]
+    },
+    {
+      title: "Avoiding Probate",
+      icon: "🔑",
+      questions: [
+        {
+          q: "What is probate?",
+          a: (
+            <>
+              <p className="mb-3">Probate is the court process that:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Validates your will</li>
+                <li>Pays debts and taxes</li>
+                <li>Distributes property to heirs</li>
+              </ul>
+              <p className="mt-3">It can take months or longer and may involve fees and public records.</p>
+            </>
+          )
+        },
+        {
+          q: "How can I avoid probate?",
+          a: (
+            <>
+              <p className="mb-3">Several tools can help assets pass outside of probate:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li><strong>POD (Payable on Death):</strong> For bank accounts—free at most banks</li>
+                <li><strong>TOD (Transfer on Death):</strong> For vehicles and investments</li>
+                <li><strong>Beneficiary designations:</strong> On retirement accounts and life insurance</li>
+                <li><strong>Joint ownership:</strong> Property passes to the surviving owner</li>
+                <li><strong>Trusts:</strong> Assets held in trust avoid probate</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "What is a Payable on Death (POD) account?",
+          a: (
+            <>
+              <p className="mb-3">A POD designation on a bank account:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Names who gets the money when you die</li>
+                <li>Is free to set up at most banks</li>
+                <li>Keeps you in full control while you are alive</li>
+                <li>Releases funds after death with a death certificate</li>
+              </ul>
+              <p className="mt-3">This avoids probate for those accounts.</p>
+            </>
+          )
+        },
+        {
+          q: "What is a Lady Bird Deed?",
+          a: (
+            <>
+              <p className="mb-3">A Lady Bird Deed (Enhanced Life Estate Deed):</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Lets you keep control of your home while alive</li>
+                <li>Transfers property to someone after death</li>
+                <li>Avoids probate</li>
+                <li>Available in some states only</li>
+              </ul>
+              <p className="mt-3">An attorney can help determine if this is right for you.</p>
+            </>
+          )
+        },
+        {
+          q: "Does a will avoid probate?",
+          a: (
+            <>
+              <p className="mb-3"><strong>No.</strong> A will does not avoid probate.</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>A will tells the court what you want</li>
+                <li>But the court still supervises distribution</li>
+                <li>Use POD, TOD, or trusts to avoid probate</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "Should I give my property away early to avoid probate?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Be careful.</strong> Gifting property early can cause problems:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>You lose control of the property</li>
+                <li>It may trigger gift taxes</li>
+                <li>It can affect Medicaid eligibility (5-year lookback)</li>
+                <li>The recipient's creditors could claim it</li>
+              </ul>
+              <p className="mt-3">Talk to an attorney before making large gifts.</p>
+            </>
+          )
+        }
+      ]
+    },
+    {
+      title: "Healthcare Decisions",
+      icon: "🏥",
+      questions: [
+        {
+          q: "What is an advance directive?",
+          a: (
+            <>
+              <p className="mb-3">An advance directive is a document that:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>States your healthcare wishes if you cannot speak for yourself</li>
+                <li>May include a living will and healthcare power of attorney</li>
+                <li>Guides doctors and family on your preferences</li>
+              </ul>
+              <p className="mt-3">
+                <Link to="/preplandashboard/advance-directive" className="text-primary hover:underline inline-flex items-center gap-1">
+                  Learn more about advance directives →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "What is a healthcare power of attorney?",
+          a: (
+            <>
+              <p className="mb-3">A healthcare power of attorney (also called healthcare proxy):</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Names someone to make medical decisions for you</li>
+                <li>Only takes effect if you cannot communicate</li>
+                <li>Should be someone who knows and respects your wishes</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "What is a DNR (Do Not Resuscitate)?",
+          a: (
+            <>
+              <p className="mb-3">A DNR order tells medical staff not to perform CPR if your heart stops.</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>It must be signed by a doctor</li>
+                <li>It applies only to resuscitation, not other care</li>
+                <li>You can change your mind anytime</li>
+              </ul>
+              <p className="mt-3">Discuss this with your doctor to understand your options.</p>
+            </>
+          )
+        },
+        {
+          q: "How do I make sure my wishes are followed?",
+          a: (
+            <>
+              <p className="mb-3">To help ensure your wishes are followed:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Complete an advance directive</li>
+                <li>Give copies to your doctor and healthcare proxy</li>
+                <li>Talk to your family about your preferences</li>
+                <li>Keep a copy where it can be found quickly</li>
+              </ul>
+            </>
+          )
+        }
+      ]
     }
   ];
   
