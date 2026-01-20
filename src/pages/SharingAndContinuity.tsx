@@ -163,7 +163,7 @@ export default function SharingAndContinuity() {
               Share with family
             </CardTitle>
             <CardDescription>
-              Invite someone to view your plan. Sharing is optional.
+              Invite family members if and when you're ready. You decide what they can see.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -238,8 +238,7 @@ export default function SharingAndContinuity() {
               Download a copy
             </CardTitle>
             <CardDescription>
-              Get a PDF of your current plan.
-              {isPreviewMode && " Preview copies include a watermark."}
+              Download a copy of what you've completed so far.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -260,12 +259,10 @@ export default function SharingAndContinuity() {
               <Clock className="h-5 w-5" />
               Save for later
             </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground text-lg">
+            <CardDescription>
               You can return and update this anytime.
-            </p>
-          </CardContent>
+            </CardDescription>
+          </CardHeader>
         </Card>
 
         <div className="pt-4">
