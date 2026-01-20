@@ -72,6 +72,8 @@ import PlannerPreview from "./pages/PlannerPreview";
 import PrePlanSummary from "./pages/PrePlanSummary";
 import SharedView from "./pages/SharedView";
 import PlannerStart from "./pages/PlannerStart";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 // Import planner layout and pages
 import {
@@ -228,6 +230,8 @@ const App = () => (
                       <Route path="/do-it-for-you/intake-submitted" element={<DoItForYouIntakeSubmitted />} />
                       <Route path="/payment-help" element={<PaymentHelp />} />
                       <Route path="/shared/:token" element={<SharedView />} />
+                      <Route path="/privacy" element={<PrivacyPolicy />} />
+                      <Route path="/terms" element={<TermsOfService />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
