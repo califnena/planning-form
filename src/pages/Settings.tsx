@@ -5,7 +5,7 @@ import { TextSizeToggle } from '@/components/TextSizeToggle';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Globe, Volume2, Mic } from 'lucide-react';
+import { ArrowLeft, Globe, Volume2, Mic, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { ShareLinksManager } from '@/components/sharing/ShareLinksManager';
@@ -249,6 +249,27 @@ const Settings = () => {
                       Minimize animations and transitions throughout the application.
                     </p>
                   </div>
+                </div>
+              </div>
+
+              {/* Legal Section */}
+              <div className="border-t pt-6">
+                <Label className="text-base font-semibold mb-4 block">Legal</Label>
+                <div className="space-y-2">
+                  <Link 
+                    to="/privacy" 
+                    className="flex items-center justify-between min-h-[52px] px-4 py-3 rounded-lg border bg-background hover:bg-muted/50 transition-colors"
+                  >
+                    <span className="text-lg text-foreground">Privacy Policy</span>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                  </Link>
+                  <Link 
+                    to="/terms" 
+                    className="flex items-center justify-between min-h-[52px] px-4 py-3 rounded-lg border bg-background hover:bg-muted/50 transition-colors"
+                  >
+                    <span className="text-lg text-foreground">Terms of Service</span>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                  </Link>
                 </div>
               </div>
             </div>
