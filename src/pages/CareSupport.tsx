@@ -12,6 +12,7 @@ import { Loader2, Heart, Sparkles, ArrowRight, Mic, Volume2, VolumeX, Home, LogO
 import { Badge } from "@/components/ui/badge";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
 import { ClaireWelcomeModal } from "@/components/assistant/ClaireWelcomeModal";
+import NotAdviceNote from "@/components/NotAdviceNote";
 
 type Message = { role: "user" | "assistant"; content: string };
 type Mode = "planning" | "emotional";
@@ -237,6 +238,8 @@ export default function CareSupport() {
         <GlobalHeader />
         
         <main className="flex-1">
+          <NotAdviceNote />
+          
           {/* Hero Section */}
           <section className="container max-w-4xl mx-auto px-4 py-12 md:py-16 text-center">
             <div className="space-y-6">
