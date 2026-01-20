@@ -76,6 +76,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import SafetyEntry from "./pages/SafetyEntry";
 import Orientation from "./pages/Orientation";
+import GuidedAction from "./pages/GuidedAction";
 
 // Import planner layout and pages
 import {
@@ -236,6 +237,7 @@ const App = () => (
                       <Route path="/terms" element={<TermsOfService />} />
                       <Route path="/safety-entry" element={<SafetyEntry />} />
                       <Route path="/orientation" element={<Orientation />} />
+                      <Route path="/guided-action" element={<GuidedAction />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
