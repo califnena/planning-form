@@ -2640,6 +2640,8 @@ export type Database = {
           active_plan_id: string | null
           completed_sections: string[] | null
           created_at: string | null
+          efa_onboarding_complete: boolean | null
+          emotional_path: string | null
           focus_areas: string[] | null
           id: string
           last_planner_activity: string | null
@@ -2658,6 +2660,8 @@ export type Database = {
           active_plan_id?: string | null
           completed_sections?: string[] | null
           created_at?: string | null
+          efa_onboarding_complete?: boolean | null
+          emotional_path?: string | null
           focus_areas?: string[] | null
           id?: string
           last_planner_activity?: string | null
@@ -2676,6 +2680,8 @@ export type Database = {
           active_plan_id?: string | null
           completed_sections?: string[] | null
           created_at?: string | null
+          efa_onboarding_complete?: boolean | null
+          emotional_path?: string | null
           focus_areas?: string[] | null
           id?: string
           last_planner_activity?: string | null
