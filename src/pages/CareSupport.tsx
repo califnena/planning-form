@@ -14,6 +14,8 @@ import { setPendingCheckout } from "@/lib/pendingCheckout";
 import { ClaireWelcomeModal } from "@/components/assistant/ClaireWelcomeModal";
 import NotAdviceNote from "@/components/NotAdviceNote";
 import { requireSessionOrRedirect } from "@/lib/sessionGuard";
+import { isStoreIAP } from "@/lib/billingMode";
+import { StoreIAPModal } from "@/components/StoreIAPModal";
 
 type Message = { role: "user" | "assistant"; content: string };
 type Mode = "planning" | "emotional";
@@ -47,6 +49,7 @@ export default function CareSupport() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [showIAPModal, setShowIAPModal] = useState(false);
 
   useEffect(() => {
     checkCAREAccess();
@@ -195,6 +198,10 @@ export default function CareSupport() {
   };
 
   const handleGetCARESupport = async (lookupKey: string = "EFAVIPMONTHLY") => {
+    if (isStoreIAP) {
+      setShowIAPModal(true);
+      return;
+    }
     const successUrl = `${window.location.origin}/purchase-success?type=vip`;
     const cancelUrl = window.location.href;
 
@@ -759,6 +766,8 @@ export default function CareSupport() {
         </div>
       </div>
       <AppFooter />
+      <ClaireWelcomeModal isOpen={showWelcome} onClose={handleWelcomeClose} />
+      <StoreIAPModal open={showIAPModal} onOpenChange={setShowIAPModal} />
     </div>
   );
 }

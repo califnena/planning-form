@@ -8,6 +8,8 @@ import { Plus, Minus } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import mascotCouple from "@/assets/mascot-couple.png";
 import { launchCheckout } from "@/lib/checkoutLauncher";
+import { isStoreIAP } from "@/lib/billingMode";
+import { StoreIAPModal } from "@/components/StoreIAPModal";
 import { supabase } from "@/integrations/supabase/client";
 import { AppFooter } from "@/components/AppFooter";
 import { AssistantWidget } from "@/components/assistant/AssistantWidget";
@@ -131,6 +133,7 @@ const Pricing = () => {
   // Fallback mode state
   const [fallbackMode, setFallbackMode] = useState<boolean>(false);
   const [fallbackReason, setFallbackReason] = useState<FallbackReason>(null);
+  const [showIAPModal, setShowIAPModal] = useState(false);
   const pageLoadTime = useRef<number>(Date.now());
 
   // Core plans - simplified to 3
@@ -322,6 +325,10 @@ const Pricing = () => {
   };
 
   const handleChoosePlan = async (plan: typeof plans[0]) => {
+    if (isStoreIAP) {
+      setShowIAPModal(true);
+      return;
+    }
     const successUrl = `${window.location.origin}${plan.successPath}`;
     const cancelUrl = window.location.href;
     setLoadingPlan(plan.id);
@@ -704,6 +711,7 @@ const Pricing = () => {
 
       <AppFooter />
       <AssistantWidget />
+      <StoreIAPModal open={showIAPModal} onOpenChange={setShowIAPModal} />
     </div>
   );
 };

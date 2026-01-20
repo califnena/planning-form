@@ -12,6 +12,8 @@ import mascotFamilyPlanning from "@/assets/mascot-family-planning.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { usePreviewModeContext } from "@/contexts/PreviewModeContext";
+import { isStoreIAP } from "@/lib/billingMode";
+import { StoreIAPModal } from "@/components/StoreIAPModal";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
 import {
   DropdownMenu,
@@ -29,6 +31,7 @@ export default function PlanAheadLanding() {
   const [learnOpen, setLearnOpen] = useState(false);
   const [otherOptionsOpen, setOtherOptionsOpen] = useState(false);
   const [hasPlannerProgress, setHasPlannerProgress] = useState(false);
+  const [showIAPModal, setShowIAPModal] = useState(false);
   const [plannerMode, setPlannerMode] = useState<string | null>(null);
   const [isResuming, setIsResuming] = useState(false);
   const { isLoggedIn, hasPaidAccess, hasPrintableAccess, openLockedModal, saveLastVisitedRoute } = usePreviewModeContext();
@@ -131,6 +134,10 @@ export default function PlanAheadLanding() {
   }
 
   const handleUseStepByStepPlanner = async () => {
+    if (isStoreIAP) {
+      setShowIAPModal(true);
+      return;
+    }
     const successUrl = `${window.location.origin}/purchase-success?type=planner`;
 
     if (!isLoggedIn) {
@@ -160,6 +167,10 @@ export default function PlanAheadLanding() {
   };
 
   const handleGetPrintableForm = async () => {
+    if (isStoreIAP) {
+      setShowIAPModal(true);
+      return;
+    }
     const successUrl = `${window.location.origin}/purchase-success?type=printable`;
 
     if (!isLoggedIn) {
@@ -522,6 +533,7 @@ export default function PlanAheadLanding() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      <StoreIAPModal open={showIAPModal} onOpenChange={setShowIAPModal} />
     </div>
   );
 }
