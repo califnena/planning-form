@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { isValid, parseISO, formatDistanceToNow } from "date-fns";
@@ -72,10 +71,6 @@ export const ResumeCard = () => {
     return null;
   }
 
-  const progressPercent = progress.totalSteps > 0 
-    ? Math.round((progress.completedSections.length / progress.totalSteps) * 100) 
-    : 0;
-
   return (
     <Card className="bg-primary/5 border-primary/20">
       <CardContent className="p-5">
@@ -99,13 +94,9 @@ export const ResumeCard = () => {
             </div>
           </div>
           
-          {/* Progress bar */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>{progress.completedSections.length} of {progress.totalSteps} sections completed</span>
-              <span>{progressPercent}%</span>
-            </div>
-            <Progress value={progressPercent} className="h-2" />
+          {/* Progress info without bar or percentage - simplified for emotional safety */}
+          <div className="text-xs text-muted-foreground">
+            <span>{progress.completedSections.length} of {progress.totalSteps} sections completed</span>
           </div>
         </div>
       </CardContent>
