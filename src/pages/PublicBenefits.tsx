@@ -59,11 +59,30 @@ export default function PublicBenefits() {
         <Card className="p-6 mb-6">
           <h2 className="text-xl font-semibold mb-3">Medicare</h2>
           <p className="text-base text-muted-foreground mb-3">
-            Medicare does not pay for funerals, burial, or cremation.
+            Medicare does not cover funeral or burial costs.
           </p>
-          <p className="text-base text-muted-foreground">
-            Medicare is health insurance. It covers doctor visits, hospital stays, and some medical services. It does not cover any costs after someone passes away.
+          
+          <h3 className="font-medium mt-4 mb-2">What Medicare does not cover</h3>
+          <ul className="list-disc list-inside text-base text-muted-foreground space-y-1 mb-4">
+            <li>Funeral services</li>
+            <li>Burial or cremation</li>
+            <li>Caskets or urns</li>
+            <li>Cemetery plots or headstones</li>
+            <li>Transportation of remains</li>
+          </ul>
+          
+          <p className="text-base text-muted-foreground mb-3">
+            Medicare is health insurance for living patients. It does not provide any benefits after death.
           </p>
+          <a 
+            href="https://www.medicare.gov/what-medicare-covers" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-primary hover:underline inline-flex items-center gap-1"
+          >
+            www.medicare.gov/what-medicare-covers
+            <span className="text-xs text-muted-foreground ml-1">(opens in new tab)</span>
+          </a>
         </Card>
 
         {/* Medicaid */}
