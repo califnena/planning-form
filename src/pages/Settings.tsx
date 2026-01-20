@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { TextSizeToggle } from '@/components/TextSizeToggle';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Globe, Volume2, Mic, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Globe, Volume2, Mic, ChevronRight, Download, Trash2, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { ShareLinksManager } from '@/components/sharing/ShareLinksManager';
@@ -14,7 +14,15 @@ import { useTextSize, TextSizePreset } from '@/contexts/TextSizeContext';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
-
+import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 // Text size preset selector component
 const TextSizePresetSelector = () => {
   const { preset, setPreset } = useTextSize();
@@ -59,6 +67,7 @@ const VoiceFriendlyToggle = () => {
 };
 
 const Settings = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [ownerName, setOwnerName] = useState<string>("");
   const [visibleSections, setVisibleSections] = useState<string[]>([
@@ -69,6 +78,12 @@ const Settings = () => {
     'vip-coach',
     'contact'
   ]);
+  
+  // Your Data section state
+  const [isExporting, setIsExporting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   useEffect(() => {
     const loadUser = async () => {
@@ -89,6 +104,79 @@ const Settings = () => {
     };
     loadUser();
   }, []);
+
+  const handleExportData = async () => {
+    setIsExporting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('export-user-data');
+      
+      if (error) throw error;
+      
+      // Create and download JSON file
+      const jsonString = JSON.stringify(data, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const today = new Date().toISOString().split('T')[0];
+      const filename = `everlasting-export-${today}.json`;
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Export ready",
+        description: "Download started",
+      });
+    } catch (error: any) {
+      console.error('Export error:', error);
+      toast({
+        title: "Export failed",
+        description: error.message || "Could not export your data. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'DELETE') return;
+    
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase.functions.invoke('delete-account', {
+        body: { confirm: 'DELETE' },
+      });
+      
+      if (error) throw error;
+      
+      // Sign out and navigate to landing
+      await supabase.auth.signOut();
+      
+      toast({
+        title: "Account deleted",
+        description: "Your account and data have been permanently deleted.",
+      });
+      
+      navigate('/');
+    } catch (error: any) {
+      console.error('Delete account error:', error);
+      toast({
+        title: "Deletion failed",
+        description: error.message || "We could not complete deletion. Please contact support.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+      setDeleteConfirmText('');
+    }
+  };
 
   const handleSectionToggle = (sectionId: string) => {
     setVisibleSections(prev => 
@@ -148,6 +236,34 @@ const Settings = () => {
                 <p className="mt-2 text-base text-muted-foreground">
                   {user?.user_metadata?.full_name || 'Not set'}
                 </p>
+              </div>
+            </div>
+
+            {/* Your Data Section */}
+            <div className="bg-card border rounded-lg p-6">
+              <Label className="text-lg font-semibold mb-4 block">Your Data</Label>
+              <div className="space-y-3">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start min-h-[52px] text-lg"
+                  onClick={handleExportData}
+                  disabled={isExporting}
+                >
+                  {isExporting ? (
+                    <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                  ) : (
+                    <Download className="mr-3 h-5 w-5" />
+                  )}
+                  {isExporting ? 'Exporting...' : 'Export my data'}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start min-h-[52px] text-lg text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => setDeleteDialogOpen(true)}
+                >
+                  <Trash2 className="mr-3 h-5 w-5" />
+                  Delete my account
+                </Button>
               </div>
             </div>
 
@@ -298,6 +414,55 @@ const Settings = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Delete Account Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete account</DialogTitle>
+            <DialogDescription>
+              This permanently deletes your account and planning data. This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="delete-confirm" className="text-sm font-medium">
+              Type DELETE to confirm
+            </Label>
+            <Input
+              id="delete-confirm"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="DELETE"
+              className="mt-2"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteDialogOpen(false);
+                setDeleteConfirmText('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteAccount}
+              disabled={deleteConfirmText !== 'DELETE' || isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                'Delete account'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
