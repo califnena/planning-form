@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Shield, Wifi, Monitor, RefreshCw, Mail, Copy, Check } from "lucide-react";
+import { ExternalLink, Shield, Wifi, Monitor, RefreshCw, Mail, Copy, Check, Apple, Smartphone, Globe, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { PublicHeader } from "@/components/PublicHeader";
 import { AppFooter } from "@/components/AppFooter";
+import { isStoreIAP } from "@/lib/billingMode";
 
 export default function PaymentHelp() {
   const navigate = useNavigate();
@@ -51,6 +52,105 @@ export default function PaymentHelp() {
     navigate(lastRoute || "/pricing");
   };
 
+  // Show subscription management content for Store IAP mode
+  if (isStoreIAP) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <PublicHeader />
+        
+        <main className="flex-1 container max-w-2xl mx-auto px-4 py-8">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate(-1)} 
+            className="mb-6"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+
+          <h1 className="text-3xl font-semibold text-foreground mb-2">
+            Manage Your Subscription
+          </h1>
+          <p className="text-muted-foreground mb-8">
+            Here's how to view or update your subscription, depending on where you signed up.
+          </p>
+
+          {/* iPhone/iPad Section */}
+          <Card className="mb-4">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Apple className="h-5 w-5" />
+                iPhone or iPad
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-muted-foreground">
+              <ol className="list-decimal list-inside space-y-2">
+                <li>Open the <strong>Settings</strong> app on your device.</li>
+                <li>Tap your name at the top.</li>
+                <li>Tap <strong>Subscriptions</strong>.</li>
+                <li>Find and tap your subscription to manage it.</li>
+              </ol>
+            </CardContent>
+          </Card>
+
+          {/* Android Section */}
+          <Card className="mb-4">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Smartphone className="h-5 w-5" />
+                Android
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-muted-foreground">
+              <ol className="list-decimal list-inside space-y-2">
+                <li>Open the <strong>Google Play Store</strong> app.</li>
+                <li>Tap your profile icon in the top right.</li>
+                <li>Tap <strong>Payments & subscriptions</strong>.</li>
+                <li>Tap <strong>Subscriptions</strong> and find your subscription.</li>
+              </ol>
+            </CardContent>
+          </Card>
+
+          {/* Web Section */}
+          <Card className="mb-4">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Globe className="h-5 w-5" />
+                Web
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-muted-foreground">
+              <p>
+                If you purchased on the web, you can manage your billing from the{" "}
+                <Button 
+                  variant="link" 
+                  className="p-0 h-auto text-primary"
+                  onClick={() => navigate("/billing")}
+                >
+                  Billing page
+                </Button>.
+              </p>
+            </CardContent>
+          </Card>
+
+          <p className="text-sm text-muted-foreground mt-6">
+            Questions? Feel free to reach out through our{" "}
+            <Button 
+              variant="link" 
+              className="p-0 h-auto text-sm text-primary"
+              onClick={() => navigate("/contact")}
+            >
+              Contact page
+            </Button>.
+          </p>
+        </main>
+
+        <AppFooter />
+      </div>
+    );
+  }
+
+  // Original payment troubleshooting content for web Stripe mode
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <PublicHeader />
