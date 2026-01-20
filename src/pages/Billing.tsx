@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Download, ArrowLeft, ExternalLink, Mail, Check, AlertCircle, Package } from "lucide-react";
+import { Loader2, Download, ArrowLeft, ExternalLink, Mail, Check, AlertCircle, Package, Smartphone } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getPlanDisplayName } from "@/lib/billingPlans";
+import { isStoreIAP } from "@/lib/billingMode";
 
 interface Subscription {
   id: string;
@@ -245,7 +246,7 @@ export default function Billing() {
                     </p>
                   )}
                 </div>
-                {isSubscriptionCancellable && (
+                {isSubscriptionCancellable && !isStoreIAP && (
                   <Button 
                     variant="outline" 
                     onClick={handleManageBilling}
@@ -275,6 +276,30 @@ export default function Billing() {
           )}
         </CardContent>
       </Card>
+
+      {/* Store IAP Management Card */}
+      {isStoreIAP && (
+        <Card className="border-blue-200 bg-blue-50/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Smartphone className="h-5 w-5 text-blue-600" />
+              Manage Subscriptions
+            </CardTitle>
+            <CardDescription>
+              Subscriptions purchased in the iOS App Store or Google Play are managed in your store account settings.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/payment-help")}
+            >
+              <ExternalLink className="mr-2 h-4 w-4" />
+              How to Manage
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* One-Time Purchases */}
       <Card>
