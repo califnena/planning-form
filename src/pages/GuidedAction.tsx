@@ -14,6 +14,7 @@ interface Task {
   id: string;
   title: string;
   explanation: string;
+  helperText: string;
   type: TaskType;
   choices?: { value: string; label: string }[];
   payloadKey: string;
@@ -22,17 +23,19 @@ interface Task {
 
 const TASKS: Task[] = [
   {
-    id: "preferred_name",
-    title: "What would you like to be called?",
-    explanation: "This helps us personalize your experience.",
+    id: "notify_contacts",
+    title: "Who should be notified",
+    explanation: "Write down the people who should be contacted. This helps others know who to reach out to.",
+    helperText: "You can change this later.",
     type: "text",
-    payloadKey: "personal_information",
-    fieldKey: "preferred_name",
+    payloadKey: "contacts",
+    fieldKey: "emergency_contact_name",
   },
   {
     id: "disposition",
-    title: "Do you have a preference for burial or cremation?",
-    explanation: "This helps guide funeral planning decisions.",
+    title: "Burial or cremation",
+    explanation: "If you have a preference, you can note it here. If you're unsure, that's okay too.",
+    helperText: "You can update this anytime.",
     type: "choice",
     choices: [
       { value: "burial", label: "Burial" },
@@ -43,12 +46,22 @@ const TASKS: Task[] = [
     fieldKey: "disposition",
   },
   {
-    id: "emergency_contact",
-    title: "Who should be contacted first in an emergency?",
-    explanation: "Just a name is enough for now.",
+    id: "service_wishes",
+    title: "Service or memorial wishes",
+    explanation: "This can be as simple or detailed as you want. Even a few notes are enough for now.",
+    helperText: "Nothing here is final.",
     type: "text",
-    payloadKey: "contacts",
-    fieldKey: "emergency_contact_name",
+    payloadKey: "funeral",
+    fieldKey: "service_wishes",
+  },
+  {
+    id: "important_notes",
+    title: "Important notes",
+    explanation: "Add anything you don't want forgotten. This can be practical or personal.",
+    helperText: "You can come back to this later.",
+    type: "text",
+    payloadKey: "funeral",
+    fieldKey: "special_notes",
   },
 ];
 
@@ -210,7 +223,7 @@ export default function GuidedAction() {
           )}
 
           <p className="text-sm text-muted-foreground">
-            You can change this later.
+            {currentTask.helperText}
           </p>
         </div>
 
