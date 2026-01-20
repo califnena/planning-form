@@ -701,6 +701,637 @@ const FAQ = () => {
       ]
     },
     {
+      title: "Money, Bills, and Debt",
+      icon: "💵",
+      questions: [
+        {
+          q: "What happens to my debt when I die?",
+          a: (
+            <>
+              <p className="mb-3">When you pass away, your debts are usually paid from your estate (the money and property you leave behind).</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Creditors are paid from your estate first</li>
+                <li>What remains goes to your heirs</li>
+                <li>If there is not enough money, some debts go unpaid</li>
+              </ul>
+              <p><strong>Your family does not automatically inherit your debt.</strong></p>
+            </>
+          )
+        },
+        {
+          q: "What happens to my medical bills?",
+          a: (
+            <>
+              <p className="mb-3">Medical bills are treated like other debts:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Paid from your estate if there is money available</li>
+                <li>Your family is generally not responsible for paying them</li>
+                <li>The hospital or provider may file a claim against your estate</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "Will my family have to pay my debt?",
+          a: (
+            <>
+              <p className="mb-3"><strong>In most cases, no.</strong> Your family is not responsible for your debts unless:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>They co-signed a loan or account</li>
+                <li>They are a joint account holder</li>
+                <li>State law requires it (rare, and usually only for spouses)</li>
+              </ul>
+              <p className="mt-3">Debt collectors may contact your family, but that does not mean they owe anything.</p>
+            </>
+          )
+        },
+        {
+          q: "What if there is no money in my estate?",
+          a: (
+            <>
+              <p className="mb-3">If your estate has no money or assets:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Creditors cannot collect from your family</li>
+                <li>The debts usually go unpaid and are written off</li>
+                <li>This is more common than people think</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "Can creditors take my house or car?",
+          a: (
+            <>
+              <p className="mb-3">It depends on the situation:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>If there is a loan on the car or house, the lender may repossess it if payments stop</li>
+                <li>If the home is paid off, it becomes part of your estate</li>
+                <li>Some assets may be protected depending on state law</li>
+              </ul>
+              <p>If someone inherits the house or car, they may be able to take over the payments.</p>
+            </>
+          )
+        },
+        {
+          q: "What happens to my credit cards?",
+          a: (
+            <>
+              <p className="mb-3">Credit card debt is paid from your estate:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Your family is not responsible (unless they were a joint account holder)</li>
+                <li>Authorized users are not responsible for the balance</li>
+                <li>If the estate has no money, the debt often goes unpaid</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "What if my family keeps getting collection calls?",
+          a: (
+            <>
+              <p className="mb-3">Your family can:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Ask the collector to stop calling</li>
+                <li>Request proof of the debt</li>
+                <li>Explain they are not responsible</li>
+              </ul>
+              <p>Collectors can contact family to find the executor, but they cannot demand payment from someone who does not owe the debt.</p>
+            </>
+          )
+        }
+      ]
+    },
+    {
+      title: "Bank Accounts, Phone, and Digital Access",
+      icon: "📱",
+      questions: [
+        {
+          q: "Will my family be able to access my bank accounts?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Not automatically.</strong> When you pass away:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Accounts are usually frozen</li>
+                <li>Your family will need legal authority to access them</li>
+                <li>A named beneficiary (POD) can claim funds with a death certificate</li>
+              </ul>
+              <p>Planning ahead—like adding a POD—helps avoid delays.</p>
+            </>
+          )
+        },
+        {
+          q: "What happens if my accounts are frozen?",
+          a: (
+            <>
+              <p className="mb-3">Frozen accounts mean:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>No withdrawals, transfers, or payments</li>
+                <li>Automatic bills may stop being paid</li>
+                <li>Someone must go through probate or show beneficiary paperwork</li>
+              </ul>
+              <p>This can take weeks or months without planning.</p>
+            </>
+          )
+        },
+        {
+          q: "What happens to my phone and phone number?",
+          a: (
+            <>
+              <p className="mb-3">Your phone account may be:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Canceled by the carrier after non-payment</li>
+                <li>Transferred to a family member (if they contact the carrier)</li>
+                <li>Kept active temporarily to receive important calls or codes</li>
+              </ul>
+              <p>Let someone know your carrier and account information.</p>
+            </>
+          )
+        },
+        {
+          q: "How can my family access my phone if it is locked?",
+          a: (
+            <>
+              <p className="mb-3">Access can be difficult if your phone is locked:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Apple and Google have strict policies</li>
+                <li>A court order may be needed</li>
+                <li>Some companies have legacy access programs</li>
+              </ul>
+              <p>The easiest solution is to share your passcode with a trusted person ahead of time.</p>
+            </>
+          )
+        },
+        {
+          q: "Can I write down my phone password safely?",
+          a: (
+            <>
+              <p className="mb-3">Yes. Consider:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Writing it on paper and storing it in a safe place</li>
+                <li>Telling one trusted person where to find it</li>
+                <li>Using a password manager with shared access</li>
+              </ul>
+              <p className="mt-3">Keep it private, but make sure it can be found when needed.</p>
+            </>
+          )
+        },
+        {
+          q: "Should I store passwords somewhere secure?",
+          a: (
+            <>
+              <p className="mb-3">Yes. Good options include:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>A password manager (like 1Password or Bitwarden)</li>
+                <li>A sealed envelope in a home safe</li>
+                <li>A document stored with your important papers</li>
+              </ul>
+              <p className="mt-3">Tell your executor or a trusted person where this information is kept.</p>
+            </>
+          )
+        },
+        {
+          q: "What happens to email, photos, and online accounts?",
+          a: (
+            <>
+              <p className="mb-3">Each service has its own rules:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Some accounts can be memorialized or closed</li>
+                <li>Some allow a legacy contact</li>
+                <li>Others may require a court order</li>
+              </ul>
+              <p>Planning ahead and setting up legacy contacts can help your family access important memories and close accounts properly.</p>
+            </>
+          )
+        }
+      ]
+    },
+    {
+      title: "Property, Car, and Personal Belongings",
+      icon: "🚗",
+      questions: [
+        {
+          q: "What happens to my car when I die?",
+          a: (
+            <>
+              <p className="mb-3">Your car becomes part of your estate:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>If you have a loan, payments must continue or the car may be repossessed</li>
+                <li>If it is paid off, it goes through probate unless you have a transfer-on-death title</li>
+                <li>Someone will need to handle the title transfer</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "Can someone drive or sell my car after I die?",
+          a: (
+            <>
+              <p className="mb-3">Not right away:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>The title must be transferred first</li>
+                <li>Driving without proper ownership can create legal issues</li>
+                <li>Insurance may not cover accidents</li>
+              </ul>
+              <p>Your family should contact the DMV and your insurance company.</p>
+            </>
+          )
+        },
+        {
+          q: "What happens to my furniture, jewelry, and personal items?",
+          a: (
+            <>
+              <p className="mb-3">Personal belongings are distributed based on:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>What your will says</li>
+                <li>State law if there is no will</li>
+                <li>Family agreements</li>
+              </ul>
+              <p>Writing down who should receive special items can prevent disagreements.</p>
+            </>
+          )
+        },
+        {
+          q: "What if I have nobody to leave my things to?",
+          a: (
+            <>
+              <p className="mb-3">If you have no heirs:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>You can leave items to friends, charities, or organizations</li>
+                <li>A will allows you to name anyone you choose</li>
+                <li>Without a will, the state decides what happens</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "What happens to my property if I do nothing?",
+          a: (
+            <>
+              <p className="mb-3">If you make no plans:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Your property goes through probate</li>
+                <li>State law determines who inherits</li>
+                <li>The process takes longer and may cost more</li>
+              </ul>
+              <p>Even simple planning can save your family time and stress.</p>
+            </>
+          )
+        },
+        {
+          q: "Can the state take my property?",
+          a: (
+            <>
+              <p className="mb-3">This is rare. The state only takes property if:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>You have no living relatives or heirs</li>
+                <li>You leave no will naming someone</li>
+              </ul>
+              <p>This is called "escheat." It almost never happens if you have any family or have written a will.</p>
+            </>
+          )
+        }
+      ]
+    },
+    {
+      title: "Funeral Choices and Costs",
+      icon: "🕯️",
+      questions: [
+        {
+          q: "What is cheaper: cremation or casket burial?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Cremation is usually less expensive.</strong></p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Direct cremation (no ceremony) is often the lowest-cost option</li>
+                <li>Traditional burial includes more services and products</li>
+                <li>Prices vary by location and provider</li>
+              </ul>
+              <p className="mt-3">You can always ask for a price list to compare options.</p>
+            </>
+          )
+        },
+        {
+          q: "Do I need flowers at a funeral?",
+          a: "No. Flowers are optional. Some families ask for donations to a charity instead. There is no requirement."
+        },
+        {
+          q: "Is a viewing required?",
+          a: "No. Viewings are optional. You can have a closed casket, a memorial without the body present, or no service at all."
+        },
+        {
+          q: "Can I keep things simple?",
+          a: (
+            <>
+              <p className="mb-3">Yes. Simple options include:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Direct cremation or direct burial</li>
+                <li>A small private gathering</li>
+                <li>No formal service</li>
+              </ul>
+              <p className="mt-3">You are not required to have a traditional funeral.</p>
+            </>
+          )
+        },
+        {
+          q: "Who decides if I do not leave instructions?",
+          a: (
+            <>
+              <p className="mb-3">If you leave no instructions:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Your next of kin usually decides</li>
+                <li>This is often a spouse, adult child, or parent</li>
+                <li>Disagreements can cause stress and delays</li>
+              </ul>
+              <p className="mt-3">Writing down your wishes helps your family make decisions with confidence.</p>
+            </>
+          )
+        },
+        {
+          q: "What happens if no one claims the body?",
+          a: (
+            <>
+              <p className="mb-3">If no one claims the body:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>The county or state may handle the arrangements</li>
+                <li>This usually means cremation or a simple burial</li>
+                <li>There is typically no ceremony</li>
+              </ul>
+              <p className="mt-3">This is rare when someone has family or friends.</p>
+            </>
+          )
+        }
+      ]
+    },
+    {
+      title: "Planning Without a Will or Trust",
+      icon: "📝",
+      questions: [
+        {
+          q: "What if I don't want to pay for a will or trust?",
+          a: (
+            <>
+              <p className="mb-3">You can still take helpful steps:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Add a POD (Payable on Death) to bank accounts—free at most banks</li>
+                <li>Write down your wishes on paper</li>
+                <li>Tell someone where your important documents are</li>
+                <li>Name beneficiaries on insurance and retirement accounts</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "What are my minimum options for planning?",
+          a: (
+            <>
+              <p className="mb-3">At a minimum, consider:</p>
+              <ol className="list-decimal ml-6 space-y-1">
+                <li>Adding beneficiaries to accounts (POD, TOD)</li>
+                <li>Writing down your funeral wishes</li>
+                <li>Telling one person where your papers are</li>
+              </ol>
+              <p className="mt-3">These steps cost little or nothing and help your family.</p>
+            </>
+          )
+        },
+        {
+          q: "Is writing things down enough?",
+          a: (
+            <>
+              <p className="mb-3">It helps, but it may not be legally binding:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Written wishes guide your family</li>
+                <li>A signed will has more legal weight</li>
+                <li>Bank beneficiaries (POD) and transfer-on-death titles are more effective for those assets</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "Can I name someone without legal paperwork?",
+          a: (
+            <>
+              <p className="mb-3">For some things, yes:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>You can add a POD or beneficiary to accounts</li>
+                <li>You can tell family who should handle things</li>
+              </ul>
+              <p>But for property, healthcare decisions, and legal matters, official documents usually work better.</p>
+            </>
+          )
+        },
+        {
+          q: "What happens if I do nothing?",
+          a: (
+            <>
+              <p className="mb-3">If you make no plans:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>State law decides who inherits your property</li>
+                <li>Your family may go through probate</li>
+                <li>Disagreements are more likely</li>
+                <li>Your wishes may not be followed</li>
+              </ul>
+              <p className="mt-3">Even small steps reduce confusion and stress.</p>
+            </>
+          )
+        }
+      ]
+    },
+    {
+      title: "Trusts and Preplanning Decisions",
+      icon: "⚖️",
+      questions: [
+        {
+          q: "When is it worth paying for a trust?",
+          a: (
+            <>
+              <p className="mb-3">A trust may be worth the cost if:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>You own property in more than one state</li>
+                <li>You have a blended family or complex situation</li>
+                <li>You want to avoid probate for all your assets</li>
+                <li>You have a family member with special needs</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "Who usually needs a trust?",
+          a: (
+            <>
+              <p className="mb-3">Trusts are often helpful for:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>People with significant assets</li>
+                <li>Those with real estate in multiple states</li>
+                <li>Families with minor children or dependents</li>
+                <li>Anyone who wants to control how assets are distributed over time</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "When is a trust unnecessary?",
+          a: (
+            <>
+              <p className="mb-3">A trust may not be needed if:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Your assets are simple (one home, a few accounts)</li>
+                <li>You can use POD, TOD, and beneficiary designations</li>
+                <li>Your state has simplified probate for small estates</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "Should I prepay my funeral?",
+          a: (
+            <>
+              <p className="mb-3">Prepaying is a personal choice. It is not required.</p>
+              <p className="font-medium mb-2">Possible benefits:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Lock in today's prices</li>
+                <li>Reduce decisions for your family</li>
+              </ul>
+              <p className="font-medium mb-2">Possible downsides:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Money is tied up</li>
+                <li>The funeral home could close or change</li>
+                <li>Contract terms vary</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "What are the pros and cons of prepaying?",
+          a: (
+            <>
+              <p className="font-medium mb-2">Pros:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Can lock in prices</li>
+                <li>Removes burden from family</li>
+                <li>May help with Medicaid planning (if irrevocable)</li>
+              </ul>
+              <p className="font-medium mb-2">Cons:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Funds may be hard to access or transfer</li>
+                <li>Provider could go out of business</li>
+                <li>Refund policies vary</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "What if prices change later?",
+          a: (
+            <>
+              <p className="mb-3">It depends on your contract:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Some contracts lock in prices</li>
+                <li>Others may require additional payment later</li>
+                <li>Always read the terms carefully</li>
+              </ul>
+              <p className="mt-3">Ask the funeral home exactly what is guaranteed.</p>
+            </>
+          )
+        }
+      ]
+    },
+    {
+      title: "When Someone Has Died",
+      icon: "🕊️",
+      questions: [
+        {
+          q: "What should I do first?",
+          a: (
+            <>
+              <p className="mb-3">Take it one step at a time:</p>
+              <ol className="list-decimal ml-6 space-y-1">
+                <li>Call a doctor, hospice, or 911 if needed</li>
+                <li>Notify close family members</li>
+                <li>Contact a funeral home</li>
+                <li>Locate important documents</li>
+              </ol>
+              <p className="mt-3">You do not have to do everything at once. Ask for help.</p>
+            </>
+          )
+        },
+        {
+          q: "Who do I call?",
+          a: (
+            <>
+              <p className="mb-3">It depends on where the death occurred:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li><strong>At home with hospice:</strong> Call hospice first</li>
+                <li><strong>At home unexpectedly:</strong> Call 911</li>
+                <li><strong>In a hospital or nursing home:</strong> Staff will guide you</li>
+              </ul>
+              <p className="mt-3">Then contact a funeral home when you are ready.</p>
+            </>
+          )
+        },
+        {
+          q: "How many death certificates do I need?",
+          a: (
+            <>
+              <p className="mb-3">A common recommendation is <strong>10–15 certified copies</strong>.</p>
+              <p className="mb-2">You may need them for:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Banks and financial accounts</li>
+                <li>Insurance claims</li>
+                <li>Property transfers</li>
+                <li>Government agencies</li>
+              </ul>
+              <p className="mt-3">It is easier to order more at the start than to request them later.</p>
+            </>
+          )
+        },
+        {
+          q: "Where do I look for insurance?",
+          a: (
+            <>
+              <p className="mb-3">Check these places:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>File cabinets, safes, and important papers</li>
+                <li>Email inbox (search for "policy" or "insurance")</li>
+                <li>Bank statements (look for premium payments)</li>
+                <li>Former employers (group life insurance)</li>
+                <li>The National Association of Insurance Commissioners (NAIC) has a free policy locator</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "What if I cannot find documents?",
+          a: (
+            <>
+              <p className="mb-3">If documents are missing:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Check with banks, insurance companies, and employers directly</li>
+                <li>Contact the county recorder for property records</li>
+                <li>Ask an attorney if you need help with probate</li>
+              </ul>
+              <p className="mt-3">Most records can be replaced—it just takes time.</p>
+            </>
+          )
+        },
+        {
+          q: "How long does everything take?",
+          a: (
+            <>
+              <p className="mb-3">Timelines vary:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Funeral arrangements: a few days</li>
+                <li>Death certificates: 1–4 weeks</li>
+                <li>Insurance claims: weeks to months</li>
+                <li>Probate: months to over a year</li>
+              </ul>
+              <p className="mt-3">There is no rush. Handle things at your own pace.</p>
+            </>
+          )
+        }
+      ]
+    },
+    {
       title: "Funeral Planning & Consumer Rights",
       icon: "⚖️",
       description: "Educational information based on FTC consumer guidance. Not legal advice.",
@@ -1031,6 +1662,11 @@ const FAQ = () => {
         
         {/* Footer with helpful links */}
         <div className="mt-12 pt-6 border-t border-border">
+          <div className="bg-muted/30 border border-border rounded-lg p-6 mb-8 max-w-3xl mx-auto">
+            <p className="text-base text-foreground text-center font-medium">
+              Every situation is different. Small steps taken early can reduce stress later.
+            </p>
+          </div>
           <p className="text-sm text-muted-foreground text-center max-w-3xl mx-auto mb-6">
             This information is provided for educational purposes only. Everlasting Funeral Advisors does not provide legal advice.
           </p>
