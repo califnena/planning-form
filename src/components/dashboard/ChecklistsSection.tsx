@@ -15,7 +15,7 @@ import {
   BookOpen,
   Info
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { generatePrePlanningChecklistPDF } from "@/lib/preplanningChecklistPdfGenerator";
 import { generateAfterDeathChecklistPDF } from "@/lib/afterDeathChecklistPdfGenerator";
 import { generateReferenceGuidePDF } from "@/lib/referenceGuidePdfGenerator";
@@ -28,6 +28,7 @@ import {
   ReadOnlyBanner, 
   DownloadFailedDialog 
 } from "@/components/ui/efa-messages";
+import { isEmotionalStageRoute } from "@/lib/utils";
 
 type DownloadType = 'pre-planning' | 'after-death' | 'reference-guide';
 
@@ -45,6 +46,7 @@ const CARD_DEFINITIONS = {
 
 export const ChecklistsSection = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [generating, setGenerating] = useState<DownloadType | null>(null);
   const { 
@@ -60,6 +62,9 @@ export const ChecklistsSection = () => {
   const [failedDownloadType, setFailedDownloadType] = useState<DownloadType | null>(null);
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const impressedCards = useRef<Set<string>>(new Set());
+  
+  // Check if we're on an emotional stage route - suppress pricing/upgrade CTAs
+  const isEmotionalRoute = isEmotionalStageRoute(location.pathname);
 
   // Track card impressions using Intersection Observer
   useEffect(() => {
@@ -178,9 +183,9 @@ export const ChecklistsSection = () => {
   const showInstructions = isOwner || (isTrustedContact && permissions.canViewInstructions);
   const showOrganizeDocuments = isOwner;
   const showAfterDeathChecklist = isOwner || (isTrustedContact && (permissions.canViewAfterDeathChecklist || permissions.canViewAfterDeathPlanner));
-  const showDoneForYou = isOwner;
-  const showVipCoach = isOwner;
-  const showMemorialSong = isOwner;
+  const showDoneForYou = isOwner && !isEmotionalRoute; // Suppress on emotional routes
+  const showVipCoach = isOwner && !isEmotionalRoute; // Suppress upgrade CTAs on emotional routes
+  const showMemorialSong = isOwner && !isEmotionalRoute; // Suppress paid service CTAs on emotional routes
   const showFreeChecklists = isOwner || (isTrustedContact && (permissions.canViewAfterDeathChecklist || permissions.canViewAfterDeathPlanner));
 
   // If trusted contact has no permissions enabled

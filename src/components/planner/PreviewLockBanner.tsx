@@ -1,7 +1,8 @@
 import { Lock, Unlock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLockState } from "@/contexts/PreviewModeContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { isEmotionalStageRoute } from "@/lib/utils";
 
 interface PreviewLockBannerProps {
   /** Optional custom message */
@@ -15,6 +16,7 @@ interface PreviewLockBannerProps {
  * 
  * Shows when user is in preview mode (not unlocked).
  * Provides clear CTA to unlock without modal popups.
+ * Suppressed on emotional stage routes.
  */
 export function PreviewLockBanner({ 
   message = "Preview mode. To make changes or save updates, unlock your plan.",
@@ -22,9 +24,10 @@ export function PreviewLockBanner({
 }: PreviewLockBannerProps) {
   const { isLocked, isLoading } = useLockState();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Don't show if unlocked or still loading
-  if (!isLocked || isLoading) {
+  // Don't show if unlocked, still loading, or on emotional stage routes
+  if (!isLocked || isLoading || isEmotionalStageRoute(location.pathname)) {
     return null;
   }
 
@@ -88,8 +91,10 @@ export function PreviewLockBanner({
 export function InlineLockedNotice() {
   const { isLocked, isLoading } = useLockState();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  if (!isLocked || isLoading) {
+  // Suppress on emotional stage routes
+  if (!isLocked || isLoading || isEmotionalStageRoute(location.pathname)) {
     return null;
   }
 

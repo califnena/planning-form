@@ -35,3 +35,32 @@ export function isTestModeEnabled(): boolean {
   }
 }
 
+/**
+ * Emotional stage routes where pricing, progress indicators,
+ * and intrusive UI elements should be suppressed to protect emotional flow.
+ */
+const EMOTIONAL_STAGE_ROUTES = [
+  "/safety-entry",
+  "/orientation",
+] as const;
+
+/**
+ * Check if the current route is an emotional stage route.
+ * On these routes, pricing banners, upgrade CTAs, progress bars,
+ * and auto-opening assistant chat should be suppressed.
+ */
+export function isEmotionalStageRoute(route: string): boolean {
+  const normalizedRoute = route.toLowerCase().split("?")[0]; // Remove query params
+  return EMOTIONAL_STAGE_ROUTES.some(
+    (emotionalRoute) => normalizedRoute === emotionalRoute || normalizedRoute.startsWith(emotionalRoute + "/")
+  );
+}
+
+/**
+ * Check if progress indicators (bars, percentages) should be hidden.
+ * Always returns true since progress indicators are globally suppressed.
+ */
+export function shouldHideProgressIndicators(): boolean {
+  return true;
+}
+
