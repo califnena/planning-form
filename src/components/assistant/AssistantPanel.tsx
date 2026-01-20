@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { isAuthExpiredError } from "@/lib/sessionGuard";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -320,11 +321,20 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
 
     } catch (error) {
       console.error('Chat error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive",
-      });
+      if (isAuthExpiredError(error)) {
+        toast({
+          title: "Session expired",
+          description: "Please log in again to continue.",
+          variant: "destructive",
+        });
+        navigate('/login');
+      } else {
+        toast({
+          title: "Message failed",
+          description: "Please try again. If it keeps happening, contact support.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
