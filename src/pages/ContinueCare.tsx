@@ -64,8 +64,8 @@ export default function ContinueCare() {
 
   const benefits = [
     "Save and update your plan",
-    "Keep everything organized",
-    "Share with family when ready",
+    "Keep everything organized in one place",
+    "Share with family when you're ready",
   ];
 
   return (
@@ -74,6 +74,10 @@ export default function ContinueCare() {
         <h1 className="text-2xl md:text-3xl font-semibold text-foreground text-center leading-tight">
           Would you like to keep everything together?
         </h1>
+
+        <p className="text-lg text-muted-foreground text-center">
+          You've started something meaningful. This helps you keep it organized and return to it over time.
+        </p>
 
         <ul className="space-y-3">
           {benefits.map((benefit, index) => (
