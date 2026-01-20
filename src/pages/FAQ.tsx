@@ -114,18 +114,146 @@ const FAQ = () => {
       icon: "💰",
       questions: [
         {
-          q: "What is a Payable on Death (POD) beneficiary and why is it important?",
+          q: "What happens to a bank account when someone dies?",
           a: (
             <>
-              A Payable on Death (POD) beneficiary is a person you name on a bank account so they receive the money <strong>right away</strong> when you die. The money passes directly to them and usually <strong>avoids probate</strong>.
-              <br /><br />
-              To set it up:
-              <ul className="list-disc ml-6 mt-2 space-y-1">
-                <li>Ask your bank for a POD or beneficiary form</li>
-                <li>List the person's full name and relationship</li>
-                <li>Return the form to the bank</li>
+              <p className="mb-3">When someone passes away, their bank accounts are usually <strong>frozen</strong>. This means:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Family members cannot withdraw money automatically</li>
+                <li>Debit cards and checks stop working</li>
+                <li>Online access is typically shut off</li>
               </ul>
-              <p className="mt-2">It is usually free and is one of the simplest ways to help your loved ones get access to cash quickly.</p>
+              <p className="mb-3">To get the money out, one of two things must happen:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li><strong>Probate:</strong> A court process that can take months and requires paperwork</li>
+                <li><strong>Named beneficiary:</strong> If someone was named on the account (like a POD), they can claim the funds with a death certificate</li>
+              </ul>
+              <p className="mt-3 text-sm text-muted-foreground">This is general information, not legal advice. Rules vary by state and bank.</p>
+            </>
+          )
+        },
+        {
+          q: "What is a Payable on Death (POD) beneficiary?",
+          a: (
+            <>
+              <p className="mb-3">A <strong>Payable on Death (POD)</strong> is a free way to name someone to receive your bank account money when you die.</p>
+              <p className="font-medium mb-2">Key facts:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li><strong>Free:</strong> Banks offer this at no cost</li>
+                <li><strong>Used for:</strong> Checking, savings, and CDs</li>
+                <li><strong>Avoids probate:</strong> Money goes directly to your beneficiary</li>
+                <li><strong>Quick:</strong> Funds are released after showing a death certificate</li>
+              </ul>
+              <p>Think of it like a label on your account that says: "When I die, give this to [person's name]."</p>
+            </>
+          )
+        },
+        {
+          q: "How do I add a POD to my bank account?",
+          a: (
+            <>
+              <p className="mb-3">Adding a POD is simple and does not require a lawyer:</p>
+              <ol className="list-decimal ml-6 space-y-1 mb-3">
+                <li>Go to your bank (in person or call)</li>
+                <li>Ask for a "Payable on Death" or "beneficiary" form</li>
+                <li>Write in the person's full name</li>
+                <li>Sign and return the form</li>
+              </ol>
+              <p className="font-medium mb-2">Good to know:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>No lawyer needed</li>
+                <li>No cost</li>
+                <li>You can change it anytime</li>
+                <li>You can name more than one person</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "Can the POD beneficiary access my money while I am alive?",
+          a: (
+            <>
+              <p className="mb-3"><strong>No.</strong> The person you name as a POD beneficiary has no access to your account while you are alive.</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>They cannot see your balance</li>
+                <li>They cannot withdraw money</li>
+                <li>They cannot make any changes</li>
+              </ul>
+              <p><strong>You keep full control.</strong> The POD only takes effect after you pass away. Until then, it is your account and your money.</p>
+            </>
+          )
+        },
+        {
+          q: "What happens if there is no POD on a bank account?",
+          a: (
+            <>
+              <p className="mb-3">If no beneficiary is named, the money becomes part of the estate. This means:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li><strong>Probate required:</strong> A court must approve who gets the money</li>
+                <li><strong>Delays:</strong> This can take weeks to months</li>
+                <li><strong>Paperwork:</strong> Someone must file documents with the court</li>
+                <li><strong>Stress for family:</strong> Your loved ones must handle legal steps during a difficult time</li>
+              </ul>
+              <p>Adding a POD now can save your family time, money, and stress later.</p>
+            </>
+          )
+        },
+        {
+          q: "How do POD, Lady Bird Deed, and Trust compare?",
+          a: (
+            <>
+              <p className="mb-4">Here is a simple comparison of three ways to pass assets without probate:</p>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-sm">
+                  <thead>
+                    <tr className="border-b-2 border-border">
+                      <th className="text-left py-2 pr-4 font-medium"></th>
+                      <th className="text-left py-2 px-4 font-medium">POD</th>
+                      <th className="text-left py-2 px-4 font-medium">Lady Bird Deed</th>
+                      <th className="text-left py-2 px-4 font-medium">Trust</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-border">
+                      <td className="py-2 pr-4 font-medium">Used for</td>
+                      <td className="py-2 px-4">Bank accounts</td>
+                      <td className="py-2 px-4">Real estate (some states)</td>
+                      <td className="py-2 px-4">Any asset</td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="py-2 pr-4 font-medium">Avoids probate</td>
+                      <td className="py-2 px-4">Yes</td>
+                      <td className="py-2 px-4">Yes</td>
+                      <td className="py-2 px-4">Yes</td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="py-2 pr-4 font-medium">Cost</td>
+                      <td className="py-2 px-4">Free</td>
+                      <td className="py-2 px-4">Recording fee</td>
+                      <td className="py-2 px-4">Attorney fees</td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="py-2 pr-4 font-medium">Control while alive</td>
+                      <td className="py-2 px-4">Full control</td>
+                      <td className="py-2 px-4">Full control</td>
+                      <td className="py-2 px-4">Full control</td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="py-2 pr-4 font-medium">Where to set up</td>
+                      <td className="py-2 px-4">Your bank</td>
+                      <td className="py-2 px-4">County recorder</td>
+                      <td className="py-2 px-4">Attorney's office</td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="py-2 pr-4 font-medium">Risk level</td>
+                      <td className="py-2 px-4">Low</td>
+                      <td className="py-2 px-4">Medium</td>
+                      <td className="py-2 px-4">Low (if done right)</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-4 text-sm text-muted-foreground">This is general information, not legal advice. Lady Bird Deeds are only available in some states.</p>
             </>
           )
         }
