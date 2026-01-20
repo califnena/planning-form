@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,9 +6,14 @@ import { PublicHeader } from "@/components/PublicHeader";
 import { AppFooter } from "@/components/AppFooter";
 import NotAdviceNote from "@/components/NotAdviceNote";
 import { MapPin, ClipboardList } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { US_STATES } from "@/lib/us-states";
 
 export default function PublicBenefits() {
   const navigate = useNavigate();
+  const [selectedState, setSelectedState] = useState<string>("");
+
+  const selectedStateLabel = US_STATES.find(s => s.value === selectedState)?.label || "";
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -99,9 +105,52 @@ export default function PublicBenefits() {
             <li>Approval is not guaranteed</li>
             <li>Some states have no funeral assistance at all</li>
           </ul>
+
+          {/* State Selector */}
+          <div className="bg-muted/50 rounded-lg p-4 mt-6">
+            <h3 className="font-medium mb-3">Which state did the deceased live in?</h3>
+            <Select value={selectedState} onValueChange={setSelectedState}>
+              <SelectTrigger className="w-full max-w-xs bg-background">
+                <SelectValue placeholder="Select a state" />
+              </SelectTrigger>
+              <SelectContent>
+                {US_STATES.map((state) => (
+                  <SelectItem key={state.value} value={state.value}>
+                    {state.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {selectedState && (
+              <div className="mt-4 space-y-3">
+                <p className="text-base text-muted-foreground">
+                  Medicaid funeral assistance rules in <strong>{selectedStateLabel}</strong> are set by the state. Coverage is not guaranteed.
+                </p>
+                
+                <h4 className="font-medium mt-3">What to search for</h4>
+                <ul className="list-disc list-inside text-base text-muted-foreground space-y-1">
+                  <li>"{selectedStateLabel} Medicaid burial assistance"</li>
+                  <li>"{selectedStateLabel} funeral expense help"</li>
+                  <li>"{selectedStateLabel} indigent burial program"</li>
+                </ul>
+
+                <h4 className="font-medium mt-3">Who to contact</h4>
+                <ul className="list-disc list-inside text-base text-muted-foreground space-y-1">
+                  <li>{selectedStateLabel} Medicaid office</li>
+                  <li>{selectedStateLabel} Department of Social Services</li>
+                  <li>Your county or city social services office</li>
+                </ul>
+
+                <p className="text-sm text-muted-foreground mt-4">
+                  We cannot confirm what {selectedStateLabel} currently offers. Rules change, and approval depends on individual circumstances.
+                </p>
+              </div>
+            )}
+          </div>
           
-          <p className="text-base text-muted-foreground mb-3">
-            Check your state's rules by contacting your local Medicaid office or Department of Social Services.
+          <p className="text-base text-muted-foreground mt-4 mb-3">
+            For official information, visit:
           </p>
           <a 
             href="https://www.medicaid.gov/" 
@@ -117,7 +166,7 @@ export default function PublicBenefits() {
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-8">
           <Button 
-            onClick={() => window.open("https://www.medicaid.gov/about-us/contact-us/index.html", "_blank", "noopener,noreferrer")}
+            onClick={() => window.open("https://www.medicaid.gov/", "_blank", "noopener,noreferrer")}
             className="flex-1"
           >
             <MapPin className="mr-2 h-4 w-4" />
