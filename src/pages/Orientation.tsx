@@ -11,14 +11,18 @@ export default function Orientation() {
           Here's what people usually handle
         </h1>
 
+        <p className="text-lg text-muted-foreground text-center">
+          You don't have to do everything at once. This is just a map.
+        </p>
+
         <div className="space-y-8">
           {/* Immediate */}
           <section className="space-y-3">
             <h2 className="text-xl font-medium text-foreground">Immediate</h2>
             <ul className="space-y-2 text-lg text-muted-foreground">
-              <li>• Notify close family</li>
-              <li>• Locate basic documents</li>
-              <li>• Understand next steps</li>
+              <li>• Let close family know</li>
+              <li>• Find basic documents</li>
+              <li>• Understand what needs attention right now</li>
             </ul>
           </section>
 
@@ -27,8 +31,8 @@ export default function Orientation() {
             <h2 className="text-xl font-medium text-foreground">Soon</h2>
             <ul className="space-y-2 text-lg text-muted-foreground">
               <li>• Burial or cremation preferences</li>
-              <li>• Service wishes</li>
-              <li>• People to contact</li>
+              <li>• Service or memorial wishes</li>
+              <li>• Who should be contacted</li>
             </ul>
           </section>
 
@@ -36,9 +40,9 @@ export default function Orientation() {
           <section className="space-y-3">
             <h2 className="text-xl font-medium text-foreground">Later</h2>
             <ul className="space-y-2 text-lg text-muted-foreground">
-              <li>• Life story or obituary</li>
-              <li>• Notes and keepsakes</li>
-              <li>• Updates over time</li>
+              <li>• Life story or obituary notes</li>
+              <li>• Personal messages or keepsakes</li>
+              <li>• Updates as things change</li>
             </ul>
           </section>
         </div>
