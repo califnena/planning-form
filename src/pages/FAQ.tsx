@@ -260,6 +260,208 @@ const FAQ = () => {
       ]
     },
     {
+      title: "Property & Home Planning",
+      icon: "🏠",
+      questions: [
+        {
+          q: "What is a Lady Bird Deed?",
+          a: (
+            <>
+              <p className="mb-3">A <strong>Lady Bird Deed</strong> (also called an Enhanced Life Estate Deed) is a special type of property deed that:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Lets you keep <strong>full control</strong> of your home while you are alive</li>
+                <li>Automatically transfers the home to someone after you pass</li>
+                <li><strong>Avoids probate</strong> for the property</li>
+                <li>Lets you sell, rent, or change your mind anytime</li>
+              </ul>
+              <p>Think of it as a way to say: "This home goes to [person] when I die, but until then, it is still mine."</p>
+            </>
+          )
+        },
+        {
+          q: "Why is the name 'Lady Bird Deed' confusing?",
+          a: (
+            <>
+              <p className="mb-3">The name "Lady Bird Deed" is informal. It reportedly comes from President Lyndon B. Johnson using this type of deed for his wife, Lady Bird Johnson.</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>The legal name is <strong>Enhanced Life Estate Deed</strong></li>
+                <li>Many people have never heard this term</li>
+                <li>The name does not explain what it does</li>
+              </ul>
+              <p>What matters is not the name—it is what the deed does: keeps your control and avoids probate.</p>
+            </>
+          )
+        },
+        {
+          q: "When might a Lady Bird Deed be useful?",
+          a: (
+            <>
+              <p className="mb-3">A Lady Bird Deed may be a good fit if:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>You want to <strong>avoid probate</strong> for your home</li>
+                <li>You want to <strong>keep full control</strong> while you are alive</li>
+                <li>Your state allows this type of deed</li>
+                <li>Your family situation is straightforward</li>
+              </ul>
+              <p className="text-muted-foreground">This does not fit everyone. Complex situations may need a different approach.</p>
+            </>
+          )
+        },
+        {
+          q: "What are the limitations of a Lady Bird Deed?",
+          a: (
+            <>
+              <p className="mb-3">There are some important limits to be aware of:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li><strong>Not available everywhere:</strong> Only some states allow this deed</li>
+                <li><strong>Only for your home:</strong> It does not cover bank accounts, cars, or other property</li>
+                <li><strong>Must be done correctly:</strong> Errors can cause problems later</li>
+                <li><strong>Usually requires an attorney:</strong> To make sure it is set up right</li>
+              </ul>
+              <p className="text-sm text-muted-foreground">This is general information, not legal advice.</p>
+            </>
+          )
+        },
+        {
+          q: "What if I transfer my home to my child while I am alive?",
+          a: (
+            <>
+              <p className="mb-3">Transferring your home to a child now (instead of using a Lady Bird Deed or trust) can create problems:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li><strong>Loss of control:</strong> You no longer own the home</li>
+                <li><strong>Child's problems become yours:</strong> If your child gets divorced or has creditors, the home could be at risk</li>
+                <li><strong>Tax issues:</strong> Your child may pay more in taxes when they sell</li>
+                <li><strong>Medicaid impact:</strong> The transfer could affect your eligibility for benefits</li>
+              </ul>
+              <p>For these reasons, transferring property early is usually <strong>not recommended</strong> without professional advice.</p>
+            </>
+          )
+        },
+        {
+          q: "What happens if I leave my home in a will?",
+          a: (
+            <>
+              <p className="mb-3">A will tells people what you want, but it does <strong>not</strong> avoid probate. If your home is only in your will:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li><strong>Probate required:</strong> The court must approve the transfer</li>
+                <li><strong>Delays:</strong> This can take months</li>
+                <li><strong>Costs:</strong> Court fees and possibly attorney fees</li>
+                <li><strong>Stress for family:</strong> More paperwork during a hard time</li>
+              </ul>
+              <p>A will is still important, but other tools (like a Lady Bird Deed or trust) can help your home pass more smoothly.</p>
+            </>
+          )
+        },
+        {
+          q: "What if I do no planning for my home?",
+          a: (
+            <>
+              <p className="mb-3">If you do not plan for your home, here is what typically happens:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li><strong>Probate:</strong> The court decides what happens to your home</li>
+                <li><strong>Court control:</strong> A judge oversees the process</li>
+                <li><strong>Delays:</strong> It can take many months</li>
+                <li><strong>Higher conflict risk:</strong> Family disagreements may arise</li>
+              </ul>
+              <p>Even simple planning can help your family avoid these issues.</p>
+            </>
+          )
+        },
+        {
+          q: "How does a trust work for a home?",
+          a: (
+            <>
+              <p className="mb-3">A <strong>trust</strong> is a legal arrangement where your home (and other assets) are held for your benefit while you are alive, then passed to others when you die.</p>
+              <p className="font-medium mb-2">Benefits:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li><strong>Avoids probate:</strong> Property transfers privately</li>
+                <li><strong>Keeps control:</strong> You manage everything while alive</li>
+                <li><strong>Handles complexity:</strong> Good for multiple properties or complicated family situations</li>
+              </ul>
+              <p className="font-medium mb-2">Downsides:</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li><strong>Higher cost:</strong> Attorney fees to set up</li>
+                <li><strong>More paperwork:</strong> Assets must be moved into the trust</li>
+              </ul>
+            </>
+          )
+        },
+        {
+          q: "How do property planning options compare?",
+          a: (
+            <>
+              <p className="mb-4">Here is a comparison of common ways to plan for your home:</p>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-sm">
+                  <thead>
+                    <tr className="border-b-2 border-border">
+                      <th className="text-left py-2 pr-4 font-medium"></th>
+                      <th className="text-left py-2 px-3 font-medium">Transfer Now</th>
+                      <th className="text-left py-2 px-3 font-medium">Will Only</th>
+                      <th className="text-left py-2 px-3 font-medium">Do Nothing</th>
+                      <th className="text-left py-2 px-3 font-medium">Lady Bird Deed</th>
+                      <th className="text-left py-2 px-3 font-medium">Trust</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-border">
+                      <td className="py-2 pr-4 font-medium">Control while alive</td>
+                      <td className="py-2 px-3">None</td>
+                      <td className="py-2 px-3">Full</td>
+                      <td className="py-2 px-3">Full</td>
+                      <td className="py-2 px-3">Full</td>
+                      <td className="py-2 px-3">Full</td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="py-2 pr-4 font-medium">Avoids probate</td>
+                      <td className="py-2 px-3">Yes</td>
+                      <td className="py-2 px-3">No</td>
+                      <td className="py-2 px-3">No</td>
+                      <td className="py-2 px-3">Yes</td>
+                      <td className="py-2 px-3">Yes</td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="py-2 pr-4 font-medium">Cost</td>
+                      <td className="py-2 px-3">Low</td>
+                      <td className="py-2 px-3">Low</td>
+                      <td className="py-2 px-3">None</td>
+                      <td className="py-2 px-3">Medium</td>
+                      <td className="py-2 px-3">Higher</td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="py-2 pr-4 font-medium">Risk level</td>
+                      <td className="py-2 px-3">High</td>
+                      <td className="py-2 px-3">Medium</td>
+                      <td className="py-2 px-3">High</td>
+                      <td className="py-2 px-3">Low</td>
+                      <td className="py-2 px-3">Low</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )
+        },
+        {
+          q: "What is the general guidance for planning?",
+          a: (
+            <>
+              <p className="mb-3">Here are some common approaches that may help:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-4">
+                <li><strong>Bank accounts:</strong> Add a POD (Payable on Death) beneficiary—it is free and simple</li>
+                <li><strong>Home:</strong> Consider a Lady Bird Deed if your state allows it and your situation is straightforward</li>
+                <li><strong>Complex situations:</strong> A trust may be better for multiple properties, blended families, or special needs</li>
+                <li><strong>Avoid gifting property early:</strong> This can create tax and legal problems</li>
+              </ul>
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <p className="text-sm text-muted-foreground"><strong>Please note:</strong> This is general information only, not legal or financial advice. Rules vary by state. Speaking with a professional can help you choose the right approach for your situation.</p>
+              </div>
+            </>
+          )
+        }
+      ]
+    },
+    {
       title: "Prepaid Contracts & Funeral Trusts",
       icon: "📋",
       questions: [
