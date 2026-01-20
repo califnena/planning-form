@@ -788,6 +788,103 @@ const FAQ = () => {
           )
         }
       ]
+    },
+    {
+      title: "Choosing a Person in Charge",
+      icon: "👤",
+      questions: [
+        {
+          q: "Why should I choose one person to be in charge?",
+          a: (
+            <>
+              <p className="mb-3">Choosing one person helps avoid confusion and conflict during a difficult time.</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>This person helps carry out funeral arrangements</li>
+                <li>They are the main point of contact for funeral homes and family</li>
+                <li>They help follow your preplan</li>
+              </ul>
+              <p className="mt-3">When everyone knows who is in charge, decisions happen faster and with less stress.</p>
+            </>
+          )
+        },
+        {
+          q: "Who should I name as my primary person in charge?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Primary Person in Charge:</strong></p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>Name one trusted person</li>
+                <li>This is who funeral homes and family look to first</li>
+                <li>Choose someone you trust to follow your wishes</li>
+              </ul>
+              <p className="mt-3">This person should be willing, available, and aware of where your preplan is saved.</p>
+            </>
+          )
+        },
+        {
+          q: "Should I name backup people?",
+          a: (
+            <>
+              <p className="mb-3">Yes. Backups prevent delays if your first choice is unavailable.</p>
+              <p className="font-medium mb-2">First Backup (Second Choice):</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Name a second person</li>
+                <li>Steps in if the primary person is unavailable</li>
+              </ul>
+              <p className="font-medium mb-2">Second Backup (Third Choice):</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Optional but helpful</li>
+                <li>Useful for emergencies or travel delays</li>
+              </ul>
+              <p><strong>Order matters.</strong> Only one person should lead at a time.</p>
+            </>
+          )
+        },
+        {
+          q: "Does this replace legal documents?",
+          a: (
+            <>
+              <p className="mb-3">No. This is a practical guide for families, not a legal document.</p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li>It does not replace a will, power of attorney, or healthcare directive</li>
+                <li>It helps family members understand your wishes</li>
+                <li>You can change your choices anytime</li>
+              </ul>
+              <p className="mt-3"><strong>Let your chosen people know where your preplan is saved.</strong></p>
+            </>
+          )
+        },
+        {
+          q: "Checklist: Choosing a Person in Charge",
+          a: (
+            <>
+              <p className="mb-3">Use this checklist to make sure you have covered the basics:</p>
+              <div className="bg-muted/30 border border-border rounded-lg p-4 space-y-2">
+                <div className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Primary person named</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>First backup named</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Second backup named (optional)</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Contact information added</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>People notified where the plan is stored</span>
+                </div>
+              </div>
+            </>
+          )
+        }
+      ]
     }
   ];
 
@@ -919,8 +1016,7 @@ const FAQ = () => {
                   <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4 flex items-center gap-3">
                     <span className="text-2xl" aria-hidden="true">{section.icon}</span>
                     {section.title}
-                    </a>
-                  )}
+                  </h2>
                   
                   <Accordion type="single" collapsible className="w-full">
                     {section.questions.map((qa, qIndex) => (
