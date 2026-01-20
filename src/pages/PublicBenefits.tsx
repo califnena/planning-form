@@ -28,14 +28,31 @@ export default function PublicBenefits() {
         <Card className="p-6 mb-6">
           <h2 className="text-xl font-semibold mb-3">Social Security Death Benefit</h2>
           <p className="text-base text-muted-foreground mb-3">
-            Social Security offers a one-time payment of $255 to certain surviving family members. This is called the "lump-sum death benefit."
+            Social Security offers a one-time payment of $255 to certain surviving family members. As of 2026, this amount has not changed.
           </p>
+          
+          <h3 className="font-medium mt-4 mb-2">Who qualifies</h3>
           <p className="text-base text-muted-foreground mb-3">
-            To qualify, the surviving spouse must have been living with the person who passed away. If there is no spouse, the payment may go to a child who is receiving Social Security benefits.
+            A surviving spouse who was living with the person at the time of death may qualify. If there is no spouse, a child who is already receiving Social Security benefits on that person's record may be eligible.
           </p>
-          <p className="text-base text-muted-foreground">
-            This benefit does not cover funeral costs. It is a small, fixed amount that has not changed in decades.
+          
+          <h3 className="font-medium mt-4 mb-2">How to apply</h3>
+          <p className="text-base text-muted-foreground mb-3">
+            You can apply by calling Social Security at 1-800-772-1213 or visiting your local Social Security office. You will need the deceased person's Social Security number.
           </p>
+          
+          <p className="text-base text-muted-foreground mb-3">
+            Amounts and rules may change. Check the official website for current information:
+          </p>
+          <a 
+            href="https://www.ssa.gov/benefits/survivors/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-primary hover:underline inline-flex items-center gap-1"
+          >
+            www.ssa.gov/benefits/survivors
+            <span className="text-xs text-muted-foreground ml-1">(opens in new tab)</span>
+          </a>
         </Card>
 
         {/* Medicare */}
