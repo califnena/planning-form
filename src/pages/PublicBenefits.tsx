@@ -163,6 +163,72 @@ export default function PublicBenefits() {
           </a>
         </Card>
 
+        {/* Social Security Checklist */}
+        <Card className="p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">Social Security Death Benefit Checklist</h2>
+          <ul className="space-y-3">
+            <li className="flex items-start gap-3">
+              <input type="checkbox" className="mt-1 h-6 w-6 min-w-[24px] rounded border-2 border-border" />
+              <span className="text-base">Locate the deceased's Social Security number</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <input type="checkbox" className="mt-1 h-6 w-6 min-w-[24px] rounded border-2 border-border" />
+              <span className="text-base">Confirm surviving spouse lived with the deceased</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <input type="checkbox" className="mt-1 h-6 w-6 min-w-[24px] rounded border-2 border-border" />
+              <span className="text-base">Gather death certificate</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <input type="checkbox" className="mt-1 h-6 w-6 min-w-[24px] rounded border-2 border-border" />
+              <span className="text-base">Call Social Security at 1-800-772-1213</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <input type="checkbox" className="mt-1 h-6 w-6 min-w-[24px] rounded border-2 border-border" />
+              <span className="text-base">Or visit your local Social Security office</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <input type="checkbox" className="mt-1 h-6 w-6 min-w-[24px] rounded border-2 border-border" />
+              <span className="text-base">Apply within 2 years of death</span>
+            </li>
+          </ul>
+        </Card>
+
+        {/* Medicaid Checklist */}
+        <Card className="p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">Medicaid Funeral Assistance Checklist</h2>
+          <ul className="space-y-3">
+            <li className="flex items-start gap-3">
+              <input type="checkbox" className="mt-1 h-6 w-6 min-w-[24px] rounded border-2 border-border" />
+              <span className="text-base">Identify the state where the deceased lived</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <input type="checkbox" className="mt-1 h-6 w-6 min-w-[24px] rounded border-2 border-border" />
+              <span className="text-base">Search for "[State] Medicaid burial assistance"</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <input type="checkbox" className="mt-1 h-6 w-6 min-w-[24px] rounded border-2 border-border" />
+              <span className="text-base">Contact state Medicaid office or Department of Social Services</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <input type="checkbox" className="mt-1 h-6 w-6 min-w-[24px] rounded border-2 border-border" />
+              <span className="text-base">Ask about income and asset limits</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <input type="checkbox" className="mt-1 h-6 w-6 min-w-[24px] rounded border-2 border-border" />
+              <span className="text-base">Gather proof of income and assets</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <input type="checkbox" className="mt-1 h-6 w-6 min-w-[24px] rounded border-2 border-border" />
+              <span className="text-base">Gather death certificate</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <input type="checkbox" className="mt-1 h-6 w-6 min-w-[24px] rounded border-2 border-border" />
+              <span className="text-base">Submit application before arranging services (if required)</span>
+            </li>
+          </ul>
+        </Card>
+
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-8">
           <Button 
@@ -183,7 +249,7 @@ export default function PublicBenefits() {
         </div>
 
         <p className="text-sm text-muted-foreground mt-8 text-center">
-          This information is for educational purposes only. Programs and eligibility rules can change. Contact the relevant agency for current details.
+          Rules and amounts may change. Always confirm using official links.
         </p>
       </main>
 
