@@ -18,6 +18,7 @@ import { MyPlanningDocumentCard } from "@/components/dashboard/MyPlanningDocumen
 import { setPendingCheckout } from "@/lib/pendingCheckout";
 import { usePlanDataStatus } from "@/hooks/usePlanDataStatus";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
+import { requireSessionOrRedirect, isAuthExpiredError } from "@/lib/sessionGuard";
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -242,8 +243,9 @@ export default function Dashboard() {
   const handleDownloadWorkbook = async () => {
     const successUrl = `${window.location.origin}/purchase-success?type=printable`;
     
-    const needsLogin = await queueCheckoutAndGoLogin("EFABASIC", successUrl);
-    if (needsLogin) return;
+    // Verify session before checkout
+    const accessToken = await requireSessionOrRedirect(navigate, toast);
+    if (!accessToken) return;
 
     try {
       const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
@@ -255,6 +257,15 @@ export default function Dashboard() {
         }
       });
       if (error) {
+        if (isAuthExpiredError(error)) {
+          toast({
+            title: "Session expired",
+            description: "Please log in again.",
+            variant: "destructive"
+          });
+          navigate("/login");
+          return;
+        }
         console.error('Stripe function error:', error);
         toast({
           title: "Checkout failed",
@@ -273,6 +284,15 @@ export default function Dashboard() {
         });
       }
     } catch (error: any) {
+      if (isAuthExpiredError(error)) {
+        toast({
+          title: "Session expired",
+          description: "Please log in again.",
+          variant: "destructive"
+        });
+        navigate("/login");
+        return;
+      }
       console.error("Error starting checkout:", error);
       toast({
         title: "Error",
@@ -285,8 +305,9 @@ export default function Dashboard() {
   const handlePurchaseBinder = async () => {
     const successUrl = `${window.location.origin}/purchase-success?type=binder`;
     
-    const needsLogin = await queueCheckoutAndGoLogin("EFABINDER", successUrl);
-    if (needsLogin) return;
+    // Verify session before checkout
+    const accessToken = await requireSessionOrRedirect(navigate, toast);
+    if (!accessToken) return;
 
     try {
       const { data, error } = await supabase.functions.invoke('stripe-create-checkout', {
@@ -298,6 +319,15 @@ export default function Dashboard() {
         }
       });
       if (error) {
+        if (isAuthExpiredError(error)) {
+          toast({
+            title: "Session expired",
+            description: "Please log in again.",
+            variant: "destructive"
+          });
+          navigate("/login");
+          return;
+        }
         console.error('Stripe function error:', error);
         toast({
           title: "Checkout failed",
@@ -316,6 +346,15 @@ export default function Dashboard() {
         });
       }
     } catch (error: any) {
+      if (isAuthExpiredError(error)) {
+        toast({
+          title: "Session expired",
+          description: "Please log in again.",
+          variant: "destructive"
+        });
+        navigate("/login");
+        return;
+      }
       console.error("Error starting checkout:", error);
       toast({
         title: "Error",
