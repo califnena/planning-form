@@ -89,14 +89,29 @@ export default function PublicBenefits() {
         <Card className="p-6 mb-6">
           <h2 className="text-xl font-semibold mb-3">Medicaid</h2>
           <p className="text-base text-muted-foreground mb-3">
-            Medicaid is different in every state. Some states offer limited help with funeral costs for people who qualify.
+            Medicaid funeral help depends on the state. Each state sets its own rules for what is covered and who qualifies.
           </p>
+          
+          <h3 className="font-medium mt-4 mb-2">What to know</h3>
+          <ul className="list-disc list-inside text-base text-muted-foreground space-y-1 mb-4">
+            <li>Typical help ranges from $500 to $1,500</li>
+            <li>Income and asset limits apply</li>
+            <li>Approval is not guaranteed</li>
+            <li>Some states have no funeral assistance at all</li>
+          </ul>
+          
           <p className="text-base text-muted-foreground mb-3">
-            This help—sometimes called "burial assistance"—is usually a small amount and may only cover basic services like a direct burial or cremation.
+            Check your state's rules by contacting your local Medicaid office or Department of Social Services.
           </p>
-          <p className="text-base text-muted-foreground">
-            To find out what your state offers, contact your local Medicaid office or Department of Social Services.
-          </p>
+          <a 
+            href="https://www.medicaid.gov/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-primary hover:underline inline-flex items-center gap-1"
+          >
+            www.medicaid.gov
+            <span className="text-xs text-muted-foreground ml-1">(opens in new tab)</span>
+          </a>
         </Card>
 
         {/* Buttons */}
