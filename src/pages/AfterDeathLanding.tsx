@@ -9,13 +9,20 @@ import { AppFooter } from "@/components/AppFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import NotAdviceNote from "@/components/NotAdviceNote";
+import { isStoreIAP } from "@/lib/billingMode";
+import { StoreIAPModal } from "@/components/StoreIAPModal";
 
 export default function AfterDeathLanding() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [showIAPModal, setShowIAPModal] = useState(false);
 
   const handlePremiumAccess = async () => {
+    if (isStoreIAP) {
+      setShowIAPModal(true);
+      return;
+    }
     setIsLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -300,6 +307,7 @@ export default function AfterDeathLanding() {
       </main>
 
       <AppFooter />
+      <StoreIAPModal open={showIAPModal} onOpenChange={setShowIAPModal} />
     </div>
   );
 }

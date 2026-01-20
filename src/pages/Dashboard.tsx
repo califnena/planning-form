@@ -19,6 +19,8 @@ import { setPendingCheckout } from "@/lib/pendingCheckout";
 import { usePlanDataStatus } from "@/hooks/usePlanDataStatus";
 import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { requireSessionOrRedirect, isAuthExpiredError } from "@/lib/sessionGuard";
+import { isStoreIAP } from "@/lib/billingMode";
+import { StoreIAPModal } from "@/components/StoreIAPModal";
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -52,6 +54,7 @@ export default function Dashboard() {
   const [hasVIPAccess, setHasVIPAccess] = useState(false);
   const [hasPrintableAccess, setHasPrintableAccess] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [showIAPModal, setShowIAPModal] = useState(false);
   
   // Admin/test users bypass all subscription checks
   const { isAdmin, isLoading: isAdminLoading } = useAdminStatus();
@@ -241,6 +244,10 @@ export default function Dashboard() {
   };
 
   const handleDownloadWorkbook = async () => {
+    if (isStoreIAP) {
+      setShowIAPModal(true);
+      return;
+    }
     const successUrl = `${window.location.origin}/purchase-success?type=printable`;
     
     // Verify session before checkout
@@ -303,6 +310,10 @@ export default function Dashboard() {
   };
 
   const handlePurchaseBinder = async () => {
+    if (isStoreIAP) {
+      setShowIAPModal(true);
+      return;
+    }
     const successUrl = `${window.location.origin}/purchase-success?type=binder`;
     
     // Verify session before checkout
@@ -411,6 +422,10 @@ export default function Dashboard() {
   };
 
   const handleVIPMonthly = async () => {
+    if (isStoreIAP) {
+      setShowIAPModal(true);
+      return;
+    }
     const successUrl = `${window.location.origin}/purchase-success?type=vip`;
     
     const needsLogin = await queueCheckoutAndGoLogin("EFAVIPMONTHLY", successUrl);
@@ -454,6 +469,10 @@ export default function Dashboard() {
   };
 
   const handleVIPYearly = async () => {
+    if (isStoreIAP) {
+      setShowIAPModal(true);
+      return;
+    }
     const successUrl = `${window.location.origin}/purchase-success?type=vip`;
     
     const needsLogin = await queueCheckoutAndGoLogin("EFAVIPYEAR", successUrl);
@@ -497,6 +516,10 @@ export default function Dashboard() {
   };
 
   const handlePremiumSubscription = async () => {
+    if (isStoreIAP) {
+      setShowIAPModal(true);
+      return;
+    }
     const successUrl = `${window.location.origin}/purchase-success?type=premium`;
     
     const needsLogin = await queueCheckoutAndGoLogin("EFAPREMIUM", successUrl);
@@ -864,6 +887,7 @@ export default function Dashboard() {
         onOpenChange={setShowPlannerModeModal} 
         onContinue={handlePlannerModeSelected} 
       />
+      <StoreIAPModal open={showIAPModal} onOpenChange={setShowIAPModal} />
     </AuthenticatedLayout>
   );
 }

@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Check, ArrowLeft } from "lucide-react";
 import binderImage from "@/assets/fireproof-binder.png";
 import { PLANS } from "@/lib/plans";
+import { isStoreIAP } from "@/lib/billingMode";
+import { StoreIAPModal } from "@/components/StoreIAPModal";
 import { CheckoutFallback } from "@/components/CheckoutFallback";
 import {
   AlertDialog,
@@ -31,6 +33,7 @@ export default function Subscription() {
   const [isMasterAccount, setIsMasterAccount] = useState(false);
   const [checkoutStarted, setCheckoutStarted] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [showIAPModal, setShowIAPModal] = useState(false);
 
   const loadSubscription = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -75,6 +78,10 @@ export default function Subscription() {
   };
 
   const handleCheckout = async (planKey: string) => {
+    if (isStoreIAP) {
+      setShowIAPModal(true);
+      return;
+    }
     setCheckoutLoading(true);
     setCheckoutStarted(true);
     
@@ -435,6 +442,7 @@ export default function Subscription() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <StoreIAPModal open={showIAPModal} onOpenChange={setShowIAPModal} />
     </div>
   );
 }

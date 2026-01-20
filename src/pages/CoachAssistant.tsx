@@ -12,6 +12,8 @@ import { Loader2, Heart, Sparkles, ArrowRight, Mic, Volume2, VolumeX, Home, LogO
 import { Badge } from "@/components/ui/badge";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
 import { requireSessionOrRedirect } from "@/lib/sessionGuard";
+import { isStoreIAP } from "@/lib/billingMode";
+import { StoreIAPModal } from "@/components/StoreIAPModal";
 
 type Message = { role: "user" | "assistant"; content: string };
 type Mode = "planning" | "emotional";
@@ -37,6 +39,7 @@ export default function CoachAssistant() {
   const [isTTSEnabled, setIsTTSEnabled] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+  const [showIAPModal, setShowIAPModal] = useState(false);
 
   useEffect(() => {
     checkVIPAccess();
@@ -172,6 +175,10 @@ export default function CoachAssistant() {
   };
 
   const handleUpgradeToVIP = async () => {
+    if (isStoreIAP) {
+      setShowIAPModal(true);
+      return;
+    }
     const successUrl = `${window.location.origin}/purchase-success?type=vip`;
     const cancelUrl = window.location.href;
 
@@ -503,6 +510,7 @@ export default function CoachAssistant() {
         </div>
       </div>
       <AppFooter />
+      <StoreIAPModal open={showIAPModal} onOpenChange={setShowIAPModal} />
     </div>
   );
 }
