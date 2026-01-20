@@ -45,11 +45,13 @@ export default function SafetyEntry() {
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="max-w-xl w-full text-center space-y-8">
         <h1 className="text-3xl md:text-4xl font-semibold text-foreground leading-tight">
-          You're not behind.
+          Let's take this one step at a time.
         </h1>
         
         <p className="text-lg text-muted-foreground leading-relaxed">
-          We'll take this one step at a time. You can pause or stop at any point.
+          Most people feel unsure where to begin.<br />
+          We'll take this one step at a time.<br />
+          You can pause, stop, or come back anytime.
         </p>
 
         <div className="flex flex-col gap-4 pt-4">
