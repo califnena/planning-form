@@ -885,8 +885,85 @@ const FAQ = () => {
           )
         }
       ]
+    },
+    {
+      title: "Social Security and Medicaid",
+      icon: "🏛️",
+      questions: [
+        {
+          q: "Does Social Security help pay for funerals?",
+          a: (
+            <>
+              <p className="mb-3">Social Security offers a small one-time death benefit of $255 (as of 2026). This amount is limited and does not cover full funeral costs.</p>
+              <p>
+                <Link to="/public-benefits" className="text-primary hover:underline inline-flex items-center gap-1">
+                  Learn how to apply and current rules here →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "Who qualifies for the Social Security death benefit?",
+          a: (
+            <>
+              <p className="mb-3">Certain spouses or dependent children may qualify. Eligibility depends on work history and relationship to the deceased.</p>
+              <p>
+                <Link to="/public-benefits" className="text-primary hover:underline inline-flex items-center gap-1">
+                  See full eligibility details →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "Does Medicare cover funeral or burial costs?",
+          a: (
+            <>
+              <p className="mb-3"><strong>No.</strong> Medicare does not cover funeral, burial, or cremation costs.</p>
+              <p>
+                <Link to="/public-benefits" className="text-primary hover:underline inline-flex items-center gap-1">
+                  Learn more about what Medicare covers →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "Does Medicaid help with funeral or burial costs?",
+          a: (
+            <>
+              <p className="mb-3">It depends on the state. Some states offer limited burial assistance through Medicaid, typically $500–$1,500. Rules vary.</p>
+              <p>
+                <Link to="/public-benefits" className="text-primary hover:underline inline-flex items-center gap-1">
+                  Check Medicaid help by state →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "How do I apply for Social Security or Medicaid help after a death?",
+          a: (
+            <>
+              <p className="mb-3">Applications are handled through government agencies:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Social Security: Apply online, by phone, or at a local office</li>
+                <li>Medicaid: Contact your state's Medicaid office</li>
+              </ul>
+              <p>
+                <Link to="/public-benefits" className="text-primary hover:underline inline-flex items-center gap-1">
+                  View step-by-step application guides →
+                </Link>
+              </p>
+            </>
+          )
+        }
+      ]
     }
   ];
+  
+  // Note: These programs offer limited help. Full details are available in the Benefits section.
 
   // Filter questions based on search query
   const filteredRequiredQuestions = useMemo(() => {
