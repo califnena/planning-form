@@ -57,6 +57,7 @@ export default function GuidedAction() {
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
   const [inputValue, setInputValue] = useState("");
   const [skippedTasks, setSkippedTasks] = useState<Set<string>>(new Set());
+  const [completedCount, setCompletedCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [planId, setPlanId] = useState<string | null>(null);
@@ -124,6 +125,14 @@ export default function GuidedAction() {
   const handleSaveAndContinue = async () => {
     if (inputValue.trim()) {
       await saveResponse();
+      const newCount = completedCount + 1;
+      setCompletedCount(newCount);
+      
+      // Show relief checkpoint after 2-3 completed tasks
+      if (newCount >= 2 && newCount <= 3) {
+        navigate("/relief-checkpoint");
+        return;
+      }
     }
     moveToNext();
   };
