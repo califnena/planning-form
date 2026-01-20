@@ -150,6 +150,27 @@ const Settings = () => {
                 </p>
               </div>
             </div>
+
+            {/* Legal Section */}
+            <div className="bg-card border rounded-lg p-6">
+              <Label className="text-lg font-semibold mb-4 block">Legal</Label>
+              <div className="space-y-2">
+                <Link 
+                  to="/privacy" 
+                  className="flex items-center justify-between min-h-[52px] px-4 py-3 rounded-lg border bg-background hover:bg-muted/50 transition-colors"
+                >
+                  <span className="text-lg text-foreground">Privacy Policy</span>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                </Link>
+                <Link 
+                  to="/terms" 
+                  className="flex items-center justify-between min-h-[52px] px-4 py-3 rounded-lg border bg-background hover:bg-muted/50 transition-colors"
+                >
+                  <span className="text-lg text-foreground">Terms of Service</span>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                </Link>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="subscription" className="space-y-4">
@@ -252,26 +273,6 @@ const Settings = () => {
                 </div>
               </div>
 
-              {/* Legal Section */}
-              <div className="border-t pt-6">
-                <Label className="text-base font-semibold mb-4 block">Legal</Label>
-                <div className="space-y-2">
-                  <Link 
-                    to="/privacy" 
-                    className="flex items-center justify-between min-h-[52px] px-4 py-3 rounded-lg border bg-background hover:bg-muted/50 transition-colors"
-                  >
-                    <span className="text-lg text-foreground">Privacy Policy</span>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                  </Link>
-                  <Link 
-                    to="/terms" 
-                    className="flex items-center justify-between min-h-[52px] px-4 py-3 rounded-lg border bg-background hover:bg-muted/50 transition-colors"
-                  >
-                    <span className="text-lg text-foreground">Terms of Service</span>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                  </Link>
-                </div>
-              </div>
             </div>
           </TabsContent>
 
