@@ -78,6 +78,7 @@ import SafetyEntry from "./pages/SafetyEntry";
 import Orientation from "./pages/Orientation";
 import GuidedAction from "./pages/GuidedAction";
 import ReliefCheckpoint from "./pages/ReliefCheckpoint";
+import ContinueCare from "./pages/ContinueCare";
 
 // Import planner layout and pages
 import {
@@ -240,6 +241,7 @@ const App = () => (
                       <Route path="/orientation" element={<Orientation />} />
                       <Route path="/guided-action" element={<GuidedAction />} />
                       <Route path="/relief-checkpoint" element={<ReliefCheckpoint />} />
+                      <Route path="/continue-care" element={<ContinueCare />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
