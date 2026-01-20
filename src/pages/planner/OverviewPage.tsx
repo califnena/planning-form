@@ -1,6 +1,6 @@
 import { SectionOverview } from "@/components/planner/sections/SectionOverview";
 import { useNavigate } from "react-router-dom";
-
+import NotAdviceNote from "@/components/NotAdviceNote";
 // Section ID to route mapping
 const sectionIdToRoute: Record<string, string> = {
   personal: "/preplandashboard/personal-family",
@@ -25,12 +25,15 @@ export default function OverviewPage() {
   const navigate = useNavigate();
 
   return (
-    <SectionOverview
-      onNavigateToChecklist={() => navigate("/preplandashboard/checklist")}
-      onNavigateToSection={(sectionId) => {
-        const route = sectionIdToRoute[sectionId];
-        if (route) navigate(route);
-      }}
-    />
+    <>
+      <NotAdviceNote />
+      <SectionOverview
+        onNavigateToChecklist={() => navigate("/preplandashboard/checklist")}
+        onNavigateToSection={(sectionId) => {
+          const route = sectionIdToRoute[sectionId];
+          if (route) navigate(route);
+        }}
+      />
+    </>
   );
 }

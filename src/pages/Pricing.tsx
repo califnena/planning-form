@@ -19,6 +19,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import NotAdviceNote from "@/components/NotAdviceNote";
 
 type StripePriceInfo = {
   lookupKey: string;
@@ -405,6 +406,7 @@ const Pricing = () => {
       </div>
 
       <main className="container mx-auto px-4 py-12 flex-1">
+        <NotAdviceNote />
         {/* Current Plan Context Header - only for logged-in users with a plan */}
         {isLoggedIn && currentPlanName && (
           <div className="max-w-5xl mx-auto mb-8">

@@ -8,6 +8,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { AppFooter } from "@/components/AppFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import NotAdviceNote from "@/components/NotAdviceNote";
 
 export default function AfterDeathLanding() {
   const navigate = useNavigate();
@@ -63,6 +64,8 @@ export default function AfterDeathLanding() {
       <main className="container mx-auto px-4 py-8">
         {/* Breadcrumbs */}
         <Breadcrumbs className="mb-6" />
+        
+        <NotAdviceNote />
         
         {/* Hero Section */}
         <div className="max-w-4xl mx-auto text-center space-y-6 mb-16">
