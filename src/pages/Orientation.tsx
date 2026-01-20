@@ -1,3 +1,4 @@
+// Emotional flow pages: do not add pricing, progress bars, or extra choices here. Keep calm and simple.
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
