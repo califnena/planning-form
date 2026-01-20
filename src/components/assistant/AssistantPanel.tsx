@@ -217,12 +217,26 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
         });
       }
 
+      // Get session for auth token
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      
+      if (!accessToken) {
+        toast({
+          title: "Session expired",
+          description: "Please log in again.",
+          variant: "destructive",
+        });
+        navigate('/login');
+        return;
+      }
+
       // Stream AI response
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/assistant-chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           messages: [
