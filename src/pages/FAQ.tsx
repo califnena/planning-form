@@ -53,6 +53,104 @@ const FAQ = () => {
 
   const faqSections = [
     {
+      title: "Pre-Planning Guide (Before Death)",
+      icon: "📋",
+      questions: [
+        {
+          q: "Why should I plan ahead?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Planning ahead is one of the greatest gifts you can give your family.</strong></p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>It reduces stress and confusion during a difficult time</li>
+                <li>Your family will know exactly what you wanted</li>
+                <li>It prevents disagreements between family members</li>
+                <li>A written plan is much better than verbal wishes that can be forgotten or misunderstood</li>
+              </ul>
+              <p>You don't have to decide everything at once. Even a few notes are a good start.</p>
+            </>
+          )
+        },
+        {
+          q: "What is the first decision I should make?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Start with your basic preference: burial or cremation.</strong></p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li><strong>Burial:</strong> Your body is placed in a casket and buried in a cemetery</li>
+                <li><strong>Cremation:</strong> Your body is reduced to ashes, which can be kept, scattered, or buried</li>
+                <li><strong>Undecided:</strong> That's okay too—you can note that you haven't decided yet</li>
+              </ul>
+              <p>This choice affects cost, location, and other arrangements. It's helpful for your family to know your preference.</p>
+            </>
+          )
+        },
+        {
+          q: "Do I want a service or memorial?",
+          a: (
+            <>
+              <p className="mb-3">Think about what feels right for you:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li><strong>Traditional service:</strong> A formal gathering with a viewing, ceremony, and burial or cremation</li>
+                <li><strong>Memorial service:</strong> A gathering to remember you, usually after cremation or burial has already happened</li>
+                <li><strong>Celebration of life:</strong> A less formal event focused on happy memories</li>
+                <li><strong>No service:</strong> Some people prefer a private, simple arrangement with no public gathering</li>
+              </ul>
+              <p>There is no right or wrong answer. This is about what feels meaningful to you.</p>
+            </>
+          )
+        },
+        {
+          q: "Where should I keep my plan?",
+          a: (
+            <>
+              <p className="mb-3">Your plan is only helpful if your family can find it. Choose one of these options:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li><strong>Physical binder:</strong> A folder or binder kept in a safe, accessible place at home (not a bank safe deposit box, which may be hard to access quickly)</li>
+                <li><strong>Digital:</strong> Use our online planner to save your wishes—you can print or share it anytime</li>
+              </ul>
+              <p className="mb-3"><strong>Important:</strong> Tell at least one trusted person where your plan is stored.</p>
+              <p>
+                <Link to="/forms" className="text-primary underline hover:text-primary/80">
+                  Download a printable planning form →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "What else can I include in my plan?",
+          a: (
+            <>
+              <p className="mb-3">You can add as much or as little as you want:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Who should be notified when you pass</li>
+                <li>Preferences for music, readings, or photos at a service</li>
+                <li>Special requests (clothing, keepsakes, donations)</li>
+                <li>Personal messages to loved ones</li>
+                <li>Notes about insurance, accounts, or important documents</li>
+              </ul>
+              <p>You can always come back and add more later.</p>
+            </>
+          )
+        },
+        {
+          q: "How do I get started?",
+          a: (
+            <>
+              <p className="mb-3">We make it easy to begin:</p>
+              <ol className="list-decimal ml-6 space-y-2 mb-3">
+                <li>Start with the <Link to="/guided-action" className="text-primary underline hover:text-primary/80">Guided Planning Tool</Link>—it walks you through one small step at a time</li>
+                <li>Or download a <Link to="/forms" className="text-primary underline hover:text-primary/80">printable form</Link> to fill out by hand</li>
+                <li>Tell someone you trust where your plan is saved</li>
+              </ol>
+              <p className="text-muted-foreground text-sm mt-3"><strong>Remember:</strong> This is not legal advice. It's a simple way to organize your wishes and help your family.</p>
+            </>
+          )
+        },
+      ]
+    },
+    {
       title: "Money, Bills, and Debt",
       icon: "💵",
       questions: [
