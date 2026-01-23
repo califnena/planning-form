@@ -448,6 +448,144 @@ const FAQ = () => {
       ]
     },
     {
+      title: "After-Death Plan (What Happens Next)",
+      icon: "🕊️",
+      questions: [
+        {
+          q: "What happens immediately after someone passes away?",
+          a: (
+            <>
+              <p className="mb-3"><strong>The first hours are about taking care of immediate needs.</strong></p>
+              <p className="mb-3">Here's what typically happens:</p>
+              <ol className="list-decimal ml-6 space-y-2 mb-3">
+                <li>A doctor or medical professional confirms the death</li>
+                <li>The funeral home is contacted to take care of the body</li>
+                <li>Close family members are notified</li>
+                <li>Someone takes charge to coordinate next steps</li>
+              </ol>
+              <p>If there is a written plan, this process is much smoother. If not, decisions must be made quickly during an emotional time.</p>
+            </>
+          )
+        },
+        {
+          q: "What does the person in charge do?",
+          a: (
+            <>
+              <p className="mb-3"><strong>They become the main point of contact and coordinator.</strong></p>
+              <p className="mb-3">The person in charge will:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Contact the funeral home and follow your wishes</li>
+                <li>Notify family, friends, and important contacts</li>
+                <li>Locate important documents (plan, will, insurance policies)</li>
+                <li>Help coordinate the service or memorial</li>
+                <li>Handle immediate decisions that need to be made</li>
+              </ul>
+              <p className="bg-muted/50 rounded-lg p-3 text-sm"><strong>This is why naming someone ahead of time matters.</strong> Without a named person, family members may disagree about who should lead.</p>
+            </>
+          )
+        },
+        {
+          q: "What documents and instructions will be needed?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Having these items ready saves time and stress.</strong></p>
+              <p className="mb-3">The person in charge will look for:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Your written wishes (burial/cremation, service preferences)</li>
+                <li>A list of people to notify</li>
+                <li>Insurance policies (especially life insurance)</li>
+                <li>Legal documents (will, trust, power of attorney)</li>
+                <li>DD-214 if you served in the military</li>
+                <li>Social Security information</li>
+              </ul>
+              <p>If these are organized in one place (like a binder or digital plan), everything moves faster.</p>
+            </>
+          )
+        },
+        {
+          q: "What benefits and payments need to be reported?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Some programs need to know right away.</strong></p>
+              <p className="mb-3">Within the first few days or weeks, the person in charge should:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Notify Social Security (stops payments and may trigger a small death benefit)</li>
+                <li>Contact pension or retirement accounts</li>
+                <li>Notify life insurance companies to file a claim</li>
+                <li>Contact banks and credit card companies</li>
+                <li>Report the death to Medicare or Medicaid if applicable</li>
+              </ul>
+              <p className="mb-3">The funeral home often helps with the Social Security notification.</p>
+              <p>
+                <Link to="/public-benefits" className="text-primary underline hover:text-primary/80">
+                  Learn about Social Security and Medicaid benefits →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "How does having a plan make this easier?",
+          a: (
+            <>
+              <p className="mb-3"><strong>A clear plan reduces stress during one of the hardest times.</strong></p>
+              <p className="mb-3">When you've planned ahead:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Your person in charge knows exactly who to call</li>
+                <li>Important documents are easy to find</li>
+                <li>Your wishes are clear, so there's no guessing</li>
+                <li>Family members are less likely to disagree</li>
+                <li>Decisions can be made quickly without extra worry</li>
+              </ul>
+              <p className="mb-3">Even a simple written plan—kept where someone can find it—makes a big difference.</p>
+              <p className="bg-primary/10 rounded-lg p-3 text-sm"><strong>A gift to your family:</strong> Planning ahead isn't about you—it's about making things easier for the people you love.</p>
+            </>
+          )
+        },
+        {
+          q: "What if there is no plan in place?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Things can still be handled, but it takes more effort.</strong></p>
+              <p className="mb-3">Without a plan:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Family must decide who is in charge (which can cause conflict)</li>
+                <li>Decisions about burial, cremation, and services must be made quickly</li>
+                <li>Important documents may be hard to find</li>
+                <li>There's more stress during an already difficult time</li>
+              </ul>
+              <p className="mb-3">If you're in this situation now, we can help.</p>
+              <p>
+                <Link to="/after-death" className="text-primary underline hover:text-primary/80">
+                  Go to the After-Death Guide →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "What should I do right now to prepare?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Even small steps help.</strong></p>
+              <ol className="list-decimal ml-6 space-y-2 mb-3">
+                <li>Name a person in charge (and at least one backup)</li>
+                <li>Write down your basic wishes (burial or cremation, service or no service)</li>
+                <li>Keep important documents in one place</li>
+                <li>Tell your person in charge where to find your plan</li>
+              </ol>
+              <p className="mb-3">You don't have to do everything at once. Start with what feels manageable.</p>
+              <p>
+                <Link to="/guided-action" className="text-primary underline hover:text-primary/80">
+                  Start with one small step →
+                </Link>
+              </p>
+            </>
+          )
+        },
+      ]
+    },
+    {
       title: "Money, Bills, and Debt",
       icon: "💵",
       questions: [
