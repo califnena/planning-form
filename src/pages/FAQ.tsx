@@ -151,6 +151,130 @@ const FAQ = () => {
       ]
     },
     {
+      title: "Pre-Checklist (Minimum Preparation)",
+      icon: "✅",
+      questions: [
+        {
+          q: "Have I assigned a person in charge?",
+          a: (
+            <>
+              <p className="mb-3"><strong>This is one of the most important steps.</strong></p>
+              <p className="mb-3">Choose one trusted person to be your main contact. This person will:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Help carry out your funeral wishes</li>
+                <li>Be the point of contact for funeral homes and family</li>
+                <li>Make sure your plan is followed</li>
+              </ul>
+              <p>Write down their name and phone number in your plan.</p>
+            </>
+          )
+        },
+        {
+          q: "Have I named a backup person?",
+          a: (
+            <>
+              <p className="mb-3"><strong>A backup prevents delays if your first choice is unavailable.</strong></p>
+              <p className="mb-3">Name at least one backup (two is even better). Backups step in if your primary person:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Is traveling or unreachable</li>
+                <li>Has a health issue of their own</li>
+                <li>Is emotionally unable to act</li>
+              </ul>
+              <p>Let each person know their role and where your plan is stored.</p>
+            </>
+          )
+        },
+        {
+          q: "Have I located my DD-214 (military discharge papers)?",
+          a: (
+            <>
+              <p className="mb-3"><strong>If you served in the military, this document is important.</strong></p>
+              <p className="mb-3">Your DD-214 proves your service and may qualify you for:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Free burial in a national or state veterans cemetery</li>
+                <li>A headstone or grave marker at no cost</li>
+                <li>A burial flag and military honors</li>
+              </ul>
+              <p className="mb-3">Store a copy with your plan. If you can't find it, you can request a replacement from the <a href="https://www.archives.gov/veterans/military-service-records" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/80">National Archives</a>.</p>
+              <p className="text-sm text-muted-foreground">Not applicable if you did not serve in the military.</p>
+            </>
+          )
+        },
+        {
+          q: "Have I added POD beneficiaries to my bank accounts?",
+          a: (
+            <>
+              <p className="mb-3"><strong>POD stands for "Payable on Death."</strong></p>
+              <p className="mb-3">Adding a POD beneficiary to your bank account means:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>The money goes directly to the person you name—no probate needed</li>
+                <li>You keep full control of the account while you're alive</li>
+                <li>It's free to set up at most banks</li>
+              </ul>
+              <p className="mb-3">Contact your bank to add a POD beneficiary. It usually takes just a few minutes.</p>
+              <p>
+                <Link to="/faq?search=POD" className="text-primary underline hover:text-primary/80">
+                  Learn more about POD accounts →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "Have I listed my insurance policies and key accounts?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Your family needs to know what exists and where to find it.</strong></p>
+              <p className="mb-3">Make a simple list that includes:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Life insurance policies (company name, policy number)</li>
+                <li>Bank and investment accounts</li>
+                <li>Retirement accounts (401k, IRA, pension)</li>
+                <li>Property deeds or car titles</li>
+              </ul>
+              <p className="mb-3">You don't need account balances—just enough information so your family can locate these accounts.</p>
+              <p>
+                <Link to="/preplandashboard/financial" className="text-primary underline hover:text-primary/80">
+                  Add accounts to your plan →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "Quick checklist summary",
+          a: (
+            <>
+              <p className="mb-3"><strong>These five steps cover the basics:</strong></p>
+              <ul className="space-y-2 mb-3">
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Primary person in charge named</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Backup person(s) named</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>DD-214 located (if veteran)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>POD beneficiaries added to bank accounts</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Insurance and key accounts listed</span>
+                </li>
+              </ul>
+              <p className="text-muted-foreground text-sm">Completing even a few of these steps can save your family significant time and stress.</p>
+            </>
+          )
+        },
+      ]
+    },
+    {
       title: "Money, Bills, and Debt",
       icon: "💵",
       questions: [
