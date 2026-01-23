@@ -586,6 +586,200 @@ const FAQ = () => {
       ]
     },
     {
+      title: "After-Death Checklist (Execution)",
+      icon: "📋",
+      questions: [
+        {
+          q: "First 24–48 hours: What do I need to do?",
+          a: (
+            <>
+              <p className="mb-3"><strong>The first two days involve several important steps.</strong></p>
+              <p className="mb-3">Use this checklist to guide you:</p>
+              <ul className="space-y-2 mb-3">
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span><strong>Confirm death was legally pronounced</strong> — A doctor, hospice nurse, or medical examiner must confirm and sign the death certificate</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span><strong>Contact the person in charge</strong> — Notify the person named to coordinate arrangements</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span><strong>Locate instructions and documents</strong> — Find the written plan, will, and insurance policies</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span><strong>Call a funeral home</strong> — They will guide you on transporting the body and next steps</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span><strong>Secure the home and property</strong> — Lock doors, secure valuables, and collect mail</span>
+                </li>
+              </ul>
+              <p className="text-muted-foreground text-sm">If the death was unexpected or occurred outside a hospital, you may need to call 911 or the non-emergency police line first.</p>
+            </>
+          )
+        },
+        {
+          q: "How is death legally confirmed?",
+          a: (
+            <>
+              <p className="mb-3"><strong>A medical professional must officially pronounce the death.</strong></p>
+              <p className="mb-3">This can be done by:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>A doctor at a hospital or nursing home</li>
+                <li>A hospice nurse (if the person was in hospice care)</li>
+                <li>A medical examiner or coroner (for unexpected deaths)</li>
+              </ul>
+              <p className="mb-3">This step is required before the funeral home can take the body and before a death certificate can be issued.</p>
+              <p className="text-muted-foreground text-sm">You do not need to do this yourself—medical staff or emergency responders will handle it.</p>
+            </>
+          )
+        },
+        {
+          q: "Who should I notify first?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Start with immediate family and the person in charge.</strong></p>
+              <p className="mb-3">In the first day or two:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Contact the named person in charge (if that's not you)</li>
+                <li>Notify close family members</li>
+                <li>Notify the person's employer (if still working)</li>
+                <li>Contact their house of worship (if applicable)</li>
+              </ul>
+              <p className="mb-3">Other notifications (insurance, banks, government) can wait a few days.</p>
+              <p className="text-muted-foreground text-sm">The funeral home will often help notify Social Security.</p>
+            </>
+          )
+        },
+        {
+          q: "What documents should I locate right away?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Finding these items early will help with arrangements.</strong></p>
+              <p className="mb-3">Look for:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Written plan or final wishes document</li>
+                <li>Life insurance policies</li>
+                <li>Will or trust documents</li>
+                <li>DD-214 (military discharge papers, if applicable)</li>
+                <li>Social Security card or number</li>
+                <li>Birth certificate and marriage certificate</li>
+              </ul>
+              <p className="mb-3">Check the usual places: a home safe, filing cabinet, or with an attorney.</p>
+              <p>
+                <Link to="/preplandashboard/legal" className="text-primary underline hover:text-primary/80">
+                  Learn about organizing important documents →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "How do I secure the home and personal property?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Protect the home while focusing on arrangements.</strong></p>
+              <p className="mb-3">Steps to take:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Lock all doors and windows</li>
+                <li>Collect mail regularly (or put it on hold)</li>
+                <li>Secure jewelry, cash, and important documents</li>
+                <li>If the person lived alone, check on pets</li>
+                <li>Turn off appliances if the home will be empty</li>
+              </ul>
+              <p className="text-muted-foreground text-sm">If the person was renting, review the lease about notice requirements.</p>
+            </>
+          )
+        },
+        {
+          q: "When should I notify benefits and insurance?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Most notifications can happen within the first week.</strong></p>
+              <p className="mb-3">Notify these as soon as you can:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li><strong>Social Security</strong> — Benefits stop at death; a small lump sum may be available for survivors</li>
+                <li><strong>Pension or retirement plans</strong> — Contact the plan administrator</li>
+                <li><strong>Life insurance companies</strong> — File a claim to receive the benefit</li>
+                <li><strong>Banks and credit unions</strong> — Notify them; they will freeze accounts</li>
+                <li><strong>Medicare or Medicaid</strong> — Coverage ends at death</li>
+              </ul>
+              <p className="mb-3"><strong>Important:</strong> Some benefits (like Social Security payments) stop immediately. The estate may need to return payments received after the date of death.</p>
+              <p>
+                <Link to="/public-benefits" className="text-primary underline hover:text-primary/80">
+                  Learn about survivor benefits →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "Are there survivor benefits I should apply for?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Yes, some programs offer help to surviving family members.</strong></p>
+              <p className="mb-3">Common survivor benefits:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li><strong>Social Security</strong> — Spouses and dependent children may qualify for monthly survivor benefits</li>
+                <li><strong>Veteran benefits</strong> — Surviving spouses of veterans may qualify for burial benefits and pensions</li>
+                <li><strong>Life insurance</strong> — Beneficiaries should file a claim</li>
+                <li><strong>Retirement accounts</strong> — Named beneficiaries can claim 401(k), IRA, or pension funds</li>
+              </ul>
+              <p className="mb-3">These benefits are not automatic—you must apply for them.</p>
+              <p>
+                <Link to="/public-benefits" className="text-primary underline hover:text-primary/80">
+                  Learn about Social Security survivor benefits →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "After-Death Checklist summary",
+          a: (
+            <>
+              <p className="mb-3"><strong>Use this as your guide for the first 48 hours:</strong></p>
+              <ul className="space-y-2 mb-3">
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Death legally pronounced</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Person in charge notified</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Plan, will, and insurance located</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Funeral home contacted</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Home and property secured</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Close family members notified</span>
+                </li>
+              </ul>
+              <p className="mb-3 text-muted-foreground text-sm">Benefits and insurance notifications can follow in the first week.</p>
+              <p>
+                <Link to="/after-death" className="text-primary underline hover:text-primary/80">
+                  Use our step-by-step After-Death Guide →
+                </Link>
+              </p>
+            </>
+          )
+        },
+      ]
+    },
+    {
       title: "Money, Bills, and Debt",
       icon: "💵",
       questions: [
