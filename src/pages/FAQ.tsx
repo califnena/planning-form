@@ -275,6 +275,179 @@ const FAQ = () => {
       ]
     },
     {
+      title: "Person in Charge (Critical Section)",
+      icon: "👤",
+      questions: [
+        {
+          q: "Why is assigning a person in charge so important?",
+          a: (
+            <>
+              <p className="mb-3"><strong>This is one of the most helpful things you can do for your family.</strong></p>
+              <p className="mb-3">When you name a person in charge:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>They coordinate decisions after your death</li>
+                <li>They help prevent confusion and conflict between family members</li>
+                <li>Funeral homes and others know who to contact first</li>
+                <li>Your wishes are more likely to be followed</li>
+              </ul>
+              <p><strong>Important:</strong> This person is not responsible for your debts. They are simply helping carry out your plan.</p>
+            </>
+          )
+        },
+        {
+          q: "Who should I choose as my primary person?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Pick someone you trust who can handle responsibility during a difficult time.</strong></p>
+              <p className="mb-3">Good qualities to look for:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Someone who can stay calm under stress</li>
+                <li>Someone who is organized and reliable</li>
+                <li>Someone who will respect your wishes, even if they disagree</li>
+                <li>Someone who lives nearby (helpful but not required)</li>
+              </ul>
+              <p>This is often a spouse, adult child, sibling, or close friend.</p>
+            </>
+          )
+        },
+        {
+          q: "Why do I need a backup person?",
+          a: (
+            <>
+              <p className="mb-3"><strong>A backup is essential in case your first choice cannot act.</strong></p>
+              <p className="mb-3">Your primary person might be unavailable because:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>They are traveling or unreachable</li>
+                <li>They have their own health emergency</li>
+                <li>They are too emotionally overwhelmed to act</li>
+                <li>They pass away before you do</li>
+              </ul>
+              <p className="mb-3">Name at least one backup. Two backups is even better.</p>
+              <p className="text-muted-foreground text-sm"><strong>Remember:</strong> Only one person should lead at a time. The order you list them matters.</p>
+            </>
+          )
+        },
+        {
+          q: "What information should I collect for each person?",
+          a: (
+            <>
+              <p className="mb-3"><strong>For each person (primary and backups), write down:</strong></p>
+              <div className="bg-muted/50 rounded-lg p-4 mb-3">
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-medium">•</span>
+                    <span><strong>Full name</strong> — Their legal name</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-medium">•</span>
+                    <span><strong>Relationship</strong> — Spouse, daughter, son, friend, etc.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-medium">•</span>
+                    <span><strong>Phone number</strong> — A number they answer regularly</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-medium">•</span>
+                    <span><strong>Email address</strong> — If they use email</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-medium">•</span>
+                    <span><strong>City and state</strong> — Where they live</span>
+                  </li>
+                </ul>
+              </div>
+              <p>
+                <Link to="/preplandashboard/contacts" className="text-primary underline hover:text-primary/80">
+                  Add your contacts to your plan →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "Is this the same as a legal executor?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Not exactly, but it's related.</strong></p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>A <strong>legal executor</strong> is named in your will and handles your estate after death (property, debts, legal matters)</li>
+                <li>A <strong>person in charge</strong> (as described here) focuses on funeral arrangements and carrying out your wishes</li>
+                <li>They can be the same person, but don't have to be</li>
+              </ul>
+              <p className="mb-3">This planning tool helps you name who should coordinate funeral arrangements. It does not replace a will.</p>
+              <p className="text-muted-foreground text-sm">For legal matters, consult an attorney.</p>
+            </>
+          )
+        },
+        {
+          q: "What if my person in charge lives far away?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Distance is not a disqualifier.</strong></p>
+              <p className="mb-3">Much of the coordination can be done by phone and email. However:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>Consider naming a local backup who can handle immediate needs</li>
+                <li>Make sure your plan includes clear instructions so decisions are easier</li>
+                <li>Provide contact information for your funeral home (if pre-arranged)</li>
+              </ul>
+              <p>A clear written plan makes distance less of a barrier.</p>
+            </>
+          )
+        },
+        {
+          q: "Do I need to tell the people I select?",
+          a: (
+            <>
+              <p className="mb-3"><strong>Yes. This is very important.</strong></p>
+              <p className="mb-3">Let each person know:</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>That you've named them in your plan</li>
+                <li>What their role is (primary or backup)</li>
+                <li>Where your plan is stored (binder, digital, etc.)</li>
+              </ul>
+              <p className="mb-3">If they don't know, they can't act. A written plan that no one knows about doesn't help.</p>
+              <p className="bg-primary/10 rounded-lg p-3 text-sm"><strong>Tip:</strong> Have a simple conversation: "I've written down my wishes. I'd like you to be my main contact if something happens to me. Is that okay with you?"</p>
+            </>
+          )
+        },
+        {
+          q: "Person in Charge checklist",
+          a: (
+            <>
+              <p className="mb-3"><strong>Use this checklist to confirm you've completed this section:</strong></p>
+              <ul className="space-y-2 mb-3">
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Primary person in charge named</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>First backup person named</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Second backup named (optional but recommended)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Contact information added for each person</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-lg">☐</span>
+                  <span>Each person notified and knows where the plan is stored</span>
+                </li>
+              </ul>
+              <p>
+                <Link to="/preplandashboard/contacts" className="text-primary underline hover:text-primary/80">
+                  Add your Person in Charge to your plan →
+                </Link>
+              </p>
+            </>
+          )
+        },
+      ]
+    },
+    {
       title: "Money, Bills, and Debt",
       icon: "💵",
       questions: [
