@@ -69,6 +69,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ErrorPanel } from '@/components/ui/ErrorPanel';
 import { LegalDisclaimer } from '@/components/ui/LegalDisclaimer';
 import { cn } from '@/lib/utils';
+import { generateAfterDeathChecklistPDF } from '@/lib/afterDeathChecklistPdfGenerator';
+import { useToast } from '@/hooks/use-toast';
 
 // Senior-friendly 3-category organization per Prompt C1
 // 'step-by-step', 'free-checklists', 'free-guides'
@@ -77,12 +79,34 @@ const DEFAULT_SECTION = 'step-by-step';
 
 const Resources = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isGeneratingAfterDeath, setIsGeneratingAfterDeath] = useState(false);
   // Fix: Default to 'education' instead of non-existent 'planning-guides'
   const initialSection = searchParams.get('section');
   const validInitialSection = initialSection && VALID_SECTIONS.includes(initialSection) ? initialSection : DEFAULT_SECTION;
   const [activeSection, setActiveSection] = useState(validInitialSection);
   const [activeSubItem, setActiveSubItem] = useState<string | undefined>(searchParams.get('sub') || undefined);
+
+  const handleDownloadAfterDeathChecklist = async () => {
+    setIsGeneratingAfterDeath(true);
+    try {
+      await generateAfterDeathChecklistPDF();
+      toast({
+        title: "PDF Generated",
+        description: "Your After-Death Checklist has been downloaded."
+      });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingAfterDeath(false);
+    }
+  };
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -918,50 +942,97 @@ const Resources = () => {
       </div>
 
       {/* Pre-Planning Checklist - PDF-based for reliability */}
-      <Card className="border-2 border-primary/20">
-        <CardHeader>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="inline-block px-3 py-1 text-sm font-semibold bg-primary/10 text-primary rounded-full">
-              ✅ Pre-Planning
-            </span>
-          </div>
-          <CardTitle className="text-xl">Pre-Planning Checklist</CardTitle>
-          <CardDescription className="text-base leading-relaxed">
-            Everything you need to prepare ahead of time for peace of mind. 
-            You can read it online, download it, or print it.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Image Preview - only renders if image exists */}
-          <div className="w-full rounded-lg border border-border overflow-hidden bg-muted/30">
-            <img 
-              src="/checklists/Pre-Planning-Checklist-4.png"
-              alt="Pre-Planning Checklist Preview"
-              className="w-full h-auto"
-              onError={(e) => {
-                // Hide the entire preview container if image fails
-                const container = e.currentTarget.parentElement;
-                if (container) container.style.display = 'none';
-              }}
-            />
-          </div>
-          
-          {/* Action Button */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <a 
-              href="/guides/EFA-Pre-Planning-Checklist.pdf" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex-1"
-            >
-              <Button className="w-full min-h-[52px] text-base gap-2">
-                <Eye className="h-5 w-5" />
-                View or Download Checklist
+      {(!activeSubItem || activeSubItem === 'pre-planning') && (
+        <Card className="border-2 border-primary/20">
+          <CardHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="inline-block px-3 py-1 text-sm font-semibold bg-primary/10 text-primary rounded-full">
+                ✅ Pre-Planning
+              </span>
+            </div>
+            <CardTitle className="text-xl">Pre-Planning Checklist</CardTitle>
+            <CardDescription className="text-base leading-relaxed">
+              Everything you need to prepare ahead of time for peace of mind. 
+              You can read it online, download it, or print it.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Image Preview - only renders if image exists */}
+            <div className="w-full rounded-lg border border-border overflow-hidden bg-muted/30">
+              <img 
+                src="/checklists/Pre-Planning-Checklist-4.png"
+                alt="Pre-Planning Checklist Preview"
+                className="w-full h-auto"
+                onError={(e) => {
+                  // Hide the entire preview container if image fails
+                  const container = e.currentTarget.parentElement;
+                  if (container) container.style.display = 'none';
+                }}
+              />
+            </div>
+            
+            {/* Action Button */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <a 
+                href="/guides/EFA-Pre-Planning-Checklist.pdf" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex-1"
+              >
+                <Button className="w-full min-h-[52px] text-base gap-2">
+                  <Eye className="h-5 w-5" />
+                  View or Download Checklist
+                </Button>
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* After-Death Checklist - Uses PDF generator */}
+      {(!activeSubItem || activeSubItem === 'after-death') && (
+        <Card className="border-2 border-blue-500/20">
+          <CardHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="inline-block px-3 py-1 text-sm font-semibold bg-blue-500/10 text-blue-700 rounded-full">
+                📋 After Death
+              </span>
+            </div>
+            <CardTitle className="text-xl">After-Death Checklist</CardTitle>
+            <CardDescription className="text-base leading-relaxed">
+              A timeline-based checklist for loved ones, executors, or trusted contacts. 
+              Organized by: first 24-48 hours, first week, first month, and 3-12 months.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Image Preview - only renders if image exists */}
+            <div className="w-full rounded-lg border border-border overflow-hidden bg-muted/30">
+              <img 
+                src="/checklists/After-Death-Checklist-3.png"
+                alt="After-Death Checklist Preview"
+                className="w-full h-auto"
+                onError={(e) => {
+                  // Hide the entire preview container if image fails
+                  const container = e.currentTarget.parentElement;
+                  if (container) container.style.display = 'none';
+                }}
+              />
+            </div>
+            
+            {/* Action Button - Uses PDF Generator */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button 
+                className="flex-1 min-h-[52px] text-base gap-2"
+                onClick={handleDownloadAfterDeathChecklist}
+                disabled={isGeneratingAfterDeath}
+              >
+                <Download className="h-5 w-5" />
+                {isGeneratingAfterDeath ? 'Generating...' : 'Download After-Death Checklist'}
               </Button>
-            </a>
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
     </div>
   );
