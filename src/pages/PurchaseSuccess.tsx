@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, Download } from "lucide-react";
+import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PublicHeader } from "@/components/PublicHeader";
@@ -62,6 +63,31 @@ export default function PurchaseSuccess() {
   const [items, setItems] = useState<VerifiedItem[]>([]);
 
   const planningMenuRoute = "/dashboard";
+
+  // Check if this is an EFABASIC/printable purchase
+  const isPrintablePurchase = useMemo(() => {
+    // Check verified items for EFABASIC
+    const hasEFABASIC = items.some((it) => it.lookupKey === "EFABASIC");
+    if (hasEFABASIC) return true;
+    // Fallback to type param
+    return typeParam === "printable";
+  }, [items, typeParam]);
+
+  // Handle download of printable planner PDF
+  const handleDownloadPrintablePlanner = () => {
+    try {
+      const link = document.createElement('a');
+      link.href = '/templates/My-Final-Wishes-Printable-Blank.pdf';
+      link.download = 'My-Final-Wishes-Printable-Blank.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success('Printable Planner downloaded successfully');
+    } catch (error) {
+      console.error('Error downloading printable planner:', error);
+      toast.error('Failed to download. Please try again.');
+    }
+  };
 
   // Compute best route based on verified items or fallback to type param
   const bestNextRoute = useMemo(() => {
@@ -189,10 +215,23 @@ export default function PurchaseSuccess() {
 
               {/* Action Buttons */}
               <div className="space-y-3">
+                {/* Download Printable Planner - only for EFABASIC/printable purchases */}
+                {isPrintablePurchase && (
+                  <Button 
+                    onClick={handleDownloadPrintablePlanner}
+                    size="lg"
+                    className="w-full min-h-[56px] text-lg"
+                  >
+                    <Download className="mr-2 h-5 w-5" />
+                    Download Printable Planner
+                  </Button>
+                )}
+
                 {/* Primary CTA */}
                 <Button 
                   onClick={() => navigate(planningMenuRoute)} 
                   size="lg"
+                  variant={isPrintablePurchase ? "outline" : "default"}
                   className="w-full min-h-[56px] text-lg"
                 >
                   Go to My Planning Menu
