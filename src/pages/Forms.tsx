@@ -3,18 +3,22 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { TextSizeToggle } from '@/components/TextSizeToggle';
 import { ArrowLeft, Download, FileText } from 'lucide-react';
-import { generateManuallyFillablePDF } from '@/lib/manuallyFillablePdfGenerator';
+
 import { generateBlankAfterLifePlanPDF } from '@/lib/blankAfterLifePlanPdfGenerator';
 import { toast } from 'sonner';
 
 const Forms = () => {
   const handleDownloadPrePlanningForm = () => {
     try {
-      const pdf = generateManuallyFillablePDF({});
-      pdf.save(`My-Final-Wishes-Blank-Form-${new Date().toISOString().split('T')[0]}.pdf`);
+      const link = document.createElement('a');
+      link.href = '/templates/My-Final-Wishes-Printable-Blank.pdf';
+      link.download = 'My-Final-Wishes-Printable-Blank.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       toast.success('Blank Pre-Planning Form downloaded successfully');
     } catch (error) {
-      console.error('Error generating pre-planning form:', error);
+      console.error('Error downloading pre-planning form:', error);
       toast.error('Failed to download form. Please try again.');
     }
   };
