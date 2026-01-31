@@ -148,6 +148,19 @@ const FAQ = () => {
             </>
           )
         },
+        {
+          q: "Where can I print a form if I don't want to use the app?",
+          a: (
+            <>
+              <p className="mb-3">If you prefer to write by hand, you can purchase our Printable Planning Form (EFABASIC). After purchase, you can download and print it as many times as you like.</p>
+              <p>
+                <Link to="/forms" className="inline-flex items-center gap-2 text-primary underline hover:text-primary/80 font-medium">
+                  View Printable Planning Form →
+                </Link>
+              </p>
+            </>
+          )
+        },
       ]
     },
     {
