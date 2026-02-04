@@ -154,8 +154,25 @@ const FAQ = () => {
             <>
               <p className="mb-3">If you prefer to write by hand, you can purchase our Printable Planning Form (EFABASIC). After purchase, you can download and print it as many times as you like.</p>
               <p>
-                <Link to="/forms" className="inline-flex items-center gap-2 text-primary underline hover:text-primary/80 font-medium">
+                <Link to="/printable-form" className="inline-flex items-center gap-2 text-primary underline hover:text-primary/80 font-medium">
                   View Printable Planning Form →
+                </Link>
+              </p>
+            </>
+          )
+        },
+        {
+          q: "Can I print a form without using the app?",
+          a: (
+            <>
+              <p className="mb-3">Yes. You can purchase a blank printable planning form.</p>
+              <ul className="list-disc ml-6 space-y-1 mb-3">
+                <li>You can print it as many times as you want</li>
+                <li>You do not need to fill anything out online</li>
+              </ul>
+              <p>
+                <Link to="/printable-form" className="inline-flex items-center gap-2 text-primary underline hover:text-primary/80 font-medium">
+                  Get the Printable Planning Form →
                 </Link>
               </p>
             </>
