@@ -43,7 +43,9 @@ const FAQ = () => {
     },
     {
       q: "Where can I print a form if I don't want to use the app?",
-      a: "You can download a blank printable planning form from the Plan Ahead section. You can print it as many times as you need."
+      a: "You can purchase a blank printable planning form that you download and fill out by hand. It does not require using the app and can be printed as many times as you wish.",
+      link: "/forms",
+      linkText: "Get the Printable Planning Form"
     },
     {
       q: "What if I don't know the answer yet?",
@@ -2070,7 +2072,12 @@ const FAQ = () => {
                       {qa.q}
                     </AccordionTrigger>
                     <AccordionContent className="text-base text-muted-foreground pb-4 leading-relaxed">
-                      {qa.a}
+                      <p>{qa.a}</p>
+                      {qa.link && qa.linkText && (
+                        <Link to={qa.link} className="inline-flex items-center gap-1 text-primary hover:underline mt-2">
+                          {qa.linkText}
+                        </Link>
+                      )}
                     </AccordionContent>
                   </AccordionItem>
                 ))}
