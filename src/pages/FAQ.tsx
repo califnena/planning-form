@@ -42,6 +42,10 @@ const FAQ = () => {
       a: "No. Our planning tools are separate from any products or services. You are never required to buy anything."
     },
     {
+      q: "Where can I print a form if I don't want to use the app?",
+      a: "You can download a blank printable planning form from the Plan Ahead section. You can print it as many times as you need."
+    },
+    {
       q: "What if I don't know the answer yet?",
       a: "That's okay. Skip any question you're not ready to answer. You can always come back later."
     },
