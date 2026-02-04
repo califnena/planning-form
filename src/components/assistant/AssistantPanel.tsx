@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { isAuthExpiredError } from "@/lib/sessionGuard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { 
+import {
   HelpCircle, 
   Send, 
   Trash2, 
@@ -57,9 +57,15 @@ const QUICK_ACTIONS = [
   },
 ];
 
+// Helper to detect printable-related pages
+const isPrintablePage = (pathname: string): boolean => {
+  return pathname === '/forms' || pathname === '/printable-form';
+};
+
 export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -232,6 +238,11 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
         return;
       }
 
+      // Determine page context for printable-specific behavior
+      const pageContext = isPrintablePage(location.pathname) 
+        ? (location.pathname === '/forms' ? 'printable-download' : 'printable-form')
+        : undefined;
+
       // Stream AI response
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/assistant-chat`, {
         method: 'POST',
@@ -244,7 +255,8 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
             ...messages.map(m => ({ role: m.role, content: m.content })),
             { role: 'user', content: messageToSend + context }
           ],
-          conversationId
+          conversationId,
+          pageContext
         }),
       });
 

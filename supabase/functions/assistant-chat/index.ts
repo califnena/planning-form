@@ -113,6 +113,25 @@ When helping this user:
 • Provide information they can use to fill out their paper form
 • If they ask about digital features, kindly explain that their current plan includes the printable form`;
 
+const PRINTABLE_PAGE_CONTEXT = `
+
+PAGE CONTEXT: The user is currently on the Printable Planning Form download page.
+
+STRICT RULES FOR THIS PAGE:
+• Do NOT suggest the digital planner or "My Wishes" app
+• Do NOT suggest continuing in the app
+• Do NOT suggest any digital tools or navigation
+• ONLY explain how to use the printable form
+• Remind them they can print multiple copies as needed
+• Do NOT trigger navigation or calls to action
+• Stay purely informational about the paper-based planning process
+
+If the user asks about:
+• How to use it: Explain they can fill it out by hand, at their own pace
+• Multiple copies: Yes, they can print as many copies as they want
+• What to do with it: Keep it in a safe place, share copies with trusted family members
+• The binder: Optional fireproof storage for their printed documents`;
+
 // Helper to check if user has only printable access (EFABASIC only)
 async function checkIsPrintableOnly(supabase: any, userId: string): Promise<boolean> {
   // Check for printable role
@@ -193,7 +212,7 @@ serve(async (req) => {
 
     console.log('Authenticated user:', user.id);
 
-    const { messages, conversationId } = await req.json();
+    const { messages, conversationId, pageContext } = await req.json();
     
     if (!messages || !Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: 'Messages array is required' }), {
@@ -213,7 +232,11 @@ serve(async (req) => {
     
     let systemPrompt = BASE_SYSTEM_PROMPT;
     
-    if (isPrintableOnly) {
+    // Check if user is on a printable-specific page - this takes priority
+    if (pageContext === 'printable-form' || pageContext === 'printable-download') {
+      systemPrompt += PRINTABLE_PAGE_CONTEXT;
+      console.log('User context: Printable form page');
+    } else if (isPrintableOnly) {
       // User only has printable access - stay informational
       systemPrompt += PRINTABLE_ONLY_CONTEXT;
       console.log('User context: Printable-only access');
