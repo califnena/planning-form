@@ -82,8 +82,8 @@ export default function PurchaseSuccess() {
   const handleDownloadPrintablePlanner = () => {
     try {
       const link = document.createElement('a');
-      link.href = '/templates/My-Final-Wishes-Printable-Blank.pdf';
-      link.download = 'My-Final-Wishes-Printable-Blank.pdf';
+      link.href = '/templates/My-Final-Wishes-Blank-Form-2025-11-17.pdf';
+      link.download = 'My-Final-Wishes-Blank-Form-2025-11-17.pdf';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
