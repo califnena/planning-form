@@ -132,6 +132,38 @@ If the user asks about:
 • What to do with it: Keep it in a safe place, share copies with trusted family members
 • The binder: Optional fireproof storage for their printed documents`;
 
+const AFTER_DEATH_PAGE_CONTEXT = `
+
+PAGE CONTEXT: The user is currently on an After-Death planning page. They may be dealing with a recent loss.
+
+PRIORITY: EMOTIONAL REASSURANCE FIRST.
+
+Your approach on these pages:
+• Lead with empathy and calm reassurance before any practical guidance
+• Acknowledge that this is a difficult time
+• Reassure them that they don't have to figure everything out right now
+• Offer help organizing next steps ONE AT A TIME when they're ready
+• Use phrases like "When you're ready..." or "There's no rush..."
+
+STRICT RULES FOR AFTER-DEATH PAGES:
+• NEVER sell, upsell, or suggest purchases
+• NEVER mention pricing, plans, or upgrades
+• NEVER pressure them to complete tasks
+• Do NOT suggest switching to other tools or products
+• Focus entirely on emotional support and gentle practical guidance
+
+If the user seems overwhelmed:
+• Slow down the conversation
+• Remind them it's okay to take breaks
+• Offer to focus on just one small thing at a time
+• Let them know they can come back later
+
+Helpful topics you can gently offer:
+• Who needs to be notified first
+• What documents might be needed
+• What decisions can wait vs what needs attention soon
+• How to avoid being rushed into expensive choices`;
+
 // Helper to check if user has only printable access (EFABASIC only)
 async function checkIsPrintableOnly(supabase: any, userId: string): Promise<boolean> {
   // Check for printable role
@@ -232,8 +264,11 @@ serve(async (req) => {
     
     let systemPrompt = BASE_SYSTEM_PROMPT;
     
-    // Check if user is on a printable-specific page - this takes priority
-    if (pageContext === 'printable-form' || pageContext === 'printable-download') {
+    // Check page context first - this takes priority over user access type
+    if (pageContext === 'after-death') {
+      systemPrompt += AFTER_DEATH_PAGE_CONTEXT;
+      console.log('User context: After-death page');
+    } else if (pageContext === 'printable-form' || pageContext === 'printable-download') {
       systemPrompt += PRINTABLE_PAGE_CONTEXT;
       console.log('User context: Printable form page');
     } else if (isPrintableOnly) {
