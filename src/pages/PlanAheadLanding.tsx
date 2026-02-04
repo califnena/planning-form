@@ -12,6 +12,7 @@ import mascotFamilyPlanning from "@/assets/mascot-family-planning.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { usePreviewModeContext } from "@/contexts/PreviewModeContext";
+import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { isStoreIAP } from "@/lib/billingMode";
 import { StoreIAPModal } from "@/components/StoreIAPModal";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
@@ -35,6 +36,7 @@ export default function PlanAheadLanding() {
   const [plannerMode, setPlannerMode] = useState<string | null>(null);
   const [isResuming, setIsResuming] = useState(false);
   const { isLoggedIn, hasPaidAccess, hasPrintableAccess, openLockedModal, saveLastVisitedRoute } = usePreviewModeContext();
+  const { isAdmin } = useAdminStatus();
 
   // Handle resume logic
   useEffect(() => {
@@ -167,6 +169,21 @@ export default function PlanAheadLanding() {
   };
 
   const handleGetPrintableForm = async () => {
+    // Admin bypass - always allow access and download
+    if (isAdmin) {
+      const link = document.createElement("a");
+      link.href = "/templates/My-Final-Wishes-Blank-Form-2025-11-17.pdf";
+      link.download = "My-Final-Wishes-Blank-Form.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast({
+        title: "Download Started",
+        description: "Your printable planning form is downloading. (Admin access)",
+      });
+      return;
+    }
+
     if (isStoreIAP) {
       setShowIAPModal(true);
       return;
