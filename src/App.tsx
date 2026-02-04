@@ -33,6 +33,7 @@ import PrePlanningWizard from "./pages/PrePlanningWizard";
 import AfterDeathWizard from "./pages/AfterDeathWizard";
 import Vendors from "./pages/Vendors";
 import Forms from "./pages/Forms";
+import PrintableFormPurchase from "./pages/PrintableFormPurchase";
 import Contact from "./pages/Contact";
 import Resources from "./pages/Resources";
 import CostEstimator from "./pages/CostEstimator";
@@ -210,6 +211,7 @@ const App = () => (
                       <Route path="/guide" element={<Guide />} />
                       <Route path="/guide/legacy" element={<PrePlanningGuide />} />
                       <Route path="/forms" element={<Forms />} />
+                      <Route path="/printable-form" element={<PrintableFormPurchase />} />
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/resources" element={<Resources />} />
                       <Route path="/resources/cost-estimator" element={<CostEstimator />} />
