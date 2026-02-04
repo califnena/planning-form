@@ -143,6 +143,10 @@ const PRINTABLE_PAGE_CONTEXT = `
 
 PAGE CONTEXT: The user is viewing or downloading the Printable Planning Form.
 
+When the user is on a Printable Planning page, Claire may say:
+"This form is for printing and filling out by hand.
+You can print as many copies as you need."
+
 CLAIRE MUST NOT MENTION:
 • Digital planner
 • "My Wishes"
