@@ -29,7 +29,7 @@ export default function PlanAheadLanding() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [learnOpen, setLearnOpen] = useState(false);
-  const [otherOptionsOpen, setOtherOptionsOpen] = useState(false);
+  
   const [hasPlannerProgress, setHasPlannerProgress] = useState(false);
   const [showIAPModal, setShowIAPModal] = useState(false);
   const [plannerMode, setPlannerMode] = useState<string | null>(null);
@@ -298,15 +298,12 @@ export default function PlanAheadLanding() {
               <span>You can <button onClick={handlePreviewPlanner} className="underline hover:text-primary transition-colors">preview the planner for free</button> before deciding.</span>
             </div>
 
-            {/* Other Options - Collapsible */}
-            <Collapsible open={otherOptionsOpen} onOpenChange={setOtherOptionsOpen} className="pt-6 border-t border-border">
-              <CollapsibleTrigger asChild>
-                <button className="w-full flex items-center justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-                  <span className="text-lg font-medium text-muted-foreground">Other ways to plan (optional)</span>
-                  {otherOptionsOpen ? <ChevronUp className="h-5 w-5 text-muted-foreground" /> : <ChevronDown className="h-5 w-5 text-muted-foreground" />}
-                </button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-4 space-y-4">
+            {/* Other Options - Always visible */}
+            <div className="pt-6 border-t border-border">
+              <div className="w-full p-4 rounded-lg bg-muted/30">
+                <span className="text-lg font-medium text-muted-foreground">Other ways to plan (optional)</span>
+              </div>
+              <div className="mt-4 space-y-4">
                 {/* Option 2: Printable Planning Form */}
                 <Card className="border hover:border-primary/30 transition-colors">
                   <CardContent className="p-6 space-y-4">
@@ -396,8 +393,8 @@ export default function PlanAheadLanding() {
                     </div>
                   </CardContent>
                 </Card>
-              </CollapsibleContent>
-            </Collapsible>
+              </div>
+            </div>
           </div>
         </section>
 
