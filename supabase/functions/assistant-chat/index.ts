@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const SYSTEM_PROMPT = `You are Claire, a calm and compassionate planning guide for Everlasting Funeral Advisors.
+const BASE_SYSTEM_PROMPT = `You are Claire, a calm and compassionate planning guide for Everlasting Funeral Advisors.
 
 Your role is to gently help people who are either:
 1) Planning ahead, or
@@ -59,6 +59,77 @@ Always offer human support when appropriate:
 Your goal is not to rush.
 Your goal is clarity, calm, and helping people feel less alone.`;
 
+const DIGITAL_PLANNER_CONTEXT = `
+
+USER CONTEXT: This user has access to the Digital Planner.
+
+When helping this user:
+• You may offer to guide them step-by-step through sections of the digital planner
+• You can reference specific sections like "About You", "Funeral Wishes", "Contacts", "Financial Life", etc.
+• Feel free to suggest they save their work as they go
+• You can help them navigate between sections
+• Remind them their progress is automatically saved
+• Offer to help them complete specific sections when relevant`;
+
+const PRINTABLE_ONLY_CONTEXT = `
+
+USER CONTEXT: This user has the Printable Planning Form only (not the digital planner).
+
+When helping this user:
+• Stay informational and educational only
+• Do NOT guide them through digital planner steps or reference digital sections
+• Do NOT suggest navigating to specific app sections
+• Help them understand concepts and decisions they can write on their printed form
+• Answer questions about planning topics in general terms
+• Provide information they can use to fill out their paper form
+• If they ask about digital features, kindly explain that their current plan includes the printable form, and they can upgrade to access the digital planner if interested`;
+
+// Helper to check if user has only printable access (EFABASIC only)
+async function checkIsPrintableOnly(supabase: any, userId: string): Promise<boolean> {
+  // Check for printable role
+  const { data: hasPrintable } = await supabase.rpc('has_app_role', { _user_id: userId, _role: 'printable' });
+  if (!hasPrintable) return false;
+
+  // Check for premium role - if they have it, they're not printable-only
+  const { data: hasPremium } = await supabase.rpc('has_app_role', { _user_id: userId, _role: 'premium' });
+  if (hasPremium) return false;
+
+  // Check for VIP role
+  const { data: hasVip } = await supabase.rpc('has_app_role', { _user_id: userId, _role: 'vip' });
+  if (hasVip) return false;
+
+  // Check for done_for_you role
+  const { data: hasDfy } = await supabase.rpc('has_app_role', { _user_id: userId, _role: 'done_for_you' });
+  if (hasDfy) return false;
+
+  // Check for admin role
+  const { data: isAdmin } = await supabase.rpc('has_app_role', { _user_id: userId, _role: 'admin' });
+  if (isAdmin) return false;
+
+  return true;
+}
+
+// Helper to check if user has any digital planner access
+async function checkHasDigitalAccess(supabase: any, userId: string): Promise<boolean> {
+  // Admin has full access
+  const { data: isAdmin } = await supabase.rpc('has_app_role', { _user_id: userId, _role: 'admin' });
+  if (isAdmin) return true;
+
+  // Premium role grants digital access
+  const { data: hasPremium } = await supabase.rpc('has_app_role', { _user_id: userId, _role: 'premium' });
+  if (hasPremium) return true;
+
+  // VIP role grants digital access
+  const { data: hasVip } = await supabase.rpc('has_app_role', { _user_id: userId, _role: 'vip' });
+  if (hasVip) return true;
+
+  // Done for you role grants digital access
+  const { data: hasDfy } = await supabase.rpc('has_app_role', { _user_id: userId, _role: 'done_for_you' });
+  if (hasDfy) return true;
+
+  return false;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -107,6 +178,23 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
+    // Determine user's access type and build appropriate system prompt
+    const isPrintableOnly = await checkIsPrintableOnly(supabase, user.id);
+    const hasDigitalAccess = await checkHasDigitalAccess(supabase, user.id);
+    
+    let systemPrompt = BASE_SYSTEM_PROMPT;
+    
+    if (isPrintableOnly) {
+      // User only has printable access - stay informational
+      systemPrompt += PRINTABLE_ONLY_CONTEXT;
+      console.log('User context: Printable-only access');
+    } else if (hasDigitalAccess) {
+      // User has digital planner access - can guide step-by-step
+      systemPrompt += DIGITAL_PLANNER_CONTEXT;
+      console.log('User context: Digital planner access');
+    }
+    // If neither, user is likely on free plan - use base prompt without context additions
+
     // Call Lovable AI
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -117,7 +205,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'system', content: systemPrompt },
           ...messages
         ],
         stream: true,
