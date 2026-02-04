@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PublicHeader } from "@/components/PublicHeader";
 import { AppFooter } from "@/components/AppFooter";
 import { supabase } from "@/integrations/supabase/client";
+import { useAdminStatus } from "@/hooks/useAdminStatus";
 
 type VerifiedItem = {
   lookupKey: string;
@@ -54,6 +55,7 @@ const TYPE_ROUTES: Record<string, string> = {
 export default function PurchaseSuccess() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { isAdmin } = useAdminStatus();
   
   const sessionId = searchParams.get("session_id");
   const typeParam = searchParams.get("type");
@@ -64,7 +66,7 @@ export default function PurchaseSuccess() {
 
   const planningMenuRoute = "/dashboard";
 
-  // Check if this is an EFABASIC/printable purchase
+  // Check if this is an EFABASIC/printable purchase OR admin has view/download access
   const isPrintablePurchase = useMemo(() => {
     // Check verified items for EFABASIC
     const hasEFABASIC = items.some((it) => it.lookupKey === "EFABASIC");
@@ -72,6 +74,9 @@ export default function PurchaseSuccess() {
     // Fallback to type param
     return typeParam === "printable";
   }, [items, typeParam]);
+
+  // Admin override: show download button without being marked as purchaser
+  const showPrintableDownload = isPrintablePurchase || isAdmin;
 
   // Handle download of printable planner PDF
   const handleDownloadPrintablePlanner = () => {
@@ -215,8 +220,8 @@ export default function PurchaseSuccess() {
 
               {/* Action Buttons */}
               <div className="space-y-3">
-                {/* Download Printable Planner - only for EFABASIC/printable purchases */}
-                {isPrintablePurchase && (
+                {/* Download Printable Planner - for EFABASIC/printable purchases OR admin view access */}
+                {showPrintableDownload && (
                   <Button 
                     onClick={handleDownloadPrintablePlanner}
                     size="lg"
