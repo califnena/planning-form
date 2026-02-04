@@ -304,7 +304,7 @@ export default function PlanAheadLanding() {
             {/* Other Options - Always visible */}
             <div className="pt-6 border-t border-border">
               <div className="w-full p-4 rounded-lg bg-muted/30">
-                <span className="text-lg font-medium text-muted-foreground">Other ways to plan (optional)</span>
+                <span className="text-lg font-medium text-muted-foreground">Printable Planning Form (Fill by Hand)</span>
               </div>
               <div className="mt-4 space-y-4">
                 {/* Option 2: Printable Planning Form */}
