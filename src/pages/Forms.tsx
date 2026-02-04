@@ -93,6 +93,11 @@ const Forms = () => {
             <p className="text-sm text-muted-foreground">
               One-time purchase. Download once and print anytime.
             </p>
+            {isAdmin && (
+              <p className="text-sm text-muted-foreground italic mt-1">
+                If you've already purchased this form, you can download it again here.
+              </p>
+            )}
           </div>
 
           {/* Explanation */}
