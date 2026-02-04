@@ -71,7 +71,7 @@ const Forms = () => {
               <FileText className="h-10 w-10 text-primary" />
             </div>
             <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground">
-              Your Printable Planning Form
+              Printable Planning Form (Fill Out by Hand)
             </h1>
           </div>
 
@@ -87,20 +87,11 @@ const Forms = () => {
 
           {/* Explanation */}
           <Card className="bg-muted/30 border-none text-left p-6 md:p-8">
-            <ul className="space-y-4 text-lg text-muted-foreground">
-              <li className="flex items-start gap-3">
-                <FileText className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                <span>This is a blank form to fill out by hand.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <FileText className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                <span>You may print as many copies as you like.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <FileText className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                <span>Nothing is stored unless you later use the app.</span>
-              </li>
-            </ul>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              This is a blank planning form you can print and fill out by hand.
+              <br />
+              It does not use the app and nothing is saved online.
+            </p>
           </Card>
 
           {/* Optional Binder Upsell */}
