@@ -365,42 +365,37 @@ export default function PlanAheadLanding() {
               <span>You can <button onClick={handlePreviewPlanner} className="underline hover:text-primary transition-colors">preview the planner for free</button> before deciding.</span>
             </div>
 
-            {/* Prefer to Fill Out a Paper Form? - Always visible */}
-            <div className="pt-6 border-t border-border">
-              <h3 className="text-lg font-semibold text-center mb-4">
-                Prefer to Fill Out a Paper Form?
-              </h3>
-              <Card className="border hover:border-primary/30 transition-colors">
-                <CardContent className="p-6 space-y-4">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                      <Printer className="h-6 w-6 text-muted-foreground" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold">Printable Planning Form</h3>
-                      <p className="text-muted-foreground mb-4">
-                        Download and print a blank form to write in by hand.
-                      </p>
-                      <Button 
-                        onClick={handleGetPrintableForm}
-                        disabled={isLoading}
-                        variant="outline"
-                        className="w-full sm:w-auto min-h-[48px]"
-                      >
-                        {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                        Get Printable Form
-                      </Button>
-                      <p className="text-sm text-muted-foreground mt-3">
-                        Want a physical binder to store your form?{" "}
-                        <Link to="/products/binder" className="underline hover:text-primary transition-colors">
-                          Order the Planning Binder
-                        </Link>
-                      </p>
-                    </div>
+            {/* Printable Planning Form - Visible Card */}
+            <Card className="border-2 hover:border-primary/30 transition-colors">
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                    <Printer className="h-6 w-6 text-muted-foreground" />
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold">Printable Planning Form (Fill by Hand)</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Prefer pen and paper? Download and print a blank form to write in by hand. No computer required after printing.
+                    </p>
+                    <Button 
+                      onClick={handleGetPrintableForm}
+                      disabled={isLoading}
+                      variant="outline"
+                      className="w-full sm:w-auto min-h-[48px]"
+                    >
+                      {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                      Get Printable Form
+                    </Button>
+                    <p className="text-sm text-muted-foreground mt-3">
+                      Want a physical binder to store your form?{" "}
+                      <Link to="/products/binder" className="underline hover:text-primary transition-colors">
+                        Order the Planning Binder
+                      </Link>
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
