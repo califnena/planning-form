@@ -35,6 +35,7 @@ export default function PlanAheadLanding() {
   const [showIAPModal, setShowIAPModal] = useState(false);
   const [plannerMode, setPlannerMode] = useState<string | null>(null);
   const [isResuming, setIsResuming] = useState(false);
+  const [showPrintableConfirmation, setShowPrintableConfirmation] = useState(false);
   const { isLoggedIn, hasPaidAccess, hasPrintableAccess, openLockedModal, saveLastVisitedRoute } = usePreviewModeContext();
   const { isAdmin } = useAdminStatus();
 
@@ -135,6 +136,46 @@ export default function PlanAheadLanding() {
     );
   }
 
+  // Show printable form confirmation after download
+  if (showPrintableConfirmation) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+        <PublicHeader />
+        <main className="container mx-auto px-4 py-12 md:py-20">
+          <div className="max-w-lg mx-auto text-center space-y-8">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+              <CheckCircle className="h-8 w-8 text-primary" />
+            </div>
+            <h1 className="text-3xl md:text-4xl font-serif font-bold">
+              Your Printable Form Is Ready
+            </h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              You can print this form as many times as you wish and fill it out by hand.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <Button 
+                onClick={() => setShowPrintableConfirmation(false)}
+                size="lg"
+                className="min-h-[48px]"
+              >
+                Return to Plan Ahead
+              </Button>
+              <Button 
+                onClick={() => navigate("/product-binder")}
+                variant="outline"
+                size="lg"
+                className="min-h-[48px]"
+              >
+                Learn About the Binder
+              </Button>
+            </div>
+          </div>
+        </main>
+        <AppFooter />
+      </div>
+    );
+  }
+
   const handleUseStepByStepPlanner = async () => {
     if (isStoreIAP) {
       setShowIAPModal(true);
@@ -177,10 +218,7 @@ export default function PlanAheadLanding() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      toast({
-        title: "Download Started",
-        description: "Your printable planning form is downloading. (Admin access)",
-      });
+      setShowPrintableConfirmation(true);
       return;
     }
 
@@ -203,10 +241,7 @@ export default function PlanAheadLanding() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      toast({
-        title: "Download Started",
-        description: "Your printable planning form is downloading.",
-      });
+      setShowPrintableConfirmation(true);
       return;
     }
 
