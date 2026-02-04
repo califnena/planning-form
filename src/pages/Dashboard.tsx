@@ -860,7 +860,7 @@ export default function Dashboard() {
             {/* Printable Documents */}
             <Card 
               className="p-5 hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => navigate('/legal-documents')}
+              onClick={() => navigate('/printable-form')}
             >
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
