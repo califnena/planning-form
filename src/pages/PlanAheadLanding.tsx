@@ -179,10 +179,16 @@ export default function PlanAheadLanding() {
     }
 
     if (hasPrintableAccess) {
-      navigate("/dashboard");
+      // Directly download the PDF - no navigation or planner state changes
+      const link = document.createElement("a");
+      link.href = "/templates/My-Final-Wishes-Blank-Form-2025-11-17.pdf";
+      link.download = "My-Final-Wishes-Blank-Form.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       toast({
-        title: "Access Granted",
-        description: "You already have printable access. Visit your Planning Menu to download.",
+        title: "Download Started",
+        description: "Your printable planning form is downloading.",
       });
       return;
     }
