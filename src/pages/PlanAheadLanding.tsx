@@ -169,6 +169,12 @@ export default function PlanAheadLanding() {
                 Learn About the Binder
               </Button>
             </div>
+            <p className="text-sm text-muted-foreground pt-4">
+              Want a physical binder to store your printed form?{" "}
+              <Link to="/product-binder" className="underline hover:text-primary transition-colors">
+                Order the Planning Binder
+              </Link>
+            </p>
           </div>
         </main>
         <AppFooter />
@@ -384,6 +390,12 @@ export default function PlanAheadLanding() {
                         {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                         Get Printable Form
                       </Button>
+                      <p className="text-sm text-muted-foreground mt-3">
+                        Want a physical binder to store your form?{" "}
+                        <Link to="/product-binder" className="underline hover:text-primary transition-colors">
+                          Order the Planning Binder
+                        </Link>
+                      </p>
                     </div>
                   </div>
                 </CardContent>
