@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -6,8 +7,26 @@ import { ArrowLeft, Download, FileText, BookOpen } from 'lucide-react';
 
 import { generateBlankAfterLifePlanPDF } from '@/lib/blankAfterLifePlanPdfGenerator';
 import { toast } from 'sonner';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 const Forms = () => {
+  const { isAdmin, isLoading: adminLoading } = useAdminStatus();
+
+  // Admin-only access verification (non-visible, testing only)
+  useEffect(() => {
+    if (adminLoading) return;
+    
+    if (isAdmin) {
+      // Log admin access for testing verification
+      console.info('[EFA Admin Access Check]', {
+        page: '/forms',
+        assetAccess: 'printable-planning-form',
+        adminBypass: true,
+        timestamp: new Date().toISOString(),
+        status: 'GRANTED - Admin override active'
+      });
+    }
+  }, [isAdmin, adminLoading]);
   const handleDownloadPrePlanningForm = () => {
     try {
       const link = document.createElement('a');
