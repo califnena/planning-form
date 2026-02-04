@@ -75,6 +75,11 @@ const Forms = () => {
             </h1>
           </div>
 
+          {/* Intro sentence */}
+          <p className="text-lg text-muted-foreground">
+            This form is separate from the digital planner.
+          </p>
+
           {/* Main Download Button */}
           <div className="space-y-2">
             <Button 
