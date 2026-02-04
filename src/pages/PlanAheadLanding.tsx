@@ -161,7 +161,7 @@ export default function PlanAheadLanding() {
                 Return to Plan Ahead
               </Button>
               <Button 
-                onClick={() => navigate("/product-binder")}
+                onClick={() => navigate("/products/binder")}
                 variant="outline"
                 size="lg"
                 className="min-h-[48px]"
@@ -171,7 +171,7 @@ export default function PlanAheadLanding() {
             </div>
             <p className="text-sm text-muted-foreground pt-4">
               Want a physical binder to store your printed form?{" "}
-              <Link to="/product-binder" className="underline hover:text-primary transition-colors">
+              <Link to="/products/binder" className="underline hover:text-primary transition-colors">
                 Order the Planning Binder
               </Link>
             </p>
@@ -392,7 +392,7 @@ export default function PlanAheadLanding() {
                       </Button>
                       <p className="text-sm text-muted-foreground mt-3">
                         Want a physical binder to store your form?{" "}
-                        <Link to="/product-binder" className="underline hover:text-primary transition-colors">
+                        <Link to="/products/binder" className="underline hover:text-primary transition-colors">
                           Order the Planning Binder
                         </Link>
                       </p>
