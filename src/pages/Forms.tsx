@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { TextSizeToggle } from '@/components/TextSizeToggle';
-import { ArrowLeft, Download, FileText } from 'lucide-react';
+import { ArrowLeft, Download, FileText, BookOpen } from 'lucide-react';
 
 import { generateBlankAfterLifePlanPDF } from '@/lib/blankAfterLifePlanPdfGenerator';
 import { toast } from 'sonner';
@@ -82,6 +82,32 @@ const Forms = () => {
                 <span>Nothing is stored unless you later use the app.</span>
               </li>
             </ul>
+          </Card>
+
+          {/* Optional Binder Upsell */}
+          <Card className="border border-dashed border-muted-foreground/30 text-left p-6 md:p-8">
+            <div className="flex items-start gap-4">
+              <div className="bg-muted w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0">
+                <BookOpen className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <div className="flex-1 space-y-3">
+                <h2 className="text-lg font-semibold text-foreground">
+                  Order the EFABINDER (Optional)
+                </h2>
+                <p className="text-muted-foreground">
+                  A fireproof binder to store your printed wishes safely. Keep everything organized in one secure place.
+                </p>
+                <a 
+                  href="https://buy.stripe.com/6oE7sLgnX1Cb02P7sN7bW00" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="outline" className="min-h-[48px]">
+                    Learn More & Order
+                  </Button>
+                </a>
+              </div>
+            </div>
           </Card>
         </div>
       </div>
