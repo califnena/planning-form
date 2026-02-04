@@ -55,6 +55,44 @@ export async function checkBasicPrintablesAccess(): Promise<boolean> {
 }
 
 /**
+ * Check if user ONLY has printable access (EFABASIC only, no premium/VIP)
+ * These users should be restricted to printable download only, not the digital planner
+ */
+export async function checkPrintableOnlyAccess(): Promise<boolean> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+
+  // Admin bypasses - they have full access
+  const { data: isAdmin } = await supabase
+    .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
+  if (isAdmin) return false;
+
+  // Check for printable role
+  const { data: hasPrintable } = await supabase
+    .rpc('has_app_role', { _user_id: user.id, _role: 'printable' });
+  
+  if (!hasPrintable) return false;
+
+  // Check for premium role - if they have it, they're not printable-only
+  const { data: hasPremium } = await supabase
+    .rpc('has_app_role', { _user_id: user.id, _role: 'premium' });
+  if (hasPremium) return false;
+
+  // Check for VIP role - if they have it, they're not printable-only
+  const { data: hasVip } = await supabase
+    .rpc('has_app_role', { _user_id: user.id, _role: 'vip' });
+  if (hasVip) return false;
+
+  // Check for done_for_you role - if they have it, they're not printable-only
+  const { data: hasDfy } = await supabase
+    .rpc('has_app_role', { _user_id: user.id, _role: 'done_for_you' });
+  if (hasDfy) return false;
+
+  // User has printable but no premium/vip/dfy - they are printable-only
+  return true;
+}
+
+/**
  * Check if user has access to premium tools (EFAPREMIUM, EFABINDER, or higher)
  */
 export async function checkPremiumToolsAccess(): Promise<boolean> {

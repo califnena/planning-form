@@ -17,7 +17,7 @@ type VerifiedItem = {
 
 // Map lookupKeys to next destination routes with highlights
 const ROUTE_BY_LOOKUP: Record<string, string> = {
-  EFABASIC: "/dashboard?highlight=printable",
+  EFABASIC: "/forms", // Printable-only users go directly to download page
   EFAPREMIUM: "/preplansteps?highlight=guided",
   EFAVIPMONTHLY: "/care-support?highlight=vip",
   EFAVIPYEAR: "/care-support?highlight=vip",
@@ -227,33 +227,45 @@ export default function PurchaseSuccess() {
                   </Button>
                 )}
 
-                {/* Primary CTA */}
-                <Button 
-                  onClick={() => navigate(planningMenuRoute)} 
-                  size="lg"
-                  variant={isPrintablePurchase ? "outline" : "default"}
-                  className="w-full min-h-[56px] text-lg"
-                >
-                  Go to My Planning Menu
-                </Button>
+                {/* Primary CTA - show appropriate destination based on purchase type */}
+                {isPrintablePurchase ? (
+                  <Button 
+                    onClick={() => navigate('/forms')} 
+                    size="lg"
+                    variant="outline"
+                    className="w-full min-h-[56px] text-lg"
+                  >
+                    Go to Download Page
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={() => navigate(planningMenuRoute)} 
+                    size="lg"
+                    className="w-full min-h-[56px] text-lg"
+                  >
+                    Go to My Planning Menu
+                  </Button>
+                )}
 
-                {/* Secondary buttons */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => navigate(bestNextRoute)}
-                    className="min-h-[48px]"
-                  >
-                    Continue
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => navigate(lastVisitedRoute || planningMenuRoute)}
-                    className="min-h-[48px]"
-                  >
-                    Continue where I left off
-                  </Button>
-                </div>
+                {/* Secondary buttons - hide for printable-only purchases */}
+                {!isPrintablePurchase && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => navigate(bestNextRoute)}
+                      className="min-h-[48px]"
+                    >
+                      Continue
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => navigate(lastVisitedRoute || planningMenuRoute)}
+                      className="min-h-[48px]"
+                    >
+                      Continue where I left off
+                    </Button>
+                  </div>
+                )}
 
                 <Button 
                   variant="ghost" 
