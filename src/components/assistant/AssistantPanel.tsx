@@ -62,6 +62,23 @@ const isPrintablePage = (pathname: string): boolean => {
   return pathname === '/forms' || pathname === '/printable-form';
 };
 
+// Helper to detect after-death related pages
+const isAfterDeathPage = (pathname: string): boolean => {
+  return pathname === '/next-steps' || 
+         pathname === '/after-death' || 
+         pathname === '/after-death-wizard' ||
+         pathname.startsWith('/case/') ||
+         pathname === '/preview-after-death';
+};
+
+// Get page context for Claire's behavior
+const getPageContext = (pathname: string): string | undefined => {
+  if (isAfterDeathPage(pathname)) return 'after-death';
+  if (pathname === '/forms') return 'printable-download';
+  if (pathname === '/printable-form') return 'printable-form';
+  return undefined;
+};
+
 export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -238,10 +255,8 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
         return;
       }
 
-      // Determine page context for printable-specific behavior
-      const pageContext = isPrintablePage(location.pathname) 
-        ? (location.pathname === '/forms' ? 'printable-download' : 'printable-form')
-        : undefined;
+      // Determine page context for context-aware Claire behavior
+      const pageContext = getPageContext(location.pathname);
 
       // Stream AI response
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/assistant-chat`, {
