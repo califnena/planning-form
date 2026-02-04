@@ -76,14 +76,19 @@ const Forms = () => {
           </div>
 
           {/* Main Download Button */}
-          <Button 
-            onClick={handleDownloadPrePlanningForm} 
-            size="lg"
-            className="min-h-[60px] text-lg px-10"
-          >
-            <Download className="mr-3 h-6 w-6" />
-            Download Blank Printable Form
-          </Button>
+          <div className="space-y-2">
+            <Button 
+              onClick={handleDownloadPrePlanningForm} 
+              size="lg"
+              className="min-h-[60px] text-lg px-10"
+            >
+              <Download className="mr-3 h-6 w-6" />
+              Download Blank Printable Form
+            </Button>
+            <p className="text-sm text-muted-foreground">
+              One-time purchase. Download once and print anytime.
+            </p>
+          </div>
 
           {/* Explanation */}
           <Card className="bg-muted/30 border-none text-left p-6 md:p-8">
