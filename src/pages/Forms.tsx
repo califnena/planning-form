@@ -82,7 +82,7 @@ const Forms = () => {
             className="min-h-[60px] text-lg px-10"
           >
             <Download className="mr-3 h-6 w-6" />
-            Download PDF
+            Download Blank Printable Form
           </Button>
 
           {/* Explanation */}
