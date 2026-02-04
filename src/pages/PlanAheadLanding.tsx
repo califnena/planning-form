@@ -344,7 +344,7 @@ export default function PlanAheadLanding() {
                         <Heart className="h-6 w-6 text-muted-foreground" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-xl font-semibold">Extra Help (Optional)</h3>
+                        <h3 className="text-xl font-semibold">Extra Help</h3>
                         <p className="text-muted-foreground mb-4">
                           If planning feels overwhelming, you can add extra support.<br />
                           CARE Support gives you access to Claire, your planning assistant.
@@ -357,7 +357,7 @@ export default function PlanAheadLanding() {
                           Learn About CARE Support
                         </Button>
                         <p className="text-xs text-muted-foreground mt-2">
-                          Optional. Cancel anytime.
+                          Cancel anytime.
                         </p>
                       </div>
                     </div>
@@ -433,7 +433,7 @@ export default function PlanAheadLanding() {
           <Collapsible open={learnOpen} onOpenChange={setLearnOpen}>
             <CollapsibleTrigger asChild>
               <button className="w-full flex items-center justify-between p-4 rounded-lg border-2 border-dashed hover:border-primary/30 transition-colors">
-                <span className="text-lg font-medium">Learn first (optional)</span>
+                <span className="text-lg font-medium">Learn first</span>
                 {learnOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
               </button>
             </CollapsibleTrigger>
