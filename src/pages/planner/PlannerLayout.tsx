@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
 import { mergeVisibleSections } from "@/lib/sections";
 import { PlanDebugPanel } from "@/components/debug/PlanDebugPanel";
+import { usePrintableOnlyAccess } from "@/hooks/usePrintableOnlyAccess";
 
 /**
  * Preview Mode Context
@@ -239,6 +240,16 @@ export default function PlannerLayout() {
 
   const { plan, loading: planLoading, updatePlan, saveState, activePlanId, refreshPlan } = usePlanData(user?.id || "");
   const { hasActiveSubscription, isLoading: subscriptionLoading, isMasterAccount } = useSubscriptionStatus(user?.id);
+  
+  // Check if user is printable-only (EFABASIC only, no premium access)
+  const { isPrintableOnly, isLoading: isPrintableOnlyLoading } = usePrintableOnlyAccess();
+  
+  // Redirect printable-only users away from digital planner
+  useEffect(() => {
+    if (!isPrintableOnlyLoading && isPrintableOnly && !isMasterAccount) {
+      navigate('/forms', { replace: true });
+    }
+  }, [isPrintableOnly, isPrintableOnlyLoading, isMasterAccount, navigate]);
   
   /**
    * SINGLE SOURCE OF TRUTH for lock state
@@ -473,12 +484,25 @@ export default function PlannerLayout() {
     }
   };
 
-  if (authLoading || planLoading || subscriptionLoading || settingsLoading) {
+  if (authLoading || planLoading || subscriptionLoading || settingsLoading || isPrintableOnlyLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-muted-foreground">Loading your planner...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Printable-only users should be redirected (handled in useEffect above)
+  // Show loading while redirecting to prevent flash
+  if (isPrintableOnly && !isMasterAccount) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Redirecting to your downloads...</p>
         </div>
       </div>
     );

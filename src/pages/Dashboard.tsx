@@ -21,6 +21,7 @@ import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { requireSessionOrRedirect, isAuthExpiredError } from "@/lib/sessionGuard";
 import { isStoreIAP } from "@/lib/billingMode";
 import { StoreIAPModal } from "@/components/StoreIAPModal";
+import { usePrintableOnlyAccess } from "@/hooks/usePrintableOnlyAccess";
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -59,7 +60,17 @@ export default function Dashboard() {
   // Admin/test users bypass all subscription checks
   const { isAdmin, isLoading: isAdminLoading } = useAdminStatus();
   
+  // Check if user is printable-only (EFABASIC only, no premium access)
+  const { isPrintableOnly, isLoading: isPrintableOnlyLoading } = usePrintableOnlyAccess();
+  
   const planDataStatus = usePlanDataStatus();
+
+  // Redirect printable-only users to the download page
+  useEffect(() => {
+    if (!isPrintableOnlyLoading && isPrintableOnly && !isAdmin) {
+      navigate('/forms', { replace: true });
+    }
+  }, [isPrintableOnly, isPrintableOnlyLoading, isAdmin, navigate]);
 
   useEffect(() => {
     const loadUserData = async () => {
