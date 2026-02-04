@@ -317,14 +317,8 @@ export default function PlanAheadLanding() {
                       <div className="flex-1">
                         <h3 className="text-xl font-semibold">Printable Planning Form</h3>
                         <p className="text-muted-foreground mb-4">
-                          Prefer to write things down or fill out a form?
+                          Download and print a blank form to write in by hand.
                         </p>
-                        <p className="text-sm font-medium mb-2">What this includes:</p>
-                        <ul className="text-sm text-muted-foreground space-y-1 mb-4">
-                          <li>• A printable planning form</li>
-                          <li>• Fill it out at your own pace</li>
-                          <li>• Keep a copy for your records</li>
-                        </ul>
                         <Button 
                           onClick={handleGetPrintableForm}
                           disabled={isLoading}
