@@ -287,6 +287,9 @@ export default function PlanAheadLanding() {
                     <p className="text-xs text-muted-foreground mt-2">
                       Requires a one-time purchase to save your plan.
                     </p>
+                    <p className="text-sm text-muted-foreground mt-3">
+                      Prefer to write by hand? You can use our <Link to="/printable-form" className="underline hover:text-primary transition-colors">Printable Planning Form (EFABASIC)</Link>.
+                    </p>
                   </div>
                 </div>
               </CardContent>
