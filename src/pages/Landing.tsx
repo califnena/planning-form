@@ -7,6 +7,7 @@ import { AppFooter } from "@/components/AppFooter";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
+import { usePreviewModeContext } from "@/contexts/PreviewModeContext";
 import mascotPlanningAhead from "@/assets/mascot-planning-ahead.png";
 import mascotFamiliesChoose from "@/assets/mascot-families-choose.png";
 import mascotHeroCouple from "@/assets/mascot-hero-couple.png";
@@ -20,6 +21,7 @@ const Landing = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [hasPlannerProgress, setHasPlannerProgress] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { saveLastVisitedRoute } = usePreviewModeContext();
   useEffect(() => {
     const savedSize = localStorage.getItem("landing_text_size");
     if (savedSize) {
@@ -74,17 +76,22 @@ const Landing = () => {
     document.documentElement.style.fontSize = `${newSize}%`;
     localStorage.setItem("landing_text_size", newSize.toString());
   };
+  /**
+   * Access Digital Planner button handler:
+   * - Not signed in → prompt sign-in
+   * - Signed in, not purchased → open Preview Mode  
+   * - Signed in + purchased → open full planner
+   */
   const handlePrimaryCTA = () => {
-    if (isLoggedIn && hasPlannerProgress) {
-      // Continue Planning → go to planner dashboard
-      navigate("/preplandashboard");
-    } else if (isLoggedIn) {
-      // Start Digital Planner → go to plan-ahead entry
-      navigate("/plan-ahead");
-    } else {
-      // Public path - go to plan-ahead landing
-      navigate("/plan-ahead");
+    if (!isLoggedIn) {
+      // Not signed in - redirect to login with return URL
+      saveLastVisitedRoute(window.location.pathname);
+      navigate("/login?return=/preplandashboard");
+      return;
     }
+    
+    // Signed in - navigate to planner (Preview Mode or Full access handled by context)
+    navigate("/preplandashboard");
   };
   return <div className="min-h-screen bg-gradient-to-b from-amber-50/40 via-background to-background">
       {/* Header */}
