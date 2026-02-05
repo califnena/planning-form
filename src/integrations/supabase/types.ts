@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_access_logs: {
+        Row: {
+          accessed_at: string | null
+          action_taken: string | null
+          admin_user_id: string | null
+          log_id: string
+          page_accessed: string | null
+        }
+        Insert: {
+          accessed_at?: string | null
+          action_taken?: string | null
+          admin_user_id?: string | null
+          log_id?: string
+          page_accessed?: string | null
+        }
+        Update: {
+          accessed_at?: string | null
+          action_taken?: string | null
+          admin_user_id?: string | null
+          log_id?: string
+          page_accessed?: string | null
+        }
+        Relationships: []
+      }
       admin_audit_log: {
         Row: {
           action_type: string
