@@ -66,8 +66,8 @@ export function PreviewLockBanner({
                   You're viewing a preview of the Digital Planner.
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  This shows how planning works step by step.
-                  To enter and save your own information, full access is required.
+                  Full access helps keep your information private and secure.
+                  You'll be able to save your wishes, return anytime, and make changes when needed.
                 </p>
               </div>
 
@@ -113,10 +113,10 @@ export function PreviewLockBanner({
         
         <div className="flex-1 min-w-0">
           <p className="text-foreground font-medium text-base">
-            Preview Mode — Explore freely, no changes are saved.
+            You're viewing a preview of the Digital Planner.
           </p>
           <p className="text-muted-foreground text-sm mt-1">
-            Ready to save your information? Unlock to enable editing.
+            Full access helps keep your information private and secure.
           </p>
         </div>
 
