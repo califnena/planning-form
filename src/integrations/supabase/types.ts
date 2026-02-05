@@ -2810,6 +2810,24 @@ export type Database = {
         }
         Relationships: []
       }
+      system_controls: {
+        Row: {
+          control_key: string
+          control_value: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          control_key: string
+          control_value?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          control_key?: string
+          control_value?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           assigned_contact_id: string | null
