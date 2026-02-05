@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { checkPaidAccess, checkVIPAccess, checkPrintableAccess, checkDoneForYouAccess } from "@/lib/accessChecks";
+import { checkPaidAccess, checkVIPAccess, checkPrintableAccess, checkDoneForYouAccess, isAdminUser } from "@/lib/accessChecks";
 
 const LAST_VISITED_KEY = "efa_last_visited_route";
 
@@ -10,6 +10,8 @@ interface AuthState {
   session: Session | null;
   isLoggedIn: boolean;
   isLoading: boolean;
+  // Admin status - bypasses all paywalls
+  isAdmin: boolean;
   // Purchase states
   hasPaidAccess: boolean;
   hasVIPAccess: boolean;
@@ -35,6 +37,7 @@ export function useAuthState(): AuthState {
   const [hasVIPAccess, setHasVIPAccess] = useState(false);
   const [hasPrintableAccess, setHasPrintableAccess] = useState(false);
   const [hasDoneForYouAccess, setHasDoneForYouAccess] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Load purchase states when user changes
   const loadPurchaseStates = useCallback(async (userId: string | undefined) => {
@@ -43,21 +46,24 @@ export function useAuthState(): AuthState {
       setHasVIPAccess(false);
       setHasPrintableAccess(false);
       setHasDoneForYouAccess(false);
+      setIsAdmin(false);
       return;
     }
 
-    // Load all access states in parallel
-    const [paid, vip, printable, dfy] = await Promise.all([
+    // Load all access states in parallel (including admin check)
+    const [paid, vip, printable, dfy, admin] = await Promise.all([
       checkPaidAccess(),
       checkVIPAccess(),
       checkPrintableAccess(),
-      checkDoneForYouAccess()
+      checkDoneForYouAccess(),
+      isAdminUser()
     ]);
 
     setHasPaidAccess(paid);
     setHasVIPAccess(vip);
     setHasPrintableAccess(printable);
     setHasDoneForYouAccess(dfy);
+    setIsAdmin(admin);
   }, []);
 
   useEffect(() => {
@@ -78,6 +84,7 @@ export function useAuthState(): AuthState {
           setHasVIPAccess(false);
           setHasPrintableAccess(false);
           setHasDoneForYouAccess(false);
+          setIsAdmin(false);
         }
       }
     );
@@ -117,6 +124,7 @@ export function useAuthState(): AuthState {
     session,
     isLoggedIn: !!user,
     isLoading,
+    isAdmin,
     hasPaidAccess,
     hasVIPAccess,
     hasPrintableAccess,

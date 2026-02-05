@@ -23,9 +23,13 @@
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Check if user has admin role (bypasses all paywalls)
+ * Single centralized helper function to check admin status.
+ * Use this everywhere to determine if the current user is an admin.
+ * Admins bypass ALL paywalls, checkout redirects, and access restrictions.
+ * 
+ * @returns Promise<boolean> - true if user is admin, false otherwise
  */
-export async function checkAdminAccess(): Promise<boolean> {
+export async function isAdminUser(): Promise<boolean> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return false;
 
@@ -33,6 +37,14 @@ export async function checkAdminAccess(): Promise<boolean> {
     .rpc('has_app_role', { _user_id: user.id, _role: 'admin' });
   
   return !!isAdmin;
+}
+
+/**
+ * Check if user has admin role (bypasses all paywalls)
+ * @deprecated Use isAdminUser() instead for consistency
+ */
+export async function checkAdminAccess(): Promise<boolean> {
+  return isAdminUser();
 }
 
 /**
