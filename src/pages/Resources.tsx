@@ -1085,7 +1085,7 @@ const Resources = () => {
       <div>
         <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Checklists</h1>
         <p className="text-lg text-muted-foreground">
-          Step-by-step checklists to help you track your progress and stay organized.
+          Step-by-step checklists to help you stay organized.
         </p>
       </div>
 
