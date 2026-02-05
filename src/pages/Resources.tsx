@@ -227,7 +227,7 @@ const Resources = () => {
               Answer questions on your computer, tablet, or phone. Your answers are saved automatically.
             </p>
             <Button className="w-full min-h-[48px]">
-              Start Digital Planner
+              Access Digital Planner
               <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
           </CardContent>
