@@ -312,108 +312,67 @@ export default function PlanAheadLanding() {
             Plan Ahead
           </h1>
           <p className="text-xl text-muted-foreground leading-relaxed">
-            Review your plan, print it, or go back to continue planning.
+            Choose how you'd like to organize your wishes.
           </p>
-          
-          {/* Primary Action Button */}
-          <div className="flex flex-col gap-4 pt-6 max-w-md mx-auto">
-            <Button 
-              onClick={handleAccessDigitalPlanner}
-              size="lg"
-              className="w-full min-h-[60px] text-lg font-semibold"
-            >
-              Access Digital Planner
-            </Button>
-          </div>
         </section>
 
-        {/* Section 2: Choose How You Want to Plan */}
+        {/* Section 2: Two Equal Planning Options */}
         <section className="max-w-3xl mx-auto mb-16">
-          <h2 className="text-2xl md:text-3xl font-serif font-semibold text-center mb-2">
-            Recommended for You
-          </h2>
-          <p className="text-muted-foreground text-center mb-8">
-            Start here. You can always change later.
-          </p>
-
-          <div className="space-y-6">
-            {/* Option 1: Step-by-Step Digital Planner */}
-            <Card className="border-2 hover:border-primary/50 transition-colors relative overflow-hidden">
-              <Badge className="absolute top-4 right-4 bg-primary text-primary-foreground">
-                Most people choose this
-              </Badge>
-              <CardContent className="p-6 pt-12 md:pt-6 space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Option 1: Access Digital Planner */}
+            <Card className="border-2 hover:border-primary/50 transition-colors h-full">
+              <CardContent className="p-6 space-y-4 flex flex-col h-full">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <FileText className="h-6 w-6 text-primary" />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold">Step-by-Step Digital Planner</h3>
-                    <p className="text-muted-foreground mb-4">
-                      You are guided through simple questions, one step at a time.
-                    </p>
-                    <p className="text-sm font-medium mb-2">What this includes:</p>
-                    <ul className="text-sm text-muted-foreground space-y-1 mb-4">
-                      <li>• Guided planning steps</li>
-                      <li>• Ability to save and return</li>
-                      <li>• Clear organization of your wishes</li>
-                    </ul>
-                    <Button 
-                      onClick={handleUseStepByStepPlanner}
-                      disabled={isLoading}
-                      className="w-full sm:w-auto min-h-[48px]"
-                    >
-                      {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                      Use Step-by-Step Planner
-                    </Button>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Requires a one-time purchase to save your plan.
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-3">
-                      Prefer to write by hand? You can use our <Link to="/printable-form" className="underline hover:text-primary transition-colors">Printable Planning Form (EFABASIC)</Link>.
-                    </p>
+                  <div>
+                    <h3 className="text-xl font-semibold">Access Digital Planner</h3>
                   </div>
                 </div>
+                <p className="text-muted-foreground flex-1">
+                  Step-by-step guidance you complete online. Save and update anytime.
+                </p>
+                <Button 
+                  onClick={handleAccessDigitalPlanner}
+                  className="w-full min-h-[48px]"
+                >
+                  Access Digital Planner
+                </Button>
               </CardContent>
             </Card>
 
-            {/* Free Preview Note */}
-            <div className="flex items-center justify-center gap-2 py-4 text-muted-foreground">
-              <Eye className="h-4 w-4" />
-              <span>You can <button onClick={handlePreviewPlanner} className="underline hover:text-primary transition-colors">preview the planner for free</button> before deciding.</span>
-            </div>
-
-            {/* Printable Planning Form - Visible Card */}
-            <Card className="border-2 hover:border-primary/30 transition-colors">
-              <CardContent className="p-6 space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                    <Printer className="h-6 w-6 text-muted-foreground" />
+            {/* Option 2: Get Printable Planning Form */}
+            <Card className="border-2 hover:border-primary/50 transition-colors h-full">
+              <CardContent className="p-6 space-y-4 flex flex-col h-full">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Printer className="h-6 w-6 text-primary" />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold">Printable Planning Form (Fill by Hand)</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Prefer pen and paper? Download and print a blank form to write in by hand. No computer required after printing.
-                    </p>
-                    <Button 
-                      onClick={handleGetPrintableForm}
-                      disabled={isLoading}
-                      variant="outline"
-                      className="w-full sm:w-auto min-h-[48px]"
-                    >
-                      {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                      Get Printable Form
-                    </Button>
-                    <p className="text-sm text-muted-foreground mt-3">
-                      Want a physical binder to store your form?{" "}
-                      <Link to="/products/binder" className="underline hover:text-primary transition-colors">
-                        Order the Planning Binder
-                      </Link>
-                    </p>
+                  <div>
+                    <h3 className="text-xl font-semibold">Get Printable Planning Form</h3>
                   </div>
                 </div>
+                <p className="text-muted-foreground flex-1">
+                  Download a blank form to print and fill out by hand.
+                </p>
+                <Button 
+                  onClick={handleGetPrintableForm}
+                  disabled={isLoading}
+                  variant="outline"
+                  className="w-full min-h-[48px]"
+                >
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Get Printable Planning Form
+                </Button>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Free Preview Note */}
+          <div className="flex items-center justify-center gap-2 py-6 text-muted-foreground">
+            <Eye className="h-4 w-4" />
+            <span>You can <button onClick={handlePreviewPlanner} className="underline hover:text-primary transition-colors">preview the planner for free</button> before deciding.</span>
           </div>
         </section>
 
