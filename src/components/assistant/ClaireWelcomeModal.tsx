@@ -31,11 +31,11 @@ export function ClaireWelcomeModal({ isOpen, onClose }: ClaireWelcomeModalProps)
               Hi, I'm Claire.
             </p>
             <p className="text-muted-foreground">
-              I'm here to help — whether you're planning ahead or have recently lost someone.
+              I help with planning ahead and guide families after a death has occurred.
+              I explain next steps, answer questions, and provide calm support.
             </p>
             <p className="text-muted-foreground">
-              Ask questions, think through decisions, or take things one step at a time.
-              No rush. No pressure.
+              I'm available 24/7, wherever you are. No rush. No pressure.
             </p>
           </div>
 

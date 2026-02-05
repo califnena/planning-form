@@ -721,7 +721,7 @@ export default function Dashboard() {
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold mb-2">CARE Support</h3>
                   <p className="text-muted-foreground mb-4 leading-relaxed">
-                    Personal planning help from Claire — a real person who walks at your pace.
+                    Planning guidance, emotional support, and after-death help. Available 24/7.
                   </p>
                   {/* Admin users bypass Stripe - always show access */}
                   {isAdmin || hasVIPAccess ? (

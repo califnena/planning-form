@@ -263,10 +263,12 @@ export default function CareSupport() {
                 <h1 className="text-4xl md:text-5xl font-serif font-bold">CARE Support</h1>
               </div>
               <p className="text-xl md:text-2xl text-muted-foreground">
-                Personal planning help, guidance, and coping support
+                Planning guidance, emotional support, and after-death help. Available 24/7.
               </p>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Extra help when planning feels overwhelming. Available when you need it.
+                Claire helps with planning ahead and guides families after a death has occurred.
+                She explains next steps, answers questions, and provides calm support.
+                Claire is available 24/7, wherever you are.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -340,10 +342,11 @@ export default function CareSupport() {
                   Hi, I'm Claire.
                 </p>
                 <p className="text-lg text-muted-foreground">
-                  I'm here to help you with planning, one step at a time.
+                  I'm here to help — whether you're planning ahead or have recently lost someone.
                 </p>
                 <p className="text-muted-foreground">
-                  Claire is your planning assistant. She helps explain things clearly and calmly, without rushing you.
+                  I provide planning support before a death, and emotional and practical guidance after.
+                  I'm available 24/7, anywhere you are.
                 </p>
                 
                 <Button 
@@ -386,16 +389,59 @@ export default function CareSupport() {
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span>Helping you stay organized</span>
+                    <span>After-death guidance and next steps</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span>Guiding you when things feel overwhelming</span>
+                    <span>Helping families stay oriented</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Emotional reassurance when things feel overwhelming</span>
                   </li>
                 </ul>
                 
                 <p className="text-sm text-muted-foreground mt-6 text-center">
                   Claire does not replace a lawyer, doctor, or financial professional. She is here to support you as you plan.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Support After a Death */}
+          <section className="py-12 md:py-16">
+            <div className="container max-w-3xl mx-auto px-4 space-y-6">
+              <h2 className="text-2xl md:text-3xl font-serif font-semibold text-center">
+                Support After a Death
+              </h2>
+              
+              <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl p-6 md:p-8 space-y-4">
+                <p className="text-lg text-center">
+                  When a death has already occurred, Claire can help guide you through what comes next.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Guidance on immediate next steps</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Help with notifications and common questions</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Calm, compassionate support at your pace</span>
+                  </li>
+                </ul>
+                <p className="text-sm text-muted-foreground text-center pt-4">
+                  Claire does not replace legal or funeral professionals. She provides guidance and emotional support.
+                </p>
+              </div>
+              
+              {/* 24/7 Callout */}
+              <div className="bg-primary/10 rounded-xl p-6 text-center">
+                <p className="text-lg font-medium text-primary">
+                  Claire is available 24/7, anywhere you are.
                 </p>
               </div>
             </div>
