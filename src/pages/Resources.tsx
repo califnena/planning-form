@@ -337,6 +337,67 @@ const Resources = () => {
           </Card>
         </div>
       </div>
+
+      {/* Get Help If You Want It Section */}
+      <div className="pt-8 border-t border-border">
+        <div className="mb-6">
+          <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">Get Help If You Want It</h2>
+          <p className="text-muted-foreground">
+            You're not required to do anything right now. Help is here when you're ready.
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Talk to Claire */}
+          <Card className="hover:border-primary/50 transition-colors">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <HelpCircle className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Talk to Claire</CardTitle>
+                  <CardDescription>Planning help, calm guidance</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Claire is here to answer questions and help you think through your options—one step at a time.
+              </p>
+              <p className="text-sm text-muted-foreground italic">
+                Look for the chat button in the corner of your screen.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Contact Everlasting Funeral Advisors */}
+          <Card className="hover:border-primary/50 transition-colors">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                  <Mail className="h-6 w-6 text-amber-700" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Contact Everlasting Funeral Advisors</CardTitle>
+                  <CardDescription>Real people, no pressure</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                If you'd like to talk to a real person, we're here to help. No sales, no pressure—just support.
+              </p>
+              <a href="mailto:info@everlastingfuneraladvisors.com" className="block">
+                <Button variant="outline" className="w-full min-h-[48px]">
+                  <Mail className="h-4 w-4 mr-2" />
+                  info@everlastingfuneraladvisors.com
+                </Button>
+              </a>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 
