@@ -58,7 +58,7 @@ import { Button } from '@/components/ui/button';
 import { TextSizeToggle } from '@/components/TextSizeToggle';
 import { 
   ExternalLink, FileText, Download, Home, Eye,
-  ChevronRight, CheckSquare, BookOpen, Info, HelpCircle, Mail
+  ChevronRight, CheckSquare, BookOpen, Info, HelpCircle, Mail, Phone
 } from 'lucide-react';
 import { GlobalHeader } from '@/components/GlobalHeader';
 import { AppFooter } from '@/components/AppFooter';
@@ -72,6 +72,7 @@ import { cn } from '@/lib/utils';
 import { generateAfterDeathChecklistPDF } from '@/lib/afterDeathChecklistPdfGenerator';
 import { useToast } from '@/hooks/use-toast';
 import { usePrintableAccess } from '@/hooks/usePrintableAccess';
+import { CallbackRequestDialog } from '@/components/resources/CallbackRequestDialog';
 
 // Senior-friendly 3-category organization per Prompt C1
 // 'step-by-step', 'free-checklists', 'free-guides'
@@ -89,6 +90,7 @@ const Resources = () => {
   const validInitialSection = initialSection && VALID_SECTIONS.includes(initialSection) ? initialSection : DEFAULT_SECTION;
   const [activeSection, setActiveSection] = useState(validInitialSection);
   const [activeSubItem, setActiveSubItem] = useState<string | undefined>(searchParams.get('sub') || undefined);
+  const [isCallbackDialogOpen, setIsCallbackDialogOpen] = useState(false);
 
   /**
    * Printable form handler - serves PDF directly if user has access
@@ -206,7 +208,7 @@ const Resources = () => {
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2">
         {/* Option 1: Digital Planner */}
         <Card className="hover:border-primary/50 transition-colors cursor-pointer border-2" onClick={() => navigate('/preplandashboard/landing')}>
           <CardHeader>
@@ -288,6 +290,33 @@ const Resources = () => {
               See Free Resources Below
               <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
+          </CardContent>
+        </Card>
+
+        {/* Option 4: Talk to a Human */}
+        <Card className="hover:border-primary/50 transition-colors cursor-pointer border-2 border-dashed" onClick={() => setIsCallbackDialogOpen(true)}>
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Phone className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Talk to a Human (Optional)</CardTitle>
+                <CardDescription>Get friendly guidance</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Have a quick question or want help deciding? You can speak with a real person. No pressure. No obligation.
+            </p>
+            <Button variant="outline" className="w-full min-h-[48px]">
+              Request a Callback
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+            <p className="text-xs text-muted-foreground text-center mt-3">
+              For guidance only. No sales or legal advice.
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -1817,6 +1846,12 @@ const Resources = () => {
       </div>
       
       <AppFooter />
+
+      {/* Callback Request Dialog */}
+      <CallbackRequestDialog 
+        open={isCallbackDialogOpen} 
+        onOpenChange={setIsCallbackDialogOpen} 
+      />
     </div>
   );
 };
