@@ -279,19 +279,13 @@ export default function PlanAheadLanding() {
 
   /**
    * Access Digital Planner button handler:
-   * - Not signed in → prompt sign-in
+   * - Not signed in → allow preview mode (no forced login)
    * - Signed in, not purchased → open Preview Mode
    * - Signed in + purchased → open full planner
    */
   const handleAccessDigitalPlanner = () => {
-    if (!isLoggedIn) {
-      // Not signed in - redirect to login with return URL
-      saveLastVisitedRoute(location.pathname);
-      navigate("/login?return=/preplandashboard");
-      return;
-    }
-    
-    // Signed in - navigate to planner (Preview Mode or Full access handled by context)
+    // Navigate to planner - Preview Mode or Full access handled by context
+    // No login required for preview mode
     navigate("/preplandashboard");
   };
 

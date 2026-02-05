@@ -24,7 +24,7 @@ interface PreviewLockBannerProps {
  * Suppressed on emotional stage routes.
  */
 export function PreviewLockBanner({ 
-  message = "You're exploring the planner in preview mode.",
+  message = "Preview mode. To save or edit your wishes, choose a plan.",
   compact = false,
   prominent = false
 }: PreviewLockBannerProps) {
@@ -63,11 +63,10 @@ export function PreviewLockBanner({
               
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold text-foreground">
-                  You're viewing a preview of the Digital Planner.
+                  Preview mode.
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Full access helps keep your information private and secure.
-                  You'll be able to save your wishes, return anytime, and make changes when needed.
+                  To save or edit your wishes, choose a plan.
                 </p>
               </div>
 
@@ -77,7 +76,7 @@ export function PreviewLockBanner({
                   className="gap-2"
                 >
                   <Unlock className="h-4 w-4" />
-                  Get Full Access
+                  Choose a Plan
                 </Button>
               </div>
             </div>
@@ -98,7 +97,7 @@ export function PreviewLockBanner({
           onClick={handleUnlock}
           className="h-auto p-0 text-primary font-medium"
         >
-          Get Full Access
+          Choose a Plan
         </Button>
       </div>
     );
@@ -113,10 +112,10 @@ export function PreviewLockBanner({
         
         <div className="flex-1 min-w-0">
           <p className="text-foreground font-medium text-base">
-            You're viewing a preview of the Digital Planner.
+            Preview mode.
           </p>
           <p className="text-muted-foreground text-sm mt-1">
-            Full access helps keep your information private and secure.
+            To save or edit your wishes, choose a plan.
           </p>
         </div>
 
@@ -127,7 +126,7 @@ export function PreviewLockBanner({
             className="shadow-sm"
           >
             <Unlock className="h-4 w-4 mr-1.5" />
-            Get Full Access
+            Choose a Plan
           </Button>
         </div>
       </div>
@@ -152,12 +151,12 @@ export function InlineLockedNotice() {
   return (
     <div className="flex items-center gap-2 text-xs text-muted-foreground py-1 px-2 bg-muted/50 rounded">
       <Eye className="h-3 w-3 text-primary" />
-      <span>Preview mode — view only</span>
+      <span>Preview mode</span>
       <button
         onClick={() => navigate("/pricing")}
         className="text-primary hover:underline font-medium"
       >
-        Get Full Access
+        Choose a Plan
       </button>
     </div>
   );
