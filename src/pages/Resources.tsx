@@ -398,6 +398,36 @@ const Resources = () => {
           </Card>
         </div>
       </div>
+
+      {/* Ready to Continue Section */}
+      <div className="pt-8 border-t border-border">
+        <div className="text-center mb-6">
+          <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">Ready to Continue?</h2>
+          <p className="text-muted-foreground">
+            Choose the option that works best for you.
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto">
+          <Button 
+            size="lg" 
+            className="min-h-[52px] flex-1"
+            onClick={() => navigate('/preplandashboard/landing')}
+          >
+            Access Digital Planner
+            <ChevronRight className="h-5 w-5 ml-2" />
+          </Button>
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="min-h-[52px] flex-1"
+            onClick={() => navigate('/forms')}
+          >
+            Get Printable Planning Form
+            <ChevronRight className="h-5 w-5 ml-2" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 
