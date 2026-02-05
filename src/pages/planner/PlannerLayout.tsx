@@ -23,6 +23,7 @@ import { mergeVisibleSections } from "@/lib/sections";
 import { PlanDebugPanel } from "@/components/debug/PlanDebugPanel";
 import { usePrintableOnlyAccess } from "@/hooks/usePrintableOnlyAccess";
 import { PlannerHelpNote } from "@/components/planner/PlannerHelpNote";
+import { AssistedHelpTrigger } from "@/components/planner/AssistedHelpTrigger";
 
 /**
  * Preview Mode Context
@@ -556,6 +557,9 @@ export default function PlannerLayout() {
             planData={{ ...plan, _pii: pendingPIIData }}
             preparedBy={plan.prepared_by || ""}
           />
+          
+          {/* Non-intrusive assisted help trigger */}
+          <AssistedHelpTrigger />
           
           <AssistantWidget />
           
