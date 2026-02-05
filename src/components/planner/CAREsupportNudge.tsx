@@ -66,8 +66,8 @@ export const CARESupportNudge = ({ onTalkToClaire }: CARESupportNudgeProps) => {
           <div className="space-y-2">
             <h4 className="font-medium text-foreground">Need a little help?</h4>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              If planning feels confusing or heavy, CARE Support is available.
-              Claire can help explain things or talk through your options.
+              Claire offers planning guidance, emotional support, and after-death help.
+              Available 24/7, wherever you are.
             </p>
             <div className="flex flex-wrap gap-2 pt-1">
               <Button

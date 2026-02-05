@@ -33,10 +33,10 @@ export const PLANS = {
     lookupKey: "EFAVIPYEAR",
     name: "CARE Support (Annual)",
     price: "$69 / year",
-    description: "Personal planning help, coping support, and guidance when you need it. Includes everything in Premium plus access to Claire, your planning assistant, for personalized guidance through end-of-life planning, organization, and coping. Get step-by-step assistance, unlimited updates, and help anytime you need support for you or your family.",
+    description: "Planning guidance, emotional support, and after-death help. Available 24/7. Includes everything in Premium plus access to Claire for personalized guidance through planning, coping, and after-death support. Get step-by-step assistance, unlimited updates, and help anytime you need support for you or your family.",
     features: [
       "Everything in Premium",
-      "Access to Claire for planning guidance and support"
+      "Access to Claire — planning guidance, emotional support, and after-death help. Available 24/7."
     ],
   },
   VIP_MONTHLY: {
@@ -44,10 +44,10 @@ export const PLANS = {
     lookupKey: "EFAVIPMONTHLY",
     name: "CARE Support (Monthly)",
     price: "$5.99 / month",
-    description: "Personal planning help, coping support, and guidance when you need it. Includes everything in Premium plus access to Claire, your planning assistant, for personalized guidance through end-of-life planning, organization, and coping. Get step-by-step assistance, unlimited updates, and help anytime you need support for you or your family.",
+    description: "Planning guidance, emotional support, and after-death help. Available 24/7. Includes everything in Premium plus access to Claire for personalized guidance through planning, coping, and after-death support. Get step-by-step assistance, unlimited updates, and help anytime you need support for you or your family.",
     features: [
       "Everything in Premium (monthly access)",
-      "Access to Claire for planning guidance and support"
+      "Access to Claire — planning guidance, emotional support, and after-death help. Available 24/7."
     ],
   },
   BINDER: {

@@ -13,7 +13,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Who is Claire?",
-    answer: "Claire is the name we use for your planning assistant. She helps explain things and guide you step by step."
+    answer: "Claire is your planning assistant. She provides planning guidance, emotional support, and after-death help. Available 24/7, wherever you are."
   },
   {
     question: "Is Claire a real person?",
@@ -21,7 +21,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "What can Claire help me with?",
-    answer: "Claire can help with:\n• Understanding planning options\n• Reviewing steps in your plan\n• Answering general questions\n• Helping you take things one step at a time"
+    answer: "Claire can help with:\n• Planning support before a death\n• Emotional and practical guidance after a death\n• Understanding planning options\n• Explaining what to do next\n• Helping families stay oriented\n• Emotional reassurance\n• Answering general questions"
   },
   {
     question: "What can Claire not do?",
@@ -41,7 +41,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "How do I talk to Claire?",
-    answer: "Look for \"Claire is here\" in the corner of the screen and click it."
+    answer: "Look for \"Claire is here\" in the corner of the screen and click it. Claire is available 24/7, anywhere you are."
   }
 ];
 
