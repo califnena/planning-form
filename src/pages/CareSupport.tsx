@@ -447,6 +447,66 @@ export default function CareSupport() {
             </div>
           </section>
 
+          {/* How Claire Can Help Beyond Planning */}
+          <section className="bg-muted/30 py-12 md:py-16">
+            <div className="container max-w-3xl mx-auto px-4 space-y-6">
+              <h2 className="text-2xl md:text-3xl font-serif font-semibold text-center">
+                How Claire Can Help Beyond Planning
+              </h2>
+              
+              <div className="bg-background rounded-xl p-6 md:p-8 shadow-sm space-y-6">
+                <p className="text-muted-foreground text-center">
+                  When it naturally relates to your question or situation, Claire may mention 
+                  Everlasting Funeral Advisors services that could be helpful. All services are 
+                  completely optional — there is no pressure and nothing is ever required.
+                </p>
+                
+                <div className="space-y-4">
+                  <p className="font-medium text-center">Examples Claire may reference when appropriate:</p>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <span>Affordable funeral and memorial options</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <span>Planning binders for organizing documents</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <span>Custom remembrance songs</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <span>Tribute or memory videos</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <span>Help writing a eulogy or personal message</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <span>Restoring or cleaning up old photos</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <span>Planning tools and educational resources</span>
+                    </li>
+                  </ul>
+                </div>
+                
+                <div className="bg-muted/50 rounded-lg p-4 text-center space-y-2">
+                  <p className="text-sm text-muted-foreground italic">
+                    Claire only mentions services when they naturally relate to your question or situation.
+                  </p>
+                  <p className="text-sm font-medium text-foreground">
+                    You are never required to use these services.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* How it works */}
           <section className="py-12 md:py-16">
             <div className="container max-w-3xl mx-auto px-4 space-y-6 text-center">
