@@ -316,13 +316,13 @@ export default function PlanAheadLanding() {
             How would you like to plan?
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Option 1: Digital Planner */}
+           {/* Option 1: Plan Online */}
             <Card className="border-2 hover:border-primary/50 transition-colors h-full">
               <CardContent className="p-6 space-y-4 flex flex-col h-full">
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
                   <FileText className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold">Digital Planner</h3>
+               <h3 className="text-xl font-semibold">Plan Online</h3>
                 <p className="text-muted-foreground flex-1 leading-relaxed">
                   Step-by-step guidance you complete online. Saved securely and easy to update.
                 </p>
@@ -330,7 +330,7 @@ export default function PlanAheadLanding() {
                   onClick={handleAccessDigitalPlanner}
                   className="w-full min-h-[48px]"
                 >
-                  Access Digital Planner
+                 Plan Online
                 </Button>
               </CardContent>
             </Card>
@@ -362,7 +362,7 @@ export default function PlanAheadLanding() {
         <section className="max-w-2xl mx-auto mb-12">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="space-y-2">
-              <p className="font-semibold text-foreground mb-3">Digital Planner</p>
+             <p className="font-semibold text-foreground mb-3">Plan Online</p>
               <p className="text-muted-foreground">• Guided step by step</p>
               <p className="text-muted-foreground">• Saved securely online</p>
               <p className="text-muted-foreground">• Easy to update anytime</p>
