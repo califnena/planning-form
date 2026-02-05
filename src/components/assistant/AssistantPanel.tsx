@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BookingModal } from "./BookingModal";
+import { Link } from "react-router-dom";
 
 type Message = {
   id: string;
@@ -595,9 +596,12 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                 <Trash2 className="h-3 w-3 mr-1" />
                 Clear history
               </Button>
-              <span className="text-xs text-muted-foreground">
-                You can close this anytime.
-              </span>
+              <Link 
+                to="/saved-summaries" 
+                className="text-xs text-primary hover:underline"
+              >
+                View saved summaries
+              </Link>
             </div>
             <p className="text-[10px] text-muted-foreground/60 text-center">
               Claire does not remember conversations unless you choose to save a summary.

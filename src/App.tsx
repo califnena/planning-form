@@ -83,6 +83,7 @@ import ContinueCare from "./pages/ContinueCare";
 import SharingAndContinuity from "./pages/SharingAndContinuity";
 import PublicBenefits from "./pages/PublicBenefits";
 import AssistedPlanning from "./pages/AssistedPlanning";
+import SavedSummaries from "./pages/SavedSummaries";
 
 // Import planner layout and pages
 import {
@@ -250,6 +251,7 @@ const App = () => (
                       <Route path="/relief-checkpoint" element={<ReliefCheckpoint />} />
                       <Route path="/continue-care" element={<ContinueCare />} />
                       <Route path="/sharing" element={<SharingAndContinuity />} />
+                      <Route path="/saved-summaries" element={<SavedSummaries />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
