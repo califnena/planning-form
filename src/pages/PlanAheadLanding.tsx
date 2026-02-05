@@ -336,6 +336,9 @@ export default function PlanAheadLanding() {
                 <p className="text-muted-foreground flex-1">
                   Step-by-step guidance you complete online. Save and update anytime.
                 </p>
+                <p className="text-sm text-muted-foreground">
+                  You can preview the planner before deciding. Editing is available after purchase.
+                </p>
                 <Button 
                   onClick={handleAccessDigitalPlanner}
                   className="w-full min-h-[48px]"
