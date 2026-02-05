@@ -313,7 +313,7 @@ export default function PlanAheadLanding() {
         {/* How would you like to plan? - Primary choice section */}
         <section className="max-w-3xl mx-auto mb-12">
           <h2 className="text-2xl font-serif font-semibold text-center mb-8">
-            How would you like to plan?
+           Choose How You'd Like to Plan
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
            {/* Option 1: Plan Online */}
@@ -322,16 +322,19 @@ export default function PlanAheadLanding() {
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
                   <FileText className="h-6 w-6 text-primary" />
                 </div>
-               <h3 className="text-xl font-semibold">Plan Online</h3>
+               <h3 className="text-xl font-semibold">Plan Online (Guided)</h3>
                 <p className="text-muted-foreground flex-1 leading-relaxed">
-                  Step-by-step guidance you complete online. Saved securely and easy to update.
+                 Answer simple questions step by step. Save your progress and come back anytime.
                 </p>
                 <Button 
                   onClick={handleAccessDigitalPlanner}
                   className="w-full min-h-[48px]"
                 >
-                 Plan Online
+                 Start Online Planning
                 </Button>
+               <p className="text-sm text-muted-foreground text-center">
+                 You can preview before deciding.
+               </p>
               </CardContent>
             </Card>
 
@@ -341,9 +344,9 @@ export default function PlanAheadLanding() {
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
                   <Printer className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold">Printable Planning Form</h3>
+               <h3 className="text-xl font-semibold">Print a Paper Form</h3>
                 <p className="text-muted-foreground flex-1 leading-relaxed">
-                  Download a blank form to print and fill out by hand. No computer needed after printing.
+                 Download a blank form to fill out by hand. No computer required.
                 </p>
                 <Button 
                   onClick={handleGetPrintableForm}
@@ -353,6 +356,9 @@ export default function PlanAheadLanding() {
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                   Get Printable Form
                 </Button>
+               <p className="text-sm text-muted-foreground text-center">
+                 Print as many copies as you need.
+               </p>
               </CardContent>
             </Card>
           </div>
@@ -362,13 +368,13 @@ export default function PlanAheadLanding() {
         <section className="max-w-2xl mx-auto mb-12">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="space-y-2">
-             <p className="font-semibold text-foreground mb-3">Plan Online</p>
+             <p className="font-semibold text-foreground mb-3">Plan Online (Guided)</p>
               <p className="text-muted-foreground">• Guided step by step</p>
               <p className="text-muted-foreground">• Saved securely online</p>
               <p className="text-muted-foreground">• Easy to update anytime</p>
             </div>
             <div className="space-y-2">
-              <p className="font-semibold text-foreground mb-3">Printable Form</p>
+             <p className="font-semibold text-foreground mb-3">Paper Form</p>
               <p className="text-muted-foreground">• Blank form</p>
               <p className="text-muted-foreground">• Stored at home</p>
               <p className="text-muted-foreground">• Changes require reprinting</p>
