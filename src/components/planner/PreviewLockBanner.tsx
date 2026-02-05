@@ -63,30 +63,21 @@ export function PreviewLockBanner({
               
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold text-foreground">
-                  Welcome! Take your time to explore.
+                  You're viewing a preview of the Digital Planner.
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  You can browse all sections and see what questions you'll answer. 
-                  In preview mode, fields are view-only and nothing is saved.
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  When you're ready to fill in your information, unlock your plan to enable editing and saving.
+                  This shows how planning works step by step.
+                  To enter and save your own information, full access is required.
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <div className="pt-2">
                 <Button
                   onClick={handleUnlock}
                   className="gap-2"
                 >
                   <Unlock className="h-4 w-4" />
-                  Unlock Full Access
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => navigate("/pricing")}
-                >
-                  View Options
+                  Unlock Full Planner
                 </Button>
               </div>
             </div>
