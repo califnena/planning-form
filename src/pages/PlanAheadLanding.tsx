@@ -22,6 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PrintableFormModal } from "@/components/PrintableFormModal";
 
 export default function PlanAheadLanding() {
   const navigate = useNavigate();
@@ -36,6 +37,7 @@ export default function PlanAheadLanding() {
   const [plannerMode, setPlannerMode] = useState<string | null>(null);
   const [isResuming, setIsResuming] = useState(false);
   const [showPrintableConfirmation, setShowPrintableConfirmation] = useState(false);
+  const [showPrintableModal, setShowPrintableModal] = useState(false);
   const { isLoggedIn, hasPaidAccess, hasPrintableAccess, openLockedModal, saveLastVisitedRoute } = usePreviewModeContext();
   const { isAdmin } = useAdminStatus();
 
@@ -222,12 +224,7 @@ export default function PlanAheadLanding() {
       setShowIAPModal(true);
       return;
     }
-    const successUrl = `${window.location.origin}/purchase-success?type=printable`;
 
-    if (!isLoggedIn) {
-      queueCheckoutAndLogin("EFABASIC", successUrl);
-      return;
-    }
 
     if (hasPrintableAccess) {
       // Directly download the PDF - no navigation or planner state changes
@@ -241,13 +238,29 @@ export default function PlanAheadLanding() {
       return;
     }
 
+    // Show explanation modal for users without access
+    setShowPrintableModal(true);
+  };
+
+  const handleUnlockPrintableForm = async () => {
+    const successUrl = `${window.location.origin}/purchase-success?type=printable`;
+
+    if (!isLoggedIn) {
+      setShowPrintableModal(false);
+      queueCheckoutAndLogin("EFABASIC", successUrl);
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("stripe-create-checkout", {
         body: { lookupKey: "EFABASIC", successUrl, cancelUrl: window.location.href },
       });
       if (error) throw error;
-      if (data?.url) window.location.href = data.url;
+      if (data?.url) {
+        setShowPrintableModal(false);
+        window.location.href = data.url;
+      }
     } catch (error) {
       console.error("Error:", error);
       toast({ title: "Error", description: "Unable to start checkout.", variant: "destructive" });
@@ -499,6 +512,12 @@ export default function PlanAheadLanding() {
         </DropdownMenu>
       </div>
       <StoreIAPModal open={showIAPModal} onOpenChange={setShowIAPModal} />
+      <PrintableFormModal 
+        open={showPrintableModal} 
+        onOpenChange={setShowPrintableModal}
+        onUnlock={handleUnlockPrintableForm}
+        isLoading={isLoading}
+      />
     </div>
   );
 }
