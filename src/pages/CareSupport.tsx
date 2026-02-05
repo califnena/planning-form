@@ -455,6 +455,13 @@ export default function CareSupport() {
               </h2>
               
               <div className="bg-background rounded-xl p-6 md:p-8 shadow-sm space-y-6">
+               {/* Memory & Privacy Disclosure */}
+               <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-center">
+                 <p className="text-sm text-primary">
+                   Claire remembers planning information you choose to save. Conversations are private.
+                 </p>
+               </div>
+               
                 <p className="text-muted-foreground text-center">
                   When it naturally relates to your question or situation, Claire may mention 
                   Everlasting Funeral Advisors services that could be helpful. All services are 
