@@ -85,6 +85,14 @@ import PublicBenefits from "./pages/PublicBenefits";
 import AssistedPlanning from "./pages/AssistedPlanning";
 import SavedSummaries from "./pages/SavedSummaries";
 
+// Admin pages
+import {
+  AdminDashboard,
+  AdminSummaryAudit,
+  AdminCompliance,
+  AdminAssistedRequests,
+} from "./pages/admin";
+
 // Import planner layout and pages
 import {
   PlannerLayout,
@@ -193,6 +201,10 @@ const App = () => (
                       <Route path="/purchase-success" element={<PurchaseSuccess />} />
                       <Route path="/admin" element={<AdminPanel />} />
                       <Route path="/admin/events" element={<AdminEvents />} />
+                      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                      <Route path="/admin/summary-audit" element={<AdminSummaryAudit />} />
+                      <Route path="/admin/compliance" element={<AdminCompliance />} />
+                      <Route path="/admin/assisted-requests" element={<AdminAssistedRequests />} />
                       <Route path="/events" element={<Events />} />
                       <Route path="/billing" element={<Billing />} />
                       <Route path="/care-support" element={<CareSupport />} />
