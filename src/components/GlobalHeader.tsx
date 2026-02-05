@@ -221,7 +221,7 @@ export const GlobalHeader = ({ onGenerateDocument, minimal = false }: GlobalHead
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/plans" className="flex items-center gap-2 cursor-pointer">
+                  <Link to="/billing" className="flex items-center gap-2 cursor-pointer">
                     <CreditCard className="h-4 w-4" />
                     {t("header.planBilling")}
                   </Link>
