@@ -81,11 +81,6 @@ export const SectionWillPrep = ({ data }: SectionWillPrepProps) => {
 
   const handleDownloadSummary = async () => {
     if (isPreviewMode) {
-      toast({
-        title: "Preview Mode",
-        description: "Downloads are locked. Start a trial to unlock.",
-        variant: "destructive",
-      });
       return;
     }
     
@@ -111,11 +106,6 @@ export const SectionWillPrep = ({ data }: SectionWillPrepProps) => {
 
   const handleDownloadOutline = async () => {
     if (isPreviewMode) {
-      toast({
-        title: "Preview Mode",
-        description: "Downloads are locked. Start a trial to unlock.",
-        variant: "destructive",
-      });
       return;
     }
     
@@ -141,11 +131,6 @@ export const SectionWillPrep = ({ data }: SectionWillPrepProps) => {
 
   const handleDownloadAttorneyPrep = async () => {
     if (isPreviewMode) {
-      toast({
-        title: "Preview Mode",
-        description: "Downloads are locked. Start a trial to unlock.",
-        variant: "destructive",
-      });
       return;
     }
     

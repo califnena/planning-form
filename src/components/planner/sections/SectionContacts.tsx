@@ -67,11 +67,6 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
 
   const addContact = (type: "person" | "professional" | "service_provider" = "person") => {
     if (isPreviewMode) {
-      toast({
-        title: "Preview Mode",
-        description: "Editing is locked. Start a trial to unlock.",
-        variant: "destructive",
-      });
       return;
     }
     const newContact: UnifiedContact = {
@@ -99,11 +94,6 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
 
   const handleSave = () => {
     if (isPreviewMode) {
-      toast({
-        title: "Preview Mode",
-        description: "Editing is locked. Start a trial to unlock.",
-        variant: "destructive",
-      });
       return;
     }
     toast({
@@ -114,11 +104,6 @@ export const SectionContacts = ({ data, onChange }: SectionContactsProps) => {
 
   const handleDownloadContacts = async () => {
     if (isPreviewMode) {
-      toast({
-        title: "Preview Mode",
-        description: "PDF export is locked. Start a trial to unlock.",
-        variant: "destructive",
-      });
       return;
     }
     const pdf = new jsPDF();

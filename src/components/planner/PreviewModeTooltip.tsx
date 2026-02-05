@@ -18,7 +18,7 @@ export function PreviewModeTooltip({ children, enabled = true }: PreviewModeTool
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Available with subscription. You're in Preview Mode.</p>
+          <p>You're viewing the planner. Choose a plan to save your work.</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
