@@ -562,8 +562,6 @@ export default function PlanAheadLanding() {
       <PrintableFormModal 
         open={showPrintableModal} 
         onOpenChange={setShowPrintableModal}
-        onUnlock={handleUnlockPrintableForm}
-        isLoading={isLoading}
       />
     </div>
   );
