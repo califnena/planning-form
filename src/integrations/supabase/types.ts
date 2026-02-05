@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action_type: string
+          admin_user_id: string
+          created_at: string
+          details: Json | null
+          id: string
+          page_accessed: string | null
+          target_id: string | null
+          target_table: string | null
+        }
+        Insert: {
+          action_type: string
+          admin_user_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          page_accessed?: string | null
+          target_id?: string | null
+          target_table?: string | null
+        }
+        Update: {
+          action_type?: string
+          admin_user_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          page_accessed?: string | null
+          target_id?: string | null
+          target_table?: string | null
+        }
+        Relationships: []
+      }
       app_owner: {
         Row: {
           created_at: string
@@ -259,6 +292,30 @@ export type Database = {
           },
         ]
       }
+      boundary_trigger_log: {
+        Row: {
+          boundary_type: string
+          handled: boolean | null
+          id: string
+          triggered_at: string
+          user_id: string | null
+        }
+        Insert: {
+          boundary_type: string
+          handled?: boolean | null
+          id?: string
+          triggered_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          boundary_type?: string
+          handled?: boolean | null
+          id?: string
+          triggered_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       businesses: {
         Row: {
           address: string | null
@@ -364,6 +421,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      claire_sessions: {
+        Row: {
+          ended_at: string | null
+          id: string
+          message_count: number | null
+          page_context: string | null
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          ended_at?: string | null
+          id?: string
+          message_count?: number | null
+          page_context?: string | null
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          ended_at?: string | null
+          id?: string
+          message_count?: number | null
+          page_context?: string | null
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       contacts: {
         Row: {
@@ -768,6 +852,7 @@ export type Database = {
       }
       efa_do_for_you_intake: {
         Row: {
+          admin_notes: string | null
           best_times: string | null
           created_at: string
           dob: string | null
@@ -798,6 +883,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          admin_notes?: string | null
           best_times?: string | null
           created_at?: string
           dob?: string | null
@@ -828,6 +914,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          admin_notes?: string | null
           best_times?: string | null
           created_at?: string
           dob?: string | null
@@ -1615,6 +1702,27 @@ export type Database = {
         }
         Relationships: []
       }
+      page_visits: {
+        Row: {
+          id: string
+          page_path: string
+          user_id: string | null
+          visited_at: string
+        }
+        Insert: {
+          id?: string
+          page_path: string
+          user_id?: string | null
+          visited_at?: string
+        }
+        Update: {
+          id?: string
+          page_path?: string
+          user_id?: string | null
+          visited_at?: string
+        }
+        Relationships: []
+      }
       personal_profiles: {
         Row: {
           accomplishments: string | null
@@ -1810,6 +1918,33 @@ export type Database = {
           },
         ]
       }
+      pii_attempt_log: {
+        Row: {
+          blocked: boolean | null
+          context_hint: string | null
+          detected_at: string
+          id: string
+          pattern_type: string
+          user_id: string | null
+        }
+        Insert: {
+          blocked?: boolean | null
+          context_hint?: string | null
+          detected_at?: string
+          id?: string
+          pattern_type: string
+          user_id?: string | null
+        }
+        Update: {
+          blocked?: boolean | null
+          context_hint?: string | null
+          detected_at?: string
+          id?: string
+          pattern_type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       plan_revisions: {
         Row: {
           created_at: string
@@ -1884,30 +2019,48 @@ export type Database = {
       }
       planning_summaries: {
         Row: {
+          category_tag: string | null
+          char_count: number | null
+          consent_captured: boolean | null
           created_at: string
           expires_at: string
           id: string
           last_renewed_at: string | null
+          pii_flag: boolean | null
+          policy_version: string | null
+          save_source: string | null
           summary_text: string
           title: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          category_tag?: string | null
+          char_count?: number | null
+          consent_captured?: boolean | null
           created_at?: string
           expires_at?: string
           id?: string
           last_renewed_at?: string | null
+          pii_flag?: boolean | null
+          policy_version?: string | null
+          save_source?: string | null
           summary_text: string
           title: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          category_tag?: string | null
+          char_count?: number | null
+          consent_captured?: boolean | null
           created_at?: string
           expires_at?: string
           id?: string
           last_renewed_at?: string | null
+          pii_flag?: boolean | null
+          policy_version?: string | null
+          save_source?: string | null
           summary_text?: string
           title?: string
           updated_at?: string
@@ -2710,6 +2863,36 @@ export type Database = {
           },
         ]
       }
+      user_save_restrictions: {
+        Row: {
+          created_at: string
+          disabled_at: string | null
+          disabled_by: string | null
+          reason: string | null
+          saving_disabled: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          disabled_at?: string | null
+          disabled_by?: string | null
+          reason?: string | null
+          saving_disabled?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          disabled_at?: string | null
+          disabled_by?: string | null
+          reason?: string | null
+          saving_disabled?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_settings: {
         Row: {
           active_plan_id: string | null
@@ -3052,6 +3235,14 @@ export type Database = {
       }
     }
     Functions: {
+      admin_disable_user_saving: {
+        Args: { _reason: string; _user_id: string }
+        Returns: boolean
+      }
+      admin_force_expire_summary: {
+        Args: { _summary_id: string }
+        Returns: boolean
+      }
       check_org_admin: {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
@@ -3061,6 +3252,26 @@ export type Database = {
         Returns: boolean
       }
       delete_expired_summaries: { Args: never; Returns: undefined }
+      get_admin_dashboard_stats: { Args: never; Returns: Json }
+      get_admin_summaries_metadata: {
+        Args: never
+        Returns: {
+          category_tag: string
+          char_count: number
+          consent_captured: boolean
+          created_at: string
+          expires_at: string
+          internal_user_id: string
+          pii_flag: boolean
+          policy_version: string
+          renewed_at: string
+          save_source: string
+          status: string
+          summary_id: string
+          user_id_hash: string
+        }[]
+      }
+      get_compliance_stats: { Args: never; Returns: Json }
       get_expiring_summaries: {
         Args: { _user_id: string }
         Returns: {
@@ -3125,6 +3336,10 @@ export type Database = {
           snippet: string
           title: string
         }[]
+      }
+      log_admin_page_access: {
+        Args: { _page_path: string }
+        Returns: undefined
       }
       needs_onboarding_wizard: {
         Args: { user_id_param: string }
