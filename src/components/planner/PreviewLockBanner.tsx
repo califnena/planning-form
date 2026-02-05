@@ -66,7 +66,14 @@ export function PreviewLockBanner({
                   Preview mode.
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  To save or edit your wishes, choose a plan.
+                  To save or edit your wishes:
+                </p>
+                <ul className="text-muted-foreground text-sm space-y-1 ml-1">
+                  <li>• EFABasic – one-time purchase</li>
+                  <li>• EFAPremium – includes additional support</li>
+                </ul>
+                <p className="text-muted-foreground text-sm mt-2">
+                  You can continue previewing without deciding.
                 </p>
               </div>
 
@@ -114,9 +121,14 @@ export function PreviewLockBanner({
           <p className="text-foreground font-medium text-base">
             Preview mode.
           </p>
-          <p className="text-muted-foreground text-sm mt-1">
-            To save or edit your wishes, choose a plan.
-          </p>
+          <div className="text-muted-foreground text-sm mt-1 space-y-1">
+            <p>To save or edit your wishes:</p>
+            <ul className="ml-1 space-y-0.5">
+              <li>• EFABasic – one-time purchase</li>
+              <li>• EFAPremium – includes additional support</li>
+            </ul>
+            <p className="text-xs mt-1">You can continue previewing without deciding.</p>
+          </div>
         </div>
 
         <div className="flex-shrink-0">
