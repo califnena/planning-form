@@ -61,6 +61,12 @@ const Forms = () => {
   if (hasAccess) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+        {/* Admin Debug Banner */}
+        {isAdmin && (
+          <div className="bg-amber-100 border-b border-amber-300 px-4 py-2 flex items-center justify-center gap-2 text-amber-800 text-sm">
+            <span className="font-medium">🛡️ Admin detected: paywalls bypassed.</span>
+          </div>
+        )}
         <div className="max-w-2xl mx-auto px-4 py-12 md:py-20">
           <div className="flex justify-between items-start mb-8">
             <Link to="/">

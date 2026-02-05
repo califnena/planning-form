@@ -334,6 +334,12 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Admin Debug Banner */}
+      {isLoggedIn && isAdmin && (
+        <div className="bg-amber-100 border-b border-amber-300 px-4 py-2 flex items-center justify-center gap-2 text-amber-800 text-sm">
+          <span className="font-medium">🛡️ Admin detected: paywalls bypassed.</span>
+        </div>
+      )}
       {/* Header */}
       <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
