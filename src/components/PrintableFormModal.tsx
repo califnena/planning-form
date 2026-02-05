@@ -1,6 +1,7 @@
  import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
  import { Button } from "@/components/ui/button";
  import { Printer, Loader2 } from "lucide-react";
+import { PRODUCT_DESCRIPTIONS } from "@/lib/productDescriptions";
  
  interface PrintableFormModalProps {
    open: boolean;
@@ -23,24 +24,19 @@
            </div>
            <DialogTitle className="text-center text-xl">Printable Planning Form</DialogTitle>
            <DialogDescription className="text-center text-base leading-relaxed">
-             This printable form is included with your purchase.
-             You'll be able to download it and print as many copies as you need.
+            {PRODUCT_DESCRIPTIONS.EFABASIC.shortDescription}
+            <br />
+            <span className="text-sm">You'll be able to download it and print as many copies as you need.</span>
            </DialogDescription>
          </DialogHeader>
  
          <div className="bg-muted/50 rounded-lg p-4 text-sm text-muted-foreground space-y-2">
-           <p className="flex items-start gap-2">
-             <span className="text-primary">✓</span>
-             <span>Fill out by hand at your own pace</span>
-           </p>
-           <p className="flex items-start gap-2">
-             <span className="text-primary">✓</span>
-             <span>No computer needed after printing</span>
-           </p>
-           <p className="flex items-start gap-2">
-             <span className="text-primary">✓</span>
-             <span>Print unlimited copies for your family</span>
-           </p>
+          {PRODUCT_DESCRIPTIONS.EFABASIC.benefits.map((benefit, idx) => (
+            <p key={idx} className="flex items-start gap-2">
+              <span className="text-primary">✓</span>
+              <span>{benefit}</span>
+            </p>
+          ))}
          </div>
  
          <DialogFooter className="flex flex-col gap-2 sm:flex-col">

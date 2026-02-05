@@ -1,3 +1,5 @@
+import { getProductName as getProductNameFromDescriptions } from "./productDescriptions";
+
 /**
  * Pending Checkout Pattern
  * 
@@ -57,14 +59,7 @@ export function hasPendingCheckout(): boolean {
  * Get user-friendly product name from lookup key
  */
 export function getProductName(lookupKey: string): string {
-  const names: Record<string, string> = {
-    EFABASIC: "Printable Planning Form",
-    EFAPREMIUM: "Premium Subscription",
-    EFABINDER: "Fireproof Binder",
-    EFAVIPMONTHLY: "VIP Planning Support (Monthly)",
-    EFAVIPYEAR: "VIP Planning Support (Yearly)",
-    EFADOFORU: "Do-It-For-You Service",
-    STANDARDSONG: "Custom Memorial Song"
-  };
-  return names[lookupKey] || lookupKey;
+  // STANDARDSONG is not in product descriptions, handle separately
+  if (lookupKey === "STANDARDSONG") return "Custom Memorial Song";
+  return getProductNameFromDescriptions(lookupKey);
 }
