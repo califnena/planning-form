@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { getPlanDisplayName } from "@/lib/billingPlans";
 import { isStoreIAP } from "@/lib/billingMode";
+ import { CallbackRequestDialog } from "@/components/resources/CallbackRequestDialog";
 
 interface Subscription {
   id: string;
@@ -57,6 +58,7 @@ export default function Billing() {
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [isMasterAccount, setIsMasterAccount] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
+ const [showContactDialog, setShowContactDialog] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -147,7 +149,7 @@ export default function Billing() {
   };
 
   const handleContactSupport = () => {
-    window.location.href = "mailto:info@everlastingfuneraladvisors.com?subject=Billing%20Support%20Request";
+   setShowContactDialog(true);
   };
 
   const formatCurrency = (amount: number, currency: string = "usd") => {
@@ -403,6 +405,12 @@ export default function Billing() {
           </Button>
         </CardContent>
       </Card>
-    </div>
+
+     {/* Contact Support Dialog */}
+     <CallbackRequestDialog 
+       open={showContactDialog} 
+       onOpenChange={setShowContactDialog} 
+     />
+   </div>
   );
 }

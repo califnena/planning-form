@@ -2416,6 +2416,48 @@ export type Database = {
         }
         Relationships: []
       }
+      support_requests: {
+        Row: {
+          contact_method: string
+          contact_value: string
+          created_at: string
+          id: string
+          message: string | null
+          name: string
+          preferred_time: string | null
+          request_type: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          contact_method: string
+          contact_value: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          name: string
+          preferred_time?: string | null
+          request_type?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          contact_method?: string
+          contact_value?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          name?: string
+          preferred_time?: string | null
+          request_type?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           assigned_contact_id: string | null

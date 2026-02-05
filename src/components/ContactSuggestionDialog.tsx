@@ -1,4 +1,4 @@
-import { useState } from "react";
+ import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -28,8 +28,19 @@ export const ContactSuggestionDialog = ({
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+   const [userId, setUserId] = useState<string | null>(null);
   const { toast } = useToast();
 
+   useEffect(() => {
+     const getUser = async () => {
+       if (open) {
+         const { data: { user } } = await supabase.auth.getUser();
+         setUserId(user?.id ?? null);
+       }
+     };
+     getUser();
+   }, [open]);
+ 
   const handleSubmit = async (type: "contact" | "suggestion") => {
     if (!name || !email || !message) {
       toast({
@@ -42,9 +53,17 @@ export const ContactSuggestionDialog = ({
 
     setLoading(true);
     try {
-      const { error } = await supabase.functions.invoke("send-contact-email", {
-        body: { name, email, message, type },
-      });
+       // Save to support_requests table instead of sending email
+       const { error } = await supabase
+         .from('support_requests')
+         .insert({
+           user_id: userId,
+           name: name,
+           contact_method: 'email',
+           contact_value: email,
+           message: message,
+           request_type: type,
+         });
 
       if (error) throw error;
 

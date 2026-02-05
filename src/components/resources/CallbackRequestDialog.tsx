@@ -1,4 +1,4 @@
- import { useState } from "react";
+  import { useState, useEffect } from "react";
  import {
    Dialog,
    DialogContent,
@@ -19,6 +19,7 @@
  } from "@/components/ui/select";
  import { useToast } from "@/hooks/use-toast";
  import { Phone, Mail, CheckCircle } from "lucide-react";
+  import { supabase } from "@/integrations/supabase/client";
  
  interface CallbackRequestDialogProps {
    open: boolean;
@@ -32,6 +33,7 @@
    const { toast } = useToast();
    const [isSubmitting, setIsSubmitting] = useState(false);
    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [userId, setUserId] = useState<string | null>(null);
    const [formData, setFormData] = useState({
      name: "",
      contactMethod: "phone",
@@ -40,6 +42,15 @@
      preferredTime: "",
      message: "",
    });
+ 
+    // Get current user if logged in
+    useEffect(() => {
+      const getUser = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUserId(user?.id ?? null);
+      };
+      getUser();
+    }, [open]);
  
    const handleSubmit = async (e: React.FormEvent) => {
      e.preventDefault();
@@ -75,30 +86,31 @@
      setIsSubmitting(true);
  
      try {
-       // Send to contact email endpoint
        const contactInfo = formData.contactMethod === "phone" 
          ? formData.phone 
          : formData.email;
-       
-       const emailBody = `
- Callback Request from Resources Page
- 
- Name: ${formData.name}
- Preferred Contact: ${formData.contactMethod === "phone" ? "Phone" : "Email"}
- Contact: ${contactInfo}
- Preferred Time: ${formData.preferredTime || "Not specified"}
- Message: ${formData.message || "No additional message"}
-       `.trim();
- 
-       // For now, open mailto as fallback
-       const mailtoLink = `mailto:info@everlastingfuneraladvisors.com?subject=Callback Request from ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(emailBody)}`;
-       window.open(mailtoLink, '_blank');
- 
+
+        // Save to database instead of sending email
+        const { error } = await supabase
+          .from('support_requests')
+          .insert({
+            user_id: userId,
+            name: formData.name,
+            contact_method: formData.contactMethod,
+            contact_value: contactInfo,
+            preferred_time: formData.preferredTime || null,
+            message: formData.message || null,
+            request_type: 'callback',
+          });
+
+        if (error) throw error;
+
        setIsSubmitted(true);
      } catch (error) {
+        console.error('Error submitting callback request:', error);
        toast({
          title: "Something went wrong",
-         description: "Please try again or email us directly.",
+          description: "Please try again.",
          variant: "destructive",
        });
      } finally {
