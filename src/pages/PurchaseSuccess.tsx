@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { CheckCircle2, Loader2, Download } from "lucide-react";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { CheckCircle2, Loader2, Download, Printer, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -172,77 +172,145 @@ export default function PurchaseSuccess() {
 
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-xl mx-auto">
-          <Card className="border-2">
-            <CardContent className="pt-8 pb-8 space-y-8">
-              {/* Success Icon */}
-              <div className="flex justify-center">
-                <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center">
-                  <CheckCircle2 className="h-12 w-12 text-green-600" />
+          {/* Printable Form Purchase - Dedicated Success View */}
+          {isPrintablePurchase ? (
+            <Card className="border-2">
+              <CardContent className="pt-8 pb-8 space-y-8">
+                {/* Success Icon */}
+                <div className="flex justify-center">
+                  <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center">
+                    <Printer className="h-10 w-10 text-green-600" />
+                  </div>
                 </div>
-              </div>
 
-              {/* Title */}
-              <h1 className="text-3xl font-bold text-center">Payment Complete</h1>
+                {/* Title */}
+                <h1 className="text-3xl font-serif font-bold text-center">
+                  Your printable form is ready.
+                </h1>
 
-              {/* Status Message */}
-              {loading ? (
-                <div className="flex items-center justify-center gap-3 text-muted-foreground">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  <span>Confirming your payment…</span>
-                </div>
-              ) : paid === false ? (
-                <p className="text-center text-muted-foreground">
-                  We could not confirm payment yet. If you completed payment, sign in and check your Planning Menu.
-                </p>
-              ) : paid === null && !typeParam ? (
-                <p className="text-center text-muted-foreground">
-                  We could not confirm the payment details on this page. If you completed payment, your access should still be available in your Planning Menu.
-                </p>
-              ) : (
-                <p className="text-center text-muted-foreground text-lg">
-                  Thank you. Your payment was successful.<br />
-                  Your access is now available in your Planning Menu.
-                </p>
-              )}
-
-              {/* What You Purchased Box */}
-              <div className="border-2 rounded-xl p-6 bg-muted/30">
-                <h2 className="font-semibold text-lg mb-4 text-center">You purchased</h2>
-                <ul className="space-y-2">
-                  {purchasedLines.map((line, idx) => (
-                    <li key={idx} className="flex items-center gap-3 text-lg">
-                      <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
-                      <span>{line}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-3">
-                {/* Download Printable Planner - for EFABASIC/printable purchases OR admin view access */}
-                {showPrintableDownload && (
-                  <Button 
-                    onClick={handleDownloadPrintablePlanner}
-                    size="lg"
-                    className="w-full min-h-[56px] text-lg"
-                  >
-                    <Download className="mr-2 h-5 w-5" />
-                    Download Printable Planner
-                  </Button>
+                {/* Status */}
+                {loading ? (
+                  <div className="flex items-center justify-center gap-3 text-muted-foreground">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>Confirming your payment…</span>
+                  </div>
+                ) : (
+                  <p className="text-center text-muted-foreground text-lg">
+                    Click the button below to download your form.
+                  </p>
                 )}
 
-                {/* Primary CTA - show appropriate destination based on purchase type */}
-                {isPrintablePurchase ? (
-                  <Button 
-                    onClick={() => navigate('/forms')} 
-                    size="lg"
-                    variant="outline"
-                    className="w-full min-h-[56px] text-lg"
-                  >
-                    Go to Download Page
-                  </Button>
+                {/* Download Button */}
+                <Button 
+                  onClick={handleDownloadPrintablePlanner}
+                  size="lg"
+                  className="w-full min-h-[60px] text-lg"
+                >
+                  <Download className="mr-2 h-5 w-5" />
+                  Download Printable Form
+                </Button>
+
+                {/* Print Instructions */}
+                <div className="border-2 rounded-xl p-6 bg-muted/30 space-y-4">
+                  <h2 className="font-semibold text-lg text-center">Print Instructions</h2>
+                  <ul className="space-y-3 text-muted-foreground">
+                    <li className="flex items-start gap-3">
+                      <span className="text-primary font-semibold">1.</span>
+                      <span>Open the downloaded PDF file</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-primary font-semibold">2.</span>
+                      <span>Print on standard letter-size paper (8.5" × 11")</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-primary font-semibold">3.</span>
+                      <span>Fill out by hand at your own pace</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-primary font-semibold">4.</span>
+                      <span>Print as many copies as you need for family members</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Binder Option */}
+                <div className="border border-dashed border-muted-foreground/30 rounded-xl p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="bg-muted w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0">
+                      <BookOpen className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1 space-y-3">
+                      <h3 className="font-semibold text-foreground">
+                        Want a binder to store your printed form?
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        Keep your printed wishes safe and organized in one secure place.
+                      </p>
+                      <Link to="/products/binder">
+                        <Button variant="outline" className="min-h-[44px]">
+                          Order the Planning Binder
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Note about re-downloading */}
+                <p className="text-sm text-muted-foreground text-center">
+                  You can return to the <Link to="/forms" className="underline hover:text-primary">download page</Link> anytime to download again.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            /* Standard Purchase Success View */
+            <Card className="border-2">
+              <CardContent className="pt-8 pb-8 space-y-8">
+                {/* Success Icon */}
+                <div className="flex justify-center">
+                  <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center">
+                    <CheckCircle2 className="h-12 w-12 text-green-600" />
+                  </div>
+                </div>
+
+                {/* Title */}
+                <h1 className="text-3xl font-bold text-center">Payment Complete</h1>
+
+                {/* Status Message */}
+                {loading ? (
+                  <div className="flex items-center justify-center gap-3 text-muted-foreground">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>Confirming your payment…</span>
+                  </div>
+                ) : paid === false ? (
+                  <p className="text-center text-muted-foreground">
+                    We could not confirm payment yet. If you completed payment, sign in and check your Planning Menu.
+                  </p>
+                ) : paid === null && !typeParam ? (
+                  <p className="text-center text-muted-foreground">
+                    We could not confirm the payment details on this page. If you completed payment, your access should still be available in your Planning Menu.
+                  </p>
                 ) : (
+                  <p className="text-center text-muted-foreground text-lg">
+                    Thank you. Your payment was successful.<br />
+                    Your access is now available in your Planning Menu.
+                  </p>
+                )}
+
+                {/* What You Purchased Box */}
+                <div className="border-2 rounded-xl p-6 bg-muted/30">
+                  <h2 className="font-semibold text-lg mb-4 text-center">You purchased</h2>
+                  <ul className="space-y-2">
+                    {purchasedLines.map((line, idx) => (
+                      <li key={idx} className="flex items-center gap-3 text-lg">
+                        <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                        <span>{line}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="space-y-3">
                   <Button 
                     onClick={() => navigate(planningMenuRoute)} 
                     size="lg"
@@ -250,10 +318,7 @@ export default function PurchaseSuccess() {
                   >
                     Go to My Planning Menu
                   </Button>
-                )}
 
-                {/* Secondary buttons - hide for printable-only purchases */}
-                {!isPrintablePurchase && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Button 
                       variant="outline" 
@@ -270,23 +335,23 @@ export default function PurchaseSuccess() {
                       Continue where I left off
                     </Button>
                   </div>
-                )}
 
-                <Button 
-                  variant="ghost" 
-                  onClick={() => navigate("/contact")}
-                  className="w-full"
-                >
-                  Need help? Contact us
-                </Button>
-              </div>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => navigate("/contact")}
+                    className="w-full"
+                  >
+                    Need help? Contact us
+                  </Button>
+                </div>
 
-              {/* Help Note */}
-              <p className="text-sm text-muted-foreground text-center">
-                If you do not see access right away, refresh the page or sign out and sign back in.
-              </p>
-            </CardContent>
-          </Card>
+                {/* Help Note */}
+                <p className="text-sm text-muted-foreground text-center">
+                  If you do not see access right away, refresh the page or sign out and sign back in.
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </main>
 
