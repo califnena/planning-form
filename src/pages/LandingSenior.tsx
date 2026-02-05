@@ -279,15 +279,15 @@ const LandingSenior = () => {
               <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-5">
                 <Shield className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Step-by-Step Guidance</h3>
+              <h3 className="font-semibold text-[hsl(var(--senior-text))] mb-3 text-lg">Support, Day or Night</h3>
               <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
-                Clear next steps when a death happens. No guessing.
+                Guided help for planning or after a loss.<br />Available 24/7.
               </p>
               <Link 
                 to="/vip-planning-support" 
                 className="text-primary text-sm hover:underline mt-3"
               >
-                Learn about Claire (VIP guidance)
+                Meet Claire (24/7 guidance)
               </Link>
             </div>
             
