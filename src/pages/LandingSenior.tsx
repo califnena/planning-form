@@ -173,7 +173,7 @@ const LandingSenior = () => {
             </h1>
             
             <p className="text-lg text-[hsl(var(--senior-text-soft))] max-w-xl mx-auto mb-10 leading-relaxed">
-              Create a plan in advance or get guided help after a death. Private. Simple. On your terms.
+              Private, simple guidance — on your terms.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -182,18 +182,15 @@ const LandingSenior = () => {
                 onClick={handlePrimaryCTA} 
                 className="min-h-[56px] text-lg px-10 rounded-xl shadow-md hover:shadow-lg transition-shadow"
               >
-               Plan Ahead
+               Plan Ahead Online
               </Button>
-             <p className="text-sm text-[hsl(var(--senior-text-soft))] -mt-2">
-               Create a plan at your own pace.
-             </p>
               
               <Link to="/after-death">
                 <Button 
                   size="lg" 
                   className="min-h-[56px] text-lg px-10 rounded-xl bg-[hsl(var(--senior-text))] hover:bg-[hsl(var(--senior-text))]/90 text-white"
                 >
-                  Get Help After a Loss
+                  Help After a Death
                 </Button>
               </Link>
             </div>
