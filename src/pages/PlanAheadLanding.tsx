@@ -114,16 +114,6 @@ export default function PlanAheadLanding() {
     navigate("/planner-preview");
   };
 
-  const handleStartPlanning = () => {
-    if (isLoggedIn && hasPlannerProgress) {
-      // Continue Planning → go to planner dashboard
-      navigate("/preplandashboard");
-    } else {
-      // Start Digital Planner → go to planner dashboard (it handles onboarding)
-      navigate("/preplandashboard");
-    }
-  };
-
   // Show loading state when resuming
   if (isResuming) {
     return (
@@ -456,7 +446,7 @@ export default function PlanAheadLanding() {
         <section className="max-w-2xl mx-auto text-center mb-12">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
-              onClick={handleStartPlanning}
+              onClick={handleAccessDigitalPlanner}
               size="lg"
               className="min-h-[56px] text-lg px-8"
             >
