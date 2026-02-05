@@ -88,6 +88,9 @@ export const CARESupportNudge = ({ onTalkToClaire }: CARESupportNudgeProps) => {
                 Not right now
               </Button>
             </div>
+            <p className="text-[10px] text-muted-foreground/60 mt-1">
+              Claire does not store personal details.
+            </p>
           </div>
         </div>
       </div>

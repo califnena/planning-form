@@ -29,6 +29,9 @@
              Do it for me
            </Link>
          </div>
+          <p className="text-xs text-muted-foreground/70 mt-2">
+            Privacy: Claire does not store personal details or remember conversations unless you save a summary.
+          </p>
        </div>
      </div>
    );
