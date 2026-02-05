@@ -7,7 +7,8 @@
  import { Button } from "@/components/ui/button";
  import { Textarea } from "@/components/ui/textarea";
  import { useToast } from "@/hooks/use-toast";
- import { Loader2, FileText, Trash2, Edit2, Eye, ArrowLeft, Save, X } from "lucide-react";
+import { Loader2, FileText, Trash2, Edit2, Eye, ArrowLeft, Save, X, Clock, RefreshCw, AlertTriangle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
  import {
    AlertDialog,
    AlertDialogAction,
@@ -31,6 +32,8 @@
    summary_text: string;
    created_at: string;
    updated_at: string;
+  expires_at: string;
+  last_renewed_at: string | null;
  }
  
  export default function SavedSummaries() {
@@ -43,6 +46,9 @@
    const [editSummary, setEditSummary] = useState<PlanningSummary | null>(null);
    const [editText, setEditText] = useState("");
    const [isSaving, setIsSaving] = useState(false);
+  const [renewSummary, setRenewSummary] = useState<PlanningSummary | null>(null);
+  const [renewEditText, setRenewEditText] = useState("");
+  const [isRenewing, setIsRenewing] = useState(false);
  
    useEffect(() => {
      loadSummaries();
@@ -60,6 +66,7 @@
          .from("planning_summaries")
          .select("*")
          .eq("user_id", user.id)
+        .gt("expires_at", new Date().toISOString())
          .order("created_at", { ascending: false });
  
        if (error) throw error;
@@ -143,6 +150,68 @@
      }
    };
  
+  const getDaysUntilExpiry = (expiresAt: string) => {
+    const now = new Date();
+    const expiry = new Date(expiresAt);
+    const diffTime = expiry.getTime() - now.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  const getExpiryStatus = (expiresAt: string) => {
+    const days = getDaysUntilExpiry(expiresAt);
+    if (days <= 0) return { status: "expired", label: "Expired", variant: "destructive" as const };
+    if (days <= 14) return { status: "expiring", label: `Expires in ${days} day${days === 1 ? "" : "s"}`, variant: "secondary" as const };
+    return { status: "active", label: `Expires in ${days} days`, variant: "outline" as const };
+  };
+
+  const handleRenew = (summary: PlanningSummary) => {
+    setRenewSummary(summary);
+    setRenewEditText(summary.summary_text);
+  };
+
+  const handleConfirmRenew = async () => {
+    if (!renewSummary || renewEditText.length > 750) return;
+
+    setIsRenewing(true);
+    try {
+      const newExpiresAt = new Date();
+      newExpiresAt.setDate(newExpiresAt.getDate() + 90);
+
+      const { error } = await supabase
+        .from("planning_summaries")
+        .update({ 
+          summary_text: renewEditText,
+          expires_at: newExpiresAt.toISOString(),
+          last_renewed_at: new Date().toISOString()
+        })
+        .eq("id", renewSummary.id);
+
+      if (error) throw error;
+
+      setSummaries(prev =>
+        prev.map(s =>
+          s.id === renewSummary.id 
+            ? { ...s, summary_text: renewEditText, expires_at: newExpiresAt.toISOString(), last_renewed_at: new Date().toISOString() } 
+            : s
+        )
+      );
+      toast({
+        title: "Summary renewed",
+        description: "Your summary has been renewed for another 90 days.",
+      });
+      setRenewSummary(null);
+    } catch (error) {
+      console.error("Error renewing summary:", error);
+      toast({
+        title: "Error",
+        description: "Failed to renew summary.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRenewing(false);
+    }
+  };
+
    const formatDate = (dateString: string) => {
      return new Date(dateString).toLocaleDateString("en-US", {
        year: "numeric",
@@ -205,18 +274,45 @@
          ) : (
            <div className="space-y-4">
              {summaries.map((summary) => (
-               <Card key={summary.id}>
+               <Card key={summary.id} className={getExpiryStatus(summary.expires_at).status === "expiring" ? "border-amber-500/50" : ""}>
                  <CardHeader className="pb-3">
                    <div className="flex items-start justify-between">
                      <div>
-                       <CardTitle className="text-lg">{summary.title}</CardTitle>
+                       <div className="flex items-center gap-2 flex-wrap">
+                         <CardTitle className="text-lg">{summary.title}</CardTitle>
+                         {getExpiryStatus(summary.expires_at).status === "expiring" && (
+                           <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 text-xs">
+                             <AlertTriangle className="h-3 w-3 mr-1" />
+                             {getExpiryStatus(summary.expires_at).label}
+                           </Badge>
+                         )}
+                       </div>
                        <CardDescription>
-                         Saved on {formatDate(summary.created_at)}
+                         Saved on {formatDate(summary.created_at)} • Expires {formatDate(summary.expires_at)}
                        </CardDescription>
                      </div>
                    </div>
                  </CardHeader>
                  <CardContent className="space-y-4">
+                   {getExpiryStatus(summary.expires_at).status === "expiring" && (
+                     <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                       <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                       <div className="text-sm">
+                         <p className="text-amber-800 dark:text-amber-300 font-medium">
+                           This summary will expire soon. Would you like to keep it?
+                         </p>
+                         <Button
+                           variant="link"
+                           size="sm"
+                           onClick={() => handleRenew(summary)}
+                           className="h-auto p-0 text-amber-700 dark:text-amber-400 hover:text-amber-900"
+                         >
+                           <RefreshCw className="h-3 w-3 mr-1" />
+                           Renew for 90 days
+                         </Button>
+                       </div>
+                     </div>
+                   )}
                    <p className="text-sm text-muted-foreground line-clamp-3">
                      {summary.summary_text}
                    </p>
@@ -236,6 +332,14 @@
                      >
                        <Edit2 className="h-4 w-4 mr-1" />
                        Edit
+                     </Button>
+                     <Button
+                       variant="outline"
+                       size="sm"
+                       onClick={() => handleRenew(summary)}
+                     >
+                       <RefreshCw className="h-4 w-4 mr-1" />
+                       Renew
                      </Button>
                      <Button
                        variant="outline"
@@ -339,6 +443,56 @@
            </AlertDialogFooter>
          </AlertDialogContent>
        </AlertDialog>
+
+       {/* Renew Confirmation Dialog */}
+       <Dialog open={!!renewSummary} onOpenChange={() => setRenewSummary(null)}>
+         <DialogContent className="max-w-lg">
+           <DialogHeader>
+             <DialogTitle className="flex items-center gap-2">
+               <RefreshCw className="h-5 w-5" />
+               Renew Summary
+             </DialogTitle>
+           </DialogHeader>
+           <div className="space-y-4">
+             <p className="text-sm text-muted-foreground">
+               I can keep this summary for another 90 days. I will not store personal details. Do you want to renew it?
+             </p>
+             
+             <div className="space-y-2">
+               <label className="text-sm font-medium">Edit before renewing (optional):</label>
+               <Textarea
+                 value={renewEditText}
+                 onChange={(e) => setRenewEditText(e.target.value)}
+                 className="min-h-[120px]"
+                 maxLength={750}
+               />
+               <p className={`text-xs ${renewEditText.length > 750 ? "text-destructive" : "text-muted-foreground"}`}>
+                 {renewEditText.length}/750 characters
+               </p>
+             </div>
+             
+             <div className="flex gap-2 justify-end">
+               <Button
+                 variant="outline"
+                 onClick={() => setRenewSummary(null)}
+               >
+                 Cancel
+               </Button>
+               <Button
+                 onClick={handleConfirmRenew}
+                 disabled={isRenewing || renewEditText.length > 750 || !renewEditText.trim()}
+               >
+                 {isRenewing ? (
+                   <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                 ) : (
+                   <RefreshCw className="h-4 w-4 mr-1" />
+                 )}
+                 Renew for 90 days
+               </Button>
+             </div>
+           </div>
+         </DialogContent>
+       </Dialog>
      </div>
    );
  }

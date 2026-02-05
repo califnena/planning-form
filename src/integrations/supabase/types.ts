@@ -1885,7 +1885,9 @@ export type Database = {
       planning_summaries: {
         Row: {
           created_at: string
+          expires_at: string
           id: string
+          last_renewed_at: string | null
           summary_text: string
           title: string
           updated_at: string
@@ -1893,7 +1895,9 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          expires_at?: string
           id?: string
+          last_renewed_at?: string | null
           summary_text: string
           title: string
           updated_at?: string
@@ -1901,7 +1905,9 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          expires_at?: string
           id?: string
+          last_renewed_at?: string | null
           summary_text?: string
           title?: string
           updated_at?: string
@@ -3054,6 +3060,17 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
+      delete_expired_summaries: { Args: never; Returns: undefined }
+      get_expiring_summaries: {
+        Args: { _user_id: string }
+        Returns: {
+          days_until_expiry: number
+          expires_at: string
+          id: string
+          summary_text: string
+          title: string
+        }[]
+      }
       get_user_org_role: {
         Args: { _org_id: string; _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -3111,6 +3128,10 @@ export type Database = {
       }
       needs_onboarding_wizard: {
         Args: { user_id_param: string }
+        Returns: boolean
+      }
+      renew_summary: {
+        Args: { _summary_id: string; _user_id: string }
         Returns: boolean
       }
     }
