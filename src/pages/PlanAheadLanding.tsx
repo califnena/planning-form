@@ -358,6 +358,26 @@ export default function PlanAheadLanding() {
           </div>
         </section>
 
+        {/* Quick Comparison */}
+        <section className="max-w-2xl mx-auto mb-12">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="space-y-2">
+              <p className="font-semibold text-foreground mb-3">Digital Planner</p>
+              <p className="text-muted-foreground">• Guided step by step</p>
+              <p className="text-muted-foreground">• Saved securely online</p>
+              <p className="text-muted-foreground">• Easy to update anytime</p>
+            </div>
+            <div className="space-y-2">
+              <p className="font-semibold text-foreground mb-3">Printable Form</p>
+              <p className="text-muted-foreground">• Blank form</p>
+              <p className="text-muted-foreground">• Stored at home</p>
+              <p className="text-muted-foreground">• Changes require reprinting</p>
+            </div>
+          </div>
+          <p className="text-center text-muted-foreground mt-6 text-base">
+            Both options are valid. Choose what feels right.
+          </p>
+        </section>
 
         {/* Section 4: Reassurance */}
         <section className="max-w-3xl mx-auto mb-16">
