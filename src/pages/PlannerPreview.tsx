@@ -158,10 +158,10 @@ export default function PlannerPreview() {
               <div className="text-center space-y-2">
                 <Sparkles className="h-8 w-8 text-primary mx-auto" />
                 <h2 className="text-2xl font-serif font-semibold">
-                  Ready to save your information?
+                  Ready for Full Access?
                 </h2>
                 <p className="text-muted-foreground">
-                  Unlock full access to:
+                  Full Access lets you:
                 </p>
               </div>
 

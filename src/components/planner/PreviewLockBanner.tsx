@@ -77,7 +77,7 @@ export function PreviewLockBanner({
                   className="gap-2"
                 >
                   <Unlock className="h-4 w-4" />
-                  Unlock Full Planner
+                  Get Full Access
                 </Button>
               </div>
             </div>
@@ -98,7 +98,7 @@ export function PreviewLockBanner({
           onClick={handleUnlock}
           className="h-auto p-0 text-primary font-medium"
         >
-          Unlock
+          Get Full Access
         </Button>
       </div>
     );
@@ -127,7 +127,7 @@ export function PreviewLockBanner({
             className="shadow-sm"
           >
             <Unlock className="h-4 w-4 mr-1.5" />
-            Unlock
+            Get Full Access
           </Button>
         </div>
       </div>
@@ -157,7 +157,7 @@ export function InlineLockedNotice() {
         onClick={() => navigate("/pricing")}
         className="text-primary hover:underline font-medium"
       >
-        Unlock to edit
+        Get Full Access
       </button>
     </div>
   );

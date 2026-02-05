@@ -171,7 +171,7 @@ const Landing = () => {
           {/* Primary actions - clean and obvious */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
             <Button size="lg" onClick={handlePrimaryCTA} className="min-h-[48px] text-lg px-8">
-              {isLoggedIn && hasPlannerProgress ? "Continue Planning" : "Access Digital Planner"}
+              Access Digital Planner
             </Button>
             <Link to="/after-death">
               <Button size="lg" variant="outline" className="min-h-[48px] text-lg px-8">

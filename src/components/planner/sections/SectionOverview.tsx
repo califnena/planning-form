@@ -159,7 +159,7 @@ export const SectionOverview = ({ onNavigateToSection }: SectionOverviewProps) =
         size="lg" 
         className="w-full gap-2"
       >
-        Continue Planning
+        Access Digital Planner
         <ArrowRight className="h-4 w-4" />
       </Button>
 

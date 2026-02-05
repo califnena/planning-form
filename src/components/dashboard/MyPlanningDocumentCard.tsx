@@ -25,7 +25,7 @@ export const MyPlanningDocumentCard = ({ hasData = false }: MyPlanningDocumentCa
             Your planning document will appear here once you start.
           </p>
           <Button onClick={() => navigate("/preplandashboard")}>
-            Start Planning
+            Access Digital Planner
             <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
         </CardContent>
@@ -50,7 +50,7 @@ export const MyPlanningDocumentCard = ({ hasData = false }: MyPlanningDocumentCa
           onClick={() => navigate("/preplandashboard")} 
           className="flex-1 gap-2"
         >
-          Continue Planning
+          Access Digital Planner
           <ArrowRight className="h-4 w-4" />
         </Button>
         <Button 

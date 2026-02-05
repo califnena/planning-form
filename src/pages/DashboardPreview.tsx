@@ -91,7 +91,7 @@ export default function DashboardPreview() {
                   <div className="flex flex-wrap gap-2">
                     <Button onClick={() => handleLoginRequired("/preplansteps")} variant="outline" className="gap-2 opacity-70">
                       <Lock className="h-4 w-4" />
-                      Begin Planning
+                      Access Digital Planner
                       <span className="text-xs text-muted-foreground">(Login required)</span>
                     </Button>
                     <Button onClick={() => handleLoginRequired("/preplansteps")} variant="outline" className="gap-2 opacity-70">

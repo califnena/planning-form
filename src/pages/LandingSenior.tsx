@@ -180,7 +180,7 @@ const LandingSenior = () => {
                 onClick={handlePrimaryCTA} 
                 className="min-h-[56px] text-lg px-10 rounded-xl shadow-md hover:shadow-lg transition-shadow"
               >
-                Continue My Plan
+                Access Digital Planner
               </Button>
               
               <Link to="/after-death">
