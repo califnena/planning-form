@@ -1,14 +1,19 @@
 import { Lock, Unlock } from "lucide-react";
+import { Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLockState } from "@/contexts/PreviewModeContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { isEmotionalStageRoute } from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface PreviewLockBannerProps {
   /** Optional custom message */
   message?: string;
   /** Whether to show as compact inline notice */
   compact?: boolean;
+  /** Whether to show as a prominent welcome banner for preview mode */
+  prominent?: boolean;
 }
 
 /**
@@ -19,8 +24,9 @@ interface PreviewLockBannerProps {
  * Suppressed on emotional stage routes.
  */
 export function PreviewLockBanner({ 
-  message = "Preview mode. To make changes or save updates, unlock your plan.",
-  compact = false 
+  message = "You're exploring the planner in preview mode.",
+  compact = false,
+  prominent = false
 }: PreviewLockBannerProps) {
   const { isLocked, isLoading } = useLockState();
   const navigate = useNavigate();
@@ -36,10 +42,64 @@ export function PreviewLockBanner({
     navigate("/pricing");
   };
 
+  // Prominent welcome banner for preview mode
+  if (prominent) {
+    return (
+      <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/30 mb-6">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Eye className="h-6 w-6 text-primary" />
+              </div>
+            </div>
+            
+            <div className="flex-1 space-y-3">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs">
+                  Preview Mode
+                </Badge>
+              </div>
+              
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold text-foreground">
+                  Welcome! Take your time to explore.
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  You can browse all sections and see what questions you'll answer. 
+                  In preview mode, fields are view-only and nothing is saved.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  When you're ready to fill in your information, unlock your plan to enable editing and saving.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <Button
+                  onClick={handleUnlock}
+                  className="gap-2"
+                >
+                  <Unlock className="h-4 w-4" />
+                  Unlock Full Access
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate("/pricing")}
+                >
+                  View Options
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (compact) {
     return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-2 rounded-md">
-        <Lock className="h-3.5 w-3.5 flex-shrink-0" />
+      <div className="flex items-center gap-2 text-sm text-muted-foreground bg-primary/5 border border-primary/20 px-3 py-2 rounded-md">
+        <Eye className="h-3.5 w-3.5 flex-shrink-0 text-primary" />
         <span className="flex-1">{message}</span>
         <Button
           variant="link"
@@ -54,18 +114,18 @@ export function PreviewLockBanner({
   }
 
   return (
-    <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6">
+    <div className="bg-gradient-to-r from-primary/5 to-secondary/20 border border-primary/20 rounded-lg p-4 mb-6">
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0 mt-0.5">
-          <Lock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+          <Eye className="h-5 w-5 text-primary" />
         </div>
         
         <div className="flex-1 min-w-0">
-          <p className="text-amber-900 dark:text-amber-100 font-medium text-base">
-            {message}
+          <p className="text-foreground font-medium text-base">
+            Preview Mode — Explore freely, no changes are saved.
           </p>
-          <p className="text-amber-700 dark:text-amber-300 text-sm mt-1">
-            Your information stays private. You can unlock anytime.
+          <p className="text-muted-foreground text-sm mt-1">
+            Ready to save your information? Unlock to enable editing.
           </p>
         </div>
 
@@ -73,10 +133,10 @@ export function PreviewLockBanner({
           <Button
             onClick={handleUnlock}
             size="sm"
-            className="bg-amber-600 hover:bg-amber-700 text-white shadow-sm"
+            className="shadow-sm"
           >
             <Unlock className="h-4 w-4 mr-1.5" />
-            Unlock my plan
+            Unlock
           </Button>
         </div>
       </div>
@@ -99,9 +159,9 @@ export function InlineLockedNotice() {
   }
 
   return (
-    <div className="flex items-center gap-2 text-xs text-muted-foreground py-1">
-      <Lock className="h-3 w-3" />
-      <span>Read-only</span>
+    <div className="flex items-center gap-2 text-xs text-muted-foreground py-1 px-2 bg-muted/50 rounded">
+      <Eye className="h-3 w-3 text-primary" />
+      <span>Preview mode — view only</span>
       <button
         onClick={() => navigate("/pricing")}
         className="text-primary hover:underline font-medium"

@@ -89,14 +89,14 @@ export default function PlannerPreview() {
           <Eye className="h-4 w-4" />
           <AlertDescription className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <span className="font-medium">Preview mode.</span>{" "}
+              <span className="font-medium">Preview Mode</span>{" "}
               <span className="text-muted-foreground">
-                To save your information, sign in and choose a planning option.
+                Explore freely — fields are view-only and nothing is saved.
               </span>
             </div>
             <div className="flex gap-2 flex-shrink-0">
               <Button size="sm" onClick={handleSignIn}>
-                Sign in to Save
+                Sign In to Unlock
               </Button>
               <Button size="sm" variant="outline" onClick={handleViewPricing}>
                 View Options
@@ -112,10 +112,10 @@ export default function PlannerPreview() {
             Preview Mode
           </Badge>
           <h1 className="text-3xl md:text-4xl font-serif font-bold">
-            See What You'll Be Planning
+            Explore the Digital Planner
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            This is a preview of the step-by-step planner. Browse the sections below to see what questions you'll answer. Nothing is saved in preview mode.
+            Browse the sections below to see what you'll be able to record. In preview mode, all fields are view-only and nothing is saved.
           </p>
         </section>
 
@@ -158,10 +158,10 @@ export default function PlannerPreview() {
               <div className="text-center space-y-2">
                 <Sparkles className="h-8 w-8 text-primary mx-auto" />
                 <h2 className="text-2xl font-serif font-semibold">
-                  When you're ready to save
+                  Ready to save your information?
                 </h2>
                 <p className="text-muted-foreground">
-                  The full planner lets you:
+                  Unlock full access to:
                 </p>
               </div>
 
