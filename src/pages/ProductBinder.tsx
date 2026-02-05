@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, ShoppingCart, Loader2 } from "lucide-react";
-import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
+import { BookOpen, ShoppingCart, Loader2, ArrowLeft } from "lucide-react";
 import { launchCheckout } from "@/lib/checkoutLauncher";
+import { TextSizeToggle } from "@/components/TextSizeToggle";
 import binderImage from "@/assets/fireproof-binder.png";
 
 export default function ProductBinder() {
@@ -22,8 +22,19 @@ export default function ProductBinder() {
   };
 
   return (
-    <AuthenticatedLayout>
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Navigation */}
+        <div className="flex justify-between items-start mb-8">
+          <Link to="/">
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
+          </Link>
+          <TextSizeToggle />
+        </div>
+
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center">
@@ -90,6 +101,6 @@ export default function ProductBinder() {
           </Card>
         </div>
       </div>
-    </AuthenticatedLayout>
+    </div>
   );
 }

@@ -137,20 +137,16 @@ const Forms = () => {
                 </div>
                 <div className="flex-1 space-y-3">
                   <h2 className="text-lg font-semibold text-foreground">
-                    Order the EFABINDER (Optional)
+                    Want a binder to store your printed form?
                   </h2>
                   <p className="text-muted-foreground">
                     A fireproof binder to store your printed wishes safely. Keep everything organized in one secure place.
                   </p>
-                  <a 
-                    href="https://buy.stripe.com/6oE7sLgnX1Cb02P7sN7bW00" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
+                  <Link to="/products/binder">
                     <Button variant="outline" className="min-h-[48px]">
-                      Learn More & Order
+                      View Binder Option
                     </Button>
-                  </a>
+                  </Link>
                 </div>
               </div>
             </Card>
@@ -232,6 +228,19 @@ const Forms = () => {
                 <p className="text-sm text-muted-foreground mt-3">
                   Secure checkout. Instant download after purchase.
                 </p>
+              </div>
+
+              {/* Binder Option for non-purchasers too */}
+              <div className="pt-6 border-t border-border mt-6">
+                <p className="text-muted-foreground mb-3">
+                  Want a binder to store your printed form?
+                </p>
+                <Link to="/products/binder">
+                  <Button variant="outline" className="min-h-[48px]">
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    View Binder Option
+                  </Button>
+                </Link>
               </div>
             </div>
           </Card>
