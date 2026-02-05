@@ -32,7 +32,8 @@ const routeLabels: Record<string, string> = {
   "/legal-forms": "Planning Forms",
   "/legal-documents": "Printable Documents",
   "/events": "Events",
-  "/vendors": "Vendors",
+  "/vendors": "Trusted Providers",
+  "/trusted-providers": "Trusted Providers",
   "/travel-protection": "Travel Protection",
 };
 
