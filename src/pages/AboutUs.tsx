@@ -1,11 +1,15 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "react-router-dom";
+ import { useState } from "react";
+ import { Button } from "@/components/ui/button";
+ import { Card, CardContent } from "@/components/ui/card";
+ import { Link } from "react-router-dom";
 import { ArrowLeft, Heart, Package, Users } from "lucide-react";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { AppFooter } from "@/components/AppFooter";
+ import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
 
 const AboutUs = () => {
+   const [showContactDialog, setShowContactDialog] = useState(false);
+ 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
       <GlobalHeader />
@@ -144,12 +148,12 @@ const AboutUs = () => {
           <div className="text-muted-foreground space-y-2">
             <p className="font-medium">Everlasting Funeral Advisors</p>
             <p>(323) 863-5804</p>
-            <a
-              href="mailto:info@everlastingfuneraladvisors.com"
-              className="text-primary hover:underline block"
+           <button
+             onClick={() => setShowContactDialog(true)}
+             className="text-primary hover:underline block mx-auto"
             >
-              info@everlastingfuneraladvisors.com
-            </a>
+             Send a Message
+           </button>
             <a
               href="https://everlastingfuneraladvisors.com/"
               target="_blank"
@@ -160,6 +164,12 @@ const AboutUs = () => {
             </a>
           </div>
         </div>
+
+       {/* Contact Dialog */}
+       <ContactSuggestionDialog 
+         open={showContactDialog} 
+         onOpenChange={setShowContactDialog} 
+       />
       </main>
       <AppFooter />
     </div>
