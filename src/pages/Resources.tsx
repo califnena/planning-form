@@ -57,8 +57,8 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { TextSizeToggle } from '@/components/TextSizeToggle';
 import { 
-  ExternalLink, FileText, Download, Home, Eye, 
-  Calculator, ChevronRight, CheckSquare, BookOpen, Info, HelpCircle, Mail
+  ExternalLink, FileText, Download, Home, Eye, Calculator,
+  ChevronRight, CheckSquare, BookOpen, Info, HelpCircle, Mail
 } from 'lucide-react';
 import { GlobalHeader } from '@/components/GlobalHeader';
 import { AppFooter } from '@/components/AppFooter';
@@ -163,9 +163,6 @@ const Resources = () => {
         }
         if (activeSubItem === 'travel-protection') {
           return renderEducation();
-        }
-        if (activeSubItem === 'cost-estimator') {
-          return renderToolsCalculators();
         }
         return renderStepByStepOverview();
       case 'free-checklists':
@@ -481,30 +478,6 @@ const Resources = () => {
           </CardContent>
         </Card>
 
-        <Link to="/resources/cost-estimator" className="block">
-          <Card className="h-full hover:border-primary/50 transition-colors cursor-pointer">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                  <Calculator className="h-6 w-6 text-amber-700" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg">Cost Estimator</CardTitle>
-                  <CardDescription>Get a general idea of funeral costs</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Enter your preferences to see estimated costs for different funeral options.
-              </p>
-              <Button variant="outline" className="w-full min-h-[48px]">
-                Open Cost Estimator
-                <ChevronRight className="h-4 w-4 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-        </Link>
       </div>
     </div>
   );
@@ -1034,121 +1007,6 @@ const Resources = () => {
         </Card>
       )}
 
-    </div>
-  );
-
-  // Tools & Calculators Section
-  const renderToolsCalculators = () => (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Tools & Calculators</h1>
-        <p className="text-lg text-muted-foreground">
-          Practical tools to help with planning decisions.
-        </p>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <Link to="/resources/cost-estimator" className="block">
-          <Card className="h-full hover:border-primary/50 transition-colors cursor-pointer">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                  <Calculator className="h-6 w-6 text-amber-700" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg">Cost Estimator</CardTitle>
-                  <CardDescription>Get a general idea of funeral costs</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Enter your preferences to see estimated costs for different funeral options.
-              </p>
-              <Button className="w-full min-h-[48px]">
-                Open Cost Estimator
-                <ChevronRight className="h-4 w-4 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-        </Link>
-        
-        <Link to="/dashboard" className="block">
-          <Card className="h-full hover:border-primary/50 transition-colors cursor-pointer">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Eye className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg">Planning Progress</CardTitle>
-                  <CardDescription>Track what you've completed</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                See which sections you've completed and what still needs attention.
-              </p>
-              <Button variant="outline" className="w-full min-h-[48px]">
-                View My Dashboard
-                <ChevronRight className="h-4 w-4 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-        </Link>
-        
-        <Link to="/forms" className="block">
-          <Card className="h-full hover:border-primary/50 transition-colors cursor-pointer">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
-                  <CheckSquare className="h-6 w-6 text-green-700" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg">Document Checklist</CardTitle>
-                  <CardDescription>See what documents you need</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                A personalized list of documents and forms to gather.
-              </p>
-              <Button variant="outline" className="w-full min-h-[48px]">
-                View Checklist
-                <ChevronRight className="h-4 w-4 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Card className="h-full border-dashed opacity-75">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
-                <Info className="h-6 w-6 text-muted-foreground" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <CardTitle className="text-lg text-muted-foreground">Decision Helper</CardTitle>
-                  <span className="text-xs text-muted-foreground font-normal">(Coming Soon)</span>
-                </div>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                We're still working on this section. It will be available soon.
-              </p>
-              <Button variant="outline" className="w-full min-h-[48px]" disabled>
-                Coming Soon
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 
