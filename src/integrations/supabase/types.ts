@@ -2621,6 +2621,48 @@ export type Database = {
         }
         Relationships: []
       }
+      summary_events: {
+        Row: {
+          event_id: string
+          event_timestamp: string | null
+          event_type: string | null
+          summary_id: string | null
+          triggered_by: string | null
+          user_id: string | null
+        }
+        Insert: {
+          event_id?: string
+          event_timestamp?: string | null
+          event_type?: string | null
+          summary_id?: string | null
+          triggered_by?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          event_id?: string
+          event_timestamp?: string | null
+          event_type?: string | null
+          summary_id?: string | null
+          triggered_by?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "summary_events_summary_id_fkey"
+            columns: ["summary_id"]
+            isOneToOne: false
+            referencedRelation: "planning_summaries"
+            referencedColumns: ["summary_id"]
+          },
+          {
+            foreignKeyName: "summary_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_public"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       support_requests: {
         Row: {
           contact_method: string
