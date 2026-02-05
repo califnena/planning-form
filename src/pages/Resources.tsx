@@ -277,6 +277,66 @@ const Resources = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Printable Documents Section */}
+      <div className="pt-8 border-t border-border">
+        <div className="mb-6">
+          <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">Printable Documents</h2>
+          <p className="text-muted-foreground">
+            Download and print. No computer required after printing.
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Printable Planning Form */}
+          <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate('/forms')}>
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
+                  <Download className="h-6 w-6 text-green-700" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Printable Planning Form</CardTitle>
+                  <CardDescription>Fill by hand</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                A form you can print and fill out by hand at your own pace.
+              </p>
+              <Button variant="outline" className="w-full min-h-[48px]">
+                Get Printable Form
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Printable After-Death Checklist */}
+          <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={handleDownloadAfterDeathChecklist}>
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                  <Download className="h-6 w-6 text-blue-700" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Printable After-Death Checklist</CardTitle>
+                  <CardDescription>What to do after a loss</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                A checklist you can print to guide you through the days after someone passes.
+              </p>
+              <Button variant="outline" className="w-full min-h-[48px]" disabled={isGeneratingAfterDeath}>
+                {isGeneratingAfterDeath ? 'Generating...' : 'Download Checklist'}
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 
