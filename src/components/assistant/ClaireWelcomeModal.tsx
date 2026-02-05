@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Heart, HelpCircle } from "lucide-react";
+import { Heart, HelpCircle, Mic } from "lucide-react";
 import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -36,6 +36,19 @@ export function ClaireWelcomeModal({ isOpen, onClose }: ClaireWelcomeModalProps)
             </p>
             <p className="text-muted-foreground">
               I'm available 24/7, wherever you are. No rush. No pressure.
+            </p>
+          </div>
+
+          {/* Voice tip */}
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Mic className="h-4 w-4 text-primary" />
+              <p className="text-sm font-medium text-foreground">
+                You can talk to Claire
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Click the mic to speak. You can also type if you prefer.
             </p>
           </div>
 

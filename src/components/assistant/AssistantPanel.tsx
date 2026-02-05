@@ -493,9 +493,19 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                     <p className="mt-2">I'm here for planning ahead — or after a loss.</p>
                     <p className="mt-1">How can I help today?</p>
                   </div>
-                 
-                 {/* Memory disclosure */}
-                 <div className="bg-muted/50 rounded-lg p-3 text-center">
+                  
+                  {/* Voice tip */}
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-center">
+                    <p className="text-sm text-foreground">
+                      You can talk to Claire. Click the mic to speak.
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      You can also type if you prefer.
+                    </p>
+                  </div>
+                  
+                  {/* Memory disclosure */}
+                  <div className="bg-muted/50 rounded-lg p-3 text-center">
                    <p className="text-xs text-muted-foreground">
                      Claire remembers planning information you choose to save. Conversations are private.
                    </p>
