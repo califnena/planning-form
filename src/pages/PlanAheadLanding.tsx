@@ -332,9 +332,15 @@ export default function PlanAheadLanding() {
                 >
                  Start Online Planning
                 </Button>
-               <p className="text-sm text-muted-foreground text-center">
-                 You can preview before deciding.
-               </p>
+               {isLoggedIn && isAdmin ? (
+                 <p className="text-sm text-primary text-center font-medium">
+                   Admin Access Enabled
+                 </p>
+               ) : (
+                 <p className="text-sm text-muted-foreground text-center">
+                   You can preview before deciding.
+                 </p>
+               )}
               </CardContent>
             </Card>
 
@@ -356,9 +362,15 @@ export default function PlanAheadLanding() {
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                   Get Printable Form
                 </Button>
-               <p className="text-sm text-muted-foreground text-center">
-                 Print as many copies as you need.
-               </p>
+               {isLoggedIn && isAdmin ? (
+                 <p className="text-sm text-primary text-center font-medium">
+                   Admin Access Enabled
+                 </p>
+               ) : (
+                 <p className="text-sm text-muted-foreground text-center">
+                   Print as many copies as you need.
+                 </p>
+               )}
               </CardContent>
             </Card>
           </div>

@@ -595,22 +595,29 @@ const Pricing = () => {
                       ))}
                     </ul>
                     
-                    <Button 
-                      className="w-full" 
-                      size="lg"
-                      variant={plan.featured ? "default" : "outline"}
-                      onClick={() => handleChoosePlan(plan)}
-                      disabled={isBuying || loadingPrices}
-                    >
-                      {isBuying ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Loading...
-                        </>
-                      ) : (
-                        plan.buttonLabel
-                      )}
-                    </Button>
+                   {/* Admin Access Label */}
+                   {isLoggedIn && isAdmin ? (
+                     <div className="w-full py-3 px-4 bg-muted/50 border border-border rounded-md text-center">
+                       <span className="text-sm font-medium text-muted-foreground">Admin Access Enabled</span>
+                     </div>
+                   ) : (
+                     <Button 
+                       className="w-full" 
+                       size="lg"
+                       variant={plan.featured ? "default" : "outline"}
+                       onClick={() => handleChoosePlan(plan)}
+                       disabled={isBuying || loadingPrices}
+                     >
+                       {isBuying ? (
+                         <>
+                           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                           Loading...
+                         </>
+                       ) : (
+                         plan.buttonLabel
+                       )}
+                     </Button>
+                   )}
                   </CardContent>
                 </Card>
               );
