@@ -78,13 +78,13 @@ const Forms = () => {
                 <FileText className="h-10 w-10 text-primary" />
               </div>
               <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground">
-                Printable Planning Form (Fill Out by Hand)
+              Your printable form is ready.
               </h1>
             </div>
 
             {/* Intro sentence */}
             <p className="text-lg text-muted-foreground">
-              This form is separate from the digital planner.
+              Click below to download and print as many copies as you need.
             </p>
 
             {/* Main Download Button */}
@@ -98,7 +98,7 @@ const Forms = () => {
                 Download Blank Printable Form
               </Button>
               <p className="text-sm text-muted-foreground">
-                One-time purchase. Download once and print anytime.
+                You can return to this page anytime to download again.
               </p>
               {isAdmin && (
                 <p className="text-sm text-muted-foreground italic mt-1">
