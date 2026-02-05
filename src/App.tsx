@@ -12,7 +12,6 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { BackToTopButton } from "./components/BackToTopButton";
 import { VisitorTracker } from "./components/VisitorTracker";
 import { LockedFeatureModal } from "./components/LockedFeatureModal";
-import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ResetPassword from "./pages/ResetPassword";
@@ -20,8 +19,6 @@ import Dashboard from "./pages/Dashboard";
 import PlannerApp from "./pages/PlannerApp";
 import Profile from "./pages/Profile";
 import Subscription from "./pages/Subscription";
-import Plans from "./pages/Plans";
-import Products from "./pages/Products";
 import ProductBinder from "./pages/ProductBinder";
 import Pricing from "./pages/Pricing";
 import AboutUs from "./pages/AboutUs";
@@ -39,10 +36,6 @@ import Resources from "./pages/Resources";
 import CostEstimator from "./pages/CostEstimator";
 import FAQ from "./pages/FAQ";
 import LegalDocuments from "./pages/LegalDocuments";
-import PreviewPrePlanning from "./pages/PreviewPrePlanning";
-import PreviewAfterDeath from "./pages/PreviewAfterDeath";
-import PreviewLegal from "./pages/PreviewLegal";
-import PreviewPDF from "./pages/PreviewPDF";
 import NotFound from "./pages/NotFound";
 import CustomSong from "./pages/CustomSong";
 import SongInfo from "./pages/SongInfo";
@@ -57,7 +50,7 @@ import Events from "./pages/Events";
 import Billing from "./pages/Billing";
 import Unsubscribe from "./pages/Unsubscribe";
 import TravelProtection from "./pages/TravelProtection";
-import LandingAlt from "./pages/LandingAlt";
+
 import LandingSenior from "./pages/LandingSenior";
 import AfterDeathLanding from "./pages/AfterDeathLanding";
 import PlanAheadLanding from "./pages/PlanAheadLanding";
@@ -79,7 +72,7 @@ import SafetyEntry from "./pages/SafetyEntry";
 import Orientation from "./pages/Orientation";
 import GuidedAction from "./pages/GuidedAction";
 import ReliefCheckpoint from "./pages/ReliefCheckpoint";
-import ContinueCare from "./pages/ContinueCare";
+
 import SharingAndContinuity from "./pages/SharingAndContinuity";
 import PublicBenefits from "./pages/PublicBenefits";
 import AssistedPlanning from "./pages/AssistedPlanning";
@@ -192,8 +185,8 @@ const App = () => (
                       
                       <Route path="/preplansteps/profile" element={<Profile />} />
                       <Route path="/preplansteps/profile/subscription" element={<Subscription />} />
-                      <Route path="/plans" element={<Plans />} />
-                      <Route path="/products" element={<Products />} />
+                      <Route path="/plans" element={<Navigate to="/pricing" replace />} />
+                      <Route path="/products" element={<Navigate to="/pricing" replace />} />
                       <Route path="/products/binder" element={<ProductBinder />} />
                       <Route path="/products/custom-song" element={<CustomSong />} />
                       <Route path="/song-info" element={<SongInfo />} />
@@ -233,13 +226,15 @@ const App = () => (
                       <Route path="/legal-documents" element={<LegalDocuments />} />
                       <Route path="/public-benefits" element={<PublicBenefits />} />
                       <Route path="/assisted-planning" element={<AssistedPlanning />} />
-                      <Route path="/preview/preplanning" element={<PreviewPrePlanning />} />
-                      <Route path="/preview/afterdeath" element={<PreviewAfterDeath />} />
-                      <Route path="/preview/legal" element={<PreviewLegal />} />
-                      <Route path="/preview/pdf" element={<PreviewPDF />} />
+                      {/* Legacy preview routes - redirect to main pages */}
+                      <Route path="/preview/preplanning" element={<Navigate to="/preplandashboard" replace />} />
+                      <Route path="/preview/afterdeath" element={<Navigate to="/next-steps" replace />} />
+                      <Route path="/preview/legal" element={<Navigate to="/legal-documents" replace />} />
+                      <Route path="/preview/pdf" element={<Navigate to="/preplan-summary" replace />} />
                       <Route path="/travel-protection" element={<TravelProtection />} />
-                      <Route path="/preview-landing" element={<LandingAlt />} />
-                      <Route path="/landingold" element={<Landing />} />
+                      {/* Legacy landing routes - redirect to main landing */}
+                      <Route path="/preview-landing" element={<Navigate to="/" replace />} />
+                      <Route path="/landingold" element={<Navigate to="/" replace />} />
                       <Route path="/home-senior" element={<LandingSenior />} />
                       <Route path="/after-death" element={<AfterDeathLanding />} />
                       <Route path="/plan-ahead" element={<PlanAheadLanding />} />
@@ -247,7 +242,7 @@ const App = () => (
                       <Route path="/planner/start" element={<PlannerStart />} />
                       <Route path="/preplan-summary" element={<PrePlanSummary />} />
                       <Route path="/plan-ahead/guide" element={<PlanAheadGuideViewer />} />
-                      <Route path="/preferences" element={<Settings />} />
+                      <Route path="/preferences" element={<Navigate to="/settings" replace />} />
                       <Route path="/settings" element={<Settings />} />
                       <Route path="/do-it-for-you" element={<DoItForYou />} />
                       <Route path="/do-it-for-you/confirmation" element={<DoItForYouConfirmation />} />
@@ -261,7 +256,7 @@ const App = () => (
                       <Route path="/orientation" element={<Orientation />} />
                       <Route path="/guided-action" element={<GuidedAction />} />
                       <Route path="/relief-checkpoint" element={<ReliefCheckpoint />} />
-                      <Route path="/continue-care" element={<ContinueCare />} />
+                      <Route path="/continue-care" element={<Navigate to="/pricing" replace />} />
                       <Route path="/sharing" element={<SharingAndContinuity />} />
                       <Route path="/saved-summaries" element={<SavedSummaries />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
