@@ -182,8 +182,11 @@ const LandingSenior = () => {
                 onClick={handlePrimaryCTA} 
                 className="min-h-[56px] text-lg px-10 rounded-xl shadow-md hover:shadow-lg transition-shadow"
               >
-                Access Digital Planner
+               Plan Ahead
               </Button>
+             <p className="text-sm text-[hsl(var(--senior-text-soft))] -mt-2">
+               Create a plan at your own pace.
+             </p>
               
               <Link to="/after-death">
                 <Button 
