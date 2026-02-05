@@ -460,6 +460,45 @@ export type Database = {
           },
         ]
       }
+      compliance_flags: {
+        Row: {
+          detected_at: string | null
+          flag_id: string
+          flag_type: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          detected_at?: string | null
+          flag_id?: string
+          flag_type?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          detected_at?: string | null
+          flag_id?: string
+          flag_type?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_flags_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "claire_sessions"
+            referencedColumns: ["session_id"]
+          },
+          {
+            foreignKeyName: "compliance_flags_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_public"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       contacts: {
         Row: {
           address: string | null
