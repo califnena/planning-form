@@ -214,6 +214,15 @@ export const SECTION_REGISTRY: SectionDefinition[] = [
     group: "help",
     showCompletionDot: false,
   },
+  {
+    id: "trusted_providers",
+    label: "Trusted Providers",
+    icon: Users,
+    route: "/trusted-providers",
+    dataKey: "",
+    group: "help",
+    showCompletionDot: false,
+  },
 ];
 
 // ============= HELPER FUNCTIONS =============

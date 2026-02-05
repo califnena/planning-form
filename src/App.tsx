@@ -28,7 +28,7 @@ import NextSteps from "./pages/NextSteps";
 import CaseDetail from "./pages/CaseDetail";
 import PrePlanningWizard from "./pages/PrePlanningWizard";
 import AfterDeathWizard from "./pages/AfterDeathWizard";
-import Vendors from "./pages/Vendors";
+import TrustedProviders from "./pages/TrustedProviders";
 import Forms from "./pages/Forms";
 import PrintableFormPurchase from "./pages/PrintableFormPurchase";
 import Contact from "./pages/Contact";
@@ -214,7 +214,8 @@ const App = () => (
                       <Route path="/next-steps/case/:caseId" element={<CaseDetail />} />
                       <Route path="/wizard/preplanning" element={<PrePlanningWizard />} />
                       <Route path="/wizard/afterdeath" element={<AfterDeathWizard />} />
-                      <Route path="/vendors" element={<Vendors />} />
+                      <Route path="/vendors" element={<Navigate to="/trusted-providers" replace />} />
+                      <Route path="/trusted-providers" element={<TrustedProviders />} />
                       <Route path="/guide" element={<Guide />} />
                       <Route path="/guide/legacy" element={<PrePlanningGuide />} />
                       <Route path="/forms" element={<Forms />} />
