@@ -28,7 +28,6 @@ export const resourceSections: ResourceSection[] = [
       { id: 'funeral-planning', label: 'Funeral Planning' },
       { id: 'digital-organization', label: 'Digital & Organization' },
       { id: 'travel-protection', label: 'Travel Protection' },
-      { id: 'cost-estimator', label: 'Cost Estimator' },
     ],
   },
   {
