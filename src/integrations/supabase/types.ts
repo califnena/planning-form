@@ -424,30 +424,41 @@ export type Database = {
       }
       claire_sessions: {
         Row: {
+          duration_seconds: number | null
           ended_at: string | null
-          id: string
-          message_count: number | null
-          page_context: string | null
-          started_at: string
-          user_id: string
+          flags_triggered: boolean | null
+          input_mode: string | null
+          session_id: string
+          started_at: string | null
+          user_id: string | null
         }
         Insert: {
+          duration_seconds?: number | null
           ended_at?: string | null
-          id?: string
-          message_count?: number | null
-          page_context?: string | null
-          started_at?: string
-          user_id: string
+          flags_triggered?: boolean | null
+          input_mode?: string | null
+          session_id?: string
+          started_at?: string | null
+          user_id?: string | null
         }
         Update: {
+          duration_seconds?: number | null
           ended_at?: string | null
-          id?: string
-          message_count?: number | null
-          page_context?: string | null
-          started_at?: string
-          user_id?: string
+          flags_triggered?: boolean | null
+          input_mode?: string | null
+          session_id?: string
+          started_at?: string | null
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "claire_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_public"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       contacts: {
         Row: {
