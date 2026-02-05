@@ -21,7 +21,7 @@ export interface ResourceSection {
 export const resourceSections: ResourceSection[] = [
   {
     id: 'step-by-step',
-    label: 'Step-by-Step Planning (In This App)',
+    label: 'Helpful Guides',
     icon: BookOpen,
     subItems: [
       { id: 'legal-medical', label: 'Legal & Medical Planning' },

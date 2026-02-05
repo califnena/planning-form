@@ -57,7 +57,7 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { TextSizeToggle } from '@/components/TextSizeToggle';
 import { 
-  ExternalLink, FileText, Download, Home, Eye, Calculator,
+  ExternalLink, FileText, Download, Home, Eye,
   ChevronRight, CheckSquare, BookOpen, Info, HelpCircle, Mail
 } from 'lucide-react';
 import { GlobalHeader } from '@/components/GlobalHeader';
@@ -198,60 +198,84 @@ const Resources = () => {
   const renderStepByStepOverview = () => (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Step-by-Step Planning (In This App)</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Helpful Guides</h1>
         <p className="text-lg text-muted-foreground">
-          Guided help within this app to walk you through the planning process.
+          Plain-language guides to help you understand and prepare.
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate('/guide')}>
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
+        {/* Pre-Planning Guide */}
+        <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={() => window.open('/guides/Pre-Planning-Guide.pdf', '_blank')}>
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <BookOpen className="h-6 w-6 text-primary" />
+                <FileText className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg">Start the Guide</CardTitle>
-                <CardDescription>Learn before you fill out forms</CardDescription>
+                <CardTitle className="text-lg">Pre-Planning Guide</CardTitle>
+                <CardDescription>For planning ahead</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-4">
-              A friendly walkthrough of the planning process, one step at a time.
+              A step-by-step guide to help you make decisions about your wishes before they're needed.
             </p>
-            <Button className="w-full min-h-[48px]">
-              Start the Guide
+            <Button variant="outline" className="w-full min-h-[48px]">
+              View Guide
               <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
           </CardContent>
         </Card>
 
-        <Link to="/resources/cost-estimator" className="block">
-          <Card className="h-full hover:border-primary/50 transition-colors cursor-pointer">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                  <Calculator className="h-6 w-6 text-amber-700" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg">Cost Estimator</CardTitle>
-                  <CardDescription>Get a general idea of funeral costs</CardDescription>
-                </div>
+        {/* After-Death Checklist */}
+        <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={() => handleSectionChange('free-checklists', 'after-death')}>
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                <CheckSquare className="h-6 w-6 text-blue-700" />
               </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Enter your preferences to see estimated costs for different funeral options.
-              </p>
-              <Button variant="outline" className="w-full min-h-[48px]">
-                Open Cost Estimator
-                <ChevronRight className="h-4 w-4 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-        </Link>
+              <div>
+                <CardTitle className="text-lg">After-Death Checklist</CardTitle>
+                <CardDescription>For after a loved one passes</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              A checklist of what to do in the first days and weeks after someone passes away.
+            </p>
+            <Button variant="outline" className="w-full min-h-[48px]">
+              View Checklist
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Common Questions (FAQ) */}
+        <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate('/faq')}>
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                <HelpCircle className="h-6 w-6 text-amber-700" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Common Questions</CardTitle>
+                <CardDescription>Answers to frequently asked questions</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Plain-language answers to questions about planning, legal matters, and what to expect.
+            </p>
+            <Button variant="outline" className="w-full min-h-[48px]">
+              View FAQ
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
