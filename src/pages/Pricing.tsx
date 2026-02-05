@@ -151,7 +151,7 @@ const Pricing = () => {
       ],
       lookupKey: "EFAPREMIUM",
       successPath: "/purchase-success?type=premium",
-      buttonLabel: "Start Digital Planner",
+      buttonLabel: "Access Digital Planner",
       featured: true
     },
     {
