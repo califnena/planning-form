@@ -395,6 +395,58 @@ export default function PlanAheadLanding() {
           </p>
         </section>
 
+        {/* Need Help While You Plan? */}
+        <section className="max-w-3xl mx-auto mb-12">
+          <h2 className="text-2xl font-serif font-semibold text-center mb-8">
+            Need Help While You Plan?
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Claire VIP Option */}
+            <Card className="border-2 hover:border-primary/50 transition-colors">
+              <CardContent className="p-6 space-y-4">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+                  <MessageCircle className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold">Work with Claire (VIP Guidance)</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Our AI assistant can answer questions and guide you through each section.
+                </p>
+                <Button 
+                  asChild
+                  variant="outline"
+                  className="w-full min-h-[48px]"
+                >
+                  <Link to="/vip-planning-support">
+                    Learn About Claire
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Human Assistance Option */}
+            <Card className="border-2 hover:border-primary/50 transition-colors">
+              <CardContent className="p-6 space-y-4">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+                  <HandHelping className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold">Have Someone Help You Fill This Out</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  A real person walks you through the forms and types your answers for you.
+                </p>
+                <Button 
+                  asChild
+                  variant="outline"
+                  className="w-full min-h-[48px]"
+                >
+                  <Link to="/assisted-planning">
+                    Learn About This Service
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
         {/* Section 4: Reassurance */}
         <section className="max-w-3xl mx-auto mb-16">
           <h2 className="text-2xl font-serif font-semibold text-center mb-6">

@@ -202,7 +202,7 @@ const LandingSenior = () => {
           <h2 className="text-xl md:text-2xl font-semibold text-[hsl(var(--senior-text))] mb-2 text-center">
             What we offer
           </h2>
-          <p className="text-[hsl(var(--senior-text-soft))] text-center mb-10">(when you are ready)</p>
+          <p className="text-[hsl(var(--senior-text-soft))] text-center mb-10">Click a box below to open that section</p>
           
           <div className="grid sm:grid-cols-2 gap-5">
             {/* 1. After-Death Help for Families */}
@@ -216,6 +216,7 @@ const LandingSenior = () => {
               <div>
                 <span className="text-[hsl(var(--senior-text))] font-medium text-lg block">After-Death Help for Families</span>
                 <span className="text-[hsl(var(--senior-text-soft))] text-sm">Guidance, checklists, and support when a death has already occurred.</span>
+                <span className="text-[hsl(var(--senior-text-soft))] text-xs block mt-1 italic">Tap or click to open</span>
               </div>
             </Link>
             
@@ -230,6 +231,7 @@ const LandingSenior = () => {
               <div>
                 <span className="text-[hsl(var(--senior-text))] font-medium text-lg block">Funeral & Memorial Products</span>
                 <span className="text-[hsl(var(--senior-text-soft))] text-sm">Caskets, urns, and memorial items selected for quality and value.</span>
+                <span className="text-[hsl(var(--senior-text-soft))] text-xs block mt-1 italic">Tap or click to open</span>
               </div>
             </a>
             
@@ -244,6 +246,7 @@ const LandingSenior = () => {
               <div>
                 <span className="text-[hsl(var(--senior-text))] font-medium text-lg block">Free Guides & Checklists</span>
                 <span className="text-[hsl(var(--senior-text-soft))] text-sm">Step-by-step help you can read, download, or print.</span>
+                <span className="text-[hsl(var(--senior-text-soft))] text-xs block mt-1 italic">Tap or click to open</span>
               </div>
             </Link>
             
@@ -258,6 +261,7 @@ const LandingSenior = () => {
               <div className="flex-1">
                 <span className="text-[hsl(var(--senior-text))] font-medium text-lg block">Planning Tools</span>
                 <span className="text-[hsl(var(--senior-text-soft))] text-sm">Interactive tools to help you plan ahead online or print forms to fill out by hand.</span>
+                <span className="text-[hsl(var(--senior-text-soft))] text-xs block mt-1 italic">Tap or click to open</span>
               </div>
               <ChevronDown className="h-5 w-5 text-[hsl(var(--senior-text-soft))] rotate-[-90deg] flex-shrink-0" />
             </Link>
@@ -279,6 +283,12 @@ const LandingSenior = () => {
               <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
                 Clear next steps when a death happens. No guessing.
               </p>
+              <Link 
+                to="/vip-planning-support" 
+                className="text-primary text-sm hover:underline mt-3"
+              >
+                Learn about Claire (VIP guidance)
+              </Link>
             </div>
             
             <div className="flex flex-col items-center text-center">
@@ -289,6 +299,12 @@ const LandingSenior = () => {
               <p className="text-[hsl(var(--senior-text-soft))] leading-relaxed">
                 Get help filling things out if you're overwhelmed.
               </p>
+              <Link 
+                to="/assisted-planning" 
+                className="text-primary text-sm hover:underline mt-3"
+              >
+                Have someone help you fill this out
+              </Link>
             </div>
             
             <div className="flex flex-col items-center text-center">
