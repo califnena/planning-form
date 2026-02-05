@@ -22,6 +22,7 @@ import { Home } from "lucide-react";
 import { mergeVisibleSections } from "@/lib/sections";
 import { PlanDebugPanel } from "@/components/debug/PlanDebugPanel";
 import { usePrintableOnlyAccess } from "@/hooks/usePrintableOnlyAccess";
+import { PlannerHelpNote } from "@/components/planner/PlannerHelpNote";
 
 /**
  * Preview Mode Context
@@ -527,6 +528,12 @@ export default function PlannerLayout() {
           >
             {/* Calm preview lock banner - shown when locked */}
             <PreviewLockBanner />
+            
+            {/* Help note for planning pages */}
+            <div className="mb-6">
+              <PlannerHelpNote />
+            </div>
+            
             <Outlet />
           </PlannerShell>
 

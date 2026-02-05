@@ -82,6 +82,7 @@ import ReliefCheckpoint from "./pages/ReliefCheckpoint";
 import ContinueCare from "./pages/ContinueCare";
 import SharingAndContinuity from "./pages/SharingAndContinuity";
 import PublicBenefits from "./pages/PublicBenefits";
+import AssistedPlanning from "./pages/AssistedPlanning";
 
 // Import planner layout and pages
 import {
@@ -218,6 +219,7 @@ const App = () => (
                       <Route path="/faq" element={<FAQ />} />
                       <Route path="/legal-documents" element={<LegalDocuments />} />
                       <Route path="/public-benefits" element={<PublicBenefits />} />
+                      <Route path="/assisted-planning" element={<AssistedPlanning />} />
                       <Route path="/preview/preplanning" element={<PreviewPrePlanning />} />
                       <Route path="/preview/afterdeath" element={<PreviewAfterDeath />} />
                       <Route path="/preview/legal" element={<PreviewLegal />} />
