@@ -1,6 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Link, useNavigate } from "react-router-dom";
+ import { Button } from "@/components/ui/button";
+ import { Card, CardContent } from "@/components/ui/card";
+ import { Link, useNavigate } from "react-router-dom";
+ import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { CheckCircle, Shield, Clock, FileText, Heart, ShoppingBag, BookOpen, ChevronDown, ChevronUp, Quote, LogOut, User, Phone } from "lucide-react";
 import { AppFooter } from "@/components/AppFooter";
@@ -25,6 +26,7 @@ const LandingSenior = () => {
   const [hasPlannerProgress, setHasPlannerProgress] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showMoreTestimonials, setShowMoreTestimonials] = useState<boolean>(false);
+ const [showContactDialog, setShowContactDialog] = useState<boolean>(false);
 
   useEffect(() => {
     const savedSize = localStorage.getItem("landing_text_size");
@@ -439,24 +441,25 @@ const LandingSenior = () => {
                 Talk to a Human (Optional)
               </h2>
               <p className="text-[hsl(var(--senior-text-soft))] text-lg leading-relaxed mb-5">
-                Have a question or feeling unsure? You can speak with a real person. No pressure. No obligation.
+               If you'd rather speak with a real person, we're here. No pressure. No obligation.
               </p>
               <Button
                 size="lg"
                 variant="outline"
-                asChild
+               onClick={() => setShowContactDialog(true)}
                 className="min-h-[52px] px-8 rounded-xl border-2 border-primary/40 text-[hsl(var(--senior-text))] hover:bg-[hsl(var(--senior-sage))] font-medium"
               >
-                <a href="mailto:info@everlastingfuneraladvisors.com?subject=Request%20for%20Guidance">
-                  Contact Us
-                </a>
+               Talk to a Human
               </Button>
-              <p className="text-sm text-[hsl(var(--senior-text-soft))] mt-4">
-                For guidance only. No sales or legal advice.
-              </p>
             </div>
           </div>
         </section>
+
+       {/* Contact Dialog */}
+       <ContactSuggestionDialog 
+         open={showContactDialog} 
+         onOpenChange={setShowContactDialog} 
+       />
       </main>
 
       <AppFooter />
