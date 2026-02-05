@@ -5,7 +5,6 @@ import { useLockState } from "@/contexts/PreviewModeContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { isEmotionalStageRoute } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 interface PreviewLockBannerProps {
   /** Optional custom message */
@@ -45,44 +44,38 @@ export function PreviewLockBanner({
   // Prominent welcome banner for preview mode
   if (prominent) {
     return (
-      <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/30 mb-6">
+      <Card className="border border-primary/10 bg-gradient-to-r from-primary/5 to-secondary/20 mb-6">
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
             <div className="flex-shrink-0">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Eye className="h-6 w-6 text-primary" />
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Eye className="h-5 w-5 text-primary" />
               </div>
             </div>
             
             <div className="flex-1 space-y-3">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">
-                  Preview Mode
-                </Badge>
-              </div>
-              
               <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-foreground">
-                  Preview mode.
+                <h3 className="text-lg font-medium text-foreground">
+                  You're in preview mode.
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  To save or edit your wishes:
+                <p className="text-muted-foreground leading-relaxed text-sm">
+                  You can look through the planner and see how it works.
                 </p>
-                <ul className="text-muted-foreground text-sm space-y-1 ml-1">
-                  <li>• EFABasic – one-time purchase</li>
-                  <li>• EFAPremium – includes additional support</li>
-                </ul>
-                <p className="text-muted-foreground text-sm mt-2">
-                  You can continue previewing without deciding.
+                <p className="text-muted-foreground leading-relaxed text-sm">
+                  When you're ready, you can choose a plan to save or fill things in.
+                </p>
+                <p className="text-muted-foreground leading-relaxed text-sm">
+                  There's no rush.
                 </p>
               </div>
 
               <div className="pt-2">
                 <Button
                   onClick={handleUnlock}
-                  className="gap-2"
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 text-primary border-primary/30 hover:bg-primary/5"
                 >
-                  <Unlock className="h-4 w-4" />
                   Choose a Plan
                 </Button>
               </div>
@@ -111,33 +104,28 @@ export function PreviewLockBanner({
   }
 
   return (
-    <div className="bg-gradient-to-r from-primary/5 to-secondary/20 border border-primary/20 rounded-lg p-4 mb-6">
+    <div className="bg-gradient-to-r from-primary/5 to-secondary/10 border border-primary/10 rounded-lg p-4 mb-6">
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0 mt-0.5">
           <Eye className="h-5 w-5 text-primary" />
         </div>
         
         <div className="flex-1 min-w-0">
-          <p className="text-foreground font-medium text-base">
-            Preview mode.
+          <p className="text-foreground font-medium text-base mb-2">
+            You're in preview mode.
           </p>
-          <div className="text-muted-foreground text-sm mt-1 space-y-1">
-            <p>To save or edit your wishes:</p>
-            <ul className="ml-1 space-y-0.5">
-              <li>• EFABasic – one-time purchase</li>
-              <li>• EFAPremium – includes additional support</li>
-            </ul>
-            <p className="text-xs mt-1">You can continue previewing without deciding.</p>
-          </div>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            You can look through the planner and see how it works. When you're ready, you can choose a plan to save or fill things in. There's no rush.
+          </p>
         </div>
 
         <div className="flex-shrink-0">
           <Button
             onClick={handleUnlock}
+            variant="outline"
             size="sm"
-            className="shadow-sm"
+            className="text-primary border-primary/30 hover:bg-primary/5"
           >
-            <Unlock className="h-4 w-4 mr-1.5" />
             Choose a Plan
           </Button>
         </div>
@@ -161,15 +149,9 @@ export function InlineLockedNotice() {
   }
 
   return (
-    <div className="flex items-center gap-2 text-xs text-muted-foreground py-1 px-2 bg-muted/50 rounded">
-      <Eye className="h-3 w-3 text-primary" />
-      <span>Preview mode</span>
-      <button
-        onClick={() => navigate("/pricing")}
-        className="text-primary hover:underline font-medium"
-      >
-        Choose a Plan
-      </button>
+    <div className="text-xs text-muted-foreground py-1 px-2 bg-muted/30 rounded inline-flex items-center gap-1.5">
+      <Eye className="h-3 w-3 text-primary/70" />
+      <span>Preview mode – explore freely</span>
     </div>
   );
 }
