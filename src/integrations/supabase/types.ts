@@ -208,6 +208,48 @@ export type Database = {
           },
         ]
       }
+      assisted_requests: {
+        Row: {
+          admin_notes: string | null
+          contact_method: string | null
+          created_at: string | null
+          email: string | null
+          help_for: string | null
+          help_types: string[] | null
+          name: string | null
+          phone: string | null
+          request_id: string
+          sections: string[] | null
+          status: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          contact_method?: string | null
+          created_at?: string | null
+          email?: string | null
+          help_for?: string | null
+          help_types?: string[] | null
+          name?: string | null
+          phone?: string | null
+          request_id?: string
+          sections?: string[] | null
+          status?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          contact_method?: string | null
+          created_at?: string | null
+          email?: string | null
+          help_for?: string | null
+          help_types?: string[] | null
+          name?: string | null
+          phone?: string | null
+          request_id?: string
+          sections?: string[] | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       audit_log: {
         Row: {
           archive_id: string | null
