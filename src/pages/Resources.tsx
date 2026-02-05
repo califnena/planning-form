@@ -71,6 +71,7 @@ import { LegalDisclaimer } from '@/components/ui/LegalDisclaimer';
 import { cn } from '@/lib/utils';
 import { generateAfterDeathChecklistPDF } from '@/lib/afterDeathChecklistPdfGenerator';
 import { useToast } from '@/hooks/use-toast';
+import { usePrintableAccess } from '@/hooks/usePrintableAccess';
 
 // Senior-friendly 3-category organization per Prompt C1
 // 'step-by-step', 'free-checklists', 'free-guides'
@@ -82,11 +83,36 @@ const Resources = () => {
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isGeneratingAfterDeath, setIsGeneratingAfterDeath] = useState(false);
+  const { hasAccess: hasPrintableAccess, isAdmin } = usePrintableAccess();
   // Fix: Default to 'education' instead of non-existent 'planning-guides'
   const initialSection = searchParams.get('section');
   const validInitialSection = initialSection && VALID_SECTIONS.includes(initialSection) ? initialSection : DEFAULT_SECTION;
   const [activeSection, setActiveSection] = useState(validInitialSection);
   const [activeSubItem, setActiveSubItem] = useState<string | undefined>(searchParams.get('sub') || undefined);
+
+  /**
+   * Printable form handler - serves PDF directly if user has access
+   * Does NOT redirect to Digital Planner
+   */
+  const handleGetPrintableForm = () => {
+    // Admin or purchased users get immediate download
+    if (isAdmin || hasPrintableAccess) {
+      const link = document.createElement("a");
+      link.href = "/templates/My-Final-Wishes-Blank-Form-2025-11-17.pdf";
+      link.download = "My-Final-Wishes-Blank-Form.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast({
+        title: "Download Started",
+        description: "Your printable form is downloading."
+      });
+      return;
+    }
+    
+    // No access - go to forms page for purchase flow
+    navigate('/forms');
+  };
 
   const handleDownloadAfterDeathChecklist = async () => {
     setIsGeneratingAfterDeath(true);
@@ -289,7 +315,7 @@ const Resources = () => {
 
         <div className="grid gap-6 md:grid-cols-2">
           {/* Printable Planning Form */}
-          <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={() => navigate('/forms')}>
+          <Card className="hover:border-primary/50 transition-colors cursor-pointer" onClick={handleGetPrintableForm}>
             <CardHeader>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
@@ -421,7 +447,7 @@ const Resources = () => {
             size="lg" 
             variant="outline" 
             className="min-h-[52px] flex-1"
-            onClick={() => navigate('/forms')}
+            onClick={handleGetPrintableForm}
           >
             Get Printable Planning Form
             <ChevronRight className="h-5 w-5 ml-2" />
