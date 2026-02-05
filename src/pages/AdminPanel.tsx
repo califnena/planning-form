@@ -14,6 +14,7 @@ import { AdminUsersTab } from "@/components/admin/AdminUsersTab";
 import { AdminRolesTab } from "@/components/admin/AdminRolesTab";
 import { AdminBillingTab } from "@/components/admin/AdminBillingTab";
 import { AdminAnalyticsTab } from "@/components/admin/AdminAnalyticsTab";
+import { AssistedHelpSettings } from "@/components/admin/AssistedHelpSettings";
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -87,11 +88,12 @@ export default function AdminPanel() {
         </Card>
 
         <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 max-w-lg">
+          <TabsList className="grid w-full grid-cols-5 max-w-2xl">
             <TabsTrigger value="users">{t("admin.tabs.users")}</TabsTrigger>
             <TabsTrigger value="roles">{t("admin.tabs.roles")}</TabsTrigger>
             <TabsTrigger value="billing">{t("admin.tabs.billing")}</TabsTrigger>
             <TabsTrigger value="analytics">{t("admin.tabs.analytics") || "Analytics"}</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users">
@@ -108,6 +110,12 @@ export default function AdminPanel() {
 
           <TabsContent value="analytics">
             <AdminAnalyticsTab />
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <div className="space-y-6">
+              <AssistedHelpSettings />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
