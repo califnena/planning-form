@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { CheckCircle, Shield, Clock, HelpCircle, FileText, Heart, Users, ShoppingBag, BookOpen, MessageCircle, ChevronDown, ChevronUp, Quote, Bot, LogIn, LogOut, User } from "lucide-react";
+import { CheckCircle, Shield, Clock, FileText, Heart, ShoppingBag, BookOpen, ChevronDown, ChevronUp, Quote, LogOut, User, Phone } from "lucide-react";
 import { AppFooter } from "@/components/AppFooter";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -428,43 +428,33 @@ const LandingSenior = () => {
         </section>
 
 
-        {/* NEED HELP SECTION */}
+        {/* TALK TO A HUMAN SECTION */}
         <section className="bg-white rounded-3xl shadow-sm border border-border/30 p-8 md:p-10 mb-16">
-          <h2 className="text-xl font-semibold text-[hsl(var(--senior-text))] mb-8 text-center">
-            Need Help Along the Way?
-          </h2>
-          
-          <div className="grid md:grid-cols-3 gap-5 mb-6">
-            <Link 
-              to="/resources" 
-              className="flex flex-col items-center text-center p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors"
-            >
-              <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center mb-4">
-                <BookOpen className="h-7 w-7 text-primary" />
-              </div>
-              <span className="font-medium text-[hsl(var(--senior-text))]">Free Guides & Resources</span>
-              <span className="text-sm text-[hsl(var(--senior-text-soft))] mt-1">Interactive planning guide</span>
-            </Link>
-            
-            <Link 
-              to="/do-it-for-you" 
-              className="flex flex-col items-center text-center p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors"
-            >
-              <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center mb-4">
-                <Users className="h-7 w-7 text-primary" />
-              </div>
-              <span className="font-medium text-[hsl(var(--senior-text))]">Request help filling out your plan</span>
-            </Link>
-            
-            <Link 
-              to="/faq" 
-              className="flex flex-col items-center text-center p-6 rounded-2xl bg-[hsl(var(--senior-warm-gray))] hover:bg-[hsl(var(--senior-sage))] transition-colors"
-            >
-              <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center mb-4">
-                <HelpCircle className="h-7 w-7 text-primary" />
-              </div>
-              <span className="font-medium text-[hsl(var(--senior-text))]">View common questions</span>
-            </Link>
+          <div className="flex flex-col md:flex-row items-center gap-8 max-w-2xl mx-auto">
+            <div className="w-20 h-20 rounded-2xl bg-[hsl(var(--senior-sage))] flex items-center justify-center flex-shrink-0">
+              <Phone className="h-10 w-10 text-primary" />
+            </div>
+            <div className="text-center md:text-left flex-1">
+              <h2 className="text-xl font-semibold text-[hsl(var(--senior-text))] mb-3">
+                Talk to a Human (Optional)
+              </h2>
+              <p className="text-[hsl(var(--senior-text-soft))] text-lg leading-relaxed mb-5">
+                Have a question or feeling unsure? You can speak with a real person. No pressure. No obligation.
+              </p>
+              <Button
+                size="lg"
+                variant="outline"
+                asChild
+                className="min-h-[52px] px-8 rounded-xl border-2 border-primary/40 text-[hsl(var(--senior-text))] hover:bg-[hsl(var(--senior-sage))] font-medium"
+              >
+                <a href="mailto:info@everlastingfuneraladvisors.com?subject=Request%20for%20Guidance">
+                  Contact Us
+                </a>
+              </Button>
+              <p className="text-sm text-[hsl(var(--senior-text-soft))] mt-4">
+                For guidance only. No sales or legal advice.
+              </p>
+            </div>
           </div>
         </section>
       </main>
