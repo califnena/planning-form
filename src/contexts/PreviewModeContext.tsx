@@ -15,6 +15,9 @@ interface PreviewModeContextType {
   isLoggedIn: boolean;
   isLoading: boolean;
   
+  /** Admin status - bypasses all paywalls */
+  isAdmin: boolean;
+  
   // Purchase states from auth
   hasPaidAccess: boolean;
   hasVIPAccess: boolean;
@@ -52,6 +55,7 @@ export function PreviewModeProvider({ children }: PreviewModeProviderProps) {
   const {
     isLoggedIn,
     isLoading,
+    isAdmin,
     hasPaidAccess,
     hasVIPAccess,
     hasPrintableAccess,
@@ -82,6 +86,7 @@ export function PreviewModeProvider({ children }: PreviewModeProviderProps) {
    * SINGLE SOURCE OF TRUTH: isUnlocked
    * 
    * User is unlocked when:
+   * - They are an admin (bypasses all paywalls)
    * - They have paid access (premium, VIP, or done-for-you)
    * 
    * This flag controls:
@@ -90,7 +95,7 @@ export function PreviewModeProvider({ children }: PreviewModeProviderProps) {
    * - PDF download (final) availability
    * - Save functionality
    */
-  const isUnlocked = hasPaidAccess || hasVIPAccess || hasDoneForYouAccess;
+  const isUnlocked = isAdmin || hasPaidAccess || hasVIPAccess || hasDoneForYouAccess;
   
   // Legacy alias for backwards compatibility
   const isPreviewMode = !isUnlocked;
@@ -102,6 +107,7 @@ export function PreviewModeProvider({ children }: PreviewModeProviderProps) {
         isPreviewMode,
         isLoggedIn,
         isLoading,
+        isAdmin,
         hasPaidAccess,
         hasVIPAccess,
         hasPrintableAccess,
