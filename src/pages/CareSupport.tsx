@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { AppFooter } from "@/components/AppFooter";
@@ -878,6 +878,12 @@ export default function CareSupport() {
                 <p className="text-xs text-muted-foreground">
                   You can close this anytime.
                 </p>
+                <Link 
+                  to="/saved-summaries" 
+                  className="text-xs text-primary hover:underline block"
+                >
+                  View your saved summaries
+                </Link>
                 <p className="text-xs text-muted-foreground/70">
                   Claire provides planning guidance and educational support. She does not provide legal, medical, or financial advice.
                 </p>
