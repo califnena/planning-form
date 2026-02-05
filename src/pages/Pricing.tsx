@@ -22,6 +22,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import NotAdviceNote from "@/components/NotAdviceNote";
+import { PRODUCT_DESCRIPTIONS } from "@/lib/productDescriptions";
 
 type StripePriceInfo = {
   lookupKey: string;
@@ -141,14 +142,8 @@ const Pricing = () => {
     {
       id: "digital",
       title: "Digital Planner",
-      whoItsFor: "For people who want guidance and flexibility online.",
-      bullets: [
-        "Interactive digital planner",
-        "Step-by-step or explore-freely option",
-        "Save progress automatically",
-        "Download your plan as a PDF",
-        "Access from any device"
-      ],
+      whoItsFor: PRODUCT_DESCRIPTIONS.EFAPREMIUM.shortDescription,
+      bullets: PRODUCT_DESCRIPTIONS.EFAPREMIUM.benefits,
       lookupKey: "EFAPREMIUM",
       successPath: "/purchase-success?type=premium",
       buttonLabel: "Access Digital Planner",
@@ -157,12 +152,8 @@ const Pricing = () => {
     {
       id: "printable",
       title: "Printable Planner",
-      whoItsFor: "For people who prefer paper or want something tangible.",
-      bullets: [
-        "Printable planning forms",
-        "Fill only what you want",
-        "Download and print anytime"
-      ],
+      whoItsFor: PRODUCT_DESCRIPTIONS.EFABASIC.shortDescription,
+      bullets: PRODUCT_DESCRIPTIONS.EFABASIC.benefits,
       lookupKey: "EFABASIC",
       successPath: "/purchase-success?type=printable",
       buttonLabel: "Download Printable Version",
@@ -171,12 +162,8 @@ const Pricing = () => {
     {
       id: "binder",
       title: "Physical Binder",
-      whoItsFor: "For families who want everything organized in one place.",
-      bullets: [
-        "Printed planner pages",
-        "Organized binder",
-        "Shipped to your home"
-      ],
+      whoItsFor: PRODUCT_DESCRIPTIONS.EFABINDER.shortDescription,
+      bullets: PRODUCT_DESCRIPTIONS.EFABINDER.benefits,
       lookupKey: "EFABINDER",
       successPath: "/purchase-success?type=binder",
       buttonLabel: "Purchase Binder",
