@@ -636,20 +636,7 @@ export default function Dashboard() {
         </div>
 
         {/* Progress Indicator - De-emphasized */}
-        {progress > 0 && (
-          <div className="mb-8 max-w-md mx-auto">
-            <p className="text-sm text-muted-foreground text-center mb-2">Your progress</p>
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-primary/60 rounded-full transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground text-center mt-2">
-              You can take this one step at a time.
-            </p>
-          </div>
-        )}
+        {/* Progress indicators removed per senior-first design - no pressure */}
 
         {/* ==================== SECTION A: PRIMARY - MY WISHES ==================== */}
         <section className="mb-12">
