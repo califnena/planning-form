@@ -255,10 +255,11 @@ const LandingSenior = () => {
               <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
                 <FileText className="h-7 w-7 text-primary" />
               </div>
-              <div>
+              <div className="flex-1">
                 <span className="text-[hsl(var(--senior-text))] font-medium text-lg block">Planning Tools</span>
-                <span className="text-[hsl(var(--senior-text-soft))] text-sm">For those who want to plan ahead at their own pace.</span>
+                <span className="text-[hsl(var(--senior-text-soft))] text-sm">Interactive tools to help you plan ahead online or print forms to fill out by hand.</span>
               </div>
+              <ChevronDown className="h-5 w-5 text-[hsl(var(--senior-text-soft))] rotate-[-90deg] flex-shrink-0" />
             </Link>
           </div>
         </section>
