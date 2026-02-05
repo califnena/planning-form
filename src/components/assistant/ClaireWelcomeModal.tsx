@@ -65,6 +65,11 @@ export function ClaireWelcomeModal({ isOpen, onClose }: ClaireWelcomeModalProps)
             You can stop anytime and come back later.
           </p>
 
+          {/* Privacy disclosure */}
+          <p className="text-center text-xs text-muted-foreground/70">
+            Privacy: Claire can save a short planning summary only if you ask. She does not store personal details.
+          </p>
+
           {/* What can Claire help with - expandable */}
           <Collapsible open={showHelp} onOpenChange={setShowHelp}>
             <CollapsibleTrigger asChild>

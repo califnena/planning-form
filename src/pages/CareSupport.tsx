@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Heart, Sparkles, ArrowRight, Mic, Volume2, VolumeX, Home, LogOut, CheckCircle, HelpCircle, MessageCircle, FileText } from "lucide-react";
+import { Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
 import { ClaireWelcomeModal } from "@/components/assistant/ClaireWelcomeModal";
@@ -404,6 +405,13 @@ export default function CareSupport() {
                 <p className="text-sm text-muted-foreground mt-6 text-center">
                   Claire does not replace a lawyer, doctor, or financial professional. She is here to support you as you plan.
                 </p>
+                
+                <div className="flex items-start gap-2 p-3 bg-muted/30 rounded-lg mt-4">
+                  <Lock className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-muted-foreground">
+                    <strong>Privacy:</strong> Claire can save a short planning summary only if you ask. She does not store personal details or remember conversations unless you choose to save a summary.
+                  </p>
+                </div>
               </div>
             </div>
           </section>

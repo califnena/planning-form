@@ -509,6 +509,9 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                    <p className="text-xs text-muted-foreground">
                      Claire remembers planning information you choose to save. Conversations are private.
                    </p>
+                   <p className="text-xs text-muted-foreground/70 mt-1">
+                     Privacy: Claire can save a short planning summary only if you ask. She does not store personal details.
+                   </p>
                  </div>
                   
                   {/* Quick action buttons for seniors */}
@@ -596,6 +599,9 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                 You can close this anytime.
               </span>
             </div>
+            <p className="text-[10px] text-muted-foreground/60 text-center">
+              Claire does not remember conversations unless you choose to save a summary.
+            </p>
           </div>
         </CardContent>
       </Card>
