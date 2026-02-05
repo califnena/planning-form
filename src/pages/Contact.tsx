@@ -1,14 +1,17 @@
-import { useState } from 'react';
+ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { TextSizeToggle } from '@/components/TextSizeToggle';
-import { ArrowLeft } from 'lucide-react';
+ import { ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+ import { supabase } from '@/integrations/supabase/client';
 
 const Contact = () => {
+   const [isSubmitting, setIsSubmitting] = useState(false);
+   const [userId, setUserId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,13 +19,49 @@ const Contact = () => {
     message: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+   useEffect(() => {
+     const getUser = async () => {
+       const { data: { user } } = await supabase.auth.getUser();
+       setUserId(user?.id ?? null);
+     };
+     getUser();
+   }, []);
+ 
+   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Message received",
-      description: "Thank you for contacting us. We'll get back to you soon.",
-    });
-    setFormData({ name: '', email: '', phone: '', message: '' });
+     setIsSubmitting(true);
+     
+     try {
+       // Save to support_requests table
+       const { error } = await supabase
+         .from('support_requests')
+         .insert({
+           user_id: userId,
+           name: formData.name,
+           contact_method: 'email',
+           contact_value: formData.email,
+           preferred_time: formData.phone ? `Phone: ${formData.phone}` : null,
+           message: formData.message,
+           request_type: 'contact',
+         });
+ 
+       if (error) throw error;
+ 
+       toast({
+         title: "Message received",
+         description: "Thank you for contacting us. We'll get back to you soon.",
+       });
+       setFormData({ name: '', email: '', phone: '', message: '' });
+     } catch (error) {
+       console.error('Error submitting contact form:', error);
+       toast({
+         title: "Something went wrong",
+         description: "Please try again.",
+         variant: "destructive",
+       });
+     } finally {
+       setIsSubmitting(false);
+     }
   };
 
   return (
@@ -93,7 +132,8 @@ const Contact = () => {
             />
           </div>
           
-          <Button type="submit" size="lg" className="w-full md:w-auto">
+           <Button type="submit" size="lg" className="w-full md:w-auto" disabled={isSubmitting}>
+             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Send Message
           </Button>
         </form>
