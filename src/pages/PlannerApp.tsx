@@ -370,11 +370,6 @@ const PlannerApp = () => {
 
   const handleDownloadManualForm = () => {
     if (isPreviewMode) {
-      toast({
-        title: "Read-Only Mode",
-        description: "Subscribe to create your printable copy.",
-        variant: "destructive",
-      });
       return;
     }
     try {
@@ -396,11 +391,6 @@ const PlannerApp = () => {
 
   const handleEmailPlan = () => {
     if (isPreviewMode) {
-      toast({
-        title: "Read-Only Mode",
-        description: "Subscribe to email your plan.",
-        variant: "destructive",
-      });
       return;
     }
     setPendingAction("email");

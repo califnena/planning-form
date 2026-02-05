@@ -1,4 +1,4 @@
-import { AlertCircle, RefreshCw, Phone, ExternalLink, WifiOff, Lock, FileQuestion } from "lucide-react";
+import { AlertCircle, RefreshCw, Phone, ExternalLink, WifiOff, Eye, FileQuestion } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -28,9 +28,9 @@ const REASON_MESSAGES: Record<EmptyStateReason, { title: string; message: string
     icon: AlertCircle,
   },
   "read-only": {
-    title: "You are viewing this in read-only mode.",
-    message: "Subscribe to edit and save your plan.",
-    icon: Lock,
+    title: "You're viewing the planner.",
+    message: "Choose a plan to save your work.",
+    icon: Eye,
   },
   "opens-new-page": {
     title: "This content opens in a new page.",
@@ -44,8 +44,8 @@ const REASON_MESSAGES: Record<EmptyStateReason, { title: string; message: string
   },
   "restricted": {
     title: "This section is not available right now.",
-    message: "You may need to subscribe or log in to access this content.",
-    icon: Lock,
+    message: "Choose a plan to access this content.",
+    icon: Eye,
   },
   "not-found": {
     title: "This content could not be found.",

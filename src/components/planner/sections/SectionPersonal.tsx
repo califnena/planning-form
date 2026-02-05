@@ -52,11 +52,6 @@ export const SectionPersonal = ({ data, onChange }: SectionPersonalProps) => {
 
   const handleSave = () => {
     if (isPreviewMode) {
-      toast({
-        title: "Read-Only Mode",
-        description: "Subscribe to edit and save your plan.",
-        variant: "destructive",
-      });
       return;
     }
     toast({

@@ -53,11 +53,6 @@ export const SectionLegacy = ({ data, onChange }: SectionLegacyProps) => {
 
   const handleSave = () => {
     if (isPreviewMode) {
-      toast({
-        title: "Read-Only Mode",
-        description: "Subscribe to edit and save your plan.",
-        variant: "destructive",
-      });
       return;
     }
     toast({
