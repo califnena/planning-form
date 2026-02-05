@@ -209,7 +209,7 @@ const Resources = () => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Option 1: Digital Planner */}
+       {/* Option 1: Plan Online */}
         <Card className="hover:border-primary/50 transition-colors cursor-pointer border-2" onClick={() => navigate('/preplandashboard/landing')}>
           <CardHeader>
             <div className="flex items-center gap-3">
@@ -217,7 +217,7 @@ const Resources = () => {
                 <BookOpen className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg">Digital Planner</CardTitle>
+               <CardTitle className="text-lg">Plan Online</CardTitle>
                 <CardDescription>Fill out on screen</CardDescription>
               </div>
             </div>
@@ -227,7 +227,7 @@ const Resources = () => {
               Answer questions on your computer, tablet, or phone. Your answers are saved automatically.
             </p>
             <Button className="w-full min-h-[48px]">
-              Access Digital Planner
+             Plan Online
               <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
           </CardContent>
