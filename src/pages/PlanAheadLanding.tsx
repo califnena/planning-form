@@ -274,6 +274,24 @@ export default function PlanAheadLanding() {
     navigate("/do-it-for-you");
   };
 
+  /**
+   * Access Digital Planner button handler:
+   * - Not signed in → prompt sign-in
+   * - Signed in, not purchased → open Preview Mode
+   * - Signed in + purchased → open full planner
+   */
+  const handleAccessDigitalPlanner = () => {
+    if (!isLoggedIn) {
+      // Not signed in - redirect to login with return URL
+      saveLastVisitedRoute(location.pathname);
+      navigate("/login?return=/preplandashboard");
+      return;
+    }
+    
+    // Signed in - navigate to planner (Preview Mode or Full access handled by context)
+    navigate("/preplandashboard");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
       <PublicHeader />
@@ -300,7 +318,7 @@ export default function PlanAheadLanding() {
           {/* Primary Action Button */}
           <div className="flex flex-col gap-4 pt-6 max-w-md mx-auto">
             <Button 
-              onClick={() => navigate("/preplandashboard")}
+              onClick={handleAccessDigitalPlanner}
               size="lg"
               className="w-full min-h-[60px] text-lg font-semibold"
             >
