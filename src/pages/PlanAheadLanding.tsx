@@ -12,7 +12,6 @@ import mascotFamilyPlanning from "@/assets/mascot-family-planning.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { usePreviewModeContext } from "@/contexts/PreviewModeContext";
-import { useAdminStatus } from "@/hooks/useAdminStatus";
 import { isStoreIAP } from "@/lib/billingMode";
 import { StoreIAPModal } from "@/components/StoreIAPModal";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
@@ -38,8 +37,7 @@ export default function PlanAheadLanding() {
   const [isResuming, setIsResuming] = useState(false);
   const [showPrintableConfirmation, setShowPrintableConfirmation] = useState(false);
   const [showPrintableModal, setShowPrintableModal] = useState(false);
-  const { isLoggedIn, hasPaidAccess, hasPrintableAccess, openLockedModal, saveLastVisitedRoute } = usePreviewModeContext();
-  const { isAdmin } = useAdminStatus();
+  const { isLoggedIn, isAdmin, hasPaidAccess, hasPrintableAccess, openLockedModal, saveLastVisitedRoute } = usePreviewModeContext();
 
   // Handle resume logic
   useEffect(() => {
