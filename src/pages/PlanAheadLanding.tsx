@@ -304,7 +304,7 @@ export default function PlanAheadLanding() {
               size="lg"
               className="w-full min-h-[60px] text-lg font-semibold"
             >
-              Continue with Digital Planner
+              Access Digital Planner
             </Button>
           </div>
         </section>
@@ -483,7 +483,7 @@ export default function PlanAheadLanding() {
               size="lg"
               className="min-h-[56px] text-lg px-8"
             >
-              Start Digital Planner
+              Access Digital Planner
             </Button>
             <Button 
               variant="outline"
