@@ -27,13 +27,15 @@ import { Badge } from "@/components/ui/badge";
  } from "@/components/ui/dialog";
  
  interface PlanningSummary {
-   id: string;
-   title: string;
-   summary_text: string;
+  summary_id: string;
+  title: string | null;
+  summary_text: string | null;
    created_at: string;
-   updated_at: string;
-  expires_at: string;
-  last_renewed_at: string | null;
+  expires_at: string | null;
+  renewed_at: string | null;
+  status: string;
+  char_count: number | null;
+  category_tag: string | null;
  }
  
  export default function SavedSummaries() {
@@ -66,7 +68,7 @@ import { Badge } from "@/components/ui/badge";
          .from("planning_summaries")
          .select("*")
          .eq("user_id", user.id)
-        .gt("expires_at", new Date().toISOString())
+        .neq("status", "expired")
          .order("created_at", { ascending: false });
  
        if (error) throw error;
@@ -90,11 +92,11 @@ import { Badge } from "@/components/ui/badge";
        const { error } = await supabase
          .from("planning_summaries")
          .delete()
-         .eq("id", deleteId);
+        .eq("summary_id", deleteId);
  
        if (error) throw error;
  
-       setSummaries(prev => prev.filter(s => s.id !== deleteId));
+      setSummaries(prev => prev.filter(s => s.summary_id !== deleteId));
        toast({
          title: "Summary deleted",
          description: "Your summary has been removed.",
@@ -113,7 +115,7 @@ import { Badge } from "@/components/ui/badge";
  
    const handleEdit = (summary: PlanningSummary) => {
      setEditSummary(summary);
-     setEditText(summary.summary_text);
+    setEditText(summary.summary_text || "");
    };
  
    const handleSaveEdit = async () => {
@@ -124,13 +126,13 @@ import { Badge } from "@/components/ui/badge";
        const { error } = await supabase
          .from("planning_summaries")
          .update({ summary_text: editText })
-         .eq("id", editSummary.id);
+        .eq("summary_id", editSummary.summary_id);
  
        if (error) throw error;
  
        setSummaries(prev =>
          prev.map(s =>
-           s.id === editSummary.id ? { ...s, summary_text: editText } : s
+          s.summary_id === editSummary.summary_id ? { ...s, summary_text: editText } : s
          )
        );
        toast({
@@ -150,14 +152,15 @@ import { Badge } from "@/components/ui/badge";
      }
    };
  
-  const getDaysUntilExpiry = (expiresAt: string) => {
+  const getDaysUntilExpiry = (expiresAt: string | null) => {
+    if (!expiresAt) return 90; // Default to 90 days if no expiry set
     const now = new Date();
     const expiry = new Date(expiresAt);
     const diffTime = expiry.getTime() - now.getTime();
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  const getExpiryStatus = (expiresAt: string) => {
+  const getExpiryStatus = (expiresAt: string | null) => {
     const days = getDaysUntilExpiry(expiresAt);
     if (days <= 0) return { status: "expired", label: "Expired", variant: "destructive" as const };
     if (days <= 14) return { status: "expiring", label: `Expires in ${days} day${days === 1 ? "" : "s"}`, variant: "secondary" as const };
@@ -166,7 +169,7 @@ import { Badge } from "@/components/ui/badge";
 
   const handleRenew = (summary: PlanningSummary) => {
     setRenewSummary(summary);
-    setRenewEditText(summary.summary_text);
+    setRenewEditText(summary.summary_text || "");
   };
 
   const handleConfirmRenew = async () => {
@@ -182,16 +185,17 @@ import { Badge } from "@/components/ui/badge";
         .update({ 
           summary_text: renewEditText,
           expires_at: newExpiresAt.toISOString(),
-          last_renewed_at: new Date().toISOString()
+          renewed_at: new Date().toISOString(),
+          status: 'active'
         })
-        .eq("id", renewSummary.id);
+        .eq("summary_id", renewSummary.summary_id);
 
       if (error) throw error;
 
       setSummaries(prev =>
         prev.map(s =>
-          s.id === renewSummary.id 
-            ? { ...s, summary_text: renewEditText, expires_at: newExpiresAt.toISOString(), last_renewed_at: new Date().toISOString() } 
+          s.summary_id === renewSummary.summary_id 
+            ? { ...s, summary_text: renewEditText, expires_at: newExpiresAt.toISOString(), renewed_at: new Date().toISOString(), status: 'active' } 
             : s
         )
       );
@@ -274,12 +278,12 @@ import { Badge } from "@/components/ui/badge";
          ) : (
            <div className="space-y-4">
              {summaries.map((summary) => (
-               <Card key={summary.id} className={getExpiryStatus(summary.expires_at).status === "expiring" ? "border-amber-500/50" : ""}>
+            <Card key={summary.summary_id} className={getExpiryStatus(summary.expires_at).status === "expiring" ? "border-amber-500/50" : ""}>
                  <CardHeader className="pb-3">
                    <div className="flex items-start justify-between">
                      <div>
                        <div className="flex items-center gap-2 flex-wrap">
-                         <CardTitle className="text-lg">{summary.title}</CardTitle>
+                      <CardTitle className="text-lg">{summary.title || "Planning Summary"}</CardTitle>
                          {getExpiryStatus(summary.expires_at).status === "expiring" && (
                            <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 text-xs">
                              <AlertTriangle className="h-3 w-3 mr-1" />
@@ -288,7 +292,7 @@ import { Badge } from "@/components/ui/badge";
                          )}
                        </div>
                        <CardDescription>
-                         Saved on {formatDate(summary.created_at)} • Expires {formatDate(summary.expires_at)}
+                      Saved on {formatDate(summary.created_at)} {summary.expires_at && `• Expires ${formatDate(summary.expires_at)}`}
                        </CardDescription>
                      </div>
                    </div>
@@ -314,7 +318,7 @@ import { Badge } from "@/components/ui/badge";
                      </div>
                    )}
                    <p className="text-sm text-muted-foreground line-clamp-3">
-                     {summary.summary_text}
+                    {summary.summary_text || "No content"}
                    </p>
                    <div className="flex flex-wrap gap-2">
                      <Button
@@ -344,7 +348,7 @@ import { Badge } from "@/components/ui/badge";
                      <Button
                        variant="outline"
                        size="sm"
-                       onClick={() => setDeleteId(summary.id)}
+                      onClick={() => setDeleteId(summary.summary_id)}
                        className="text-destructive hover:text-destructive"
                      >
                        <Trash2 className="h-4 w-4 mr-1" />

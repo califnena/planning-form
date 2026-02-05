@@ -2033,51 +2033,59 @@ export type Database = {
           category_tag: string | null
           char_count: number | null
           consent_captured: boolean | null
-          created_at: string
-          expires_at: string
-          id: string
-          last_renewed_at: string | null
+          created_at: string | null
+          expires_at: string | null
           pii_flag: boolean | null
           policy_version: string | null
+          renewed_at: string | null
           save_source: string | null
-          summary_text: string
-          title: string
-          updated_at: string
-          user_id: string
+          status: string | null
+          summary_id: string
+          summary_text: string | null
+          title: string | null
+          user_id: string | null
         }
         Insert: {
           category_tag?: string | null
           char_count?: number | null
           consent_captured?: boolean | null
-          created_at?: string
-          expires_at?: string
-          id?: string
-          last_renewed_at?: string | null
+          created_at?: string | null
+          expires_at?: string | null
           pii_flag?: boolean | null
           policy_version?: string | null
+          renewed_at?: string | null
           save_source?: string | null
-          summary_text: string
-          title: string
-          updated_at?: string
-          user_id: string
+          status?: string | null
+          summary_id?: string
+          summary_text?: string | null
+          title?: string | null
+          user_id?: string | null
         }
         Update: {
           category_tag?: string | null
           char_count?: number | null
           consent_captured?: boolean | null
-          created_at?: string
-          expires_at?: string
-          id?: string
-          last_renewed_at?: string | null
+          created_at?: string | null
+          expires_at?: string | null
           pii_flag?: boolean | null
           policy_version?: string | null
+          renewed_at?: string | null
           save_source?: string | null
-          summary_text?: string
-          title?: string
-          updated_at?: string
-          user_id?: string
+          status?: string | null
+          summary_id?: string
+          summary_text?: string | null
+          title?: string | null
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "planning_summaries_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_public"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       plans: {
         Row: {
