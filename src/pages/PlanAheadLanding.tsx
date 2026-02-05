@@ -455,26 +455,6 @@ export default function PlanAheadLanding() {
           </Collapsible>
         </section>
 
-        {/* Final CTA */}
-        <section className="max-w-2xl mx-auto text-center mb-12">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              onClick={handleAccessDigitalPlanner}
-              size="lg"
-              className="min-h-[56px] text-lg px-8"
-            >
-              Access Digital Planner
-            </Button>
-            <Button 
-              variant="outline"
-              size="lg"
-              onClick={handlePreviewPlanner}
-              className="min-h-[56px] text-lg"
-            >
-              Preview First
-            </Button>
-          </div>
-        </section>
       </main>
 
       {/* Footer Note */}
