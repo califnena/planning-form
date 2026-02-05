@@ -242,12 +242,9 @@ export function UserDetailDrawer({ user, orgId, open, onOpenChange, onUserUpdate
                   </span>
                 </div>
                 <Separator className="my-2" />
-                <Button variant="outline" size="sm" className="w-full" asChild>
-                  <a href={`mailto:${user.email}`}>
-                    <Mail className="mr-2 h-4 w-4" />
-                    {t("admin.users.sendEmail")}
-                  </a>
-                </Button>
+               <div className="text-sm text-muted-foreground text-center py-2">
+                 User contact: internal records only
+               </div>
               </CardContent>
             </Card>
 

@@ -473,14 +473,14 @@ const Resources = () => {
                     <Mail className="h-5 w-5 text-amber-700" />
                   </div>
                   <div>
-                    <p className="font-medium">Email Us</p>
-                    <a 
-                      href="mailto:info@everlastingfuneraladvisors.com" 
-                      className="text-sm text-primary hover:underline"
-                    >
-                      info@everlastingfuneraladvisors.com
-                    </a>
-                    <p className="text-sm text-muted-foreground">No pressure, just support.</p>
+                   <p className="font-medium">Send a Message</p>
+                   <button 
+                     onClick={() => setIsCallbackDialogOpen(true)}
+                     className="text-sm text-primary hover:underline text-left"
+                   >
+                     Talk to a Human
+                   </button>
+                   <p className="text-sm text-muted-foreground">No pressure, just support.</p>
                   </div>
                 </div>
               </CardContent>

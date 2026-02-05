@@ -147,7 +147,7 @@ export const generateAfterDeathChecklistPDF = async () => {
   pdf.setFontSize(10);
   pdf.text("Everlasting Funeral Advisors", pageWidth / 2, 205, { align: "center" });
   pdf.setFontSize(9);
-  pdf.text("(323) 863-5804 | info@everlastingfuneraladvisors.com", pageWidth / 2, 213, { align: "center" });
+ pdf.text("(323) 863-5804 | everlastingfuneraladvisors.com", pageWidth / 2, 213, { align: "center" });
 
   pdf.setFontSize(9);
   pdf.setTextColor(150, 150, 150);

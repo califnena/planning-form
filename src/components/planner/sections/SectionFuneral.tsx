@@ -41,14 +41,17 @@ export const SectionFuneral = ({ data, onChange }: SectionFuneralProps) => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         
-        const { error } = await supabase.functions.invoke('send-contact-email', {
-          body: {
-            name: user?.email || "User",
-            email: user?.email || "no-email@provided.com",
-            message: "A user has requested to be contacted by Everlasting Funeral Advisors through the My Final Wishes platform.",
-            type: "contact"
-          }
-        });
+       // Save to internal support_requests table instead of sending email
+       const { error } = await supabase
+         .from('support_requests')
+         .insert({
+           user_id: user?.id || null,
+           name: user?.email?.split('@')[0] || "User",
+           contact_method: 'email',
+           contact_value: user?.email || 'from-planner',
+           message: "User requested to be contacted through the planner.",
+           request_type: 'contact',
+         });
 
         if (error) throw error;
 

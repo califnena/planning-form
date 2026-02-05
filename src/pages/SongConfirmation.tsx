@@ -3,9 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Music } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+ import { useState } from "react";
+ import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
 
 export default function SongConfirmation() {
   const navigate = useNavigate();
+   const [showContactDialog, setShowContactDialog] = useState(false);
 
   return (
     <AuthenticatedLayout>
@@ -49,8 +52,8 @@ export default function SongConfirmation() {
                 <div>
                   <h3 className="font-semibold mb-1">Questions?</h3>
                   <p className="text-sm text-muted-foreground">
-                    If you have any questions about your order, please contact us at{" "}
-                    <a href="mailto:info@everlastingfuneraladvisors.com" className="text-primary hover:underline">info@everlastingfuneraladvisors.com</a>
+                   If you have any questions about your order,{" "}
+                   <button onClick={() => setShowContactDialog(true)} className="text-primary hover:underline">send us a message</button>.
                   </p>
                 </div>
               </div>
@@ -66,6 +69,12 @@ export default function SongConfirmation() {
             </div>
           </CardContent>
         </Card>
+
+       {/* Contact Dialog */}
+       <ContactSuggestionDialog 
+         open={showContactDialog} 
+         onOpenChange={setShowContactDialog} 
+       />
       </div>
     </AuthenticatedLayout>
   );

@@ -1,7 +1,11 @@
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { AppFooter } from "@/components/AppFooter";
+ import { useState } from "react";
+ import { ContactSuggestionDialog } from "@/components/ContactSuggestionDialog";
 
 const TermsOfService = () => {
+   const [showContactDialog, setShowContactDialog] = useState(false);
+ 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <GlobalHeader />
@@ -104,12 +108,12 @@ const TermsOfService = () => {
               Contact us
             </h2>
             <p className="text-lg leading-relaxed text-foreground">
-              <a 
-                href="mailto:info@everlastingfuneraladvisors.com" 
-                className="text-primary hover:underline"
+             <button 
+               onClick={() => setShowContactDialog(true)}
+               className="text-primary hover:underline"
               >
-                info@everlastingfuneraladvisors.com
-              </a>
+               Send a Message
+             </button>
             </p>
           </section>
 
@@ -120,6 +124,12 @@ const TermsOfService = () => {
           </footer>
         </article>
       </main>
+
+     {/* Contact Dialog */}
+     <ContactSuggestionDialog 
+       open={showContactDialog} 
+       onOpenChange={setShowContactDialog} 
+     />
 
       <AppFooter />
     </div>
