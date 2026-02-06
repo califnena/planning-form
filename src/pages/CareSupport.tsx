@@ -110,7 +110,12 @@ You don't have to have the right words. You can share what's on your mind, or we
 What would help most in this moment?`
   };
 
-  const RETURNING_USER_MESSAGE = "Welcome back. Where would you like to pick things up today?";
+  // Shorter returning user messages per mode
+  const MODE_RETURNING_MESSAGES: Record<Exclude<Mode, null>, string> = {
+    planning: "Welcome back. What would you like to work on today?",
+    afterdeath: "I'm here. What can I help with next?",
+    emotional: "I'm here with you. What's on your mind?"
+  };
 
   // Handle mode selection with first-message logic
   const handleModeSelect = (newMode: Exclude<Mode, null>) => {
@@ -119,8 +124,8 @@ What would help most in this moment?`
     const isFirstTime = !seenModes.has(newMode);
     setMode(newMode);
     
-    // Add Claire's welcome message
-    const welcomeMessage = isFirstTime ? MODE_FIRST_MESSAGES[newMode] : RETURNING_USER_MESSAGE;
+    // Add Claire's welcome message - full intro for first time, short for returning
+    const welcomeMessage = isFirstTime ? MODE_FIRST_MESSAGES[newMode] : MODE_RETURNING_MESSAGES[newMode];
     setMessages([{ role: "assistant", content: welcomeMessage }]);
     
     // Mark this mode as seen
