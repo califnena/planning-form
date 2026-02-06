@@ -809,8 +809,15 @@ What would help most in this moment?`
             <CardContent className="p-4 space-y-3">
               {/* Only show chat area when there are messages or loading */}
               {(messages.length > 0 || isLoading) && (
-                <ScrollArea className="max-h-[400px] pr-4">
-                  <div className="space-y-3">
+                <div 
+                  className="space-y-3 pr-2"
+                  style={{
+                    maxHeight: '60vh',
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                    WebkitOverflowScrolling: 'touch',
+                  }}
+                >
                     {messages.map((msg, i) => {
                       const isAssistant = msg.role === "assistant";
                       const prevMsg = messages[i - 1];
@@ -940,8 +947,14 @@ What would help most in this moment?`
                     
                     {/* Quick Options - shown when there's an error */}
                     {showErrorOptions && !isLoading && (
-                      <div className="mt-4 ml-11 space-y-3">
-                        <div className="flex flex-wrap gap-2">
+                      <div 
+                        className="mt-4 ml-11 space-y-3"
+                        style={{
+                          height: 'auto',
+                          overflow: 'visible',
+                        }}
+                      >
+                        <div className="flex flex-wrap gap-2" style={{ overflow: 'visible' }}>
                           <Button
                             variant="outline"
                             size="sm"
@@ -1008,8 +1021,7 @@ What would help most in this moment?`
                         </div>
                       </div>
                     )}
-                  </div>
-                </ScrollArea>
+                </div>
               )}
 
 
