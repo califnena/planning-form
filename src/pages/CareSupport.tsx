@@ -546,8 +546,8 @@ export default function CareSupport() {
                   borderColor: 'hsl(140, 15%, 85%)'
                 }}
               >
-                Read guides and type your own answers for free.<br />
-                If you want help filling things out, saving your work, or being guided step by step, personal support is required.
+                Access guides and checklists for free.<br />
+                If you'd like help filling things out, saving your work, or being guided step by step, personal support is available.
               </p>
             </div>
           </div>
