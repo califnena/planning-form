@@ -411,13 +411,10 @@ export default function CareSupport() {
               </div>
 
               {/* Helper text - access info */}
-              <div className="text-sm text-muted-foreground text-center space-y-1 pt-2 border-t border-border/50">
-                <p>You can explore guides, checklists, and planners for free.</p>
-                <p>You may type in your own answers at any time.</p>
-                <p className="text-xs text-muted-foreground/80 pt-1">
-                  If you want Claire to fill things out for you, save your progress, or guide you step by step, personal support is required.
-                </p>
-              </div>
+              <p className="text-sm text-muted-foreground text-center pt-2 border-t border-border/50">
+                You can answer questions yourself for free.<br />
+                If you'd like Claire to help fill things out or save your work, personal support is required.
+              </p>
             </CardContent>
           </Card>
 
