@@ -19,7 +19,7 @@ import { StoreIAPModal } from "@/components/StoreIAPModal";
 import { AfterDeathResourcesResponse } from "@/components/assistant/AfterDeathResourcesResponse";
 
 type Message = { role: "user" | "assistant"; content: string };
-type Mode = "planning" | "emotional";
+type Mode = "planning" | "afterdeath" | "emotional";
 
 const TOPICS = [
   { label: "🌺 My Funeral Wishes", prompt: "Help me document my funeral wishes." },
@@ -767,7 +767,7 @@ export default function CareSupport() {
 
               <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg">
                 <h3 className="font-semibold mb-3 text-center">Select Your Mode:</h3>
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid md:grid-cols-3 gap-4">
                   <button
                     onClick={() => setMode("planning")}
                     className={`p-4 rounded-lg border-2 transition-all ${
@@ -782,6 +782,23 @@ export default function CareSupport() {
                     </div>
                     <p className="text-xs text-left text-muted-foreground">
                       Get help organizing your funeral wishes, legal documents, and final instructions
+                    </p>
+                  </button>
+
+                  <button
+                    onClick={() => setMode("afterdeath")}
+                    className={`p-4 rounded-lg border-2 transition-all ${
+                      mode === "afterdeath"
+                        ? "border-primary bg-primary/10 shadow-lg"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <ClipboardCheck className="h-5 w-5 text-primary" />
+                      <span className="font-semibold text-lg">📋 After-Death Mode</span>
+                    </div>
+                    <p className="text-xs text-left text-muted-foreground">
+                      Guidance and checklists for what to do after a death, step by step.
                     </p>
                   </button>
 
@@ -808,7 +825,7 @@ export default function CareSupport() {
                 <p className="text-sm text-center">
                   <span className="font-medium">Current mode:</span>{" "}
                   <span className="text-primary font-semibold">
-                    {mode === "planning" ? "🗂 Planning Mode" : "💛 Emotional Support Mode"}
+                    {mode === "planning" ? "🗂 Planning Mode" : mode === "afterdeath" ? "📋 After-Death Mode" : "💛 Emotional Support Mode"}
                   </span>
                 </p>
               </div>
