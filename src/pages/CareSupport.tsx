@@ -67,6 +67,27 @@ const EMOTIONAL_ACTIONS: QuickAction[] = [
   { label: "Talk to a real person", navigateTo: "/contact", icon: Phone },
 ];
 
+// Suggestion chips shown after Claire's first message (subset of actions - prompts only)
+const PLANNING_SUGGESTIONS = [
+  { label: "My funeral wishes", prompt: "I'd like help thinking through my funeral wishes." },
+  { label: "Writing my legacy letter", prompt: "Help me write a legacy letter to my family." },
+  { label: "Organizing my documents", prompt: "What documents should I organize for my family?" },
+];
+
+const AFTERDEATH_SUGGESTIONS = [
+  { label: "What needs to be done first?", prompt: "Someone has passed away. What needs to be done first?" },
+  { label: "Who needs to be notified?", prompt: "Who needs to be notified after someone passes away?" },
+  { label: "What documents are needed?", prompt: "What documents will I need to gather after a death?" },
+  { label: "Talk to a real person", navigateTo: "/contact" },
+];
+
+const EMOTIONAL_SUGGESTIONS = [
+  { label: "How do I cope with grief?", prompt: "How do I cope with grief? I'm struggling and don't know what to do." },
+  { label: "Is what I'm feeling normal?", prompt: "Is what I'm feeling normal? I'm not sure if my reactions are okay." },
+  { label: "I'm struggling right now", prompt: "I'm really struggling right now. What can I do to feel a little better?" },
+  { label: "Talk to a real person", navigateTo: "/contact" },
+];
+
 export default function CareSupport() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -632,51 +653,7 @@ What would help most in this moment?`
               </p>
             </div>
           </div>
-
-          {/* GUARDRAIL: Mode-specific actions - ONLY shown when mode is explicitly selected */}
-          {mode !== null && messages.length === 0 && !showAfterDeathResources && (
-            <Card className="border-none shadow-lg">
-              <CardContent className="p-4 space-y-3">
-                <p className="text-sm text-center text-muted-foreground mb-2">
-                  Current mode: <span className="font-medium text-foreground">
-                    {mode === "planning" ? "Planning Ahead" : mode === "afterdeath" ? "After a Death" : "Emotional Support"}
-                  </span>
-                </p>
-                <div className="space-y-2">
-                  {(mode === "afterdeath" ? AFTERDEATH_ACTIONS : mode === "emotional" ? EMOTIONAL_ACTIONS : PLANNING_ACTIONS).map((action) => (
-                    <Button
-                      key={action.label}
-                      variant="outline"
-                      className="w-full justify-start text-left h-auto py-3 px-4"
-                      onClick={() => {
-                        if (action.downloadUrl) {
-                          const link = document.createElement('a');
-                          link.href = action.downloadUrl;
-                          link.download = '';
-                          link.click();
-                        } else if (action.showAfterDeathResources) {
-                          setShowAfterDeathResources(true);
-                        } else if (action.navigateTo) {
-                          navigate(action.navigateTo);
-                        } else if (action.prompt) {
-                          // Use session-aware handler for emotional mode
-                          if (mode === "emotional") {
-                            startEmotionalSession(action.prompt);
-                          } else {
-                            handleTopicClick(action.prompt);
-                          }
-                        }
-                      }}
-                      disabled={isLoading && !action.navigateTo && !action.showAfterDeathResources && !action.downloadUrl}
-                    >
-                      <action.icon className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
-                      <span>{action.label}</span>
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {/* Note: Mode-specific quick action buttons moved to suggestion chips after Claire's first message */}
           
           {/* After-Death Resources Response */}
           {showAfterDeathResources && messages.length === 0 && (
@@ -698,46 +675,93 @@ What would help most in this moment?`
                       const prevMsg = messages[i - 1];
                       const showAvatar = isAssistant && (!prevMsg || prevMsg.role !== "assistant");
                       
+                      // Show suggestion chips after Claire's first welcome message
+                      const isFirstWelcomeMessage = i === 0 && isAssistant && messages.length === 1;
+                      const suggestions = mode === "planning" ? PLANNING_SUGGESTIONS 
+                        : mode === "afterdeath" ? AFTERDEATH_SUGGESTIONS 
+                        : mode === "emotional" ? EMOTIONAL_SUGGESTIONS 
+                        : [];
+                      
                       return (
-                        <div
-                          key={i}
-                          className={`flex items-start gap-3 ${
-                            isAssistant ? "mr-4" : "ml-8 justify-end"
-                          }`}
-                        >
-                          {/* Claire avatar - only on first message in sequence */}
-                          {isAssistant && (
-                            <div className="flex-shrink-0 w-8">
-                              {showAvatar && (
-                                <img 
-                                  src={claireAvatar} 
-                                  alt="Claire" 
-                                  className="w-8 h-8 rounded-full object-cover shadow-sm border"
-                                  style={{ borderColor: 'hsl(140, 18%, 85%)' }}
-                                />
-                              )}
+                        <div key={i}>
+                          <div
+                            className={`flex items-start gap-3 ${
+                              isAssistant ? "mr-4" : "ml-8 justify-end"
+                            }`}
+                          >
+                            {/* Claire avatar - only on first message in sequence */}
+                            {isAssistant && (
+                              <div className="flex-shrink-0 w-8">
+                                {showAvatar && (
+                                  <img 
+                                    src={claireAvatar} 
+                                    alt="Claire" 
+                                    className="w-8 h-8 rounded-full object-cover shadow-sm border"
+                                    style={{ borderColor: 'hsl(140, 18%, 85%)' }}
+                                  />
+                                )}
+                              </div>
+                            )}
+                            
+                            {/* Message bubble */}
+                            <div
+                              className={`p-4 rounded-xl max-w-[85%] ${
+                                isAssistant 
+                                  ? "shadow-sm" 
+                                  : "bg-primary/10"
+                              }`}
+                              style={isAssistant ? { 
+                                backgroundColor: '#EEF4F1',
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
+                              } : undefined}
+                            >
+                              <p 
+                                className="text-base leading-relaxed whitespace-pre-wrap"
+                                style={{ color: 'hsl(215, 20%, 22%)' }}
+                              >
+                                {msg.content}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          {/* Suggestion chips after first welcome message */}
+                          {isFirstWelcomeMessage && suggestions.length > 0 && (
+                            <div className="mt-4 ml-11 space-y-3">
+                              <div className="flex flex-wrap gap-2">
+                                {suggestions.map((suggestion) => (
+                                  <button
+                                    key={suggestion.label}
+                                    onClick={() => {
+                                      if (suggestion.navigateTo) {
+                                        navigate(suggestion.navigateTo);
+                                      } else if (suggestion.prompt) {
+                                        if (mode === "emotional") {
+                                          startEmotionalSession(suggestion.prompt);
+                                        } else {
+                                          handleTopicClick(suggestion.prompt);
+                                        }
+                                      }
+                                    }}
+                                    disabled={isLoading}
+                                    className="px-3 py-2 text-sm rounded-full border transition-colors hover:bg-muted/50 disabled:opacity-50"
+                                    style={{
+                                      borderColor: 'hsl(175, 25%, 75%)',
+                                      color: 'hsl(175, 35%, 35%)',
+                                      backgroundColor: 'hsl(0, 0%, 100%)'
+                                    }}
+                                  >
+                                    {suggestion.label}
+                                  </button>
+                                ))}
+                              </div>
+                              <p 
+                                className="text-sm"
+                                style={{ color: 'hsl(215, 15%, 50%)' }}
+                              >
+                                Or type anything you'd like to ask.
+                              </p>
                             </div>
                           )}
-                          
-                          {/* Message bubble */}
-                          <div
-                            className={`p-4 rounded-xl max-w-[85%] ${
-                              isAssistant 
-                                ? "shadow-sm" 
-                                : "bg-primary/10"
-                            }`}
-                            style={isAssistant ? { 
-                              backgroundColor: '#EEF4F1',
-                              boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
-                            } : undefined}
-                          >
-                            <p 
-                              className="text-base leading-relaxed whitespace-pre-wrap"
-                              style={{ color: 'hsl(215, 20%, 22%)' }}
-                            >
-                              {msg.content}
-                            </p>
-                          </div>
                         </div>
                       );
                     })}
