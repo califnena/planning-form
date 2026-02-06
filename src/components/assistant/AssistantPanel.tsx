@@ -51,19 +51,19 @@ type QuickAction = {
 // Mode-specific actions
 const PLANNING_ACTIONS: QuickAction[] = [
   { 
-    label: "Start my plan", 
-    prompt: "I'd like to start planning ahead for myself or a loved one.",
+    label: "My Funeral Wishes", 
+    prompt: "I'd like help thinking through my funeral wishes.",
+    icon: Heart 
+  },
+  { 
+    label: "Writing My Legacy Letter", 
+    prompt: "I'd like help writing a legacy letter to my loved ones.",
     icon: FileText 
   },
   { 
-    label: "I have questions about planning", 
-    prompt: "I have questions about funeral pre-planning.",
-    icon: MessageCircle 
-  },
-  { 
-    label: "Help me understand my options", 
-    prompt: "Can you help me understand my funeral planning options?",
-    icon: HelpCircle 
+    label: "Organizing My Documents", 
+    prompt: "I need help organizing my important documents for my family.",
+    icon: ClipboardCheck 
   },
 ];
 
