@@ -16,7 +16,8 @@ import {
   X,
   Heart,
   FileText,
-  Sparkles
+  Sparkles,
+  ClipboardCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BookingModal } from "./BookingModal";
@@ -35,7 +36,14 @@ interface AssistantPanelProps {
 }
 
 // Quick action buttons for seniors
-const QUICK_ACTIONS = [
+type QuickAction = {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  prompt?: string;
+  navigateTo?: string;
+};
+
+const QUICK_ACTIONS: QuickAction[] = [
   { 
     label: "I'm planning ahead", 
     prompt: "I'm planning ahead for myself or a loved one.",
@@ -55,6 +63,11 @@ const QUICK_ACTIONS = [
     label: "I need more support", 
     prompt: "I'm feeling a bit overwhelmed and could use some extra support.",
     icon: HelpCircle 
+  },
+  { 
+    label: "After-Death Planner & Checklist", 
+    navigateTo: "/after-death",
+    icon: ClipboardCheck 
   },
 ];
 
@@ -522,8 +535,15 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                         key={action.label}
                         variant="outline"
                         className="w-full justify-start text-left h-auto py-3 px-4"
-                        onClick={() => handleSend(action.prompt)}
-                        disabled={isLoading}
+                        onClick={() => {
+                          if (action.navigateTo) {
+                            onClose();
+                            navigate(action.navigateTo);
+                          } else if (action.prompt) {
+                            handleSend(action.prompt);
+                          }
+                        }}
+                        disabled={isLoading && !action.navigateTo}
                       >
                         <action.icon className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
                         <span className="text-sm">{action.label}</span>
