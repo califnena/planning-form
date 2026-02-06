@@ -27,8 +27,31 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-type Message = { role: "user" | "assistant"; content: string };
+type Message = { role: "user" | "assistant"; content: string; isError?: boolean };
 type Mode = "planning" | "afterdeath" | "emotional" | null;
+
+// Mode-specific fallback messages when AI fails
+const ERROR_FALLBACK_MESSAGES: Record<Exclude<Mode, null>, string> = {
+  planning: "I'm here. If you tell me what you're working on, I can guide you. You can also use the guides and checklists below.",
+  afterdeath: "I'm here. If you tell me what happened and what you need help with first, I'll guide you. You can also download the After Death Guide below.",
+  emotional: "I'm here with you. If you want, tell me what's on your mind. If you'd rather not type, you can use the quick options below."
+};
+
+// Generic fallback when mode is null
+const GENERIC_ERROR_FALLBACK = "Sorry, I didn't catch that. Please try again, or tap one of the quick options below.";
+
+// Safe error logging (no PII)
+const logClaireError = (mode: Mode, errorCode: string | number, errorMessage: string, isRetry: boolean) => {
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    mode: mode || "none",
+    errorCode: String(errorCode),
+    errorMessage: errorMessage.slice(0, 200), // Truncate to avoid PII leakage
+    isRetry
+  };
+  console.log("[Claire Error Log]", JSON.stringify(logEntry));
+  // Future: Could store in a claire_error_logs table if needed
+};
 
 
 type QuickAction = {
@@ -157,6 +180,9 @@ What would help most in this moment?`
     const isFirstTime = !seenModes.has(newMode);
     setMode(newMode);
     
+    // Clear any error state when switching modes
+    setShowErrorOptions(false);
+    
     // Add Claire's welcome message - full intro for first time, short for returning
     const welcomeMessage = isFirstTime ? MODE_FIRST_MESSAGES[newMode] : MODE_RETURNING_MESSAGES[newMode];
     setMessages([{ role: "assistant", content: welcomeMessage }]);
@@ -198,6 +224,10 @@ What would help most in this moment?`
   const [showSessionsExhausted, setShowSessionsExhausted] = useState(false);
   // Pending emotional action after disclosure
   const [pendingEmotionalPrompt, setPendingEmotionalPrompt] = useState<string | null>(null);
+  // Track if the last message was an error (to show quick options)
+  const [showErrorOptions, setShowErrorOptions] = useState(false);
+  // Store the last user message for retry functionality
+  const [lastUserMessage, setLastUserMessage] = useState<string>("");
   
   // Emotional support session tracking
   const emotionalSessions = useEmotionalSupportSessions(userId);
@@ -333,21 +363,34 @@ What would help most in this moment?`
     }
   };
 
-  const streamChat = async (userMessage: string) => {
-    const newMessages: Message[] = [...messages, { role: "user", content: userMessage }];
+  const streamChat = async (userMessage: string, isRetry: boolean = false) => {
+    // Store last message for retry functionality
+    setLastUserMessage(userMessage);
+    setShowErrorOptions(false);
+    
+    const newMessages: Message[] = [...messages.filter(m => !m.isError), { role: "user", content: userMessage }];
     setMessages(newMessages);
     setIsLoading(true);
 
-    try {
+    // Helper to add error message to chat inline
+    const addErrorMessage = (errorMsg: string) => {
+      const fallbackMessage = mode ? ERROR_FALLBACK_MESSAGES[mode] : GENERIC_ERROR_FALLBACK;
+      setMessages(prev => [
+        ...prev.filter(m => !m.isError),
+        { role: "assistant", content: fallbackMessage, isError: true }
+      ]);
+      setShowErrorOptions(true);
+    };
+
+    // Helper to attempt the API call with timeout
+    const attemptFetch = async (): Promise<Response> => {
       // For guest mode, use anon key; for logged-in users, use session token
       let authHeader: string;
       
       if (isLoggedIn) {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.access_token) {
-          toast({ title: "Session expired", description: "Please sign in again.", variant: "destructive" });
-          setIsLoading(false);
-          return;
+          throw new Error("Session expired");
         }
         authHeader = `Bearer ${session.access_token}`;
       } else {
@@ -355,16 +398,89 @@ What would help most in this moment?`
         authHeader = `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`;
       }
 
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach-chat`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader,
-        },
-        body: JSON.stringify({ messages: newMessages, mode }),
-      });
+      // Create AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
-      if (!response.ok || !response.body) throw new Error("Failed to start stream");
+      try {
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach-chat`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: authHeader,
+          },
+          body: JSON.stringify({ messages: newMessages, mode }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        return response;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+      }
+    };
+
+    try {
+      let response: Response;
+      
+      try {
+        response = await attemptFetch();
+      } catch (firstError) {
+        // First attempt failed - log and retry after 1 second
+        const errorMessage = firstError instanceof Error ? firstError.message : "Unknown error";
+        logClaireError(mode, "FIRST_ATTEMPT", errorMessage, false);
+        
+        if (!isRetry) {
+          // Wait 1 second and retry once
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          try {
+            response = await attemptFetch();
+          } catch (retryError) {
+            const retryErrorMessage = retryError instanceof Error ? retryError.message : "Unknown error";
+            logClaireError(mode, "RETRY_FAILED", retryErrorMessage, true);
+            addErrorMessage(retryErrorMessage);
+            setIsLoading(false);
+            return;
+          }
+        } else {
+          addErrorMessage(errorMessage);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Check for HTTP errors
+      if (!response.ok) {
+        const errorCode = response.status;
+        let errorMessage = "Request failed";
+        
+        if (errorCode === 429) {
+          errorMessage = "Too many requests. Please wait a moment.";
+        } else if (errorCode === 402) {
+          errorMessage = "Service temporarily unavailable.";
+        } else if (errorCode === 500 || errorCode === 502 || errorCode === 503) {
+          errorMessage = "Service is temporarily busy.";
+        }
+        
+        logClaireError(mode, errorCode, errorMessage, isRetry);
+        
+        // Retry once for server errors if this wasn't already a retry
+        if (!isRetry && (errorCode >= 500 || errorCode === 429)) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          return streamChat(userMessage, true);
+        }
+        
+        addErrorMessage(errorMessage);
+        setIsLoading(false);
+        return;
+      }
+
+      if (!response.body) {
+        logClaireError(mode, "NO_BODY", "No response body", isRetry);
+        addErrorMessage("No response received");
+        setIsLoading(false);
+        return;
+      }
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -394,11 +510,12 @@ What would help most in this moment?`
             if (content) {
               assistantContent += content;
               setMessages((prev) => {
-                const last = prev[prev.length - 1];
-                if (last?.role === "assistant") {
-                  return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: assistantContent } : m));
+                const filtered = prev.filter(m => !m.isError);
+                const last = filtered[filtered.length - 1];
+                if (last?.role === "assistant" && !last.isError) {
+                  return filtered.map((m, i) => (i === filtered.length - 1 ? { ...m, content: assistantContent } : m));
                 }
-                return [...prev, { role: "assistant", content: assistantContent }];
+                return [...filtered, { role: "assistant", content: assistantContent }];
               });
             }
           } catch {
@@ -407,15 +524,32 @@ What would help most in this moment?`
           }
         }
       }
+      
+      // Successful response - clear error state
+      setShowErrorOptions(false);
     } catch (error) {
-      console.error("Chat error:", error);
-      toast({
-        title: "Error",
-        description: "Failed to get response. Please try again.",
-        variant: "destructive",
-      });
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      logClaireError(mode, "CATCH_ALL", errorMessage, isRetry);
+      
+      // Retry once if this wasn't already a retry
+      if (!isRetry) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return streamChat(userMessage, true);
+      }
+      
+      addErrorMessage(errorMessage);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Handle retry from error options
+  const handleRetry = () => {
+    if (lastUserMessage) {
+      setShowErrorOptions(false);
+      // Remove the error message before retrying
+      setMessages(prev => prev.filter(m => !m.isError));
+      streamChat(lastUserMessage);
     }
   };
 
@@ -714,17 +848,18 @@ What would help most in this moment?`
                             <div
                               className={`p-4 rounded-xl max-w-[85%] ${
                                 isAssistant 
-                                  ? "shadow-sm" 
+                                  ? msg.isError ? "" : "shadow-sm"
                                   : "bg-primary/10"
                               }`}
                               style={isAssistant ? { 
-                                backgroundColor: '#EEF4F1',
-                                boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
+                                backgroundColor: msg.isError ? 'hsl(45, 80%, 96%)' : '#EEF4F1',
+                                boxShadow: msg.isError ? '0 1px 3px rgba(180, 140, 50, 0.15)' : '0 1px 3px rgba(0,0,0,0.08)',
+                                borderLeft: msg.isError ? '3px solid hsl(45, 70%, 55%)' : undefined
                               } : undefined}
                             >
                               <p 
                                 className="text-base leading-relaxed whitespace-pre-wrap"
-                                style={{ color: 'hsl(215, 20%, 22%)' }}
+                                style={{ color: msg.isError ? 'hsl(30, 30%, 30%)' : 'hsl(215, 20%, 22%)' }}
                               >
                                 {msg.content}
                               </p>
@@ -799,6 +934,77 @@ What would help most in this moment?`
                             <Loader2 className="h-4 w-4 animate-spin" />
                             <span className="text-sm">Claire is thinking...</span>
                           </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Quick Options - shown when there's an error */}
+                    {showErrorOptions && !isLoading && (
+                      <div className="mt-4 ml-11 space-y-3">
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleRetry}
+                            className="rounded-full"
+                            style={{
+                              borderColor: 'hsl(175, 25%, 65%)',
+                              color: 'hsl(175, 35%, 30%)'
+                            }}
+                          >
+                            Try again
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setShowErrorOptions(false);
+                              const defaultPrompt = mode === "planning" 
+                                ? "What are common planning questions?" 
+                                : mode === "afterdeath" 
+                                  ? "What are the most common questions after a death?"
+                                  : "What do people commonly ask about grief?";
+                              streamChat(defaultPrompt);
+                            }}
+                            className="rounded-full"
+                            style={{
+                              borderColor: 'hsl(175, 25%, 65%)',
+                              color: 'hsl(175, 35%, 30%)'
+                            }}
+                          >
+                            Show common questions
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const link = document.createElement('a');
+                              link.href = '/guides/EFA-After-Death-Planner-and-Checklist.pdf';
+                              link.download = 'After-Death-Guide.pdf';
+                              link.click();
+                            }}
+                            className="rounded-full"
+                            style={{
+                              borderColor: 'hsl(175, 25%, 65%)',
+                              color: 'hsl(175, 35%, 30%)'
+                            }}
+                          >
+                            <Download className="h-3 w-3 mr-1" />
+                            Download After Death Guide
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate("/contact")}
+                            className="rounded-full"
+                            style={{
+                              borderColor: 'hsl(175, 25%, 65%)',
+                              color: 'hsl(175, 35%, 30%)'
+                            }}
+                          >
+                            <Phone className="h-3 w-3 mr-1" />
+                            Talk to a real person
+                          </Button>
                         </div>
                       </div>
                     )}
