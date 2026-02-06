@@ -1,10 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+// Monthly limit for emotional support messages
+const EMOTIONAL_SUPPORT_MONTHLY_LIMIT = 200;
+
 interface SessionData {
-  sessionsUsed: number;
-  sessionsLimit: number;
-  sessionsRemaining: number;
+  messagesUsed: number;
+  messagesLimit: number;
+  messagesRemaining: number;
   firstSessionShown: boolean;
   isLoading: boolean;
   hasAccess: boolean;
@@ -12,9 +15,9 @@ interface SessionData {
 
 export function useEmotionalSupportSessions(userId: string | null) {
   const [sessionData, setSessionData] = useState<SessionData>({
-    sessionsUsed: 0,
-    sessionsLimit: 5,
-    sessionsRemaining: 5,
+    messagesUsed: 0,
+    messagesLimit: EMOTIONAL_SUPPORT_MONTHLY_LIMIT,
+    messagesRemaining: EMOTIONAL_SUPPORT_MONTHLY_LIMIT,
     firstSessionShown: false,
     isLoading: true,
     hasAccess: false,
@@ -76,22 +79,22 @@ export function useEmotionalSupportSessions(userId: string | null) {
 
       if (existingSession) {
         setSessionData({
-          sessionsUsed: existingSession.sessions_used,
-          sessionsLimit: existingSession.sessions_limit,
-          sessionsRemaining: existingSession.sessions_limit - existingSession.sessions_used,
+          messagesUsed: existingSession.sessions_used,
+          messagesLimit: existingSession.sessions_limit,
+          messagesRemaining: existingSession.sessions_limit - existingSession.sessions_used,
           firstSessionShown: existingSession.first_session_shown,
           isLoading: false,
           hasAccess: true,
         });
       } else {
-        // Create new record for this billing period
+        // Create new record for this billing period with 200 message limit
         const { data: newSession, error: insertError } = await supabase
           .from("emotional_support_sessions")
           .insert({
             user_id: userId,
             billing_period_start: billingPeriodStart,
             sessions_used: 0,
-            sessions_limit: 5,
+            sessions_limit: EMOTIONAL_SUPPORT_MONTHLY_LIMIT,
             first_session_shown: false,
           })
           .select()
@@ -102,9 +105,9 @@ export function useEmotionalSupportSessions(userId: string | null) {
         }
 
         setSessionData({
-          sessionsUsed: 0,
-          sessionsLimit: 5,
-          sessionsRemaining: 5,
+          messagesUsed: 0,
+          messagesLimit: EMOTIONAL_SUPPORT_MONTHLY_LIMIT,
+          messagesRemaining: EMOTIONAL_SUPPORT_MONTHLY_LIMIT,
           firstSessionShown: false,
           isLoading: false,
           hasAccess: true,
@@ -120,8 +123,8 @@ export function useEmotionalSupportSessions(userId: string | null) {
     fetchSessionData();
   }, [fetchSessionData]);
 
-  const consumeSession = useCallback(async (): Promise<boolean> => {
-    if (!userId || sessionData.sessionsRemaining <= 0) {
+  const consumeMessage = useCallback(async (): Promise<boolean> => {
+    if (!userId || sessionData.messagesRemaining <= 0) {
       return false;
     }
 
@@ -130,24 +133,24 @@ export function useEmotionalSupportSessions(userId: string | null) {
     const { error } = await supabase
       .from("emotional_support_sessions")
       .update({ 
-        sessions_used: sessionData.sessionsUsed + 1 
+        sessions_used: sessionData.messagesUsed + 1 
       })
       .eq("user_id", userId)
       .eq("billing_period_start", billingPeriodStart);
 
     if (error) {
-      console.error("Error consuming session:", error);
+      console.error("Error consuming message:", error);
       return false;
     }
 
     setSessionData(prev => ({
       ...prev,
-      sessionsUsed: prev.sessionsUsed + 1,
-      sessionsRemaining: prev.sessionsRemaining - 1,
+      messagesUsed: prev.messagesUsed + 1,
+      messagesRemaining: prev.messagesRemaining - 1,
     }));
 
     return true;
-  }, [userId, sessionData.sessionsUsed, sessionData.sessionsRemaining, getBillingPeriodStart]);
+  }, [userId, sessionData.messagesUsed, sessionData.messagesRemaining, getBillingPeriodStart]);
 
   const markFirstSessionShown = useCallback(async () => {
     if (!userId) return;
@@ -165,7 +168,7 @@ export function useEmotionalSupportSessions(userId: string | null) {
 
   return {
     ...sessionData,
-    consumeSession,
+    consumeMessage,
     markFirstSessionShown,
     refetch: fetchSessionData,
   };
