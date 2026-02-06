@@ -720,42 +720,99 @@ export default function CareSupport() {
       
       <ClaireWelcomeModal isOpen={showWelcome} onClose={handleWelcomeClose} />
       
-      <div className="flex-1 bg-gradient-to-b from-background to-muted/30 p-4 md:p-8">
-        <div className="max-w-4xl mx-auto space-y-6">
+      <div className="flex-1 bg-gradient-to-b from-background to-muted/30 px-4 py-3 md:p-8">
+        <div className="max-w-4xl mx-auto space-y-4">
+          {/* Compact header for mobile */}
+          <div className="flex items-center justify-between">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/dashboard")}
+              className="gap-1 text-xs px-2"
+            >
+              <Home className="h-4 w-4" />
+              <span className="hidden sm:inline">Planning Menu</span>
+            </Button>
+            <div className="flex items-center gap-1">
+              <Heart className="h-5 w-5 text-primary" />
+              <span className="text-lg font-serif font-semibold">Claire</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="gap-1 text-xs px-2"
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">Logout</span>
+            </Button>
+          </div>
+
+          {/* Mode Selection - FIRST and prominent */}
           <Card className="border-none shadow-lg">
-            <CardHeader className="text-center space-y-4">
-              <div className="flex items-center justify-between mb-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate("/dashboard")}
-                  className="gap-2"
+            <CardContent className="p-4 space-y-3">
+              <h3 className="font-semibold text-center text-base">Select Your Mode:</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <button
+                  onClick={() => setMode("planning")}
+                  className={`p-3 rounded-lg border-2 transition-all text-left ${
+                    mode === "planning"
+                      ? "border-primary bg-primary/10 shadow-md"
+                      : "border-border hover:border-primary/50"
+                  }`}
                 >
-                  <Home className="h-4 w-4" />
-                  Planning Menu
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLogout}
-                  className="gap-2"
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="font-medium">Planning Ahead</span>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setMode("afterdeath")}
+                  className={`p-3 rounded-lg border-2 transition-all text-left ${
+                    mode === "afterdeath"
+                      ? "border-primary bg-primary/10 shadow-md"
+                      : "border-border hover:border-primary/50"
+                  }`}
                 >
-                  <LogOut className="h-4 w-4" />
-                  Logout
-                </Button>
+                  <div className="flex items-center gap-2">
+                    <ClipboardCheck className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="font-medium">After a Death</span>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setMode("emotional")}
+                  className={`p-3 rounded-lg border-2 transition-all text-left ${
+                    mode === "emotional"
+                      ? "border-primary bg-primary/10 shadow-md"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Heart className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="font-medium">Emotional Support</span>
+                  </div>
+                </button>
               </div>
-              <div className="flex items-center justify-center gap-2">
-                <Heart className="h-6 w-6 text-primary" />
-                <CardTitle className="text-3xl font-serif">Talk to Claire</CardTitle>
-              </div>
-              <CardDescription className="text-base">
-                Hi, it's Claire. What would you like help with today?
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Mode-specific quick actions when no messages */}
-              {messages.length === 0 && !showAfterDeathResources && (
-                <div className="space-y-3">
+
+              {/* Helper text */}
+              <p className="text-sm text-muted-foreground text-center">
+                Tap an option above, or type a question below.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Mode-specific actions - shown after mode selection */}
+          {messages.length === 0 && !showAfterDeathResources && (
+            <Card className="border-none shadow-lg">
+              <CardContent className="p-4 space-y-3">
+                <p className="text-sm text-center text-muted-foreground mb-2">
+                  Current mode: <span className="font-medium text-foreground">
+                    {mode === "planning" ? "Planning Ahead" : mode === "afterdeath" ? "After a Death" : "Emotional Support"}
+                  </span>
+                </p>
+                <div className="space-y-2">
                   {(mode === "afterdeath" ? AFTERDEATH_ACTIONS : mode === "emotional" ? EMOTIONAL_ACTIONS : PLANNING_ACTIONS).map((action) => (
                     <Button
                       key={action.label}
@@ -782,79 +839,18 @@ export default function CareSupport() {
                     </Button>
                   ))}
                 </div>
-              )}
-              
-              {/* After-Death Resources Response */}
-              {showAfterDeathResources && messages.length === 0 && (
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* After-Death Resources Response */}
+          {showAfterDeathResources && messages.length === 0 && (
+            <Card className="border-none shadow-lg">
+              <CardContent className="p-4">
                 <AfterDeathResourcesResponse />
-              )}
-
-              <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg">
-                <h3 className="font-semibold mb-3 text-center">Select Your Mode:</h3>
-                <div className="grid md:grid-cols-3 gap-4">
-                  <button
-                    onClick={() => setMode("planning")}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      mode === "planning"
-                        ? "border-primary bg-primary/10 shadow-lg"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <Sparkles className="h-5 w-5 text-primary" />
-                      <span className="font-semibold text-lg">🗂 Planning Mode</span>
-                    </div>
-                    <p className="text-xs text-left text-muted-foreground">
-                      Get help organizing your funeral wishes, legal documents, and final instructions
-                    </p>
-                  </button>
-
-                  <button
-                    onClick={() => setMode("afterdeath")}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      mode === "afterdeath"
-                        ? "border-primary bg-primary/10 shadow-lg"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <ClipboardCheck className="h-5 w-5 text-primary" />
-                      <span className="font-semibold text-lg">📋 After-Death Mode</span>
-                    </div>
-                    <p className="text-xs text-left text-muted-foreground">
-                      Guidance and checklists for what to do after a death, step by step.
-                    </p>
-                  </button>
-
-                  <button
-                    onClick={() => setMode("emotional")}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      mode === "emotional"
-                        ? "border-primary bg-primary/10 shadow-lg"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <Heart className="h-5 w-5 text-primary" />
-                      <span className="font-semibold text-lg">💛 Emotional Support</span>
-                    </div>
-                    <p className="text-xs text-left text-muted-foreground">
-                      Receive compassionate guidance for managing grief, anxiety, and difficult emotions
-                    </p>
-                  </button>
-                </div>
-              </div>
-
-              <div className="bg-muted/50 p-3 rounded-lg">
-                <p className="text-sm text-center">
-                  <span className="font-medium">Current mode:</span>{" "}
-                  <span className="text-primary font-semibold">
-                    {mode === "planning" ? "🗂 Planning Mode" : mode === "afterdeath" ? "📋 After-Death Mode" : "💛 Emotional Support Mode"}
-                  </span>
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
           <Card className="border-none shadow-lg">
             <CardContent className="p-4 space-y-3">
