@@ -271,7 +271,7 @@ import { Badge } from "@/components/ui/badge";
                  onClick={() => navigate("/care-support")}
                  className="mt-4"
                >
-                 Talk to Claire
+                 Open Claire
                </Button>
              </CardContent>
            </Card>

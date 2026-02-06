@@ -98,15 +98,15 @@ export default function ClaireFAQ() {
                     onClick={() => navigate("/care-support")}
                     className="min-h-[48px]"
                   >
-                    Get CARE Support
+                    Open Claire
                   </Button>
                   <Button 
                     variant="outline"
                     size="lg"
-                    onClick={() => navigate("/dashboard")}
+                    onClick={() => navigate("/faq")}
                     className="min-h-[48px]"
                   >
-                    Go to Planning Menu
+                    See FAQs & Guides
                   </Button>
                 </div>
               </div>

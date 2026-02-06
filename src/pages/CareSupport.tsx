@@ -697,54 +697,37 @@ What would help most in this moment?`
               borderColor: 'hsl(140, 18%, 88%)'
             }}
           >
-            <div className="p-4 md:p-6 space-y-4">
-              {/* Claire Avatar and Introduction */}
-              <div className="flex flex-col items-center text-center space-y-3">
+            <div className="p-4 md:p-5 space-y-3">
+              {/* Compact Claire Header - Mobile First */}
+              <div className="flex items-center gap-3">
                 <img 
                   src={claireAvatar} 
-                  alt="Claire - Your Support Assistant" 
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover shadow-sm border-2"
+                  alt="Claire" 
+                  className="w-12 h-12 rounded-full object-cover shadow-sm border-2 flex-shrink-0"
                   style={{ borderColor: 'hsl(140, 18%, 85%)' }}
                 />
-                
-                {/* Claire's First-Person Introduction */}
-                <p 
-                  className="text-xs uppercase tracking-wide font-medium"
-                  style={{ color: 'hsl(175, 25%, 45%)' }}
-                >
-                  A note from Claire
-                </p>
-                <div 
-                  className="space-y-2 text-base leading-relaxed max-w-md"
-                  style={{ color: 'hsl(215, 20%, 25%)' }}
-                >
-                  <p className="font-medium" style={{ color: 'hsl(215, 20%, 20%)' }}>
-                    Hi, I'm Claire.
-                  </p>
-                  <p>
-                    I'm here to help you find your way through planning ahead, handling things after a death, or simply taking a moment to breathe.
-                  </p>
-                  <p>
-                    You can explore guides and checklists on your own, or I can stay with you and help step by step when you'd like more support.
-                  </p>
-                  <p>
-                    There's no rush. You're in control of what we do and when.
+                <div>
+                  <h2 
+                    className="text-xl font-semibold"
+                    style={{ color: 'hsl(215, 20%, 22%)' }}
+                  >
+                    Claire
+                  </h2>
+                  <p 
+                    className="text-sm"
+                    style={{ color: 'hsl(215, 15%, 45%)' }}
+                  >
+                    Pick a mode, then ask a question.
                   </p>
                 </div>
               </div>
               
-              <h3 
-                className="font-semibold text-center text-lg pt-2"
-                style={{ color: 'hsl(215, 20%, 22%)' }}
-              >
-                Select Your Mode
-              </h3>
-              
+              {/* Mode Selection Buttons */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 {/* Planning Ahead Button */}
                 <button
                   onClick={() => handleModeSelect("planning")}
-                  className={`p-3 rounded-lg border-2 transition-all text-left min-h-[56px] ${
+                  className={`p-3 rounded-lg border-2 transition-all text-left min-h-[48px] ${
                     mode === "planning"
                       ? "shadow-md"
                       : "hover:shadow-sm"
@@ -764,7 +747,7 @@ What would help most in this moment?`
                 {/* After a Death Button */}
                 <button
                   onClick={() => handleModeSelect("afterdeath")}
-                  className={`p-3 rounded-lg border-2 transition-all text-left min-h-[56px] ${
+                  className={`p-3 rounded-lg border-2 transition-all text-left min-h-[48px] ${
                     mode === "afterdeath"
                       ? "shadow-md"
                       : "hover:shadow-sm"
@@ -784,7 +767,7 @@ What would help most in this moment?`
                 {/* Emotional Support Button */}
                 <button
                   onClick={handleEmotionalModeSelect}
-                  className={`p-3 rounded-lg border-2 transition-all text-left min-h-[56px] ${
+                  className={`p-3 rounded-lg border-2 transition-all text-left min-h-[48px] ${
                     mode === "emotional"
                       ? "shadow-md"
                       : "hover:shadow-sm"
@@ -807,24 +790,40 @@ What would help most in this moment?`
                           color: mode === "emotional" ? 'hsl(0, 0%, 100%)' : 'hsl(215, 20%, 25%)'
                         }}
                       >
-                        {emotionalSessions.sessionsRemaining} sessions
+                        {emotionalSessions.sessionsRemaining} left
                       </Badge>
                     )}
                   </div>
                 </button>
               </div>
 
-              {/* Helper text - access info */}
+              {/* Helper text under mode buttons */}
               <p 
-                className="text-sm text-center pt-3 border-t"
-                style={{ 
-                  color: 'hsl(215, 15%, 40%)',
-                  borderColor: 'hsl(140, 15%, 85%)'
-                }}
+                className="text-xs text-center"
+                style={{ color: 'hsl(215, 15%, 50%)' }}
               >
-                Access guides and checklists for free.<br />
-                If you'd like help filling things out, saving your work, or being guided step by step, personal support is available.
+                Tap a mode, then type your question below.
               </p>
+
+              {/* Free to explore section */}
+              <div 
+                className="pt-3 border-t space-y-1"
+                style={{ borderColor: 'hsl(140, 15%, 85%)' }}
+              >
+                <p 
+                  className="text-sm font-medium text-center"
+                  style={{ color: 'hsl(215, 20%, 30%)' }}
+                >
+                  Free to explore
+                </p>
+                <p 
+                  className="text-xs text-center leading-relaxed"
+                  style={{ color: 'hsl(215, 15%, 45%)' }}
+                >
+                  Explore FAQs, guides, and checklists for free.<br />
+                  If you want step-by-step help, saving your progress, or help filling things out, Personal Support is available.
+                </p>
+              </div>
             </div>
           </div>
           {/* Note: Mode-specific quick action buttons moved to suggestion chips after Claire's first message */}
