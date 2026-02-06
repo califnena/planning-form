@@ -504,40 +504,20 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
           <ScrollArea className="flex-1 pr-4" ref={scrollRef}>
             <div className="space-y-4">
               {messages.length === 0 && (
-                <div className="space-y-4">
-                  <div className="text-center text-muted-foreground text-sm py-4">
+                <div className="space-y-2">
+                  {/* Compact header */}
+                  <div className="text-center text-muted-foreground text-sm py-1">
                     <p className="text-base font-medium text-foreground">Hi, I'm Claire.</p>
-                    <p className="mt-2">I'm here for planning ahead — or after a loss.</p>
-                    <p className="mt-1">How can I help today?</p>
+                    <p className="mt-1 text-sm">How can I help today?</p>
                   </div>
                   
-                  {/* Voice tip */}
-                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-center">
-                    <p className="text-sm text-foreground">
-                      You can talk to Claire. Click the mic to speak.
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      You can also type if you prefer.
-                    </p>
-                  </div>
-                  
-                  {/* Memory disclosure */}
-                  <div className="bg-muted/50 rounded-lg p-3 text-center">
-                   <p className="text-xs text-muted-foreground">
-                     Claire remembers planning information you choose to save. Conversations are private.
-                   </p>
-                   <p className="text-xs text-muted-foreground/70 mt-1">
-                     Privacy: Claire can save a short planning summary only if you ask. She does not store personal details.
-                   </p>
-                 </div>
-                  
-                  {/* Quick action buttons for seniors */}
+                  {/* Quick action buttons - prioritized for immediate visibility */}
                   <div className="space-y-2">
                     {QUICK_ACTIONS.map((action) => (
                       <Button
                         key={action.label}
                         variant="outline"
-                        className="w-full justify-start text-left h-auto py-3 px-4"
+                        className="w-full justify-start text-left h-auto py-2.5 px-4"
                         onClick={() => {
                           if (action.showAfterDeathResources) {
                             setShowAfterDeathResources(true);
@@ -555,6 +535,20 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                       </Button>
                     ))}
                   </div>
+                  
+                  {/* Voice tip - compact */}
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-2 text-center">
+                    <p className="text-xs text-foreground">
+                      Click the mic to speak, or type below.
+                    </p>
+                  </div>
+                  
+                  {/* Memory disclosure - compact */}
+                  <div className="bg-muted/50 rounded-lg p-2 text-center">
+                   <p className="text-[11px] text-muted-foreground">
+                     Claire remembers planning info you save. Conversations are private.
+                   </p>
+                 </div>
                 </div>
               )}
               
