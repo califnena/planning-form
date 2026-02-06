@@ -187,10 +187,10 @@ export default function AfterDeathLanding() {
                     <p className="text-sm text-muted-foreground">Complete printable guide</p>
                   </div>
                 </a>
-                <a href="/checklists/After-Death-Checklist.png" download className="flex items-center gap-3 p-4 border rounded-lg hover:bg-muted transition-colors">
+                <a href="/guides/After-Life-Action-Plan-BLANK.pdf" download className="flex items-center gap-3 p-4 border rounded-lg hover:bg-muted transition-colors">
                   <ClipboardCheck className="h-8 w-8 text-primary" />
                   <div>
-                    <p className="font-medium">Quick Reference Checklist</p>
+                    <p className="font-medium">After Death Planner</p>
                     <p className="text-sm text-muted-foreground">One-page visual guide</p>
                   </div>
                 </a>
