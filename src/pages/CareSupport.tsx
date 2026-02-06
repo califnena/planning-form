@@ -18,6 +18,7 @@ import { isStoreIAP } from "@/lib/billingMode";
 import { StoreIAPModal } from "@/components/StoreIAPModal";
 import { AfterDeathResourcesResponse } from "@/components/assistant/AfterDeathResourcesResponse";
 import { useEmotionalSupportSessions } from "@/hooks/useEmotionalSupportSessions";
+import claireAvatar from "@/assets/claire-avatar.png";
 import {
   Dialog,
   DialogContent,
@@ -399,8 +400,8 @@ export default function CareSupport() {
       
       <ClaireWelcomeModal isOpen={showWelcome} onClose={handleWelcomeClose} />
       
-      <div className="flex-1 bg-gradient-to-b from-background to-muted/30 px-4 py-3 md:p-8">
-        <div className="max-w-4xl mx-auto space-y-4">
+      <div className="flex-1 bg-gradient-to-b from-background to-muted/30 px-4 py-2 md:py-4 md:px-8">
+        <div className="max-w-4xl mx-auto space-y-3">
           {/* Compact header for mobile */}
           <div className="flex items-center justify-between">
             <Button
@@ -413,8 +414,8 @@ export default function CareSupport() {
               <span className="hidden sm:inline">Planning Menu</span>
             </Button>
             <div className="flex items-center gap-1">
-              <Heart className="h-5 w-5 text-primary" />
-              <span className="text-lg font-serif font-semibold">Claire</span>
+              <Heart className="h-5 w-5" style={{ color: 'hsl(175, 35%, 40%)' }} />
+              <span className="text-lg font-serif font-semibold" style={{ color: 'hsl(215, 20%, 22%)' }}>Claire</span>
             </div>
             <Button
               variant="ghost"
@@ -427,11 +428,34 @@ export default function CareSupport() {
             </Button>
           </div>
 
-          {/* Mode Selection - FIRST and prominent */}
-          <Card className="border-none shadow-lg">
-            <CardContent className="p-4 space-y-3">
-              <h3 className="font-semibold text-center text-base">Select Your Mode:</h3>
+          {/* Claire Mode Selection Card - Soft sage identity */}
+          <div 
+            className="rounded-xl shadow-md border"
+            style={{ 
+              backgroundColor: 'hsl(140, 20%, 95%)',
+              borderColor: 'hsl(140, 18%, 88%)'
+            }}
+          >
+            <div className="p-4 md:p-6 space-y-4">
+              {/* Claire Avatar */}
+              <div className="flex flex-col items-center">
+                <img 
+                  src={claireAvatar} 
+                  alt="Claire - Your Support Assistant" 
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover shadow-sm border-2"
+                  style={{ borderColor: 'hsl(140, 18%, 85%)' }}
+                />
+              </div>
+              
+              <h3 
+                className="font-semibold text-center text-lg"
+                style={{ color: 'hsl(215, 20%, 22%)' }}
+              >
+                Select Your Mode
+              </h3>
+              
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                {/* Planning Ahead Button */}
                 <button
                   onClick={() => {
                     if (mode !== "planning") {
@@ -439,18 +463,24 @@ export default function CareSupport() {
                       toast({ title: "Switched to: Planning Ahead", duration: 2000 });
                     }
                   }}
-                  className={`p-3 rounded-lg border-2 transition-all text-left ${
+                  className={`p-3 rounded-lg border-2 transition-all text-left min-h-[56px] ${
                     mode === "planning"
-                      ? "border-primary bg-primary/10 shadow-md"
-                      : "border-border hover:border-primary/50"
+                      ? "shadow-md"
+                      : "hover:shadow-sm"
                   }`}
+                  style={{ 
+                    backgroundColor: mode === "planning" ? 'hsl(175, 35%, 40%)' : 'hsl(0, 0%, 100%)',
+                    borderColor: mode === "planning" ? 'hsl(175, 35%, 35%)' : 'hsl(30, 8%, 75%)',
+                    color: mode === "planning" ? 'hsl(0, 0%, 100%)' : 'hsl(215, 20%, 22%)'
+                  }}
                 >
                   <div className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-primary flex-shrink-0" />
+                    <Sparkles className="h-5 w-5 flex-shrink-0" style={{ color: mode === "planning" ? 'hsl(0, 0%, 100%)' : 'hsl(175, 35%, 40%)' }} />
                     <span className="font-medium">Planning Ahead</span>
                   </div>
                 </button>
 
+                {/* After a Death Button */}
                 <button
                   onClick={() => {
                     if (mode !== "afterdeath") {
@@ -458,31 +488,49 @@ export default function CareSupport() {
                       toast({ title: "Switched to: After a Death", duration: 2000 });
                     }
                   }}
-                  className={`p-3 rounded-lg border-2 transition-all text-left ${
+                  className={`p-3 rounded-lg border-2 transition-all text-left min-h-[56px] ${
                     mode === "afterdeath"
-                      ? "border-primary bg-primary/10 shadow-md"
-                      : "border-border hover:border-primary/50"
+                      ? "shadow-md"
+                      : "hover:shadow-sm"
                   }`}
+                  style={{ 
+                    backgroundColor: mode === "afterdeath" ? 'hsl(175, 35%, 40%)' : 'hsl(0, 0%, 100%)',
+                    borderColor: mode === "afterdeath" ? 'hsl(175, 35%, 35%)' : 'hsl(30, 8%, 75%)',
+                    color: mode === "afterdeath" ? 'hsl(0, 0%, 100%)' : 'hsl(215, 20%, 22%)'
+                  }}
                 >
                   <div className="flex items-center gap-2">
-                    <ClipboardCheck className="h-5 w-5 text-primary flex-shrink-0" />
+                    <ClipboardCheck className="h-5 w-5 flex-shrink-0" style={{ color: mode === "afterdeath" ? 'hsl(0, 0%, 100%)' : 'hsl(175, 35%, 40%)' }} />
                     <span className="font-medium">After a Death</span>
                   </div>
                 </button>
 
+                {/* Emotional Support Button */}
                 <button
                   onClick={handleEmotionalModeSelect}
-                  className={`p-3 rounded-lg border-2 transition-all text-left ${
+                  className={`p-3 rounded-lg border-2 transition-all text-left min-h-[56px] ${
                     mode === "emotional"
-                      ? "border-primary bg-primary/10 shadow-md"
-                      : "border-border hover:border-primary/50"
+                      ? "shadow-md"
+                      : "hover:shadow-sm"
                   }`}
+                  style={{ 
+                    backgroundColor: mode === "emotional" ? 'hsl(175, 35%, 40%)' : 'hsl(0, 0%, 100%)',
+                    borderColor: mode === "emotional" ? 'hsl(175, 35%, 35%)' : 'hsl(30, 8%, 75%)',
+                    color: mode === "emotional" ? 'hsl(0, 0%, 100%)' : 'hsl(215, 20%, 22%)'
+                  }}
                 >
                   <div className="flex items-center gap-2">
-                    <Heart className="h-5 w-5 text-primary flex-shrink-0" />
+                    <Heart className="h-5 w-5 flex-shrink-0" style={{ color: mode === "emotional" ? 'hsl(0, 0%, 100%)' : 'hsl(175, 35%, 40%)' }} />
                     <span className="font-medium">Emotional Support</span>
                     {emotionalSessions.hasAccess && emotionalSessions.sessionsRemaining > 0 && (
-                      <Badge variant="secondary" className="text-xs ml-auto">
+                      <Badge 
+                        variant="secondary" 
+                        className="text-xs ml-auto"
+                        style={{ 
+                          backgroundColor: mode === "emotional" ? 'hsl(175, 35%, 50%)' : 'hsl(30, 8%, 85%)',
+                          color: mode === "emotional" ? 'hsl(0, 0%, 100%)' : 'hsl(215, 20%, 25%)'
+                        }}
+                      >
                         {emotionalSessions.sessionsRemaining} sessions
                       </Badge>
                     )}
@@ -491,12 +539,18 @@ export default function CareSupport() {
               </div>
 
               {/* Helper text - access info */}
-              <p className="text-sm text-muted-foreground text-center pt-2 border-t border-border/50">
+              <p 
+                className="text-sm text-center pt-3 border-t"
+                style={{ 
+                  color: 'hsl(215, 15%, 40%)',
+                  borderColor: 'hsl(140, 15%, 85%)'
+                }}
+              >
                 Read guides and type your own answers for free.<br />
                 If you want help filling things out, saving your work, or being guided step by step, personal support is required.
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* GUARDRAIL: Mode-specific actions - ONLY shown when mode is explicitly selected */}
           {mode !== null && messages.length === 0 && !showAfterDeathResources && (
