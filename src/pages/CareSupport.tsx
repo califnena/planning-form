@@ -8,8 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Heart, Sparkles, ArrowRight, Mic, Volume2, VolumeX, Home, LogOut, CheckCircle, HelpCircle, MessageCircle, FileText } from "lucide-react";
-import { Lock } from "lucide-react";
+import { Loader2, Heart, Sparkles, ArrowRight, Mic, Volume2, VolumeX, Home, LogOut, CheckCircle, HelpCircle, MessageCircle, FileText, ClipboardCheck, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
 import { ClaireWelcomeModal } from "@/components/assistant/ClaireWelcomeModal";
@@ -28,7 +27,15 @@ const TOPICS = [
   { label: "💼 Organizing My Documents", prompt: "Help me organize important documents and passwords." },
 ];
 
-const QUICK_ACTIONS = [
+type QuickAction = {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  prompt?: string;
+  navigateTo?: string;
+};
+
+const QUICK_ACTIONS: QuickAction[] = [
+  { label: "After-Death Planner & Checklist", navigateTo: "/after-death", icon: ClipboardCheck },
   { label: "Help me understand my options", prompt: "Can you help me understand my planning options?", icon: HelpCircle },
   { label: "Help me continue my plan", prompt: "I want to continue working on my plan.", icon: FileText },
   { label: "I have a question", prompt: "I have a question about planning.", icon: MessageCircle },
@@ -732,8 +739,14 @@ export default function CareSupport() {
                       key={action.label}
                       variant="outline"
                       className="w-full justify-start text-left h-auto py-3 px-4"
-                      onClick={() => handleTopicClick(action.prompt)}
-                      disabled={isLoading}
+                      onClick={() => {
+                        if (action.navigateTo) {
+                          navigate(action.navigateTo);
+                        } else if (action.prompt) {
+                          handleTopicClick(action.prompt);
+                        }
+                      }}
+                      disabled={isLoading && !action.navigateTo}
                     >
                       <action.icon className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
                       <span>{action.label}</span>
