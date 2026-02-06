@@ -69,10 +69,15 @@ const EMOTIONAL_ACTIONS: QuickAction[] = [
 
 // Suggestion chips shown after Claire's first message (subset of actions - prompts only)
 const PLANNING_SUGGESTIONS = [
-  { label: "My funeral wishes", prompt: "I'd like help thinking through my funeral wishes." },
-  { label: "Writing my legacy letter", prompt: "Help me write a legacy letter to my family." },
-  { label: "Organizing my documents", prompt: "What documents should I organize for my family?" },
+  { label: "Funeral or memorial wishes", prompt: "I'd like help thinking through my funeral or memorial wishes." },
+  { label: "Important documents to gather", prompt: "What important documents should I gather and organize?" },
+  { label: "Who should be in charge later", prompt: "How do I decide who should be in charge of things after I'm gone?" },
+  { label: "Personal messages or legacy letters", prompt: "Help me write personal messages or a legacy letter to my family." },
+  { label: "Saving what I've already entered", prompt: "I want to save and organize what I've already entered." },
 ];
+
+// Intro text shown above suggestion chips
+const SUGGESTION_INTRO_TEXT = "You can start anywhere. For example:";
 
 const AFTERDEATH_SUGGESTIONS = [
   { label: "What needs to be done first?", prompt: "Someone has passed away. What needs to be done first?" },
@@ -727,6 +732,15 @@ What would help most in this moment?`
                           {/* Suggestion chips after first welcome message */}
                           {isFirstWelcomeMessage && suggestions.length > 0 && (
                             <div className="mt-4 ml-11 space-y-3">
+                              {/* Intro text for Planning mode */}
+                              {mode === "planning" && (
+                                <p 
+                                  className="text-sm font-medium"
+                                  style={{ color: 'hsl(215, 20%, 35%)' }}
+                                >
+                                  {SUGGESTION_INTRO_TEXT}
+                                </p>
+                              )}
                               <div className="flex flex-wrap gap-2">
                                 {suggestions.map((suggestion) => (
                                   <button
