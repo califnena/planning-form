@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BookingModal } from "./BookingModal";
+import { AfterDeathResourcesResponse } from "./AfterDeathResourcesResponse";
 import { Link } from "react-router-dom";
 
 type Message = {
@@ -41,6 +42,7 @@ type QuickAction = {
   icon: React.ComponentType<{ className?: string }>;
   prompt?: string;
   navigateTo?: string;
+  showAfterDeathResources?: boolean;
 };
 
 const QUICK_ACTIONS: QuickAction[] = [
@@ -66,7 +68,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   },
   { 
     label: "After-Death Planner & Checklist", 
-    navigateTo: "/after-death",
+    showAfterDeathResources: true,
     icon: ClipboardCheck 
   },
 ];
@@ -103,6 +105,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [showBooking, setShowBooking] = useState(false);
   const [hasCAREAccess, setHasCAREAccess] = useState<boolean | null>(null);
+  const [showAfterDeathResources, setShowAfterDeathResources] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -536,14 +539,16 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                         variant="outline"
                         className="w-full justify-start text-left h-auto py-3 px-4"
                         onClick={() => {
-                          if (action.navigateTo) {
+                          if (action.showAfterDeathResources) {
+                            setShowAfterDeathResources(true);
+                          } else if (action.navigateTo) {
                             onClose();
                             navigate(action.navigateTo);
                           } else if (action.prompt) {
                             handleSend(action.prompt);
                           }
                         }}
-                        disabled={isLoading && !action.navigateTo}
+                        disabled={isLoading && !action.navigateTo && !action.showAfterDeathResources}
                       >
                         <action.icon className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
                         <span className="text-sm">{action.label}</span>
@@ -551,6 +556,11 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                     ))}
                   </div>
                 </div>
+              )}
+              
+              {/* After-Death Resources Response */}
+              {showAfterDeathResources && messages.length === 0 && (
+                <AfterDeathResourcesResponse onClose={onClose} />
               )}
               
               {messages.map((msg) => (
