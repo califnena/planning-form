@@ -91,6 +91,16 @@ All colors MUST be HSL.
     --section-records-border: 45 40% 80%;
     --section-help: 160 25% 92%;            /* Soft teal - support */
     --section-help-border: 160 30% 80%;
+    
+    /* Claire section - soft sage identity */
+    --claire-bg: 140 20% 95%;               /* Soft sage tint background */
+    --claire-border: 140 18% 88%;           /* Subtle sage border */
+    --claire-text: 215 20% 22%;             /* Charcoal text, not black */
+    --claire-text-soft: 215 15% 40%;        /* Softer text for descriptions */
+    --claire-primary: 175 35% 40%;          /* Muted teal for primary buttons */
+    --claire-primary-foreground: 0 0% 100%;
+    --claire-secondary: 30 8% 75%;          /* Warm gray for secondary */
+    --claire-secondary-foreground: 215 20% 22%;
   }
 
   .dark {
