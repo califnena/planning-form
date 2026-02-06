@@ -857,29 +857,32 @@ export default function CareSupport() {
           </Card>
 
           <Card className="border-none shadow-lg">
-            <CardContent className="p-6 space-y-4">
-              <ScrollArea className="h-[400px] pr-4">
-                <div className="space-y-4">
-                  {messages.map((msg, i) => (
-                    <div
-                      key={i}
-                      className={`p-4 rounded-lg ${
-                        msg.role === "user"
-                          ? "bg-primary/10 ml-8"
-                          : "bg-muted mr-8"
-                      }`}
-                    >
-                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                    </div>
-                  ))}
-                  {isLoading && (
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span className="text-sm">Claire is thinking...</span>
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
+            <CardContent className="p-4 space-y-3">
+              {/* Only show chat area when there are messages or loading */}
+              {(messages.length > 0 || isLoading) && (
+                <ScrollArea className="max-h-[400px] pr-4">
+                  <div className="space-y-4">
+                    {messages.map((msg, i) => (
+                      <div
+                        key={i}
+                        className={`p-4 rounded-lg ${
+                          msg.role === "user"
+                            ? "bg-primary/10 ml-8"
+                            : "bg-muted mr-8"
+                        }`}
+                      >
+                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                      </div>
+                    ))}
+                    {isLoading && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span className="text-sm">Claire is thinking...</span>
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
+              )}
 
 
               <div className="space-y-2">
