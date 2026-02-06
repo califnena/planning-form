@@ -69,18 +69,18 @@ const PLANNING_ACTIONS: QuickAction[] = [
 
 const AFTER_DEATH_ACTIONS: QuickAction[] = [
   { 
-    label: "What do I do first?", 
+    label: "What to Do First", 
     prompt: "Someone has passed away. What should I do first?",
     icon: ClipboardCheck 
   },
   { 
-    label: "After-Death Planner & Checklist", 
+    label: "After Death Checklist", 
     showAfterDeathResources: true,
     icon: FileText 
   },
   { 
-    label: "Who do I need to notify?", 
-    prompt: "Who do I need to notify after a death?",
+    label: "Organizing Documents for Executor", 
+    prompt: "I need help organizing documents for the executor of an estate.",
     icon: MessageCircle 
   },
 ];
@@ -601,6 +601,13 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                            selectedMode === 'planning' ? 'Planning Ahead' : 'Emotional Support'}
                         </span>
                       </div>
+                      
+                      {/* Subtle note for After a Death mode */}
+                      {selectedMode === 'after-death' && (
+                        <p className="text-xs text-muted-foreground text-center italic pb-1">
+                          You don't need to do everything at once.
+                        </p>
+                      )}
                       
                       {/* Actions for selected mode */}
                       {(selectedMode === 'planning' ? PLANNING_ACTIONS : 
