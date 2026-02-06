@@ -40,7 +40,7 @@ const PrintableFormPurchase = () => {
             <FileText className="h-8 w-8 text-primary" />
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-            Printable Planning Form
+            Printable End-of-Life Planning Form
           </h1>
           <p className="text-lg text-muted-foreground">
             A professionally formatted form you can print and fill out by hand.
@@ -50,44 +50,25 @@ const PrintableFormPurchase = () => {
         <Card className="mb-8">
           <CardContent className="p-6 md:p-8">
             <div className="space-y-6">
-              {/* Benefits */}
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <CheckCircle2 className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Blank Printable Form</h3>
-                    <p className="text-muted-foreground">
-                      A comprehensive form with clear sections for all your important information.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Printer className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Print Unlimited Times</h3>
-                    <p className="text-muted-foreground">
-                      Download once and print as many copies as you need. Make copies for your family or keep a backup.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <FileText className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">No App Required</h3>
-                    <p className="text-muted-foreground">
-                      Fill it out by hand at your own pace. No computer skills needed—just pen and paper.
-                    </p>
-                  </div>
-                </div>
-              </div>
+              {/* Key Benefits */}
+              <ul className="space-y-3">
+                <li className="flex items-center gap-3 text-foreground">
+                  <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>Print at home</span>
+                </li>
+                <li className="flex items-center gap-3 text-foreground">
+                  <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>Fill in by hand</span>
+                </li>
+                <li className="flex items-center gap-3 text-foreground">
+                  <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>No account required</span>
+                </li>
+                <li className="flex items-center gap-3 text-foreground">
+                  <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>Immediate download after payment</span>
+                </li>
+              </ul>
 
               {/* Divider */}
               <div className="border-t border-border" />
@@ -141,6 +122,9 @@ const PrintableFormPurchase = () => {
           </Button>
           <p className="text-sm text-muted-foreground mt-3">
             Secure checkout powered by Stripe. No account required.
+          </p>
+          <p className="text-sm text-muted-foreground mt-4 italic">
+            This is the same form many families use when planning with Everlasting Funeral Advisors.
           </p>
         </div>
 
