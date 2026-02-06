@@ -206,7 +206,7 @@ serve(async (req) => {
 
     console.log('Authenticated user:', user.id);
 
-    const { messages, mode } = await req.json();
+    const { messages, mode, activeTopic } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
@@ -215,8 +215,24 @@ serve(async (req) => {
     // ═══════════════════════════════════════════════════════════════
     const normalizedMode = mode || "planning";
     console.log("Active mode (locked):", normalizedMode);
+    console.log("Active topic:", activeTopic || "none");
     
-    const systemPrompt = getModeLockedPrompt(normalizedMode);
+    let systemPrompt = getModeLockedPrompt(normalizedMode);
+    
+    // If there's an active topic, add topic-focused instructions
+    if (activeTopic) {
+      const topicInstructions = `
+
+═══════════════════════════════════════════════════════════════
+ACTIVE TOPIC: ${activeTopic.toUpperCase().replace('_', ' ')} (LOCKED)
+═══════════════════════════════════════════════════════════════
+
+The user is focused on this topic. Keep your responses relevant to this topic.
+- Provide suggestions and follow-up questions related to ${activeTopic.replace('_', ' ')}
+- Do not surface unrelated topics unless the user explicitly asks
+- Stay focused and helpful within this topic area`;
+      systemPrompt += topicInstructions;
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
