@@ -49,9 +49,12 @@ const PLANNING_ACTIONS: QuickAction[] = [
 ];
 
 const AFTERDEATH_ACTIONS: QuickAction[] = [
+  { label: "What needs to be done first?", prompt: "Someone has passed away. What needs to be done first?", icon: ArrowRightCircle },
+  { label: "Who needs to be notified?", prompt: "Who needs to be notified after someone passes away?", icon: MessageCircle },
+  { label: "What documents are needed?", prompt: "What documents will I need to gather after a death?", icon: FileText },
+  { label: "Funeral and service decisions", prompt: "What decisions need to be made about the funeral or memorial service?", icon: ClipboardCheck },
+  { label: "What can wait until later?", prompt: "What tasks can wait until later? I don't want to miss anything urgent.", icon: HelpCircle },
   { label: "Download After Death Guide", downloadUrl: "/guides/EFA-After-Death-Planner-and-Checklist.pdf", icon: Download },
-  { label: "Download After Death Planner", downloadUrl: "/guides/After-Life-Action-Plan-BLANK.pdf", icon: Download },
-  { label: "Walk me through what to do next", prompt: "Someone has passed away. Can you walk me through what I need to do next, step by step?", icon: ArrowRightCircle },
   { label: "Talk to a real person", navigateTo: "/contact", icon: Phone },
 ];
 
