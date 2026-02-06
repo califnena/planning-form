@@ -16,6 +16,7 @@ import NotAdviceNote from "@/components/NotAdviceNote";
 import { requireSessionOrRedirect } from "@/lib/sessionGuard";
 import { isStoreIAP } from "@/lib/billingMode";
 import { StoreIAPModal } from "@/components/StoreIAPModal";
+import { AfterDeathResourcesResponse } from "@/components/assistant/AfterDeathResourcesResponse";
 
 type Message = { role: "user" | "assistant"; content: string };
 type Mode = "planning" | "emotional";
@@ -32,10 +33,11 @@ type QuickAction = {
   icon: React.ComponentType<{ className?: string }>;
   prompt?: string;
   navigateTo?: string;
+  showAfterDeathResources?: boolean;
 };
 
 const QUICK_ACTIONS: QuickAction[] = [
-  { label: "After-Death Planner & Checklist", navigateTo: "/after-death", icon: ClipboardCheck },
+  { label: "After-Death Planner & Checklist", showAfterDeathResources: true, icon: ClipboardCheck },
   { label: "Help me understand my options", prompt: "Can you help me understand my planning options?", icon: HelpCircle },
   { label: "Help me continue my plan", prompt: "I want to continue working on my plan.", icon: FileText },
   { label: "I have a question", prompt: "I have a question about planning.", icon: MessageCircle },
@@ -58,6 +60,7 @@ export default function CareSupport() {
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showIAPModal, setShowIAPModal] = useState(false);
+  const [showAfterDeathResources, setShowAfterDeathResources] = useState(false);
 
   useEffect(() => {
     checkCAREAccess();
@@ -732,7 +735,7 @@ export default function CareSupport() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Quick actions when no messages */}
-              {messages.length === 0 && (
+              {messages.length === 0 && !showAfterDeathResources && (
                 <div className="space-y-3">
                   {QUICK_ACTIONS.map((action) => (
                     <Button
@@ -740,19 +743,26 @@ export default function CareSupport() {
                       variant="outline"
                       className="w-full justify-start text-left h-auto py-3 px-4"
                       onClick={() => {
-                        if (action.navigateTo) {
+                        if (action.showAfterDeathResources) {
+                          setShowAfterDeathResources(true);
+                        } else if (action.navigateTo) {
                           navigate(action.navigateTo);
                         } else if (action.prompt) {
                           handleTopicClick(action.prompt);
                         }
                       }}
-                      disabled={isLoading && !action.navigateTo}
+                      disabled={isLoading && !action.navigateTo && !action.showAfterDeathResources}
                     >
                       <action.icon className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
                       <span>{action.label}</span>
                     </Button>
                   ))}
                 </div>
+              )}
+              
+              {/* After-Death Resources Response */}
+              {showAfterDeathResources && messages.length === 0 && (
+                <AfterDeathResourcesResponse />
               )}
 
               <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg">
