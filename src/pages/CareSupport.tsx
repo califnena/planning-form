@@ -412,8 +412,8 @@ export default function CareSupport() {
 
               {/* Helper text - access info */}
               <p className="text-sm text-muted-foreground text-center pt-2 border-t border-border/50">
-                You can answer questions yourself for free.<br />
-                If you'd like Claire to help fill things out or save your work, personal support is required.
+                Read guides and type your own answers for free.<br />
+                If you want help filling things out, saving your work, or being guided step by step, personal support is required.
               </p>
             </CardContent>
           </Card>
