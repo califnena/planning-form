@@ -662,7 +662,30 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                         </div>
                       )}
                       
-                      {/* Quick actions removed - users should type or speak their questions */}
+                      {/* Quick actions only shown for after-death mode */}
+                      {selectedMode === 'after-death' && (
+                        AFTER_DEATH_ACTIONS.map((action) => (
+                          <Button
+                            key={action.label}
+                            variant="outline"
+                            className="w-full justify-start text-left h-auto py-2.5 px-4"
+                            onClick={() => {
+                              if (action.showAfterDeathResources) {
+                                setShowAfterDeathResources(true);
+                              } else if (action.navigateTo) {
+                                onClose();
+                                navigate(action.navigateTo);
+                              } else if (action.prompt) {
+                                handleSend(action.prompt);
+                              }
+                            }}
+                            disabled={isLoading && !action.navigateTo && !action.showAfterDeathResources}
+                          >
+                            <action.icon className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+                            <span className="text-sm">{action.label}</span>
+                          </Button>
+                        ))
+                      )}
                     </div>
                   )}
                   
