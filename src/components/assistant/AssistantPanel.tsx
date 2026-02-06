@@ -18,12 +18,14 @@ import {
   FileText,
   Sparkles,
   ClipboardCheck,
-  Users
+  Users,
+  CheckCircle2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BookingModal } from "./BookingModal";
 import { AfterDeathResourcesResponse } from "./AfterDeathResourcesResponse";
 import { Link } from "react-router-dom";
+import { usePlanningCompletion } from "@/hooks/usePlanningCompletion";
 
 type Message = {
   id: string;
@@ -140,6 +142,9 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
   const [selectedMode, setSelectedMode] = useState<ClaireMode>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  
+  // Check if user has completed their planning
+  const planningCompletion = usePlanningCompletion();
 
   useEffect(() => {
     if (isOpen) {
@@ -612,30 +617,59 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                         </p>
                       )}
                       
-                      {/* Actions for selected mode */}
-                      {(selectedMode === 'planning' ? PLANNING_ACTIONS : 
-                        selectedMode === 'after-death' ? AFTER_DEATH_ACTIONS : 
-                        EMOTIONAL_ACTIONS).map((action) => (
-                        <Button
-                          key={action.label}
-                          variant="outline"
-                          className="w-full justify-start text-left h-auto py-2.5 px-4"
-                          onClick={() => {
-                            if (action.showAfterDeathResources) {
-                              setShowAfterDeathResources(true);
-                            } else if (action.navigateTo) {
+                      {/* End-of-planning celebration for Planning Mode */}
+                      {selectedMode === 'planning' && planningCompletion.isComplete && (
+                        <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center space-y-3">
+                          <div className="flex justify-center">
+                            <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                              <CheckCircle2 className="h-6 w-6 text-green-600" />
+                            </div>
+                          </div>
+                          <div>
+                            <p className="font-medium text-green-800">You've done something wonderful.</p>
+                            <p className="text-sm text-green-700 mt-1">
+                              Your plan is complete. Your loved ones will thank you for this gift.
+                            </p>
+                          </div>
+                          <Button
+                            variant="outline"
+                            className="border-green-300 text-green-700 hover:bg-green-100"
+                            onClick={() => {
                               onClose();
-                              navigate(action.navigateTo);
-                            } else if (action.prompt) {
-                              handleSend(action.prompt);
-                            }
-                          }}
-                          disabled={isLoading && !action.navigateTo && !action.showAfterDeathResources}
-                        >
-                          <action.icon className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
-                          <span className="text-sm">{action.label}</span>
-                        </Button>
-                      ))}
+                              navigate('/preplan-summary');
+                            }}
+                          >
+                            View Your Plan Summary
+                          </Button>
+                        </div>
+                      )}
+                      
+                      {/* Actions for selected mode - hide if planning is complete */}
+                      {!(selectedMode === 'planning' && planningCompletion.isComplete) && (
+                        (selectedMode === 'planning' ? PLANNING_ACTIONS : 
+                          selectedMode === 'after-death' ? AFTER_DEATH_ACTIONS : 
+                          EMOTIONAL_ACTIONS).map((action) => (
+                          <Button
+                            key={action.label}
+                            variant="outline"
+                            className="w-full justify-start text-left h-auto py-2.5 px-4"
+                            onClick={() => {
+                              if (action.showAfterDeathResources) {
+                                setShowAfterDeathResources(true);
+                              } else if (action.navigateTo) {
+                                onClose();
+                                navigate(action.navigateTo);
+                              } else if (action.prompt) {
+                                handleSend(action.prompt);
+                              }
+                            }}
+                            disabled={isLoading && !action.navigateTo && !action.showAfterDeathResources}
+                          >
+                            <action.icon className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+                            <span className="text-sm">{action.label}</span>
+                          </Button>
+                        ))
+                      )}
                     </div>
                   )}
                   
