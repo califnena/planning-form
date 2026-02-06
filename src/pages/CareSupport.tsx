@@ -13,6 +13,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Badge } from "@/components/ui/badge";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
 import { ClaireWelcomeModal } from "@/components/assistant/ClaireWelcomeModal";
+import { PersonalSupportModal } from "@/components/assistant/PersonalSupportModal";
+import { EmotionalSupportLimitModal } from "@/components/assistant/EmotionalSupportLimitModal";
 import NotAdviceNote from "@/components/NotAdviceNote";
 import { requireSessionOrRedirect } from "@/lib/sessionGuard";
 import { isStoreIAP } from "@/lib/billingMode";
@@ -251,6 +253,9 @@ export default function CareSupport() {
   // Emotional support session modals
   const [showSessionDisclosure, setShowSessionDisclosure] = useState(false);
   const [showSessionsExhausted, setShowSessionsExhausted] = useState(false);
+  // Personal Support paywall modal
+  const [showPersonalSupportModal, setShowPersonalSupportModal] = useState(false);
+  const [pendingPaidAction, setPendingPaidAction] = useState<string | null>(null);
   // Pending emotional action after disclosure
   const [pendingEmotionalPrompt, setPendingEmotionalPrompt] = useState<string | null>(null);
   // Track if the last message was an error (to show quick options)
@@ -264,6 +269,9 @@ export default function CareSupport() {
   
   // Emotional support session tracking
   const emotionalSessions = useEmotionalSupportSessions(userId);
+  
+  // Check if user has paid access (Personal Support)
+  const hasPersonalSupport = hasAccess;
 
   useEffect(() => {
     checkCAREAccess();
@@ -330,18 +338,35 @@ export default function CareSupport() {
     return true;
   };
 
+  // Helper to check if user has Personal Support (paid access) for paid features
+  // Features that require paid: save progress, step-by-step planner, generate personalized summaries
+  const requirePersonalSupport = (featureName: string): boolean => {
+    if (!hasPersonalSupport) {
+      setPendingPaidAction(featureName);
+      setShowPersonalSupportModal(true);
+      return false;
+    }
+    return true;
+  };
+
+  // Handle continuing free after paywall modal
+  const handleContinueFree = () => {
+    setPendingPaidAction(null);
+    // User can continue browsing FAQs and guides
+  };
+
   // Handle emotional support session logic
   const handleEmotionalModeSelect = () => {
     if (mode === "emotional") return; // Already in mode
     
-    // If user has access and has sessions remaining, check for first-use disclosure
-    if (emotionalSessions.hasAccess && emotionalSessions.sessionsRemaining > 0) {
+    // If user has access and has messages remaining, check for first-use disclosure
+    if (emotionalSessions.hasAccess && emotionalSessions.messagesRemaining > 0) {
       if (!emotionalSessions.firstSessionShown) {
         setShowSessionDisclosure(true);
       }
       // Use handleModeSelect for consistent first-message behavior
       handleModeSelect("emotional");
-    } else if (emotionalSessions.hasAccess && emotionalSessions.sessionsRemaining <= 0) {
+    } else if (emotionalSessions.hasAccess && emotionalSessions.messagesRemaining <= 0) {
       // Show exhausted modal
       setShowSessionsExhausted(true);
     } else {
@@ -350,9 +375,9 @@ export default function CareSupport() {
     }
   };
 
-  // Handle starting an emotional support session (consumes a session)
+  // Handle starting an emotional support session (consumes a message)
   const startEmotionalSession = async (prompt: string) => {
-    // Check if user has access and sessions
+    // Check if user has access and messages
     if (!emotionalSessions.hasAccess || !isLoggedIn) {
       // Guest or no access - just proceed without tracking
       streamChat(prompt);
@@ -366,14 +391,14 @@ export default function CareSupport() {
       return;
     }
 
-    // Check remaining sessions
-    if (emotionalSessions.sessionsRemaining <= 0) {
+    // Check remaining messages
+    if (emotionalSessions.messagesRemaining <= 0) {
       setShowSessionsExhausted(true);
       return;
     }
 
-    // Consume a session and proceed
-    const consumed = await emotionalSessions.consumeSession();
+    // Consume a message and proceed
+    const consumed = await emotionalSessions.consumeMessage();
     if (consumed) {
       streamChat(prompt);
     } else {
@@ -387,8 +412,8 @@ export default function CareSupport() {
     setShowSessionDisclosure(false);
     
     if (pendingEmotionalPrompt) {
-      // Consume session and start chat
-      const consumed = await emotionalSessions.consumeSession();
+      // Consume message and start chat
+      const consumed = await emotionalSessions.consumeMessage();
       if (consumed) {
         streamChat(pendingEmotionalPrompt);
       }
@@ -781,7 +806,7 @@ export default function CareSupport() {
                   <div className="flex items-center gap-2">
                     <Heart className="h-5 w-5 flex-shrink-0" style={{ color: mode === "emotional" ? 'hsl(0, 0%, 100%)' : 'hsl(175, 35%, 40%)' }} />
                     <span className="font-medium">Emotional Support</span>
-                    {emotionalSessions.hasAccess && emotionalSessions.sessionsRemaining > 0 && (
+                    {emotionalSessions.hasAccess && emotionalSessions.messagesRemaining > 0 && (
                       <Badge 
                         variant="secondary" 
                         className="text-xs ml-auto"
@@ -790,7 +815,7 @@ export default function CareSupport() {
                           color: mode === "emotional" ? 'hsl(0, 0%, 100%)' : 'hsl(215, 20%, 25%)'
                         }}
                       >
-                        {emotionalSessions.sessionsRemaining} left
+                        {emotionalSessions.messagesRemaining} left
                       </Badge>
                     )}
                   </div>
@@ -814,14 +839,23 @@ export default function CareSupport() {
                   className="text-sm font-medium text-center"
                   style={{ color: 'hsl(215, 20%, 30%)' }}
                 >
-                  Free to explore
+                  {hasPersonalSupport ? "Personal Support" : "Free to explore"}
                 </p>
                 <p 
                   className="text-xs text-center leading-relaxed"
                   style={{ color: 'hsl(215, 15%, 45%)' }}
                 >
-                  Explore FAQs, guides, and checklists for free.<br />
-                  If you want step-by-step help, saving your progress, or help filling things out, Personal Support is available.
+                  {hasPersonalSupport ? (
+                    <>
+                      Includes step-by-step guidance and progress saving.<br />
+                      Emotional Support includes up to 200 messages/month.
+                    </>
+                  ) : (
+                    <>
+                      Explore FAQs, guides, and checklists for free.<br />
+                      If you want step-by-step help, saving your progress, or help filling things out, Personal Support is available.
+                    </>
+                  )}
                 </p>
               </div>
             </div>
@@ -1211,10 +1245,10 @@ export default function CareSupport() {
             </DialogTitle>
             <DialogDescription className="text-center pt-4 space-y-3">
               <p>
-                Emotional support is provided in guided sessions.
+                Personal Support includes up to 200 messages/month in Emotional Support mode.
               </p>
               <p className="font-medium text-foreground">
-                You have {emotionalSessions.sessionsRemaining} sessions available for this period.
+                You have {emotionalSessions.messagesRemaining} messages remaining this month.
               </p>
             </DialogDescription>
           </DialogHeader>
@@ -1229,48 +1263,21 @@ export default function CareSupport() {
         </DialogContent>
       </Dialog>
 
-      {/* Emotional Support Sessions Exhausted Modal */}
-      <Dialog open={showSessionsExhausted} onOpenChange={setShowSessionsExhausted}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-center">Sessions Used</DialogTitle>
-            <DialogDescription className="text-center pt-4 space-y-3">
-              <p>
-                You've used your emotional support sessions for this period.
-              </p>
-              <p>
-                I can still help with guides and practical next steps.
-              </p>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-3 pt-4">
-            <Button 
-              onClick={() => {
-                setShowSessionsExhausted(false);
-                navigate("/resources");
-              }}
-              className="min-h-[48px] gap-2"
-            >
-              <BookOpen className="h-4 w-4" />
-              View Guides
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={() => {
-                setShowSessionsExhausted(false);
-                navigate("/contact");
-              }}
-              className="min-h-[48px] gap-2"
-            >
-              <Phone className="h-4 w-4" />
-              Contact Us for More Support
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground text-center pt-2">
-            We'll review your request and follow up personally.
-          </p>
-        </DialogContent>
-      </Dialog>
+      {/* Personal Support Paywall Modal */}
+      <PersonalSupportModal
+        open={showPersonalSupportModal}
+        onOpenChange={setShowPersonalSupportModal}
+        onContinueFree={handleContinueFree}
+        featureAttempted={pendingPaidAction || undefined}
+      />
+
+      {/* Emotional Support Limit Modal */}
+      <EmotionalSupportLimitModal
+        open={showSessionsExhausted}
+        onOpenChange={setShowSessionsExhausted}
+        messagesUsed={emotionalSessions.messagesUsed}
+        messagesLimit={emotionalSessions.messagesLimit}
+      />
     </div>
   );
 }
