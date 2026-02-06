@@ -410,10 +410,14 @@ export default function CareSupport() {
                 </button>
               </div>
 
-              {/* Helper text */}
-              <p className="text-sm text-muted-foreground text-center">
-                Tap an option above, or type a question below.
-              </p>
+              {/* Helper text - access info */}
+              <div className="text-sm text-muted-foreground text-center space-y-1 pt-2 border-t border-border/50">
+                <p>You can explore guides, checklists, and planners for free.</p>
+                <p>You may type in your own answers at any time.</p>
+                <p className="text-xs text-muted-foreground/80 pt-1">
+                  If you want Claire to fill things out for you, save your progress, or guide you step by step, personal support is required.
+                </p>
+              </div>
             </CardContent>
           </Card>
 
