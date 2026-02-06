@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Heart, Sparkles, ArrowRight, Mic, Volume2, VolumeX, Home, LogOut, CheckCircle, HelpCircle, MessageCircle, FileText, ClipboardCheck, Lock } from "lucide-react";
+import { Loader2, Heart, Sparkles, ArrowRight, Mic, Volume2, VolumeX, Home, LogOut, CheckCircle, HelpCircle, MessageCircle, FileText, ClipboardCheck, Lock, Phone, Download, ArrowRightCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
 import { ClaireWelcomeModal } from "@/components/assistant/ClaireWelcomeModal";
@@ -34,14 +34,29 @@ type QuickAction = {
   prompt?: string;
   navigateTo?: string;
   showAfterDeathResources?: boolean;
+  downloadUrl?: string;
 };
 
-const QUICK_ACTIONS: QuickAction[] = [
+const PLANNING_ACTIONS: QuickAction[] = [
   { label: "After-Death Planner & Checklist", showAfterDeathResources: true, icon: ClipboardCheck },
   { label: "Help me understand my options", prompt: "Can you help me understand my planning options?", icon: HelpCircle },
   { label: "Help me continue my plan", prompt: "I want to continue working on my plan.", icon: FileText },
   { label: "I have a question", prompt: "I have a question about planning.", icon: MessageCircle },
   { label: "I need more support", prompt: "I'm feeling overwhelmed and need support.", icon: Heart },
+];
+
+const AFTERDEATH_ACTIONS: QuickAction[] = [
+  { label: "Download After Death Guide", downloadUrl: "/guides/EFA-After-Death-Planner-and-Checklist.pdf", icon: Download },
+  { label: "Download After Death Planner", downloadUrl: "/guides/After-Life-Action-Plan-BLANK.pdf", icon: Download },
+  { label: "Walk me through what to do next", prompt: "Someone has passed away. Can you walk me through what I need to do next, step by step?", icon: ArrowRightCircle },
+  { label: "Talk to a real person", navigateTo: "/contact", icon: Phone },
+];
+
+const EMOTIONAL_ACTIONS: QuickAction[] = [
+  { label: "I'm feeling overwhelmed", prompt: "I'm feeling overwhelmed and could use some support.", icon: Heart },
+  { label: "Help me cope with grief", prompt: "I'm grieving and need some gentle guidance.", icon: Heart },
+  { label: "I just need someone to listen", prompt: "I just need someone to listen right now.", icon: MessageCircle },
+  { label: "Talk to a real person", navigateTo: "/contact", icon: Phone },
 ];
 
 export default function CareSupport() {
@@ -734,16 +749,21 @@ export default function CareSupport() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Quick actions when no messages */}
+              {/* Mode-specific quick actions when no messages */}
               {messages.length === 0 && !showAfterDeathResources && (
                 <div className="space-y-3">
-                  {QUICK_ACTIONS.map((action) => (
+                  {(mode === "afterdeath" ? AFTERDEATH_ACTIONS : mode === "emotional" ? EMOTIONAL_ACTIONS : PLANNING_ACTIONS).map((action) => (
                     <Button
                       key={action.label}
                       variant="outline"
                       className="w-full justify-start text-left h-auto py-3 px-4"
                       onClick={() => {
-                        if (action.showAfterDeathResources) {
+                        if (action.downloadUrl) {
+                          const link = document.createElement('a');
+                          link.href = action.downloadUrl;
+                          link.download = '';
+                          link.click();
+                        } else if (action.showAfterDeathResources) {
                           setShowAfterDeathResources(true);
                         } else if (action.navigateTo) {
                           navigate(action.navigateTo);
@@ -751,7 +771,7 @@ export default function CareSupport() {
                           handleTopicClick(action.prompt);
                         }
                       }}
-                      disabled={isLoading && !action.navigateTo && !action.showAfterDeathResources}
+                      disabled={isLoading && !action.navigateTo && !action.showAfterDeathResources && !action.downloadUrl}
                     >
                       <action.icon className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
                       <span>{action.label}</span>
