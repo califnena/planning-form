@@ -21,12 +21,6 @@ import { AfterDeathResourcesResponse } from "@/components/assistant/AfterDeathRe
 type Message = { role: "user" | "assistant"; content: string };
 type Mode = "planning" | "afterdeath" | "emotional";
 
-const TOPICS = [
-  { label: "🌺 My Funeral Wishes", prompt: "Help me document my funeral wishes." },
-  { label: "🕊 Writing My Legacy Letter", prompt: "Help me write a legacy letter to my family." },
-  { label: "🪷 Coping with Grief", prompt: "I'm feeling overwhelmed and need gentle support." },
-  { label: "💼 Organizing My Documents", prompt: "Help me organize important documents and passwords." },
-];
 
 type QuickAction = {
   label: string;
@@ -887,20 +881,6 @@ export default function CareSupport() {
                 </div>
               </ScrollArea>
 
-              <div className="grid grid-cols-2 gap-2">
-                {TOPICS.map((topic) => (
-                  <Button
-                    key={topic.label}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleTopicClick(topic.prompt)}
-                    disabled={isLoading}
-                    className="text-xs"
-                  >
-                    {topic.label}
-                  </Button>
-                ))}
-              </div>
 
               <div className="space-y-2">
                 <div className="flex gap-2">
