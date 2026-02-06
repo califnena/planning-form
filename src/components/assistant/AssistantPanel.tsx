@@ -120,6 +120,33 @@ const isAfterDeathPage = (pathname: string): boolean => {
          pathname === '/preview-after-death';
 };
 
+// Helper to detect pre-planning related pages
+const isPlanningPage = (pathname: string): boolean => {
+  return pathname.startsWith('/planner') || 
+         pathname.startsWith('/preplandashboard') ||
+         pathname === '/preplan-summary' ||
+         pathname === '/plan-ahead' ||
+         pathname === '/orientation' ||
+         pathname === '/guided-action' ||
+         pathname === '/forms' ||
+         pathname === '/printable-form';
+};
+
+// Helper to detect emotional/grief support pages
+const isEmotionalPage = (pathname: string): boolean => {
+  return pathname === '/care-support' ||
+         pathname === '/safety-entry' ||
+         pathname === '/relief-checkpoint';
+};
+
+// Get default Claire mode based on current page
+const getDefaultMode = (pathname: string): ClaireMode => {
+  if (isAfterDeathPage(pathname)) return 'after-death';
+  if (isEmotionalPage(pathname)) return 'emotional';
+  if (isPlanningPage(pathname)) return 'planning';
+  return null;
+};
+
 // Get page context for Claire's behavior
 const getPageContext = (pathname: string): string | undefined => {
   if (isAfterDeathPage(pathname)) return 'after-death';
@@ -149,8 +176,15 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
   useEffect(() => {
     if (isOpen) {
       checkAccessAndLoad();
+      // Set default mode based on current page (only if no mode selected yet)
+      if (!selectedMode) {
+        const defaultMode = getDefaultMode(location.pathname);
+        if (defaultMode) {
+          setSelectedMode(defaultMode);
+        }
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, location.pathname]);
 
   useEffect(() => {
     if (scrollRef.current) {
