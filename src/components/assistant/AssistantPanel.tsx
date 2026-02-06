@@ -698,8 +698,8 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
           </ScrollArea>
 
           <div className="space-y-2">
-            <p className="text-[10px] text-muted-foreground/60 text-center">
-              Want to keep something? You can ask Claire to save a short summary.
+            <p className="text-sm text-muted-foreground text-center font-light">
+              You can tap one of the options above, or type a question below.
             </p>
             <div className="flex gap-2">
               <Textarea
