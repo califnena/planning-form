@@ -667,7 +667,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                             </div>
                           </div>
                           <p className="text-base text-foreground leading-relaxed">
-                            It looks like you've reached the end of this planner.<br />
+                            It looks like you've reached the end.<br />
                             Would you like to review and save what you've done?
                           </p>
                           <div className="flex flex-col gap-3 pt-2">
