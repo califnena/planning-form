@@ -47,7 +47,7 @@ export function LockedFeatureModal() {
         <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-2">
           <Button variant="outline" onClick={handleContinuePreview} className="gap-2 flex-1">
             <Eye className="h-4 w-4" />
-            Continue Preview
+            View Sample Pages
           </Button>
           <Button onClick={handleUnlock} className="flex-1">
             Unlock Full Planner
