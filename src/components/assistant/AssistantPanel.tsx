@@ -754,32 +754,27 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
 
           {/* Only show input area after a mode is selected or conversation has started */}
           {(selectedMode || messages.length > 0) && (
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground text-center font-light">
-                You can tap one of the options above, or type a question below.
-              </p>
-              <div className="flex gap-2">
-                <Textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type your question here, or choose an option above."
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSend();
-                    }
-                  }}
-                  className="resize-none min-h-[60px]"
-                  rows={2}
-                />
-                <Button 
-                  onClick={() => handleSend()} 
-                  disabled={isLoading || !input.trim()}
-                  size="icon"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
+            <div className="flex gap-2">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type your question here..."
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                className="resize-none min-h-[60px]"
+                rows={2}
+              />
+              <Button 
+                onClick={() => handleSend()} 
+                disabled={isLoading || !input.trim()}
+                size="icon"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
             </div>
           )}
 
