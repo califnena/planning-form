@@ -186,30 +186,18 @@ export default function CareSupport() {
     return new Set();
   });
 
-  // Mode-specific first messages
+  // Welcome messages - first time for each mode (short, first-person, ends with clear next step)
   const MODE_FIRST_MESSAGES: Record<Exclude<Mode, null>, string> = {
-    planning: `I'm glad you're here.
-
-We can take this one step at a time. I can help you understand what to think about, or we can start filling things out together if you'd like.
-
-What would you like help with today?`,
-    afterdeath: `I'm really sorry you're going through this.
-
-I can help you focus on what matters most right now, and we'll take the rest one step at a time.
-
-Would you like help understanding what to do first, or would you rather ask a specific question?`,
-    emotional: `I'm here with you.
-
-You don't have to have the right words. You can share what's on your mind, or we can just talk through what feels heavy right now.
-
-What would help most in this moment?`
+    planning: `Hi, I'm Claire. I can help you think through your wishes and get organized, one small step at a time. If you want, we can start with the basics and build from there. Pick a question below, or type your own.`,
+    afterdeath: `Hi, I'm Claire. If a death just happened, we can slow this down and focus on what matters first. Tell me what happened and what you need help with right now, or tap a question below.`,
+    emotional: `Hi, I'm Claire. I'm here with you. You do not have to carry this all at once. If you want, tell me what is feeling hardest right now, or tap a question below.`
   };
 
   // Shorter returning user messages per mode
   const MODE_RETURNING_MESSAGES: Record<Exclude<Mode, null>, string> = {
-    planning: "Welcome back. What would you like to work on today?",
-    afterdeath: "I'm here. What can I help with next?",
-    emotional: "I'm here with you. What's on your mind?"
+    planning: "Welcome back. Tell me what you want to work on today, or tap a question below to pick up where you left off.",
+    afterdeath: "Welcome back. We can continue from where you left off, or you can ask something new. Tap a question below, or type what you need.",
+    emotional: "Welcome back. I'm here. Tell me what you need in this moment, or tap a question below."
   };
 
   // Handle mode selection with first-message logic
