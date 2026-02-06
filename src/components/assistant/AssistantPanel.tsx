@@ -17,7 +17,8 @@ import {
   Heart,
   FileText,
   Sparkles,
-  ClipboardCheck
+  ClipboardCheck,
+  Users
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BookingModal } from "./BookingModal";
@@ -87,19 +88,19 @@ const AFTER_DEATH_ACTIONS: QuickAction[] = [
 
 const EMOTIONAL_ACTIONS: QuickAction[] = [
   { 
-    label: "I'm feeling overwhelmed", 
-    prompt: "I'm feeling overwhelmed and could use some support.",
+    label: "Coping with Grief", 
+    prompt: "I'm struggling with grief. Can you help me understand what I'm feeling?",
     icon: Heart 
   },
   { 
-    label: "I need someone to talk to", 
+    label: "Talk Through What I'm Feeling", 
     prompt: "I just need someone to talk to about what I'm going through.",
     icon: MessageCircle 
   },
   { 
-    label: "Help me take the next step", 
-    prompt: "I'm struggling to take the next step. Can you help me?",
-    icon: HelpCircle 
+    label: "I Need More Support", 
+    prompt: "I need more support than I'm getting right now. What are my options?",
+    icon: Users 
   },
 ];
 
