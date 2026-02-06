@@ -142,11 +142,17 @@ const Pricing = () => {
     {
       id: "printable",
       title: "Printable Planning Form",
-      whoItsFor: PRODUCT_DESCRIPTIONS.EFABASIC.shortDescription,
-      bullets: PRODUCT_DESCRIPTIONS.EFABASIC.benefits,
+      price: "$9.99",
+      whoItsFor: "For those who prefer paper.",
+      bullets: [
+        "Download and print",
+        "Write by hand",
+        "Share with family",
+        "No login required"
+      ],
       lookupKey: "EFABASIC",
       successPath: "/purchase-success?type=printable",
-      buttonLabel: "Buy Printable Planning Form – $9.99",
+      buttonLabel: "Buy Printable Form",
       featured: true
     },
     {
@@ -459,11 +465,12 @@ const Pricing = () => {
           {/* Plans Grid - 3 Cards */}
           <div ref={planCardsRef} className="grid md:grid-cols-3 gap-6 scroll-mt-8">
             {plans.map((plan) => {
-              const priceText = loadingPrices ? (
+              // Use static price if defined, otherwise fetch from Stripe
+              const priceText = plan.price ? plan.price : (loadingPrices ? (
                 <span className="flex items-center justify-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
                 </span>
-              ) : getDisplayedPrice(plan.lookupKey);
+              ) : getDisplayedPrice(plan.lookupKey));
               const isBuying = loadingPlan === plan.id;
               const isRecommended = recommendedPlan === plan.id;
               const isCurrentPlan = currentPlanId === plan.id;
