@@ -368,8 +368,15 @@ export default function PrePlanSummary() {
       case "started":
         return <Circle className="h-5 w-5 text-amber-500 fill-amber-200" />;
       default:
-        return <Circle className="h-5 w-5 text-muted-foreground/40" />;
+        return null; // Skipped sections show text label instead
     }
+  };
+  
+  const StatusLabel = ({ status }: { status: "completed" | "started" | "not_started" }) => {
+    if (status === "not_started") {
+      return <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">Optional</span>;
+    }
+    return null;
   };
 
   if (loading) {
@@ -444,14 +451,24 @@ export default function PrePlanSummary() {
           </p>
         </div>
 
-        {/* Primary Action + Sign Plan */}
+        {/* Primary Actions */}
         <div className="mb-8 space-y-3">
-          <div className="flex flex-col sm:flex-row gap-3">
+          {/* Main action buttons - 2x2 grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Button 
+              onClick={() => window.print()}
+              variant="outline"
+              size="lg"
+              className="h-14 text-base font-medium gap-3"
+            >
+              <FileText className="h-5 w-5" />
+              Print My Planner
+            </Button>
             <Button 
               onClick={handleDownloadPDF}
               disabled={generatingPdf}
               size="lg"
-              className="flex-1 h-14 text-lg font-medium gap-3"
+              className="h-14 text-base font-medium gap-3"
             >
               {generatingPdf ? (
                 <>
@@ -461,21 +478,42 @@ export default function PrePlanSummary() {
               ) : (
                 <>
                   {isLocked ? <Lock className="h-5 w-5" /> : <Download className="h-5 w-5" />}
-                  {isLocked ? "Preview Copy" : "Print or Save My Plan"}
+                  Download PDF
                 </>
               )}
             </Button>
             <Button 
-              onClick={() => navigate("/preplandashboard/signature")}
+              onClick={() => navigate("/planner/overview")}
               variant="outline"
               size="lg"
-              className="h-14 text-lg font-medium gap-3"
-              disabled={isLocked}
+              className="h-14 text-base font-medium gap-3"
             >
-              <PenLine className="h-5 w-5" />
-              Sign This Plan (Optional)
+              <Edit className="h-5 w-5" />
+              Edit My Information
+            </Button>
+            <Button 
+              onClick={() => navigate("/home-senior")}
+              variant="outline"
+              size="lg"
+              className="h-14 text-base font-medium gap-3"
+            >
+              <Check className="h-5 w-5" />
+              Save and Finish for Now
             </Button>
           </div>
+          
+          {/* Optional Sign Plan */}
+          <Button 
+            onClick={() => navigate("/preplandashboard/signature")}
+            variant="ghost"
+            size="lg"
+            className="w-full h-12 text-base font-medium gap-2 text-muted-foreground"
+            disabled={isLocked}
+          >
+            <PenLine className="h-5 w-5" />
+            Sign This Plan (Optional)
+          </Button>
+          
           <p className="text-sm text-muted-foreground text-center">
             {isLocked 
               ? "Preview includes a watermark. Unlock to get your final copy."
@@ -551,7 +589,7 @@ export default function PrePlanSummary() {
             </div>
           )}
           
-          {/* Share with Family - ONLY placement */}
+          {/* Share with Family */}
           <Button 
             variant="outline"
             size="lg"
@@ -615,8 +653,9 @@ export default function PrePlanSummary() {
                     className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors"
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <StatusIcon status={section.status} />
+                      {section.status !== "not_started" && <StatusIcon status={section.status} />}
                       <span className="text-foreground truncate">{section.label}</span>
+                      <StatusLabel status={section.status} />
                     </div>
                     <Button
                       variant="outline"
