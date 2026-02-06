@@ -137,8 +137,18 @@ const Pricing = () => {
   const [showIAPModal, setShowIAPModal] = useState(false);
   const pageLoadTime = useRef<number>(Date.now());
 
-  // Core plans - simplified to 3
+  // Core plans - ordered: Printable (emphasized), Digital, Binder
   const plans = [
+    {
+      id: "printable",
+      title: "Printable Planning Form",
+      whoItsFor: PRODUCT_DESCRIPTIONS.EFABASIC.shortDescription,
+      bullets: PRODUCT_DESCRIPTIONS.EFABASIC.benefits,
+      lookupKey: "EFABASIC",
+      successPath: "/purchase-success?type=printable",
+      buttonLabel: "Buy Printable Planning Form – $9.99",
+      featured: true
+    },
     {
       id: "digital",
       title: "Digital Planner",
@@ -147,21 +157,11 @@ const Pricing = () => {
       lookupKey: "EFAPREMIUM",
       successPath: "/purchase-success?type=premium",
       buttonLabel: "Access Digital Planner",
-      featured: true
-    },
-    {
-      id: "printable",
-      title: "Printable Planner",
-      whoItsFor: PRODUCT_DESCRIPTIONS.EFABASIC.shortDescription,
-      bullets: PRODUCT_DESCRIPTIONS.EFABASIC.benefits,
-      lookupKey: "EFABASIC",
-      successPath: "/purchase-success?type=printable",
-      buttonLabel: "Download Printable Version",
       featured: false
     },
     {
       id: "binder",
-      title: "Physical Binder",
+      title: "Planning Binder",
       whoItsFor: PRODUCT_DESCRIPTIONS.EFABINDER.shortDescription,
       bullets: PRODUCT_DESCRIPTIONS.EFABINDER.benefits,
       lookupKey: "EFABINDER",
@@ -454,96 +454,7 @@ const Pricing = () => {
             isAdmin={isAdmin} 
           />
 
-          {/* Fallback Mode UI - shown when Stripe fails to load */}
-          {fallbackMode && (
-            <Card className="border-amber-300 bg-amber-50/50 dark:bg-amber-950/20 max-w-2xl mx-auto">
-              <CardHeader className="text-center">
-                <div className="mx-auto mb-2">
-                  <AlertTriangle className="h-10 w-10 text-amber-600" />
-                </div>
-                <CardTitle className="text-amber-800 dark:text-amber-200">
-                  Secure checkout did not load
-                </CardTitle>
-                <p className="text-amber-700 dark:text-amber-300 text-sm mt-2">
-                  Your browser or network blocked the secure checkout screen. Use the buttons below to continue.
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-3">
-                  {/* Core plans first */}
-                  <Button 
-                    onClick={() => handleOpenPaymentLink("EFAPREMIUM")} 
-                    className="w-full justify-between"
-                    variant="default"
-                  >
-                    <span>Digital Planner (Premium)</span>
-                    <ExternalLink className="h-4 w-4 ml-2" />
-                  </Button>
-                  <Button 
-                    onClick={() => handleOpenPaymentLink("EFABASIC")} 
-                    className="w-full justify-between"
-                    variant="outline"
-                  >
-                    <span>Printable Planner (Basic)</span>
-                    <ExternalLink className="h-4 w-4 ml-2" />
-                  </Button>
-                  <Button 
-                    onClick={() => handleOpenPaymentLink("EFABINDER")} 
-                    className="w-full justify-between"
-                    variant="outline"
-                  >
-                    <span>Physical Binder</span>
-                    <ExternalLink className="h-4 w-4 ml-2" />
-                  </Button>
-                  
-                  {/* Additional plans */}
-                  <div className="border-t border-amber-200 dark:border-amber-800 pt-3 mt-2">
-                    <p className="text-xs text-amber-600 dark:text-amber-400 mb-2">Additional options:</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button 
-                        onClick={() => handleOpenPaymentLink("EFAVIPMONTHLY")} 
-                        variant="ghost"
-                        size="sm"
-                        className="justify-between text-xs"
-                      >
-                        <span>VIP Monthly</span>
-                        <ExternalLink className="h-3 w-3" />
-                      </Button>
-                      <Button 
-                        onClick={() => handleOpenPaymentLink("EFAVIPYEAR")} 
-                        variant="ghost"
-                        size="sm"
-                        className="justify-between text-xs"
-                      >
-                        <span>VIP Yearly</span>
-                        <ExternalLink className="h-3 w-3" />
-                      </Button>
-                      <Button 
-                        onClick={() => handleOpenPaymentLink("EFADOFORU")} 
-                        variant="ghost"
-                        size="sm"
-                        className="justify-between text-xs col-span-2"
-                      >
-                        <span>Do-It-For-You Service</span>
-                        <ExternalLink className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-center pt-2">
-                  <Button onClick={handleReloadPage} variant="outline" size="sm">
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Reload Page
-                  </Button>
-                </div>
-
-                <p className="text-xs text-center text-muted-foreground">
-                  Try disabling ad blockers, VPN, or iCloud Private Relay. Or open in Chrome if using Safari.
-                </p>
-              </CardContent>
-            </Card>
-          )}
+          {/* Fallback Mode Notice - minimal, below cards */}
 
           {/* Plans Grid - 3 Cards */}
           <div ref={planCardsRef} className="grid md:grid-cols-3 gap-6 scroll-mt-8">
@@ -630,35 +541,58 @@ const Pricing = () => {
             })}
           </div>
 
-          {/* Comparison Table */}
+          {/* Fallback Mode - shown below cards when Stripe fails */}
+          {fallbackMode && (
+            <div className="text-center p-4 bg-muted/50 rounded-lg border border-border">
+              <p className="text-sm text-muted-foreground mb-3">
+                Having trouble with checkout? Use these direct links:
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                <Button onClick={() => handleOpenPaymentLink("EFABASIC")} variant="outline" size="sm">
+                  Printable Form <ExternalLink className="h-3 w-3 ml-1" />
+                </Button>
+                <Button onClick={() => handleOpenPaymentLink("EFAPREMIUM")} variant="outline" size="sm">
+                  Digital Planner <ExternalLink className="h-3 w-3 ml-1" />
+                </Button>
+                <Button onClick={() => handleOpenPaymentLink("EFABINDER")} variant="outline" size="sm">
+                  Binder <ExternalLink className="h-3 w-3 ml-1" />
+                </Button>
+              </div>
+              <Button onClick={handleReloadPage} variant="ghost" size="sm" className="mt-2">
+                <RefreshCw className="h-3 w-3 mr-1" /> Reload Page
+              </Button>
+            </div>
+          )}
+
+          {/* Comparison Table - Order: Printable, Digital, Binder */}
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
                   <th className="text-left py-3 px-4 font-medium text-muted-foreground">Feature</th>
-                  <th className="text-center py-3 px-4 font-medium">Digital</th>
                   <th className="text-center py-3 px-4 font-medium">Printable</th>
+                  <th className="text-center py-3 px-4 font-medium">Digital</th>
                   <th className="text-center py-3 px-4 font-medium">Binder</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="border-b border-border/50">
-                  <td className="py-3 px-4">Online access</td>
-                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
-                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
-                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
-                </tr>
-                <tr className="border-b border-border/50">
-                  <td className="py-3 px-4">Step-by-step guidance</td>
-                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
-                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
-                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
-                </tr>
-                <tr className="border-b border-border/50">
                   <td className="py-3 px-4">Printable</td>
                   <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                   <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
                   <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                </tr>
+                <tr className="border-b border-border/50">
+                  <td className="py-3 px-4">Online access</td>
+                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
+                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
+                </tr>
+                <tr className="border-b border-border/50">
+                  <td className="py-3 px-4">Step-by-step guidance</td>
+                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
+                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
                 </tr>
                 <tr className="border-b border-border/50">
                   <td className="py-3 px-4">Physical copy shipped</td>
