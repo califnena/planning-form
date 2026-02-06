@@ -24,6 +24,8 @@ import { PlanDebugPanel } from "@/components/debug/PlanDebugPanel";
 import { usePrintableOnlyAccess } from "@/hooks/usePrintableOnlyAccess";
 import { PlannerHelpNote } from "@/components/planner/PlannerHelpNote";
 import { AssistedHelpTrigger } from "@/components/planner/AssistedHelpTrigger";
+import { useExitPlannerGuard } from "@/hooks/useExitPlannerGuard";
+import { ExitPlannerDialog } from "@/components/planner/ExitPlannerDialog";
 
 /**
  * Preview Mode Context
@@ -260,6 +262,29 @@ export default function PlannerLayout() {
    */
   const isUnlocked = hasActiveSubscription || isMasterAccount;
   const isPreviewMode = !isUnlocked;
+  
+  // Check if user has any plan data (for exit prompt)
+  const hasPlanData = Boolean(
+    plan.about_me_notes || 
+    plan.funeral_wishes_notes || 
+    plan.financial_notes || 
+    plan.legal_notes ||
+    plan.messages_notes ||
+    plan.checklist_notes ||
+    plan.instructions_notes
+  );
+  
+  // Exit planner guard - prompts user to review before leaving
+  const { 
+    showDialog: showExitDialog, 
+    handleReview: onExitReview, 
+    confirmExit 
+  } = useExitPlannerGuard({ hasPlanData });
+  
+  const handleExitReview = () => {
+    onExitReview();
+    navigate("/preplan-summary");
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -556,6 +581,13 @@ export default function PlannerLayout() {
             onOpenChange={setShowEmailDialog}
             planData={{ ...plan, _pii: pendingPIIData }}
             preparedBy={plan.prepared_by || ""}
+          />
+          
+          {/* Exit planner confirmation dialog */}
+          <ExitPlannerDialog
+            open={showExitDialog}
+            onReview={handleExitReview}
+            onExit={confirmExit}
           />
           
           {/* Non-intrusive assisted help trigger */}
