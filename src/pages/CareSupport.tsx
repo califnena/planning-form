@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Heart, Sparkles, ArrowRight, Mic, Volume2, VolumeX, Home, LogOut, CheckCircle, HelpCircle, MessageCircle, FileText, ClipboardCheck, Lock, Phone, Download, ArrowRightCircle } from "lucide-react";
+import { Loader2, Heart, Sparkles, ArrowRight, Mic, Volume2, VolumeX, Home, LogOut, CheckCircle, HelpCircle, MessageCircle, FileText, ClipboardCheck, Lock, Phone, Download, ArrowRightCircle, BookOpen } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
 import { ClaireWelcomeModal } from "@/components/assistant/ClaireWelcomeModal";
@@ -17,6 +17,7 @@ import { requireSessionOrRedirect } from "@/lib/sessionGuard";
 import { isStoreIAP } from "@/lib/billingMode";
 import { StoreIAPModal } from "@/components/StoreIAPModal";
 import { AfterDeathResourcesResponse } from "@/components/assistant/AfterDeathResourcesResponse";
+import { useEmotionalSupportSessions } from "@/hooks/useEmotionalSupportSessions";
 import {
   Dialog,
   DialogContent,
@@ -94,6 +95,16 @@ export default function CareSupport() {
   const [guestMode, setGuestMode] = useState(false);
   // Login required modal for save-related actions
   const [showLoginRequiredModal, setShowLoginRequiredModal] = useState(false);
+  // User ID for session tracking
+  const [userId, setUserId] = useState<string | null>(null);
+  // Emotional support session modals
+  const [showSessionDisclosure, setShowSessionDisclosure] = useState(false);
+  const [showSessionsExhausted, setShowSessionsExhausted] = useState(false);
+  // Pending emotional action after disclosure
+  const [pendingEmotionalPrompt, setPendingEmotionalPrompt] = useState<string | null>(null);
+  
+  // Emotional support session tracking
+  const emotionalSessions = useEmotionalSupportSessions(userId);
 
   useEffect(() => {
     checkCAREAccess();
@@ -118,10 +129,12 @@ export default function CareSupport() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         setIsLoggedIn(false);
+        setUserId(null);
         setCheckingAccess(false);
         return;
       }
       setIsLoggedIn(true);
+      setUserId(user.id);
 
       const { data: hasVIPAccess } = await supabase
         .rpc('has_vip_access', { _user_id: user.id });
@@ -156,6 +169,73 @@ export default function CareSupport() {
       return false;
     }
     return true;
+  };
+
+  // Handle emotional support session logic
+  const handleEmotionalModeSelect = () => {
+    if (mode === "emotional") return; // Already in mode
+    
+    // If user has access and has sessions remaining, check for first-use disclosure
+    if (emotionalSessions.hasAccess && emotionalSessions.sessionsRemaining > 0) {
+      if (!emotionalSessions.firstSessionShown) {
+        setShowSessionDisclosure(true);
+      }
+      setMode("emotional");
+      toast({ title: "Switched to: Emotional Support", duration: 2000 });
+    } else if (emotionalSessions.hasAccess && emotionalSessions.sessionsRemaining <= 0) {
+      // Show exhausted modal
+      setShowSessionsExhausted(true);
+    } else {
+      // No access - just switch mode (guest experience)
+      setMode("emotional");
+      toast({ title: "Switched to: Emotional Support", duration: 2000 });
+    }
+  };
+
+  // Handle starting an emotional support session (consumes a session)
+  const startEmotionalSession = async (prompt: string) => {
+    // Check if user has access and sessions
+    if (!emotionalSessions.hasAccess || !isLoggedIn) {
+      // Guest or no access - just proceed without tracking
+      streamChat(prompt);
+      return;
+    }
+
+    // Check for first-use disclosure
+    if (!emotionalSessions.firstSessionShown) {
+      setPendingEmotionalPrompt(prompt);
+      setShowSessionDisclosure(true);
+      return;
+    }
+
+    // Check remaining sessions
+    if (emotionalSessions.sessionsRemaining <= 0) {
+      setShowSessionsExhausted(true);
+      return;
+    }
+
+    // Consume a session and proceed
+    const consumed = await emotionalSessions.consumeSession();
+    if (consumed) {
+      streamChat(prompt);
+    } else {
+      toast({ title: "Unable to start session", description: "Please try again.", variant: "destructive" });
+    }
+  };
+
+  // Handle disclosure continue
+  const handleDisclosureContinue = async () => {
+    await emotionalSessions.markFirstSessionShown();
+    setShowSessionDisclosure(false);
+    
+    if (pendingEmotionalPrompt) {
+      // Consume session and start chat
+      const consumed = await emotionalSessions.consumeSession();
+      if (consumed) {
+        streamChat(pendingEmotionalPrompt);
+      }
+      setPendingEmotionalPrompt(null);
+    }
   };
 
   const streamChat = async (userMessage: string) => {
@@ -391,12 +471,7 @@ export default function CareSupport() {
                 </button>
 
                 <button
-                  onClick={() => {
-                    if (mode !== "emotional") {
-                      setMode("emotional");
-                      toast({ title: "Switched to: Emotional Support", duration: 2000 });
-                    }
-                  }}
+                  onClick={handleEmotionalModeSelect}
                   className={`p-3 rounded-lg border-2 transition-all text-left ${
                     mode === "emotional"
                       ? "border-primary bg-primary/10 shadow-md"
@@ -406,6 +481,11 @@ export default function CareSupport() {
                   <div className="flex items-center gap-2">
                     <Heart className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="font-medium">Emotional Support</span>
+                    {emotionalSessions.hasAccess && emotionalSessions.sessionsRemaining > 0 && (
+                      <Badge variant="secondary" className="text-xs ml-auto">
+                        {emotionalSessions.sessionsRemaining} sessions
+                      </Badge>
+                    )}
                   </div>
                 </button>
               </div>
@@ -444,7 +524,12 @@ export default function CareSupport() {
                         } else if (action.navigateTo) {
                           navigate(action.navigateTo);
                         } else if (action.prompt) {
-                          handleTopicClick(action.prompt);
+                          // Use session-aware handler for emotional mode
+                          if (mode === "emotional") {
+                            startEmotionalSession(action.prompt);
+                          } else {
+                            handleTopicClick(action.prompt);
+                          }
                         }
                       }}
                       disabled={isLoading && !action.navigateTo && !action.showAfterDeathResources && !action.downloadUrl}
@@ -591,6 +676,77 @@ export default function CareSupport() {
               Continue without saving
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Emotional Support Session Disclosure Modal (first use) */}
+      <Dialog open={showSessionDisclosure} onOpenChange={setShowSessionDisclosure}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center flex items-center justify-center gap-2">
+              <Heart className="h-5 w-5 text-primary" />
+              Guided Emotional Support
+            </DialogTitle>
+            <DialogDescription className="text-center pt-4 space-y-3">
+              <p>
+                Emotional support is provided in guided sessions.
+              </p>
+              <p className="font-medium text-foreground">
+                You have {emotionalSessions.sessionsRemaining} sessions available for this period.
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 pt-4">
+            <Button 
+              onClick={handleDisclosureContinue}
+              className="min-h-[48px]"
+            >
+              Continue
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Emotional Support Sessions Exhausted Modal */}
+      <Dialog open={showSessionsExhausted} onOpenChange={setShowSessionsExhausted}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">Sessions Used</DialogTitle>
+            <DialogDescription className="text-center pt-4 space-y-3">
+              <p>
+                You've used your emotional support sessions for this period.
+              </p>
+              <p>
+                I can still help with guides and practical next steps.
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 pt-4">
+            <Button 
+              onClick={() => {
+                setShowSessionsExhausted(false);
+                navigate("/resources");
+              }}
+              className="min-h-[48px] gap-2"
+            >
+              <BookOpen className="h-4 w-4" />
+              View Guides
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => {
+                setShowSessionsExhausted(false);
+                navigate("/contact");
+              }}
+              className="min-h-[48px] gap-2"
+            >
+              <Phone className="h-4 w-4" />
+              Contact Us for More Support
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground text-center pt-2">
+            We'll review your request and follow up personally.
+          </p>
         </DialogContent>
       </Dialog>
     </div>
