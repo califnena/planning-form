@@ -705,7 +705,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
               <Textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask me anything..."
+                placeholder="Type your question here, or choose an option above."
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
