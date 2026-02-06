@@ -83,6 +83,8 @@ export default function CareSupport() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [showIAPModal, setShowIAPModal] = useState(false);
   const [showAfterDeathResources, setShowAfterDeathResources] = useState(false);
+  // Guest mode allows users to access Claire without subscription - paywall shows when saving
+  const [guestMode, setGuestMode] = useState(false);
 
   useEffect(() => {
     checkCAREAccess();
@@ -279,8 +281,8 @@ export default function CareSupport() {
     );
   }
 
-  // No access - show full landing page
-  if (!hasAccess) {
+  // No access and not in guest mode - show full landing page
+  if (!hasAccess && !guestMode) {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/30">
         <GlobalHeader />
@@ -306,19 +308,12 @@ export default function CareSupport() {
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                 <Button 
-                  onClick={() => handleGetCARESupport()}
-                  disabled={isCheckoutLoading}
+                  onClick={() => setGuestMode(true)}
                   size="lg"
                   className="min-h-[56px] text-lg px-8"
                 >
-                  {isCheckoutLoading ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <>
-                      Start Claire
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </>
-                  )}
+                  Start Claire
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 <Button 
                   variant="outline"
