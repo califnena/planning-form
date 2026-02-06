@@ -669,24 +669,69 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                         </div>
                       )}
                       
-                      {/* Quick actions for after-death and emotional modes */}
-                      {(selectedMode === 'after-death' || selectedMode === 'emotional') && (
-                        (selectedMode === 'after-death' ? AFTER_DEATH_ACTIONS : EMOTIONAL_ACTIONS).map((action) => (
+                      {/* Quick actions for after-death mode */}
+                      {selectedMode === 'after-death' && (
+                        <>
+                          {AFTER_DEATH_ACTIONS.map((action) => (
+                            <Button
+                              key={action.label}
+                              variant="outline"
+                              className="w-full justify-start text-left h-auto py-2.5 px-4"
+                              onClick={() => {
+                                if (action.showAfterDeathResources) {
+                                  setShowAfterDeathResources(true);
+                                } else if (action.navigateTo) {
+                                  onClose();
+                                  navigate(action.navigateTo);
+                                } else if (action.prompt) {
+                                  handleSend(action.prompt);
+                                }
+                              }}
+                              disabled={isLoading && !action.navigateTo && !action.showAfterDeathResources}
+                            >
+                              <action.icon className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+                              <span className="text-sm">{action.label}</span>
+                            </Button>
+                          ))}
+                          
+                          {/* Download buttons for After-Death mode */}
+                          <div className="pt-2 space-y-2">
+                            <a 
+                              href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
+                              download
+                              className="flex items-center gap-3 w-full py-2.5 px-4 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground text-left"
+                            >
+                              <FileText className="h-4 w-4 flex-shrink-0 text-primary" />
+                              <span className="text-sm">Download After Death Guide</span>
+                            </a>
+                            <a 
+                              href="/guides/After-Life-Action-Plan-BLANK.pdf" 
+                              download
+                              className="flex items-center gap-3 w-full py-2.5 px-4 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground text-left"
+                            >
+                              <ClipboardCheck className="h-4 w-4 flex-shrink-0 text-primary" />
+                              <span className="text-sm">Download After Death Planner</span>
+                            </a>
+                          </div>
+                        </>
+                      )}
+                      
+                      {/* Quick actions for emotional mode */}
+                      {selectedMode === 'emotional' && (
+                        EMOTIONAL_ACTIONS.map((action) => (
                           <Button
                             key={action.label}
                             variant="outline"
                             className="w-full justify-start text-left h-auto py-2.5 px-4"
                             onClick={() => {
-                              if (action.showAfterDeathResources) {
-                                setShowAfterDeathResources(true);
-                              } else if (action.navigateTo) {
+                              if (action.navigateTo) {
                                 onClose();
                                 navigate(action.navigateTo);
                               } else if (action.prompt) {
                                 handleSend(action.prompt);
                               }
                             }}
-                            disabled={isLoading && !action.navigateTo && !action.showAfterDeathResources}
+                            disabled={isLoading && !action.navigateTo}
                           >
                             <action.icon className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
                             <span className="text-sm">{action.label}</span>
