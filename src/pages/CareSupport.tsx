@@ -66,7 +66,17 @@ export default function CareSupport() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [mode, setMode] = useState<Mode>("planning");
+  const [mode, setMode] = useState<Mode>(() => {
+    const savedMode = localStorage.getItem("claire_mode");
+    return (savedMode === "planning" || savedMode === "afterdeath" || savedMode === "emotional") 
+      ? savedMode 
+      : "planning";
+  });
+
+  // Persist mode to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem("claire_mode", mode);
+  }, [mode]);
   const [hasAccess, setHasAccess] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
