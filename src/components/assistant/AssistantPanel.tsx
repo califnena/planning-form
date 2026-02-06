@@ -662,9 +662,9 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                         </div>
                       )}
                       
-                      {/* Quick actions only shown for after-death mode */}
-                      {selectedMode === 'after-death' && (
-                        AFTER_DEATH_ACTIONS.map((action) => (
+                      {/* Quick actions for after-death and emotional modes */}
+                      {(selectedMode === 'after-death' || selectedMode === 'emotional') && (
+                        (selectedMode === 'after-death' ? AFTER_DEATH_ACTIONS : EMOTIONAL_ACTIONS).map((action) => (
                           <Button
                             key={action.label}
                             variant="outline"
