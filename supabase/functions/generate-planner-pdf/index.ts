@@ -499,11 +499,13 @@ async function generateSimplePdf(
   
   // Body text - generous line spacing for senior readability
   const howToUseBodyText = [
-    "This planner is designed to help you organize important information and share your wishes with the people you trust.",
+    "This planner is designed to help you organize important information and share your wishes with the",
+    "people you trust.",
     "",
     "Nothing in this guide is required. You may complete as much or as little as you choose.",
     "",
-    "The more information you include, the more it will help your loved ones, or those responsible for carrying out your wishes, do so as smoothly and accurately as possible.",
+    "The more information you include, the more it will help your loved ones, or those responsible for",
+    "carrying out your wishes, do so as smoothly and accurately as possible.",
     "",
     "This planner is meant to support peace of mind and reduce stress for those you care about.",
     "",
