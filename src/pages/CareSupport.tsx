@@ -17,6 +17,13 @@ import { requireSessionOrRedirect } from "@/lib/sessionGuard";
 import { isStoreIAP } from "@/lib/billingMode";
 import { StoreIAPModal } from "@/components/StoreIAPModal";
 import { AfterDeathResourcesResponse } from "@/components/assistant/AfterDeathResourcesResponse";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type Message = { role: "user" | "assistant"; content: string };
 type Mode = "planning" | "afterdeath" | "emotional" | null;
@@ -85,6 +92,8 @@ export default function CareSupport() {
   const [showAfterDeathResources, setShowAfterDeathResources] = useState(false);
   // Guest mode allows users to access Claire without subscription - paywall shows when saving
   const [guestMode, setGuestMode] = useState(false);
+  // Login required modal for save-related actions
+  const [showLoginRequiredModal, setShowLoginRequiredModal] = useState(false);
 
   useEffect(() => {
     checkCAREAccess();
@@ -140,24 +149,42 @@ export default function CareSupport() {
     }
   };
 
+  // Helper to check if user is logged in and show modal if not
+  const requireLoginForSave = (): boolean => {
+    if (!isLoggedIn) {
+      setShowLoginRequiredModal(true);
+      return false;
+    }
+    return true;
+  };
+
   const streamChat = async (userMessage: string) => {
     const newMessages: Message[] = [...messages, { role: "user", content: userMessage }];
     setMessages(newMessages);
     setIsLoading(true);
 
     try {
-      // Get session token before making the request
-      const accessToken = await requireSessionOrRedirect(navigate, toast);
-      if (!accessToken) {
-        setIsLoading(false);
-        return;
+      // For guest mode, use anon key; for logged-in users, use session token
+      let authHeader: string;
+      
+      if (isLoggedIn) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          toast({ title: "Session expired", description: "Please sign in again.", variant: "destructive" });
+          setIsLoading(false);
+          return;
+        }
+        authHeader = `Bearer ${session.access_token}`;
+      } else {
+        // Guest mode - use anon key for basic chat (no save functionality)
+        authHeader = `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`;
       }
 
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach-chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: authHeader,
         },
         body: JSON.stringify({ messages: newMessages, mode }),
       });
@@ -937,12 +964,16 @@ export default function CareSupport() {
                 <p className="text-xs text-muted-foreground">
                   You can close this anytime.
                 </p>
-                <Link 
-                  to="/saved-summaries" 
-                  className="text-xs text-primary hover:underline block"
+                <button 
+                  onClick={() => {
+                    if (requireLoginForSave()) {
+                      navigate("/saved-summaries");
+                    }
+                  }}
+                  className="text-xs text-primary hover:underline block mx-auto"
                 >
                   View your saved summaries
-                </Link>
+                </button>
                 <p className="text-xs text-muted-foreground/70">
                   Claire provides planning guidance and educational support. She does not provide legal, medical, or financial advice.
                 </p>
@@ -954,6 +985,36 @@ export default function CareSupport() {
       <AppFooter />
       <ClaireWelcomeModal isOpen={showWelcome} onClose={handleWelcomeClose} />
       <StoreIAPModal open={showIAPModal} onOpenChange={setShowIAPModal} />
+      
+      {/* Login Required Modal for save-related actions */}
+      <Dialog open={showLoginRequiredModal} onOpenChange={setShowLoginRequiredModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">Sign in to save</DialogTitle>
+            <DialogDescription className="text-center pt-2">
+              To save or edit your plan later, please sign in.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 pt-4">
+            <Button 
+              onClick={() => {
+                setShowLoginRequiredModal(false);
+                navigate("/login");
+              }}
+              className="min-h-[48px]"
+            >
+              Sign In
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => setShowLoginRequiredModal(false)}
+              className="min-h-[48px]"
+            >
+              Continue without saving
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
