@@ -136,6 +136,10 @@ const Pricing = () => {
   const [fallbackMode, setFallbackMode] = useState<boolean>(false);
   const [fallbackReason, setFallbackReason] = useState<FallbackReason>(null);
   const [showIAPModal, setShowIAPModal] = useState(false);
+  
+  // Soft helper for printable form nudge
+  const [showPrintableNudge, setShowPrintableNudge] = useState<boolean>(false);
+  const nudgeDismissedRef = useRef<boolean>(false);
   const pageLoadTime = useRef<number>(Date.now());
 
   // Detect printable-only intent from query params
@@ -303,6 +307,19 @@ const Pricing = () => {
     return () => clearTimeout(timeoutId);
   }, [loadingPrices]);
 
+  // 30-second timeout to show printable form nudge (only if not already in printable intent mode)
+  useEffect(() => {
+    if (printableIntent || nudgeDismissedRef.current) return;
+    
+    const nudgeTimeoutId = setTimeout(() => {
+      if (!nudgeDismissedRef.current) {
+        setShowPrintableNudge(true);
+      }
+    }, 30000); // 30 seconds
+
+    return () => clearTimeout(nudgeTimeoutId);
+  }, [printableIntent]);
+
   // Handler for opening Stripe Payment Links
   const handleOpenPaymentLink = (lookupKey: string) => {
     const link = STRIPE_PAYMENT_LINKS[lookupKey];
@@ -346,8 +363,44 @@ const Pricing = () => {
 
   const getDisplayedPrice = (lookupKey: string) => priceLabel(stripePrices[lookupKey]);
 
+  const handleDismissPrintableNudge = () => {
+    nudgeDismissedRef.current = true;
+    setShowPrintableNudge(false);
+  };
+
+  const handleGoToPrintableForm = () => {
+    nudgeDismissedRef.current = true;
+    setShowPrintableNudge(false);
+    navigate("/pricing?product=printable");
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Soft helper nudge for printable form */}
+      {showPrintableNudge && !printableIntent && (
+        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-50 animate-in slide-in-from-bottom-4 fade-in duration-300">
+          <div className="bg-card border border-border rounded-lg shadow-lg p-4">
+            <button 
+              onClick={handleDismissPrintableNudge}
+              className="absolute top-2 right-2 text-muted-foreground hover:text-foreground"
+              aria-label="Dismiss"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <p className="text-sm text-foreground pr-4 mb-3">
+              Just looking for the printable form? You can purchase it directly without creating an account.
+            </p>
+            <Button 
+              size="sm" 
+              onClick={handleGoToPrintableForm}
+              className="w-full"
+            >
+              Go to Printable Form
+            </Button>
+          </div>
+        </div>
+      )}
+      
       {/* Admin Debug Banner */}
       {isLoggedIn && isAdmin && (
         <div className="bg-amber-100 border-b border-amber-300 px-4 py-2 flex items-center justify-center gap-2 text-amber-800 text-sm">
