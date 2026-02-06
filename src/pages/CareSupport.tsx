@@ -77,7 +77,8 @@ const PLANNING_SUGGESTIONS = [
 ];
 
 // Intro text shown above suggestion chips
-const SUGGESTION_INTRO_TEXT = "You can start anywhere. For example:";
+const PLANNING_INTRO_TEXT = "You can start anywhere. For example:";
+const EMOTIONAL_INTRO_TEXT = "If it helps, we can talk about:";
 
 const AFTERDEATH_SUGGESTIONS = [
   { label: "What needs to be done first?", prompt: "Someone has passed away. What needs to be done first?" },
@@ -87,10 +88,11 @@ const AFTERDEATH_SUGGESTIONS = [
 ];
 
 const EMOTIONAL_SUGGESTIONS = [
-  { label: "How do I cope with grief?", prompt: "How do I cope with grief? I'm struggling and don't know what to do." },
-  { label: "Is what I'm feeling normal?", prompt: "Is what I'm feeling normal? I'm not sure if my reactions are okay." },
-  { label: "I'm struggling right now", prompt: "I'm really struggling right now. What can I do to feel a little better?" },
-  { label: "Talk to a real person", navigateTo: "/contact" },
+  { label: "Feeling overwhelmed or numb", prompt: "I'm feeling overwhelmed or numb. Is that normal?" },
+  { label: "Grief and emotions", prompt: "I'd like to talk about grief and the emotions I'm experiencing." },
+  { label: "Family conversations", prompt: "How do I have difficult conversations with family about loss?" },
+  { label: "What comes next", prompt: "I'm not sure what comes next. Can you help me understand?" },
+  { label: "Or anything else on your mind", prompt: "I just need someone to talk to right now." },
 ];
 
 export default function CareSupport() {
@@ -732,13 +734,13 @@ What would help most in this moment?`
                           {/* Suggestion chips after first welcome message */}
                           {isFirstWelcomeMessage && suggestions.length > 0 && (
                             <div className="mt-4 ml-11 space-y-3">
-                              {/* Intro text for Planning mode */}
-                              {mode === "planning" && (
+                              {/* Intro text for Planning and Emotional modes */}
+                              {(mode === "planning" || mode === "emotional") && (
                                 <p 
                                   className="text-sm font-medium"
                                   style={{ color: 'hsl(215, 20%, 35%)' }}
                                 >
-                                  {SUGGESTION_INTRO_TEXT}
+                                  {mode === "planning" ? PLANNING_INTRO_TEXT : EMOTIONAL_INTRO_TEXT}
                                 </p>
                               )}
                               <div className="flex flex-wrap gap-2">
