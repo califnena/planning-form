@@ -441,6 +441,14 @@ export default function PrePlanSummary() {
         {/* Preview Lock Banner - calm paywall messaging */}
         <PreviewLockBanner />
 
+        {/* Reassurance message */}
+        <Card className="mb-6 p-4 bg-muted/30 border-muted">
+          <p className="text-base text-foreground text-center leading-relaxed">
+            You do not need to complete everything.<br />
+            You can come back and make changes at any time.
+          </p>
+        </Card>
+
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl sm:text-3xl font-semibold text-foreground">
