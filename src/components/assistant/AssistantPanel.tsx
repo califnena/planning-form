@@ -689,21 +689,21 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                     </div>
                   )}
                   
-                  {/* Voice tip - compact, only show after mode selected */}
+                  {/* Voice tip and memory disclosure - only show after mode selected */}
                   {selectedMode && (
-                    <div className="bg-primary/5 border border-primary/20 rounded-lg p-2 text-center">
-                      <p className="text-xs text-foreground">
-                        Click the mic to speak, or type below.
-                      </p>
-                    </div>
+                    <>
+                      <div className="bg-primary/5 border border-primary/20 rounded-lg p-2 text-center">
+                        <p className="text-xs text-foreground">
+                          Click the mic to speak, or type below.
+                        </p>
+                      </div>
+                      <div className="bg-muted/50 rounded-lg p-2 text-center">
+                        <p className="text-[11px] text-muted-foreground">
+                          Claire remembers planning info you save. Conversations are private.
+                        </p>
+                      </div>
+                    </>
                   )}
-                  
-                  {/* Memory disclosure - always visible but compact */}
-                  <div className="bg-muted/50 rounded-lg p-2 text-center">
-                   <p className="text-[11px] text-muted-foreground">
-                     Claire remembers planning info you save. Conversations are private.
-                   </p>
-                 </div>
                 </div>
               )}
               
