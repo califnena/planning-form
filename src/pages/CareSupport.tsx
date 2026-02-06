@@ -315,7 +315,7 @@ export default function CareSupport() {
                     <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
                     <>
-                      Get CARE Support
+                      Start Claire
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </>
                   )}
@@ -326,7 +326,7 @@ export default function CareSupport() {
                   onClick={() => navigate("/claire-faq")}
                   className="min-h-[56px] text-lg"
                 >
-                  Talk to Claire
+                  Read CARE & Claire FAQs
                 </Button>
               </div>
             </div>
@@ -382,15 +382,7 @@ export default function CareSupport() {
                   I'm available 24/7, anywhere you are.
                 </p>
                 
-                <Button 
-                  variant="outline"
-                  size="lg"
-                  onClick={() => navigate("/claire-faq")}
-                  className="mt-4 min-h-[48px]"
-                >
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Talk to Claire
-                </Button>
+                {/* Duplicate CTA removed - FAQ link is in hero section */}
                 
                 <p className="text-sm text-muted-foreground pt-2">
                   You're always in control of what you do next.
