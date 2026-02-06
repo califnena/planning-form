@@ -19,7 +19,7 @@ import { StoreIAPModal } from "@/components/StoreIAPModal";
 import { AfterDeathResourcesResponse } from "@/components/assistant/AfterDeathResourcesResponse";
 
 type Message = { role: "user" | "assistant"; content: string };
-type Mode = "planning" | "afterdeath" | "emotional";
+type Mode = "planning" | "afterdeath" | "emotional" | null;
 
 
 type QuickAction = {
@@ -60,16 +60,19 @@ export default function CareSupport() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  // GUARDRAIL: Mode starts as null - no topic buttons shown until user explicitly selects a mode
   const [mode, setMode] = useState<Mode>(() => {
     const savedMode = localStorage.getItem("claire_mode");
     return (savedMode === "planning" || savedMode === "afterdeath" || savedMode === "emotional") 
       ? savedMode 
-      : "planning";
+      : null; // No default mode - forces explicit selection
   });
 
-  // Persist mode to localStorage when it changes
+  // Persist mode to localStorage when it changes (only when not null)
   useEffect(() => {
-    localStorage.setItem("claire_mode", mode);
+    if (mode) {
+      localStorage.setItem("claire_mode", mode);
+    }
   }, [mode]);
   const [hasAccess, setHasAccess] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
@@ -803,8 +806,8 @@ export default function CareSupport() {
             </CardContent>
           </Card>
 
-          {/* Mode-specific actions - shown after mode selection */}
-          {messages.length === 0 && !showAfterDeathResources && (
+          {/* GUARDRAIL: Mode-specific actions - ONLY shown when mode is explicitly selected */}
+          {mode !== null && messages.length === 0 && !showAfterDeathResources && (
             <Card className="border-none shadow-lg">
               <CardContent className="p-4 space-y-3">
                 <p className="text-sm text-center text-muted-foreground mb-2">
