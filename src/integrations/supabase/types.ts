@@ -1401,6 +1401,39 @@ export type Database = {
           },
         ]
       }
+      emotional_support_sessions: {
+        Row: {
+          billing_period_start: string
+          created_at: string
+          first_session_shown: boolean
+          id: string
+          sessions_limit: number
+          sessions_used: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          billing_period_start: string
+          created_at?: string
+          first_session_shown?: boolean
+          id?: string
+          sessions_limit?: number
+          sessions_used?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          billing_period_start?: string
+          created_at?: string
+          first_session_shown?: boolean
+          id?: string
+          sessions_limit?: number
+          sessions_used?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       faqs: {
         Row: {
           answer: string
