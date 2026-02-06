@@ -481,31 +481,89 @@ async function generateSimplePdf(
   addFooter(coverPage, pageNum++);
 
   // ============================================================
-  // PAGE 2: Table of Contents with page numbers
+  // PAGE 2: How to Use This Planner
+  // ============================================================
+  const howToUsePage = pdfDoc.addPage([pageWidth, pageHeight]);
+  addPageHeader(howToUsePage);
+  
+  // Centered title
+  const howToUseTitle = "How to Use This Planner";
+  const howToUseTitleWidth = helveticaBold.widthOfTextAtSize(howToUseTitle, 20);
+  howToUsePage.drawText(howToUseTitle, {
+    x: (pageWidth - howToUseTitleWidth) / 2,
+    y: pageHeight - 120,
+    size: 20,
+    font: helveticaBold,
+    color: headerColor,
+  });
+  
+  // Body text - generous line spacing for senior readability
+  const howToUseBodyText = [
+    "This planner is designed to help you organize important information and share your wishes with the people you trust.",
+    "",
+    "Nothing in this guide is required. You may complete as much or as little as you choose.",
+    "",
+    "The more information you include, the more it will help your loved ones, or those responsible for carrying out your wishes, do so as smoothly and accurately as possible.",
+    "",
+    "This planner is meant to support peace of mind and reduce stress for those you care about.",
+    "",
+    "Keep this planner in a safe place and let your designated person know where it is stored.",
+  ];
+  
+  let howToUseY = pageHeight - 180;
+  const howToUseLineHeight = 24; // Generous spacing for seniors
+  const howToUseFontSize = 13; // Large, readable font
+  
+  for (const paragraph of howToUseBodyText) {
+    if (paragraph === "") {
+      // Empty string = paragraph break
+      howToUseY -= howToUseLineHeight * 0.5;
+    } else {
+      // Wrap text for proper line breaks
+      const wrappedLines = wrapText(paragraph, pageWidth - margin * 2, howToUseFontSize);
+      for (const line of wrappedLines) {
+        howToUsePage.drawText(line, {
+          x: margin,
+          y: howToUseY,
+          size: howToUseFontSize,
+          font: helvetica,
+          color: textColor,
+        });
+        howToUseY -= howToUseLineHeight;
+      }
+    }
+  }
+  
+  addDraftWatermark(howToUsePage);
+  addFooter(howToUsePage, pageNum++);
+
+  // ============================================================
+  // PAGE 3: Table of Contents with page numbers
   // ============================================================
   const tocPage = pdfDoc.addPage([pageWidth, pageHeight]);
   addPageHeader(tocPage);
   let tocY = addSectionHeader(tocPage, "Table of Contents", pageHeight - 100);
   
   // Define sections with their page numbers
+  // NOTE: Page numbers increased by 1 due to "How to Use This Planner" page
   // NOTE: Address is now part of Personal Information (consolidated)
   // NOTE: About You (family) follows Personal Information
   const tocSections = [
-    { title: "Checklist", page: 3 },
-    { title: "Instructions", page: 4 },
-    { title: "Personal Information", page: 5 },
-    { title: "About You", page: 6 },
-    { title: "My Life Story & Legacy", page: 7 },
-    { title: "People to Notify", page: 8 },
-    { title: "Funeral & Memorial Wishes", page: 9 },
-    { title: "Financial Life", page: 11 },
-    { title: "Insurance Policies", page: 12 },
-    { title: "Property & Valuables", page: 13 },
-    { title: "Pets", page: 14 },
-    { title: "Online Accounts", page: 15 },
-    { title: "Legal Documents", page: 16 },
-    { title: "Messages to Loved Ones", page: 17 },
-    { title: "Plan Review & Signature", page: 19 },
+    { title: "Checklist", page: 4 },
+    { title: "Instructions", page: 5 },
+    { title: "Personal Information", page: 6 },
+    { title: "About You", page: 7 },
+    { title: "My Life Story & Legacy", page: 8 },
+    { title: "People to Notify", page: 9 },
+    { title: "Funeral & Memorial Wishes", page: 10 },
+    { title: "Financial Life", page: 12 },
+    { title: "Insurance Policies", page: 13 },
+    { title: "Property & Valuables", page: 14 },
+    { title: "Pets", page: 15 },
+    { title: "Online Accounts", page: 16 },
+    { title: "Legal Documents", page: 17 },
+    { title: "Messages to Loved Ones", page: 18 },
+    { title: "Plan Review & Signature", page: 20 },
   ];
   
   for (const section of tocSections) {
