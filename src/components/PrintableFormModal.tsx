@@ -50,7 +50,7 @@ export function PrintableFormModal({ open, onOpenChange }: PrintableFormModalPro
             onClick={handleUnlock} 
             className="w-full min-h-[48px]"
           >
-            Get Printable Form
+            Buy Printable Planning Form – $9.99
           </Button>
           <Button 
             variant="ghost" 

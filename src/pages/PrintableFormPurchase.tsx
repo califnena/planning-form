@@ -136,7 +136,7 @@ const PrintableFormPurchase = () => {
                 Opening Secure Checkout...
               </>
             ) : (
-              "Purchase Printable Form"
+              "Buy Printable Planning Form – $9.99"
             )}
           </Button>
           <p className="text-sm text-muted-foreground mt-3">

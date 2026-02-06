@@ -229,7 +229,7 @@ const Forms = () => {
                   className="min-h-[56px] text-lg px-10"
                 >
                   <ShoppingCart className="mr-3 h-5 w-5" />
-                  Get Printable Form
+                  Buy Printable Planning Form – $9.99
                 </Button>
                 <p className="text-sm text-muted-foreground mt-3">
                   Secure checkout. Instant download after purchase.
