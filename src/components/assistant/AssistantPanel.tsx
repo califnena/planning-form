@@ -546,9 +546,6 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                   {!selectedMode && (
                     <div className="text-center py-2">
                       <p className="text-base font-medium text-foreground">Select Your Mode</p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Tap one of the options below, or type a question.
-                      </p>
                     </div>
                   )}
                   
@@ -595,6 +592,11 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                       </button>
                     </div>
                   )}
+                  
+                  {/* Helper text - always visible */}
+                  <p className="text-sm text-muted-foreground text-center">
+                    Tap one of the options below, or type a question.
+                  </p>
                   
                   {/* Mode-specific actions - show after mode selected */}
                   {selectedMode && (
