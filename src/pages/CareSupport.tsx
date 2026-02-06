@@ -682,23 +682,74 @@ What would help most in this moment?`
               {/* Only show chat area when there are messages or loading */}
               {(messages.length > 0 || isLoading) && (
                 <ScrollArea className="max-h-[400px] pr-4">
-                  <div className="space-y-4">
-                    {messages.map((msg, i) => (
-                      <div
-                        key={i}
-                        className={`p-4 rounded-lg ${
-                          msg.role === "user"
-                            ? "bg-primary/10 ml-8"
-                            : "bg-muted mr-8"
-                        }`}
-                      >
-                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                      </div>
-                    ))}
+                  <div className="space-y-3">
+                    {messages.map((msg, i) => {
+                      const isAssistant = msg.role === "assistant";
+                      const prevMsg = messages[i - 1];
+                      const showAvatar = isAssistant && (!prevMsg || prevMsg.role !== "assistant");
+                      
+                      return (
+                        <div
+                          key={i}
+                          className={`flex items-start gap-3 ${
+                            isAssistant ? "mr-4" : "ml-8 justify-end"
+                          }`}
+                        >
+                          {/* Claire avatar - only on first message in sequence */}
+                          {isAssistant && (
+                            <div className="flex-shrink-0 w-8">
+                              {showAvatar && (
+                                <img 
+                                  src={claireAvatar} 
+                                  alt="Claire" 
+                                  className="w-8 h-8 rounded-full object-cover shadow-sm border"
+                                  style={{ borderColor: 'hsl(140, 18%, 85%)' }}
+                                />
+                              )}
+                            </div>
+                          )}
+                          
+                          {/* Message bubble */}
+                          <div
+                            className={`p-4 rounded-xl max-w-[85%] ${
+                              isAssistant 
+                                ? "shadow-sm" 
+                                : "bg-primary/10"
+                            }`}
+                            style={isAssistant ? { 
+                              backgroundColor: '#EEF4F1',
+                              boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
+                            } : undefined}
+                          >
+                            <p 
+                              className="text-base leading-relaxed whitespace-pre-wrap"
+                              style={{ color: 'hsl(215, 20%, 22%)' }}
+                            >
+                              {msg.content}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
                     {isLoading && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span className="text-sm">Claire is thinking...</span>
+                      <div className="flex items-center gap-3 mr-4">
+                        <div className="w-8 flex-shrink-0">
+                          <img 
+                            src={claireAvatar} 
+                            alt="Claire" 
+                            className="w-8 h-8 rounded-full object-cover shadow-sm border"
+                            style={{ borderColor: 'hsl(140, 18%, 85%)' }}
+                          />
+                        </div>
+                        <div 
+                          className="p-4 rounded-xl shadow-sm"
+                          style={{ backgroundColor: '#EEF4F1' }}
+                        >
+                          <div className="flex items-center gap-2" style={{ color: 'hsl(215, 15%, 45%)' }}>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span className="text-sm">Claire is thinking...</span>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
