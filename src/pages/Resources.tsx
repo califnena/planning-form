@@ -112,8 +112,8 @@ const Resources = () => {
       return;
     }
     
-    // No access - go to forms page for purchase flow
-    navigate('/forms');
+    // No access - go directly to one-page checkout
+    navigate('/printable-form');
   };
 
   const handleDownloadAfterDeathChecklist = async () => {
