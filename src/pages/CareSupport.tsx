@@ -118,6 +118,36 @@ const EMOTIONAL_SUGGESTIONS = [
   { label: "Or anything else on your mind", prompt: "I just need someone to talk to right now." },
 ];
 
+// Static common questions for fallback (no AI call needed)
+const COMMON_QUESTIONS_AFTERDEATH = [
+  { label: "Who needs to be notified after someone passes away?", prompt: "Who needs to be notified after someone passes away?" },
+  { label: "What should I do in the first 24–48 hours?", prompt: "What should I do in the first 24–48 hours after someone passes away?" },
+  { label: "How do I get a death certificate?", prompt: "How do I get a death certificate?" },
+  { label: "What happens to Social Security benefits?", prompt: "What happens to Social Security benefits after someone dies?" },
+  { label: "What documents will I need?", prompt: "What documents will I need after someone passes away?" },
+  { label: "What do I do with bills and accounts?", prompt: "What do I do with the person's bills and accounts after they pass away?" },
+  { label: "How do I handle funeral arrangements?", prompt: "How do I handle funeral arrangements?" },
+  { label: "What if there is no will?", prompt: "What happens if there is no will?" },
+];
+
+const COMMON_QUESTIONS_PLANNING = [
+  { label: "What should I plan first?", prompt: "What should I plan first when starting end-of-life planning?" },
+  { label: "What documents do I need?", prompt: "What documents do I need for end-of-life planning?" },
+  { label: "How do I choose someone to be in charge?", prompt: "How do I choose someone to be in charge after I'm gone?" },
+  { label: "What are my funeral options?", prompt: "What are my options for funeral or cremation?" },
+  { label: "How do I write a legacy letter?", prompt: "How do I write a legacy letter to my family?" },
+  { label: "What about my digital accounts?", prompt: "What should I do about my digital accounts and passwords?" },
+];
+
+const COMMON_QUESTIONS_EMOTIONAL = [
+  { label: "Is what I'm feeling normal?", prompt: "Is what I'm feeling normal? I'm not sure if my reactions are okay." },
+  { label: "How long does grief last?", prompt: "How long does grief last? When will I feel better?" },
+  { label: "How do I cope day to day?", prompt: "How do I cope with grief day to day?" },
+  { label: "How do I talk to others about my loss?", prompt: "How do I talk to family and friends about my loss?" },
+  { label: "I'm feeling overwhelmed", prompt: "I'm feeling overwhelmed. What can I do right now?" },
+  { label: "Is it okay to feel angry or numb?", prompt: "Is it okay to feel angry or numb after a loss?" },
+];
+
 export default function CareSupport() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -182,6 +212,7 @@ What would help most in this moment?`
     
     // Clear any error state when switching modes
     setShowErrorOptions(false);
+    setShowCommonQuestions(false);
     
     // Add Claire's welcome message - full intro for first time, short for returning
     const welcomeMessage = isFirstTime ? MODE_FIRST_MESSAGES[newMode] : MODE_RETURNING_MESSAGES[newMode];
@@ -228,6 +259,8 @@ What would help most in this moment?`
   const [showErrorOptions, setShowErrorOptions] = useState(false);
   // Store the last user message for retry functionality
   const [lastUserMessage, setLastUserMessage] = useState<string>("");
+  // Track if common questions are expanded
+  const [showCommonQuestions, setShowCommonQuestions] = useState(false);
   
   // Emotional support session tracking
   const emotionalSessions = useEmotionalSupportSessions(userId);
@@ -970,22 +1003,14 @@ What would help most in this moment?`
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => {
-                              setShowErrorOptions(false);
-                              const defaultPrompt = mode === "planning" 
-                                ? "What are common planning questions?" 
-                                : mode === "afterdeath" 
-                                  ? "What are the most common questions after a death?"
-                                  : "What do people commonly ask about grief?";
-                              streamChat(defaultPrompt);
-                            }}
+                            onClick={() => setShowCommonQuestions(prev => !prev)}
                             className="rounded-full"
                             style={{
                               borderColor: 'hsl(175, 25%, 65%)',
                               color: 'hsl(175, 35%, 30%)'
                             }}
                           >
-                            Show common questions
+                            {showCommonQuestions ? 'Hide common questions' : 'Show common questions people often ask'}
                           </Button>
                           <Button
                             variant="outline"
@@ -1019,6 +1044,59 @@ What would help most in this moment?`
                             Talk to a real person
                           </Button>
                         </div>
+                        
+                        {/* Expandable Common Questions Section */}
+                        {showCommonQuestions && (
+                          <div 
+                            className="mt-4 p-4 rounded-lg"
+                            style={{
+                              backgroundColor: 'hsl(175, 30%, 97%)',
+                              border: '1px solid hsl(175, 25%, 85%)',
+                              height: 'auto',
+                              overflow: 'visible',
+                            }}
+                          >
+                            <p 
+                              className="text-sm font-medium mb-3"
+                              style={{ color: 'hsl(215, 20%, 35%)' }}
+                            >
+                              Common questions people often ask:
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {(mode === "afterdeath" ? COMMON_QUESTIONS_AFTERDEATH 
+                                : mode === "planning" ? COMMON_QUESTIONS_PLANNING 
+                                : COMMON_QUESTIONS_EMOTIONAL
+                              ).map((q, idx) => (
+                                <Button
+                                  key={idx}
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    // Insert question as if user typed it
+                                    setInput(q.prompt);
+                                    // Trigger chat immediately
+                                    streamChat(q.prompt);
+                                    // Keep questions visible for follow-ups
+                                  }}
+                                  className="rounded-full text-left whitespace-normal h-auto py-2"
+                                  style={{
+                                    borderColor: 'hsl(175, 25%, 75%)',
+                                    color: 'hsl(175, 35%, 25%)',
+                                    backgroundColor: 'white',
+                                  }}
+                                >
+                                  {q.label}
+                                </Button>
+                              ))}
+                            </div>
+                            <p 
+                              className="text-xs mt-3"
+                              style={{ color: 'hsl(215, 15%, 50%)' }}
+                            >
+                              You can also type your own question anytime.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     )}
                 </div>
