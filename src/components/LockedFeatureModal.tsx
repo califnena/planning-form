@@ -44,15 +44,19 @@ export function LockedFeatureModal() {
           </DialogDescription>
         </DialogHeader>
 
-        <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-2">
-          <Button variant="outline" onClick={handleContinuePreview} className="gap-2 flex-1">
+        <div className="flex flex-col gap-3">
+          <Button variant="outline" onClick={handleContinuePreview} className="gap-2 w-full">
             <Eye className="h-4 w-4" />
             View Sample Pages
           </Button>
-          <Button onClick={handleUnlock} className="flex-1">
+          <p className="text-sm text-muted-foreground text-center leading-relaxed">
+            This lets you look at example sections only.<br />
+            To save or edit your information, access is required.
+          </p>
+          <Button onClick={handleUnlock} className="w-full">
             Unlock Full Planner
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
