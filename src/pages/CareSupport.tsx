@@ -77,6 +77,63 @@ export default function CareSupport() {
       : null; // No default mode - forces explicit selection
   });
 
+  // Track which modes user has seen before (for first-message logic)
+  const [seenModes, setSeenModes] = useState<Set<Mode>>(() => {
+    const saved = localStorage.getItem("claire_seen_modes");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return new Set(parsed as Mode[]);
+      } catch {
+        return new Set();
+      }
+    }
+    return new Set();
+  });
+
+  // Mode-specific first messages
+  const MODE_FIRST_MESSAGES: Record<Exclude<Mode, null>, string> = {
+    planning: `I'm glad you're here.
+
+We can take this one step at a time. I can help you understand what to think about, or we can start filling things out together if you'd like.
+
+What would you like help with today?`,
+    afterdeath: `I'm really sorry you're going through this.
+
+I can help you focus on what matters most right now, and we'll take the rest one step at a time.
+
+Would you like help understanding what to do first, or would you rather ask a specific question?`,
+    emotional: `I'm here with you.
+
+You don't have to have the right words. You can share what's on your mind, or we can just talk through what feels heavy right now.
+
+What would help most in this moment?`
+  };
+
+  const RETURNING_USER_MESSAGE = "Welcome back. Where would you like to pick things up today?";
+
+  // Handle mode selection with first-message logic
+  const handleModeSelect = (newMode: Exclude<Mode, null>) => {
+    if (mode === newMode) return;
+    
+    const isFirstTime = !seenModes.has(newMode);
+    setMode(newMode);
+    
+    // Add Claire's welcome message
+    const welcomeMessage = isFirstTime ? MODE_FIRST_MESSAGES[newMode] : RETURNING_USER_MESSAGE;
+    setMessages([{ role: "assistant", content: welcomeMessage }]);
+    
+    // Mark this mode as seen
+    if (isFirstTime) {
+      const updatedSeen = new Set(seenModes);
+      updatedSeen.add(newMode);
+      setSeenModes(updatedSeen);
+      localStorage.setItem("claire_seen_modes", JSON.stringify([...updatedSeen]));
+    }
+    
+    toast({ title: `Switched to: ${newMode === "planning" ? "Planning Ahead" : newMode === "afterdeath" ? "After a Death" : "Emotional Support"}`, duration: 2000 });
+  };
+
   // Persist mode to localStorage when it changes (only when not null)
   useEffect(() => {
     if (mode) {
@@ -181,15 +238,14 @@ export default function CareSupport() {
       if (!emotionalSessions.firstSessionShown) {
         setShowSessionDisclosure(true);
       }
-      setMode("emotional");
-      toast({ title: "Switched to: Emotional Support", duration: 2000 });
+      // Use handleModeSelect for consistent first-message behavior
+      handleModeSelect("emotional");
     } else if (emotionalSessions.hasAccess && emotionalSessions.sessionsRemaining <= 0) {
       // Show exhausted modal
       setShowSessionsExhausted(true);
     } else {
-      // No access - just switch mode (guest experience)
-      setMode("emotional");
-      toast({ title: "Switched to: Emotional Support", duration: 2000 });
+      // No access - use handleModeSelect (guest experience with first-message)
+      handleModeSelect("emotional");
     }
   };
 
@@ -482,12 +538,7 @@ export default function CareSupport() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 {/* Planning Ahead Button */}
                 <button
-                  onClick={() => {
-                    if (mode !== "planning") {
-                      setMode("planning");
-                      toast({ title: "Switched to: Planning Ahead", duration: 2000 });
-                    }
-                  }}
+                  onClick={() => handleModeSelect("planning")}
                   className={`p-3 rounded-lg border-2 transition-all text-left min-h-[56px] ${
                     mode === "planning"
                       ? "shadow-md"
@@ -507,12 +558,7 @@ export default function CareSupport() {
 
                 {/* After a Death Button */}
                 <button
-                  onClick={() => {
-                    if (mode !== "afterdeath") {
-                      setMode("afterdeath");
-                      toast({ title: "Switched to: After a Death", duration: 2000 });
-                    }
-                  }}
+                  onClick={() => handleModeSelect("afterdeath")}
                   className={`p-3 rounded-lg border-2 transition-all text-left min-h-[56px] ${
                     mode === "afterdeath"
                       ? "shadow-md"
