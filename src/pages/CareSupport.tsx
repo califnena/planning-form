@@ -78,6 +78,7 @@ const PLANNING_SUGGESTIONS = [
 
 // Intro text shown above suggestion chips
 const PLANNING_INTRO_TEXT = "You can start anywhere. For example:";
+const AFTERDEATH_INTRO_TEXT = "You can access guides and checklists on your own for free. If you'd like help filling things out, saving your work, or being guided step by step, personal support is available.";
 const EMOTIONAL_INTRO_TEXT = "If it helps, we can talk about:";
 
 const AFTERDEATH_SUGGESTIONS = [
@@ -734,15 +735,17 @@ What would help most in this moment?`
                           {/* Suggestion chips after first welcome message */}
                           {isFirstWelcomeMessage && suggestions.length > 0 && (
                             <div className="mt-4 ml-11 space-y-3">
-                              {/* Intro text for Planning and Emotional modes */}
-                              {(mode === "planning" || mode === "emotional") && (
-                                <p 
-                                  className="text-sm font-medium"
-                                  style={{ color: 'hsl(215, 20%, 35%)' }}
-                                >
-                                  {mode === "planning" ? PLANNING_INTRO_TEXT : EMOTIONAL_INTRO_TEXT}
-                                </p>
-                              )}
+                              {/* Intro text for all modes */}
+                              <p 
+                                className="text-sm font-medium"
+                                style={{ color: 'hsl(215, 20%, 35%)' }}
+                              >
+                                {mode === "planning" 
+                                  ? PLANNING_INTRO_TEXT 
+                                  : mode === "afterdeath" 
+                                    ? AFTERDEATH_INTRO_TEXT 
+                                    : EMOTIONAL_INTRO_TEXT}
+                              </p>
                               <div className="flex flex-wrap gap-2">
                                 {suggestions.map((suggestion) => (
                                   <button
