@@ -749,7 +749,12 @@ export default function CareSupport() {
               <h3 className="font-semibold text-center text-base">Select Your Mode:</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <button
-                  onClick={() => setMode("planning")}
+                  onClick={() => {
+                    if (mode !== "planning") {
+                      setMode("planning");
+                      toast({ title: "Switched to: Planning Ahead", duration: 2000 });
+                    }
+                  }}
                   className={`p-3 rounded-lg border-2 transition-all text-left ${
                     mode === "planning"
                       ? "border-primary bg-primary/10 shadow-md"
@@ -763,7 +768,12 @@ export default function CareSupport() {
                 </button>
 
                 <button
-                  onClick={() => setMode("afterdeath")}
+                  onClick={() => {
+                    if (mode !== "afterdeath") {
+                      setMode("afterdeath");
+                      toast({ title: "Switched to: After a Death", duration: 2000 });
+                    }
+                  }}
                   className={`p-3 rounded-lg border-2 transition-all text-left ${
                     mode === "afterdeath"
                       ? "border-primary bg-primary/10 shadow-md"
@@ -777,7 +787,12 @@ export default function CareSupport() {
                 </button>
 
                 <button
-                  onClick={() => setMode("emotional")}
+                  onClick={() => {
+                    if (mode !== "emotional") {
+                      setMode("emotional");
+                      toast({ title: "Switched to: Emotional Support", duration: 2000 });
+                    }
+                  }}
                   className={`p-3 rounded-lg border-2 transition-all text-left ${
                     mode === "emotional"
                       ? "border-primary bg-primary/10 shadow-md"
