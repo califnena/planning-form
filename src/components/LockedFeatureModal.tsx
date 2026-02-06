@@ -38,13 +38,16 @@ export function LockedFeatureModal() {
           <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
             <Eye className="h-6 w-6 text-primary" />
           </div>
-          <DialogTitle className="text-center">Digital Planning Access Required</DialogTitle>
+          <DialogTitle className="text-center">Saving Your Plan Requires Access</DialogTitle>
           <DialogDescription className="text-center">
-            To save or edit your wishes, Digital Planning Access is required.
+            To save or edit your wishes, access is required.
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-3">
+          <Button onClick={handleUnlock} className="w-full">
+            Unlock Digital Planner
+          </Button>
           <Button variant="outline" onClick={handleContinuePreview} className="gap-2 w-full">
             <Eye className="h-4 w-4" />
             View Sample Pages
@@ -53,9 +56,6 @@ export function LockedFeatureModal() {
             This lets you look at example sections only.<br />
             To save or edit your information, access is required.
           </p>
-          <Button onClick={handleUnlock} className="w-full">
-            Unlock Full Planner
-          </Button>
         </div>
       </DialogContent>
     </Dialog>
