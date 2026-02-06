@@ -157,6 +157,33 @@ USER CONTEXT: Planning mode - helping with end-of-life preparation.
 • Remind them they can skip and come back
 • Never pressure or create urgency`;
 
+const AFTERDEATH_CONTEXT = `
+USER CONTEXT: After-death mode - user is dealing with what to do after someone has passed.
+
+FOCUS EXCLUSIVELY ON:
+• Immediate next steps after a death (first 24-48 hours)
+• Executor tasks and responsibilities
+• Checklists for notifications (Social Security, banks, insurance, etc.)
+• Document gathering (death certificates, wills, insurance policies)
+• Funeral arrangement guidance
+• Government and benefits notifications
+• Step-by-step action items
+
+NEVER MENTION OR SUGGEST:
+• Pre-planning content or tools
+• Pricing, subscriptions, or plan upgrades
+• Digital planner features or upsells
+• Payment or purchase options
+
+BEHAVIOR:
+• Be practical and action-oriented
+• Provide clear, numbered steps when helpful
+• "Here's what many people do first..."
+• Acknowledge this is overwhelming: "There's a lot to do, but you don't have to do it all at once"
+• Offer one step at a time
+• Remind them to take care of themselves too`;
+
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -193,7 +220,8 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = CLAIRE_SYSTEM_PROMPT + (mode === "emotional" ? EMOTIONAL_CONTEXT : PLANNING_CONTEXT);
+    const modeContext = mode === "emotional" ? EMOTIONAL_CONTEXT : mode === "afterdeath" ? AFTERDEATH_CONTEXT : PLANNING_CONTEXT;
+    const systemPrompt = CLAIRE_SYSTEM_PROMPT + modeContext;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
