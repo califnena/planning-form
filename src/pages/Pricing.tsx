@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Loader2, Check, X, ChevronDown, User, ExternalLink, RefreshCw, AlertTriangle } from "lucide-react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Plus, Minus } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
@@ -119,6 +119,7 @@ const FAQS = [
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const planCardsRef = useRef<HTMLDivElement>(null);
   const [textSize, setTextSize] = useState<number>(100);
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
@@ -136,6 +137,13 @@ const Pricing = () => {
   const [fallbackReason, setFallbackReason] = useState<FallbackReason>(null);
   const [showIAPModal, setShowIAPModal] = useState(false);
   const pageLoadTime = useRef<number>(Date.now());
+
+  // Detect printable-only intent from query params
+  const printableIntent = searchParams.get("product") === "printable" || 
+                          searchParams.get("type") === "printable" ||
+                          searchParams.get("type") === "paper" ||
+                          searchParams.get("product") === "paper" ||
+                          searchParams.get("download") === "form";
 
   // Core plans - ordered: Printable (emphasized), Digital, Binder
   const plans = [
@@ -447,24 +455,26 @@ const Pricing = () => {
               />
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-              Choose what works best for you.
+              {printableIntent ? "Printable Planning Form" : "Choose what works best for you."}
             </h1>
             <p className="text-lg text-muted-foreground">
-              Start simple. Add more only if you want.
+              {printableIntent ? "Download, print, and fill out by hand." : "Start simple. Add more only if you want."}
             </p>
           </div>
 
-          {/* Stripe Validation Alert - shows issues to admins */}
-          <StripeValidationAlert 
-            lookupKeys={PRICING_PAGE_LOOKUP_KEYS} 
-            isAdmin={isAdmin} 
-          />
+          {/* Stripe Validation Alert - shows issues to admins (hide in printable-only mode) */}
+          {!printableIntent && (
+            <StripeValidationAlert 
+              lookupKeys={PRICING_PAGE_LOOKUP_KEYS} 
+              isAdmin={isAdmin} 
+            />
+          )}
 
           {/* Fallback Mode Notice - minimal, below cards */}
 
-          {/* Plans Grid - 3 Cards */}
-          <div ref={planCardsRef} className="grid md:grid-cols-3 gap-6 scroll-mt-8">
-            {plans.map((plan) => {
+          {/* Plans Grid - Show only printable if printableIntent, otherwise show all */}
+          <div ref={planCardsRef} className={`grid gap-6 scroll-mt-8 ${printableIntent ? "max-w-md mx-auto" : "md:grid-cols-3"}`}>
+            {(printableIntent ? plans.filter(p => p.id === "printable") : plans).map((plan) => {
               // Use static price if defined, otherwise fetch from Stripe
               const priceText = plan.price ? plan.price : (loadingPrices ? (
                 <span className="flex items-center justify-center gap-2">
@@ -548,22 +558,26 @@ const Pricing = () => {
             })}
           </div>
 
-          {/* Fallback Mode - shown below cards when Stripe fails */}
+          {/* Fallback Mode - shown below cards when Stripe fails (simplified for printable-only) */}
           {fallbackMode && (
             <div className="text-center p-4 bg-muted/50 rounded-lg border border-border">
               <p className="text-sm text-muted-foreground mb-3">
-                Having trouble with checkout? Use these direct links:
+                Having trouble with checkout? Use this direct link:
               </p>
               <div className="flex flex-wrap justify-center gap-2">
                 <Button onClick={() => handleOpenPaymentLink("EFABASIC")} variant="outline" size="sm">
                   Printable Form <ExternalLink className="h-3 w-3 ml-1" />
                 </Button>
-                <Button onClick={() => handleOpenPaymentLink("EFAPREMIUM")} variant="outline" size="sm">
-                  Digital Planner <ExternalLink className="h-3 w-3 ml-1" />
-                </Button>
-                <Button onClick={() => handleOpenPaymentLink("EFABINDER")} variant="outline" size="sm">
-                  Binder <ExternalLink className="h-3 w-3 ml-1" />
-                </Button>
+                {!printableIntent && (
+                  <>
+                    <Button onClick={() => handleOpenPaymentLink("EFAPREMIUM")} variant="outline" size="sm">
+                      Digital Planner <ExternalLink className="h-3 w-3 ml-1" />
+                    </Button>
+                    <Button onClick={() => handleOpenPaymentLink("EFABINDER")} variant="outline" size="sm">
+                      Binder <ExternalLink className="h-3 w-3 ml-1" />
+                    </Button>
+                  </>
+                )}
               </div>
               <Button onClick={handleReloadPage} variant="ghost" size="sm" className="mt-2">
                 <RefreshCw className="h-3 w-3 mr-1" /> Reload Page
@@ -571,81 +585,99 @@ const Pricing = () => {
             </div>
           )}
 
-          {/* Comparison Table - Order: Printable, Digital, Binder */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Feature</th>
-                  <th className="text-center py-3 px-4 font-medium">Printable</th>
-                  <th className="text-center py-3 px-4 font-medium">Digital</th>
-                  <th className="text-center py-3 px-4 font-medium">Binder</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-border/50">
-                  <td className="py-3 px-4">Printable</td>
-                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
-                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
-                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
-                </tr>
-                <tr className="border-b border-border/50">
-                  <td className="py-3 px-4">Online access</td>
-                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
-                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
-                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
-                </tr>
-                <tr className="border-b border-border/50">
-                  <td className="py-3 px-4">Step-by-step guidance</td>
-                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
-                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
-                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
-                </tr>
-                <tr className="border-b border-border/50">
-                  <td className="py-3 px-4">Physical copy shipped</td>
-                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
-                  <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
-                  <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          {/* Printable-only mode: Show reassurance and skip comparison/upsells */}
+          {printableIntent ? (
+            <>
+              {/* Simple reassurance for printable buyers */}
+              <div className="text-center space-y-4 max-w-md mx-auto">
+                <p className="text-sm text-muted-foreground italic">
+                  This is the same form many families use when planning with Everlasting Funeral Advisors.
+                </p>
+                <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
+                  <span>✓ Secure checkout</span>
+                  <span>✓ Instant download</span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Comparison Table - Order: Printable, Digital, Binder */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Feature</th>
+                      <th className="text-center py-3 px-4 font-medium">Printable</th>
+                      <th className="text-center py-3 px-4 font-medium">Digital</th>
+                      <th className="text-center py-3 px-4 font-medium">Binder</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-border/50">
+                      <td className="py-3 px-4">Printable</td>
+                      <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                    </tr>
+                    <tr className="border-b border-border/50">
+                      <td className="py-3 px-4">Online access</td>
+                      <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
+                      <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
+                    </tr>
+                    <tr className="border-b border-border/50">
+                      <td className="py-3 px-4">Step-by-step guidance</td>
+                      <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
+                      <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                      <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
+                    </tr>
+                    <tr className="border-b border-border/50">
+                      <td className="py-3 px-4">Physical copy shipped</td>
+                      <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
+                      <td className="text-center py-3 px-4"><X className="h-4 w-4 text-muted-foreground/40 mx-auto" /></td>
+                      <td className="text-center py-3 px-4"><Check className="h-4 w-4 text-primary mx-auto" /></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
 
-          {/* Reassurance Strip */}
-          <div className="flex flex-wrap justify-center gap-6 py-6 text-sm text-muted-foreground border-y border-border">
-            <span>Educational only.</span>
-            <span>You're in control.</span>
-            <span>No obligation to finish or share.</span>
-          </div>
+              {/* Reassurance Strip */}
+              <div className="flex flex-wrap justify-center gap-6 py-6 text-sm text-muted-foreground border-y border-border">
+                <span>Educational only.</span>
+                <span>You're in control.</span>
+                <span>No obligation to finish or share.</span>
+              </div>
 
-          {/* FAQ */}
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-xl font-semibold text-center mb-6">Common Questions</h2>
-            <Accordion type="single" collapsible className="w-full">
-              {FAQS.map((faq, index) => (
-                <AccordionItem key={index} value={`faq-${index}`}>
-                  <AccordionTrigger className="text-left text-sm">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
+              {/* FAQ */}
+              <div className="max-w-2xl mx-auto">
+                <h2 className="text-xl font-semibold text-center mb-6">Common Questions</h2>
+                <Accordion type="single" collapsible className="w-full">
+                  {FAQS.map((faq, index) => (
+                    <AccordionItem key={index} value={`faq-${index}`}>
+                      <AccordionTrigger className="text-left text-sm">
+                        {faq.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm text-muted-foreground">
+                        {faq.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
 
-          {/* Additional Services Note */}
-          <Card className="bg-muted/30 border-dashed">
-            <CardContent className="p-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                Looking for more support? We also offer{" "}
-                <Link to="/care-support" className="underline hover:text-foreground">CARE Support</Link>,{" "}
-                <Link to="/do-it-for-you" className="underline hover:text-foreground">Do-It-For-You Planning</Link>, and{" "}
-                <Link to="/custom-song" className="underline hover:text-foreground">Custom Memorial Songs</Link>.
-              </p>
-            </CardContent>
-          </Card>
+              {/* Additional Services Note */}
+              <Card className="bg-muted/30 border-dashed">
+                <CardContent className="p-6 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    Looking for more support? We also offer{" "}
+                    <Link to="/care-support" className="underline hover:text-foreground">CARE Support</Link>,{" "}
+                    <Link to="/do-it-for-you" className="underline hover:text-foreground">Do-It-For-You Planning</Link>, and{" "}
+                    <Link to="/custom-song" className="underline hover:text-foreground">Custom Memorial Songs</Link>.
+                  </p>
+                </CardContent>
+              </Card>
+            </>
+          )}
 
         </div>
       </main>
