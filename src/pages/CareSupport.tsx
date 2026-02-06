@@ -437,18 +437,37 @@ export default function CareSupport() {
             }}
           >
             <div className="p-4 md:p-6 space-y-4">
-              {/* Claire Avatar */}
-              <div className="flex flex-col items-center">
+              {/* Claire Avatar and Introduction */}
+              <div className="flex flex-col items-center text-center space-y-3">
                 <img 
                   src={claireAvatar} 
                   alt="Claire - Your Support Assistant" 
                   className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover shadow-sm border-2"
                   style={{ borderColor: 'hsl(140, 18%, 85%)' }}
                 />
+                
+                {/* Claire's First-Person Introduction */}
+                <div 
+                  className="space-y-2 text-base leading-relaxed max-w-md"
+                  style={{ color: 'hsl(215, 20%, 25%)' }}
+                >
+                  <p className="font-medium" style={{ color: 'hsl(215, 20%, 20%)' }}>
+                    Hi, I'm Claire.
+                  </p>
+                  <p>
+                    I'm here to help you find your way through planning ahead, handling things after a death, or simply taking a moment to breathe.
+                  </p>
+                  <p>
+                    You can explore guides and checklists on your own, or I can stay with you and help step by step when you'd like more support.
+                  </p>
+                  <p>
+                    There's no rush. You're in control of what we do and when.
+                  </p>
+                </div>
               </div>
               
               <h3 
-                className="font-semibold text-center text-lg"
+                className="font-semibold text-center text-lg pt-2"
                 style={{ color: 'hsl(215, 20%, 22%)' }}
               >
                 Select Your Mode
