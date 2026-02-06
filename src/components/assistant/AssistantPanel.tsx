@@ -617,36 +617,47 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                         </p>
                       )}
                       
-                      {/* End-of-planning celebration for Planning Mode */}
+                      {/* End-of-planning prompt for Planning Mode */}
                       {selectedMode === 'planning' && planningCompletion.isComplete && (
-                        <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center space-y-3">
+                        <div className="bg-accent/50 border border-border rounded-xl p-5 text-center space-y-4">
                           <div className="flex justify-center">
-                            <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
-                              <CheckCircle2 className="h-6 w-6 text-green-600" />
+                            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                              <CheckCircle2 className="h-6 w-6 text-primary" />
                             </div>
                           </div>
-                          <div>
-                            <p className="font-medium text-green-800">You've done something wonderful.</p>
-                            <p className="text-sm text-green-700 mt-1">
-                              Your plan is complete. Your loved ones will thank you for this gift.
-                            </p>
+                          <p className="text-base text-foreground leading-relaxed">
+                            It looks like you've reached the end of this planner.<br />
+                            Would you like to review and save what you've done?
+                          </p>
+                          <div className="flex flex-col gap-3 pt-2">
+                            <Button
+                              size="lg"
+                              className="w-full py-6 text-base"
+                              onClick={() => {
+                                onClose();
+                                navigate('/preplan-summary');
+                              }}
+                            >
+                              Yes, review my plan
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="lg"
+                              className="w-full py-6 text-base"
+                              onClick={() => {
+                                onClose();
+                                navigate('/planner/overview');
+                              }}
+                            >
+                              No, I want to keep working
+                            </Button>
                           </div>
-                          <Button
-                            variant="outline"
-                            className="border-green-300 text-green-700 hover:bg-green-100"
-                            onClick={() => {
-                              onClose();
-                              navigate('/preplan-summary');
-                            }}
-                          >
-                            View Your Plan Summary
-                          </Button>
                         </div>
                       )}
                       
                       {/* Actions for selected mode - hide if planning is complete */}
                       {!(selectedMode === 'planning' && planningCompletion.isComplete) && (
-                        (selectedMode === 'planning' ? PLANNING_ACTIONS : 
+                        (selectedMode === 'planning' ? PLANNING_ACTIONS :
                           selectedMode === 'after-death' ? AFTER_DEATH_ACTIONS : 
                           EMOTIONAL_ACTIONS).map((action) => (
                           <Button
