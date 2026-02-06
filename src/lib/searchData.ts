@@ -7,6 +7,7 @@ export interface SearchResult {
   type: 'section' | 'afterdeath' | 'resource' | 'faq' | 'legal';
   url: string;
   category: string;
+  keywords?: string[];
 }
 
 // After-Death Plan steps
@@ -66,6 +67,17 @@ export const LEGAL_ITEMS = [
 
 export function buildSearchIndex(): SearchResult[] {
   const results: SearchResult[] = [];
+
+  // Add After-Death Planner & Checklist as a top-level item
+  results.push({
+    id: 'after-death-planner',
+    title: 'After-Death Planner & Checklist',
+    description: 'Step-by-step tasks and checklists for after a death',
+    type: 'resource',
+    category: 'After-Death Resources',
+    url: '/after-death',
+    keywords: ['after death', 'death', 'checklist', 'executor', 'funeral steps', 'what to do when someone dies', 'after passing'],
+  });
 
   // Add Pre-Planning sections
   ALL_SECTIONS.forEach(section => {
@@ -185,10 +197,12 @@ export function searchContent(query: string): SearchResult[] {
       const titleMatch = item.title.toLowerCase().includes(lowerQuery);
       const descMatch = item.description.toLowerCase().includes(lowerQuery);
       const categoryMatch = item.category.toLowerCase().includes(lowerQuery);
+      const keywordMatch = item.keywords?.some(kw => kw.toLowerCase().includes(lowerQuery) || lowerQuery.includes(kw.toLowerCase()));
 
       // Calculate relevance score
       let score = 0;
       if (titleMatch) score += 10;
+      if (keywordMatch) score += 8;
       if (descMatch) score += 5;
       if (categoryMatch) score += 3;
 
