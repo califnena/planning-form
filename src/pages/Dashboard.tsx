@@ -729,7 +729,7 @@ export default function Dashboard() {
                       onClick={() => navigate('/care-support')} 
                       className="min-h-[48px]"
                     >
-                      Talk to Claire
+                      Open Claire
                     </Button>
                   ) : (
                     <Button 

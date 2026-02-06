@@ -46,11 +46,11 @@ export function LockedFeatureModal() {
 
         <div className="flex flex-col gap-3">
           <Button onClick={handleUnlock} className="w-full">
-            Unlock Digital Planner
+            Unlock Full Planner
           </Button>
           <Button variant="outline" onClick={handleContinuePreview} className="gap-2 w-full">
             <Eye className="h-4 w-4" />
-            View Sample Pages
+            Keep Browsing (No Login)
           </Button>
           <p className="text-sm text-muted-foreground text-center leading-relaxed">
             This lets you look at example sections only.<br />

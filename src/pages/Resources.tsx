@@ -1790,10 +1790,10 @@ const Resources = () => {
           </p>
           <div className="flex flex-wrap gap-3">
             <Link to="/care-support">
-              <Button size="lg" className="min-h-[48px]">Learn About CARE Support</Button>
+              <Button size="lg" className="min-h-[48px]">Open Claire</Button>
             </Link>
             <Link to="/faq">
-              <Button size="lg" variant="outline" className="min-h-[48px]">View All FAQs</Button>
+              <Button size="lg" variant="outline" className="min-h-[48px]">See FAQs & Guides</Button>
             </Link>
           </div>
         </CardContent>
