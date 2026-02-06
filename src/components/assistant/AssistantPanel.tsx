@@ -652,6 +652,13 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                               No, I want to keep working
                             </Button>
                           </div>
+                          {/* Gentle exit - no pressure dismissal */}
+                          <button
+                            onClick={onClose}
+                            className="text-sm text-muted-foreground hover:text-foreground transition-colors pt-2"
+                          >
+                            Maybe later — just close for now
+                          </button>
                         </div>
                       )}
                       
