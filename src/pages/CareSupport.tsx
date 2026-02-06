@@ -59,9 +59,11 @@ const AFTERDEATH_ACTIONS: QuickAction[] = [
 ];
 
 const EMOTIONAL_ACTIONS: QuickAction[] = [
-  { label: "I'm feeling overwhelmed", prompt: "I'm feeling overwhelmed and could use some support.", icon: Heart },
-  { label: "Help me cope with grief", prompt: "I'm grieving and need some gentle guidance.", icon: Heart },
-  { label: "I just need someone to listen", prompt: "I just need someone to listen right now.", icon: MessageCircle },
+  { label: "How do I cope with grief?", prompt: "How do I cope with grief? I'm struggling and don't know what to do.", icon: Heart },
+  { label: "Is what I'm feeling normal?", prompt: "Is what I'm feeling normal? I'm not sure if my reactions are okay.", icon: HelpCircle },
+  { label: "How do I talk to others about my loss?", prompt: "How do I talk to family and friends about my loss? It feels so hard.", icon: MessageCircle },
+  { label: "When does grief get easier?", prompt: "When does grief get easier? Will I always feel this way?", icon: HelpCircle },
+  { label: "I'm struggling right now", prompt: "I'm really struggling right now. What can I do to feel a little better?", icon: Heart },
   { label: "Talk to a real person", navigateTo: "/contact", icon: Phone },
 ];
 
