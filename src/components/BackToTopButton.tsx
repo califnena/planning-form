@@ -31,12 +31,17 @@ export const BackToTopButton = () => {
   return (
     <Button
       onClick={scrollToTop}
-      className="fixed bottom-24 right-6 md:bottom-24 md:right-8 z-50 rounded-full px-4 py-6 shadow-lg hover:shadow-xl transition-all"
-      size="lg"
+      className="fixed bottom-20 right-4 md:bottom-24 md:right-8 z-40 rounded-full shadow-lg hover:shadow-xl transition-all"
+      size="sm"
       aria-label="Back to top"
+      style={{
+        pointerEvents: 'auto',
+        // Smaller footprint on mobile to avoid blocking scroll gestures
+        padding: '8px 12px',
+      }}
     >
-      <ArrowUp className="h-5 w-5 mr-2" />
-      <span className="text-base font-semibold">Back to Top</span>
+      <ArrowUp className="h-4 w-4 md:h-5 md:w-5 md:mr-2" />
+      <span className="hidden md:inline text-sm font-semibold">Back to Top</span>
     </Button>
   );
 };
