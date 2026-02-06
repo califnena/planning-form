@@ -306,6 +306,11 @@ export default function CareSupport() {
                 Claire is available 24/7, wherever you are.
               </p>
               
+              <p className="text-base text-muted-foreground max-w-xl mx-auto pt-2">
+                CARE Support is guided help for planning ahead, after a death, or emotional support.
+                Choose a mode so Claire gives the right kind of help.
+              </p>
+              
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                 <Button 
                   onClick={() => setGuestMode(true)}
