@@ -93,62 +93,167 @@ const EMOTIONAL_ACTIONS: QuickAction[] = [
   { label: "Talk to a real person", navigateTo: "/contact", icon: Phone },
 ];
 
-// ============== POPULAR QUESTIONS - Mode-aware (6 primary + 6 more per mode) ==============
+// ============== TOPIC CATEGORIES ==============
+type TopicCategory = 
+  | "first_steps" 
+  | "documents" 
+  | "notifications" 
+  | "funeral_decisions" 
+  | "financial" 
+  | "grief_coping"
+  | "family_communication"
+  | "timeline"
+  | "general";
 
-const POPULAR_QUESTIONS_PLANNING = {
+// ============== MAPPED INSTANT ANSWERS - Displayed immediately without AI call ==============
+const INSTANT_ANSWERS: Record<string, { answer: string; topic: TopicCategory; followUp: string }> = {
+  // Planning Ahead
+  "What should I decide first when planning ahead?": {
+    topic: "first_steps",
+    answer: "Start with the basics: Do you prefer burial or cremation? Would you like a service, and if so, what type? These two decisions shape everything else. You can always change your mind later.",
+    followUp: "Would you like to talk through burial vs. cremation options?"
+  },
+  "How do I choose a person to be in charge after I'm gone?": {
+    topic: "documents",
+    answer: "Choose someone you trust who is organized, calm under pressure, and willing to follow your wishes. It's helpful to pick someone geographically close. Talk to them first to make sure they're comfortable with the responsibility.",
+    followUp: "Have you thought about who that might be?"
+  },
+  "What documents should I gather for end-of-life planning?": {
+    topic: "documents",
+    answer: "Key documents include: your will, advance directive or living will, healthcare power of attorney, financial power of attorney, life insurance policies, bank/investment account information, and property deeds. Keep them in a fireproof box or safe deposit box.",
+    followUp: "Would you like to work on organizing these documents?"
+  },
+  "How do I share my wishes with my family?": {
+    topic: "family_communication",
+    answer: "Pick a calm moment, not a holiday. Start simply: 'I've been thinking about planning ahead and want to share my wishes with you.' Focus on one topic at a time. It's okay if they resist—plant the seed and return to it later.",
+    followUp: "What part of this conversation feels hardest for you?"
+  },
+  "How do I plan for funeral costs without overpaying?": {
+    topic: "financial",
+    answer: "Get itemized price lists from 2-3 funeral homes (they're required to provide them). Avoid prepaying unless through a reputable provider. Consider direct cremation or burial for the lowest cost. You don't have to buy everything from one place.",
+    followUp: "Would you like to know what options are available in your area?"
+  },
+  "What if I want a simple funeral or cremation?": {
+    topic: "funeral_decisions",
+    answer: "Simple is a valid choice. Direct cremation (no service) or direct burial are the most affordable options. You can still have a memorial gathering separately. Many people find simple arrangements are less stressful for everyone.",
+    followUp: "Are you thinking about cremation or burial?"
+  },
+  // After Death
+  "Someone has passed away. What needs to be done first?": {
+    topic: "first_steps",
+    answer: "Here's what most people do first:\n• If unexpected: call 911. If expected (hospice): call the hospice or funeral home.\n• Notify one family member to help coordinate.\n• Contact a funeral home for transport.\n• Secure the home, keys, and pets.\n• Locate ID and any written wishes.",
+    followUp: "Was this at home, hospital, or hospice?"
+  },
+  "Who needs to be notified first after someone passes away?": {
+    topic: "notifications",
+    answer: "Start with:\n• Immediate family members\n• The person's employer (if applicable)\n• Social Security Administration\n• Banks and financial institutions\n• Insurance companies\n• Utility companies can wait a few weeks.",
+    followUp: "Do you have a list of accounts to notify?"
+  },
+  "What documents will I need to gather after a death?": {
+    topic: "documents",
+    answer: "You'll need:\n• Death certificate (order 10+ copies)\n• Will or trust documents\n• Life insurance policies\n• Bank and investment statements\n• Property deeds\n• Social Security number\n• Birth certificate and ID",
+    followUp: "Have you been able to locate any of these documents?"
+  },
+  "What decisions need to be made about the funeral or memorial service?": {
+    topic: "funeral_decisions",
+    answer: "Key decisions:\n• Burial or cremation\n• Type of service (religious, secular, celebration of life)\n• Location (funeral home, church, cemetery, other)\n• Who will officiate\n• Music, readings, speakers\n• Open or closed casket (if applicable)",
+    followUp: "Did the person leave any written wishes about their service?"
+  },
+  "What tasks can wait until later? I don't want to miss anything urgent.": {
+    topic: "timeline",
+    answer: "Can wait 2-4 weeks:\n• Canceling subscriptions and memberships\n• Selling or donating belongings\n• Updating property titles\n• Filing probate (unless urgent)\n\nFocus now on: funeral arrangements, death certificates, and notifying close family.",
+    followUp: "What feels most pressing to you right now?"
+  },
+  // Emotional Support
+  "I feel overwhelmed. What should I do first?": {
+    topic: "grief_coping",
+    answer: "That makes sense. Grief is overwhelming. Right now, just focus on breathing. You don't have to figure everything out today. If there are practical things that need attention, ask someone to help. It's okay to take things one hour at a time.",
+    followUp: "Is there someone who can help you with the immediate tasks?"
+  },
+  "How do I handle family conflict right now during grief?": {
+    topic: "family_communication",
+    answer: "Grief can bring out strong emotions. Try to pause before reacting. Focus on what the person who passed would have wanted. It's okay to step away from a conversation. Some conflicts can wait—not everything needs to be resolved right now.",
+    followUp: "Is there a specific disagreement you're dealing with?"
+  },
+  "How do I talk to kids about loss?": {
+    topic: "family_communication",
+    answer: "Use simple, honest language: 'Grandma died. Her body stopped working.' Avoid euphemisms like 'passed away' or 'went to sleep.' Answer their questions honestly. Let them express feelings. It's okay to say 'I'm sad too.'",
+    followUp: "How old are the children you're talking to?"
+  },
+  "What can I do when I cannot sleep because of grief?": {
+    topic: "grief_coping",
+    answer: "Grief disrupts sleep. Try a consistent bedtime routine. Limit screens before bed. Write down worries before sleeping. Gentle movement during the day can help. If it continues, talk to a doctor—it's a common part of grief.",
+    followUp: "How long has sleep been difficult?"
+  },
+  "Is what I am feeling normal after a loss?": {
+    topic: "grief_coping",
+    answer: "Yes. There is no 'normal' in grief. Sadness, anger, relief, numbness, guilt—all are common. Grief comes in waves. Some days will be harder than others. You're not doing this wrong.",
+    followUp: "What are you feeling most right now?"
+  },
+  "How do I get through the next 24 hours?": {
+    topic: "grief_coping",
+    answer: "Just focus on the next few hours. Eat something small, even if you're not hungry. Drink water. Rest when you can. Let someone help you. It's okay to cancel plans. You're allowed to just survive right now.",
+    followUp: "Is there one thing I can help you think through?"
+  },
+};
+
+// ============== POPULAR QUESTIONS - Mode-aware with topics ==============
+type PopularQuestion = { label: string; prompt: string; topic: TopicCategory };
+
+const POPULAR_QUESTIONS_PLANNING: { primary: PopularQuestion[]; more: PopularQuestion[] } = {
   primary: [
-    { label: "What should I decide first?", prompt: "What should I decide first when planning ahead?" },
-    { label: "How do I choose a person in charge?", prompt: "How do I choose a person to be in charge after I'm gone?" },
-    { label: "What documents should I gather?", prompt: "What documents should I gather for end-of-life planning?" },
-    { label: "How do I share my wishes with family?", prompt: "How do I share my wishes with my family?" },
-    { label: "How do I plan costs without overpaying?", prompt: "How do I plan for funeral costs without overpaying?" },
-    { label: "What if I want something simple?", prompt: "What if I want a simple funeral or cremation?" },
+    { label: "What should I decide first?", prompt: "What should I decide first when planning ahead?", topic: "first_steps" },
+    { label: "How do I choose a person in charge?", prompt: "How do I choose a person to be in charge after I'm gone?", topic: "documents" },
+    { label: "What documents should I gather?", prompt: "What documents should I gather for end-of-life planning?", topic: "documents" },
+    { label: "How do I share my wishes with family?", prompt: "How do I share my wishes with my family?", topic: "family_communication" },
+    { label: "How do I plan costs without overpaying?", prompt: "How do I plan for funeral costs without overpaying?", topic: "financial" },
+    { label: "What if I want something simple?", prompt: "What if I want a simple funeral or cremation?", topic: "funeral_decisions" },
   ],
   more: [
-    { label: "What are my funeral options?", prompt: "What are my options for funeral or cremation?" },
-    { label: "How do I write a legacy letter?", prompt: "How do I write a legacy letter to my family?" },
-    { label: "What about my digital accounts?", prompt: "What should I do about my digital accounts and passwords?" },
-    { label: "Do I need a will?", prompt: "Do I need a will, and how do I get started?" },
-    { label: "How do I prepay for a funeral?", prompt: "How do I prepay for a funeral, and is it a good idea?" },
-    { label: "What if my family disagrees?", prompt: "What if my family disagrees with my wishes?" },
+    { label: "What are my funeral options?", prompt: "What are my options for funeral or cremation?", topic: "funeral_decisions" },
+    { label: "How do I write a legacy letter?", prompt: "How do I write a legacy letter to my family?", topic: "family_communication" },
+    { label: "What about my digital accounts?", prompt: "What should I do about my digital accounts and passwords?", topic: "documents" },
+    { label: "Do I need a will?", prompt: "Do I need a will, and how do I get started?", topic: "documents" },
+    { label: "How do I prepay for a funeral?", prompt: "How do I prepay for a funeral, and is it a good idea?", topic: "financial" },
+    { label: "What if my family disagrees?", prompt: "What if my family disagrees with my wishes?", topic: "family_communication" },
   ]
 };
 
-const POPULAR_QUESTIONS_AFTERDEATH = {
+const POPULAR_QUESTIONS_AFTERDEATH: { primary: PopularQuestion[]; more: PopularQuestion[] } = {
   primary: [
-    { label: "Who needs to be notified first?", prompt: "Who needs to be notified first after someone passes away?" },
-    { label: "What documents do I need right away?", prompt: "What documents do I need right away after a death?" },
-    { label: "How do I get death certificates?", prompt: "How do I get death certificates?" },
-    { label: "What do I do about Social Security benefits?", prompt: "What happens to Social Security benefits after someone dies?" },
-    { label: "What do I do about bills and accounts?", prompt: "What do I do with bills and accounts after someone passes away?" },
-    { label: "What happens if there is no will?", prompt: "What happens if there is no will?" },
+    { label: "What needs to be done first?", prompt: "Someone has passed away. What needs to be done first?", topic: "first_steps" },
+    { label: "Who needs to be notified?", prompt: "Who needs to be notified first after someone passes away?", topic: "notifications" },
+    { label: "What documents do I need?", prompt: "What documents will I need to gather after a death?", topic: "documents" },
+    { label: "Funeral and service decisions", prompt: "What decisions need to be made about the funeral or memorial service?", topic: "funeral_decisions" },
+    { label: "What can wait until later?", prompt: "What tasks can wait until later? I don't want to miss anything urgent.", topic: "timeline" },
+    { label: "How do I get death certificates?", prompt: "How do I get death certificates?", topic: "documents" },
   ],
   more: [
-    { label: "How do I handle funeral arrangements?", prompt: "How do I handle funeral arrangements?" },
-    { label: "What about their bank accounts?", prompt: "What happens to bank accounts after someone dies?" },
-    { label: "Do I need a lawyer?", prompt: "Do I need a lawyer to settle an estate?" },
-    { label: "What can wait until later?", prompt: "What tasks can wait until later after a death?" },
-    { label: "How do I notify employers?", prompt: "How do I notify the person's employer or former employer?" },
-    { label: "What about their car and property?", prompt: "What do I do with their car and personal property?" },
+    { label: "What about Social Security?", prompt: "What happens to Social Security benefits after someone dies?", topic: "notifications" },
+    { label: "What about bills and accounts?", prompt: "What do I do with bills and accounts after someone passes away?", topic: "financial" },
+    { label: "What if there is no will?", prompt: "What happens if there is no will?", topic: "documents" },
+    { label: "Do I need a lawyer?", prompt: "Do I need a lawyer to settle an estate?", topic: "documents" },
+    { label: "How do I notify employers?", prompt: "How do I notify the person's employer or former employer?", topic: "notifications" },
+    { label: "What about their car and property?", prompt: "What do I do with their car and personal property?", topic: "financial" },
   ]
 };
 
-const POPULAR_QUESTIONS_EMOTIONAL = {
+const POPULAR_QUESTIONS_EMOTIONAL: { primary: PopularQuestion[]; more: PopularQuestion[] } = {
   primary: [
-    { label: "I feel overwhelmed. What should I do first?", prompt: "I feel overwhelmed. What should I do first?" },
-    { label: "How do I handle family conflict right now?", prompt: "How do I handle family conflict right now during grief?" },
-    { label: "How do I talk to kids about loss?", prompt: "How do I talk to kids about loss?" },
-    { label: "What can I do when I cannot sleep?", prompt: "What can I do when I cannot sleep because of grief?" },
-    { label: "Is what I am feeling normal?", prompt: "Is what I am feeling normal after a loss?" },
-    { label: "How do I get through the next 24 hours?", prompt: "How do I get through the next 24 hours?" },
+    { label: "I feel overwhelmed", prompt: "I feel overwhelmed. What should I do first?", topic: "grief_coping" },
+    { label: "Family conflict right now", prompt: "How do I handle family conflict right now during grief?", topic: "family_communication" },
+    { label: "Talking to kids about loss", prompt: "How do I talk to kids about loss?", topic: "family_communication" },
+    { label: "I cannot sleep", prompt: "What can I do when I cannot sleep because of grief?", topic: "grief_coping" },
+    { label: "Is what I'm feeling normal?", prompt: "Is what I am feeling normal after a loss?", topic: "grief_coping" },
+    { label: "Get through the next 24 hours", prompt: "How do I get through the next 24 hours?", topic: "grief_coping" },
   ],
   more: [
-    { label: "How long does grief last?", prompt: "How long does grief last?" },
-    { label: "Is it okay to feel angry?", prompt: "Is it okay to feel angry after a loss?" },
-    { label: "How do I cope day to day?", prompt: "How do I cope with grief day to day?" },
-    { label: "What if I can't stop crying?", prompt: "What if I can't stop crying?" },
-    { label: "How do I go back to work?", prompt: "How do I go back to work after a loss?" },
-    { label: "When should I seek professional help?", prompt: "When should I seek professional help for grief?" },
+    { label: "How long does grief last?", prompt: "How long does grief last?", topic: "grief_coping" },
+    { label: "Is it okay to feel angry?", prompt: "Is it okay to feel angry after a loss?", topic: "grief_coping" },
+    { label: "How do I cope day to day?", prompt: "How do I cope with grief day to day?", topic: "grief_coping" },
+    { label: "What if I can't stop crying?", prompt: "What if I can't stop crying?", topic: "grief_coping" },
+    { label: "Going back to work", prompt: "How do I go back to work after a loss?", topic: "timeline" },
+    { label: "When to seek professional help?", prompt: "When should I seek professional help for grief?", topic: "grief_coping" },
   ]
 };
 
@@ -158,7 +263,6 @@ const FAQ_LINKS_BY_MODE: Record<Exclude<Mode, null>, string> = {
   afterdeath: "/faq#after-death", 
   emotional: "/faq#grief"
 };
-
 export default function CareSupport() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -213,6 +317,10 @@ export default function CareSupport() {
     setShowErrorOptions(false);
     setPopularQuestionsOpen(false);
     setShowMoreQuestions(false);
+    
+    // Clear topic lock when switching modes
+    setActiveTopic(null);
+    setTopicLock(false);
     
     // Add Claire's welcome message - full intro for first time, short for returning
     const welcomeMessage = isFirstTime ? MODE_FIRST_MESSAGES[newMode] : MODE_RETURNING_MESSAGES[newMode];
@@ -279,6 +387,10 @@ export default function CareSupport() {
   const [showWrapUpPrompt, setShowWrapUpPrompt] = useState(false);
   const [showWrapUpConfirmation, setShowWrapUpConfirmation] = useState(false);
   const [wrapUpDismissed, setWrapUpDismissed] = useState(false);
+  
+  // Topic locking - when user selects a predefined question, lock to that topic
+  const [activeTopic, setActiveTopic] = useState<TopicCategory | null>(null);
+  const [topicLock, setTopicLock] = useState(false);
   
   // Emotional support session tracking
   const emotionalSessions = useEmotionalSupportSessions(userId);
@@ -480,7 +592,7 @@ export default function CareSupport() {
             "Content-Type": "application/json",
             Authorization: authHeader,
           },
-          body: JSON.stringify({ messages: newMessages, mode }),
+          body: JSON.stringify({ messages: newMessages, mode, activeTopic }),
           signal: controller.signal,
         });
         clearTimeout(timeoutId);
@@ -638,12 +750,49 @@ export default function CareSupport() {
 
   const handleSend = () => {
     if (!input.trim()) return;
+    
+    // Check if user is explicitly changing topic (simple heuristics)
+    const topicChangeKeywords = [
+      "different question", "something else", "another topic", 
+      "change topic", "new question", "let's talk about", "switch to"
+    ];
+    const inputLower = input.toLowerCase();
+    const isTopicChange = topicChangeKeywords.some(kw => inputLower.includes(kw));
+    
+    if (isTopicChange) {
+      // Clear topic lock when user explicitly changes topic
+      setActiveTopic(null);
+      setTopicLock(false);
+    }
+    
     streamChat(input);
     setInput("");
   };
 
-  const handleTopicClick = (prompt: string) => {
-    streamChat(prompt);
+  // Handle predefined question click - display instant answer and lock to topic
+  const handleTopicClick = (prompt: string, topic?: TopicCategory) => {
+    const instantAnswer = INSTANT_ANSWERS[prompt];
+    
+    if (instantAnswer) {
+      // Display the mapped instant answer immediately (no AI call)
+      const fullAnswer = `${instantAnswer.answer}\n\n${instantAnswer.followUp}`;
+      setMessages(prev => [
+        ...prev.filter(m => !m.isError),
+        { role: "user", content: prompt },
+        { role: "assistant", content: fullAnswer }
+      ]);
+      
+      // Set topic lock
+      setActiveTopic(instantAnswer.topic);
+      setTopicLock(true);
+    } else {
+      // No instant answer - call AI but still set topic if provided
+      if (topic) {
+        setActiveTopic(topic);
+        setTopicLock(true);
+      }
+      streamChat(prompt);
+    }
   };
 
   const handleLogout = async () => {
@@ -1001,19 +1150,21 @@ export default function CareSupport() {
                                       border: '1px solid hsl(175, 25%, 85%)',
                                     }}
                                   >
-                                    {/* Primary 6 questions */}
+                                    {/* Primary 6 questions - filtered by topic when locked */}
                                     <div className="flex flex-wrap gap-2">
                                       {(mode === "afterdeath" ? POPULAR_QUESTIONS_AFTERDEATH.primary 
                                         : mode === "planning" ? POPULAR_QUESTIONS_PLANNING.primary 
                                         : POPULAR_QUESTIONS_EMOTIONAL.primary
-                                      ).map((q, idx) => (
+                                      )
+                                        .filter(q => !topicLock || q.topic === activeTopic)
+                                        .map((q, idx) => (
                                         <button
                                           key={idx}
                                           onClick={() => {
                                             if (mode === "emotional") {
                                               startEmotionalSession(q.prompt);
                                             } else {
-                                              handleTopicClick(q.prompt);
+                                              handleTopicClick(q.prompt, q.topic);
                                             }
                                           }}
                                           disabled={isLoading}
@@ -1040,20 +1191,22 @@ export default function CareSupport() {
                                       </button>
                                     )}
 
-                                    {/* Additional 6 questions (shown when expanded) */}
+                                    {/* Additional 6 questions (shown when expanded) - filtered by topic when locked */}
                                     {showMoreQuestions && (
                                       <div className="flex flex-wrap gap-2 pt-2 border-t" style={{ borderColor: 'hsl(175, 25%, 85%)' }}>
                                         {(mode === "afterdeath" ? POPULAR_QUESTIONS_AFTERDEATH.more 
                                           : mode === "planning" ? POPULAR_QUESTIONS_PLANNING.more 
                                           : POPULAR_QUESTIONS_EMOTIONAL.more
-                                        ).map((q, idx) => (
+                                        )
+                                          .filter(q => !topicLock || q.topic === activeTopic)
+                                          .map((q, idx) => (
                                           <button
                                             key={idx}
                                             onClick={() => {
                                               if (mode === "emotional") {
                                                 startEmotionalSession(q.prompt);
                                               } else {
-                                                handleTopicClick(q.prompt);
+                                                handleTopicClick(q.prompt, q.topic);
                                               }
                                             }}
                                             disabled={isLoading}
@@ -1070,12 +1223,36 @@ export default function CareSupport() {
                                       </div>
                                     )}
 
-                                    <p 
-                                      className="text-xs pt-2"
-                                      style={{ color: 'hsl(215, 15%, 50%)' }}
-                                    >
-                                      Or type anything you'd like to ask.
-                                    </p>
+                                    {/* Topic lock indicator with option to explore other topics */}
+                                    {topicLock && activeTopic && (
+                                      <div className="flex items-center gap-2 pt-2">
+                                        <p 
+                                          className="text-xs"
+                                          style={{ color: 'hsl(215, 15%, 50%)' }}
+                                        >
+                                          Showing related questions.
+                                        </p>
+                                        <button
+                                          onClick={() => {
+                                            setActiveTopic(null);
+                                            setTopicLock(false);
+                                          }}
+                                          className="text-xs underline"
+                                          style={{ color: 'hsl(175, 35%, 35%)' }}
+                                        >
+                                          Show all questions
+                                        </button>
+                                      </div>
+                                    )}
+
+                                    {!topicLock && (
+                                      <p 
+                                        className="text-xs pt-2"
+                                        style={{ color: 'hsl(215, 15%, 50%)' }}
+                                      >
+                                        Or type anything you'd like to ask.
+                                      </p>
+                                    )}
                                   </div>
                                 </CollapsibleContent>
                               </Collapsible>
