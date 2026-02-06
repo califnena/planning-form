@@ -358,7 +358,7 @@ export default function PlanAheadLanding() {
                   className="w-full min-h-[48px]"
                 >
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                  Get Printable Form
+                  Buy Printable Planning Form – $9.99
                 </Button>
                {isLoggedIn && isAdmin ? (
                  <p className="text-sm text-primary text-center font-medium">

@@ -258,7 +258,7 @@ const Resources = () => {
               Print the form and fill it out with a pen at your own pace. No computer needed after printing.
             </p>
             <Button variant="outline" className="w-full min-h-[48px]">
-              Get Printable Form
+              Buy Printable Planning Form – $9.99
               <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
           </CardContent>
