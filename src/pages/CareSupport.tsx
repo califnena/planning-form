@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Heart, Sparkles, ArrowRight, Mic, Volume2, VolumeX, Home, LogOut, CheckCircle, HelpCircle, MessageCircle, FileText, ClipboardCheck, Lock, Phone, Download, ArrowRightCircle, BookOpen } from "lucide-react";
+import { Loader2, Heart, Sparkles, ArrowRight, Mic, Volume2, VolumeX, Home, LogOut, CheckCircle, HelpCircle, MessageCircle, FileText, ClipboardCheck, Lock, Phone, Download, ArrowRightCircle, BookOpen, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
 import { setPendingCheckout } from "@/lib/pendingCheckout";
 import { ClaireWelcomeModal } from "@/components/assistant/ClaireWelcomeModal";
@@ -90,63 +91,71 @@ const EMOTIONAL_ACTIONS: QuickAction[] = [
   { label: "Talk to a real person", navigateTo: "/contact", icon: Phone },
 ];
 
-// Suggestion chips shown after Claire's first message (subset of actions - prompts only)
-const PLANNING_SUGGESTIONS = [
-  { label: "Funeral or memorial wishes", prompt: "I'd like help thinking through my funeral or memorial wishes." },
-  { label: "Important documents to gather", prompt: "What important documents should I gather and organize?" },
-  { label: "Who should be in charge later", prompt: "How do I decide who should be in charge of things after I'm gone?" },
-  { label: "Personal messages or legacy letters", prompt: "Help me write personal messages or a legacy letter to my family." },
-  { label: "Saving what I've already entered", prompt: "I want to save and organize what I've already entered." },
-];
+// ============== POPULAR QUESTIONS - Mode-aware (6 primary + 6 more per mode) ==============
 
-// Intro text shown above suggestion chips
-const PLANNING_INTRO_TEXT = "You can start anywhere. For example:";
-const EMOTIONAL_INTRO_TEXT = "If it helps, we can talk about:";
+const POPULAR_QUESTIONS_PLANNING = {
+  primary: [
+    { label: "What should I decide first?", prompt: "What should I decide first when planning ahead?" },
+    { label: "How do I choose a person in charge?", prompt: "How do I choose a person to be in charge after I'm gone?" },
+    { label: "What documents should I gather?", prompt: "What documents should I gather for end-of-life planning?" },
+    { label: "How do I share my wishes with family?", prompt: "How do I share my wishes with my family?" },
+    { label: "How do I plan costs without overpaying?", prompt: "How do I plan for funeral costs without overpaying?" },
+    { label: "What if I want something simple?", prompt: "What if I want a simple funeral or cremation?" },
+  ],
+  more: [
+    { label: "What are my funeral options?", prompt: "What are my options for funeral or cremation?" },
+    { label: "How do I write a legacy letter?", prompt: "How do I write a legacy letter to my family?" },
+    { label: "What about my digital accounts?", prompt: "What should I do about my digital accounts and passwords?" },
+    { label: "Do I need a will?", prompt: "Do I need a will, and how do I get started?" },
+    { label: "How do I prepay for a funeral?", prompt: "How do I prepay for a funeral, and is it a good idea?" },
+    { label: "What if my family disagrees?", prompt: "What if my family disagrees with my wishes?" },
+  ]
+};
 
-const AFTERDEATH_SUGGESTIONS = [
-  { label: "What needs to be done first?", prompt: "Someone has passed away. What needs to be done first?" },
-  { label: "Who needs to be notified?", prompt: "Who needs to be notified after someone passes away?" },
-  { label: "What documents are needed?", prompt: "What documents will I need to gather after a death?" },
-  { label: "Talk to a real person", navigateTo: "/contact" },
-];
+const POPULAR_QUESTIONS_AFTERDEATH = {
+  primary: [
+    { label: "Who needs to be notified first?", prompt: "Who needs to be notified first after someone passes away?" },
+    { label: "What documents do I need right away?", prompt: "What documents do I need right away after a death?" },
+    { label: "How do I get death certificates?", prompt: "How do I get death certificates?" },
+    { label: "What do I do about Social Security benefits?", prompt: "What happens to Social Security benefits after someone dies?" },
+    { label: "What do I do about bills and accounts?", prompt: "What do I do with bills and accounts after someone passes away?" },
+    { label: "What happens if there is no will?", prompt: "What happens if there is no will?" },
+  ],
+  more: [
+    { label: "How do I handle funeral arrangements?", prompt: "How do I handle funeral arrangements?" },
+    { label: "What about their bank accounts?", prompt: "What happens to bank accounts after someone dies?" },
+    { label: "Do I need a lawyer?", prompt: "Do I need a lawyer to settle an estate?" },
+    { label: "What can wait until later?", prompt: "What tasks can wait until later after a death?" },
+    { label: "How do I notify employers?", prompt: "How do I notify the person's employer or former employer?" },
+    { label: "What about their car and property?", prompt: "What do I do with their car and personal property?" },
+  ]
+};
 
-const EMOTIONAL_SUGGESTIONS = [
-  { label: "Feeling overwhelmed or numb", prompt: "I'm feeling overwhelmed or numb. Is that normal?" },
-  { label: "Grief and emotions", prompt: "I'd like to talk about grief and the emotions I'm experiencing." },
-  { label: "Family conversations", prompt: "How do I have difficult conversations with family about loss?" },
-  { label: "What comes next", prompt: "I'm not sure what comes next. Can you help me understand?" },
-  { label: "Or anything else on your mind", prompt: "I just need someone to talk to right now." },
-];
+const POPULAR_QUESTIONS_EMOTIONAL = {
+  primary: [
+    { label: "I feel overwhelmed. What should I do first?", prompt: "I feel overwhelmed. What should I do first?" },
+    { label: "How do I handle family conflict right now?", prompt: "How do I handle family conflict right now during grief?" },
+    { label: "How do I talk to kids about loss?", prompt: "How do I talk to kids about loss?" },
+    { label: "What can I do when I cannot sleep?", prompt: "What can I do when I cannot sleep because of grief?" },
+    { label: "Is what I am feeling normal?", prompt: "Is what I am feeling normal after a loss?" },
+    { label: "How do I get through the next 24 hours?", prompt: "How do I get through the next 24 hours?" },
+  ],
+  more: [
+    { label: "How long does grief last?", prompt: "How long does grief last?" },
+    { label: "Is it okay to feel angry?", prompt: "Is it okay to feel angry after a loss?" },
+    { label: "How do I cope day to day?", prompt: "How do I cope with grief day to day?" },
+    { label: "What if I can't stop crying?", prompt: "What if I can't stop crying?" },
+    { label: "How do I go back to work?", prompt: "How do I go back to work after a loss?" },
+    { label: "When should I seek professional help?", prompt: "When should I seek professional help for grief?" },
+  ]
+};
 
-// Static common questions for fallback (no AI call needed)
-const COMMON_QUESTIONS_AFTERDEATH = [
-  { label: "Who needs to be notified after someone passes away?", prompt: "Who needs to be notified after someone passes away?" },
-  { label: "What should I do in the first 24–48 hours?", prompt: "What should I do in the first 24–48 hours after someone passes away?" },
-  { label: "How do I get a death certificate?", prompt: "How do I get a death certificate?" },
-  { label: "What happens to Social Security benefits?", prompt: "What happens to Social Security benefits after someone dies?" },
-  { label: "What documents will I need?", prompt: "What documents will I need after someone passes away?" },
-  { label: "What do I do with bills and accounts?", prompt: "What do I do with the person's bills and accounts after they pass away?" },
-  { label: "How do I handle funeral arrangements?", prompt: "How do I handle funeral arrangements?" },
-  { label: "What if there is no will?", prompt: "What happens if there is no will?" },
-];
-
-const COMMON_QUESTIONS_PLANNING = [
-  { label: "What should I plan first?", prompt: "What should I plan first when starting end-of-life planning?" },
-  { label: "What documents do I need?", prompt: "What documents do I need for end-of-life planning?" },
-  { label: "How do I choose someone to be in charge?", prompt: "How do I choose someone to be in charge after I'm gone?" },
-  { label: "What are my funeral options?", prompt: "What are my options for funeral or cremation?" },
-  { label: "How do I write a legacy letter?", prompt: "How do I write a legacy letter to my family?" },
-  { label: "What about my digital accounts?", prompt: "What should I do about my digital accounts and passwords?" },
-];
-
-const COMMON_QUESTIONS_EMOTIONAL = [
-  { label: "Is what I'm feeling normal?", prompt: "Is what I'm feeling normal? I'm not sure if my reactions are okay." },
-  { label: "How long does grief last?", prompt: "How long does grief last? When will I feel better?" },
-  { label: "How do I cope day to day?", prompt: "How do I cope with grief day to day?" },
-  { label: "How do I talk to others about my loss?", prompt: "How do I talk to family and friends about my loss?" },
-  { label: "I'm feeling overwhelmed", prompt: "I'm feeling overwhelmed. What can I do right now?" },
-  { label: "Is it okay to feel angry or numb?", prompt: "Is it okay to feel angry or numb after a loss?" },
-];
+// FAQ deep-links by mode
+const FAQ_LINKS_BY_MODE: Record<Exclude<Mode, null>, string> = {
+  planning: "/faq#planning",
+  afterdeath: "/faq#after-death", 
+  emotional: "/faq#grief"
+};
 
 export default function CareSupport() {
   const navigate = useNavigate();
@@ -212,7 +221,8 @@ What would help most in this moment?`
     
     // Clear any error state when switching modes
     setShowErrorOptions(false);
-    setShowCommonQuestions(false);
+    setPopularQuestionsOpen(false);
+    setShowMoreQuestions(false);
     
     // Add Claire's welcome message - full intro for first time, short for returning
     const welcomeMessage = isFirstTime ? MODE_FIRST_MESSAGES[newMode] : MODE_RETURNING_MESSAGES[newMode];
@@ -259,8 +269,10 @@ What would help most in this moment?`
   const [showErrorOptions, setShowErrorOptions] = useState(false);
   // Store the last user message for retry functionality
   const [lastUserMessage, setLastUserMessage] = useState<string>("");
-  // Track if common questions are expanded
-  const [showCommonQuestions, setShowCommonQuestions] = useState(false);
+  // Track if popular questions collapsible is open
+  const [popularQuestionsOpen, setPopularQuestionsOpen] = useState(false);
+  // Track if "More questions" is expanded
+  const [showMoreQuestions, setShowMoreQuestions] = useState(false);
   
   // Emotional support session tracking
   const emotionalSessions = useEmotionalSupportSessions(userId);
@@ -855,12 +867,8 @@ What would help most in this moment?`
                       const prevMsg = messages[i - 1];
                       const showAvatar = isAssistant && (!prevMsg || prevMsg.role !== "assistant");
                       
-                      // Show suggestion chips after Claire's first welcome message
+                      // Show popular questions collapsible after Claire's first welcome message
                       const isFirstWelcomeMessage = i === 0 && isAssistant && messages.length === 1;
-                      const suggestions = mode === "planning" ? PLANNING_SUGGESTIONS 
-                        : mode === "afterdeath" ? AFTERDEATH_SUGGESTIONS 
-                        : mode === "emotional" ? EMOTIONAL_SUGGESTIONS 
-                        : [];
                       
                       return (
                         <div key={i}>
@@ -905,51 +913,125 @@ What would help most in this moment?`
                             </div>
                           </div>
                           
-                          {/* Suggestion chips after first welcome message */}
-                          {isFirstWelcomeMessage && suggestions.length > 0 && (
-                            <div className="mt-4 ml-11 space-y-3">
-                              {/* Intro text for Planning and Emotional modes only */}
-                              {(mode === "planning" || mode === "emotional") && (
-                                <p 
-                                  className="text-sm font-medium"
-                                  style={{ color: 'hsl(215, 20%, 35%)' }}
-                                >
-                                  {mode === "planning" ? PLANNING_INTRO_TEXT : EMOTIONAL_INTRO_TEXT}
-                                </p>
-                              )}
-                              <div className="flex flex-wrap gap-2">
-                                {suggestions.map((suggestion) => (
-                                  <button
-                                    key={suggestion.label}
-                                    onClick={() => {
-                                      if (suggestion.navigateTo) {
-                                        navigate(suggestion.navigateTo);
-                                      } else if (suggestion.prompt) {
-                                        if (mode === "emotional") {
-                                          startEmotionalSession(suggestion.prompt);
-                                        } else {
-                                          handleTopicClick(suggestion.prompt);
-                                        }
-                                      }
-                                    }}
-                                    disabled={isLoading}
-                                    className="px-3 py-2 text-sm rounded-full border transition-colors hover:bg-muted/50 disabled:opacity-50"
-                                    style={{
-                                      borderColor: 'hsl(175, 25%, 75%)',
-                                      color: 'hsl(175, 35%, 35%)',
-                                      backgroundColor: 'hsl(0, 0%, 100%)'
+                          {/* Collapsible Popular Questions - shown after first welcome message */}
+                          {isFirstWelcomeMessage && mode && (
+                            <div className="mt-4 ml-11">
+                              <Collapsible open={popularQuestionsOpen} onOpenChange={setPopularQuestionsOpen}>
+                                <CollapsibleTrigger asChild>
+                                  <button 
+                                    className="flex items-center gap-2 w-full text-left p-3 rounded-lg transition-colors hover:bg-muted/30"
+                                    style={{ 
+                                      backgroundColor: popularQuestionsOpen ? 'hsl(175, 30%, 97%)' : 'transparent',
+                                      border: '1px solid hsl(175, 25%, 85%)'
                                     }}
                                   >
-                                    {suggestion.label}
+                                    <div className="flex-1">
+                                      <p 
+                                        className="text-sm font-medium"
+                                        style={{ color: 'hsl(215, 20%, 30%)' }}
+                                      >
+                                        Popular questions
+                                      </p>
+                                      <p 
+                                        className="text-xs"
+                                        style={{ color: 'hsl(215, 15%, 50%)' }}
+                                      >
+                                        Tap one, or type your own.
+                                      </p>
+                                    </div>
+                                    {popularQuestionsOpen ? (
+                                      <ChevronUp className="h-4 w-4" style={{ color: 'hsl(175, 35%, 40%)' }} />
+                                    ) : (
+                                      <ChevronDown className="h-4 w-4" style={{ color: 'hsl(175, 35%, 40%)' }} />
+                                    )}
                                   </button>
-                                ))}
-                              </div>
-                              <p 
-                                className="text-sm"
-                                style={{ color: 'hsl(215, 15%, 50%)' }}
-                              >
-                                Or type anything you'd like to ask.
-                              </p>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent>
+                                  <div 
+                                    className="mt-2 p-4 rounded-lg space-y-3"
+                                    style={{
+                                      backgroundColor: 'hsl(175, 30%, 97%)',
+                                      border: '1px solid hsl(175, 25%, 85%)',
+                                    }}
+                                  >
+                                    {/* Primary 6 questions */}
+                                    <div className="flex flex-wrap gap-2">
+                                      {(mode === "afterdeath" ? POPULAR_QUESTIONS_AFTERDEATH.primary 
+                                        : mode === "planning" ? POPULAR_QUESTIONS_PLANNING.primary 
+                                        : POPULAR_QUESTIONS_EMOTIONAL.primary
+                                      ).map((q, idx) => (
+                                        <button
+                                          key={idx}
+                                          onClick={() => {
+                                            if (mode === "emotional") {
+                                              startEmotionalSession(q.prompt);
+                                            } else {
+                                              handleTopicClick(q.prompt);
+                                            }
+                                          }}
+                                          disabled={isLoading}
+                                          className="px-3 py-2 text-sm rounded-full border transition-colors hover:bg-white disabled:opacity-50 text-left"
+                                          style={{
+                                            borderColor: 'hsl(175, 25%, 75%)',
+                                            color: 'hsl(175, 35%, 30%)',
+                                            backgroundColor: 'hsl(0, 0%, 100%)'
+                                          }}
+                                        >
+                                          {q.label}
+                                        </button>
+                                      ))}
+                                    </div>
+
+                                    {/* More questions toggle */}
+                                    {!showMoreQuestions && (
+                                      <button
+                                        onClick={() => setShowMoreQuestions(true)}
+                                        className="text-sm font-medium underline-offset-2 hover:underline"
+                                        style={{ color: 'hsl(175, 35%, 35%)' }}
+                                      >
+                                        More questions
+                                      </button>
+                                    )}
+
+                                    {/* Additional 6 questions (shown when expanded) */}
+                                    {showMoreQuestions && (
+                                      <div className="flex flex-wrap gap-2 pt-2 border-t" style={{ borderColor: 'hsl(175, 25%, 85%)' }}>
+                                        {(mode === "afterdeath" ? POPULAR_QUESTIONS_AFTERDEATH.more 
+                                          : mode === "planning" ? POPULAR_QUESTIONS_PLANNING.more 
+                                          : POPULAR_QUESTIONS_EMOTIONAL.more
+                                        ).map((q, idx) => (
+                                          <button
+                                            key={idx}
+                                            onClick={() => {
+                                              if (mode === "emotional") {
+                                                startEmotionalSession(q.prompt);
+                                              } else {
+                                                handleTopicClick(q.prompt);
+                                              }
+                                            }}
+                                            disabled={isLoading}
+                                            className="px-3 py-2 text-sm rounded-full border transition-colors hover:bg-white disabled:opacity-50 text-left"
+                                            style={{
+                                              borderColor: 'hsl(175, 25%, 75%)',
+                                              color: 'hsl(175, 35%, 30%)',
+                                              backgroundColor: 'hsl(0, 0%, 100%)'
+                                            }}
+                                          >
+                                            {q.label}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                    <p 
+                                      className="text-xs pt-2"
+                                      style={{ color: 'hsl(215, 15%, 50%)' }}
+                                    >
+                                      Or type anything you'd like to ask.
+                                    </p>
+                                  </div>
+                                </CollapsibleContent>
+                              </Collapsible>
                             </div>
                           )}
                         </div>
@@ -986,6 +1068,7 @@ What would help most in this moment?`
                           overflow: 'visible',
                         }}
                       >
+                        {/* Error action buttons */}
                         <div className="flex flex-wrap gap-2" style={{ overflow: 'visible' }}>
                           <Button
                             variant="outline"
@@ -1002,32 +1085,15 @@ What would help most in this moment?`
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setShowCommonQuestions(prev => !prev)}
+                            onClick={() => mode && navigate(FAQ_LINKS_BY_MODE[mode])}
                             className="rounded-full"
                             style={{
                               borderColor: 'hsl(175, 25%, 65%)',
                               color: 'hsl(175, 35%, 30%)'
                             }}
                           >
-                            {showCommonQuestions ? 'Hide common questions' : 'Show common questions people often ask'}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              const link = document.createElement('a');
-                              link.href = '/guides/EFA-After-Death-Planner-and-Checklist.pdf';
-                              link.download = 'After-Death-Guide.pdf';
-                              link.click();
-                            }}
-                            className="rounded-full"
-                            style={{
-                              borderColor: 'hsl(175, 25%, 65%)',
-                              color: 'hsl(175, 35%, 30%)'
-                            }}
-                          >
-                            <Download className="h-3 w-3 mr-1" />
-                            Download After Death Guide
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            Open FAQs for this topic
                           </Button>
                           <Button
                             variant="outline"
@@ -1043,59 +1109,6 @@ What would help most in this moment?`
                             Talk to a real person
                           </Button>
                         </div>
-                        
-                        {/* Expandable Common Questions Section */}
-                        {showCommonQuestions && (
-                          <div 
-                            className="mt-4 p-4 rounded-lg"
-                            style={{
-                              backgroundColor: 'hsl(175, 30%, 97%)',
-                              border: '1px solid hsl(175, 25%, 85%)',
-                              height: 'auto',
-                              overflow: 'visible',
-                            }}
-                          >
-                            <p 
-                              className="text-sm font-medium mb-3"
-                              style={{ color: 'hsl(215, 20%, 35%)' }}
-                            >
-                              Common questions people often ask:
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                              {(mode === "afterdeath" ? COMMON_QUESTIONS_AFTERDEATH 
-                                : mode === "planning" ? COMMON_QUESTIONS_PLANNING 
-                                : COMMON_QUESTIONS_EMOTIONAL
-                              ).map((q, idx) => (
-                                <Button
-                                  key={idx}
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    // Insert question as if user typed it
-                                    setInput(q.prompt);
-                                    // Trigger chat immediately
-                                    streamChat(q.prompt);
-                                    // Keep questions visible for follow-ups
-                                  }}
-                                  className="rounded-full text-left whitespace-normal h-auto py-2"
-                                  style={{
-                                    borderColor: 'hsl(175, 25%, 75%)',
-                                    color: 'hsl(175, 35%, 25%)',
-                                    backgroundColor: 'white',
-                                  }}
-                                >
-                                  {q.label}
-                                </Button>
-                              ))}
-                            </div>
-                            <p 
-                              className="text-xs mt-3"
-                              style={{ color: 'hsl(215, 15%, 50%)' }}
-                            >
-                              You can also type your own question anytime.
-                            </p>
-                          </div>
-                        )}
                       </div>
                     )}
                 </div>
