@@ -19,7 +19,8 @@ import {
   Sparkles,
   ClipboardCheck,
   Users,
-  CheckCircle2
+  CheckCircle2,
+  Phone
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BookingModal } from "./BookingModal";
@@ -41,75 +42,6 @@ interface AssistantPanelProps {
 
 // Mode types for Claire
 type ClaireMode = 'planning' | 'after-death' | 'emotional' | null;
-
-// Quick action buttons for seniors
-type QuickAction = {
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  prompt?: string;
-  navigateTo?: string;
-  showAfterDeathResources?: boolean;
-};
-
-// Mode-specific actions
-const PLANNING_ACTIONS: QuickAction[] = [
-  { 
-    label: "My Funeral Wishes", 
-    prompt: "I'd like help thinking through my funeral wishes.",
-    icon: Heart 
-  },
-  { 
-    label: "Writing My Legacy Letter", 
-    prompt: "I'd like help writing a legacy letter to my loved ones.",
-    icon: FileText 
-  },
-  { 
-    label: "Organizing My Documents", 
-    prompt: "I need help organizing my important documents for my family.",
-    icon: ClipboardCheck 
-  },
-];
-
-const AFTER_DEATH_ACTIONS: QuickAction[] = [
-  { 
-    label: "What to Do First", 
-    prompt: "Someone has passed away. What should I do first?",
-    icon: ClipboardCheck 
-  },
-  { 
-    label: "After Death Checklist", 
-    showAfterDeathResources: true,
-    icon: FileText 
-  },
-  { 
-    label: "Organizing Documents for Executor", 
-    prompt: "I need help organizing documents for the executor of an estate.",
-    icon: MessageCircle 
-  },
-];
-
-const EMOTIONAL_ACTIONS: QuickAction[] = [
-  { 
-    label: "Coping with Grief", 
-    prompt: "I'm struggling with grief. Can you help me understand what I'm feeling?",
-    icon: Heart 
-  },
-  { 
-    label: "Talk Through What I'm Feeling", 
-    prompt: "I just need someone to talk to about what I'm going through.",
-    icon: MessageCircle 
-  },
-  { 
-    label: "I Need More Support", 
-    prompt: "I need more support than I'm getting right now. What are my options?",
-    icon: Users 
-  },
-];
-
-// Helper to detect printable-related pages
-const isPrintablePage = (pathname: string): boolean => {
-  return pathname === '/forms' || pathname === '/printable-form';
-};
 
 // Helper to detect after-death related pages
 const isAfterDeathPage = (pathname: string): boolean => {
@@ -155,6 +87,13 @@ const getPageContext = (pathname: string): string | undefined => {
   return undefined;
 };
 
+// Mode labels for display
+const MODE_LABELS: Record<Exclude<ClaireMode, null>, string> = {
+  'planning': 'Planning Ahead',
+  'after-death': 'After a Death',
+  'emotional': 'Emotional Support'
+};
+
 export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -167,6 +106,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
   const [hasCAREAccess, setHasCAREAccess] = useState<boolean | null>(null);
   const [showAfterDeathResources, setShowAfterDeathResources] = useState(false);
   const [selectedMode, setSelectedMode] = useState<ClaireMode>(null);
+  const [showCompletion, setShowCompletion] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   
@@ -487,6 +427,16 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
     navigate("/care-support");
   };
 
+  const handleTalkToRealPerson = () => {
+    onClose();
+    navigate("/contact");
+  };
+
+  const handleModeSelect = (mode: ClaireMode) => {
+    setSelectedMode(mode);
+    setShowAfterDeathResources(false);
+  };
+
   if (!isOpen) return null;
 
   // No CARE access - show upsell
@@ -551,10 +501,302 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
     );
   }
 
+  // Render mode entry (SLOT 1: MODE_ENTRY)
+  const renderModeEntry = () => (
+    <div className="space-y-4">
+      {/* Claire's intro message */}
+      <div className="text-center space-y-2 py-2">
+        <p className="text-base text-foreground leading-relaxed">
+          Hi, I'm Claire. I can help in different ways.
+        </p>
+        <p className="text-base text-foreground leading-relaxed">
+          Please choose what you'd like help with today.
+        </p>
+      </div>
+
+      {/* Mode selection buttons */}
+      <div className="space-y-2">
+        <Button
+          variant="outline"
+          className="w-full justify-start text-left h-auto py-3 px-4 border-2 hover:border-primary/40 hover:bg-primary/5"
+          onClick={() => handleModeSelect('planning')}
+        >
+          <FileText className="h-5 w-5 mr-3 flex-shrink-0 text-primary" />
+          <span className="text-base font-medium">Planning Ahead</span>
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full justify-start text-left h-auto py-3 px-4 border-2 hover:border-primary/40 hover:bg-primary/5"
+          onClick={() => handleModeSelect('after-death')}
+        >
+          <Heart className="h-5 w-5 mr-3 flex-shrink-0 text-primary" />
+          <span className="text-base font-medium">After a Death</span>
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full justify-start text-left h-auto py-3 px-4 border-2 hover:border-primary/40 hover:bg-primary/5"
+          onClick={() => handleModeSelect('emotional')}
+        >
+          <HelpCircle className="h-5 w-5 mr-3 flex-shrink-0 text-primary" />
+          <span className="text-base font-medium">Emotional Support</span>
+        </Button>
+      </div>
+
+      {/* Helper text */}
+      <p className="text-sm text-muted-foreground text-center pt-1">
+        Tap one of the options above, or type a question below.
+      </p>
+    </div>
+  );
+
+  // Render mode-specific actions (SLOT 2A: PLANNING_ACTIONS)
+  const renderPlanningActions = () => (
+    <div className="space-y-4">
+      {/* Planning completion prompt */}
+      {planningCompletion.isComplete && showCompletion && (
+        <div className="bg-accent/50 border border-border rounded-xl p-4 text-center space-y-3">
+          <div className="flex justify-center">
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <CheckCircle2 className="h-5 w-5 text-primary" />
+            </div>
+          </div>
+          <p className="text-base text-foreground leading-relaxed">
+            It looks like you've reached the end.<br />
+            Would you like to review and save what you've done?
+          </p>
+          <div className="flex flex-col gap-2 pt-1">
+            <Button
+              size="lg"
+              className="w-full py-5 text-base"
+              onClick={() => {
+                onClose();
+                navigate('/preplan-summary');
+              }}
+            >
+              Yes, review my plan
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full py-5 text-base"
+              onClick={() => setShowCompletion(false)}
+            >
+              No, I want to keep working
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Claire's planning intro */}
+      {!planningCompletion.isComplete || !showCompletion ? (
+        <>
+          <div className="text-center py-2">
+            <p className="text-base text-foreground leading-relaxed">
+              We'll take this one step at a time.<br />
+              You can skip anything and come back later.
+            </p>
+          </div>
+
+          {/* Planning action buttons */}
+          <div className="space-y-2">
+            <Button
+              variant="outline"
+              className="w-full justify-start text-left h-auto py-3 px-4"
+              onClick={() => handleSend("I'd like help thinking through my funeral wishes.")}
+              disabled={isLoading}
+            >
+              <Heart className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+              <span className="text-sm">My Funeral Wishes</span>
+            </Button>
+            
+            <Button
+              variant="outline"
+              className="w-full justify-start text-left h-auto py-3 px-4"
+              onClick={() => handleSend("I'd like help writing a legacy letter to my loved ones.")}
+              disabled={isLoading}
+            >
+              <FileText className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+              <span className="text-sm">Writing My Legacy Letter</span>
+            </Button>
+            
+            <Button
+              variant="outline"
+              className="w-full justify-start text-left h-auto py-3 px-4"
+              onClick={() => handleSend("I need help organizing my important documents for my family.")}
+              disabled={isLoading}
+            >
+              <ClipboardCheck className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+              <span className="text-sm">Organizing My Documents</span>
+            </Button>
+          </div>
+        </>
+      ) : null}
+    </div>
+  );
+
+  // Render mode-specific actions (SLOT 2B: AFTER_DEATH_ACTIONS)
+  const renderAfterDeathActions = () => (
+    <div className="space-y-4">
+      {/* Claire's after-death intro */}
+      <div className="text-center py-2">
+        <p className="text-base text-foreground leading-relaxed">
+          I'm here to help you focus on what to do next.<br />
+          You don't need to do everything at once.
+        </p>
+      </div>
+
+      {/* After-death resources view */}
+      {showAfterDeathResources ? (
+        <div className="space-y-2">
+          <button 
+            onClick={() => setShowAfterDeathResources(false)}
+            className="text-xs text-primary hover:underline flex items-center gap-1"
+          >
+            ← Back to options
+          </button>
+          <AfterDeathResourcesResponse onClose={onClose} />
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <Button
+            variant="outline"
+            className="w-full justify-start text-left h-auto py-3 px-4"
+            onClick={() => handleSend("Someone has passed away. What should I do first?")}
+            disabled={isLoading}
+          >
+            <ClipboardCheck className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+            <span className="text-sm">What to Do First</span>
+          </Button>
+          
+          <Button
+            variant="outline"
+            className="w-full justify-start text-left h-auto py-3 px-4"
+            onClick={() => setShowAfterDeathResources(true)}
+          >
+            <FileText className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+            <span className="text-sm">After Death Checklist</span>
+          </Button>
+          
+          <Button
+            variant="outline"
+            className="w-full justify-start text-left h-auto py-3 px-4"
+            onClick={() => handleSend("I need help organizing documents for the executor of an estate.")}
+            disabled={isLoading}
+          >
+            <MessageCircle className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+            <span className="text-sm">Organizing Documents for Executor</span>
+          </Button>
+
+          {/* Download buttons */}
+          <a 
+            href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
+            download
+            className="flex items-center gap-3 w-full py-3 px-4 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground text-left"
+          >
+            <FileText className="h-4 w-4 flex-shrink-0 text-primary" />
+            <span className="text-sm">Download After Death Guide</span>
+          </a>
+          
+          <a 
+            href="/guides/After-Life-Action-Plan-BLANK.pdf" 
+            download
+            className="flex items-center gap-3 w-full py-3 px-4 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground text-left"
+          >
+            <ClipboardCheck className="h-4 w-4 flex-shrink-0 text-primary" />
+            <span className="text-sm">Download After Death Planner</span>
+          </a>
+          
+          {/* Talk to a real person */}
+          <Button
+            variant="outline"
+            className="w-full justify-start text-left h-auto py-3 px-4 mt-2"
+            onClick={handleTalkToRealPerson}
+          >
+            <Phone className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+            <span className="text-sm">Talk to a real person</span>
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+
+  // Render mode-specific actions (SLOT 2C: EMOTIONAL_SUPPORT_ACTIONS)
+  const renderEmotionalActions = () => (
+    <div className="space-y-4">
+      {/* Claire's emotional support intro */}
+      <div className="text-center py-2">
+        <p className="text-base text-foreground leading-relaxed">
+          You don't have to go through this alone.<br />
+          I'm here to listen.
+        </p>
+      </div>
+
+      {/* Emotional support action buttons */}
+      <div className="space-y-2">
+        <Button
+          variant="outline"
+          className="w-full justify-start text-left h-auto py-3 px-4"
+          onClick={() => handleSend("I'm struggling with grief. Can you help me understand what I'm feeling?")}
+          disabled={isLoading}
+        >
+          <Heart className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+          <span className="text-sm">Coping with Grief</span>
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full justify-start text-left h-auto py-3 px-4"
+          onClick={() => handleSend("I just need someone to talk to about what I'm going through.")}
+          disabled={isLoading}
+        >
+          <MessageCircle className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+          <span className="text-sm">Talk Through What I'm Feeling</span>
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full justify-start text-left h-auto py-3 px-4"
+          onClick={() => handleSend("I need more support than I'm getting right now. What are my options?")}
+          disabled={isLoading}
+        >
+          <Users className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+          <span className="text-sm">I Need More Support</span>
+        </Button>
+        
+        {/* Talk to a real person */}
+        <Button
+          variant="outline"
+          className="w-full justify-start text-left h-auto py-3 px-4 mt-2"
+          onClick={handleTalkToRealPerson}
+        >
+          <Phone className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+          <span className="text-sm">Talk to a real person</span>
+        </Button>
+      </div>
+    </div>
+  );
+
+  // Render mode indicator and change option
+  const renderModeIndicator = () => (
+    <div className="flex items-center justify-between py-2 px-1 mb-2">
+      <span className="text-xs text-muted-foreground">
+        Current help type: <span className="font-medium text-foreground">{MODE_LABELS[selectedMode!]}</span>
+      </span>
+      <button 
+        onClick={() => handleModeSelect(null)}
+        className="text-xs text-primary hover:underline"
+      >
+        Change
+      </button>
+    </div>
+  );
+
   return (
     <>
-      <Card ref={panelRef} className="fixed bottom-24 right-6 w-[380px] h-[600px] shadow-2xl z-40 flex flex-col md:bottom-8 md:right-24">
-        <CardHeader className="pb-3 space-y-3">
+      <Card ref={panelRef} className="fixed bottom-24 right-6 w-[380px] max-h-[85vh] shadow-2xl z-40 flex flex-col md:bottom-8 md:right-24">
+        <CardHeader className="pb-2 flex-shrink-0">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2">
               <Heart className="h-5 w-5 text-primary" />
@@ -571,241 +813,28 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
           </div>
         </CardHeader>
 
-        <CardContent className="flex-1 flex flex-col gap-3 p-4 overflow-hidden">
-          <ScrollArea className="flex-1 pr-4" ref={scrollRef}>
-            <div className="space-y-4">
-              {messages.length === 0 && !showAfterDeathResources && (
-                <div className="space-y-3">
-                  {/* Mode selection header - only show when no mode selected */}
-                  {!selectedMode && (
-                    <div className="text-center py-2">
-                      <p className="text-base font-medium text-foreground">Select Your Mode</p>
-                    </div>
-                  )}
-                  
-                  {/* Mode selection buttons - show when no mode selected */}
-                  {!selectedMode && (
-                    <div className="grid grid-cols-1 gap-2">
-                      <button
-                        onClick={() => setSelectedMode('planning')}
-                        className="flex items-center gap-3 p-3 rounded-xl border-2 border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/40 transition-all text-left"
-                      >
-                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                          <FileText className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground">Planning Ahead</p>
-                          <p className="text-xs text-muted-foreground">Pre-plan for yourself or a loved one</p>
-                        </div>
-                      </button>
-                      
-                      <button
-                        onClick={() => setSelectedMode('after-death')}
-                        className="flex items-center gap-3 p-3 rounded-xl border-2 border-rose-200 bg-rose-50/50 hover:bg-rose-50 hover:border-rose-300 transition-all text-left"
-                      >
-                        <div className="h-10 w-10 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0">
-                          <Heart className="h-5 w-5 text-rose-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground">After a Death</p>
-                          <p className="text-xs text-muted-foreground">Guidance for immediate next steps</p>
-                        </div>
-                      </button>
-                      
-                      <button
-                        onClick={() => setSelectedMode('emotional')}
-                        className="flex items-center gap-3 p-3 rounded-xl border-2 border-amber-200 bg-amber-50/50 hover:bg-amber-50 hover:border-amber-300 transition-all text-left"
-                      >
-                        <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                          <HelpCircle className="h-5 w-5 text-amber-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground">Emotional Support</p>
-                          <p className="text-xs text-muted-foreground">Someone to listen and help</p>
-                        </div>
-                      </button>
-                    </div>
-                  )}
-                  
-                  {/* Helper text - always visible */}
-                  <p className="text-sm text-muted-foreground text-center">
-                    Tap one of the options below, or type a question.
-                  </p>
-                  
-                  {/* Mode-specific actions - show after mode selected */}
-                  {selectedMode && (
-                    <div className="space-y-2">
-                      {/* Current help type label */}
-                      <p className="text-xs text-muted-foreground text-center mb-1">
-                        Current help type: {selectedMode === 'after-death' ? 'After a Death' : 
-                         selectedMode === 'planning' ? 'Planning Ahead' : 'Emotional Support'}
-                      </p>
-                      
-                      {/* Back button to switch modes */}
-                      <div className="flex justify-center mb-2">
-                        <button 
-                          onClick={() => setSelectedMode(null)}
-                          className="text-xs text-primary hover:underline flex items-center gap-1"
-                        >
-                          ← Change help type
-                        </button>
-                      </div>
-                      
-                      {/* Subtle note for After a Death mode */}
-                      {selectedMode === 'after-death' && (
-                        <p className="text-xs text-muted-foreground text-center italic pb-1">
-                          You don't need to do everything at once.
-                        </p>
-                      )}
-                      
-                      {/* End-of-planning prompt for Planning Mode */}
-                      {selectedMode === 'planning' && planningCompletion.isComplete && (
-                        <div className="bg-accent/50 border border-border rounded-xl p-5 text-center space-y-4">
-                          <div className="flex justify-center">
-                            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                              <CheckCircle2 className="h-6 w-6 text-primary" />
-                            </div>
-                          </div>
-                          <p className="text-base text-foreground leading-relaxed">
-                            It looks like you've reached the end.<br />
-                            Would you like to review and save what you've done?
-                          </p>
-                          <div className="flex flex-col gap-3 pt-2">
-                            <Button
-                              size="lg"
-                              className="w-full py-6 text-base"
-                              onClick={() => {
-                                onClose();
-                                navigate('/preplan-summary');
-                              }}
-                            >
-                              Yes, review my plan
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="lg"
-                              className="w-full py-6 text-base"
-                              onClick={() => {
-                                onClose();
-                                navigate('/planner/overview');
-                              }}
-                            >
-                              No, I want to keep working
-                            </Button>
-                          </div>
-                          {/* Gentle exit - no pressure dismissal */}
-                          <button
-                            onClick={onClose}
-                            className="text-sm text-muted-foreground hover:text-foreground transition-colors pt-2"
-                          >
-                            Maybe later — just close for now
-                          </button>
-                        </div>
-                      )}
-                      
-                      {/* Quick actions for after-death mode */}
-                      {selectedMode === 'after-death' && (
-                        <>
-                          {AFTER_DEATH_ACTIONS.map((action) => (
-                            <Button
-                              key={action.label}
-                              variant="outline"
-                              className="w-full justify-start text-left h-auto py-2.5 px-4"
-                              onClick={() => {
-                                if (action.showAfterDeathResources) {
-                                  setShowAfterDeathResources(true);
-                                } else if (action.navigateTo) {
-                                  onClose();
-                                  navigate(action.navigateTo);
-                                } else if (action.prompt) {
-                                  handleSend(action.prompt);
-                                }
-                              }}
-                              disabled={isLoading && !action.navigateTo && !action.showAfterDeathResources}
-                            >
-                              <action.icon className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
-                              <span className="text-sm">{action.label}</span>
-                            </Button>
-                          ))}
-                          
-                          {/* Download buttons for After-Death mode */}
-                          <div className="pt-2 space-y-2">
-                            <a 
-                              href="/guides/EFA-After-Death-Planner-and-Checklist.pdf" 
-                              download
-                              className="flex items-center gap-3 w-full py-2.5 px-4 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground text-left"
-                            >
-                              <FileText className="h-4 w-4 flex-shrink-0 text-primary" />
-                              <span className="text-sm">Download After Death Guide</span>
-                            </a>
-                            <a 
-                              href="/guides/After-Life-Action-Plan-BLANK.pdf" 
-                              download
-                              className="flex items-center gap-3 w-full py-2.5 px-4 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground text-left"
-                            >
-                              <ClipboardCheck className="h-4 w-4 flex-shrink-0 text-primary" />
-                              <span className="text-sm">Download After Death Planner</span>
-                            </a>
-                          </div>
-                        </>
-                      )}
-                      
-                      {/* Quick actions for emotional mode */}
-                      {selectedMode === 'emotional' && (
-                        EMOTIONAL_ACTIONS.map((action) => (
-                          <Button
-                            key={action.label}
-                            variant="outline"
-                            className="w-full justify-start text-left h-auto py-2.5 px-4"
-                            onClick={() => {
-                              if (action.navigateTo) {
-                                onClose();
-                                navigate(action.navigateTo);
-                              } else if (action.prompt) {
-                                handleSend(action.prompt);
-                              }
-                            }}
-                            disabled={isLoading && !action.navigateTo}
-                          >
-                            <action.icon className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
-                            <span className="text-sm">{action.label}</span>
-                          </Button>
-                        ))
-                      )}
-                    </div>
-                  )}
-                  
-                  {/* Voice tip and memory disclosure - only show after mode selected */}
-                  {selectedMode && (
-                    <>
-                      <div className="bg-primary/5 border border-primary/20 rounded-lg p-2 text-center">
-                        <p className="text-xs text-foreground">
-                          Click the mic to speak, or type below.
-                        </p>
-                      </div>
-                      <div className="bg-muted/50 rounded-lg p-2 text-center">
-                        <p className="text-[11px] text-muted-foreground">
-                          Claire remembers planning info you save. Conversations are private.
-                        </p>
-                      </div>
-                    </>
-                  )}
-                </div>
+        <CardContent className="flex-1 flex flex-col gap-3 p-4 overflow-hidden min-h-0">
+          <ScrollArea className="flex-1 pr-2" ref={scrollRef}>
+            <div className="space-y-3">
+              {/* Mode indicator when mode is selected */}
+              {selectedMode && messages.length === 0 && !showAfterDeathResources && renderModeIndicator()}
+              
+              {/* SLOT 1: Mode Entry - show when no mode selected AND no messages */}
+              {!selectedMode && messages.length === 0 && renderModeEntry()}
+              
+              {/* SLOT 2A/2B/2C: Mode-specific actions - show when mode selected AND no messages */}
+              {selectedMode && messages.length === 0 && !showAfterDeathResources && (
+                <>
+                  {selectedMode === 'planning' && renderPlanningActions()}
+                  {selectedMode === 'after-death' && renderAfterDeathActions()}
+                  {selectedMode === 'emotional' && renderEmotionalActions()}
+                </>
               )}
               
-              {/* After-Death Resources Response */}
-              {showAfterDeathResources && messages.length === 0 && (
-                <div className="space-y-2">
-                  <button 
-                    onClick={() => setShowAfterDeathResources(false)}
-                    className="text-xs text-primary hover:underline flex items-center gap-1"
-                  >
-                    ← Back to options
-                  </button>
-                  <AfterDeathResourcesResponse onClose={onClose} />
-                </div>
-              )}
+              {/* After-Death Resources when triggered from after-death mode */}
+              {selectedMode === 'after-death' && showAfterDeathResources && messages.length === 0 && renderAfterDeathActions()}
               
+              {/* Conversation messages */}
               {messages.map((msg) => (
                 <div
                   key={msg.id}
@@ -835,9 +864,9 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
             </div>
           </ScrollArea>
 
-          {/* Only show input area after a mode is selected or conversation has started */}
+          {/* Input area - show when mode selected OR conversation started */}
           {(selectedMode || messages.length > 0) && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-shrink-0">
               <Textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -848,27 +877,28 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                     handleSend();
                   }
                 }}
-                className="resize-none min-h-[60px]"
+                className="resize-none min-h-[52px]"
                 rows={2}
               />
               <Button 
                 onClick={() => handleSend()} 
                 disabled={isLoading || !input.trim()}
                 size="icon"
+                className="flex-shrink-0"
               >
                 <Send className="h-4 w-4" />
               </Button>
             </div>
           )}
 
-          {/* Footer actions - always visible */}
-          <div className="space-y-2">
+          {/* Footer actions */}
+          <div className="space-y-1 flex-shrink-0">
             <div className="flex justify-between items-center">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleDeleteHistory}
-                className="text-xs"
+                className="text-xs h-8"
               >
                 <Trash2 className="h-3 w-3 mr-1" />
                 Clear history
@@ -881,7 +911,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
               </Link>
             </div>
             <p className="text-[10px] text-muted-foreground/60 text-center">
-              Claire does not remember conversations unless you choose to save a summary.
+              Claire does not remember conversations unless you save a summary.
             </p>
           </div>
         </CardContent>
