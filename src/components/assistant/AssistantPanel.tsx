@@ -589,18 +589,20 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                   {/* Mode-specific actions - show after mode selected */}
                   {selectedMode && (
                     <div className="space-y-2">
-                      {/* Selected mode indicator with back button */}
-                      <div className="flex items-center justify-between mb-2">
+                      {/* Current help type label */}
+                      <p className="text-xs text-muted-foreground text-center mb-1">
+                        Current help type: {selectedMode === 'after-death' ? 'After a Death' : 
+                         selectedMode === 'planning' ? 'Planning Ahead' : 'Emotional Support'}
+                      </p>
+                      
+                      {/* Back button to switch modes */}
+                      <div className="flex justify-center mb-2">
                         <button 
                           onClick={() => setSelectedMode(null)}
                           className="text-xs text-primary hover:underline flex items-center gap-1"
                         >
-                          ← Back to topics
+                          ← Change help type
                         </button>
-                        <span className="text-xs text-muted-foreground capitalize">
-                          {selectedMode === 'after-death' ? 'After a Death' : 
-                           selectedMode === 'planning' ? 'Planning Ahead' : 'Emotional Support'}
-                        </span>
                       </div>
                       
                       {/* Subtle note for After a Death mode */}
