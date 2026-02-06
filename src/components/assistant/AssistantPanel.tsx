@@ -545,6 +545,9 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                   {/* Mode selection header */}
                   <div className="text-center py-1">
                     <p className="text-base font-medium text-foreground">How can I help you today?</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Tap one of the options below, or type a question.
+                    </p>
                   </div>
                   
                   {/* Mode selection buttons - show when no mode selected */}
