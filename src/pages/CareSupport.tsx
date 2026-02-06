@@ -447,6 +447,12 @@ export default function CareSupport() {
                 />
                 
                 {/* Claire's First-Person Introduction */}
+                <p 
+                  className="text-xs uppercase tracking-wide font-medium"
+                  style={{ color: 'hsl(175, 25%, 45%)' }}
+                >
+                  A note from Claire
+                </p>
                 <div 
                   className="space-y-2 text-base leading-relaxed max-w-md"
                   style={{ color: 'hsl(215, 20%, 25%)' }}
