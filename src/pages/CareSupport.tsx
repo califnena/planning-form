@@ -230,9 +230,17 @@ export default function CareSupport() {
   };
 
   // Persist mode to localStorage when it changes (only when not null)
+  // Also reset wrap-up state when switching modes
   useEffect(() => {
     if (mode) {
       localStorage.setItem("claire_mode", mode);
+      // Reset wrap-up state when switching away from planning mode
+      if (mode !== "planning") {
+        setPlanningMessageCount(0);
+        setShowWrapUpPrompt(false);
+        setShowWrapUpConfirmation(false);
+        setWrapUpDismissed(false);
+      }
     }
   }, [mode]);
   const [hasAccess, setHasAccess] = useState(false);
@@ -266,6 +274,11 @@ export default function CareSupport() {
   const [popularQuestionsOpen, setPopularQuestionsOpen] = useState(false);
   // Track if "More questions" is expanded
   const [showMoreQuestions, setShowMoreQuestions] = useState(false);
+  // Planning Ahead wrap-up flow
+  const [planningMessageCount, setPlanningMessageCount] = useState(0);
+  const [showWrapUpPrompt, setShowWrapUpPrompt] = useState(false);
+  const [showWrapUpConfirmation, setShowWrapUpConfirmation] = useState(false);
+  const [wrapUpDismissed, setWrapUpDismissed] = useState(false);
   
   // Emotional support session tracking
   const emotionalSessions = useEmotionalSupportSessions(userId);
@@ -585,6 +598,18 @@ export default function CareSupport() {
       
       // Successful response - clear error state
       setShowErrorOptions(false);
+      
+      // Track message count for Planning Ahead wrap-up flow
+      if (mode === "planning" && !wrapUpDismissed && !showWrapUpPrompt && !showWrapUpConfirmation) {
+        setPlanningMessageCount(prev => {
+          const newCount = prev + 1;
+          // Show wrap-up prompt after 10+ messages
+          if (newCount >= 10) {
+            setShowWrapUpPrompt(true);
+          }
+          return newCount;
+        });
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       logClaireError(mode, "CATCH_ALL", errorMessage, isRetry);
@@ -1135,6 +1160,101 @@ export default function CareSupport() {
                     )}
                 </div>
               )}
+
+              {/* Planning Ahead Wrap-up Prompt */}
+              {mode === "planning" && showWrapUpPrompt && !showWrapUpConfirmation && (
+                <div 
+                  className="rounded-xl p-4 space-y-3"
+                  style={{ backgroundColor: 'hsl(140, 30%, 96%)', border: '1px solid hsl(140, 20%, 85%)' }}
+                >
+                  <div className="flex items-start gap-3">
+                    <img 
+                      src={claireAvatar} 
+                      alt="Claire" 
+                      className="h-8 w-8 rounded-full flex-shrink-0"
+                    />
+                    <p className="text-sm" style={{ color: 'hsl(215, 20%, 30%)' }}>
+                      Do you want to stop here for now, or keep going?
+                    </p>
+                  </div>
+                  <div className="flex gap-2 pl-11">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setShowWrapUpPrompt(false);
+                        setShowWrapUpConfirmation(true);
+                      }}
+                      className="rounded-full"
+                      style={{ backgroundColor: 'hsl(175, 35%, 45%)' }}
+                    >
+                      I'm done for now
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setShowWrapUpPrompt(false);
+                        setWrapUpDismissed(true);
+                        setPlanningMessageCount(0); // Reset so it doesn't immediately show again
+                      }}
+                      className="rounded-full"
+                      style={{ borderColor: 'hsl(175, 25%, 65%)', color: 'hsl(175, 35%, 30%)' }}
+                    >
+                      Keep going
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Planning Ahead Wrap-up Confirmation */}
+              {mode === "planning" && showWrapUpConfirmation && (
+                <div 
+                  className="rounded-xl p-4 space-y-3"
+                  style={{ backgroundColor: 'hsl(140, 30%, 96%)', border: '1px solid hsl(140, 20%, 85%)' }}
+                >
+                  <div className="flex items-start gap-3">
+                    <img 
+                      src={claireAvatar} 
+                      alt="Claire" 
+                      className="h-8 w-8 rounded-full flex-shrink-0"
+                    />
+                    <p className="text-sm" style={{ color: 'hsl(215, 20%, 30%)' }}>
+                      Okay. I can take you to your Planning Review so you can print, download, or edit.
+                    </p>
+                  </div>
+                  <div className="flex gap-2 pl-11">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        // Check if user has Personal Support for Planning Review
+                        if (!hasPersonalSupport) {
+                          setPendingPaidAction("Planning Review");
+                          setShowPersonalSupportModal(true);
+                          return;
+                        }
+                        navigate("/preplan-summary");
+                      }}
+                      className="rounded-full"
+                      style={{ backgroundColor: 'hsl(175, 35%, 45%)' }}
+                    >
+                      Go to Planning Review
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setShowWrapUpConfirmation(false);
+                        setWrapUpDismissed(true);
+                      }}
+                      className="rounded-full"
+                      style={{ borderColor: 'hsl(175, 25%, 65%)', color: 'hsl(175, 35%, 30%)' }}
+                    >
+                      Stay here
+                    </Button>
+                  </div>
+                </div>
+              )}
+
 
 
               <div className="space-y-2">
