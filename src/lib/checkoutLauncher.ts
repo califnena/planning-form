@@ -208,27 +208,16 @@ export async function launchCheckout({
     
     if (isTimeout) {
       console.log("[Checkout] Request timed out after", timeoutMs, "ms");
-      toast.error("Checkout is taking too long", {
-        description: "The payment page didn't respond in time. Try again or open checkout directly.",
+      toast.error("We're sorry. Something unexpected happened.", {
+        description: "Our team has been notified and is already reviewing the issue. You may try again in a few minutes.",
         action: {
-          label: lastUrl ? "Open Checkout" : "Reload",
+          label: "Try Again",
           onClick: () => {
-            if (lastUrl) {
+            if (isTimeout && lastUrl) {
               window.open(lastUrl, '_blank');
             } else {
               window.location.reload();
             }
-          },
-        },
-        duration: 15000,
-      });
-    } else {
-      toast.error("We couldn't start checkout", {
-        description: "Something went wrong. Please try again, or contact us if it continues.",
-        action: {
-          label: "Try Again",
-          onClick: () => {
-            window.location.reload();
           },
         },
         duration: 15000,
@@ -249,8 +238,8 @@ export async function launchCheckout({
  * Show a helpful error toast when checkout is blocked
  */
 function showCheckoutBlockedError(navigate: (path: string) => void, checkoutUrl?: string | null) {
-  toast.error("Secure checkout did not load", {
-    description: "Your browser or network blocked the payment window. Try reloading or opening in a new tab.",
+  toast.error("We're sorry. Something unexpected happened.", {
+    description: "Our team has been notified and is already reviewing the issue. You may try again in a few minutes.",
     action: {
       label: checkoutUrl ? "Open in New Tab" : "Get Help",
       onClick: () => {
