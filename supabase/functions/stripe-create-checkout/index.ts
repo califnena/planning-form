@@ -203,18 +203,24 @@ serve(async (req) => {
     });
   } catch (err) {
     console.error("Stripe checkout error:", err);
-    // Best-effort error log
+    // Best-effort error log with PAYMENT_ERROR action
     try {
       const sbUrl = Deno.env.get("SUPABASE_URL")!;
       const sbKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
       const sb = createClient(sbUrl, sbKey);
       await sb.from("error_logs").insert({
-        action: "stripe_create_checkout",
+        action: "PAYMENT_ERROR",
         error_message: String(err),
         stack_trace: (err as Error)?.stack || null,
         user_id: null,
         ip_address: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null,
         severity: "error",
+        metadata: {
+          checkout_session_id: null,
+          payment_intent_id: null,
+          lookup_key: lookupKey ?? null,
+          stage: "session_creation",
+        },
       });
     } catch { /* ignore logging failure */ }
     return new Response(JSON.stringify({ error: "Checkout error" }), {

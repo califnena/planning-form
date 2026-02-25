@@ -12,7 +12,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { setPendingCheckout, getProductName } from "./pendingCheckout";
 import { toast } from "sonner";
-import { logCriticalError } from "./errorLogger";
+import { logPaymentError } from "./errorLogger";
 
 export type CheckoutParams = {
   lookupKey: string;
@@ -197,12 +197,14 @@ export async function launchCheckout({
     const isTimeout = error.message?.includes('timed out');
     const lastUrl = getLastCheckoutUrl();
 
-    // Log to error_logs table
-    logCriticalError({
-      action: "stripe_checkout_launch",
+    // Log as PAYMENT_ERROR with Stripe IDs
+    const checkoutSessionId = lastUrl?.match(/cs_[a-zA-Z0-9_]+/)?.[0] || null;
+    logPaymentError({
       error_message: error.message || "Unknown checkout error",
+      checkout_session_id: checkoutSessionId,
+      payment_intent_id: null,
+      lookup_key: lookupKey,
       stack_trace: error.stack,
-      metadata: { lookupKey, isTimeout },
       severity: isTimeout ? "warning" : "error",
     });
     

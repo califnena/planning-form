@@ -14,6 +14,31 @@ export type ErrorLogPayload = {
   severity?: "warning" | "error" | "critical";
 };
 
+/**
+ * Log a Stripe-specific PAYMENT_ERROR with checkout/payment intent IDs.
+ */
+export function logPaymentError(opts: {
+  error_message: string;
+  checkout_session_id?: string | null;
+  payment_intent_id?: string | null;
+  lookup_key?: string;
+  stack_trace?: string;
+  severity?: "warning" | "error" | "critical";
+}): void {
+  logCriticalError({
+    action: "PAYMENT_ERROR",
+    error_message: opts.error_message,
+    stack_trace: opts.stack_trace,
+    stripe_event_id: opts.checkout_session_id || undefined,
+    severity: opts.severity || "error",
+    metadata: {
+      checkout_session_id: opts.checkout_session_id || null,
+      payment_intent_id: opts.payment_intent_id || null,
+      lookup_key: opts.lookup_key || null,
+    },
+  });
+}
+
 export async function logCriticalError(payload: ErrorLogPayload): Promise<void> {
   try {
     // Gather context

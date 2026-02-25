@@ -80,10 +80,11 @@ serve(async (req) => {
     } catch (err) {
       console.error("Webhook signature verification failed:", err);
       await logErrorToDb(supabase, {
-        action: "stripe_webhook_signature",
-        error_message: String(err),
+        action: "PAYMENT_ERROR",
+        error_message: `Webhook signature verification failed: ${String(err)}`,
         ip_address: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("cf-connecting-ip") || null,
         severity: "critical",
+        metadata: { stage: "signature_verification" },
       });
       return new Response(JSON.stringify({ error: "Invalid signature" }), {
         status: 400,
@@ -129,17 +130,18 @@ serve(async (req) => {
     });
   } catch (err) {
     console.error("Webhook error:", err);
-    // Best-effort error log
+    // Best-effort error log with PAYMENT_ERROR
     try {
       const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
       const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
       const sb = createClient(supabaseUrl, supabaseServiceKey);
       await logErrorToDb(sb, {
-        action: "stripe_webhook_unhandled",
-        error_message: String(err),
+        action: "PAYMENT_ERROR",
+        error_message: `Webhook processing failed: ${String(err)}`,
         stack_trace: (err as Error)?.stack,
         ip_address: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null,
         severity: "critical",
+        metadata: { stage: "webhook_processing" },
       });
     } catch { /* ignore logging failure */ }
     return new Response(JSON.stringify({ error: "Webhook processing failed" }), {
@@ -429,6 +431,21 @@ async function handlePaymentFailed(supabase: any, invoice: Stripe.Invoice) {
   console.log(`Reason: ${invoice.last_finalization_error?.message || "Unknown"}`);
   console.log(`Next step: User must retry checkout.`);
   console.log("=== END ADMIN NOTIFICATION ===");
+
+  // Log as PAYMENT_ERROR with Stripe IDs
+  await logErrorToDb(supabase, {
+    action: "PAYMENT_ERROR",
+    error_message: `Payment failed: ${invoice.last_finalization_error?.message || "Unknown reason"}`,
+    user_email: invoice.customer_email || null,
+    stripe_event_id: invoice.id,
+    severity: "error",
+    metadata: {
+      checkout_session_id: null,
+      payment_intent_id: (invoice.payment_intent as string) || null,
+      subscription_id: invoice.subscription as string,
+      stage: "recurring_payment",
+    },
+  });
 
   const { data: subData } = await supabase
     .from("subscriptions")
