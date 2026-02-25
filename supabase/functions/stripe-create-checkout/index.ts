@@ -81,40 +81,77 @@ serve(async (req) => {
     console.log(`Notes: Customer is being sent to Stripe Checkout.`);
     console.log("=== END ADMIN NOTIFICATION ===");
 
-    console.log(`Searching for price with lookup key: ${lookupKey}`);
+    console.log(`Resolving price for lookup key: ${lookupKey}`);
 
-    // Resolve active price by lookup key
-    const prices = await stripe.prices.list({
-      lookup_keys: [lookupKey],
-      active: true,
-      expand: ["data.product"],
-      limit: 1,
-    });
+    let priceId: string | null = null;
+    let product: any = null;
 
-    console.log(`Stripe API response for lookup key ${lookupKey}:`, {
-      found: prices.data.length,
-      priceIds: prices.data.map((p: any) => p.id),
-      productNames: prices.data.map((p: any) => (p.product as any)?.name),
-    });
+    // For EFABINDER, prefer env-based price ID if set
+    const envBinderPrice = lookupKey === "EFABINDER" ? Deno.env.get("STRIPE_PRICE_ID_BINDER") : null;
 
-    if (!prices.data.length) {
-      console.error(`No active price found for lookup key: ${lookupKey}. Check Stripe Dashboard.`);
-      return new Response(JSON.stringify({ 
-        error: `No active price found for lookup key: ${lookupKey}. Please verify the price is active and has the correct lookup key in Stripe Dashboard.`
-      }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+    if (envBinderPrice) {
+      console.log(`Using env STRIPE_PRICE_ID_BINDER: ${envBinderPrice}`);
+      priceId = envBinderPrice;
+      // Optionally fetch product name for logs
+      try {
+        const p = await stripe.prices.retrieve(envBinderPrice, { expand: ["product"] });
+        product = p.product;
+      } catch (e) {
+        console.warn("Could not expand binder price product:", e);
+      }
+    } else {
+      // Resolve active price by lookup key
+      const prices = await stripe.prices.list({
+        lookup_keys: [lookupKey],
+        active: true,
+        expand: ["data.product"],
+        limit: 1,
       });
+
+      console.log(`Stripe lookup_key search result for ${lookupKey}:`, {
+        found: prices.data.length,
+        priceIds: prices.data.map((p: any) => p.id),
+        productNames: prices.data.map((p: any) => (p.product as any)?.name),
+      });
+
+      if (!prices.data.length) {
+        console.error(`No active price found for lookup key: ${lookupKey}. Check Stripe Dashboard.`);
+        return new Response(JSON.stringify({ 
+          error: lookupKey === "EFABINDER"
+            ? "Binder price not configured"
+            : `No active price found for key: ${lookupKey}`
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      priceId = prices.data[0].id;
+      product = prices.data[0].product;
     }
 
-    const priceId = prices.data[0].id;
-    const product = prices.data[0].product as any;
+    console.log(`Creating checkout session for price ${priceId} (${product?.name || "unknown"})`);
 
-    console.log(`Creating checkout session for price ${priceId} (${product?.name})`);
+    // Determine checkout mode: binder is always "payment", others depend on price type
+    const isBinder = lookupKey === "EFABINDER";
+    let checkoutMode: "payment" | "subscription" = "payment";
+    if (!isBinder) {
+      // Fetch price to check type
+      try {
+        const priceObj = await stripe.prices.retrieve(priceId);
+        checkoutMode = priceObj.type === "recurring" ? "subscription" : "payment";
+      } catch {
+        checkoutMode = "payment";
+      }
+    }
 
-    // Determine checkout mode based on price type
-    const priceType = prices.data[0].type;
-    const checkoutMode = priceType === "recurring" ? "subscription" : "payment";
+    // Build metadata
+    const sessionMetadata: Record<string, string> = {
+      user_id: userId || "",
+      lookup_key: lookupKey,
+      source: "efa_site",
+      ...(isBinder ? { product_type: "binder" } : {}),
+    };
 
     // Create Checkout Session with user metadata
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
@@ -124,33 +161,26 @@ serve(async (req) => {
       cancel_url: cancelUrl ?? `${req.headers.get("origin") ?? "https://"}/dashboard`,
       allow_promotion_codes: allowPromotionCodes === true,
       
-    // Collect customer contact info
+      // Collect customer contact info
       customer_creation: checkoutMode === "payment" ? "always" : undefined,
       billing_address_collection: "auto",
       
       // Shipping address for physical products (binder)
-      ...(lookupKey === "EFABINDER" ? {
+      ...(isBinder ? {
         shipping_address_collection: {
-          allowed_countries: ["US"],
+          allowed_countries: ["US"] as any,
         },
       } : {}),
       
-      // Phone collection (optional but requested)
+      // Phone collection
       phone_number_collection: collectPhone ? { enabled: true } : undefined,
       
-      // Put lookupKey in metadata so webhook can map access cleanly
-      metadata: {
-        user_id: userId || "",
-        lookup_key: lookupKey,
-      },
+      metadata: sessionMetadata,
       
       // Also attach metadata to payment intent for one-time payments
       ...(checkoutMode === "payment" ? {
         payment_intent_data: {
-          metadata: {
-            user_id: userId || "",
-            lookup_key: lookupKey,
-          }
+          metadata: sessionMetadata,
         }
       } : {}),
       
