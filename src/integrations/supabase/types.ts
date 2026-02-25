@@ -16,12 +16,15 @@ export type Database = {
     Tables: {
       activity_events: {
         Row: {
+          city: string | null
+          country: string | null
           created_at: string
           event_type: string
           id: string
           label: string | null
           page_path: string | null
           referrer: string | null
+          region: string | null
           section: string | null
           session_id: string
           user_agent: string | null
@@ -30,12 +33,15 @@ export type Database = {
           visitor_id: string
         }
         Insert: {
+          city?: string | null
+          country?: string | null
           created_at?: string
           event_type: string
           id?: string
           label?: string | null
           page_path?: string | null
           referrer?: string | null
+          region?: string | null
           section?: string | null
           session_id: string
           user_agent?: string | null
@@ -44,12 +50,15 @@ export type Database = {
           visitor_id: string
         }
         Update: {
+          city?: string | null
+          country?: string | null
           created_at?: string
           event_type?: string
           id?: string
           label?: string | null
           page_path?: string | null
           referrer?: string | null
+          region?: string | null
           section?: string | null
           session_id?: string
           user_agent?: string | null
@@ -118,6 +127,8 @@ export type Database = {
       }
       analytics_events: {
         Row: {
+          city: string | null
+          country: string | null
           created_at: string
           duration_ms: number | null
           event_name: string
@@ -127,12 +138,15 @@ export type Database = {
           mode: string | null
           page_path: string | null
           referrer: string | null
+          region: string | null
           session_id: string
           user_email: string | null
           user_id: string | null
           visitor_id: string
         }
         Insert: {
+          city?: string | null
+          country?: string | null
           created_at?: string
           duration_ms?: number | null
           event_name: string
@@ -142,12 +156,15 @@ export type Database = {
           mode?: string | null
           page_path?: string | null
           referrer?: string | null
+          region?: string | null
           session_id: string
           user_email?: string | null
           user_id?: string | null
           visitor_id: string
         }
         Update: {
+          city?: string | null
+          country?: string | null
           created_at?: string
           duration_ms?: number | null
           event_name?: string
@@ -157,6 +174,7 @@ export type Database = {
           mode?: string | null
           page_path?: string | null
           referrer?: string | null
+          region?: string | null
           session_id?: string
           user_email?: string | null
           user_id?: string | null

@@ -5,6 +5,7 @@
  * - Captures duration_ms on page_view by recording enter time and flushing on leave/route-change.
  * - Attaches user_id + user_email when authenticated.
  * - Fire-and-forget inserts into analytics_events.
+ * - SKIPS all tracking for admin/staff/owner roles.
  */
 
 import { supabase } from "@/integrations/supabase/client";
@@ -32,9 +33,12 @@ function getSessionId(): string {
   return id;
 }
 
-// ── Cached auth (avoid repeated getUser calls) ──────────────────────────────
+// ── Cached auth + admin check ───────────────────────────────────────────────
+
+const ADMIN_ROLES = ["admin", "staff", "owner"];
 
 let cachedUser: { id: string; email?: string } | null = null;
+let cachedIsAdmin: boolean | null = null;
 let userFetched = false;
 
 async function getUser() {
@@ -42,19 +46,82 @@ async function getUser() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       cachedUser = user ? { id: user.id, email: user.email ?? undefined } : null;
+      if (user) {
+        cachedIsAdmin = await checkIsAdminRole(user.id);
+      } else {
+        cachedIsAdmin = false;
+      }
     } catch { /* ignore */ }
     userFetched = true;
   }
   return cachedUser;
 }
 
+async function checkIsAdminRole(userId: string): Promise<boolean> {
+  try {
+    // Check all admin-like roles
+    for (const role of ADMIN_ROLES) {
+      const { data } = await supabase.rpc("has_app_role", { _user_id: userId, _role: role });
+      if (data === true) return true;
+    }
+  } catch { /* ignore */ }
+  return false;
+}
+
+function isAdminUser(): boolean {
+  return cachedIsAdmin === true;
+}
+
 // Refresh on auth state change
 supabase.auth.onAuthStateChange((_event, session) => {
-  cachedUser = session?.user
-    ? { id: session.user.id, email: session.user.email ?? undefined }
-    : null;
+  if (session?.user) {
+    cachedUser = { id: session.user.id, email: session.user.email ?? undefined };
+    // Re-check admin status asynchronously
+    checkIsAdminRole(session.user.id).then(result => { cachedIsAdmin = result; });
+  } else {
+    cachedUser = null;
+    cachedIsAdmin = false;
+  }
   userFetched = true;
 });
+
+// ── Geolocation (once per session) ──────────────────────────────────────────
+
+const GEO_KEY = "efa_a_geo";
+
+interface GeoData {
+  country: string | null;
+  region: string | null;
+  city: string | null;
+}
+
+let geoData: GeoData | null = null;
+let geoFetched = false;
+
+async function getGeo(): Promise<GeoData> {
+  if (geoFetched && geoData) return geoData;
+  // Check session cache
+  const cached = sessionStorage.getItem(GEO_KEY);
+  if (cached) {
+    geoData = JSON.parse(cached);
+    geoFetched = true;
+    return geoData!;
+  }
+  try {
+    const res = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(3000) });
+    if (res.ok) {
+      const d = await res.json();
+      geoData = { country: d.country_name || null, region: d.region || null, city: d.city || null };
+    } else {
+      geoData = { country: null, region: null, city: null };
+    }
+  } catch {
+    geoData = { country: null, region: null, city: null };
+  }
+  sessionStorage.setItem(GEO_KEY, JSON.stringify(geoData));
+  geoFetched = true;
+  return geoData;
+}
 
 // ── Core send ───────────────────────────────────────────────────────────────
 
@@ -75,6 +142,12 @@ export function sendAnalyticsEvent(payload: AnalyticsPayload): void {
   (async () => {
     try {
       const user = await getUser();
+
+      // Skip tracking for admin/staff/owner users
+      if (user && isAdminUser()) return;
+
+      const geo = await getGeo();
+
       await supabase.from("analytics_events" as any).insert({
         event_name: payload.event_name,
         page_path: pagePath,
@@ -87,6 +160,9 @@ export function sendAnalyticsEvent(payload: AnalyticsPayload): void {
         user_email: user?.email ?? null,
         duration_ms: payload.duration_ms ?? null,
         metadata: payload.metadata ?? null,
+        country: geo.country,
+        region: geo.region,
+        city: geo.city,
       });
     } catch {
       // fire-and-forget
