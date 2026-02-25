@@ -160,6 +160,12 @@ export async function launchCheckout({
       throw new Error(error.message || 'Unable to start checkout');
     }
 
+    // Edge function returned JSON with an error field (e.g. price not found)
+    if (data?.error) {
+      console.error('[Checkout] Server returned error:', data.error);
+      throw new Error(data.error);
+    }
+
     if (!data?.url) {
       console.error('[Checkout] No checkout URL returned:', data);
       throw new Error('No checkout URL returned from server');
@@ -207,7 +213,16 @@ export async function launchCheckout({
         duration: 15000,
       });
     } else {
-      showCheckoutBlockedError(navigate, lastUrl);
+      toast.error("We couldn't start checkout", {
+        description: "Something went wrong. Please try again, or contact us if it continues.",
+        action: {
+          label: "Try Again",
+          onClick: () => {
+            window.location.reload();
+          },
+        },
+        duration: 15000,
+      });
     }
 
     onLoadingChange?.(false);
