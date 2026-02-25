@@ -205,6 +205,26 @@ serve(async (req) => {
 
     console.log(`Checkout session created: ${session.id}, URL: ${session.url}`);
 
+    // Record checkout attempt for billing analytics
+    try {
+      const sbUrl = Deno.env.get("SUPABASE_URL")!;
+      const sbServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const sbAdmin = createClient(sbUrl, sbServiceKey);
+      await sbAdmin.from("checkout_attempts").insert({
+        user_id: userId || null,
+        user_email: userEmail || null,
+        product_sku: lookupKey,
+        amount: null, // will be filled by webhook
+        currency: "usd",
+        stripe_session_id: session.id,
+        status: "created",
+        last_event_type: "checkout.session.created",
+        page_url: req.headers.get("referer") || null,
+      });
+    } catch (e) {
+      console.error("Failed to record checkout attempt:", e);
+    }
+
     return new Response(JSON.stringify({ url: session.url }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -512,6 +512,60 @@ export type Database = {
           },
         ]
       }
+      checkout_attempts: {
+        Row: {
+          amount: number | null
+          anonymous_session_id: string | null
+          created_at: string
+          currency: string | null
+          id: string
+          last_event_type: string | null
+          metadata: Json | null
+          page_url: string | null
+          product_sku: string
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          updated_at: string
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          anonymous_session_id?: string | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          last_event_type?: string | null
+          metadata?: Json | null
+          page_url?: string | null
+          product_sku: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          anonymous_session_id?: string | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          last_event_type?: string | null
+          metadata?: Json | null
+          page_url?: string | null
+          product_sku?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       claire_sessions: {
         Row: {
           duration_seconds: number | null
@@ -3077,6 +3131,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_activity: {
+        Row: {
+          anonymous_session_id: string | null
+          created_at: string
+          event_name: string
+          id: string
+          metadata: Json | null
+          page_url: string | null
+          section: string | null
+          user_id: string | null
+        }
+        Insert: {
+          anonymous_session_id?: string | null
+          created_at?: string
+          event_name: string
+          id?: string
+          metadata?: Json | null
+          page_url?: string | null
+          section?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          anonymous_session_id?: string | null
+          created_at?: string
+          event_name?: string
+          id?: string
+          metadata?: Json | null
+          page_url?: string | null
+          section?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       user_admin_meta: {
         Row: {
