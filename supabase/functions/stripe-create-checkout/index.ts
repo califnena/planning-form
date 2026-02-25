@@ -59,6 +59,7 @@ serve(async (req) => {
       allowPromotionCodes = true,
       trialDays,
       collectPhone = true,
+      idempotencyKey,
     } = await req.json();
 
     console.log("Stripe checkout request:", { lookupKey, mode, successUrl, cancelUrl });
@@ -193,7 +194,14 @@ serve(async (req) => {
         : {}),
     };
     
-    const session = await stripe.checkout.sessions.create(sessionParams);
+    // Pass idempotency key to Stripe to prevent duplicate charges on retries
+    const stripeOptions: Stripe.RequestOptions = {};
+    if (idempotencyKey && typeof idempotencyKey === "string") {
+      stripeOptions.idempotencyKey = idempotencyKey;
+      console.log(`Using idempotency key: ${idempotencyKey}`);
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams, stripeOptions);
 
     console.log(`Checkout session created: ${session.id}, URL: ${session.url}`);
 

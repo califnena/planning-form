@@ -5,14 +5,17 @@
  * Ensures consistent behavior:
  * - If not logged in → save pending checkout → redirect to login
  * - If logged in → invoke checkout → redirect to Stripe URL
+ * - Automatic retry (up to 2x) for transient errors with 1s/3s backoff
+ * - Idempotency key prevents double-charging on retry
  * - If URL missing → show error with fallback options
- * - 8-second timeout for hung requests
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import { setPendingCheckout, getProductName } from "./pendingCheckout";
 import { toast } from "sonner";
 import { logPaymentError } from "./errorLogger";
+import { retryWithBackoff, isTransientError } from "./retryWithBackoff";
+import { generateIdempotencyKey } from "./idempotencyKey";
 
 export type CheckoutParams = {
   lookupKey: string;
@@ -20,6 +23,8 @@ export type CheckoutParams = {
   cancelUrl: string;
   navigate: (path: string) => void;
   onLoadingChange?: (loading: boolean) => void;
+  /** Called with a status message during retries */
+  onStatusChange?: (status: string | null) => void;
   /** Timeout in ms before showing error (default: 8000) */
   timeoutMs?: number;
 };
@@ -50,16 +55,13 @@ export function checkStripeScriptAccess(): Promise<boolean> {
     const img = new Image();
     img.onload = () => resolve(true);
     img.onerror = () => resolve(false);
-    // Use a small Stripe asset to check connectivity
     img.src = "https://js.stripe.com/v3/fingerprinted/img/visa-729c05c240c4bdb47b03ac81d9945bfe.svg?" + Date.now();
-    // Timeout after 3 seconds
     setTimeout(() => resolve(false), 3000);
   });
 }
 
 /**
  * Safely open Stripe checkout URL
- * Returns true if successful, false if blocked
  */
 function openStripeCheckoutSafely(checkoutUrl: string): boolean {
   if (!checkoutUrl || !checkoutUrl.includes("stripe.com")) {
@@ -67,16 +69,13 @@ function openStripeCheckoutSafely(checkoutUrl: string): boolean {
     return false;
   }
 
-  // Store for recovery
   localStorage.setItem("efa_last_checkout_url", checkoutUrl);
   localStorage.setItem("efa_checkout_return_url", window.location.pathname);
 
   console.log("[Checkout] Opening Stripe URL:", checkoutUrl);
 
-  // Try opening in a new tab first (reduces preview/CSP issues)
   const newTab = window.open(checkoutUrl, "_blank", "noopener,noreferrer");
 
-  // If popups blocked, fall back to same-tab redirect
   if (!newTab) {
     console.log("[Checkout] Popup blocked, falling back to redirect");
     try {
@@ -104,7 +103,7 @@ function createTimeout(ms: number): Promise<never> {
 
 /**
  * Launch Stripe Checkout with proper handling for logged-out users,
- * error fallbacks, and 8-second timeout.
+ * retry with backoff, idempotency keys, and friendly UX.
  */
 export async function launchCheckout({
   lookupKey,
@@ -112,9 +111,11 @@ export async function launchCheckout({
   cancelUrl,
   navigate,
   onLoadingChange,
+  onStatusChange,
   timeoutMs = 8000,
 }: CheckoutParams): Promise<CheckoutResult> {
   onLoadingChange?.(true);
+  onStatusChange?.(null);
   console.log("[Checkout] Starting checkout for:", lookupKey);
 
   try {
@@ -122,78 +123,94 @@ export async function launchCheckout({
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      // Save pending checkout and redirect to login
-      setPendingCheckout({
-        lookupKey,
-        successUrl,
-        cancelUrl,
-      });
-      
+      setPendingCheckout({ lookupKey, successUrl, cancelUrl });
       toast.info("Sign in to continue", {
         description: `You'll be redirected to purchase ${getProductName(lookupKey)} after signing in.`,
       });
-      
       navigate('/login');
       onLoadingChange?.(false);
+      onStatusChange?.(null);
       return { success: true, redirected: false };
     }
 
     console.log("[Checkout] User authenticated, invoking checkout function");
 
-    // Race between checkout request and timeout
-    const checkoutPromise = supabase.functions.invoke('stripe-create-checkout', {
-      body: {
-        lookupKey,
-        successUrl,
-        cancelUrl,
-      },
+    // Generate idempotency key to prevent double-charging
+    const idempotencyKey = generateIdempotencyKey({
+      userId: user.id,
+      actionType: "checkout",
+      lookupKey,
     });
 
-    const { data, error } = await Promise.race([
-      checkoutPromise,
-      createTimeout(timeoutMs).catch((e) => {
-        throw e;
-      }),
-    ]) as { data: any; error: any };
+    // Invoke checkout with retry for transient errors
+    const { data, error } = await retryWithBackoff(
+      async () => {
+        const checkoutPromise = supabase.functions.invoke('stripe-create-checkout', {
+          body: {
+            lookupKey,
+            successUrl,
+            cancelUrl,
+            idempotencyKey,
+          },
+        });
 
-    if (error) {
-      console.error('[Checkout] Edge function error:', error);
-      throw new Error(error.message || 'Unable to start checkout');
-    }
+        const result = await Promise.race([
+          checkoutPromise,
+          createTimeout(timeoutMs).catch((e) => { throw e; }),
+        ]) as { data: any; error: any };
 
-    // Edge function returned JSON with an error field (e.g. price not found)
-    if (data?.error) {
-      console.error('[Checkout] Server returned error:', data.error);
-      throw new Error(data.error);
-    }
+        if (result.error) {
+          const err = new Error(result.error.message || 'Unable to start checkout');
+          (err as any).status = result.error.status;
+          throw err;
+        }
 
-    if (!data?.url) {
-      console.error('[Checkout] No checkout URL returned:', data);
-      throw new Error('No checkout URL returned from server');
-    }
+        if (result.data?.error) {
+          const err = new Error(result.data.error);
+          // Mark server-returned errors as non-transient by default
+          (err as any).permanent = true;
+          throw err;
+        }
+
+        if (!result.data?.url) {
+          throw new Error('No checkout URL returned from server');
+        }
+
+        return result;
+      },
+      {
+        maxRetries: 2,
+        delays: [1000, 3000],
+        onRetry: (attempt) => {
+          console.log(`[Checkout] Retrying (attempt ${attempt})...`);
+          onStatusChange?.("Still working… retrying once more.");
+        },
+      }
+    );
+
+    onStatusChange?.(null);
 
     console.log("[Checkout] Got Stripe URL, attempting to open");
 
-    // Try to open Stripe checkout safely
     const opened = openStripeCheckoutSafely(data.url);
-    
+
     if (!opened) {
       console.error("[Checkout] Failed to open checkout URL");
       showCheckoutBlockedError(navigate, data.url);
       onLoadingChange?.(false);
       return { success: false, redirected: false, error: "Payment page blocked", stripeUrl: data.url };
     }
-    
-    // Keep loading for a moment to allow redirect
+
     setTimeout(() => {
       onLoadingChange?.(false);
     }, 2000);
-    
+
     return { success: true, redirected: true, stripeUrl: data.url };
 
   } catch (error: any) {
     console.error('[Checkout] Launch error:', error);
-    
+    onStatusChange?.(null);
+
     const isTimeout = error.message?.includes('timed out');
     const lastUrl = getLastCheckoutUrl();
 
@@ -207,31 +224,28 @@ export async function launchCheckout({
       stack_trace: error.stack,
       severity: isTimeout ? "warning" : "error",
     });
-    
-    if (isTimeout) {
-      console.log("[Checkout] Request timed out after", timeoutMs, "ms");
-      toast.error("We're sorry. Something unexpected happened.", {
-        description: "Our team has been notified and is already reviewing the issue. You may try again in a few minutes.",
-        action: {
-          label: "Try Again",
-          onClick: () => {
-            if (isTimeout && lastUrl) {
-              window.open(lastUrl, '_blank');
-            } else {
-              window.location.reload();
-            }
-          },
+
+    toast.error("We're sorry. Something unexpected happened.", {
+      description: "Our team has been notified and is already reviewing the issue. You may try again in a few minutes.",
+      action: {
+        label: "Try Again",
+        onClick: () => {
+          if (isTimeout && lastUrl) {
+            window.open(lastUrl, '_blank');
+          } else {
+            window.location.reload();
+          }
         },
-        duration: 15000,
-      });
-    }
+      },
+      duration: 15000,
+    });
 
     onLoadingChange?.(false);
-    return { 
-      success: false, 
-      redirected: false, 
-      error: error.message, 
-      timedOut: isTimeout 
+    return {
+      success: false,
+      redirected: false,
+      error: error.message,
+      timedOut: isTimeout,
     };
   }
 }
@@ -283,21 +297,13 @@ export function getCheckoutTroubleshootingMessage(): string {
 
 /**
  * Validate that Stripe key mode matches price mode
- * Returns warning message if mismatch detected
  */
 export function validateStripeModeMatch(publishableKey: string, priceId?: string): string | null {
   const isTestKey = publishableKey?.startsWith('pk_test_');
   const isLiveKey = publishableKey?.startsWith('pk_live_');
-  
+
   if (!isTestKey && !isLiveKey) {
     return "Invalid Stripe publishable key format";
-  }
-
-  // If we have a price ID, check if modes match
-  if (priceId) {
-    const isTestPrice = priceId?.startsWith('price_') && priceId?.includes('test');
-    // This is a heuristic - Stripe doesn't explicitly mark test prices
-    // The best validation is at the server level
   }
 
   return null;
