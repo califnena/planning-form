@@ -116,6 +116,54 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_events: {
+        Row: {
+          created_at: string
+          duration_ms: number | null
+          event_name: string
+          id: string
+          label: string | null
+          metadata: Json | null
+          mode: string | null
+          page_path: string | null
+          referrer: string | null
+          session_id: string
+          user_email: string | null
+          user_id: string | null
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_ms?: number | null
+          event_name: string
+          id?: string
+          label?: string | null
+          metadata?: Json | null
+          mode?: string | null
+          page_path?: string | null
+          referrer?: string | null
+          session_id: string
+          user_email?: string | null
+          user_id?: string | null
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number | null
+          event_name?: string
+          id?: string
+          label?: string | null
+          metadata?: Json | null
+          mode?: string | null
+          page_path?: string | null
+          referrer?: string | null
+          session_id?: string
+          user_email?: string | null
+          user_id?: string | null
+          visitor_id?: string
+        }
+        Relationships: []
+      }
       app_config: {
         Row: {
           description: string | null

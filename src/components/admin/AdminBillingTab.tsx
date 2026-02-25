@@ -23,6 +23,16 @@ interface CheckoutAttempt {
   page_url: string | null;
 }
 
+interface AnalyticsCheckout {
+  id: string;
+  created_at: string;
+  event_name: string;
+  label: string | null;
+  visitor_id: string;
+  user_email: string | null;
+  metadata: Record<string, unknown> | null;
+}
+
 interface BillingStats {
   attempts: number;
   paid: number;
@@ -34,6 +44,7 @@ interface BillingStats {
 export function AdminBillingTab() {
   const [loading, setLoading] = useState(true);
   const [attempts, setAttempts] = useState<CheckoutAttempt[]>([]);
+  const [analyticsCheckouts, setAnalyticsCheckouts] = useState<AnalyticsCheckout[]>([]);
   const [period, setPeriod] = useState<"7" | "30">("7");
 
   useEffect(() => {
@@ -42,13 +53,23 @@ export function AdminBillingTab() {
 
   const loadData = async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from("checkout_attempts" as any)
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(200);
 
-    setAttempts((data as unknown as CheckoutAttempt[]) || []);
+    const [attemptsRes, analyticsRes] = await Promise.all([
+      supabase
+        .from("checkout_attempts" as any)
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(200),
+      supabase
+        .from("analytics_events" as any)
+        .select("id,created_at,event_name,label,visitor_id,user_email,metadata")
+        .in("event_name", ["checkout_clicked", "checkout_success", "checkout_fail"])
+        .order("created_at", { ascending: false })
+        .limit(200),
+    ]);
+
+    setAttempts((attemptsRes.data as unknown as CheckoutAttempt[]) || []);
+    setAnalyticsCheckouts((analyticsRes.data as unknown as AnalyticsCheckout[]) || []);
     setLoading(false);
   };
 
@@ -66,6 +87,16 @@ export function AdminBillingTab() {
       conversionRate: inPeriod.length > 0 ? Math.round((paid / inPeriod.length) * 100) : 0,
     };
   }, [attempts, period]);
+
+  const analyticsStats = useMemo(() => {
+    const cutoff = subDays(new Date(), parseInt(period)).toISOString();
+    const inPeriod = analyticsCheckouts.filter(a => a.created_at >= cutoff);
+    return {
+      clicks: inPeriod.filter(a => a.event_name === "checkout_clicked").length,
+      successes: inPeriod.filter(a => a.event_name === "checkout_success").length,
+      failures: inPeriod.filter(a => a.event_name === "checkout_fail").length,
+    };
+  }, [analyticsCheckouts, period]);
 
   const statusBadge = (status: string) => {
     switch (status) {
@@ -101,43 +132,20 @@ export function AdminBillingTab() {
         </Select>
       </div>
 
-      {/* Stats cards */}
+      {/* Stats cards – Stripe webhook data */}
       <div className="grid gap-4 md:grid-cols-5">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Attempts</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent><div className="text-2xl font-bold">{stats.attempts}</div></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Paid</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent><div className="text-2xl font-bold text-primary">{stats.paid}</div></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Failed</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-destructive" />
-          </CardHeader>
-          <CardContent><div className="text-2xl font-bold text-destructive">{stats.failed}</div></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Expired</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent><div className="text-2xl font-bold">{stats.expired}</div></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Conversion</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent><div className="text-2xl font-bold">{stats.conversionRate}%</div></CardContent>
-        </Card>
+        <StatCard title="Attempts" value={stats.attempts} icon={<CreditCard className="h-4 w-4 text-muted-foreground" />} />
+        <StatCard title="Paid" value={stats.paid} icon={<CheckCircle2 className="h-4 w-4 text-primary" />} />
+        <StatCard title="Failed" value={stats.failed} icon={<AlertTriangle className="h-4 w-4 text-destructive" />} />
+        <StatCard title="Expired" value={stats.expired} icon={<Clock className="h-4 w-4 text-muted-foreground" />} />
+        <StatCard title="Conversion" value={`${stats.conversionRate}%`} icon={<TrendingUp className="h-4 w-4 text-muted-foreground" />} />
+      </div>
+
+      {/* Analytics-sourced checkout funnel */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <StatCard title="Checkout Clicks" value={analyticsStats.clicks} icon={<CreditCard className="h-4 w-4 text-muted-foreground" />} subtitle="From analytics" />
+        <StatCard title="Successes" value={analyticsStats.successes} icon={<CheckCircle2 className="h-4 w-4 text-primary" />} subtitle="From analytics" />
+        <StatCard title="Failures" value={analyticsStats.failures} icon={<AlertTriangle className="h-4 w-4 text-destructive" />} subtitle="From analytics" />
       </div>
 
       {/* Attempts table */}
@@ -147,58 +155,81 @@ export function AdminBillingTab() {
             <CreditCard className="h-5 w-5" />
             Recent Checkout Attempts
           </CardTitle>
-          <CardDescription>Last 50 checkout attempts</CardDescription>
+          <CardDescription>Last 50 checkout attempts (Stripe webhook data)</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Product</TableHead>
-                  <TableHead>User / Session</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Stripe Session</TableHead>
-                  <TableHead>Last Event</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {attempts.slice(0, 50).map((a) => (
-                  <TableRow key={a.id}>
-                    <TableCell className="text-sm whitespace-nowrap">
-                      {format(new Date(a.created_at), "MMM d, HH:mm")}
-                    </TableCell>
-                    <TableCell>{statusBadge(a.status)}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="font-mono text-xs">{a.product_sku}</Badge>
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {a.user_email || (a.anonymous_session_id ? `anon:${a.anonymous_session_id.slice(0, 8)}` : "—")}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {a.amount != null ? `$${(a.amount / 100).toFixed(2)}` : "—"}
-                    </TableCell>
-                    <TableCell className="font-mono text-xs max-w-[140px] truncate">
-                      {a.stripe_session_id ? a.stripe_session_id.slice(0, 20) + "…" : "—"}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      {a.last_event_type || "—"}
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {attempts.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                      No checkout attempts recorded yet.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          <CheckoutTable attempts={attempts.slice(0, 50)} statusBadge={statusBadge} />
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+// ── Sub-components ──────────────────────────────────────────────────────────
+
+function StatCard({ title, value, icon, subtitle }: { title: string; value: number | string; icon: React.ReactNode; subtitle?: string }) {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        {icon}
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+        {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
+      </CardContent>
+    </Card>
+  );
+}
+
+function CheckoutTable({ attempts, statusBadge }: { attempts: CheckoutAttempt[]; statusBadge: (s: string) => React.ReactNode }) {
+  return (
+    <div className="rounded-md border overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Date</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Product</TableHead>
+            <TableHead>User / Session</TableHead>
+            <TableHead>Amount</TableHead>
+            <TableHead>Stripe Session</TableHead>
+            <TableHead>Last Event</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {attempts.map((a) => (
+            <TableRow key={a.id}>
+              <TableCell className="text-sm whitespace-nowrap">
+                {format(new Date(a.created_at), "MMM d, HH:mm")}
+              </TableCell>
+              <TableCell>{statusBadge(a.status)}</TableCell>
+              <TableCell>
+                <Badge variant="outline" className="font-mono text-xs">{a.product_sku}</Badge>
+              </TableCell>
+              <TableCell className="text-sm">
+                {a.user_email || (a.anonymous_session_id ? `anon:${a.anonymous_session_id.slice(0, 8)}` : "—")}
+              </TableCell>
+              <TableCell className="text-sm">
+                {a.amount != null ? `$${(a.amount / 100).toFixed(2)}` : "—"}
+              </TableCell>
+              <TableCell className="font-mono text-xs max-w-[140px] truncate">
+                {a.stripe_session_id ? a.stripe_session_id.slice(0, 20) + "…" : "—"}
+              </TableCell>
+              <TableCell className="text-xs text-muted-foreground">
+                {a.last_event_type || "—"}
+              </TableCell>
+            </TableRow>
+          ))}
+          {attempts.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                No checkout attempts recorded yet.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 }
