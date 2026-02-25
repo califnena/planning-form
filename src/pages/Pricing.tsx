@@ -8,6 +8,7 @@ import { Plus, Minus } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import mascotCouple from "@/assets/mascot-couple.png";
 import { launchCheckout } from "@/lib/checkoutLauncher";
+import { toast } from "sonner";
 import { isStoreIAP } from "@/lib/billingMode";
 import { StoreIAPModal } from "@/components/StoreIAPModal";
 import { supabase } from "@/integrations/supabase/client";
@@ -350,15 +351,44 @@ const Pricing = () => {
     const successUrl = `${window.location.origin}${plan.successPath}`;
     const cancelUrl = window.location.href;
     setLoadingPlan(plan.id);
-    await launchCheckout({
-      lookupKey: plan.lookupKey,
-      successUrl,
-      cancelUrl,
-      navigate,
-      onLoadingChange: (loading) => {
-        if (!loading) setLoadingPlan(null);
-      },
-    });
+
+    // Safety timeout: never spin longer than 15 seconds regardless of what happens
+    const safetyTimeout = setTimeout(() => {
+      setLoadingPlan(null);
+      console.error(`[Pricing] Safety timeout hit for ${plan.lookupKey}`);
+      toast.error("We're having trouble connecting to checkout. Please try again.");
+    }, 15000);
+
+    try {
+      const result = await launchCheckout({
+        lookupKey: plan.lookupKey,
+        successUrl,
+        cancelUrl,
+        navigate,
+        onLoadingChange: (loading) => {
+          if (!loading) {
+            clearTimeout(safetyTimeout);
+            setLoadingPlan(null);
+          }
+        },
+        timeoutMs: 10000,
+      });
+
+      if (!result.success) {
+        clearTimeout(safetyTimeout);
+        setLoadingPlan(null);
+        console.error(`[Pricing] Checkout failed for ${plan.lookupKey}:`, result.error);
+        if (!result.timedOut) {
+          toast.error("We're having trouble connecting to checkout. Please try again.");
+        }
+        // timedOut case already shows its own toast via launchCheckout
+      }
+    } catch (err) {
+      clearTimeout(safetyTimeout);
+      setLoadingPlan(null);
+      console.error(`[Pricing] Unexpected error for ${plan.lookupKey}:`, err);
+      toast.error("We're having trouble connecting to checkout. Please try again.");
+    }
   };
 
   const getDisplayedPrice = (lookupKey: string) => priceLabel(stripePrices[lookupKey]);
