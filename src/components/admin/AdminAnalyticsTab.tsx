@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { UserActivitySection } from "@/components/admin/UserActivitySection";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -554,6 +555,20 @@ export function AdminAnalyticsTab() {
               </TableBody>
             </Table>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* User Activity Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-5 w-5" />
+            User Activity Tracking
+          </CardTitle>
+          <CardDescription>Click tracking: page views, mode selections, downloads, purchases</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <UserActivitySection />
         </CardContent>
       </Card>
     </div>

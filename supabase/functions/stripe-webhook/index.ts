@@ -94,6 +94,9 @@ serve(async (req) => {
 
     console.log(`Processing Stripe event: ${event.type}`);
 
+    // ---- Update checkout_attempts based on Stripe events ----
+    await updateCheckoutAttempt(supabase, event);
+
     // Handle checkout.session.completed - MAIN SUCCESS EVENT
     if (event.type === "checkout.session.completed") {
       await handleCheckoutCompleted(stripe, supabase, event.data.object as Stripe.Checkout.Session);
@@ -150,6 +153,55 @@ serve(async (req) => {
     });
   }
 });
+
+// ---- Checkout attempts tracker ----
+async function updateCheckoutAttempt(supabase: any, event: Stripe.Event) {
+  try {
+    const obj = event.data.object as any;
+    let sessionId: string | null = null;
+    let status: string | null = null;
+    let paymentIntentId: string | null = null;
+    let amount: number | null = null;
+
+    if (event.type === "checkout.session.completed") {
+      sessionId = obj.id;
+      status = "paid";
+      paymentIntentId = obj.payment_intent || null;
+      amount = obj.amount_total || null;
+    } else if (event.type === "checkout.session.expired") {
+      sessionId = obj.id;
+      status = "expired";
+    } else if (event.type === "invoice.payment_failed") {
+      // Try to find the checkout session via subscription
+      status = "failed";
+      paymentIntentId = obj.payment_intent || null;
+    }
+
+    if (sessionId && status) {
+      const updatePayload: Record<string, unknown> = {
+        status,
+        last_event_type: event.type,
+        updated_at: new Date().toISOString(),
+      };
+      if (paymentIntentId) updatePayload.stripe_payment_intent_id = paymentIntentId;
+      if (amount != null) updatePayload.amount = amount;
+      if (obj.customer_details?.email) updatePayload.user_email = obj.customer_details.email;
+
+      const { error } = await supabase
+        .from("checkout_attempts")
+        .update(updatePayload)
+        .eq("stripe_session_id", sessionId);
+
+      if (error) {
+        console.error("[updateCheckoutAttempt] update failed:", error);
+      } else {
+        console.log(`[updateCheckoutAttempt] Updated ${sessionId} → ${status}`);
+      }
+    }
+  } catch (e) {
+    console.error("[updateCheckoutAttempt] error:", e);
+  }
+}
 
 // ---- Error logging helper ----
 type ErrorLogRow = {
