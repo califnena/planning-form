@@ -5,7 +5,7 @@ export const STRIPE_LOOKUP_KEYS = {
   // Subscription Plans
   BASIC: 'EFABASIC',
   PREMIUM: 'EFAPREMIUM',
-  PREMIUM_YEAR: 'EFAPREMIUMYEAR',
+  PREMIUM_YEAR: 'EFAPREMIUM', // Stripe has EFAPREMIUM as the yearly premium price
   VIP_YEAR: 'EFAVIPYEAR',
   VIP_MONTHLY: 'EFAVIPMONTHLY',
   
@@ -22,6 +22,7 @@ export const STRIPE_LOOKUP_KEYS = {
 export const ALL_CANONICAL_LOOKUP_KEYS = [
   'EFABASIC',
   'EFAPREMIUM',
+  // EFAPREMIUMYEAR removed - EFAPREMIUM is the yearly premium price
   'EFABINDER',
   'EFAVIPMONTHLY',
   'EFAVIPYEAR',

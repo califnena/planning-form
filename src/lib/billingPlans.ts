@@ -51,7 +51,8 @@ export const PLAN_DEFINITIONS: Record<string, PlanDefinition> = {
       'Unlimited updates'
     ]
   },
-  EFAPREMIUMYEAR: {
+  // EFAPREMIUM also covers yearly premium (EFAPREMIUMYEAR alias removed)
+  EFAPREMIUMYEAR_LEGACY: {
     planCode: 'premium',
     roles: ['premium', 'printable'],
     name: 'Premium Tool (Annual)',

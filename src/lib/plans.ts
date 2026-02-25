@@ -13,7 +13,7 @@ export const PLANS = {
   },
   PREMIUM_ANNUAL: {
     key: "premium_annual",
-    lookupKey: "EFAPREMIUMYEAR",
+    lookupKey: "EFAPREMIUM",
     name: "Premium (Annual)",
     price: "$29.99 / year",
     description: "Gain full access to your planning toolkit. Generate blank and prefilled forms, save data in all fields, and create downloadable PDF reports. Email your completed plan, record personal audio or video messages, update anytime, and use multilingual fields. Organize your wishes securely and share easily with loved ones or advisors. Unlimited updates and priority support included.",
