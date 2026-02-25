@@ -18,7 +18,7 @@ export const STRIPE_TO_ROLES_MAP: Record<string, string[]> = {
   
   // Premium subscription - grants basic + vip + printable
   'EFAPREMIUM': ['basic', 'vip', 'printable'],
-  'EFAPREMIUMYEAR': ['basic', 'vip', 'printable'],
+  // EFAPREMIUMYEAR removed - EFAPREMIUM covers yearly premium
   
   // VIP subscriptions - grants vip + printable
   'EFAVIPYEAR': ['vip', 'printable'],

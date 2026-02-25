@@ -70,7 +70,7 @@ export default function Subscription() {
 
   const PLAN_LOOKUP: Record<string, { lookupKey: string; mode: "subscription" | "payment" }> = {
     [PLANS.BASIC_ANNUAL.key]: { lookupKey: "EFABASIC", mode: "subscription" },
-    [PLANS.PREMIUM_ANNUAL.key]: { lookupKey: "EFAPREMIUMYEAR", mode: "subscription" },
+    [PLANS.PREMIUM_ANNUAL.key]: { lookupKey: "EFAPREMIUM", mode: "subscription" },
     [PLANS.VIP_ANNUAL.key]: { lookupKey: "EFAVIPYEAR", mode: "subscription" },
     [PLANS.VIP_MONTHLY.key]: { lookupKey: "EFAVIPMONTHLY", mode: "subscription" },
     [PLANS.BINDER.key]: { lookupKey: "EFABINDER", mode: "payment" },

@@ -4,7 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.74.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, stripe-signature",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, stripe-signature, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 /**
@@ -21,7 +21,7 @@ const corsHeaders = {
 const PLAN_DEFINITIONS: Record<string, { planCode: string; roles: string[] }> = {
   'EFABASIC': { planCode: 'basic', roles: ['printable'] },
   'EFAPREMIUM': { planCode: 'premium', roles: ['premium', 'printable'] },
-  'EFAPREMIUMYEAR': { planCode: 'premium', roles: ['premium', 'printable'] },
+  // EFAPREMIUMYEAR removed - EFAPREMIUM covers yearly premium
   'EFAVIPYEAR': { planCode: 'vip_annual', roles: ['vip', 'premium', 'printable'] },
   'EFAVIPMONTHLY': { planCode: 'vip_monthly', roles: ['vip', 'premium', 'printable'] },
   'EFADOFORU': { planCode: 'done_for_you', roles: ['done_for_you', 'vip', 'premium', 'printable'] },

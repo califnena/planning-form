@@ -85,6 +85,7 @@ import {
   AdminCompliance,
   AdminAssistedRequests,
 } from "./pages/admin";
+import AdminPaymentsTest from "./pages/admin/AdminPaymentsTest";
 
 // Import planner layout and pages
 import {
@@ -198,6 +199,7 @@ const App = () => (
                       <Route path="/admin/summary-audit" element={<AdminSummaryAudit />} />
                       <Route path="/admin/compliance" element={<AdminCompliance />} />
                       <Route path="/admin/assisted-requests" element={<AdminAssistedRequests />} />
+                      <Route path="/admin/payments-test" element={<AdminPaymentsTest />} />
                       <Route path="/events" element={<Events />} />
                       <Route path="/billing" element={<Billing />} />
                       <Route path="/care-support" element={<CareSupport />} />
