@@ -73,43 +73,33 @@ export function CheckoutFallback({
   };
 
   return (
-    <Card className="border-amber-300 bg-amber-50/50 dark:bg-amber-950/20 max-w-md mx-auto">
+    <Card className="border-2 border-muted max-w-md mx-auto">
       <CardHeader className="text-center">
-        <div className="mx-auto mb-2">
-          <AlertTriangle className="h-10 w-10 text-amber-600" />
+        <div className="mx-auto mb-2 w-16 h-16 rounded-full bg-muted/30 flex items-center justify-center">
+          <AlertTriangle className="h-8 w-8 text-muted-foreground" />
         </div>
-        <CardTitle className="text-amber-800 dark:text-amber-200">
-          Secure checkout did not load
+        <CardTitle className="text-foreground">
+          We're sorry.
         </CardTitle>
-        <CardDescription className="text-amber-700 dark:text-amber-300">
-          Your browser may have blocked the secure checkout screen. This is usually caused by:
+        <CardDescription className="text-base text-muted-foreground leading-relaxed">
+          Something unexpected happened. Our team has been notified and is already reviewing the issue.
+          You may try again in a few minutes.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <ul className="text-sm text-amber-700 dark:text-amber-300 space-y-1 list-disc list-inside">
-          <li>Ad blockers or privacy extensions</li>
-          <li>Safari's Intelligent Tracking Prevention</li>
-          <li>VPN or network restrictions</li>
-          <li>iCloud Private Relay</li>
-        </ul>
-
         <div className="flex flex-col gap-2 pt-2">
-          <Button onClick={handleReload} className="w-full" variant="default">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Reload Page
+          <Button onClick={handleReload} className="w-full h-14 text-base" variant="default">
+            <RefreshCw className="h-5 w-5 mr-2" />
+            Try again
           </Button>
           
           {lastCheckoutUrl && (
-            <Button onClick={handleOpenCheckout} className="w-full" variant="outline">
-              <ExternalLink className="h-4 w-4 mr-2" />
+            <Button onClick={handleOpenCheckout} className="w-full h-14 text-base" variant="outline">
+              <ExternalLink className="h-5 w-5 mr-2" />
               Open Checkout in New Tab
             </Button>
           )}
         </div>
-
-        <p className="text-xs text-center text-muted-foreground pt-2">
-          Try disabling ad blockers for this site, or open in Chrome if using Safari.
-        </p>
       </CardContent>
     </Card>
   );

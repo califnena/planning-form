@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useLoadingTimeout } from "@/hooks/useLoadingTimeout";
+import { LoadingTimeoutFallback } from "@/components/LoadingTimeoutFallback";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
@@ -80,6 +82,7 @@ export default function PrePlanSummary() {
   const isLocked = !isUnlocked && !subscriptionLoading;
   
   const loading = planLoading || dataLoading;
+  const { timedOut } = useLoadingTimeout(loading, 15000);
 
   // Notes are kept in-memory only (per mandate: do not use localStorage)
 
@@ -378,6 +381,14 @@ export default function PrePlanSummary() {
     }
     return null;
   };
+
+  if (timedOut) {
+    return (
+      <AuthenticatedLayout>
+        <LoadingTimeoutFallback />
+      </AuthenticatedLayout>
+    );
+  }
 
   if (loading) {
     return (
