@@ -12,6 +12,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { setPendingCheckout, getProductName } from "./pendingCheckout";
 import { toast } from "sonner";
+import { logCriticalError } from "./errorLogger";
 
 export type CheckoutParams = {
   lookupKey: string;
@@ -195,6 +196,15 @@ export async function launchCheckout({
     
     const isTimeout = error.message?.includes('timed out');
     const lastUrl = getLastCheckoutUrl();
+
+    // Log to error_logs table
+    logCriticalError({
+      action: "stripe_checkout_launch",
+      error_message: error.message || "Unknown checkout error",
+      stack_trace: error.stack,
+      metadata: { lookupKey, isTimeout },
+      severity: isTimeout ? "warning" : "error",
+    });
     
     if (isTimeout) {
       console.log("[Checkout] Request timed out after", timeoutMs, "ms");
