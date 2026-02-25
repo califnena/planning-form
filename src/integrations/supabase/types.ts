@@ -1443,6 +1443,8 @@ export type Database = {
           ip_address: string | null
           metadata: Json | null
           page_url: string | null
+          resolved_at: string | null
+          resolved_by: string | null
           severity: string
           stack_trace: string | null
           stripe_event_id: string | null
@@ -1457,6 +1459,8 @@ export type Database = {
           ip_address?: string | null
           metadata?: Json | null
           page_url?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
           severity?: string
           stack_trace?: string | null
           stripe_event_id?: string | null
@@ -1471,6 +1475,8 @@ export type Database = {
           ip_address?: string | null
           metadata?: Json | null
           page_url?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
           severity?: string
           stack_trace?: string | null
           stripe_event_id?: string | null
