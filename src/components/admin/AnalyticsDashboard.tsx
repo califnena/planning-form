@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Loader2, Eye, Users, MousePointer, FileDown, ShoppingCart, CheckCircle, XCircle,
-  ArrowLeft, Clock, ChevronRight,
+  ArrowLeft, Clock, ChevronRight, Globe, UserCheck, UserX,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, subDays } from "date-fns";
@@ -27,10 +27,29 @@ interface AnalyticsRow {
   user_email: string | null;
   duration_ms: number | null;
   metadata: Record<string, unknown> | null;
+  country: string | null;
+  region: string | null;
+  city: string | null;
 }
 
 type Range = "7" | "30";
 type AudienceFilter = "all" | "logged_in" | "anonymous";
+
+// ── Admin user IDs cache (to exclude from display) ──────────────────────────
+
+async function fetchAdminUserIds(): Promise<Set<string>> {
+  try {
+    const { data } = await supabase
+      .from("user_roles" as any)
+      .select("user_id, role:role_id(name)")
+      .in("role_id", (
+        await supabase.from("app_roles").select("id").in("name", ["admin", "staff", "owner"])
+      ).data?.map((r: any) => r.id) || []);
+    return new Set((data || []).map((r: any) => r.user_id));
+  } catch {
+    return new Set();
+  }
+}
 
 // ── Main component ──────────────────────────────────────────────────────────
 
@@ -40,9 +59,12 @@ export function AnalyticsDashboard() {
   const [range, setRange] = useState<Range>("7");
   const [audience, setAudience] = useState<AudienceFilter>("all");
   const [selectedVisitor, setSelectedVisitor] = useState<string | null>(null);
+  const [adminIds, setAdminIds] = useState<Set<string>>(new Set());
 
   const loadData = useCallback(async () => {
     setLoading(true);
+    const [ids] = await Promise.all([fetchAdminUserIds()]);
+    setAdminIds(ids);
     const since = subDays(new Date(), parseInt(range)).toISOString();
     const { data } = await supabase
       .from("analytics_events" as any)
@@ -56,19 +78,85 @@ export function AnalyticsDashboard() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  // ── Filtered rows ─────────────────────────────────────────────────────────
+  // ── Filter out admin users from all data ──────────────────────────────────
+
+  const nonAdminRows = useMemo(() => {
+    return rows.filter(r => !r.user_id || !adminIds.has(r.user_id));
+  }, [rows, adminIds]);
 
   const filtered = useMemo(() => {
-    if (audience === "all") return rows;
-    if (audience === "logged_in") return rows.filter(r => r.user_id);
-    return rows.filter(r => !r.user_id);
-  }, [rows, audience]);
+    if (audience === "all") return nonAdminRows;
+    if (audience === "logged_in") return nonAdminRows.filter(r => r.user_id);
+    return nonAdminRows.filter(r => !r.user_id);
+  }, [nonAdminRows, audience]);
 
   // ── KPI stats ─────────────────────────────────────────────────────────────
 
   const count = (name: string) => filtered.filter(r => r.event_name === name).length;
   const totalSessions = useMemo(() => new Set(filtered.map(r => r.session_id)).size, [filtered]);
   const uniqueVisitors = useMemo(() => new Set(filtered.map(r => r.visitor_id)).size, [filtered]);
+  const loggedInVisitors = useMemo(() => new Set(filtered.filter(r => r.user_id).map(r => r.user_id)).size, [filtered]);
+  const anonymousVisitors = useMemo(() => {
+    const loggedInVids = new Set(filtered.filter(r => r.user_id).map(r => r.visitor_id));
+    return new Set(filtered.filter(r => !r.user_id && !loggedInVids.has(r.visitor_id)).map(r => r.visitor_id)).size;
+  }, [filtered]);
+
+  // ── Visitors with location ("Who visited and from where") ─────────────────
+
+  const visitors = useMemo(() => {
+    const map = new Map<string, {
+      email: string | null;
+      firstSeen: string;
+      lastSeen: string;
+      total: number;
+      sessions: Set<string>;
+      country: string | null;
+      region: string | null;
+      city: string | null;
+      totalDuration: number;
+    }>();
+    filtered.forEach(r => {
+      const existing = map.get(r.visitor_id);
+      if (!existing) {
+        map.set(r.visitor_id, {
+          email: r.user_email,
+          firstSeen: r.created_at,
+          lastSeen: r.created_at,
+          total: 1,
+          sessions: new Set([r.session_id]),
+          country: r.country,
+          region: r.region,
+          city: r.city,
+          totalDuration: r.duration_ms || 0,
+        });
+      } else {
+        existing.total++;
+        existing.sessions.add(r.session_id);
+        if (r.user_email) existing.email = r.user_email;
+        if (r.created_at < existing.firstSeen) existing.firstSeen = r.created_at;
+        if (r.created_at > existing.lastSeen) existing.lastSeen = r.created_at;
+        if (r.country && !existing.country) existing.country = r.country;
+        if (r.region && !existing.region) existing.region = r.region;
+        if (r.city && !existing.city) existing.city = r.city;
+        if (r.duration_ms) existing.totalDuration += r.duration_ms;
+      }
+    });
+    return Array.from(map.entries())
+      .map(([vid, v]) => ({
+        visitorId: vid,
+        email: v.email,
+        firstSeen: v.firstSeen,
+        lastSeen: v.lastSeen,
+        total: v.total,
+        sessionCount: v.sessions.size,
+        country: v.country,
+        region: v.region,
+        city: v.city,
+        totalTime: v.totalDuration,
+      }))
+      .sort((a, b) => new Date(b.lastSeen).getTime() - new Date(a.lastSeen).getTime())
+      .slice(0, 50);
+  }, [filtered]);
 
   // ── Top pages ─────────────────────────────────────────────────────────────
 
@@ -99,26 +187,6 @@ export function AnalyticsDashboard() {
     return Array.from(map.entries()).sort((a, b) => b[1] - a[1]).slice(0, 20);
   }, [filtered]);
 
-  // ── Visitors list ─────────────────────────────────────────────────────────
-
-  const visitors = useMemo(() => {
-    const map = new Map<string, { email: string | null; lastSeen: string; total: number }>();
-    filtered.forEach(r => {
-      const existing = map.get(r.visitor_id);
-      if (!existing) {
-        map.set(r.visitor_id, { email: r.user_email, lastSeen: r.created_at, total: 1 });
-      } else {
-        existing.total++;
-        if (r.user_email) existing.email = r.user_email;
-        if (r.created_at > existing.lastSeen) existing.lastSeen = r.created_at;
-      }
-    });
-    return Array.from(map.entries())
-      .map(([vid, v]) => ({ visitorId: vid, ...v }))
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 50);
-  }, [filtered]);
-
   // ── Visitor timeline ──────────────────────────────────────────────────────
 
   const visitorTimeline = useMemo(() => {
@@ -141,6 +209,18 @@ export function AnalyticsDashboard() {
     return <MousePointer className="h-3.5 w-3.5" />;
   };
 
+  const formatDuration = (ms: number) => {
+    const s = Math.round(ms / 1000);
+    if (s < 60) return `${s}s`;
+    const m = Math.floor(s / 60);
+    return `${m}m ${s % 60}s`;
+  };
+
+  const formatLocation = (country: string | null, region: string | null, city: string | null) => {
+    const parts = [city, region, country].filter(Boolean);
+    return parts.length > 0 ? parts.join(", ") : "—";
+  };
+
   if (loading) {
     return <Card><CardContent className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></CardContent></Card>;
   }
@@ -160,7 +240,10 @@ export function AnalyticsDashboard() {
               <CardTitle className="text-base">
                 {info?.email || `Visitor ${selectedVisitor.slice(0, 8)}…`}
               </CardTitle>
-              <CardDescription>Last 50 events · {info?.total ?? 0} total interactions</CardDescription>
+              <CardDescription>
+                {formatLocation(info?.country ?? null, info?.region ?? null, info?.city ?? null)}
+                {" · "}{info?.sessionCount ?? 0} sessions · {info?.total ?? 0} events
+              </CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -221,16 +304,69 @@ export function AnalyticsDashboard() {
         </Select>
       </div>
 
+      {/* Visitor summary cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <KpiCard title="Total Sessions" value={totalSessions} icon={<Eye className="h-4 w-4 text-muted-foreground" />} />
+        <KpiCard title="Unique Visitors" value={uniqueVisitors} icon={<Users className="h-4 w-4 text-muted-foreground" />} />
+        <KpiCard title="Logged-in Visitors" value={loggedInVisitors} icon={<UserCheck className="h-4 w-4 text-muted-foreground" />} />
+        <KpiCard title="Anonymous Visitors" value={anonymousVisitors} icon={<UserX className="h-4 w-4 text-muted-foreground" />} />
+      </div>
+
       {/* KPI cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
-        <KpiCard title="Sessions" value={totalSessions} icon={<Eye className="h-4 w-4 text-muted-foreground" />} />
-        <KpiCard title="Visitors" value={uniqueVisitors} icon={<Users className="h-4 w-4 text-muted-foreground" />} />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <KpiCard title="Mode Selects" value={count("mode_selected")} icon={<MousePointer className="h-4 w-4 text-muted-foreground" />} />
         <KpiCard title="Downloads" value={count("download_clicked")} icon={<FileDown className="h-4 w-4 text-muted-foreground" />} />
         <KpiCard title="Checkout Clicks" value={count("checkout_clicked")} icon={<ShoppingCart className="h-4 w-4 text-muted-foreground" />} />
         <KpiCard title="FAQ Opens" value={count("faq_opened")} icon={<Eye className="h-4 w-4 text-muted-foreground" />} />
         <KpiCard title="Page Views" value={count("page_view")} icon={<Clock className="h-4 w-4 text-muted-foreground" />} />
       </div>
+
+      {/* Who visited and from where */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2"><Globe className="h-4 w-4" /> Who Visited &amp; From Where</CardTitle>
+          <CardDescription>Click a visitor to see their full timeline. Admin/staff/owner accounts are excluded.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Person</TableHead>
+                  <TableHead>Visitor ID</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>First Seen</TableHead>
+                  <TableHead>Last Seen</TableHead>
+                  <TableHead className="text-right">Sessions</TableHead>
+                  <TableHead className="text-right">Total Time</TableHead>
+                  <TableHead />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {visitors.map(v => (
+                  <TableRow key={v.visitorId} className="cursor-pointer hover:bg-muted/50" onClick={() => setSelectedVisitor(v.visitorId)}>
+                    <TableCell className="text-sm">
+                      {v.email || <span className="text-muted-foreground italic">Anonymous</span>}
+                    </TableCell>
+                    <TableCell className="text-xs font-mono text-muted-foreground">
+                      {v.email ? "—" : v.visitorId.slice(0, 12) + "…"}
+                    </TableCell>
+                    <TableCell className="text-xs whitespace-nowrap">{formatLocation(v.country, v.region, v.city)}</TableCell>
+                    <TableCell className="text-xs whitespace-nowrap">{format(new Date(v.firstSeen), "MMM d, HH:mm")}</TableCell>
+                    <TableCell className="text-xs whitespace-nowrap">{format(new Date(v.lastSeen), "MMM d, HH:mm")}</TableCell>
+                    <TableCell className="text-right"><Badge variant="secondary">{v.sessionCount}</Badge></TableCell>
+                    <TableCell className="text-right text-xs">{v.totalTime > 0 ? formatDuration(v.totalTime) : "—"}</TableCell>
+                    <TableCell><ChevronRight className="h-4 w-4 text-muted-foreground" /></TableCell>
+                  </TableRow>
+                ))}
+                {visitors.length === 0 && (
+                  <TableRow><TableCell colSpan={8} className="text-center py-8 text-muted-foreground">No visitors yet</TableCell></TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Top pages */}
@@ -295,43 +431,6 @@ export function AnalyticsDashboard() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Visitors list */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Visitors</CardTitle>
-          <CardDescription>Click a visitor to see their full timeline</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-md border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Visitor / Email</TableHead>
-                  <TableHead>Last Seen</TableHead>
-                  <TableHead className="text-right">Events</TableHead>
-                  <TableHead />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {visitors.map(v => (
-                  <TableRow key={v.visitorId} className="cursor-pointer hover:bg-muted/50" onClick={() => setSelectedVisitor(v.visitorId)}>
-                    <TableCell className="text-sm">
-                      {v.email || <span className="font-mono text-xs text-muted-foreground">{v.visitorId.slice(0, 12)}…</span>}
-                    </TableCell>
-                    <TableCell className="text-xs whitespace-nowrap">{format(new Date(v.lastSeen), "MMM d, HH:mm")}</TableCell>
-                    <TableCell className="text-right"><Badge variant="secondary">{v.total}</Badge></TableCell>
-                    <TableCell><ChevronRight className="h-4 w-4 text-muted-foreground" /></TableCell>
-                  </TableRow>
-                ))}
-                {visitors.length === 0 && (
-                  <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No visitors yet</TableCell></TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

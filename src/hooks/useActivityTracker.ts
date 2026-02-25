@@ -1,10 +1,7 @@
 /**
  * Lightweight activity tracker that logs events to activity_events.
  * Works for both authenticated and anonymous visitors.
- * 
- * Usage:
- *   - Auto-tracks page_view on route changes (via useRouteTracker in App)
- *   - Call trackEvent() for manual events (clicks, mode selects, downloads, etc.)
+ * SKIPS all tracking for admin/staff/owner roles.
  */
 
 import { useEffect, useRef } from "react";
@@ -15,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const VISITOR_KEY = "efa_visitor_id";
 const SESSION_KEY = "efa_session_id";
+const ADMIN_ROLES = ["admin", "staff", "owner"];
 
 function getVisitorId(): string {
   let id = localStorage.getItem(VISITOR_KEY);
@@ -32,6 +30,25 @@ function getSessionId(): string {
     sessionStorage.setItem(SESSION_KEY, id);
   }
   return id;
+}
+
+// ── Admin check cache ───────────────────────────────────────────────────────
+
+let cachedAdminCheck: { userId: string; isAdmin: boolean } | null = null;
+
+async function isUserAdmin(userId: string): Promise<boolean> {
+  if (cachedAdminCheck && cachedAdminCheck.userId === userId) return cachedAdminCheck.isAdmin;
+  try {
+    for (const role of ADMIN_ROLES) {
+      const { data } = await supabase.rpc("has_app_role", { _user_id: userId, _role: role });
+      if (data === true) {
+        cachedAdminCheck = { userId, isAdmin: true };
+        return true;
+      }
+    }
+  } catch { /* ignore */ }
+  cachedAdminCheck = { userId, isAdmin: false };
+  return false;
 }
 
 // ── Section resolver ────────────────────────────────────────────────────────
@@ -74,6 +91,9 @@ export function trackEvent(opts: TrackEventOpts): void {
   (async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
+
+      // Skip tracking for admin/staff/owner users
+      if (user && await isUserAdmin(user.id)) return;
 
       await supabase.from("activity_events" as any).insert({
         user_id: user?.id ?? null,
