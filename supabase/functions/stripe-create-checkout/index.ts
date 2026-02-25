@@ -124,9 +124,16 @@ serve(async (req) => {
       cancel_url: cancelUrl ?? `${req.headers.get("origin") ?? "https://"}/dashboard`,
       allow_promotion_codes: allowPromotionCodes === true,
       
-      // Collect customer contact info
+    // Collect customer contact info
       customer_creation: checkoutMode === "payment" ? "always" : undefined,
       billing_address_collection: "auto",
+      
+      // Shipping address for physical products (binder)
+      ...(lookupKey === "EFABINDER" ? {
+        shipping_address_collection: {
+          allowed_countries: ["US"],
+        },
+      } : {}),
       
       // Phone collection (optional but requested)
       phone_number_collection: collectPhone ? { enabled: true } : undefined,
