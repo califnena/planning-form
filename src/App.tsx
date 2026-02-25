@@ -11,6 +11,7 @@ import { PreviewModeProvider } from "./contexts/PreviewModeContext";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { BackToTopButton } from "./components/BackToTopButton";
 import { VisitorTracker } from "./components/VisitorTracker";
+import { useRouteTracker } from "./hooks/useActivityTracker";
 import { LockedFeatureModal } from "./components/LockedFeatureModal";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -121,6 +122,11 @@ import {
 
 const queryClient = new QueryClient();
 
+function RouteTrackerMount() {
+  useRouteTracker();
+  return null;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <I18nextProvider i18n={i18n}>
@@ -135,6 +141,7 @@ const App = () => (
                 <BackToTopButton />
                 <VisitorTracker />
                 <LockedFeatureModal />
+                <RouteTrackerMount />
                 <div className="flex flex-col min-h-screen">
                   <div className="flex-1">
                     <Routes>

@@ -6,6 +6,7 @@ import { generatePrePlanningChecklistPDF } from "@/lib/preplanningChecklistPdfGe
 import { generateAfterDeathChecklistPDF } from "@/lib/afterDeathChecklistPdfGenerator";
 import { useToast } from "@/hooks/use-toast";
 import { FileDown } from "lucide-react";
+import { trackEvent } from "@/hooks/useActivityTracker";
 
 export const ResourcesDownloadSection = () => {
   const [generatingId, setGeneratingId] = useState<string | null>(null);
@@ -13,6 +14,7 @@ export const ResourcesDownloadSection = () => {
 
   const handleDownloadPDF = async (documentId: string) => {
     setGeneratingId(documentId);
+    trackEvent({ eventType: "download", label: documentId });
     try {
       switch (documentId) {
         case 'reference-guide':
