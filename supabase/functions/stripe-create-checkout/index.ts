@@ -203,6 +203,20 @@ serve(async (req) => {
     });
   } catch (err) {
     console.error("Stripe checkout error:", err);
+    // Best-effort error log
+    try {
+      const sbUrl = Deno.env.get("SUPABASE_URL")!;
+      const sbKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const sb = createClient(sbUrl, sbKey);
+      await sb.from("error_logs").insert({
+        action: "stripe_create_checkout",
+        error_message: String(err),
+        stack_trace: (err as Error)?.stack || null,
+        user_id: null,
+        ip_address: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null,
+        severity: "error",
+      });
+    } catch { /* ignore logging failure */ }
     return new Response(JSON.stringify({ error: "Checkout error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

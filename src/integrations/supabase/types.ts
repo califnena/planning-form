@@ -1434,6 +1434,51 @@ export type Database = {
         }
         Relationships: []
       }
+      error_logs: {
+        Row: {
+          action: string
+          created_at: string
+          error_message: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          page_url: string | null
+          severity: string
+          stack_trace: string | null
+          stripe_event_id: string | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          error_message: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          page_url?: string | null
+          severity?: string
+          stack_trace?: string | null
+          stripe_event_id?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          error_message?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          page_url?: string | null
+          severity?: string
+          stack_trace?: string | null
+          stripe_event_id?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       faqs: {
         Row: {
           answer: string

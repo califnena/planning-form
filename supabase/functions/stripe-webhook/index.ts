@@ -79,6 +79,12 @@ serve(async (req) => {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
     } catch (err) {
       console.error("Webhook signature verification failed:", err);
+      await logErrorToDb(supabase, {
+        action: "stripe_webhook_signature",
+        error_message: String(err),
+        ip_address: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("cf-connecting-ip") || null,
+        severity: "critical",
+      });
       return new Response(JSON.stringify({ error: "Invalid signature" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -123,6 +129,19 @@ serve(async (req) => {
     });
   } catch (err) {
     console.error("Webhook error:", err);
+    // Best-effort error log
+    try {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const sb = createClient(supabaseUrl, supabaseServiceKey);
+      await logErrorToDb(sb, {
+        action: "stripe_webhook_unhandled",
+        error_message: String(err),
+        stack_trace: (err as Error)?.stack,
+        ip_address: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null,
+        severity: "critical",
+      });
+    } catch { /* ignore logging failure */ }
     return new Response(JSON.stringify({ error: "Webhook processing failed" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -130,6 +149,38 @@ serve(async (req) => {
   }
 });
 
+// ---- Error logging helper ----
+type ErrorLogRow = {
+  action: string;
+  error_message: string;
+  stack_trace?: string | null;
+  user_id?: string | null;
+  user_email?: string | null;
+  ip_address?: string | null;
+  stripe_event_id?: string | null;
+  severity?: string;
+  metadata?: Record<string, unknown> | null;
+};
+
+async function logErrorToDb(supabase: any, row: ErrorLogRow) {
+  try {
+    await supabase.from("error_logs").insert({
+      action: row.action,
+      error_message: row.error_message,
+      stack_trace: row.stack_trace || null,
+      user_id: row.user_id || null,
+      user_email: row.user_email || null,
+      ip_address: row.ip_address || null,
+      stripe_event_id: row.stripe_event_id || null,
+      severity: row.severity || "error",
+      metadata: row.metadata || null,
+    });
+  } catch (e) {
+    console.error("[logErrorToDb] failed:", e);
+  }
+}
+
+// ---- Stripe event handlers ----
 async function handleCheckoutCompleted(stripe: Stripe, supabase: any, session: Stripe.Checkout.Session) {
   console.log("Checkout session completed:", session.id);
 
