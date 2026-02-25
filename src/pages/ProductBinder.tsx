@@ -12,13 +12,19 @@ export default function ProductBinder() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePurchaseBinder = async () => {
-    await launchCheckout({
+    const result = await launchCheckout({
       lookupKey: 'EFABINDER',
       successUrl: `${window.location.origin}/purchase-success?product=binder`,
       cancelUrl: window.location.href,
       navigate,
       onLoadingChange: setIsLoading,
+      timeoutMs: 10000,
     });
+
+    // Ensure spinner stops if checkout didn't redirect
+    if (!result.redirected) {
+      setIsLoading(false);
+    }
   };
 
   return (
