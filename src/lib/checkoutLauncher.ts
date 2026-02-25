@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { logPaymentError } from "./errorLogger";
 import { retryWithBackoff, isTransientError } from "./retryWithBackoff";
 import { generateIdempotencyKey } from "./idempotencyKey";
+import { trackEvent } from "@/hooks/useActivityTracker";
 
 export type CheckoutParams = {
   lookupKey: string;
@@ -116,7 +117,8 @@ export async function launchCheckout({
 }: CheckoutParams): Promise<CheckoutResult> {
   onLoadingChange?.(true);
   onStatusChange?.(null);
-  console.log("[Checkout] Starting checkout for:", lookupKey);
+    console.log("[Checkout] Starting checkout for:", lookupKey);
+    trackEvent({ eventType: "checkout_start", label: lookupKey });
 
   try {
     // Check if user is logged in
@@ -205,10 +207,12 @@ export async function launchCheckout({
       onLoadingChange?.(false);
     }, 2000);
 
+    trackEvent({ eventType: "checkout_success", label: lookupKey, value: { stripeUrl: data.url } });
     return { success: true, redirected: true, stripeUrl: data.url };
 
   } catch (error: any) {
     console.error('[Checkout] Launch error:', error);
+    trackEvent({ eventType: "checkout_fail", label: lookupKey, value: { error: error.message } });
     onStatusChange?.(null);
 
     const isTimeout = error.message?.includes('timed out');

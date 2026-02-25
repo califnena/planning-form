@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Mail, Calendar, Crown, Shield, MessageSquare, Ban, CheckCircle, AlertTriangle, Trash2 } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Loader2, Mail, Calendar, Crown, Shield, MessageSquare, Ban, CheckCircle, AlertTriangle, Trash2, Activity } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { 
@@ -21,6 +22,15 @@ import {
   unblockUser,
   removeUserFromOrg
 } from "@/lib/adminApi";
+import { supabase } from "@/integrations/supabase/client";
+
+interface UserActivityRow {
+  id: string;
+  created_at: string;
+  event_type: string;
+  page_path: string | null;
+  label: string | null;
+}
 
 interface UserDetailDrawerProps {
   user: AdminUser | null;
@@ -38,6 +48,7 @@ export function UserDetailDrawer({ user, orgId, open, onOpenChange, onUserUpdate
   const [adminMeta, setAdminMeta] = useState<UserAdminMeta | null>(null);
   const [notes, setNotes] = useState("");
   const [tags, setTags] = useState("");
+  const [userActivity, setUserActivity] = useState<UserActivityRow[]>([]);
 
   useEffect(() => {
     if (user && open) {
@@ -49,10 +60,21 @@ export function UserDetailDrawer({ user, orgId, open, onOpenChange, onUserUpdate
     if (!user) return;
     setLoading(true);
     try {
-      const meta = await getUserAdminMeta(user.userId);
+      const [meta] = await Promise.all([
+        getUserAdminMeta(user.userId),
+      ]);
       setAdminMeta(meta);
       setNotes(meta?.notes || "");
       setTags(meta?.tags?.join(", ") || "");
+
+      // Load activity events for this user
+      const { data: actData } = await supabase
+        .from("activity_events" as any)
+        .select("id,created_at,event_type,page_path,label")
+        .eq("user_id", user.userId)
+        .order("created_at", { ascending: false })
+        .limit(30);
+      setUserActivity((actData as unknown as UserActivityRow[]) || []);
     } catch (error: any) {
       toast({
         title: t("admin.error"),
@@ -371,6 +393,48 @@ export function UserDetailDrawer({ user, orgId, open, onOpenChange, onUserUpdate
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Recent Activity */}
+            {userActivity.length > 0 && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Activity className="h-4 w-4" />
+                    Recent Activity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="rounded-md border overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Time</TableHead>
+                          <TableHead>Event</TableHead>
+                          <TableHead>Page</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {userActivity.slice(0, 20).map((e) => (
+                          <TableRow key={e.id}>
+                            <TableCell className="text-xs whitespace-nowrap">
+                              {format(new Date(e.created_at), "MMM d, HH:mm")}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="font-mono text-xs">
+                                {e.event_type}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-xs font-mono max-w-[120px] truncate">
+                              {e.page_path || "—"}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         )}
       </SheetContent>

@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          label: string | null
+          page_path: string | null
+          referrer: string | null
+          section: string | null
+          session_id: string
+          user_agent: string | null
+          user_id: string | null
+          value: Json | null
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          label?: string | null
+          page_path?: string | null
+          referrer?: string | null
+          section?: string | null
+          session_id: string
+          user_agent?: string | null
+          user_id?: string | null
+          value?: Json | null
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          label?: string | null
+          page_path?: string | null
+          referrer?: string | null
+          section?: string | null
+          session_id?: string
+          user_agent?: string | null
+          user_id?: string | null
+          value?: Json | null
+          visitor_id?: string
+        }
+        Relationships: []
+      }
       admin_access_logs: {
         Row: {
           accessed_at: string | null

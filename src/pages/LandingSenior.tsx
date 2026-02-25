@@ -7,6 +7,7 @@ import { CheckCircle, Shield, Clock, FileText, Heart, ShoppingBag, BookOpen, Che
 import { AppFooter } from "@/components/AppFooter";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { trackEvent } from "@/hooks/useActivityTracker";
 import mascotHeroCouple from "@/assets/mascot-hero-couple.png";
 import mascotFamiliesChoose from "@/assets/mascot-families-choose.png";
 import efaHeaderLogo from "@/assets/efa-header-logo.png";
@@ -179,13 +180,13 @@ const LandingSenior = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button 
                 size="lg" 
-                onClick={handlePrimaryCTA} 
+                onClick={() => { trackEvent({ eventType: "mode_select", label: "plan_ahead" }); handlePrimaryCTA(); }} 
                 className="min-h-[56px] text-lg px-10 rounded-xl shadow-md hover:shadow-lg transition-shadow"
               >
                Plan Ahead Online
               </Button>
               
-              <Link to="/after-death">
+              <Link to="/after-death" onClick={() => trackEvent({ eventType: "mode_select", label: "after_death" })}>
                 <Button 
                   size="lg" 
                   className="min-h-[56px] text-lg px-10 rounded-xl bg-[hsl(var(--senior-text))] hover:bg-[hsl(var(--senior-text))]/90 text-white"
