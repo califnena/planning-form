@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PlannerModeModal } from "@/components/planner/PlannerModeModal";
+import { useLoadingTimeout } from "@/hooks/useLoadingTimeout";
+import { LoadingTimeoutFallback } from "@/components/LoadingTimeoutFallback";
 
 /**
  * Single entry point for the planner.
@@ -17,6 +19,7 @@ export default function PlannerStart() {
   const [isLoading, setIsLoading] = useState(true);
   const [showModeModal, setShowModeModal] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const { timedOut } = useLoadingTimeout(isLoading, 15000);
 
   useEffect(() => {
     const initializePlanner = async () => {
@@ -144,6 +147,14 @@ export default function PlannerStart() {
           }}
           onContinue={handleModeSelected}
         />
+      </div>
+    );
+  }
+
+  if (timedOut) {
+    return (
+      <div className="min-h-screen bg-background">
+        <LoadingTimeoutFallback />
       </div>
     );
   }
