@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { trackFaqOpened } from '@/lib/analyticsTracker';
 import { Button } from '@/components/ui/button';
 import { TextSizeToggle } from '@/components/TextSizeToggle';
 import { ArrowLeft, Download, ExternalLink, FileText, Search, X } from 'lucide-react';
@@ -2061,7 +2062,7 @@ const FAQ = () => {
                 The most important things to know before you start.
               </p>
               
-              <Accordion type="single" collapsible className="w-full">
+              <Accordion type="single" collapsible className="w-full" onValueChange={(v) => v && trackFaqOpened(v)}>
                 {filteredRequiredQuestions.map((qa, qIndex) => (
                   <AccordionItem 
                     key={qIndex} 
@@ -2108,7 +2109,7 @@ const FAQ = () => {
                     {section.title}
                   </h2>
                   
-                  <Accordion type="single" collapsible className="w-full">
+                  <Accordion type="single" collapsible className="w-full" onValueChange={(v) => v && trackFaqOpened(v)}>
                     {section.questions.map((qa, qIndex) => (
                       <AccordionItem 
                         key={qIndex} 

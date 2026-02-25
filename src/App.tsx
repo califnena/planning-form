@@ -12,6 +12,7 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { BackToTopButton } from "./components/BackToTopButton";
 import { VisitorTracker } from "./components/VisitorTracker";
 import { useRouteTracker } from "./hooks/useActivityTracker";
+import { useAnalyticsPageTracker } from "./hooks/useAnalyticsPageTracker";
 import { LockedFeatureModal } from "./components/LockedFeatureModal";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -124,6 +125,7 @@ const queryClient = new QueryClient();
 
 function RouteTrackerMount() {
   useRouteTracker();
+  useAnalyticsPageTracker();
   return null;
 }
 

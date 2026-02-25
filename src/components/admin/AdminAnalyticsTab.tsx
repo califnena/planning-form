@@ -1,25 +1,23 @@
-import { ActivityAnalytics } from "@/components/admin/ActivityAnalytics";
-import { UserActivitySection } from "@/components/admin/UserActivitySection";
-import { useTranslation } from "react-i18next";
+import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
+import { AdminBillingTab } from "@/components/admin/AdminBillingTab";
 import { Separator } from "@/components/ui/separator";
+import { ActivityAnalytics } from "@/components/admin/ActivityAnalytics";
 
 export function AdminAnalyticsTab() {
-  const { t } = useTranslation();
-
   return (
     <div className="space-y-8">
-      {/* Primary: real-time activity analytics */}
-      <ActivityAnalytics />
+      {/* Primary: first-party analytics */}
+      <AnalyticsDashboard />
 
       <Separator />
 
-      {/* Legacy user_activity section (kept for backwards compatibility) */}
+      {/* Legacy activity_events tracker (kept for backwards compat) */}
       <details className="group">
         <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground">
-          Legacy User Activity (old tracker)
+          Legacy Activity Events (old tracker)
         </summary>
         <div className="mt-4">
-          <UserActivitySection />
+          <ActivityAnalytics />
         </div>
       </details>
     </div>
