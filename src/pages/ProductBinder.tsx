@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +30,7 @@ export default function ProductBinder() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+      <SEOHead title="Fireproof Binder | Everlasting Funeral Advisors" description="Keep your funeral plans safe with our premium fireproof document binder. Protect important documents for your family." canonicalUrl="https://planner.everlastingfuneraladvisors.com/products/binder" />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Navigation */}
         <div className="flex justify-between items-start mb-8">

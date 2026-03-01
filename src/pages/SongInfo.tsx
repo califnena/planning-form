@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
@@ -143,6 +144,7 @@ export default function SongInfo() {
 
   return (
     <AuthenticatedLayout>
+      <SEOHead title="Song Details | Everlasting Funeral Advisors" description="Provide details for your custom memorial song. Share memories and preferences to create a meaningful tribute." canonicalUrl="https://planner.everlastingfuneraladvisors.com/song-info" />
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         <Card>
           <CardHeader>

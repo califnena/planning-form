@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -45,6 +46,7 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+      <SEOHead title="Reset Password | Everlasting Funeral Advisors" description="Reset your Everlasting Funeral Advisors account password securely." canonicalUrl="https://planner.everlastingfuneraladvisors.com/reset-password" />
       <div className="absolute top-4 left-4">
         <BackToHomeButton />
       </div>

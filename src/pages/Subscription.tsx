@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -204,6 +205,7 @@ export default function Subscription() {
 
   return (
     <div className="container mx-auto py-10">
+      <SEOHead title="Manage Subscription | Everlasting Funeral Advisors" description="View and manage your planning subscription. Upgrade, downgrade, or cancel your plan." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplansteps/profile/subscription" />
       <Button 
         variant="ghost" 
         onClick={() => navigate("/preplansteps")}

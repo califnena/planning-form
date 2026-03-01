@@ -1,3 +1,4 @@
+ import SEOHead from "@/components/SEOHead";
  import { useState } from "react";
  import { Button } from "@/components/ui/button";
  import { Card, CardContent } from "@/components/ui/card";
@@ -12,6 +13,7 @@ const AboutUs = () => {
  
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
+      <SEOHead title="About Us | Everlasting Funeral Advisors" description="Learn about Everlasting Funeral Advisors — our mission to help families plan ahead with compassion, clarity, and confidence." canonicalUrl="https://planner.everlastingfuneraladvisors.com/about-us" />
       <GlobalHeader />
 
       <main className="container mx-auto px-4 py-12 max-w-5xl">

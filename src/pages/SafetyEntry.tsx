@@ -1,4 +1,5 @@
 // Emotional flow pages: do not add pricing, progress bars, or extra choices here. Keep calm and simple.
+import SEOHead from "@/components/SEOHead";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ export default function SafetyEntry() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <SEOHead title="Welcome | Everlasting Funeral Advisors" description="A calm, safe entry point to begin your planning journey at your own pace." canonicalUrl="https://planner.everlastingfuneraladvisors.com/safety-entry" />
       <div className="max-w-xl w-full text-center space-y-8">
         <h1 className="text-3xl md:text-4xl font-semibold text-foreground leading-tight">
           Let's take this one step at a time.

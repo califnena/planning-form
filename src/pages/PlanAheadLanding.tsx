@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -289,6 +290,7 @@ export default function PlanAheadLanding() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+      <SEOHead title="Plan Ahead — Free Funeral Pre-Planning | Everlasting Funeral Advisors" description="Start your free funeral pre-planning today. Document your wishes, organize important information, and give your family peace of mind." canonicalUrl="https://planner.everlastingfuneraladvisors.com/plan-ahead" />
       <PublicHeader />
 
       <main className="container mx-auto px-4 py-8 md:py-12">

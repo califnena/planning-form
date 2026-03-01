@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { FileText, Download, Lock } from "lucide-react";
@@ -135,6 +136,7 @@ export default function SharedView() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead title="Shared Plan View | Everlasting Funeral Advisors" description="View a shared funeral planning summary. Access the information your loved one has chosen to share." />
       {/* Header */}
       <header className="border-b bg-white">
         <div className="container mx-auto px-4 py-4">

@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Users } from 'lucide-react';
@@ -19,6 +20,7 @@ import NotAdviceNote from '@/components/NotAdviceNote';
 const TrustedProviders = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Trusted Funeral Providers | Everlasting Funeral Advisors" description="Browse our directory of trusted funeral homes, cremation services, and end-of-life care providers in your area." canonicalUrl="https://planner.everlastingfuneraladvisors.com/trusted-providers" />
       <div className="max-w-5xl mx-auto px-4 py-8 md:py-10">
         {/* Header Navigation */}
         <div className="flex justify-between items-start mb-6">

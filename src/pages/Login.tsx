@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useEffect, useState } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -183,6 +184,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden flex items-center justify-center px-4 py-8 bg-muted/30">
+      <SEOHead title="Log In | Everlasting Funeral Advisors" description="Sign in to your Everlasting Funeral Advisors account to access your funeral planner, saved documents, and planning tools." canonicalUrl="https://planner.everlastingfuneraladvisors.com/login" />
       <div className="absolute top-4 left-4">
         <BackToHomeButton />
       </div>

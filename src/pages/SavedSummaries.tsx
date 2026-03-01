@@ -1,3 +1,4 @@
+ import SEOHead from "@/components/SEOHead";
  import { useState, useEffect } from "react";
  import { useNavigate } from "react-router-dom";
  import { supabase } from "@/integrations/supabase/client";
@@ -234,6 +235,7 @@ import { Badge } from "@/components/ui/badge";
  
    return (
      <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/30">
+       <SEOHead title="Saved Summaries | Everlasting Funeral Advisors" description="View and manage your saved planning summaries. Download or share completed plans." canonicalUrl="https://planner.everlastingfuneraladvisors.com/saved-summaries" />
        <GlobalHeader />
  
        <main className="flex-1 container max-w-3xl mx-auto px-4 py-8">

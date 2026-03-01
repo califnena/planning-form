@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { AppFooter } from "@/components/AppFooter";
  import { useState } from "react";
@@ -8,6 +9,7 @@ const PrivacyPolicy = () => {
  
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead title="Privacy Policy | Everlasting Funeral Advisors" description="Read our privacy policy to understand how we collect, use, and protect your personal information." canonicalUrl="https://planner.everlastingfuneraladvisors.com/privacy" />
       <GlobalHeader />
       
       <main className="flex-1 px-4 py-8 md:py-12">

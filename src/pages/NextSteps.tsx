@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -60,6 +61,7 @@ export default function NextSteps() {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
+      <SEOHead title="Next Steps After a Death | Everlasting Funeral Advisors" description="Step-by-step guidance for what to do after a loved one passes. Manage notifications, documents, and arrangements." canonicalUrl="https://planner.everlastingfuneraladvisors.com/next-steps" />
       <p className="text-muted-foreground">{t("afterDeathSteps.loadingPlanner")}</p>
     </div>
   );

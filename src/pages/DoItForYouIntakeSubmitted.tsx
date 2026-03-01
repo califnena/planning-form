@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,7 @@ export default function DoItForYouIntakeSubmitted() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead title="Intake Submitted | Everlasting Funeral Advisors" description="Your planning intake form has been submitted. We'll review your information and reach out soon." canonicalUrl="https://planner.everlastingfuneraladvisors.com/do-it-for-you/intake-submitted" />
       <GlobalHeader />
       
       <main className="flex-1 flex items-center justify-center py-16 px-4">

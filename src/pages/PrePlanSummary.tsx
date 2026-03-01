@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { useLoadingTimeout } from "@/hooks/useLoadingTimeout";
 import { LoadingTimeoutFallback } from "@/components/LoadingTimeoutFallback";
@@ -428,6 +429,7 @@ export default function PrePlanSummary() {
 
   return (
     <AuthenticatedLayout>
+      <SEOHead title="My Plan Summary | Everlasting Funeral Advisors" description="Review your complete funeral planning summary. Download, share, or continue editing your plan." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplan-summary" />
       {/* DEV: Plan debug panel */}
       <PlanDebugPanel />
       <div className="container mx-auto px-4 py-6 max-w-lg print:p-0">

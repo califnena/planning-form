@@ -55,6 +55,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import SEOHead from "@/components/SEOHead";
 import { TextSizeToggle } from '@/components/TextSizeToggle';
 import { 
   ExternalLink, FileText, Download, Home, Eye,
@@ -1803,6 +1804,7 @@ const Resources = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEOHead title="Resources & Guides | Everlasting Funeral Advisors" description="Download free funeral planning guides, checklists, and educational resources to help you and your family prepare with confidence." canonicalUrl="https://planner.everlastingfuneraladvisors.com/resources" />
       <GlobalHeader minimal />
       
       {/* Page Header - Clean and focused */}

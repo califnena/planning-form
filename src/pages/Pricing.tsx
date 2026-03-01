@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -406,6 +407,7 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEOHead title="Pricing & Plans | Everlasting Funeral Advisors" description="Compare our affordable funeral planning packages. Start free and upgrade for premium features including printable forms, custom songs, and expert support." canonicalUrl="https://planner.everlastingfuneraladvisors.com/pricing" />
       {/* Soft helper nudge for printable form */}
       {showPrintableNudge && !printableIntent && (
         <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-50 animate-in slide-in-from-bottom-4 fade-in duration-300">

@@ -1,3 +1,4 @@
+ import SEOHead from "@/components/SEOHead";
  import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -66,6 +67,7 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Contact Us | Everlasting Funeral Advisors" description="Get in touch with Everlasting Funeral Advisors. We're here to help with your funeral planning questions and concerns." canonicalUrl="https://planner.everlastingfuneraladvisors.com/contact" />
       <div className="max-w-3xl mx-auto px-4 py-8 md:py-12">
         <div className="flex justify-between items-start mb-8">
           <Link to="/">

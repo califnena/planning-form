@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -153,6 +154,7 @@ export default function PaymentHelp() {
   // Original payment troubleshooting content for web Stripe mode
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead title="Payment Help | Everlasting Funeral Advisors" description="Get help with payments, billing issues, and subscription management." canonicalUrl="https://planner.everlastingfuneraladvisors.com/payment-help" />
       <PublicHeader />
       
       <main className="flex-1 container max-w-3xl py-12 space-y-8">

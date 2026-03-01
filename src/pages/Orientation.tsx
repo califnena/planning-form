@@ -1,4 +1,5 @@
 // Emotional flow pages: do not add pricing, progress bars, or extra choices here. Keep calm and simple.
+import SEOHead from "@/components/SEOHead";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -7,6 +8,7 @@ export default function Orientation() {
 
   return (
     <div className="min-h-screen bg-background px-4 py-12">
+      <SEOHead title="Getting Started | Everlasting Funeral Advisors" description="Learn how the planning tool works and what to expect as you begin organizing your wishes." canonicalUrl="https://planner.everlastingfuneraladvisors.com/orientation" />
       <div className="max-w-2xl mx-auto space-y-10">
         <h1 className="text-3xl md:text-4xl font-semibold text-foreground text-center leading-tight">
           Here's what people usually handle

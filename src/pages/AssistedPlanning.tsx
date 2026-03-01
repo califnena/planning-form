@@ -1,3 +1,4 @@
+ import SEOHead from "@/components/SEOHead";
  import { Link, useNavigate } from "react-router-dom";
  import { PublicHeader } from "@/components/PublicHeader";
  import { AppFooter } from "@/components/AppFooter";
@@ -114,6 +115,7 @@
  
    return (
      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+       <SEOHead title="Assisted Planning | Everlasting Funeral Advisors" description="Request hands-on help with your funeral planning. Our team provides guided support for every step of the process." canonicalUrl="https://planner.everlastingfuneraladvisors.com/assisted-planning" />
        <PublicHeader />
   
        <main className="container mx-auto px-4 py-8 md:py-12">

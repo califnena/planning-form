@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -166,6 +167,7 @@ export default function AfterDeathWizard() {
       canGoNext={true}
       mode="afterdeath"
     >
+      <SEOHead title="After Death Wizard | Everlasting Funeral Advisors" description="Guided steps for managing affairs after a loved one passes. We'll walk you through everything you need to do." canonicalUrl="https://planner.everlastingfuneraladvisors.com/wizard/afterdeath" />
       <StepComponent
         formData={formData}
         onSave={saveFormData}

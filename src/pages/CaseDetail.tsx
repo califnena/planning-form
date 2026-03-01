@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -284,6 +285,7 @@ export default function CaseDetail() {
 
   return (
     <>
+      <SEOHead title="Case Details | Everlasting Funeral Advisors" description="Manage case details, documents, and tasks for your after-death planning case." canonicalUrl="https://planner.everlastingfuneraladvisors.com/next-steps/case" />
       <GlobalHeader />
       <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}

@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,7 @@ export default function AfterDeathLanding() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-50 via-background to-background">
+      <SEOHead title="After a Death — What to Do Next | Everlasting Funeral Advisors" description="Step-by-step guidance for families after a loved one passes. Checklists, notifications, and support to help you through this difficult time." canonicalUrl="https://planner.everlastingfuneraladvisors.com/after-death" />
       <PublicHeader />
 
       <main className="container mx-auto px-4 py-8">

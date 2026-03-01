@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ export default function SongConfirmation() {
 
   return (
     <AuthenticatedLayout>
+      <SEOHead title="Song Order Confirmed | Everlasting Funeral Advisors" description="Your custom memorial song order has been confirmed. We'll be in touch with updates on your personalized tribute." canonicalUrl="https://planner.everlastingfuneraladvisors.com/song-confirmation" />
       <div className="container mx-auto px-4 py-16 max-w-2xl">
         <Card className="text-center">
           <CardHeader>

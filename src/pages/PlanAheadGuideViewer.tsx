@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Maximize2, BookOpen } from "lucide-react";
@@ -11,6 +12,7 @@ export default function PlanAheadGuideViewer() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEOHead title="Plan Ahead Guide | Everlasting Funeral Advisors" description="View our interactive Plan Ahead guide to help you prepare for end-of-life decisions with confidence." canonicalUrl="https://planner.everlastingfuneraladvisors.com/plan-ahead/guide" />
       <PublicHeader />
 
       <main className="flex-1 container mx-auto px-4 py-8">

@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -272,6 +273,7 @@ export default function PrePlanningWizard() {
       canGoNext={true}
       mode="preplanning"
     >
+      <SEOHead title="Pre-Planning Wizard | Everlasting Funeral Advisors" description="Step through your funeral pre-planning with our guided wizard. Complete each section at your own pace." canonicalUrl="https://planner.everlastingfuneraladvisors.com/wizard/preplanning" />
       {/* Autosave indicator */}
       <div className="flex justify-end mb-4">
         <AutosaveIndicator 

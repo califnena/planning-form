@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
@@ -618,6 +619,7 @@ export default function Dashboard() {
 
   return (
     <AuthenticatedLayout>
+      <SEOHead title="My Dashboard | Everlasting Funeral Advisors" description="Access your personalized funeral planning dashboard. View progress, manage documents, and continue planning." canonicalUrl="https://planner.everlastingfuneraladvisors.com/dashboard" />
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Page Title and Purpose - Unified "My Wishes" */}
         <div className="mb-10 text-center">

@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -17,6 +18,7 @@ export default function PublicBenefits() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead title="Public Benefits & Assistance | Everlasting Funeral Advisors" description="Find public benefits and government assistance programs that may help cover funeral and burial costs in your state." canonicalUrl="https://planner.everlastingfuneraladvisors.com/public-benefits" />
       <PublicHeader />
       
       <main className="flex-1 container max-w-3xl mx-auto px-4 py-8">

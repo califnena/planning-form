@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
@@ -161,6 +162,7 @@ export default function PlannerStart() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
+      <SEOHead title="Start Planning | Everlasting Funeral Advisors" description="Begin your personalized funeral planning journey. Choose your planning mode and get started." canonicalUrl="https://planner.everlastingfuneraladvisors.com/planner/start" />
       <div className="text-center space-y-4">
         <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
         <p className="text-muted-foreground">

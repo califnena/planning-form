@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -81,6 +82,7 @@ export default function PlannerPreview() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+      <SEOHead title="Planner Preview | Everlasting Funeral Advisors" description="Preview the funeral planner before creating an account. See how easy it is to organize your wishes." canonicalUrl="https://planner.everlastingfuneraladvisors.com/planner-preview" />
       <PublicHeader />
 
       <main className="container mx-auto px-4 py-8 md:py-12">

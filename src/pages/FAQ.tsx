@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { trackFaqOpened } from '@/lib/analyticsTracker';
@@ -2006,6 +2007,7 @@ const FAQ = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="FAQ | Everlasting Funeral Advisors" description="Find answers to common questions about funeral pre-planning, costs, legal documents, and how our free planning tool works." canonicalUrl="https://planner.everlastingfuneraladvisors.com/faq" />
       <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
         <div className="flex justify-between items-start mb-8">
           <BackNavigation />

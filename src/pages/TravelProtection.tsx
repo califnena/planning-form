@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useNavigate } from "react-router-dom";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Card } from "@/components/ui/card";
@@ -10,6 +11,7 @@ export default function TravelProtection() {
 
   return (
     <AuthenticatedLayout>
+      <SEOHead title="Travel Protection Planning | Everlasting Funeral Advisors" description="Plan for the unexpected while traveling. Ensure your family is prepared with travel protection and emergency planning." canonicalUrl="https://planner.everlastingfuneraladvisors.com/travel-protection" />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">

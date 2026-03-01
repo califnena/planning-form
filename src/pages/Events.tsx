@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { format, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from "date-fns";
@@ -264,6 +265,7 @@ const Events = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Community Events | Everlasting Funeral Advisors" description="Find local funeral planning workshops, grief support groups, and community events near you." canonicalUrl="https://planner.everlastingfuneraladvisors.com/events" />
       <GlobalHeader />
       
       <main className="container mx-auto px-4 py-8">
