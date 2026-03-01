@@ -1,3 +1,4 @@
+ import SEOHead from "@/components/SEOHead";
  import { Button } from "@/components/ui/button";
  import { Card, CardContent } from "@/components/ui/card";
  import { Link, useNavigate } from "react-router-dom";
@@ -93,6 +94,13 @@ const LandingSenior = () => {
 
   return (
     <div className="min-h-screen bg-[hsl(var(--senior-cream))] text-[1.1rem] leading-relaxed">
+      <SEOHead
+        title="Free Funeral Planning Tool | Everlasting Funeral Advisors"
+        description="Plan ahead with confidence. Our free funeral planner helps families in Florida and across the U.S. organize end-of-life wishes, compare costs, and reduce stress for loved ones."
+        canonicalUrl="https://planner.everlastingfuneraladvisors.com/"
+        ogImage="https://planner.everlastingfuneraladvisors.com/og-image.jpg"
+        ogType="website"
+      />
       {/* Simple Header - warm and calm */}
       <header className="border-b border-border/50 sticky top-0 z-50 bg-[hsl(var(--senior-cream))]/95 backdrop-blur">
         <div className="max-w-[900px] mx-auto px-5 py-3 flex justify-between items-center">
