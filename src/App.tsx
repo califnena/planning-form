@@ -1,3 +1,4 @@
+import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -130,6 +131,7 @@ function RouteTrackerMount() {
 }
 
 const App = () => (
+  <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <I18nextProvider i18n={i18n}>
       <TextSizeProvider>
@@ -285,6 +287,7 @@ const App = () => (
       </TextSizeProvider>
     </I18nextProvider>
   </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;
