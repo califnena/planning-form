@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -202,6 +203,7 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Settings | Everlasting Funeral Advisors" description="Customize your planning experience. Adjust text size, accessibility options, and notification preferences." canonicalUrl="https://planner.everlastingfuneraladvisors.com/settings" />
       <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
         <div className="flex justify-between items-start mb-8">
           <Link to="/">

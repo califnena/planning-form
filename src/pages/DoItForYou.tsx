@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -69,6 +70,7 @@ export default function DoItForYou() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead title="Do It For You Service | Everlasting Funeral Advisors" description="Let our experts handle your funeral pre-planning. We'll guide you through every step with personalized, compassionate support." canonicalUrl="https://planner.everlastingfuneraladvisors.com/do-it-for-you" />
       <GlobalHeader />
       
       <main className="flex-1">

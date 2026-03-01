@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { AppFooter } from "@/components/AppFooter";
  import { useState } from "react";
@@ -8,6 +9,7 @@ const TermsOfService = () => {
  
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead title="Terms of Service | Everlasting Funeral Advisors" description="Review our terms of service for using the Everlasting Funeral Advisors planning platform." canonicalUrl="https://planner.everlastingfuneraladvisors.com/terms" />
       <GlobalHeader />
       
       <main className="flex-1 px-4 py-8 md:py-12">

@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -125,6 +126,7 @@ export default function Profile() {
 
   return (
     <>
+      <SEOHead title="My Profile | Everlasting Funeral Advisors" description="Manage your account profile, personal information, and preferences." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplansteps/profile" />
       <GlobalHeader />
       <div className="container max-w-2xl py-8">
       <Button 

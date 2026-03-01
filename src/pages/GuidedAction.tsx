@@ -1,4 +1,5 @@
 // Emotional flow pages: do not add pricing, progress bars, or extra choices here. Keep calm and simple.
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -176,6 +177,7 @@ export default function GuidedAction() {
 
   return (
     <div className="min-h-screen bg-background px-4 py-12">
+      <SEOHead title="Guided Action Steps | Everlasting Funeral Advisors" description="Follow guided action steps to complete your funeral planning tasks one at a time." canonicalUrl="https://planner.everlastingfuneraladvisors.com/guided-action" />
       <div className="max-w-xl mx-auto space-y-8">
         <div className="space-y-4">
           <h1 className="text-2xl md:text-3xl font-semibold text-foreground leading-tight">

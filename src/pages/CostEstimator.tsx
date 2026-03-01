@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -166,6 +167,7 @@ export default function CostEstimator() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEOHead title="Funeral Cost Estimator | Everlasting Funeral Advisors" description="Estimate funeral costs in your state. Compare cremation, burial, and service options to plan a budget that works for your family." canonicalUrl="https://planner.everlastingfuneraladvisors.com/resources/cost-estimator" />
       <GlobalHeader />
       
       <main className="flex-1 container max-w-4xl mx-auto px-4 py-8">

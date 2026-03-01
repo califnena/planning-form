@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -165,6 +166,7 @@ const Forms = () => {
   // User does NOT have access - show purchase prompt
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+      <SEOHead title="Printable Planning Forms | Everlasting Funeral Advisors" description="Download and print funeral planning forms to organize your wishes offline. Available with your planning subscription." canonicalUrl="https://planner.everlastingfuneraladvisors.com/forms" />
       <div className="max-w-2xl mx-auto px-4 py-12 md:py-20">
         <div className="flex justify-between items-start mb-8">
           <Link to="/">

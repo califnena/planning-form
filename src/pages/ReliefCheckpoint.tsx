@@ -1,4 +1,5 @@
 // Emotional flow pages: do not add pricing, progress bars, or extra choices here. Keep calm and simple.
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -101,6 +102,7 @@ export default function ReliefCheckpoint() {
 
   return (
     <div className="min-h-screen bg-background px-4 py-12">
+      <SEOHead title="Progress Check | Everlasting Funeral Advisors" description="Review your planning progress and see what you've accomplished so far." canonicalUrl="https://planner.everlastingfuneraladvisors.com/relief-checkpoint" />
       <div className="max-w-xl mx-auto space-y-8">
         <h1 className="text-2xl md:text-3xl font-semibold text-foreground text-center leading-tight">
           You've already taken care of important things.

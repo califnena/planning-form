@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FileText, Printer, CheckCircle2, ArrowLeft, Loader2 } from "lucide-react";
@@ -22,6 +23,7 @@ const PrintableFormPurchase = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead title="Printable Planning Form | Everlasting Funeral Advisors" description="Purchase a printable funeral planning form to organize your wishes offline. Simple, clear, and easy to complete." canonicalUrl="https://planner.everlastingfuneraladvisors.com/printable-form" />
       <PublicHeader />
       
       <main className="flex-1 max-w-3xl mx-auto px-4 py-8 md:py-12 w-full">

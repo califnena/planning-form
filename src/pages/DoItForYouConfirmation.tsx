@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +18,7 @@ export default function DoItForYouConfirmation() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead title="Service Confirmed | Everlasting Funeral Advisors" description="Your Do-It-For-You planning service is confirmed. Our team will be in touch to begin your personalized planning." canonicalUrl="https://planner.everlastingfuneraladvisors.com/do-it-for-you/confirmation" />
       <GlobalHeader />
       
       <main className="flex-1 flex items-center justify-center py-16 px-4">

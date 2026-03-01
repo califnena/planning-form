@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -84,6 +85,7 @@ export default function CustomSong() {
 
   return (
     <AuthenticatedLayout>
+      <SEOHead title="Custom Memorial Song | Everlasting Funeral Advisors" description="Create a personalized memorial song for your loved one. A unique, heartfelt tribute to celebrate their life and legacy." canonicalUrl="https://planner.everlastingfuneraladvisors.com/products/custom-song" />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-10">
           {/* Navigation Links */}

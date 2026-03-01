@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,6 +45,7 @@ const Unsubscribe = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEOHead title="Unsubscribe | Everlasting Funeral Advisors" description="Manage your email notification preferences." canonicalUrl="https://planner.everlastingfuneraladvisors.com/unsubscribe" />
       <GlobalHeader />
       
       <main className="flex-1 container mx-auto px-4 py-16 flex items-center justify-center">

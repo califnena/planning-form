@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Shield, AlertTriangle, ExternalLink, FileText, Scale, Heart, FileCheck, UserCheck, Stethoscope, XCircle } from "lucide-react";
@@ -10,6 +11,7 @@ import { LegalDisclaimer } from "@/components/ui/LegalDisclaimer";
 const LegalForms = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Legal Forms & Documents | Everlasting Funeral Advisors" description="Access essential legal forms for end-of-life planning including advance directives, power of attorney, and healthcare proxies." canonicalUrl="https://planner.everlastingfuneraladvisors.com/legal-forms" />
       {/* Header */}
       <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">

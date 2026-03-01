@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -856,6 +857,7 @@ export default function CareSupport() {
   // Show main assistant interface directly
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHead title="Care & Support | Everlasting Funeral Advisors" description="Get compassionate planning support from our care team. Guided assistance for funeral planning, grief support, and family coordination." canonicalUrl="https://planner.everlastingfuneraladvisors.com/care-support" />
       <GlobalHeader />
       
       <ClaireWelcomeModal isOpen={showWelcome} onClose={handleWelcomeClose} />

@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { AppFooter } from "@/components/AppFooter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,6 +51,7 @@ export default function ClaireFAQ() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/30">
+      <SEOHead title="Claire FAQ | Everlasting Funeral Advisors" description="Get answers about Claire, our compassionate AI planning assistant. Learn how Claire can help guide your funeral planning process." canonicalUrl="https://planner.everlastingfuneraladvisors.com/claire-faq" />
       <GlobalHeader />
       
       <main className="flex-1 container max-w-3xl mx-auto px-4 py-8 md:py-12">

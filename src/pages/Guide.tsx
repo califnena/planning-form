@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -180,6 +181,7 @@ export default function Guide() {
   // Default: show all guide topics
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead title="Planning Guide | Everlasting Funeral Advisors" description="A comprehensive guide to funeral pre-planning. Learn about each step of the process and make informed decisions for your family." canonicalUrl="https://planner.everlastingfuneraladvisors.com/guide" />
       <GlobalHeader />
       
       <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">

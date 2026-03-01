@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { CheckCircle2, Loader2, Download, Printer, BookOpen } from "lucide-react";
@@ -168,6 +169,7 @@ export default function PurchaseSuccess() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEOHead title="Purchase Successful | Everlasting Funeral Advisors" description="Thank you for your purchase! Access your planning tools and resources." canonicalUrl="https://planner.everlastingfuneraladvisors.com/purchase-success" />
       <PublicHeader />
 
       <main className="flex-1 container mx-auto px-4 py-12">

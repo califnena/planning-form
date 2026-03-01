@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ const NotFound = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6">
+      <SEOHead title="Page Not Found | Everlasting Funeral Advisors" description="The page you're looking for doesn't exist. Return home to continue your funeral planning journey." />
       <div className="text-center max-w-md">
         <div className="mb-8">
           <span className="text-6xl">🏠</span>

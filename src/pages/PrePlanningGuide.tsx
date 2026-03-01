@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ export default function PrePlanningGuide() {
 
   return (
     <AuthenticatedLayout>
+      <SEOHead title="Pre-Planning Guide | Everlasting Funeral Advisors" description="Download our comprehensive pre-planning guide to help organize your funeral wishes and important information." canonicalUrl="https://planner.everlastingfuneraladvisors.com/guide/legacy" />
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         <Card>
           <CardHeader>

@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -139,6 +140,7 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+      <SEOHead title="Create Account | Everlasting Funeral Advisors" description="Sign up for a free account to start planning ahead. Organize your end-of-life wishes, compare funeral costs, and protect your family." canonicalUrl="https://planner.everlastingfuneraladvisors.com/signup" />
       <div className="absolute top-4 left-4">
         <BackToHomeButton />
       </div>

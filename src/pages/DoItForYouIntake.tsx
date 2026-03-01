@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -268,6 +269,7 @@ export default function DoItForYouIntake() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead title="Planning Intake Form | Everlasting Funeral Advisors" description="Complete your intake form to begin your personalized funeral planning service. Share your preferences and needs." canonicalUrl="https://planner.everlastingfuneraladvisors.com/do-it-for-you/intake" />
       <GlobalHeader />
       
       <main className="flex-1 py-12 px-4">

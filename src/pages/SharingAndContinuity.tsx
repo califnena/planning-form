@@ -1,4 +1,5 @@
 // Emotional flow pages: do not add pricing, progress bars, or extra choices here. Keep calm and simple.
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -151,6 +152,7 @@ export default function SharingAndContinuity() {
 
   return (
     <div className="min-h-screen bg-background px-4 py-12">
+      <SEOHead title="Sharing & Continuity | Everlasting Funeral Advisors" description="Set up sharing options and continuity plans so your loved ones can access your planning information when needed." canonicalUrl="https://planner.everlastingfuneraladvisors.com/sharing" />
       <div className="max-w-2xl mx-auto space-y-8">
         <h1 className="text-2xl md:text-3xl font-semibold text-foreground text-center leading-tight">
           Keep Your Plan Safe

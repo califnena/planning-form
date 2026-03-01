@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FileText, Star, BookOpen, Music, Printer, Users, ListChecks, ShoppingBag, Plane, Lock, Eye } from "lucide-react";
@@ -34,6 +35,7 @@ export default function DashboardPreview() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Dashboard Preview | Everlasting Funeral Advisors" description="Preview the planning dashboard and see what's available with your account." canonicalUrl="https://planner.everlastingfuneraladvisors.com/dashboard-preview" />
       <PublicHeader />
       
       <div className="container mx-auto px-4 py-8 max-w-6xl">

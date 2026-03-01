@@ -1,3 +1,4 @@
+ import SEOHead from "@/components/SEOHead";
  import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -184,6 +185,7 @@ export default function Billing() {
 
   return (
     <div className="container max-w-4xl py-8 space-y-8">
+      <SEOHead title="Billing & Invoices | Everlasting Funeral Advisors" description="Manage your subscription, view invoices, and update payment methods for your funeral planning account." canonicalUrl="https://planner.everlastingfuneraladvisors.com/billing" />
       <Button 
         variant="ghost" 
         onClick={() => navigate("/dashboard")}
