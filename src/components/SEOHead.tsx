@@ -6,9 +6,10 @@ interface SEOHeadProps {
   canonicalUrl?: string;
   ogImage?: string;
   ogType?: string;
+  jsonLd?: Record<string, unknown>;
 }
 
-const SEOHead = ({ title, description, canonicalUrl, ogImage, ogType = "website" }: SEOHeadProps) => (
+const SEOHead = ({ title, description, canonicalUrl, ogImage, ogType = "website", jsonLd }: SEOHeadProps) => (
   <Helmet>
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -22,6 +23,11 @@ const SEOHead = ({ title, description, canonicalUrl, ogImage, ogType = "website"
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     {ogImage && <meta name="twitter:image" content={ogImage} />}
+    {jsonLd && (
+      <script type="application/ld+json">
+        {JSON.stringify(jsonLd)}
+      </script>
+    )}
   </Helmet>
 );
 

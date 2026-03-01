@@ -100,6 +100,32 @@ const LandingSenior = () => {
         canonicalUrl="https://planner.everlastingfuneraladvisors.com/"
         ogImage="https://planner.everlastingfuneraladvisors.com/og-image.jpg"
         ogType="website"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "name": "Everlasting Funeral Advisors",
+          "url": "https://everlastingfuneraladvisors.com",
+          "description": "Funeral planning advisory services helping Florida families and individuals nationwide plan ahead, reduce costs, and relieve loved ones of difficult decisions.",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "FishHawk",
+            "addressRegion": "FL",
+            "addressCountry": "US"
+          },
+          "serviceArea": {
+            "@type": "Country",
+            "name": "United States"
+          },
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Funeral Planning Services",
+            "itemListElement": [
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Pre-Need Funeral Planning" } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Funeral Cost Comparison" } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "End-of-Life Document Organization" } }
+            ]
+          }
+        }}
       />
       {/* Simple Header - warm and calm */}
       <header className="border-b border-border/50 sticky top-0 z-50 bg-[hsl(var(--senior-cream))]/95 backdrop-blur">
