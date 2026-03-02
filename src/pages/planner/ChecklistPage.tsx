@@ -3,6 +3,7 @@ import { SectionChecklist } from "@/components/planner/sections/SectionChecklist
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
+import SEOHead from "@/components/SEOHead";
 
 /**
  * ChecklistPage
@@ -16,6 +17,7 @@ export default function ChecklistPage() {
 
   return (
     <div>
+      <SEOHead title="Planning Checklist | Everlasting Funeral Advisors" description="Track your pre-planning progress with our comprehensive funeral planning checklist." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplandashboard/checklist" />
       <div className="flex justify-between items-center mb-4">
         <AutosaveIndicator 
           saving={saveState.saving} 

@@ -3,6 +3,7 @@ import { SectionProperty } from "@/components/planner/sections/SectionProperty";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
+import SEOHead from "@/components/SEOHead";
 
 /**
  * PropertyValuablesPage
@@ -18,6 +19,7 @@ export default function PropertyValuablesPage() {
 
   return (
     <div>
+      <SEOHead title="Property & Valuables | Everlasting Funeral Advisors" description="Document your property, real estate, and valuable possessions for your family's reference." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplandashboard/property-valuables" />
       <div className="flex justify-between items-center mb-4">
         <AutosaveIndicator 
           saving={saveState.saving} 

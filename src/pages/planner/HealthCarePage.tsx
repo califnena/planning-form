@@ -4,6 +4,7 @@ import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
 import { useEffect } from "react";
+import SEOHead from "@/components/SEOHead";
 
 /**
  * HealthCarePage
@@ -43,6 +44,7 @@ export default function HealthCarePage() {
 
   return (
     <div>
+      <SEOHead title="Health Care | Everlasting Funeral Advisors" description="Document your health care information, medical history, and physician details." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplandashboard/health-care" />
       <div className="flex justify-between items-center mb-4">
         <AutosaveIndicator 
           saving={saveState.saving} 

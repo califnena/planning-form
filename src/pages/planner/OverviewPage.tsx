@@ -1,6 +1,7 @@
 import { SectionOverview } from "@/components/planner/sections/SectionOverview";
 import { useNavigate } from "react-router-dom";
 import NotAdviceNote from "@/components/NotAdviceNote";
+import SEOHead from "@/components/SEOHead";
 
 // Section ID to route mapping
 const sectionIdToRoute: Record<string, string> = {
@@ -27,6 +28,7 @@ export default function OverviewPage() {
 
   return (
     <>
+      <SEOHead title="Planner Overview | Everlasting Funeral Advisors" description="View your funeral planning progress and navigate to each section of your end-of-life plan." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplandashboard/overview" />
       <NotAdviceNote />
       <SectionOverview
         onNavigateToChecklist={() => navigate("/preplandashboard/checklist")}

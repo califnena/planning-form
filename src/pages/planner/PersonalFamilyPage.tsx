@@ -6,6 +6,7 @@ import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Users } from "lucide-react";
+import SEOHead from "@/components/SEOHead";
 
 /**
  * PersonalFamilyPage
@@ -21,6 +22,7 @@ export default function PersonalFamilyPage() {
 
   return (
     <div>
+      <SEOHead title="Personal & Family Info | Everlasting Funeral Advisors" description="Enter your personal details and family background to build a complete end-of-life plan." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplandashboard/personal-family" />
       <div className="flex justify-between items-center mb-4">
         <AutosaveIndicator 
           saving={saveState.saving} 

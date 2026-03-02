@@ -4,6 +4,7 @@ import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
 import { useEffect } from "react";
+import SEOHead from "@/components/SEOHead";
 
 /**
  * CarePreferencesPage
@@ -42,6 +43,7 @@ export default function CarePreferencesPage() {
 
   return (
     <div>
+      <SEOHead title="Care Preferences | Everlasting Funeral Advisors" description="Outline your care and comfort preferences to guide loved ones in honoring your wishes." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplandashboard/care-preferences" />
       <div className="flex justify-between items-center mb-4">
         <AutosaveIndicator 
           saving={saveState.saving} 

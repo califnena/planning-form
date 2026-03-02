@@ -3,6 +3,7 @@ import { SectionSignature } from "@/components/planner/sections/SectionSignature
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
+import SEOHead from "@/components/SEOHead";
 
 /**
  * SignaturePage
@@ -18,6 +19,7 @@ export default function SignaturePage() {
 
   return (
     <div>
+      <SEOHead title="Review & Signature | Everlasting Funeral Advisors" description="Review your completed plan and add your signature to finalize your end-of-life wishes." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplandashboard/signature" />
       <div className="flex justify-between items-center mb-4">
         <AutosaveIndicator 
           saving={saveState.saving} 

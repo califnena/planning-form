@@ -3,6 +3,7 @@ import { SectionFuneral } from "@/components/planner/sections/SectionFuneral";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
+import SEOHead from "@/components/SEOHead";
 
 /**
  * FuneralWishesPage
@@ -18,6 +19,7 @@ export default function FuneralWishesPage() {
 
   return (
     <div>
+      <SEOHead title="Funeral Wishes | Everlasting Funeral Advisors" description="Record your funeral service preferences including burial, cremation, and memorial wishes." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplandashboard/funeral-wishes" />
       <div className="flex justify-between items-center mb-4">
         <AutosaveIndicator 
           saving={saveState.saving} 
