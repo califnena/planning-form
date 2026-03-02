@@ -3,6 +3,7 @@ import { SectionContacts } from "@/components/planner/sections/SectionContacts";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
+import SEOHead from "@/components/SEOHead";
 
 /**
  * ContactsPage
@@ -18,6 +19,7 @@ export default function ContactsPage() {
 
   return (
     <div>
+      <SEOHead title="Important Contacts | Everlasting Funeral Advisors" description="List the people who should be notified and important contacts for your end-of-life plan." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplandashboard/contacts" />
       <div className="flex justify-between items-center mb-4">
         <AutosaveIndicator 
           saving={saveState.saving} 

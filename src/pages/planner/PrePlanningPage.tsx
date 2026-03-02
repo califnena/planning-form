@@ -3,6 +3,7 @@ import { SectionPrePlanning } from "@/components/planner/sections/SectionPrePlan
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import SEOHead from "@/components/SEOHead";
 
 export default function PrePlanningPage() {
   const { user, saveState } = usePlanContext();
@@ -40,6 +41,7 @@ export default function PrePlanningPage() {
 
   return (
     <div>
+      <SEOHead title="Pre-Planning Overview | Everlasting Funeral Advisors" description="Begin your pre-planning journey with a guided overview of all the steps involved." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplandashboard/pre-planning" />
       <div className="flex justify-between items-center mb-4">
         <AutosaveIndicator 
           saving={saveState.saving} 

@@ -3,6 +3,7 @@ import { SectionLegacy } from "@/components/planner/sections/SectionLegacy";
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
+import SEOHead from "@/components/SEOHead";
 
 /**
  * LifeStoryPage
@@ -18,6 +19,7 @@ export default function LifeStoryPage() {
 
   return (
     <div>
+      <SEOHead title="Life Story & Legacy | Everlasting Funeral Advisors" description="Capture your life story, memories, and legacy for your family to cherish." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplandashboard/life-story" />
       <div className="flex justify-between items-center mb-4">
         <AutosaveIndicator 
           saving={saveState.saving} 

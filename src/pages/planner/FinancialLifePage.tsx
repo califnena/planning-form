@@ -3,6 +3,7 @@ import { SectionFinancial } from "@/components/planner/sections/SectionFinancial
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
+import SEOHead from "@/components/SEOHead";
 
 /**
  * FinancialLifePage
@@ -18,6 +19,7 @@ export default function FinancialLifePage() {
 
   return (
     <div>
+      <SEOHead title="Financial Life | Everlasting Funeral Advisors" description="Document your financial accounts, assets, and information for your family's reference." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplandashboard/financial-life" />
       <div className="flex justify-between items-center mb-4">
         <AutosaveIndicator 
           saving={saveState.saving} 

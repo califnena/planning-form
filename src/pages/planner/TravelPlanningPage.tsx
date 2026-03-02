@@ -4,6 +4,7 @@ import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
 import { useEffect } from "react";
+import SEOHead from "@/components/SEOHead";
 
 /**
  * TravelPlanningPage
@@ -44,6 +45,7 @@ export default function TravelPlanningPage() {
 
   return (
     <div>
+      <SEOHead title="Travel Planning | Everlasting Funeral Advisors" description="Plan for travel and away-from-home arrangements as part of your end-of-life preparation." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplandashboard/travel-planning" />
       <div className="flex justify-between items-center mb-4">
         <AutosaveIndicator 
           saving={saveState.saving} 

@@ -4,6 +4,7 @@ import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
 import { ClearSectionButton } from "@/components/planner/ClearSectionButton";
+import SEOHead from "@/components/SEOHead";
 
 /**
  * DigitalPage
@@ -24,6 +25,7 @@ export default function DigitalPage() {
 
   return (
     <div>
+      <SEOHead title="Digital Accounts | Everlasting Funeral Advisors" description="Organize your online accounts and digital assets so loved ones can manage them when needed." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplandashboard/digital" />
       <div className="flex justify-between items-center mb-4">
         <AutosaveIndicator 
           saving={saveState.saving} 

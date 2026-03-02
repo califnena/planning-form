@@ -3,6 +3,7 @@ import { SectionAdvanceDirective, AdvanceDirectiveData } from "@/components/plan
 import { PreviewModeWrapper } from "@/components/planner/PreviewModeWrapper";
 import { SectionNavigation } from "@/components/planner/SectionNavigation";
 import { AutosaveIndicator } from "@/components/planner/AutosaveIndicator";
+import SEOHead from "@/components/SEOHead";
 
 /**
  * AdvanceDirectivePage
@@ -29,6 +30,7 @@ export default function AdvanceDirectivePage() {
 
   return (
     <div>
+      <SEOHead title="Advance Directive | Everlasting Funeral Advisors" description="Document your advance healthcare directive and living will preferences for end-of-life medical care." canonicalUrl="https://planner.everlastingfuneraladvisors.com/preplandashboard/advance-directive" />
       <div className="flex justify-between items-center mb-4">
         <AutosaveIndicator 
           saving={saveState.saving} 
